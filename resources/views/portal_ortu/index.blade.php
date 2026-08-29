@@ -1752,7 +1752,8 @@
 
       if (type === 'absen') {
         if (!secAbsen) return;
-        if (secAbsen.style.display === 'none' || secAbsen.style.display === '') {
+        const isHidden = (secAbsen.style.display === 'none' || !secAbsen.style.display);
+        if (isHidden) {
           secAbsen.style.display = 'block';
           if (secKasus) secKasus.style.display = 'none';
           if (secPengumuman) secPengumuman.style.display = 'none';
@@ -1768,7 +1769,8 @@
         }
       } else if (type === 'kasus') {
         if (!secKasus) return;
-        if (secKasus.style.display === 'none' || secKasus.style.display === '') {
+        const isHidden = (secKasus.style.display === 'none' || !secKasus.style.display);
+        if (isHidden) {
           secKasus.style.display = 'block';
           if (secAbsen) secAbsen.style.display = 'none';
           if (secPengumuman) secPengumuman.style.display = 'none';
@@ -1784,7 +1786,8 @@
         }
       } else if (type === 'pengumuman') {
         if (!secPengumuman) return;
-        if (secPengumuman.style.display === 'none' || secPengumuman.style.display === '') {
+        const isHidden = (secPengumuman.style.display === 'none' || !secPengumuman.style.display);
+        if (isHidden) {
           secPengumuman.style.display = 'block';
           if (secAbsen) secAbsen.style.display = 'none';
           if (secKasus) secKasus.style.display = 'none';
@@ -1800,6 +1803,7 @@
         }
       }
     }
+    window.togglePortalSection = togglePortalSection;
 
     document.addEventListener('DOMContentLoaded', function() {
       const secAbsen = document.getElementById('riwayat-kehadiran');
@@ -1832,6 +1836,9 @@
         if (secPengumuman) secPengumuman.style.display = 'none';
         if (btnAbsen) btnAbsen.classList.add('active');
         if (btnKasus) btnKasus.classList.remove('active');
+        if (btnPengumuman) btnPengumuman.classList.remove('active');
+      }
+
       @if($siswa)
         saveSiswaToLocalStorage({
           nis: "{{ $siswa->nis }}",
