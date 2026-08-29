@@ -525,8 +525,8 @@
     {{-- ══ 4. RIWAYAT PERUBAHAN JADWAL (TABEL TERPADU) ══ --}}
     <div class="panel" style="padding:0; overflow:hidden; border:1px solid var(--border); border-radius:var(--r-md); box-shadow:var(--shadow-sm); background:var(--bg-2); margin-bottom:24px;">
       <div style="padding:14px 18px; border-bottom:1px solid var(--border); background:var(--surface); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
-        <div style="font-size:15px; font-weight:800; color:var(--text); display:flex; align-items:center; gap:8px;">
-          <i class="bi bi-clock-history" style="color:var(--gold);"></i>
+        <div style="font-size:15px; font-weight:800; color:#000000; display:flex; align-items:center; gap:8px;">
+          <i class="bi bi-clock-history" style="color:#000000;"></i>
           <span>Riwayat Jadwal Operasional (10 Hari Terakhir)</span>
         </div>
       </div>
@@ -541,49 +541,49 @@
           <table class="data-table" style="width:100%; border-collapse:collapse;">
             <thead>
               <tr style="background:var(--bg-3);">
-                <th style="padding:12px 14px;">Tanggal</th>
-                <th style="padding:12px 14px;">Hari</th>
-                <th style="padding:12px 14px; text-align:center;">Batas Masuk</th>
-                <th style="padding:12px 14px; text-align:center;">Mulai Pulang</th>
-                <th style="padding:12px 14px; text-align:center;">Tutup Gerbang</th>
-                <th style="padding:12px 14px;">Keterangan</th>
-                <th style="padding:12px 14px;">Diubah Oleh</th>
+                <th style="padding:12px 14px; color:#000000; font-weight:800;">Tanggal</th>
+                <th style="padding:12px 14px; color:#000000; font-weight:800;">Hari</th>
+                <th style="padding:12px 14px; text-align:center; color:#000000; font-weight:800;">Batas Masuk</th>
+                <th style="padding:12px 14px; text-align:center; color:#000000; font-weight:800;">Mulai Pulang</th>
+                <th style="padding:12px 14px; text-align:center; color:#000000; font-weight:800;">Tutup Gerbang</th>
+                <th style="padding:12px 14px; color:#000000; font-weight:800;">Keterangan</th>
+                <th style="padding:12px 14px; color:#000000; font-weight:800;">Diubah Oleh</th>
               </tr>
             </thead>
             <tbody>
               @foreach($riwayatJadwal as $rj)
                 @php $isToday = $rj->tanggal === $today; @endphp
-                <tr style="border-bottom:1px solid var(--border); {{ $isToday ? 'background:rgba(202,138,4,0.04);' : '' }}">
+                <tr style="border-bottom:1px solid var(--border);">
                   <td style="padding:12px 14px;">
-                    <span style="font-family:var(--font-mono); font-weight:700; color:{{ $isToday ? 'var(--gold)' : 'var(--text)' }};">
+                    <span style="font-family:var(--font-mono); font-weight:700; color:#000000;">
                       {{ \Carbon\Carbon::parse($rj->tanggal)->format('d/m/Y') }}
                     </span>
                     @if($isToday)
-                      &nbsp;<span class="badge" style="background:var(--gold-dim); color:var(--gold); font-size:10px; font-weight:800; border:1px solid rgba(202,138,4,0.3);">HARI INI</span>
+                      &nbsp;<span style="color:#000000; font-size:10px; font-weight:800;">HARI INI</span>
                     @endif
                   </td>
-                  <td style="padding:12px 14px; color:var(--text-2); font-weight:600;">
+                  <td style="padding:12px 14px; color:#000000; font-weight:700;">
                     {{ \Carbon\Carbon::parse($rj->tanggal)->translatedFormat('l') }}
                   </td>
                   <td style="padding:12px 14px; text-align:center;">
-                    <span class="badge" style="background:rgba(34,197,94,0.12); color:#16A34A; border:1px solid rgba(34,197,94,0.3); font-family:var(--font-mono); font-weight:800; font-size:11px;">
+                    <span style="font-family:var(--font-mono); font-weight:800; font-size:13px; color:#000000;">
                       {{ substr($rj->jam_masuk_toleransi, 0, 5) }}
                     </span>
                   </td>
                   <td style="padding:12px 14px; text-align:center;">
-                    <span class="badge" style="background:rgba(234,179,8,0.15); color:#CA8A04; border:1px solid rgba(234,179,8,0.3); font-family:var(--font-mono); font-weight:800; font-size:11px;">
+                    <span style="font-family:var(--font-mono); font-weight:800; font-size:13px; color:#000000;">
                       {{ substr($rj->jam_pulang_mulai, 0, 5) }}
                     </span>
                   </td>
                   <td style="padding:12px 14px; text-align:center;">
-                    <span class="badge" style="background:rgba(239,68,68,0.12); color:#DC2626; border:1px solid rgba(239,68,68,0.3); font-family:var(--font-mono); font-weight:800; font-size:11px;">
+                    <span style="font-family:var(--font-mono); font-weight:800; font-size:13px; color:#000000;">
                       {{ substr($rj->jam_tutup_gerbang ?? '18:00', 0, 5) }}
                     </span>
                   </td>
-                  <td style="padding:12px 14px; color:var(--text); font-size:12.5px; font-weight:600;">
+                  <td style="padding:12px 14px; color:#000000; font-size:12.5px; font-weight:600;">
                     {{ $rj->keterangan ?? '—' }}
                   </td>
-                  <td style="padding:12px 14px; color:var(--text-3); font-size:11.5px; font-family:var(--font-mono);">
+                  <td style="padding:12px 14px; color:#000000; font-size:11.5px; font-family:var(--font-mono); font-weight:700;">
                     {{ $rj->diubah_oleh ?? 'Sistem' }}
                   </td>
                 </tr>
