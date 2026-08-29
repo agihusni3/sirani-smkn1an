@@ -78,22 +78,24 @@
       gap: 8px;
     }
     .btn-print {
-      background: linear-gradient(135deg, #FACC15, #EAB308);
-      color: #0F172A;
+      background: #000000;
+      color: #FFFFFF;
       font-weight: 800;
       font-size: 13px;
       padding: 8px 18px;
       border-radius: 8px;
-      border: none;
+      border: 1px solid #000000;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
       gap: 6px;
       text-decoration: none;
-      box-shadow: 0 2px 8px rgba(234, 179, 8, 0.4);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
       transition: transform .15s;
     }
     .btn-print:hover {
+      background: #262626;
+      border-color: #262626;
       transform: translateY(-1px);
     }
     .btn-back {

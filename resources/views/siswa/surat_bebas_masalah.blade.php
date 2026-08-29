@@ -73,10 +73,10 @@
       gap: 8px;
     }
     .btn-print {
-      background: #EAB308;
-      color: #0F172A;
+      background: #000000;
+      color: #FFFFFF;
       font-weight: 800;
-      border: none;
+      border: 1px solid #000000;
       padding: 8px 16px;
       border-radius: 8px;
       font-size: 12px;
@@ -85,9 +85,11 @@
       align-items: center;
       gap: 6px;
       transition: all .2s ease;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
     }
     .btn-print:hover {
-      background: #FACC15;
+      background: #262626;
+      border-color: #262626;
       transform: translateY(-1px);
     }
     .btn-back {

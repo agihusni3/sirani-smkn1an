@@ -74,9 +74,9 @@
       color: #FFFFFF;
     }
     .btn-print {
-      background: linear-gradient(135deg, #CA8A04, #EAB308);
-      color: #0F172A;
-      border: none;
+      background: #000000;
+      color: #FFFFFF;
+      border: 1px solid #000000;
       padding: 9px 22px;
       border-radius: 8px;
       font-size: 13px;
@@ -85,9 +85,11 @@
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      box-shadow: 0 4px 14px rgba(202,138,4,0.4);
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
     }
     .btn-print:hover {
+      background: #262626;
+      border-color: #262626;
       transform: translateY(-1px);
     }
 
