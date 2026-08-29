@@ -1220,8 +1220,8 @@
                 <tbody>
                   <tr>
                     <td style="white-space:nowrap;">
-                      <span class="status-badge status-hadir" style="font-size:11.5px;">
-                        <i class="bi bi-check-circle-fill"></i> Hadir Tepat Waktu
+                      <span style="font-weight:800; font-size:13px; color:var(--text);">
+                        Hadir Tepat Waktu
                       </span>
                     </td>
                     <td style="text-align:center; font-family:var(--font-mono); font-weight:900; font-size:14px; color:var(--text);">
@@ -1236,8 +1236,8 @@
                   </tr>
                   <tr>
                     <td style="white-space:nowrap;">
-                      <span class="status-badge status-terlambat" style="font-size:11.5px;">
-                        <i class="bi bi-clock-fill"></i> Terlambat Hadir
+                      <span style="font-weight:800; font-size:13px; color:var(--text);">
+                        Terlambat Hadir
                       </span>
                     </td>
                     <td style="text-align:center; font-family:var(--font-mono); font-weight:900; font-size:14px; color:var(--text);">
@@ -1252,8 +1252,8 @@
                   </tr>
                   <tr>
                     <td style="white-space:nowrap;">
-                      <span class="status-badge status-izin" style="font-size:11.5px;">
-                        <i class="bi bi-file-earmark-medical-fill"></i> Izin (Disetujui)
+                      <span style="font-weight:800; font-size:13px; color:var(--text);">
+                        Izin (Disetujui)
                       </span>
                     </td>
                     <td style="text-align:center; font-family:var(--font-mono); font-weight:900; font-size:14px; color:var(--text);">
@@ -1268,8 +1268,8 @@
                   </tr>
                   <tr>
                     <td style="white-space:nowrap;">
-                      <span class="status-badge status-sakit" style="font-size:11.5px;">
-                        <i class="bi bi-heart-pulse-fill"></i> Sakit
+                      <span style="font-weight:800; font-size:13px; color:var(--text);">
+                        Sakit
                       </span>
                     </td>
                     <td style="text-align:center; font-family:var(--font-mono); font-weight:900; font-size:14px; color:var(--text);">
@@ -1284,8 +1284,8 @@
                   </tr>
                   <tr>
                     <td style="white-space:nowrap;">
-                      <span class="status-badge status-alpha" style="font-size:11.5px;">
-                        <i class="bi bi-x-circle-fill"></i> Alpha (Tanpa Keterangan)
+                      <span style="font-weight:800; font-size:13px; color:var(--text);">
+                        Alpha (Tanpa Keterangan)
                       </span>
                     </td>
                     <td style="text-align:center; font-family:var(--font-mono); font-weight:900; font-size:14px; color:var(--text);">
@@ -1294,14 +1294,14 @@
                     <td style="text-align:center; font-family:var(--font-mono); font-weight:800; font-size:13px; color:var(--text-2);">
                       {{ $stats['total'] > 0 ? round(($stats['alpha'] / $stats['total']) * 100, 1) : 0 }}%
                     </td>
-                    <td style="font-size:12px; color:{{ $stats['alpha'] > 0 ? 'var(--red)' : 'var(--text-2)' }};">
+                    <td style="font-size:12px; color:var(--text);">
                       {{ $stats['alpha'] > 0 ? 'Perlu perhatian wali murid & konfirmasi ke wali kelas' : 'Tidak ada catatan alpha (Tertib)' }}
                     </td>
                   </tr>
                   <tr>
                     <td style="white-space:nowrap;">
-                      <span class="status-badge status-bolos" style="font-size:11.5px;">
-                        <i class="bi bi-exclamation-triangle-fill"></i> Bolos
+                      <span style="font-weight:800; font-size:13px; color:var(--text);">
+                        Bolos
                       </span>
                     </td>
                     <td style="text-align:center; font-family:var(--font-mono); font-weight:900; font-size:14px; color:var(--text);">
@@ -1310,13 +1310,13 @@
                     <td style="text-align:center; font-family:var(--font-mono); font-weight:800; font-size:13px; color:var(--text-2);">
                       {{ $stats['total'] > 0 ? round(($stats['bolos'] / $stats['total']) * 100, 1) : 0 }}%
                     </td>
-                    <td style="font-size:12px; color:{{ $stats['bolos'] > 0 ? '#991B1B' : 'var(--text-2)' }};">
+                    <td style="font-size:12px; color:var(--text);">
                       {{ $stats['bolos'] > 0 ? 'Meninggalkan KBM tanpa izin piket' : 'Tidak ada catatan bolos' }}
                     </td>
                   </tr>
                   <tr style="background:var(--bg-subtle); font-weight:800; border-top:2px solid var(--border);">
                     <td style="white-space:nowrap; font-weight:900; color:var(--text);">
-                      <i class="bi bi-calculator" style="color:var(--gold);"></i> TOTAL HARI EFEKTIF
+                      TOTAL HARI EFEKTIF
                     </td>
                     <td style="text-align:center; font-family:var(--font-mono); font-weight:900; font-size:14.5px; color:var(--text);">
                       {{ $stats['total'] }} Hari
@@ -1362,17 +1362,17 @@
                       </td>
                       <td style="text-align:center; white-space:nowrap;">
                         @if($abs->status === 'hadir')
-                          <span class="status-badge status-hadir"><i class="bi bi-check-circle-fill"></i> Hadir Tepat Waktu</span>
+                          <span style="font-weight:800; font-size:12.5px; color:var(--text);">Hadir Tepat Waktu</span>
                         @elseif($abs->status === 'terlambat')
-                          <span class="status-badge status-terlambat"><i class="bi bi-clock-fill"></i> Terlambat</span>
+                          <span style="font-weight:800; font-size:12.5px; color:var(--text);">Terlambat</span>
                         @elseif($abs->status === 'izin')
-                          <span class="status-badge status-izin"><i class="bi bi-file-earmark-medical-fill"></i> Izin</span>
+                          <span style="font-weight:800; font-size:12.5px; color:var(--text);">Izin</span>
                         @elseif($abs->status === 'sakit')
-                          <span class="status-badge status-sakit"><i class="bi bi-heart-pulse-fill"></i> Sakit</span>
+                          <span style="font-weight:800; font-size:12.5px; color:var(--text);">Sakit</span>
                         @elseif($abs->status === 'bolos')
-                          <span class="status-badge status-bolos"><i class="bi bi-exclamation-triangle-fill"></i> Bolos</span>
+                          <span style="font-weight:800; font-size:12.5px; color:var(--text);">Bolos</span>
                         @elseif($abs->status === 'alpha')
-                          <span class="status-badge status-alpha"><i class="bi bi-x-circle-fill"></i> Alpha</span>
+                          <span style="font-weight:800; font-size:12.5px; color:var(--text);">Alpha</span>
                         @endif
                       </td>
                       <td style="font-size:12.5px; color:var(--text-2); min-width:180px;">
