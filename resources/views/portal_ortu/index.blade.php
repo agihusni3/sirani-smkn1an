@@ -1622,6 +1622,8 @@
             <strong>Prinsip Pendidikan Positif:</strong> Seluruh catatan ketertiban bersifat edukatif dan dapat dipulihkan melalui perbaikan perilaku, keaktifan ibadah, serta konsistensi hadir tepat waktu di sekolah.
           </span>
         </div>
+      </div>
+
       {{-- 4. PENGUMUMAN RESMI SEKOLAH --}}
       <div class="dossier-card" id="section-pengumuman" style="margin-top: 20px; scroll-margin-top: 70px; display: none;">
         <div class="dossier-header">
