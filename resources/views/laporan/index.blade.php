@@ -64,11 +64,14 @@
     }
     .period-chip:hover { color: var(--text); background: rgba(255,255,255,0.06); border-color: var(--border-2); }
     .period-chip.active { 
-      background: linear-gradient(135deg, var(--gold), var(--gold-2)); 
-      color: #0F172A; 
-      border-color: var(--gold); 
+      background: #000000 !important; 
+      color: #FFFFFF !important; 
+      border-color: #000000 !important; 
       font-weight: 800; 
-      box-shadow: 0 2px 8px var(--gold-glow); 
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25); 
+    }
+    .period-chip.active i {
+      color: #FFFFFF !important;
     }
 
     /* Executive KPI Grid */
@@ -753,25 +756,6 @@
           </div>
         </div>
       </form>
-
-      <!-- Action Toolbar (Print & Export) -->
-      <div style="display:flex; gap:12px; margin-top:18px; padding-top:14px; border-top:1px solid var(--border); justify-content:space-between; align-items:center; flex-wrap:wrap;">
-        <div style="font-size:12.5px; color:var(--text-3); display:flex; align-items:center; gap:6px;">
-          <i class="bi bi-info-circle-fill" style="color:var(--gold);"></i>
-          <span>Menampilkan: <strong style="color:var(--text);">{{ $periodeText }}</strong></span>
-        </div>
-        <div style="display:flex; gap:8px;">
-          <button onclick="window.print()" class="btn btn-outline" style="height:36px; font-size:12px; font-weight:700; display:inline-flex; align-items:center; gap:6px;" data-tooltip="Cetak Langsung Format A4" title="Cetak Langsung Format A4">
-            <i class="bi bi-printer-fill"></i> Cetak A4
-          </button>
-          <a href="{{ route('laporan.cetak-pdf', request()->query()) }}" target="_blank" class="btn btn-outline" style="height:36px; font-size:12px; font-weight:700; color:var(--red); border-color:rgba(239,68,68,0.4); display:inline-flex; align-items:center; gap:6px;" data-tooltip="Download File PDF Resmi" title="Download File PDF Resmi">
-            <i class="bi bi-file-earmark-pdf-fill"></i> PDF Resmi
-          </a>
-          <a href="{{ route('laporan.export-csv', request()->query()) }}" class="btn btn-outline" style="height:36px; font-size:12px; font-weight:700; color:var(--green); border-color:rgba(34,197,94,0.4); display:inline-flex; align-items:center; gap:6px;" data-tooltip="Export Data ke Excel/CSV" title="Export Data ke Excel/CSV">
-            <i class="bi bi-file-earmark-excel-fill"></i> Export Excel/CSV
-          </a>
-        </div>
-      </div>
     </div>
 
     @if(in_array($periode, ['mingguan', 'bulanan', 'tahunan']))
@@ -783,6 +767,17 @@
           <div style="font-weight:800; font-size:15px; color:var(--text); display:flex; align-items:center; gap:8px;">
             <i class="bi bi-file-earmark-spreadsheet-fill" style="color:var(--gold);"></i>
             <span>Rekapitulasi {{ ucfirst($kategori) }} ({{ ucfirst($periode) }})</span>
+          </div>
+          <div style="display:flex; gap:8px;">
+            <button onclick="window.print()" class="btn btn-outline" style="height:36px; font-size:12px; font-weight:700; display:inline-flex; align-items:center; gap:6px;" data-tooltip="Cetak Langsung Format A4" title="Cetak Langsung Format A4">
+              <i class="bi bi-printer-fill"></i> Cetak A4
+            </button>
+            <a href="{{ route('laporan.cetak-pdf', request()->query()) }}" target="_blank" class="btn btn-outline" style="height:36px; font-size:12px; font-weight:700; color:var(--red); border-color:rgba(239,68,68,0.4); display:inline-flex; align-items:center; gap:6px;" data-tooltip="Download File PDF Resmi" title="Download File PDF Resmi">
+              <i class="bi bi-file-earmark-pdf-fill"></i> PDF Resmi
+            </a>
+            <a href="{{ route('laporan.export-csv', request()->query()) }}" class="btn btn-outline" style="height:36px; font-size:12px; font-weight:700; color:var(--green); border-color:rgba(34,197,94,0.4); display:inline-flex; align-items:center; gap:6px;" data-tooltip="Export Data ke Excel/CSV" title="Export Data ke Excel/CSV">
+              <i class="bi bi-file-earmark-excel-fill"></i> Export Excel/CSV
+            </a>
           </div>
         </div>
 
@@ -945,15 +940,23 @@
       @endif
 
       <div class="panel" style="padding:0; overflow:hidden;">
-        <div class="panel-title no-print" style="padding:14px 18px; margin:0; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center;">
+        <div class="panel-title no-print" style="padding:14px 18px; margin:0; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
           <div>
             <span><i class="bi bi-journal-text" style="color:var(--gold); margin-right:8px;"></i>Rincian Riwayat Presensi Individu</span>
             <span class="badge" style="background:var(--bg-3); color:var(--text); font-size:11.5px; font-weight:700; margin-left:6px;">
               Menampilkan {{ $laporans->firstItem() ?? 0 }} - {{ $laporans->lastItem() ?? 0 }} dari {{ $laporans->total() }} Hari Tercatat
             </span>
           </div>
-          <div style="font-size:12px; color:var(--text-3);">
-            Halaman {{ $laporans->currentPage() }} dari {{ $laporans->lastPage() }}
+          <div style="display:flex; gap:8px; align-items:center;">
+            <button onclick="window.print()" class="btn btn-outline" style="height:36px; font-size:12px; font-weight:700; display:inline-flex; align-items:center; gap:6px;" data-tooltip="Cetak Langsung Format A4" title="Cetak Langsung Format A4">
+              <i class="bi bi-printer-fill"></i> Cetak A4
+            </button>
+            <a href="{{ route('laporan.cetak-pdf', request()->query()) }}" target="_blank" class="btn btn-outline" style="height:36px; font-size:12px; font-weight:700; color:var(--red); border-color:rgba(239,68,68,0.4); display:inline-flex; align-items:center; gap:6px;" data-tooltip="Download File PDF Resmi" title="Download File PDF Resmi">
+              <i class="bi bi-file-earmark-pdf-fill"></i> PDF Resmi
+            </a>
+            <a href="{{ route('laporan.export-csv', request()->query()) }}" class="btn btn-outline" style="height:36px; font-size:12px; font-weight:700; color:var(--green); border-color:rgba(34,197,94,0.4); display:inline-flex; align-items:center; gap:6px;" data-tooltip="Export Data ke Excel/CSV" title="Export Data ke Excel/CSV">
+              <i class="bi bi-file-earmark-excel-fill"></i> Export Excel/CSV
+            </a>
           </div>
         </div>
 
@@ -1089,6 +1092,17 @@
           <div style="font-weight:800; font-size:15px; color:var(--text); display:flex; align-items:center; gap:8px;">
             <i class="bi bi-table" style="color:var(--gold);"></i>
             <span>Rincian Presensi Harian</span>
+          </div>
+          <div style="display:flex; gap:8px;">
+            <button onclick="window.print()" class="btn btn-outline" style="height:36px; font-size:12px; font-weight:700; display:inline-flex; align-items:center; gap:6px;" data-tooltip="Cetak Langsung Format A4" title="Cetak Langsung Format A4">
+              <i class="bi bi-printer-fill"></i> Cetak A4
+            </button>
+            <a href="{{ route('laporan.cetak-pdf', request()->query()) }}" target="_blank" class="btn btn-outline" style="height:36px; font-size:12px; font-weight:700; color:var(--red); border-color:rgba(239,68,68,0.4); display:inline-flex; align-items:center; gap:6px;" data-tooltip="Download File PDF Resmi" title="Download File PDF Resmi">
+              <i class="bi bi-file-earmark-pdf-fill"></i> PDF Resmi
+            </a>
+            <a href="{{ route('laporan.export-csv', request()->query()) }}" class="btn btn-outline" style="height:36px; font-size:12px; font-weight:700; color:var(--green); border-color:rgba(34,197,94,0.4); display:inline-flex; align-items:center; gap:6px;" data-tooltip="Export Data ke Excel/CSV" title="Export Data ke Excel/CSV">
+              <i class="bi bi-file-earmark-excel-fill"></i> Export Excel/CSV
+            </a>
           </div>
         </div>
 
