@@ -111,7 +111,7 @@
       font-weight: 800;
       text-transform: uppercase;
       letter-spacing: 0.5px;
-      color: var(--text-3);
+      color: #000000;
     }
     .lp-kpi-icon {
       width: 28px;
@@ -121,12 +121,15 @@
       align-items: center;
       justify-content: center;
       font-size: 14px;
+      background: rgba(0, 0, 0, 0.06);
+      color: #000000;
+      border: 1px solid rgba(0, 0, 0, 0.12);
     }
     .lp-kpi-val {
       font-size: 24px;
       font-weight: 900;
       font-family: var(--font-mono);
-      color: var(--text);
+      color: #000000;
       line-height: 1.1;
     }
 
@@ -455,7 +458,7 @@
       <div class="lp-kpi-card">
         <div class="lp-kpi-head">
           <span class="lp-kpi-title">Total Rekap</span>
-          <div class="lp-kpi-icon" style="background:var(--gold-dim); color:var(--gold);">
+          <div class="lp-kpi-icon">
             <i class="bi bi-folder-symlink-fill"></i>
           </div>
         </div>
@@ -466,7 +469,7 @@
       <div class="lp-kpi-card">
         <div class="lp-kpi-head">
           <span class="lp-kpi-title">Hadir Tepat</span>
-          <div class="lp-kpi-icon" style="background:rgba(34,197,94,0.12); color:var(--green);">
+          <div class="lp-kpi-icon">
             <i class="bi bi-check-circle-fill"></i>
           </div>
         </div>
@@ -477,7 +480,7 @@
       <div class="lp-kpi-card">
         <div class="lp-kpi-head">
           <span class="lp-kpi-title">Terlambat</span>
-          <div class="lp-kpi-icon" style="background:rgba(245,158,11,0.12); color:var(--amber);">
+          <div class="lp-kpi-icon">
             <i class="bi bi-clock-history"></i>
           </div>
         </div>
@@ -488,7 +491,7 @@
       <div class="lp-kpi-card">
         <div class="lp-kpi-head">
           <span class="lp-kpi-title">Izin / Sakit</span>
-          <div class="lp-kpi-icon" style="background:rgba(59,130,246,0.12); color:var(--navy);">
+          <div class="lp-kpi-icon">
             <i class="bi bi-envelope-open-fill"></i>
           </div>
         </div>
@@ -499,7 +502,7 @@
       <div class="lp-kpi-card">
         <div class="lp-kpi-head">
           <span class="lp-kpi-title">Alpha</span>
-          <div class="lp-kpi-icon" style="background:rgba(239,68,68,0.12); color:var(--red);">
+          <div class="lp-kpi-icon">
             <i class="bi bi-exclamation-triangle-fill"></i>
           </div>
         </div>
@@ -510,7 +513,7 @@
       <div class="lp-kpi-card">
         <div class="lp-kpi-head">
           <span class="lp-kpi-title">Bolos</span>
-          <div class="lp-kpi-icon" style="background:rgba(153,27,27,0.12); color:#991B1B;">
+          <div class="lp-kpi-icon">
             <i class="bi bi-x-octagon-fill"></i>
           </div>
         </div>
@@ -521,11 +524,11 @@
       <div class="lp-kpi-card">
         <div class="lp-kpi-head">
           <span class="lp-kpi-title">Kehadiran</span>
-          <div class="lp-kpi-icon" style="background:var(--gold-dim); color:var(--gold);">
+          <div class="lp-kpi-icon">
             <i class="bi bi-pie-chart-fill"></i>
           </div>
         </div>
-        <div class="lp-kpi-val" style="color:var(--gold);">{{ $persentase }}%</div>
+        <div class="lp-kpi-val">{{ $persentase }}%</div>
       </div>
     </div>
 
