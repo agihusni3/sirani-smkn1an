@@ -650,11 +650,12 @@
   .btn:active { transform: translateY(0); }
 
   .btn-gold {
-    background: var(--gold);
-    color: #fff;
-    box-shadow: none;
+    background: #000000;
+    color: #FFFFFF;
+    border: 1px solid #000000;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
   }
-  .btn-gold:hover { background: var(--gold-2); box-shadow: none; }
+  .btn-gold:hover { background: #262626; border-color: #262626; box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2); }
 
   .btn-danger {
     background: var(--bg-2);
