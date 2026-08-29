@@ -283,19 +283,19 @@
     <div class="panel" style="background:var(--bg-2); border:1px solid var(--border); padding:14px 18px; margin-bottom:20px;">
       <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
         <div style="display:flex; align-items:center; gap:10px;">
-          <div style="width:36px; height:36px; border-radius:8px; background:rgba(34,197,94,0.15); color:#16A34A; display:flex; align-items:center; justify-content:center; font-size:18px;">
-            <i class="bi bi-shield-check"></i>
+          <div style="width:36px; height:36px; border-radius:8px; background:rgba(0,0,0,0.06); color:#000000; border:1px solid rgba(0,0,0,0.12); display:flex; align-items:center; justify-content:center; font-size:18px;">
+            <i class="bi bi-shield-check" style="color:#000000;"></i>
           </div>
           <div>
-            <div style="font-size:12px; font-weight:800; text-transform:uppercase; color:var(--text-2); letter-spacing:0.5px;">Petugas Guru Piket Hari Ini:</div>
+            <div style="font-size:12px; font-weight:800; text-transform:uppercase; color:#000000; letter-spacing:0.5px;">Petugas Guru Piket Hari Ini:</div>
             <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-top:2px;">
               @forelse($guruPiketHariIni as $gp)
-                <span class="badge" style="background:var(--bg-3); border:1px solid var(--border); color:var(--text); font-size:12px; font-weight:700; padding:4px 10px; display:inline-flex; align-items:center; gap:6px;">
-                  <strong>{{ $gp->guru->nama ?? 'Guru' }}</strong>
-                  <span style="font-size:10.5px; color:var(--text-3);">({{ $gp->keterangan ?: ($gp->guru->jabatan ?? 'Guru Piket') }})</span>
+                <span class="badge" style="background:var(--bg-3); border:1px solid var(--border); color:#000000; font-size:12px; font-weight:700; padding:4px 10px; display:inline-flex; align-items:center; gap:6px;">
+                  <strong style="color:#000000;">{{ $gp->guru->nama ?? 'Guru' }}</strong>
+                  <span style="font-size:10.5px; color:#000000;">({{ $gp->keterangan ?: ($gp->guru->jabatan ?? 'Guru Piket') }})</span>
                 </span>
               @empty
-                <span style="color:var(--text-3); font-size:12.5px; font-style:italic;">Belum ada jadwal penugasan guru piket untuk hari ini.</span>
+                <span style="color:#000000; font-size:12.5px; font-style:italic;">Belum ada jadwal penugasan guru piket untuk hari ini.</span>
               @endforelse
             </div>
           </div>
@@ -328,11 +328,11 @@
           <button type="button" class="btn btn-sm btn-gold" onclick="openModal('modalPresensiManual')" style="font-size:11.5px; font-weight:800; display:inline-flex; align-items:center; gap:6px;">
             <i class="bi bi-clipboard-plus-fill"></i> Presensi Manual
           </button>
-          <a href="{{ route('izin-siswa.index') }}" class="btn btn-sm btn-outline" style="font-size:11.5px; font-weight:700;">
-            <i class="bi bi-envelope-paper-fill" style="color:var(--gold);"></i> Catat Izin
+          <a href="{{ route('izin-siswa.index') }}" class="btn btn-sm btn-outline" style="font-size:11.5px; font-weight:800; color:#000000; display:inline-flex; align-items:center; gap:6px;">
+            <i class="bi bi-envelope-paper-fill" style="color:#000000;"></i> Catat Izin
           </a>
-          <a href="{{ route('jadwal-piket.index') }}" class="btn btn-sm btn-outline" style="font-size:11.5px; font-weight:700;">
-            <i class="bi bi-calendar-week"></i> Jadwal Mingguan
+          <a href="{{ route('jadwal-piket.index') }}" class="btn btn-sm btn-outline" style="font-size:11.5px; font-weight:800; color:#000000; display:inline-flex; align-items:center; gap:6px;">
+            <i class="bi bi-calendar-week" style="color:#000000;"></i> Jadwal Mingguan
           </a>
         </div>
       </div>
