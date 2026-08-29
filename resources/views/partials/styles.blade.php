@@ -1425,4 +1425,170 @@
     padding: 0;
     font-weight: 800;
   }
+
+  /* ═══════════════════════════════════════════════════════════════════
+     STANDARISASI DESAIN MONOKROM MODERN (REKAP PRESENSI & LAPORAN STANDARD)
+     ═══════════════════════════════════════════════════════════════════ */
+
+  /* 1. Standard Segmented Control Switcher */
+  .segmented-control {
+    display: inline-flex;
+    background: var(--bg-3);
+    padding: 4px;
+    border-radius: var(--r-md);
+    gap: 4px;
+    border: 1px solid var(--border);
+    margin-bottom: 20px;
+  }
+  .segmented-btn {
+    padding: 8px 18px;
+    border-radius: var(--r-sm);
+    font-size: 13px;
+    font-weight: 800;
+    border: none;
+    background: transparent;
+    color: var(--text-2);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all .2s ease;
+    text-decoration: none;
+  }
+  .segmented-btn:hover { color: var(--text); }
+  .segmented-btn.active {
+    background: #000000 !important;
+    color: #FFFFFF !important;
+    font-weight: 800;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25);
+  }
+  .segmented-btn.active i {
+    color: #FFFFFF !important;
+  }
+
+  /* 2. Standard Period Chips / Filter Pills */
+  .period-chip {
+    padding: 7px 16px;
+    border-radius: var(--r-sm);
+    font-size: 12.5px;
+    font-weight: 700;
+    cursor: pointer;
+    background: var(--bg-3);
+    border: 1px solid var(--border);
+    color: var(--text-2);
+    transition: all .15s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .period-chip:hover { color: var(--text); background: rgba(255,255,255,0.06); border-color: var(--border-2); }
+  .period-chip.active { 
+    background: #000000 !important; 
+    color: #FFFFFF !important; 
+    border-color: #000000 !important; 
+    font-weight: 800; 
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25); 
+  }
+  .period-chip.active i {
+    color: #FFFFFF !important;
+  }
+
+  /* 3. Standard Executive KPI Grid & Cards (Monochrome) */
+  .lp-kpi-grid, .kpi-grid-mono {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(145px, 1fr));
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+  .lp-kpi-card, .kpi-card-mono {
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: var(--r-md);
+    padding: 14px 16px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: all .2s ease;
+    box-shadow: var(--shadow-sm);
+  }
+  .lp-kpi-card:hover, .kpi-card-mono:hover {
+    border-color: var(--border-2);
+    transform: translateY(-2px);
+  }
+  .lp-kpi-head, .kpi-head-mono {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+  }
+  .lp-kpi-title, .kpi-title-mono {
+    font-size: 10.5px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #000000;
+  }
+  .lp-kpi-icon, .kpi-icon-mono {
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    background: rgba(0, 0, 0, 0.06);
+    color: #000000;
+    border: 1px solid rgba(0, 0, 0, 0.12);
+  }
+  .lp-kpi-val, .kpi-val-mono {
+    font-size: 24px;
+    font-weight: 900;
+    font-family: var(--font-mono);
+    color: #000000;
+    line-height: 1.1;
+  }
+
+  /* 4. Standard Document & Print Outline Buttons */
+  .btn-outline-mono, .btn-doc-action {
+    height: 36px;
+    font-size: 12px;
+    font-weight: 800;
+    color: #000000;
+    border: 1.5px solid #000000;
+    background: var(--bg-2);
+    border-radius: var(--r-sm);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all .15s ease;
+  }
+  .btn-outline-mono:hover, .btn-doc-action:hover {
+    background: rgba(0, 0, 0, 0.04);
+    color: #000000;
+    border-color: #000000;
+    transform: translateY(-1px);
+  }
+  .btn-outline-mono i, .btn-doc-action i {
+    color: #000000;
+  }
+
+  /* 5. Standard Monochrome Badge */
+  .badge-mono {
+    background: rgba(0, 0, 0, 0.06);
+    color: #000000;
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    font-size: 11px;
+    font-weight: 800;
+    padding: 3px 10px;
+    border-radius: 12px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .badge-mono i {
+    color: #000000;
+  }
 </style>

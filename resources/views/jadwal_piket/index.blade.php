@@ -59,7 +59,7 @@
     <header class="header no-print">
       <div class="header-title">
         <h1>
-          <i class="bi bi-calendar-week-fill" style="color:var(--gold); margin-right:8px;"></i>Jadwal Penugasan Guru Piket
+          <i class="bi bi-calendar-week-fill" style="color:#000000; margin-right:8px;"></i>Jadwal Penugasan Guru Piket
         </h1>
         <p>Atur penugasan harian guru piket. Hanya guru yang bertugas pada hari tersebut yang berwenang mengelola meja piket harian.</p>
       </div>
@@ -95,7 +95,7 @@
     <!-- Form Tambah Penugasan Piket (Collapsible / Toggle) -->
     <div class="panel" id="panelFormPiket" style="display:none; margin-bottom:24px; animation:fadeIn 0.25s ease;">
       <div class="panel-title" style="display:flex; justify-content:space-between; align-items:center;">
-        <span><i class="bi bi-person-plus-fill" style="color:var(--green); margin-right:6px;"></i>Tambah Guru ke Jadwal Piket</span>
+        <span><i class="bi bi-person-plus-fill" style="color:#000000; margin-right:6px;"></i>Tambah Guru ke Jadwal Piket</span>
         <button type="button" onclick="toggleFormPiket(false)" class="btn btn-outline" style="height:30px; width:30px; padding:0; display:inline-flex; align-items:center; justify-content:center; border-radius:6px; color:var(--text-3);" title="Tutup Form">
           <i class="bi bi-x-lg"></i>
         </button>
