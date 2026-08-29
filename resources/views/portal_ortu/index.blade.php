@@ -943,10 +943,11 @@
               <p style="font-size: 12.5px; color: var(--text-2); line-height: 1.5; margin: 0; white-space: pre-line;">{{ $p->isi_pesan }}</p>
               
               @if($p->banner_url)
-                <div style="margin-top: 10px; border-radius: 8px; overflow: hidden; border: 1px solid var(--border); max-width: 100%;">
-                  <a href="{{ $p->banner_url }}" target="_blank" title="Klik untuk memperbesar gambar">
-                    <img src="{{ $p->banner_url }}" alt="{{ $p->judul }}" style="width: 100%; max-height: 380px; object-fit: contain; background: rgba(0,0,0,0.02); display: block;" />
-                  </a>
+                <div style="position:relative; margin-top:10px; border-radius:8px; overflow:hidden; border:1px solid var(--border); max-width:100%; cursor:zoom-in;" onclick="openImageZoom('{{ $p->banner_url }}', '{{ addslashes($p->judul) }}')">
+                  <img src="{{ $p->banner_url }}" alt="{{ $p->judul }}" style="width:100%; max-height:380px; object-fit:contain; background:rgba(0,0,0,0.02); display:block;" />
+                  <div style="position:absolute; bottom:8px; right:8px; background:rgba(15,23,42,0.85); color:#fff; font-size:11px; font-weight:700; padding:4px 10px; border-radius:6px; backdrop-filter:blur(4px); display:flex; align-items:center; gap:5px; pointer-events:none;">
+                    <i class="bi bi-arrows-fullscreen"></i> Ketuk untuk Zoom
+                  </div>
                 </div>
               @endif
             </div>
@@ -1655,10 +1656,11 @@
                 <p style="font-size:12.5px; color:var(--text-2); line-height:1.5; margin:0; white-space:pre-line;">{{ $p->isi_pesan }}</p>
                 
                 @if($p->banner_url)
-                  <div style="margin-top:10px; border-radius:8px; overflow:hidden; border:1px solid var(--border); max-width:100%;">
-                    <a href="{{ $p->banner_url }}" target="_blank" title="Klik untuk memperbesar gambar">
-                      <img src="{{ $p->banner_url }}" alt="{{ $p->judul }}" style="width:100%; max-height:380px; object-fit:contain; background:rgba(0,0,0,0.02); display:block;" />
-                    </a>
+                  <div style="position:relative; margin-top:10px; border-radius:8px; overflow:hidden; border:1px solid var(--border); max-width:100%; cursor:zoom-in;" onclick="openImageZoom('{{ $p->banner_url }}', '{{ addslashes($p->judul) }}')">
+                    <img src="{{ $p->banner_url }}" alt="{{ $p->judul }}" style="width:100%; max-height:380px; object-fit:contain; background:rgba(0,0,0,0.02); display:block;" />
+                    <div style="position:absolute; bottom:8px; right:8px; background:rgba(15,23,42,0.85); color:#fff; font-size:11px; font-weight:700; padding:4px 10px; border-radius:6px; backdrop-filter:blur(4px); display:flex; align-items:center; gap:5px; pointer-events:none;">
+                      <i class="bi bi-arrows-fullscreen"></i> Ketuk untuk Zoom
+                    </div>
                   </div>
                 @endif
               </div>
@@ -2033,8 +2035,123 @@
           alert('Panduan Instal di Android:\n\n1. Ketuk ikon menu browser (titik 3 di kanan atas).\n2. Pilih "Instal Aplikasi" atau "Tambahkan ke Layar Utama".');
         }
       }
+    // Image Zoom Lightbox Controller
+    let currentZoomScale = 1;
+    function openImageZoom(imgUrl, title) {
+      const modal = document.getElementById('imageZoomModal');
+      const modalImg = document.getElementById('zoomModalImg');
+      const modalTitle = document.getElementById('zoomModalTitle');
+      const downloadLink = document.getElementById('zoomDownloadLink');
+
+      if (!modal || !modalImg) return;
+
+      modalImg.src = imgUrl;
+      if (modalTitle) modalTitle.innerText = title || 'Pengumuman Sekolah';
+      if (downloadLink) downloadLink.href = imgUrl;
+
+      currentZoomScale = 1;
+      applyZoomScale();
+
+      modal.style.display = 'flex';
+      document.body.style.overflow = 'hidden';
     }
+
+    function closeImageZoom() {
+      const modal = document.getElementById('imageZoomModal');
+      if (modal) modal.style.display = 'none';
+      document.body.style.overflow = '';
+    }
+
+    function adjustZoom(delta) {
+      currentZoomScale = Math.min(Math.max(0.6, currentZoomScale + delta), 3.5);
+      applyZoomScale();
+    }
+
+    function resetZoom() {
+      currentZoomScale = 1;
+      applyZoomScale();
+    }
+
+    function toggleDoubleZoom(e) {
+      e.stopPropagation();
+      if (currentZoomScale > 1.2) {
+        currentZoomScale = 1;
+      } else {
+        currentZoomScale = 2;
+      }
+      applyZoomScale();
+    }
+
+    function applyZoomScale() {
+      const img = document.getElementById('zoomModalImg');
+      const text = document.getElementById('zoomLevelText');
+      if (img) {
+        img.style.transform = 'scale(' + currentZoomScale + ')';
+        img.style.cursor = currentZoomScale > 1.2 ? 'zoom-out' : 'zoom-in';
+      }
+      if (text) {
+        text.innerText = Math.round(currentZoomScale * 100) + '%';
+      }
+    }
+
+    function handleModalBackdropClick(e) {
+      if (e.target.id === 'imageZoomModal' || e.target.id === 'zoomViewport') {
+        closeImageZoom();
+      }
+    }
+
+    window.openImageZoom = openImageZoom;
+    window.closeImageZoom = closeImageZoom;
+    window.adjustZoom = adjustZoom;
+    window.resetZoom = resetZoom;
+    window.toggleDoubleZoom = toggleDoubleZoom;
+    window.handleModalBackdropClick = handleModalBackdropClick;
+
+    // Close on Escape key
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        closeImageZoom();
+        closeQrScanner();
+      }
+    });
   </script>
+
+  {{-- LIGHTBOX IMAGE ZOOM MODAL --}}
+  <div id="imageZoomModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.94); z-index:99999; flex-direction:column; justify-content:space-between; user-select:none; backdrop-filter:blur(6px);" onclick="handleModalBackdropClick(event)">
+    {{-- Top Controls Bar --}}
+    <div style="display:flex; justify-content:space-between; align-items:center; padding:12px 16px; background:rgba(15,23,42,0.85); border-bottom:1px solid rgba(255,255,255,0.12); color:#fff; z-index:10;">
+      <div style="font-weight:800; font-size:13px; max-width:55%; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" id="zoomModalTitle">
+        Pengumuman Sekolah
+      </div>
+      <div style="display:flex; align-items:center; gap:6px;">
+        <button type="button" onclick="adjustZoom(-0.3)" style="background:rgba(255,255,255,0.15); border:none; color:#fff; padding:6px 10px; border-radius:6px; font-size:13px; cursor:pointer;" title="Perkecil">
+          <i class="bi bi-zoom-out"></i>
+        </button>
+        <button type="button" onclick="resetZoom()" style="background:rgba(255,255,255,0.15); border:none; color:#fff; padding:6px 8px; border-radius:6px; font-size:11px; font-weight:800; cursor:pointer; min-width:44px;" title="Reset Ukuran" id="zoomLevelText">
+          100%
+        </button>
+        <button type="button" onclick="adjustZoom(0.3)" style="background:rgba(255,255,255,0.15); border:none; color:#fff; padding:6px 10px; border-radius:6px; font-size:13px; cursor:pointer;" title="Perbesar">
+          <i class="bi bi-zoom-in"></i>
+        </button>
+        <a id="zoomDownloadLink" href="#" target="_blank" style="background:rgba(255,255,255,0.15); border:none; color:#fff; padding:6px 10px; border-radius:6px; font-size:13px; text-decoration:none; display:inline-flex; align-items:center;" title="Buka Gambar Asli">
+          <i class="bi bi-box-arrow-up-right"></i>
+        </a>
+        <button type="button" onclick="closeImageZoom()" style="background:rgba(220,38,38,0.85); border:none; color:#fff; padding:6px 10px; border-radius:6px; font-size:13px; cursor:pointer; margin-left:4px;" title="Tutup">
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>
+    </div>
+
+    {{-- Image Display Area with Pan & Zoom --}}
+    <div style="flex:1; display:flex; align-items:center; justify-content:center; overflow:auto; position:relative; padding:12px; cursor:grab;" id="zoomViewport">
+      <img id="zoomModalImg" src="" alt="Pengumuman" style="max-width:96vw; max-height:82vh; object-fit:contain; transition:transform 0.15s ease-out; transform-origin:center center; box-shadow:0 10px 30px rgba(0,0,0,0.5); border-radius:6px;" onclick="toggleDoubleZoom(event)" />
+    </div>
+
+    {{-- Bottom Hint Bar --}}
+    <div style="padding:10px 16px; background:rgba(15,23,42,0.85); text-align:center; color:rgba(255,255,255,0.75); font-size:11.5px; border-top:1px solid rgba(255,255,255,0.12);">
+      <i class="bi bi-info-circle"></i> <strong>Ketuk 2x</strong> pada gambar untuk Zoom · Gunakan tombol <i class="bi bi-zoom-in"></i> / <i class="bi bi-zoom-out"></i> untuk mengatur skala
+    </div>
+  </div>
 
   {{-- QR SCANNER MODAL --}}
   <div id="qrModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:9999; align-items:center; justify-content:center; padding:16px;">
