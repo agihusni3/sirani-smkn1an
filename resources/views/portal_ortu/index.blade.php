@@ -919,43 +919,6 @@
       </div>
     @endif
 
-    {{-- PENGUMUMAN RESMI SEKOLAH (ON-DEMAND SAAT LANDING) --}}
-    @if(!$siswa && isset($pengumumans) && $pengumumans->count() > 0)
-      <div style="margin-bottom: 20px; text-align: center;">
-        <button type="button" id="btnLandingPengumuman" onclick="toggleLandingPengumuman()" class="btn-portal-tab" style="padding: 8px 16px; font-size: 12px; margin: 0 auto; display: inline-flex;">
-          <i class="bi bi-megaphone"></i> <span>Lihat Pengumuman Sekolah</span>
-          <span style="font-size:10px; background:var(--text); color:var(--bg); padding:1px 6px; border-radius:10px; margin-left:4px;">{{ $pengumumans->count() }}</span>
-        </button>
-
-        <div id="landing-pengumuman" style="display: none; margin-top: 14px; text-align: left;">
-          @foreach($pengumumans as $p)
-            @php $badge = $p->kategori_badge; @endphp
-            <div style="background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--r-md); padding: 14px 18px; margin-bottom: 10px; box-shadow: var(--shadow-sm);">
-              <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 6px; margin-bottom: 4px;">
-                <span style="font-size:11px; font-weight:800; color:var(--text); text-transform:uppercase; letter-spacing:0.4px;">
-                  {{ $badge['label'] }}
-                </span>
-                <span style="font-size: 11px; color: var(--text-3); font-weight: 600;">
-                  <i class="bi bi-clock"></i> {{ $p->created_at->translatedFormat('d M Y') }}
-                </span>
-              </div>
-              <h3 style="font-size: 14.5px; font-weight: 800; color: var(--text); margin: 0 0 4px;">{{ $p->judul }}</h3>
-              <p style="font-size: 12.5px; color: var(--text-2); line-height: 1.5; margin: 0; white-space: pre-line;">{{ $p->isi_pesan }}</p>
-              
-              @if($p->banner_url)
-                <div style="position:relative; margin-top:10px; border-radius:8px; overflow:hidden; border:1px solid var(--border); max-width:100%; cursor:zoom-in;" onclick="openImageZoom('{{ $p->banner_url }}', '{{ addslashes($p->judul) }}')">
-                  <img src="{{ $p->banner_url }}" alt="{{ $p->judul }}" style="width:100%; max-height:380px; object-fit:contain; background:rgba(0,0,0,0.02); display:block;" />
-                  <div style="position:absolute; bottom:8px; right:8px; background:rgba(15,23,42,0.85); color:#fff; font-size:11px; font-weight:700; padding:4px 10px; border-radius:6px; backdrop-filter:blur(4px); display:flex; align-items:center; gap:5px; pointer-events:none;">
-                    <i class="bi bi-arrows-fullscreen"></i> Ketuk untuk Zoom
-                  </div>
-                </div>
-              @endif
-            </div>
-          @endforeach
-        </div>
-      </div>
-    @endif
-
     @if($keyword && !$siswa)
       {{-- SISWA TIDAK DITEMUKAN --}}
       <div style="background:var(--bg-card); border:1px solid var(--border); border-radius:var(--r-xl); padding:40px 20px; text-align:center; box-shadow:var(--shadow-sm);">
@@ -1810,24 +1773,6 @@
       }
     }
     window.togglePortalSection = togglePortalSection;
-
-    function toggleLandingPengumuman() {
-      const el = document.getElementById('landing-pengumuman');
-      const btn = document.getElementById('btnLandingPengumuman');
-      if (!el) return;
-      const isHidden = (el.style.display === 'none' || !el.style.display);
-      if (isHidden) {
-        el.style.display = 'block';
-        if (btn) btn.classList.add('active');
-        setTimeout(function() {
-          el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }, 50);
-      } else {
-        el.style.display = 'none';
-        if (btn) btn.classList.remove('active');
-      }
-    }
-    window.toggleLandingPengumuman = toggleLandingPengumuman;
 
     document.addEventListener('DOMContentLoaded', function() {
       const secAbsen = document.getElementById('riwayat-kehadiran');
