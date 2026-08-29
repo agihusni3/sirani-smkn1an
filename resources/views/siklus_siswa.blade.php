@@ -66,10 +66,13 @@
       background: rgba(255, 255, 255, 0.05);
     }
     .segmented-btn.active {
-      background: linear-gradient(135deg, var(--gold), var(--gold-2));
-      color: #0F172A;
+      background: #000000 !important;
+      color: #FFFFFF !important;
       font-weight: 900;
-      box-shadow: 0 2px 10px var(--gold-glow);
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25);
+    }
+    .segmented-btn.active i {
+      color: #FFFFFF !important;
     }
 
     /* ─── Step Cards & Containers ─── */

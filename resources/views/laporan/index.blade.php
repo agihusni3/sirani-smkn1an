@@ -33,9 +33,13 @@
     }
     .segmented-btn:hover { color: var(--text); }
     .segmented-btn.active {
-      background: linear-gradient(135deg, var(--gold), var(--gold-2));
-      color: #0F172A;
-      box-shadow: 0 2px 10px var(--gold-glow);
+      background: #000000 !important;
+      color: #FFFFFF !important;
+      font-weight: 800;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25);
+    }
+    .segmented-btn.active i {
+      color: #FFFFFF !important;
     }
 
     /* Executive Filter Panel */
