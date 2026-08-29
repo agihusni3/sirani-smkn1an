@@ -900,15 +900,15 @@
       {{-- 1. IDENTITAS SISWA & STATUS HARI INI (DOSSIER DIGITAL) --}}
       <div class="dossier-card">
         <div class="dossier-header">
-          <span style="font-size:11.5px; font-weight:800; color:var(--text-3); text-transform:uppercase; letter-spacing:0.5px;">
-            <i class="bi bi-person-badge-fill" style="color:var(--gold);"></i> Profil Lengkap Siswa
+          <span style="font-size:11.5px; font-weight:800; color:var(--text); text-transform:uppercase; letter-spacing:0.5px;">
+            Profil Lengkap Siswa
           </span>
           
           <div style="display:flex; gap:6px;">
-            <button type="button" onclick="copyLinkPresensi('{{ url('/presensi-siswa/'.$siswa->nis) }}')" id="btnCopyLink" style="background:var(--bg-subtle); border:1px solid var(--border); padding:4px 10px; border-radius:var(--r-sm); font-size:11.5px; font-weight:700; color:var(--text-2); cursor:pointer; display:inline-flex; align-items:center; gap:5px;">
+            <button type="button" onclick="copyLinkPresensi('{{ url('/presensi-siswa/'.$siswa->nis) }}')" id="btnCopyLink" style="background:var(--bg-subtle); border:1px solid var(--border); padding:5px 12px; border-radius:var(--r-sm); font-size:11.5px; font-weight:700; color:var(--text); cursor:pointer; display:inline-flex; align-items:center; gap:5px;">
               <i class="bi bi-link-45deg"></i> <span id="copyBtnText">Salin Tautan</span>
             </button>
-            <button type="button" onclick="resetSiswaTersimpan()" style="background:var(--bg-subtle); border:1px solid var(--border); padding:4px 10px; border-radius:var(--r-sm); font-size:11.5px; font-weight:700; color:var(--text-2); cursor:pointer; display:inline-flex; align-items:center; gap:5px;">
+            <button type="button" onclick="resetSiswaTersimpan()" style="background:var(--bg-subtle); border:1px solid var(--border); padding:5px 12px; border-radius:var(--r-sm); font-size:11.5px; font-weight:700; color:var(--text); cursor:pointer; display:inline-flex; align-items:center; gap:5px;">
               <i class="bi bi-arrow-repeat"></i> Ganti Siswa
             </button>
           </div>
@@ -926,26 +926,26 @@
             </div>
             <div>
               <h2 class="student-name">{{ $siswa->nama }}</h2>
-              <div style="font-size:12px; color:var(--text-2); display:flex; flex-wrap:wrap; gap:6px;">
+              <div style="font-size:12px; color:var(--text-2); display:flex; flex-wrap:wrap; gap:6px; justify-content:center;">
                 <span>NIS: <strong style="font-family:var(--font-mono); color:var(--text);">{{ $siswa->nis }}</strong></span>
                 <span>•</span>
                 <span>NISN: <strong style="font-family:var(--font-mono); color:var(--text);">{{ $siswa->nisn ?: '-' }}</strong></span>
               </div>
               <div class="student-meta-tags">
-                <span class="tag-pill gold">
+                <span class="tag-pill">
                   <i class="bi bi-building"></i> Kelas {{ $rombel->nama_rombel ?? 'Belum Ada Rombel' }}
                 </span>
                 <span class="tag-pill">
                   <i class="bi bi-book-half"></i> {{ $rombel->jurusan->nama_jurusan ?? '-' }}
                 </span>
                 @if($siswa->status === 'pkl')
-                  <span class="tag-pill" style="background:var(--teal-subtle); color:var(--teal); border-color:rgba(13,148,136,0.3); font-weight:800;">
-                    <i class="bi bi-briefcase-fill"></i> Sedang Praktik Kerja (PKL)
+                  <span class="tag-pill" style="color:var(--text); font-weight:800;">
+                    <i class="bi bi-briefcase"></i> Praktik Kerja (PKL)
                   </span>
                 @endif
                 @if($waliKelas)
                   <span class="tag-pill">
-                    <i class="bi bi-person-workspace"></i> Wali Kelas: {{ $waliKelas->nama }}
+                    <i class="bi bi-person"></i> Wali Kelas: {{ $waliKelas->nama }}
                   </span>
                   @if($waliKelas->no_hp)
                     @php
@@ -953,14 +953,14 @@
                       if (str_starts_with($hpWaliClean, '0')) $hpWaliClean = '62' . substr($hpWaliClean, 1);
                       $pesanWaWali = rawurlencode("Halo Bapak/Ibu Wali Kelas {$waliKelas->nama}, saya orang tua dari {$siswa->nama} (Kelas " . ($rombel->nama_rombel ?? '-') . "). Ingin berkonsultasi mengenai kehadiran/perkembangan belajar ananda.");
                     @endphp
-                    <a href="https://wa.me/{{ $hpWaliClean }}?text={{ $pesanWaWali }}" target="_blank" class="tag-pill" style="background:rgba(34,197,94,0.1); color:#16A34A; border-color:rgba(34,197,94,0.25); font-weight:700;" title="Konsultasi WhatsApp dengan Wali Kelas">
+                    <a href="https://wa.me/{{ $hpWaliClean }}?text={{ $pesanWaWali }}" target="_blank" class="tag-pill" style="color:#16A34A; font-weight:800;" title="Konsultasi WhatsApp dengan Wali Kelas">
                       <i class="bi bi-whatsapp"></i> Hubungi Wali Kelas
                     </a>
                   @endif
                 @endif
                 @if($siswa->nama_ortu)
                   <span class="tag-pill">
-                    <i class="bi bi-person-heart" style="color:var(--gold);"></i> Wali Murid: {{ $siswa->nama_ortu }}
+                    <i class="bi bi-people"></i> Wali Murid: {{ $siswa->nama_ortu }}
                   </span>
                 @endif
               </div>
@@ -970,40 +970,40 @@
           {{-- Kanan: Status Kehadiran Hari Ini --}}
           <div class="today-widget">
             <div class="today-widget-title">
-              <span>Kehadiran Hari Ini ({{ \Carbon\Carbon::today()->translatedFormat('d M Y') }})</span>
+              <span style="font-weight:800; color:var(--text);">Kehadiran Hari Ini ({{ \Carbon\Carbon::today()->translatedFormat('d M Y') }})</span>
               <div>
                 @if($todayAbsensi)
                   @if($todayAbsensi->status === 'hadir')
-                    <span class="status-badge status-hadir"><i class="bi bi-check-circle-fill"></i> Hadir Tepat Waktu</span>
+                    <span style="font-weight:800; font-size:12px; color:var(--text);">Hadir Tepat Waktu</span>
                   @elseif($todayAbsensi->status === 'terlambat')
-                    <span class="status-badge status-terlambat"><i class="bi bi-clock-fill"></i> Terlambat</span>
+                    <span style="font-weight:800; font-size:12px; color:var(--text);">Terlambat</span>
                   @elseif($todayAbsensi->status === 'izin')
-                    <span class="status-badge status-izin"><i class="bi bi-file-earmark-medical-fill"></i> Izin</span>
+                    <span style="font-weight:800; font-size:12px; color:var(--text);">Izin</span>
                   @elseif($todayAbsensi->status === 'sakit')
-                    <span class="status-badge status-sakit"><i class="bi bi-heart-pulse-fill"></i> Sakit</span>
+                    <span style="font-weight:800; font-size:12px; color:var(--text);">Sakit</span>
                   @elseif($todayAbsensi->status === 'bolos')
-                    <span class="status-badge status-bolos"><i class="bi bi-exclamation-triangle-fill"></i> Bolos</span>
+                    <span style="font-weight:800; font-size:12px; color:var(--text);">Bolos</span>
                   @elseif($todayAbsensi->status === 'alpha')
-                    <span class="status-badge status-alpha"><i class="bi bi-x-circle-fill"></i> Alpha</span>
+                    <span style="font-weight:800; font-size:12px; color:var(--text);">Alpha</span>
                   @endif
                 @elseif($siswa->status === 'pkl')
-                  <span class="status-badge status-pkl"><i class="bi bi-briefcase-fill"></i> PKL</span>
+                  <span style="font-weight:800; font-size:12px; color:var(--text);">PKL</span>
                 @else
-                  <span class="status-badge status-none"><i class="bi bi-hourglass-split"></i> Belum Presensi</span>
+                  <span style="font-weight:800; font-size:12px; color:var(--text);">Belum Presensi</span>
                 @endif
               </div>
             </div>
 
             <div class="today-time-grid">
               <div class="today-time-box">
-                <div class="today-time-label"><i class="bi bi-box-arrow-in-right" style="color:var(--green);"></i> Masuk Gerbang</div>
-                <div class="today-time-val" style="color:{{ $todayAbsensi && $todayAbsensi->jam_masuk ? 'var(--text)' : 'var(--text-3)' }};">
+                <div class="today-time-label">Masuk Gerbang</div>
+                <div class="today-time-val">
                   {{ $todayAbsensi && $todayAbsensi->jam_masuk ? substr($todayAbsensi->jam_masuk, 0, 5).' WIB' : '—' }}
                 </div>
               </div>
               <div class="today-time-box">
-                <div class="today-time-label"><i class="bi bi-box-arrow-right" style="color:var(--gold);"></i> Pulang Gerbang</div>
-                <div class="today-time-val" style="color:{{ $todayAbsensi && $todayAbsensi->jam_pulang ? 'var(--text)' : 'var(--text-3)' }};">
+                <div class="today-time-label">Pulang Gerbang</div>
+                <div class="today-time-val">
                   {{ $todayAbsensi && $todayAbsensi->jam_pulang ? substr($todayAbsensi->jam_pulang, 0, 5).' WIB' : '—' }}
                 </div>
               </div>
@@ -1025,43 +1025,39 @@
           <div class="discipline-score-card">
             <div class="discipline-val">{{ $stats['persen'] }}%</div>
             <div class="discipline-lbl">Tingkat Kedisiplinan</div>
-            <div class="discipline-badge">{{ $stats['predikat'] }} ({{ $stats['total'] }} Hari Aktif)</div>
+            <div style="font-size:11.5px; font-weight:800; color:var(--text); margin-top:4px;">{{ $stats['predikat'] }} ({{ $stats['total'] }} Hari Aktif)</div>
           </div>
 
           {{-- 1. Hadir Tepat --}}
           <div class="stat-metric-card">
             <div class="stat-metric-title">
-              <span>Hadir Tepat</span>
-              <span class="badge" style="background:rgba(34,197,94,0.12); color:#16A34A; border:1px solid rgba(34,197,94,0.25); font-size:9.5px; font-weight:800;">Tepat</span>
+              <span style="font-weight:800; color:var(--text);">Hadir Tepat</span>
             </div>
-            <div class="stat-metric-num">{{ $stats['hadir'] }}</div>
+            <div class="stat-metric-num" style="color:var(--text);">{{ $stats['hadir'] }}</div>
           </div>
 
           {{-- 2. Terlambat --}}
           <div class="stat-metric-card">
             <div class="stat-metric-title">
-              <span>Terlambat</span>
-              <span class="badge" style="background:rgba(245,158,11,0.12); color:#D97706; border:1px solid rgba(245,158,11,0.25); font-size:9.5px; font-weight:800;">Telat</span>
+              <span style="font-weight:800; color:var(--text);">Terlambat</span>
             </div>
-            <div class="stat-metric-num">{{ $stats['terlambat'] }}</div>
+            <div class="stat-metric-num" style="color:var(--text);">{{ $stats['terlambat'] }}</div>
           </div>
 
           {{-- 3. Izin / Sakit --}}
           <div class="stat-metric-card">
             <div class="stat-metric-title">
-              <span>Izin / Sakit</span>
-              <span class="badge" style="background:rgba(59,130,246,0.12); color:#2563EB; border:1px solid rgba(59,130,246,0.25); font-size:9.5px; font-weight:800;">Izin</span>
+              <span style="font-weight:800; color:var(--text);">Izin / Sakit</span>
             </div>
-            <div class="stat-metric-num">{{ $stats['izin'] + $stats['sakit'] }}</div>
+            <div class="stat-metric-num" style="color:var(--text);">{{ $stats['izin'] + $stats['sakit'] }}</div>
           </div>
 
           {{-- 4. Alpha / Bolos --}}
           <div class="stat-metric-card">
             <div class="stat-metric-title">
-              <span>Alpha / Bolos</span>
-              <span class="badge" style="background:rgba(239,68,68,0.12); color:#DC2626; border:1px solid rgba(239,68,68,0.25); font-size:9.5px; font-weight:800;">Alpha</span>
+              <span style="font-weight:800; color:var(--text);">Alpha / Bolos</span>
             </div>
-            <div class="stat-metric-num">{{ $stats['alpha'] + $stats['bolos'] }}</div>
+            <div class="stat-metric-num" style="color:var(--text);">{{ $stats['alpha'] + $stats['bolos'] }}</div>
           </div>
         </div>
 
