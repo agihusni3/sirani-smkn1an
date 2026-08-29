@@ -395,11 +395,18 @@
   .nav-item i { font-size: 17px; width: 22px; text-align: center; flex-shrink: 0; }
   .nav-item:hover { background: var(--surface); color: var(--text); transform: translateX(2px); }
   .nav-item.active {
-    background: var(--gold-dim);
-    color: var(--gold);
-    border-color: rgba(250,204,21,0.25);
-    font-weight: 700;
-    box-shadow: var(--shadow-sm);
+    background: #000000 !important;
+    color: #FFFFFF !important;
+    border-color: #000000 !important;
+    font-weight: 800;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+  }
+  .nav-item.active i,
+  .nav-item.active .nav-icon {
+    color: #FFFFFF !important;
+  }
+  .nav-item.active .nav-text {
+    color: #FFFFFF !important;
   }
 
   /* ─── Page Header ─── */

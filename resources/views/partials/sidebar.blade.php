@@ -33,9 +33,17 @@
     color: var(--text);
   }
   .nav-item.active {
-    background: var(--gold-dim);
-    color: var(--gold);
-    font-weight: 700;
+    background: #000000 !important;
+    color: #FFFFFF !important;
+    font-weight: 800;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+  }
+  .nav-item.active .nav-icon,
+  .nav-item.active i {
+    color: #FFFFFF !important;
+  }
+  .nav-item.active .nav-text {
+    color: #FFFFFF !important;
   }
   .nav-left-part {
     display: flex;
@@ -61,15 +69,17 @@
   .nav-count-badge {
     font-size: 10.5px;
     font-family: var(--font-mono);
-    font-weight: 700;
+    font-weight: 800;
     padding: 2px 7px;
     border-radius: 6px;
-    background: var(--bg-3);
-    color: var(--text-2);
+    background: rgba(0, 0, 0, 0.06);
+    color: #000000;
+    border: 1px solid rgba(0, 0, 0, 0.12);
   }
   .nav-item.active .nav-count-badge {
-    background: var(--gold);
-    color: #000;
+    background: #FFFFFF !important;
+    color: #000000 !important;
+    border-color: #FFFFFF !important;
   }
 
   /* ── Mobile Bottom Navigation Bar ── */
@@ -99,9 +109,9 @@
       justify-content: center;
       flex: 1;
       height: 100%;
+      color: var(--text-2);
       text-decoration: none;
-      color: var(--text-3);
-      font-size: 10px;
+      font-size: 10.5px;
       font-weight: 700;
       gap: 3px;
       transition: color 0.15s ease;
@@ -115,7 +125,8 @@
       line-height: 1;
     }
     .mobile-nav-link.active, .mobile-nav-link:active {
-      color: var(--gold);
+      color: #000000;
+      font-weight: 900;
     }
     /* Add bottom padding to main content to not overlap bottom bar */
     .main-content {
@@ -240,7 +251,7 @@
             $sidebarDisiplinCount = \App\Models\KasusDisiplin::where('is_active', true)->where('status_tahap', '!=', 'selesai_pembinaan')->forUser($user)->count();
           @endphp
           @if($sidebarDisiplinCount > 0)
-            <span class="nav-count-badge" style="background:var(--gold); color:#000;">{{ $sidebarDisiplinCount }}</span>
+            <span class="nav-count-badge">{{ $sidebarDisiplinCount }}</span>
           @endif
         </a>
       @endif
