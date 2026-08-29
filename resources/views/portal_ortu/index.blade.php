@@ -605,6 +605,30 @@
       border: 1px solid var(--border);
       flex-wrap: wrap;
     }
+    .btn-portal-tab {
+      background: var(--bg-subtle);
+      border: 1px solid var(--border);
+      padding: 6px 14px;
+      border-radius: var(--r-sm);
+      font-size: 11.5px;
+      font-weight: 800;
+      color: var(--text);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all .2s ease;
+      font-family: var(--font-main);
+    }
+    .btn-portal-tab:hover {
+      background: var(--border);
+    }
+    .btn-portal-tab.active {
+      background: var(--text);
+      color: var(--bg);
+      border-color: var(--text);
+    }
+
     .period-btn {
       padding: 5px 12px;
       border-radius: 7px;
@@ -904,13 +928,13 @@
             Profil Lengkap Siswa
           </span>
           
-          <div style="display:flex; gap:6px; flex-wrap:wrap;">
-            <a href="#riwayat-kehadiran" style="background:var(--bg-subtle); border:1px solid var(--border); padding:5px 12px; border-radius:var(--r-sm); font-size:11.5px; font-weight:800; color:var(--text); text-decoration:none; display:inline-flex; align-items:center; gap:5px;">
+          <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <button type="button" id="btnToggleAbsen" onclick="togglePortalSection('absen')" class="btn-portal-tab">
               <i class="bi bi-calendar-check"></i> Rekap Absen
-            </a>
-            <a href="#portofolio-karakter" style="background:var(--bg-subtle); border:1px solid var(--border); padding:5px 12px; border-radius:var(--r-sm); font-size:11.5px; font-weight:800; color:var(--text); text-decoration:none; display:inline-flex; align-items:center; gap:5px;">
+            </button>
+            <button type="button" id="btnToggleKasus" onclick="togglePortalSection('kasus')" class="btn-portal-tab">
               <i class="bi bi-shield-check"></i> Rekap Kasus
-            </a>
+            </button>
           </div>
         </div>
 
@@ -1017,7 +1041,7 @@
       </div>
 
       {{-- 2. REKAPITULASI & RIWAYAT KEHADIRAN TERPADU --}}
-      <div id="riwayat-kehadiran" style="scroll-margin-top: 70px;">
+      <div id="riwayat-kehadiran" style="scroll-margin-top: 70px; display: {{ (request()->has('periode') || request()->has('tanggal') || request()->has('bulan') || request()->has('tahun')) ? 'block' : 'none' }};">
         
         {{-- KARTU SKOR DISIPLIN & 4 METRIK KEHADIRAN (KPI) --}}
         <div class="stats-overview-grid">
@@ -1407,7 +1431,6 @@
       </div>
 
       {{-- 3. PORTOFOLIO KARAKTER, KEDISIPLINAN & SELF-REWARD --}}
-      {{-- 3. PORTOFOLIO KARAKTER, KEDISIPLINAN & SELF-REWARD --}}
       @php
         $poinBersih = $kasusDisiplin ? $kasusDisiplin->poin_bersih : 0;
         $totalPelanggaran = $kasusDisiplin ? $kasusDisiplin->total_poin_pelanggaran : 0;
@@ -1417,7 +1440,7 @@
         $a3 = $pengaturanDisiplin->ambang_tahap_3_wakasis ?? 50;
         $a4 = $pengaturanDisiplin->ambang_tahap_4_kepsek ?? 75;
       @endphp
-      <div class="dossier-card" id="portofolio-karakter" style="margin-top: 20px; scroll-margin-top: 70px;">
+      <div class="dossier-card" id="portofolio-karakter" style="margin-top: 20px; scroll-margin-top: 70px; display: none;">
         <div class="dossier-header">
           <div>
             <h3 style="font-size:14.5px; font-weight:800; color:var(--text); margin:0;">Portofolio Karakter &amp; Kredit Kedisiplinan</h3>
@@ -1619,6 +1642,64 @@
     function resetSiswaTersimpan() {
       window.location.href = '/cek-presensi';
     }
+    function togglePortalSection(type) {
+      const secAbsen = document.getElementById('riwayat-kehadiran');
+      const secKasus = document.getElementById('portofolio-karakter');
+      const btnAbsen = document.getElementById('btnToggleAbsen');
+      const btnKasus = document.getElementById('btnToggleKasus');
+
+      if (!secAbsen || !secKasus) return;
+
+      if (type === 'absen') {
+        if (secAbsen.style.display === 'none' || secAbsen.style.display === '') {
+          secAbsen.style.display = 'block';
+          secKasus.style.display = 'none';
+          if (btnAbsen) btnAbsen.classList.add('active');
+          if (btnKasus) btnKasus.classList.remove('active');
+          setTimeout(function() {
+            secAbsen.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }, 50);
+        } else {
+          secAbsen.style.display = 'none';
+          if (btnAbsen) btnAbsen.classList.remove('active');
+        }
+      } else if (type === 'kasus') {
+        if (secKasus.style.display === 'none' || secKasus.style.display === '') {
+          secKasus.style.display = 'block';
+          secAbsen.style.display = 'none';
+          if (btnKasus) btnKasus.classList.add('active');
+          if (btnAbsen) btnAbsen.classList.remove('active');
+          setTimeout(function() {
+            secKasus.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }, 50);
+        } else {
+          secKasus.style.display = 'none';
+          if (btnKasus) btnKasus.classList.remove('active');
+        }
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      const secAbsen = document.getElementById('riwayat-kehadiran');
+      const btnAbsen = document.getElementById('btnToggleAbsen');
+      const secKasus = document.getElementById('portofolio-karakter');
+      const btnKasus = document.getElementById('btnToggleKasus');
+
+      const urlParams = new URLSearchParams(window.location.search);
+      const hash = window.location.hash;
+
+      if (hash === '#portofolio-karakter') {
+        if (secKasus) secKasus.style.display = 'block';
+        if (secAbsen) secAbsen.style.display = 'none';
+        if (btnKasus) btnKasus.classList.add('active');
+        if (btnAbsen) btnAbsen.classList.remove('active');
+      } else if (hash === '#riwayat-kehadiran' || urlParams.has('periode') || urlParams.has('tanggal') || urlParams.has('bulan') || urlParams.has('tahun')) {
+        if (secAbsen) secAbsen.style.display = 'block';
+        if (secKasus) secKasus.style.display = 'none';
+        if (btnAbsen) btnAbsen.classList.add('active');
+        if (btnKasus) btnKasus.classList.remove('active');
+      }
+    });
   </script>
 
 </body>
