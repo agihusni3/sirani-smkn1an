@@ -871,8 +871,8 @@
       </div>
     @endif
 
-    {{-- PENGUMUMAN RESMI SEKOLAH (JIKA ADA) --}}
-    @if(isset($pengumumans) && $pengumumans->count() > 0)
+    {{-- PENGUMUMAN RESMI SEKOLAH (SAAT LANDING / SEBELUM PILIH SISWA) --}}
+    @if(!$siswa && isset($pengumumans) && $pengumumans->count() > 0)
       <div style="margin-bottom: 20px;">
         @foreach($pengumumans as $p)
           @php $badge = $p->kategori_badge; @endphp
@@ -934,6 +934,12 @@
             </button>
             <button type="button" id="btnToggleKasus" onclick="togglePortalSection('kasus')" class="btn-portal-tab">
               <i class="bi bi-shield-check"></i> Rekap Kasus
+            </button>
+            <button type="button" id="btnTogglePengumuman" onclick="togglePortalSection('pengumuman')" class="btn-portal-tab">
+              <i class="bi bi-megaphone"></i> Pengumuman
+              @if(isset($pengumumans) && $pengumumans->count() > 0)
+                <span style="font-size:10px; background:var(--text); color:var(--bg); padding:1px 6px; border-radius:10px; margin-left:2px;">{{ $pengumumans->count() }}</span>
+              @endif
             </button>
           </div>
         </div>
@@ -1566,6 +1572,52 @@
             <strong>Prinsip Pendidikan Positif:</strong> Seluruh catatan ketertiban bersifat edukatif dan dapat dipulihkan melalui perbaikan perilaku, keaktifan ibadah, serta konsistensi hadir tepat waktu di sekolah.
           </span>
         </div>
+      {{-- 4. PENGUMUMAN RESMI SEKOLAH --}}
+      <div class="dossier-card" id="section-pengumuman" style="margin-top: 20px; scroll-margin-top: 70px; display: none;">
+        <div class="dossier-header">
+          <div>
+            <h3 style="font-size:14.5px; font-weight:800; color:var(--text); margin:0;">Pengumuman &amp; Informasi Sekolah</h3>
+            <p style="font-size:11.5px; color:var(--text-3); margin-top:2px;">Pemberitahuan resmi dari pihak SMKN 1 Air Naningan untuk wali murid</p>
+          </div>
+          @if(isset($pengumumans) && $pengumumans->count() > 0)
+            <span style="font-size:11.5px; font-weight:800; color:var(--text);">
+              {{ $pengumumans->count() }} Pengumuman Aktif
+            </span>
+          @endif
+        </div>
+
+        @if(isset($pengumumans) && $pengumumans->count() > 0)
+          <div style="display:flex; flex-direction:column; gap:12px;">
+            @foreach($pengumumans as $p)
+              @php $badge = $p->kategori_badge; @endphp
+              <div style="background:var(--bg-subtle); border:1px solid var(--border); border-radius:var(--r-md); padding:14px 16px;">
+                <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:6px; margin-bottom:4px;">
+                  <span style="font-size:11px; font-weight:800; color:var(--text); text-transform:uppercase; letter-spacing:0.4px;">
+                    {{ $badge['label'] }}
+                  </span>
+                  <span style="font-size:11px; color:var(--text-3); font-weight:600;">
+                    <i class="bi bi-clock"></i> {{ $p->created_at->translatedFormat('d M Y') }}
+                  </span>
+                </div>
+                <h4 style="font-size:14px; font-weight:800; color:var(--text); margin:0 0 6px;">{{ $p->judul }}</h4>
+                <p style="font-size:12.5px; color:var(--text-2); line-height:1.5; margin:0; white-space:pre-line;">{{ $p->isi_pesan }}</p>
+                
+                @if($p->banner_url)
+                  <div style="margin-top:10px; border-radius:8px; overflow:hidden; border:1px solid var(--border); max-width:100%;">
+                    <a href="{{ $p->banner_url }}" target="_blank" title="Klik untuk memperbesar gambar">
+                      <img src="{{ $p->banner_url }}" alt="{{ $p->judul }}" style="width:100%; max-height:380px; object-fit:contain; background:rgba(0,0,0,0.02); display:block;" />
+                    </a>
+                  </div>
+                @endif
+              </div>
+            @endforeach
+          </div>
+        @else
+          <div style="text-align:center; padding:24px 16px; color:var(--text-3); font-size:12px;">
+            <i class="bi bi-megaphone" style="font-size:24px; display:block; margin-bottom:6px; opacity:0.6;"></i>
+            Saat ini belum ada pengumuman resmi terbaru dari sekolah.
+          </div>
+        @endif
       </div>
 
     @endif
@@ -1645,17 +1697,20 @@
     function togglePortalSection(type) {
       const secAbsen = document.getElementById('riwayat-kehadiran');
       const secKasus = document.getElementById('portofolio-karakter');
+      const secPengumuman = document.getElementById('section-pengumuman');
       const btnAbsen = document.getElementById('btnToggleAbsen');
       const btnKasus = document.getElementById('btnToggleKasus');
-
-      if (!secAbsen || !secKasus) return;
+      const btnPengumuman = document.getElementById('btnTogglePengumuman');
 
       if (type === 'absen') {
+        if (!secAbsen) return;
         if (secAbsen.style.display === 'none' || secAbsen.style.display === '') {
           secAbsen.style.display = 'block';
-          secKasus.style.display = 'none';
+          if (secKasus) secKasus.style.display = 'none';
+          if (secPengumuman) secPengumuman.style.display = 'none';
           if (btnAbsen) btnAbsen.classList.add('active');
           if (btnKasus) btnKasus.classList.remove('active');
+          if (btnPengumuman) btnPengumuman.classList.remove('active');
           setTimeout(function() {
             secAbsen.scrollIntoView({ behavior: 'smooth', block: 'start' });
           }, 50);
@@ -1664,17 +1719,36 @@
           if (btnAbsen) btnAbsen.classList.remove('active');
         }
       } else if (type === 'kasus') {
+        if (!secKasus) return;
         if (secKasus.style.display === 'none' || secKasus.style.display === '') {
           secKasus.style.display = 'block';
-          secAbsen.style.display = 'none';
+          if (secAbsen) secAbsen.style.display = 'none';
+          if (secPengumuman) secPengumuman.style.display = 'none';
           if (btnKasus) btnKasus.classList.add('active');
           if (btnAbsen) btnAbsen.classList.remove('active');
+          if (btnPengumuman) btnPengumuman.classList.remove('active');
           setTimeout(function() {
             secKasus.scrollIntoView({ behavior: 'smooth', block: 'start' });
           }, 50);
         } else {
           secKasus.style.display = 'none';
           if (btnKasus) btnKasus.classList.remove('active');
+        }
+      } else if (type === 'pengumuman') {
+        if (!secPengumuman) return;
+        if (secPengumuman.style.display === 'none' || secPengumuman.style.display === '') {
+          secPengumuman.style.display = 'block';
+          if (secAbsen) secAbsen.style.display = 'none';
+          if (secKasus) secKasus.style.display = 'none';
+          if (btnPengumuman) btnPengumuman.classList.add('active');
+          if (btnAbsen) btnAbsen.classList.remove('active');
+          if (btnKasus) btnKasus.classList.remove('active');
+          setTimeout(function() {
+            secPengumuman.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }, 50);
+        } else {
+          secPengumuman.style.display = 'none';
+          if (btnPengumuman) btnPengumuman.classList.remove('active');
         }
       }
     }
@@ -1684,6 +1758,8 @@
       const btnAbsen = document.getElementById('btnToggleAbsen');
       const secKasus = document.getElementById('portofolio-karakter');
       const btnKasus = document.getElementById('btnToggleKasus');
+      const secPengumuman = document.getElementById('section-pengumuman');
+      const btnPengumuman = document.getElementById('btnTogglePengumuman');
 
       const urlParams = new URLSearchParams(window.location.search);
       const hash = window.location.hash;
@@ -1691,13 +1767,24 @@
       if (hash === '#portofolio-karakter') {
         if (secKasus) secKasus.style.display = 'block';
         if (secAbsen) secAbsen.style.display = 'none';
+        if (secPengumuman) secPengumuman.style.display = 'none';
         if (btnKasus) btnKasus.classList.add('active');
         if (btnAbsen) btnAbsen.classList.remove('active');
+        if (btnPengumuman) btnPengumuman.classList.remove('active');
+      } else if (hash === '#section-pengumuman' || hash === '#pengumuman') {
+        if (secPengumuman) secPengumuman.style.display = 'block';
+        if (secAbsen) secAbsen.style.display = 'none';
+        if (secKasus) secKasus.style.display = 'none';
+        if (btnPengumuman) btnPengumuman.classList.add('active');
+        if (btnAbsen) btnAbsen.classList.remove('active');
+        if (btnKasus) btnKasus.classList.remove('active');
       } else if (hash === '#riwayat-kehadiran' || urlParams.has('periode') || urlParams.has('tanggal') || urlParams.has('bulan') || urlParams.has('tahun')) {
         if (secAbsen) secAbsen.style.display = 'block';
         if (secKasus) secKasus.style.display = 'none';
+        if (secPengumuman) secPengumuman.style.display = 'none';
         if (btnAbsen) btnAbsen.classList.add('active');
         if (btnKasus) btnKasus.classList.remove('active');
+        if (btnPengumuman) btnPengumuman.classList.remove('active');
       }
     });
   </script>
