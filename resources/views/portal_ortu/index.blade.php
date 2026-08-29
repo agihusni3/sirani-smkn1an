@@ -707,13 +707,18 @@
       white-space: nowrap;
     }
     .period-btn:hover {
-      background: var(--gold-subtle);
-      color: var(--gold-dark);
+      background: rgba(0,0,0,0.06);
+      color: var(--text);
     }
     .period-btn.active {
-      background: var(--gold);
-      color: #0F172A;
+      background: #000000 !important;
+      color: #FFFFFF !important;
       font-weight: 800;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+    }
+    .period-btn.active i,
+    .period-btn.active span {
+      color: #FFFFFF !important;
     }
 
     .period-input-wrap {
