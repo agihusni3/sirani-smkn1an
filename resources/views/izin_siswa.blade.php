@@ -184,10 +184,13 @@
       border-color: var(--border-2);
     }
     .izin-tab-btn.active {
-      color: #0F172A;
-      background: linear-gradient(135deg, var(--gold), var(--gold-2));
-      border-color: var(--gold);
-      box-shadow: 0 2px 10px var(--gold-glow);
+      color: #FFFFFF !important;
+      background: #000000 !important;
+      border-color: #000000 !important;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+    }
+    .izin-tab-btn.active i {
+      color: #FFFFFF !important;
     }
     .izin-tab-pane { display: none; }
     .izin-tab-pane.active { display: block; }
