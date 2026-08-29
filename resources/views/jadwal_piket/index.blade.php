@@ -88,7 +88,7 @@
       </div>
       <button type="button" id="btnToggleFormPiket" onclick="toggleFormPiket()" class="btn btn-gold" style="height:38px; padding:0 16px; font-size:12.5px; font-weight:800; display:inline-flex; align-items:center; gap:6px;">
         <i class="bi bi-person-plus-fill" id="iconTogglePiket"></i>
-        <span id="textTogglePiket">+ Tambah Guru Piket</span>
+        <span id="textTogglePiket">Tambah Guru Piket</span>
       </button>
     </div>
 

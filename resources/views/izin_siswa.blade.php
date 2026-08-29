@@ -248,8 +248,19 @@
     @if(session('error'))<div class="alert-error" style="margin-bottom:18px;"><i class="bi bi-exclamation-triangle-fill" style="margin-right:6px;"></i>{{ session('error') }}</div>@endif
     @if(isset($errors) && $errors->any())<div class="alert-error" style="margin-bottom:18px;">@foreach($errors->all() as $err)<div><i class="bi bi-x-circle-fill" style="margin-right:6px;"></i>{{ $err }}</div>@endforeach</div>@endif
 
-    {{-- PANEL CATAT PERIZINAN BARU --}}
-    <div class="izin-form-card">
+    {{-- TOOLBAR & TOMBOL TOGGLE CATAT PERIZINAN BARU --}}
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px; flex-wrap:wrap; gap:10px;">
+      <div style="font-size:13px; font-weight:700; color:var(--text-2);">
+        <i class="bi bi-file-earmark-medical" style="margin-right:4px;"></i> Pencatatan perizinan resmi siswa &amp; guru
+      </div>
+      <button type="button" id="btnToggleFormIzin" onclick="toggleFormIzin()" class="btn btn-gold" style="height:38px; padding:0 16px; font-size:12.5px; font-weight:800; display:inline-flex; align-items:center; gap:6px;">
+        <i class="bi bi-plus-circle-fill" id="iconToggleIzin"></i>
+        <span id="textToggleIzin">Catat Perizinan Baru</span>
+      </button>
+    </div>
+
+    {{-- PANEL CATAT PERIZINAN BARU (HIDDEN DEFAULT / TOGGLE) --}}
+    <div class="izin-form-card" id="panelFormIzin" style="display:none; margin-bottom:24px; animation:fadeIn 0.25s ease;">
       <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:20px; padding-bottom:14px; border-bottom:1px solid var(--border);">
         <div style="display:flex; align-items:center; gap:8px;">
           <div style="width:32px; height:32px; border-radius:8px; background:var(--green-dim); color:var(--green); display:flex; align-items:center; justify-content:center; font-size:16px;">
@@ -261,13 +272,20 @@
           </div>
         </div>
         
-        {{-- Kategori Toggle Segmented --}}
-        <div style="display:flex; background:var(--bg-3); border:1px solid var(--border-2); border-radius:12px; padding:4px; gap:4px;">
-          <button type="button" class="btn-toggle-kat active" id="btnKatSiswa" onclick="switchKategori('siswa')">
-            <i class="bi bi-people-fill"></i> Peserta Didik (Siswa)
-          </button>
-          <button type="button" class="btn-toggle-kat" id="btnKatGuru" onclick="switchKategori('guru')">
-            <i class="bi bi-person-badge-fill"></i> Guru &amp; Pegawai
+        <div style="display:flex; align-items:center; gap:8px;">
+          {{-- Kategori Toggle Segmented --}}
+          <div style="display:flex; background:var(--bg-3); border:1px solid var(--border-2); border-radius:12px; padding:4px; gap:4px;">
+            <button type="button" class="btn-toggle-kat active" id="btnKatSiswa" onclick="switchKategori('siswa')">
+              <i class="bi bi-people-fill"></i> Peserta Didik (Siswa)
+            </button>
+            <button type="button" class="btn-toggle-kat" id="btnKatGuru" onclick="switchKategori('guru')">
+              <i class="bi bi-person-badge-fill"></i> Guru &amp; Pegawai
+            </button>
+          </div>
+
+          {{-- Tombol Tutup --}}
+          <button type="button" onclick="toggleFormIzin(false)" class="btn btn-outline" style="height:32px; width:32px; padding:0; display:inline-flex; align-items:center; justify-content:center; border-radius:6px; color:var(--text-3);" title="Tutup Form">
+            <i class="bi bi-x-lg"></i>
           </button>
         </div>
       </div>
@@ -903,13 +921,30 @@
     });
   }
 
-  // Close combobox when clicking outside
-  document.addEventListener('click', function(e) {
-    const wrap = document.querySelector('.person-picker-wrap');
-    if (wrap && !wrap.contains(e.target)) {
-      closePersonPickerDropdown();
+  // ── Toggle Form Pencatatan Izin ──
+  function toggleFormIzin(forceState) {
+    const panel = document.getElementById('panelFormIzin');
+    const text = document.getElementById('textToggleIzin');
+    const icon = document.getElementById('iconToggleIzin');
+    const btn = document.getElementById('btnToggleFormIzin');
+    if (!panel) return;
+
+    const isVisible = (panel.style.display !== 'none' && panel.style.display !== '');
+    const targetState = (forceState !== undefined) ? forceState : !isVisible;
+
+    if (targetState) {
+      panel.style.display = 'block';
+      if (text) text.innerText = 'Tutup Form';
+      if (icon) icon.className = 'bi bi-x-lg';
+      if (btn) btn.classList.add('active');
+      panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } else {
+      panel.style.display = 'none';
+      if (text) text.innerText = 'Catat Perizinan Baru';
+      if (icon) icon.className = 'bi bi-plus-circle-fill';
+      if (btn) btn.classList.remove('active');
     }
-  });
+  }
 
   document.addEventListener('DOMContentLoaded', () => {
     switchKategori('siswa');
