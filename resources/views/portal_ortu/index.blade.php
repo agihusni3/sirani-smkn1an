@@ -29,35 +29,14 @@
       --bg-subtle: #F1F5F9;
       --border: #E2E8F0;
       --border-2: #CBD5E1;
-      --text: #0F172A;
-      --text-2: #475569;
-      --text-3: #94A3B8;
+      --text: #000000;
+      --text-2: #000000;
+      --text-3: #000000;
       
-      --gold: #CA8A04;
-      --gold-dark: #A16207;
-      --gold-light: #FEF08A;
-      --gold-subtle: rgba(202, 138, 4, 0.08);
-      --gold-border: rgba(202, 138, 4, 0.25);
-      
-      --green: #16A34A;
-      --green-subtle: rgba(22, 163, 74, 0.1);
-      
-      --amber: #D97706;
-      --amber-subtle: rgba(217, 119, 6, 0.1);
-      
-      --red: #DC2626;
-      --red-subtle: rgba(220, 38, 38, 0.1);
-      
-      --blue: #2563EB;
-      --blue-subtle: rgba(37, 99, 235, 0.1);
-
-      --teal: #0D9488;
-      --teal-subtle: rgba(13, 148, 136, 0.1);
-      
-      --r-sm: 8px;
-      --r-md: 12px;
-      --r-lg: 16px;
-      --r-xl: 20px;
+      --r-sm: 6px;
+      --r-md: 8px;
+      --r-lg: 10px;
+      --r-xl: 12px;
       --shadow-sm: 0 1px 3px rgba(0,0,0,0.04);
       --shadow-md: 0 4px 14px rgba(0,0,0,0.05);
       
@@ -70,7 +49,7 @@
     body {
       font-family: var(--font-main);
       background-color: var(--bg);
-      color: var(--text);
+      color: #000000;
       line-height: 1.5;
       min-height: 100vh;
       display: flex;
@@ -80,7 +59,7 @@
 
     /* ─── Top Navigation ─── */
     .top-nav {
-      background: var(--bg-card);
+      background: #FFFFFF;
       border-bottom: 1px solid var(--border);
       position: sticky;
       top: 0;
@@ -100,32 +79,32 @@
       align-items: center;
       gap: 10px;
       text-decoration: none;
-      color: var(--text);
+      color: #000000;
     }
     .brand-icon {
       width: 36px;
       height: 36px;
-      background: var(--bg-subtle);
-      border: 1px solid var(--border-2);
+      background: #000000;
+      border: 1px solid #000000;
       border-radius: var(--r-sm);
       display: flex;
       align-items: center;
       justify-content: center;
-      color: var(--text);
+      color: #FFFFFF;
       font-size: 16px;
       flex-shrink: 0;
     }
     .brand-text h1 {
       font-size: 14px;
-      font-weight: 800;
+      font-weight: 900;
       line-height: 1.2;
-      color: var(--text);
+      color: #000000;
       letter-spacing: -0.01em;
     }
     .brand-text p {
       font-size: 11px;
-      color: var(--text-3);
-      font-weight: 600;
+      color: #000000;
+      font-weight: 700;
     }
 
     /* ─── Container ─── */
@@ -139,7 +118,7 @@
 
     /* ─── Institutional Search Console ─── */
     .search-console-card {
-      background: var(--bg-card);
+      background: #F8FAFC;
       border: 1px solid var(--border);
       border-radius: var(--r-xl);
       padding: 24px 20px;
@@ -151,8 +130,8 @@
       align-items: center;
       gap: 6px;
       font-size: 11px;
-      font-weight: 800;
-      color: var(--text-3);
+      font-weight: 900;
+      color: #000000;
       margin-bottom: 10px;
       text-transform: uppercase;
       letter-spacing: 0.5px;
@@ -163,11 +142,11 @@
       line-height: 1.25;
       margin-bottom: 8px;
       letter-spacing: -0.02em;
-      color: var(--text);
+      color: #000000;
     }
     .search-desc {
       font-size: 13px;
-      color: var(--text-2);
+      color: #000000;
       max-width: 640px;
       line-height: 1.55;
       margin-bottom: 18px;
@@ -179,7 +158,7 @@
     }
     .search-input-wrap {
       display: flex;
-      background: var(--bg-subtle);
+      background: #FFFFFF;
       border: 1px solid var(--border-2);
       border-radius: var(--r-md);
       padding: 4px;
@@ -187,8 +166,8 @@
       gap: 4px;
     }
     .search-input-wrap:focus-within {
-      border-color: var(--text);
-      background: var(--bg-card);
+      border-color: #000000;
+      background: #FFFFFF;
     }
     .search-input {
       flex: 1;
@@ -196,23 +175,23 @@
       outline: none;
       padding: 10px 12px;
       font-size: 13.5px;
-      font-weight: 600;
-      color: var(--text);
+      font-weight: 700;
+      color: #000000;
       background: transparent;
       font-family: var(--font-main);
       min-width: 0;
     }
     .search-input::placeholder {
-      color: var(--text-3);
+      color: #64748B;
       font-weight: 500;
       font-size: 12.5px;
     }
     .btn-search {
-      background: var(--text);
-      color: var(--bg);
-      font-weight: 800;
+      background: #000000 !important;
+      color: #FFFFFF !important;
+      font-weight: 900;
       font-size: 12.5px;
-      border: none;
+      border: 1px solid #000000;
       border-radius: var(--r-sm);
       padding: 0 16px;
       cursor: pointer;
@@ -226,7 +205,7 @@
       height: 40px;
     }
     .btn-search:hover {
-      opacity: 0.9;
+      opacity: 0.85;
     }
 
     /* ─── Highlights Features Grid ─── */
@@ -246,10 +225,10 @@
     .portal-feature-icon {
       width: 32px;
       height: 32px;
-      border-radius: 8px;
-      background: var(--bg-subtle);
-      border: 1px solid var(--border);
-      color: var(--text);
+      border-radius: var(--r-sm);
+      background: #000000;
+      border: 1px solid #000000;
+      color: #FFFFFF;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -258,14 +237,14 @@
     }
     .portal-feature-text strong {
       font-size: 12.5px;
-      font-weight: 800;
-      color: var(--text);
+      font-weight: 900;
+      color: #000000;
       display: block;
       line-height: 1.3;
     }
     .portal-feature-text span {
       font-size: 11.5px;
-      color: var(--text-3);
+      color: #000000;
       line-height: 1.4;
       display: block;
       margin-top: 2px;
@@ -281,7 +260,7 @@
 
     /* ─── Compact Search Bar (When Student Found) ─── */
     .compact-search-card {
-      background: var(--bg-card);
+      background: #F8FAFC;
       border: 1px solid var(--border);
       border-radius: var(--r-md);
       padding: 10px 14px;
@@ -308,7 +287,7 @@
 
     /* ─── Student Profile & Live Gate Widget (Dossier) ─── */
     .dossier-card {
-      background: var(--bg-card);
+      background: #FFFFFF;
       border: 1px solid var(--border);
       border-radius: var(--r-xl);
       padding: 22px 24px;
@@ -353,7 +332,7 @@
       justify-content: center;
       font-size: 26px;
       font-weight: 900;
-      color: var(--text);
+      color: #000000;
       flex-shrink: 0;
       overflow: hidden;
     }
@@ -365,7 +344,7 @@
     .student-name {
       font-size: 19px;
       font-weight: 900;
-      color: var(--text);
+      color: #000000;
       line-height: 1.25;
       margin-bottom: 4px;
       letter-spacing: -0.01em;
@@ -378,22 +357,19 @@
     }
     .tag-pill {
       font-size: 11.5px;
-      font-weight: 700;
+      font-weight: 800;
       padding: 4px 10px;
-      border-radius: 6px;
-      background: var(--bg-subtle);
-      border: 1px solid var(--border);
-      color: var(--text-2);
+      border-radius: var(--r-sm);
+      background: #F1F5F9;
+      border: 1px solid var(--border-2);
+      color: #000000 !important;
       display: inline-flex;
       align-items: center;
       gap: 5px;
       text-decoration: none;
     }
-    .tag-pill.gold {
-      background: var(--bg-subtle);
-      border-color: var(--border-2);
-      color: var(--text);
-      font-weight: 800;
+    .tag-pill i {
+      color: #000000 !important;
     }
 
     @media (max-width: 600px) {
@@ -456,17 +432,17 @@
 
     /* ─── Today's Live Attendance Widget ─── */
     .today-widget {
-      background: var(--bg-subtle);
+      background: #F1F5F9;
       border: 1px solid var(--border);
       border-radius: var(--r-lg);
       padding: 16px 18px;
     }
     .today-widget-title {
       font-size: 11px;
-      font-weight: 800;
+      font-weight: 900;
       text-transform: uppercase;
       letter-spacing: 0.5px;
-      color: var(--text-3);
+      color: #000000;
       margin-bottom: 12px;
       display: flex;
       justify-content: space-between;
@@ -480,16 +456,16 @@
       gap: 10px;
     }
     .today-time-box {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
+      background: #FFFFFF;
+      border: 1px solid var(--border-2);
       border-radius: var(--r-sm);
       padding: 10px;
       text-align: center;
     }
     .today-time-label {
       font-size: 10.5px;
-      font-weight: 800;
-      color: var(--text-3);
+      font-weight: 900;
+      color: #000000;
       text-transform: uppercase;
       letter-spacing: 0.4px;
     }
@@ -497,7 +473,7 @@
       font-family: var(--font-mono);
       font-size: 16px;
       font-weight: 900;
-      color: var(--text);
+      color: #000000;
       margin-top: 2px;
     }
 
@@ -506,23 +482,19 @@
       display: inline-flex;
       align-items: center;
       gap: 5px;
-      font-size: 10.5px;
-      font-weight: 800;
-      padding: 3px 9px;
-      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 900;
+      padding: 2px 6px;
+      border-radius: 4px;
       text-transform: uppercase;
       letter-spacing: 0.4px;
       white-space: nowrap;
       flex-shrink: 0;
       line-height: 1.3;
+      background: transparent !important;
+      color: #000000 !important;
+      border: none !important;
     }
-    .status-hadir { background: var(--green-subtle); color: var(--green); border: 1px solid rgba(22,163,74,0.25); }
-    .status-terlambat { background: var(--amber-subtle); color: var(--amber); border: 1px solid rgba(217,119,6,0.25); }
-    .status-izin, .status-sakit { background: var(--blue-subtle); color: var(--blue); border: 1px solid rgba(37,99,235,0.25); }
-    .status-bolos { background: rgba(153,27,27,0.1); color: #991B1B; border: 1px solid rgba(153,27,27,0.25); }
-    .status-alpha { background: var(--red-subtle); color: var(--red); border: 1px solid rgba(220,38,38,0.25); }
-    .status-pkl { background: var(--teal-subtle); color: var(--teal); border: 1px solid rgba(13,148,136,0.25); }
-    .status-none { background: var(--bg-card); color: var(--text-3); border: 1px solid var(--border); }
 
     /* ─── Discipline Score & 4 KPI Cards ─── */
     .stats-overview-grid {
@@ -545,11 +517,11 @@
     }
 
     .discipline-score-card {
-      background: var(--bg-card);
+      background: #F1F5F9;
       border: 1px solid var(--border);
       border-radius: var(--r-lg);
       padding: 16px 18px;
-      color: var(--text);
+      color: #000000;
       display: flex;
       flex-direction: column;
       justify-content: center;
@@ -560,31 +532,19 @@
       font-weight: 900;
       line-height: 1;
       font-family: var(--font-mono);
-      color: var(--text);
+      color: #000000;
     }
     .discipline-lbl {
       font-size: 11px;
-      font-weight: 800;
+      font-weight: 900;
       text-transform: uppercase;
       letter-spacing: 0.5px;
       margin-top: 4px;
-      color: var(--text-3);
-    }
-    .discipline-badge {
-      display: inline-block;
-      background: var(--gold-subtle);
-      border: 1px solid var(--gold-border);
-      color: var(--gold);
-      padding: 2px 8px;
-      border-radius: 12px;
-      font-size: 11px;
-      font-weight: 800;
-      margin-top: 6px;
-      width: fit-content;
+      color: #000000;
     }
 
     .stat-metric-card {
-      background: var(--bg-card);
+      background: #F1F5F9;
       border: 1px solid var(--border);
       border-radius: var(--r-lg);
       padding: 14px 16px;
@@ -603,13 +563,13 @@
       font-weight: 900;
       line-height: 1.1;
       font-family: var(--font-mono);
-      color: var(--text);
+      color: #000000;
       margin-top: 4px;
     }
     .stat-metric-title {
       font-size: 11px;
-      font-weight: 700;
-      color: var(--text-2);
+      font-weight: 900;
+      color: #000000;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -617,7 +577,7 @@
 
     /* ─── Period Control ─── */
     .period-control-card {
-      background: var(--bg-card);
+      background: #F8FAFC;
       border: 1px solid var(--border);
       border-radius: var(--r-md);
       padding: 8px 12px;
@@ -631,11 +591,11 @@
     }
     .period-tabs {
       display: inline-flex;
-      background: var(--bg-subtle);
-      padding: 3px;
-      border-radius: 10px;
-      gap: 3px;
-      border: 1px solid var(--border);
+      background: #E2E8F0;
+      padding: 4px;
+      border-radius: var(--r-md);
+      gap: 4px;
+      border: 1px solid var(--border-2);
       flex-wrap: wrap;
     }
     .portal-nav-btn-group {
@@ -644,13 +604,13 @@
       gap: 6px;
     }
     .btn-portal-tab {
-      background: var(--bg-card);
-      border: 1px solid var(--border-2);
+      background: #000000 !important;
+      color: #FFFFFF !important;
+      border: 1px solid #000000;
       padding: 6px 10px;
       border-radius: var(--r-sm);
       font-size: 11.5px;
       font-weight: 800;
-      color: #0F172A;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
@@ -660,16 +620,18 @@
       font-family: var(--font-main);
       white-space: nowrap;
       text-align: center;
+      opacity: 0.75;
     }
     .btn-portal-tab:hover {
-      background: var(--bg-subtle);
-      border-color: #000000;
+      opacity: 0.95;
     }
     .btn-portal-tab.active {
       background: #000000 !important;
       color: #FFFFFF !important;
       border-color: #000000 !important;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25) !important;
+      opacity: 1 !important;
+      font-weight: 900;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35) !important;
     }
     .btn-portal-tab.active i,
     .btn-portal-tab.active span {
@@ -677,27 +639,23 @@
     }
     .portal-badge-count {
       font-size: 9.5px;
-      font-weight: 800;
-      background: #000000;
-      color: #FFFFFF;
+      font-weight: 900;
+      background: #FFFFFF;
+      color: #000000;
       padding: 1px 5px;
       border-radius: 10px;
       margin-left: 2px;
       display: inline-block;
     }
-    .btn-portal-tab.active .portal-badge-count {
-      background: #FFFFFF !important;
-      color: #000000 !important;
-    }
 
     .period-btn {
       padding: 5px 12px;
-      border-radius: 7px;
+      border-radius: var(--r-sm);
       font-size: 11.5px;
-      font-weight: 700;
-      border: none;
-      background: transparent;
-      color: var(--text-2);
+      font-weight: 800;
+      border: 1px solid #000000;
+      background: #000000 !important;
+      color: #FFFFFF !important;
       cursor: pointer;
       text-decoration: none;
       display: inline-flex;
@@ -705,15 +663,18 @@
       gap: 5px;
       transition: all .15s ease;
       white-space: nowrap;
+      opacity: 0.65;
     }
     .period-btn:hover {
-      background: var(--gold-subtle);
-      color: var(--gold-dark);
+      opacity: 0.9;
+      color: #FFFFFF !important;
     }
     .period-btn.active {
-      background: var(--gold);
-      color: #0F172A;
-      font-weight: 800;
+      background: #000000 !important;
+      color: #FFFFFF !important;
+      font-weight: 900;
+      opacity: 1 !important;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
     }
 
     .period-input-wrap {
@@ -724,24 +685,24 @@
     }
     .form-control-pt {
       padding: 5px 10px;
-      border-radius: 6px;
+      border-radius: var(--r-sm);
       border: 1px solid var(--border-2);
-      background: var(--bg-subtle);
+      background: #FFFFFF;
       font-family: var(--font-main);
       font-size: 12px;
-      font-weight: 700;
-      color: var(--text);
+      font-weight: 800;
+      color: #000000;
       outline: none;
       cursor: pointer;
     }
     .form-control-pt:focus {
-      border-color: var(--gold);
-      background: var(--bg-card);
+      border-color: #000000;
+      background: #FFFFFF;
     }
 
     /* ─── Table Panel ─── */
     .panel {
-      background: var(--bg-card);
+      background: #FFFFFF;
       border: 1px solid var(--border);
       border-radius: var(--r-xl);
       padding: 0;
@@ -756,8 +717,9 @@
       justify-content: space-between;
       align-items: center;
       font-size: 14px;
-      font-weight: 800;
-      background: #FAFBFD;
+      font-weight: 900;
+      background: #F8FAFC;
+      color: #000000;
     }
     .table-wrap {
       overflow-x: auto;
@@ -771,25 +733,26 @@
       font-size: 13px;
     }
     th {
-      background: #F1F5F9;
-      color: var(--text-2);
-      font-weight: 800;
+      background: #E2E8F0;
+      color: #000000;
+      font-weight: 900;
       font-size: 11px;
       text-transform: uppercase;
       letter-spacing: 0.5px;
       padding: 12px 16px;
       text-align: left;
-      border-bottom: 1px solid var(--border);
+      border-bottom: 2px solid #CBD5E1;
       white-space: nowrap;
     }
     td {
       padding: 12px 16px;
       border-bottom: 1px solid var(--border);
-      color: var(--text);
+      color: #000000;
+      font-weight: 700;
       vertical-align: middle;
     }
     tbody tr:last-child td { border-bottom: none; }
-    tbody tr:hover { background: #FAFBFD; }
+    tbody tr:hover { background: #F8FAFC; }
 
     /* ─── Mobile Scroll Hint ─── */
     .mobile-scroll-hint {
@@ -798,7 +761,8 @@
       background: var(--bg-subtle);
       border-bottom: 1px solid var(--border);
       font-size: 11px;
-      color: var(--text-3);
+      color: #000000;
+      font-weight: 700;
       text-align: center;
     }
     @media (max-width: 768px) {
@@ -810,9 +774,10 @@
       text-align: center;
       padding: 24px 16px;
       font-size: 12px;
-      color: var(--text-3);
+      color: #000000;
+      font-weight: 700;
       border-top: 1px solid var(--border);
-      background: var(--bg-card);
+      background: #FFFFFF;
       margin-top: auto;
     }
   </style>
@@ -833,7 +798,7 @@
       </a>
 
       <div class="nav-actions" style="display:flex; align-items:center; gap:8px;">
-        <button type="button" id="btnPwaInstall" onclick="triggerPwaInstall()" style="background:var(--text); color:var(--bg); border:none; padding:6px 12px; border-radius:var(--r-sm); font-size:11.5px; font-weight:800; cursor:pointer; display:inline-flex; align-items:center; gap:5px; font-family:var(--font-main);">
+        <button type="button" id="btnPwaInstall" onclick="triggerPwaInstall()" style="background:#000000 !important; color:#FFFFFF !important; border:1px solid #000000; padding:6px 12px; border-radius:var(--r-sm); font-size:11.5px; font-weight:900; cursor:pointer; display:inline-flex; align-items:center; gap:5px; font-family:var(--font-main);">
           <i class="bi bi-phone"></i> <span>Instal Aplikasi</span>
         </button>
       </div>
@@ -858,7 +823,7 @@
         <div class="search-form-box">
           <form method="GET" action="{{ route('portal.ortu.index') }}">
             <div class="search-input-wrap">
-              <i class="bi bi-search" style="align-self:center; margin-left:12px; color:var(--text-3); font-size:15px;"></i>
+              <i class="bi bi-search" style="align-self:center; margin-left:12px; color:#000000; font-size:15px;"></i>
               <input
                 type="text"
                 name="keyword"
@@ -869,7 +834,7 @@
                 required
                 autofocus
               />
-              <button type="button" onclick="startQrScanner()" class="btn-search" style="background:var(--bg-subtle); color:var(--text); border:1px solid var(--border-2); padding:0 12px;" title="Scan QR Code Kartu Pelajar">
+              <button type="button" onclick="startQrScanner()" class="btn-search" style="background:#000000 !important; color:#FFFFFF !important; border:1px solid #000000; padding:0 12px;" title="Scan QR Code Kartu Pelajar">
                 <i class="bi bi-qr-code-scan"></i> <span style="display:none;" class="qr-btn-text">Scan</span>
               </button>
               <button type="submit" class="btn-search">
@@ -1017,8 +982,8 @@
                       if (str_starts_with($hpWaliClean, '0')) $hpWaliClean = '62' . substr($hpWaliClean, 1);
                       $pesanWaWali = rawurlencode("Halo Bapak/Ibu Wali Kelas {$waliKelas->nama}, saya orang tua dari {$siswa->nama} (Kelas " . ($rombel->nama_rombel ?? '-') . "). Ingin berkonsultasi mengenai kehadiran/perkembangan belajar ananda.");
                     @endphp
-                    <a href="https://wa.me/{{ $hpWaliClean }}?text={{ $pesanWaWali }}" target="_blank" class="tag-pill" style="color:#16A34A; font-weight:800;" title="Konsultasi WhatsApp dengan Wali Kelas">
-                      <i class="bi bi-whatsapp"></i> Hubungi Wali Kelas
+                    <a href="https://wa.me/{{ $hpWaliClean }}?text={{ $pesanWaWali }}" target="_blank" class="tag-pill" style="background:#000000 !important; color:#FFFFFF !important; border-color:#000000; font-weight:900;" title="Konsultasi WhatsApp dengan Wali Kelas">
+                      <i class="bi bi-whatsapp" style="color:#FFFFFF !important;"></i> Hubungi Wali Kelas
                     </a>
                   @endif
                 @endif
@@ -1435,17 +1400,17 @@
                           <span style="font-weight:800; font-size:12.5px; color:var(--text);">Alpha</span>
                         @endif
                       </td>
-                      <td style="font-size:12.5px; color:var(--text-2); min-width:180px;">
+                      <td style="font-size:12.5px; color:#000000; font-weight:700; min-width:180px;">
                         @if($abs->keterangan)
-                          <span style="font-weight:600; color:var(--text);"><i class="bi bi-chat-left-text-fill" style="color:var(--gold); font-size:11px; margin-right:4px;"></i>{{ $abs->keterangan }}</span>
+                          <span style="font-weight:700; color:#000000;"><i class="bi bi-chat-left-text-fill" style="color:#000000; font-size:11px; margin-right:4px;"></i>{{ $abs->keterangan }}</span>
                         @elseif($abs->status === 'bolos')
-                          <span style="color:#991B1B; font-weight:600;"><i class="bi bi-exclamation-triangle-fill"></i> Tidak tap pulang (tanpa izin piket)</span>
+                          <span style="color:#000000; font-weight:700;"><i class="bi bi-exclamation-triangle-fill" style="color:#000000;"></i> Tidak tap pulang (tanpa izin piket)</span>
                         @elseif($abs->status === 'alpha')
-                          <span style="color:#DC2626; font-weight:600;"><i class="bi bi-x-circle-fill"></i> Tidak hadir tanpa keterangan</span>
+                          <span style="color:#000000; font-weight:700;"><i class="bi bi-x-circle-fill" style="color:#000000;"></i> Tidak hadir tanpa keterangan</span>
                         @elseif($abs->status === 'terlambat')
-                          <span style="color:var(--amber); font-weight:600;"><i class="bi bi-clock-history"></i> Terlambat masuk gerbang</span>
+                          <span style="color:#000000; font-weight:700;"><i class="bi bi-clock-history" style="color:#000000;"></i> Terlambat masuk gerbang</span>
                         @elseif($abs->status === 'hadir')
-                          <span style="color:var(--text-3);"><i class="bi bi-check2"></i> Hadir pembelajaran reguler</span>
+                          <span style="color:#000000; font-weight:700;"><i class="bi bi-check2" style="color:#000000;"></i> Hadir pembelajaran reguler</span>
                         @else
                           -
                         @endif
@@ -1865,16 +1830,16 @@
       }
 
       let html = '<div style="background:var(--bg-subtle); border:1px solid var(--border); border-radius:var(--r-md); padding:12px 14px; margin-bottom:18px;">';
-      html += '<div style="font-size:11.5px; font-weight:800; color:var(--text); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">';
-      html += '<span><i class="bi bi-bookmark-check-fill" style="color:var(--text); margin-right:4px;"></i> Profil Anak Tersimpan di HP Ini</span>';
-      html += '<button type="button" onclick="clearSavedStudents()" style="background:none; border:none; color:var(--text-3); font-size:11px; font-weight:700; cursor:pointer;"><i class="bi bi-trash"></i> Hapus</button>';
+      html += '<div style="font-size:11.5px; font-weight:800; color:#000000; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">';
+      html += '<span><i class="bi bi-bookmark-check-fill" style="color:#000000; margin-right:4px;"></i> Profil Anak Tersimpan di HP Ini</span>';
+      html += '<button type="button" onclick="clearSavedStudents()" style="background:none; border:none; color:#000000; font-size:11px; font-weight:800; cursor:pointer;"><i class="bi bi-trash"></i> Hapus</button>';
       html += '</div>';
 
       html += '<div style="display:flex; flex-direction:column; gap:6px;">';
       saved.forEach(function(s) {
         html += '<div style="background:var(--bg-card); border:1px solid var(--border); border-radius:var(--r-sm); padding:8px 12px; display:flex; justify-content:space-between; align-items:center; gap:8px;">';
         html += '<div style="display:flex; align-items:center; gap:10px; min-width:0;">';
-        html += '<div style="width:32px; height:32px; border-radius:50%; background:var(--bg-subtle); border:1px solid var(--border); display:flex; align-items:center; justify-content:center; font-weight:800; font-size:13px; color:var(--text); flex-shrink:0; overflow:hidden;">';
+        html += '<div style="width:32px; height:32px; border-radius:50%; background:var(--bg-subtle); border:1px solid var(--border); display:flex; align-items:center; justify-content:center; font-weight:800; font-size:13px; color:#000000; flex-shrink:0; overflow:hidden;">';
         if (s.foto) {
           html += '<img src="' + s.foto + '" style="width:100%; height:100%; object-fit:cover;">';
         } else {
@@ -1882,8 +1847,8 @@
         }
         html += '</div>';
         html += '<div style="min-width:0;">';
-        html += '<strong style="color:var(--text); font-size:12.5px; display:block; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">' + s.nama + '</strong>';
-        html += '<span style="font-size:11px; color:var(--text-3); font-family:var(--font-mono);">NIS: ' + s.nis + (s.rombel ? ' · ' + s.rombel : '') + '</span>';
+        html += '<strong style="color:#000000; font-size:12.5px; display:block; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">' + s.nama + '</strong>';
+        html += '<span style="font-size:11px; color:#000000; font-family:var(--font-mono);">NIS: ' + s.nis + (s.rombel ? ' · ' + s.rombel : '') + '</span>';
         html += '</div>';
         html += '</div>';
         html += '<a href="/presensi-siswa/' + s.nis + '" class="btn-search" style="padding:4px 12px; height:30px; font-size:11.5px; text-decoration:none; flex-shrink:0;">Buka →</a>';
@@ -2118,13 +2083,13 @@
 
   {{-- QR SCANNER MODAL --}}
   <div id="qrModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:9999; align-items:center; justify-content:center; padding:16px;">
-    <div style="background:var(--bg-card); border-radius:var(--r-lg); max-width:380px; width:100%; padding:20px; text-align:center; position:relative; box-shadow:var(--shadow-lg);">
+    <div style="background:#FFFFFF; border-radius:var(--r-lg); max-width:380px; width:100%; padding:20px; text-align:center; position:relative; box-shadow:var(--shadow-lg); border:1px solid var(--border);">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
-        <strong style="color:var(--text); font-size:14px;"><i class="bi bi-qr-code-scan"></i> Scan QR Kartu Pelajar</strong>
-        <button type="button" onclick="closeQrScanner()" style="background:none; border:none; font-size:18px; color:var(--text-3); cursor:pointer;"><i class="bi bi-x-lg"></i></button>
+        <strong style="color:#000000; font-size:14px; font-weight:900;"><i class="bi bi-qr-code-scan"></i> Scan QR Kartu Pelajar</strong>
+        <button type="button" onclick="closeQrScanner()" style="background:#000000; border:none; font-size:12px; color:#FFFFFF; border-radius:4px; padding:4px 8px; cursor:pointer;" title="Tutup"><i class="bi bi-x-lg"></i></button>
       </div>
       <div id="qr-reader" style="width:100%; border-radius:8px; overflow:hidden;"></div>
-      <div style="font-size:11.5px; color:var(--text-3); margin-top:12px;">Arahkan kamera ke QR Code pada kartu pelajar / rapor ananda.</div>
+      <div style="font-size:11.5px; color:#000000; font-weight:700; margin-top:12px;">Arahkan kamera ke QR Code pada kartu pelajar / rapor ananda.</div>
     </div>
   </div>
 
