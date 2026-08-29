@@ -26,18 +26,18 @@
     :root {
       --bg: #F8FAFC;
       --bg-card: #FFFFFF;
-      --bg-subtle: #F1F5F9;
-      --border: #E2E8F0;
+      --bg-subtle: #EEF2F6;
+      --border: #DCE3EB;
       --border-2: #CBD5E1;
       --text: #000000;
       --text-2: #000000;
       --text-3: #000000;
       
-      --r-sm: 6px;
-      --r-md: 8px;
-      --r-lg: 10px;
-      --r-xl: 12px;
-      --shadow-sm: 0 1px 3px rgba(0,0,0,0.04);
+      --r-sm: 8px;
+      --r-md: 12px;
+      --r-lg: 16px;
+      --r-xl: 20px;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.03);
       --shadow-md: 0 4px 14px rgba(0,0,0,0.05);
       
       --font-main: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
@@ -118,7 +118,7 @@
 
     /* ─── Institutional Search Console ─── */
     .search-console-card {
-      background: #F8FAFC;
+      background: #EEF2F6;
       border: 1px solid var(--border);
       border-radius: var(--r-xl);
       padding: 24px 20px;
@@ -129,7 +129,7 @@
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      font-size: 11px;
+      font-size: 11.5px;
       font-weight: 900;
       color: #000000;
       margin-bottom: 10px;
@@ -260,9 +260,9 @@
 
     /* ─── Compact Search Bar (When Student Found) ─── */
     .compact-search-card {
-      background: #F8FAFC;
+      background: #EEF2F6;
       border: 1px solid var(--border);
-      border-radius: var(--r-md);
+      border-radius: var(--r-lg);
       padding: 10px 14px;
       margin-bottom: 18px;
       display: flex;
@@ -360,7 +360,7 @@
       font-weight: 800;
       padding: 4px 10px;
       border-radius: var(--r-sm);
-      background: #F1F5F9;
+      background: #EEF2F6;
       border: 1px solid var(--border-2);
       color: #000000 !important;
       display: inline-flex;
@@ -430,20 +430,20 @@
       }
     }
 
-    /* ─── Today's Live Attendance Widget ─── */
+    /* ─── Today's Live Attendance Widget (Exact Match User Design) ─── */
     .today-widget {
-      background: #F1F5F9;
+      background: #EEF2F6;
       border: 1px solid var(--border);
-      border-radius: var(--r-lg);
-      padding: 16px 18px;
+      border-radius: var(--r-xl);
+      padding: 18px 20px;
     }
     .today-widget-title {
-      font-size: 11px;
+      font-size: 12.5px;
       font-weight: 900;
       text-transform: uppercase;
-      letter-spacing: 0.5px;
+      letter-spacing: 0.4px;
       color: #000000;
-      margin-bottom: 12px;
+      margin-bottom: 14px;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -453,17 +453,17 @@
     .today-time-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 10px;
+      gap: 12px;
     }
     .today-time-box {
       background: #FFFFFF;
       border: 1px solid var(--border-2);
-      border-radius: var(--r-sm);
-      padding: 10px;
+      border-radius: var(--r-md);
+      padding: 14px 12px;
       text-align: center;
     }
     .today-time-label {
-      font-size: 10.5px;
+      font-size: 12px;
       font-weight: 900;
       color: #000000;
       text-transform: uppercase;
@@ -471,10 +471,10 @@
     }
     .today-time-val {
       font-family: var(--font-mono);
-      font-size: 16px;
+      font-size: 17px;
       font-weight: 900;
       color: #000000;
-      margin-top: 2px;
+      margin-top: 4px;
     }
 
     /* ─── Status Badges ─── */
@@ -517,7 +517,7 @@
     }
 
     .discipline-score-card {
-      background: #F1F5F9;
+      background: #EEF2F6;
       border: 1px solid var(--border);
       border-radius: var(--r-lg);
       padding: 16px 18px;
@@ -544,7 +544,7 @@
     }
 
     .stat-metric-card {
-      background: #F1F5F9;
+      background: #EEF2F6;
       border: 1px solid var(--border);
       border-radius: var(--r-lg);
       padding: 14px 16px;
@@ -577,9 +577,9 @@
 
     /* ─── Period Control ─── */
     .period-control-card {
-      background: #F8FAFC;
+      background: #EEF2F6;
       border: 1px solid var(--border);
-      border-radius: var(--r-md);
+      border-radius: var(--r-lg);
       padding: 8px 12px;
       margin-bottom: 16px;
       box-shadow: var(--shadow-sm);
@@ -591,7 +591,7 @@
     }
     .period-tabs {
       display: inline-flex;
-      background: #E2E8F0;
+      background: #DCE3EB;
       padding: 4px;
       border-radius: var(--r-md);
       gap: 4px;
@@ -999,46 +999,46 @@
           {{-- Kanan: Status Kehadiran Hari Ini --}}
           <div class="today-widget">
             <div class="today-widget-title">
-              <span style="font-weight:800; color:var(--text);">Kehadiran Hari Ini ({{ \Carbon\Carbon::today()->translatedFormat('d M Y') }})</span>
+              <span style="font-weight:900; color:#000000; letter-spacing:0.3px;">KEHADIRAN HARI INI ({{ strtoupper(\Carbon\Carbon::today()->translatedFormat('d M Y')) }})</span>
               <div>
                 @if($todayAbsensi)
                   @if($todayAbsensi->status === 'hadir')
-                    <span style="font-weight:800; font-size:12px; color:var(--text);">Hadir Tepat Waktu</span>
+                    <span style="font-weight:900; font-size:12.5px; color:#000000; letter-spacing:0.3px;">HADIR TEPAT WAKTU</span>
                   @elseif($todayAbsensi->status === 'terlambat')
-                    <span style="font-weight:800; font-size:12px; color:var(--text);">Terlambat</span>
+                    <span style="font-weight:900; font-size:12.5px; color:#000000; letter-spacing:0.3px;">TERLAMBAT</span>
                   @elseif($todayAbsensi->status === 'izin')
-                    <span style="font-weight:800; font-size:12px; color:var(--text);">Izin</span>
+                    <span style="font-weight:900; font-size:12.5px; color:#000000; letter-spacing:0.3px;">IZIN</span>
                   @elseif($todayAbsensi->status === 'sakit')
-                    <span style="font-weight:800; font-size:12px; color:var(--text);">Sakit</span>
+                    <span style="font-weight:900; font-size:12.5px; color:#000000; letter-spacing:0.3px;">SAKIT</span>
                   @elseif($todayAbsensi->status === 'bolos')
-                    <span style="font-weight:800; font-size:12px; color:var(--text);">Bolos</span>
+                    <span style="font-weight:900; font-size:12.5px; color:#000000; letter-spacing:0.3px;">BOLOS</span>
                   @elseif($todayAbsensi->status === 'alpha')
-                    <span style="font-weight:800; font-size:12px; color:var(--text);">Alpha</span>
+                    <span style="font-weight:900; font-size:12.5px; color:#000000; letter-spacing:0.3px;">ALPHA</span>
                   @endif
                 @elseif($siswa->status === 'pkl')
-                  <span style="font-weight:800; font-size:12px; color:var(--text);">PKL</span>
+                  <span style="font-weight:900; font-size:12.5px; color:#000000; letter-spacing:0.3px;">PKL</span>
                 @else
-                  <span style="font-weight:800; font-size:12px; color:var(--text);">Belum Presensi</span>
+                  <span style="font-weight:900; font-size:12.5px; color:#000000; letter-spacing:0.3px;">BELUM PRESENSI</span>
                 @endif
               </div>
             </div>
 
             <div class="today-time-grid">
               <div class="today-time-box">
-                <div class="today-time-label">Masuk Gerbang</div>
+                <div class="today-time-label">MASUK GERBANG</div>
                 <div class="today-time-val">
                   {{ $todayAbsensi && $todayAbsensi->jam_masuk ? substr($todayAbsensi->jam_masuk, 0, 5).' WIB' : '—' }}
                 </div>
               </div>
               <div class="today-time-box">
-                <div class="today-time-label">Pulang Gerbang</div>
+                <div class="today-time-label">PULANG GERBANG</div>
                 <div class="today-time-val">
                   {{ $todayAbsensi && $todayAbsensi->jam_pulang ? substr($todayAbsensi->jam_pulang, 0, 5).' WIB' : '—' }}
                 </div>
               </div>
             </div>
             
-            <div style="font-size:11px; color:var(--text-3); text-align:center; margin-top:8px;">
+            <div style="font-size:12px; color:#000000; font-weight:600; text-align:center; margin-top:14px;">
               {{ $todayAbsensi ? ($todayAbsensi->keterangan ?: 'Tervalidasi via Smart Gate Face ID SMKN 1 AN') : ($siswa->status === 'pkl' ? 'Siswa sedang melaksanakan PKL di Industri' : 'Belum ada rekaman Face ID pada gerbang hari ini') }}
             </div>
           </div>
