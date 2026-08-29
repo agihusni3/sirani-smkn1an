@@ -45,9 +45,23 @@ class PortalOrtuController extends Controller
         ];
 
         if ($keyword !== '') {
-            $siswa = Siswa::where('nis', $keyword)
-                ->orWhere('nisn', $keyword)
-                ->first();
+            $cleanPhone = preg_replace('/[^0-9]/', '', $keyword);
+
+            $siswa = Siswa::where(function ($q) use ($keyword, $cleanPhone) {
+                $q->where('nis', $keyword)
+                  ->orWhere('nisn', $keyword);
+
+                if (!empty($cleanPhone) && strlen($cleanPhone) >= 7) {
+                    $phoneTrim = ltrim($cleanPhone, '0');
+                    if (str_starts_with($phoneTrim, '62')) {
+                        $phoneTrim = substr($phoneTrim, 2);
+                    }
+                    $q->orWhere('no_hp_ortu', 'LIKE', "%{$cleanPhone}%")
+                      ->orWhere('no_hp_ortu', 'LIKE', "%{$phoneTrim}%")
+                      ->orWhere('no_hp_siswa', 'LIKE', "%{$cleanPhone}%")
+                      ->orWhere('no_hp_siswa', 'LIKE', "%{$phoneTrim}%");
+                }
+            })->first();
 
             if ($siswa) {
                 // Ambil Rombel aktif dan Wali Kelas

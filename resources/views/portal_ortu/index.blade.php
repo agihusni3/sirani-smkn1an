@@ -829,9 +829,10 @@
         <span class="search-badge">
           <i class="bi bi-shield-check"></i> Layanan Informasi Presensi Siswa
         </span>
-        <h2 class="search-title">Pantau Kehadiran &amp; Ketertiban Putra/Putri Anda</h2>
+        <div id="savedStudentsContainer" style="display:none;"></div>
+
         <p class="search-desc">
-          Selamat datang di portal presensi mandiri SMKN 1 Air Naningan. Masukkan <strong>Nomor Induk Siswa (NIS)</strong> atau <strong>NISN</strong> ananda untuk memantau catatan absensi harian Smart Gate Face ID, riwayat izin, serta pembinaan kedisiplinan secara real-time.
+          Selamat datang di portal presensi mandiri SMKN 1 Air Naningan. Masukkan <strong>NIS</strong>, <strong>NISN</strong>, atau <strong>Nomor WhatsApp Orang Tua</strong> untuk memantau catatan absensi Face ID, riwayat izin, dan kedisiplinan ananda secara real-time.
         </p>
 
         <div class="search-form-box">
@@ -843,14 +844,20 @@
                 name="keyword"
                 class="search-input"
                 value="{{ $keyword }}"
-                placeholder="Ketik NIS (contoh: 10245) atau NISN siswa..."
+                placeholder="Ketik NIS, NISN, atau No. WhatsApp..."
                 autocomplete="off"
                 required
                 autofocus
               />
+              <button type="button" onclick="startQrScanner()" class="btn-search" style="background:var(--bg-subtle); color:var(--text); border:1px solid var(--border-2); padding:0 12px;" title="Scan QR Code Kartu Pelajar">
+                <i class="bi bi-qr-code-scan"></i> <span style="display:none;" class="qr-btn-text">Scan</span>
+              </button>
               <button type="submit" class="btn-search">
                 <i class="bi bi-arrow-right-circle-fill"></i> Cek Presensi
               </button>
+            </div>
+            <div style="font-size:11.5px; color:var(--text-3); margin-top:6px; display:flex; align-items:center; gap:4px;">
+              <i class="bi bi-info-circle"></i> <span>Tips: Bisa langsung cari menggunakan No. WhatsApp Orang Tua yang terdaftar.</span>
             </div>
           </form>
         </div>
@@ -1825,9 +1832,141 @@
         if (secPengumuman) secPengumuman.style.display = 'none';
         if (btnAbsen) btnAbsen.classList.add('active');
         if (btnKasus) btnKasus.classList.remove('active');
-        if (btnPengumuman) btnPengumuman.classList.remove('active');
-      }
+      @if($siswa)
+        saveSiswaToLocalStorage({
+          nis: "{{ $siswa->nis }}",
+          nama: "{{ $siswa->nama }}",
+          rombel: "{{ $rombel->nama_rombel ?? '' }}",
+          foto: "{{ $siswa->foto ? asset('storage/'.$siswa->foto) : '' }}"
+        });
+      @else
+        renderSavedStudents();
+      @endif
     });
+
+    // Auto-Remember / LocalStorage Management
+    function saveSiswaToLocalStorage(siswaData) {
+      if (!siswaData || !siswaData.nis) return;
+      let saved = [];
+      try {
+        saved = JSON.parse(localStorage.getItem('sirani_saved_students') || '[]');
+      } catch (e) { saved = []; }
+
+      saved = saved.filter(function(s) { return s.nis !== siswaData.nis; });
+      saved.unshift(siswaData);
+      if (saved.length > 5) saved = saved.slice(0, 5);
+      localStorage.setItem('sirani_saved_students', JSON.stringify(saved));
+    }
+
+    function renderSavedStudents() {
+      const container = document.getElementById('savedStudentsContainer');
+      if (!container) return;
+
+      let saved = [];
+      try {
+        saved = JSON.parse(localStorage.getItem('sirani_saved_students') || '[]');
+      } catch (e) { saved = []; }
+
+      if (saved.length === 0) {
+        container.style.display = 'none';
+        return;
+      }
+
+      let html = '<div style="background:var(--bg-subtle); border:1px solid var(--border); border-radius:var(--r-md); padding:12px 14px; margin-bottom:18px;">';
+      html += '<div style="font-size:11.5px; font-weight:800; color:var(--text); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">';
+      html += '<span><i class="bi bi-bookmark-check-fill" style="color:var(--text); margin-right:4px;"></i> Profil Anak Tersimpan di HP Ini</span>';
+      html += '<button type="button" onclick="clearSavedStudents()" style="background:none; border:none; color:var(--text-3); font-size:11px; font-weight:700; cursor:pointer;"><i class="bi bi-trash"></i> Hapus</button>';
+      html += '</div>';
+
+      html += '<div style="display:flex; flex-direction:column; gap:6px;">';
+      saved.forEach(function(s) {
+        html += '<div style="background:var(--bg-card); border:1px solid var(--border); border-radius:var(--r-sm); padding:8px 12px; display:flex; justify-content:space-between; align-items:center; gap:8px;">';
+        html += '<div style="display:flex; align-items:center; gap:10px; min-width:0;">';
+        html += '<div style="width:32px; height:32px; border-radius:50%; background:var(--bg-subtle); border:1px solid var(--border); display:flex; align-items:center; justify-content:center; font-weight:800; font-size:13px; color:var(--text); flex-shrink:0; overflow:hidden;">';
+        if (s.foto) {
+          html += '<img src="' + s.foto + '" style="width:100%; height:100%; object-fit:cover;">';
+        } else {
+          html += s.nama.charAt(0).toUpperCase();
+        }
+        html += '</div>';
+        html += '<div style="min-width:0;">';
+        html += '<strong style="color:var(--text); font-size:12.5px; display:block; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">' + s.nama + '</strong>';
+        html += '<span style="font-size:11px; color:var(--text-3); font-family:var(--font-mono);">NIS: ' + s.nis + (s.rombel ? ' · ' + s.rombel : '') + '</span>';
+        html += '</div>';
+        html += '</div>';
+        html += '<a href="/presensi-siswa/' + s.nis + '" class="btn-search" style="padding:4px 12px; height:30px; font-size:11.5px; text-decoration:none; flex-shrink:0;">Buka →</a>';
+        html += '</div>';
+      });
+      html += '</div></div>';
+
+      container.innerHTML = html;
+      container.style.display = 'block';
+    }
+
+    function clearSavedStudents() {
+      if (confirm('Hapus daftar profil anak yang tersimpan di perangkat ini?')) {
+        localStorage.removeItem('sirani_saved_students');
+        renderSavedStudents();
+      }
+    }
+
+    // QR Code Scanner
+    let html5QrCode = null;
+    function startQrScanner() {
+      const modal = document.getElementById('qrModal');
+      if (!modal) return;
+      modal.style.display = 'flex';
+
+      if (!window.Html5Qrcode) {
+        const script = document.createElement('script');
+        script.src = "https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js";
+        script.onload = function() { initQrCode(); };
+        document.body.appendChild(script);
+      } else {
+        initQrCode();
+      }
+    }
+
+    function initQrCode() {
+      if (html5QrCode) {
+        html5QrCode.stop().then(function() { startScanning(); }).catch(function() { startScanning(); });
+      } else {
+        startScanning();
+      }
+    }
+
+    function startScanning() {
+      html5QrCode = new Html5Qrcode("qr-reader");
+      html5QrCode.start(
+        { facingMode: "environment" },
+        { fps: 10, qrbox: { width: 220, height: 220 } },
+        function(decodedText) {
+          html5QrCode.stop().then(function() {
+            closeQrScanner();
+            let target = decodedText.trim();
+            if (target.includes('/presensi-siswa/')) {
+              window.location.href = target;
+            } else {
+              const cleanNis = target.replace(/[^0-9]/g, '');
+              window.location.href = '/presensi-siswa/' + (cleanNis || target);
+            }
+          });
+        },
+        function(errorMessage) {}
+      ).catch(function(err) {
+        alert("Tidak dapat mengakses kamera: " + err);
+        closeQrScanner();
+      });
+    }
+
+    function closeQrScanner() {
+      const modal = document.getElementById('qrModal');
+      if (modal) modal.style.display = 'none';
+      if (html5QrCode) {
+        try { html5QrCode.stop(); } catch(e) {}
+      }
+    }
+
     // Service Worker Registration for PWA
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', function() {
@@ -1867,6 +2006,18 @@
       }
     }
   </script>
+
+  {{-- QR SCANNER MODAL --}}
+  <div id="qrModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:9999; align-items:center; justify-content:center; padding:16px;">
+    <div style="background:var(--bg-card); border-radius:var(--r-lg); max-width:380px; width:100%; padding:20px; text-align:center; position:relative; box-shadow:var(--shadow-lg);">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+        <strong style="color:var(--text); font-size:14px;"><i class="bi bi-qr-code-scan"></i> Scan QR Kartu Pelajar</strong>
+        <button type="button" onclick="closeQrScanner()" style="background:none; border:none; font-size:18px; color:var(--text-3); cursor:pointer;"><i class="bi bi-x-lg"></i></button>
+      </div>
+      <div id="qr-reader" style="width:100%; border-radius:8px; overflow:hidden;"></div>
+      <div style="font-size:11.5px; color:var(--text-3); margin-top:12px;">Arahkan kamera ke QR Code pada kartu pelajar / rapor ananda.</div>
+    </div>
+  </div>
 
 </body>
 </html>
