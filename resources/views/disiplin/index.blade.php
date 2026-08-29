@@ -27,9 +27,18 @@
       transform: translateY(-2px);
     }
     .kpi-disiplin-card.active {
-      border-color: var(--gold);
-      background: var(--bg-3);
-      box-shadow: 0 0 10px var(--gold-glow);
+      border-color: #000000;
+      background: #000000 !important;
+      color: #FFFFFF !important;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25);
+    }
+    .kpi-disiplin-card.active .tahap-pill-counter,
+    .kpi-disiplin-card.active .kpi-disiplin-num,
+    .kpi-disiplin-card.active div {
+      color: #FFFFFF !important;
+    }
+    .kpi-disiplin-card.active i {
+      color: #FFFFFF !important;
     }
     .kpi-disiplin-num {
       font-size: 24px;
@@ -250,7 +259,7 @@
 
       <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
         @if($user->isAdmin() || $user->isWakaKesiswaan())
-          <button type="button" class="btn btn-outline" style="border-color:var(--gold); color:var(--gold); font-weight:700;" onclick="openModalPengaturanDisiplin()">
+          <button type="button" class="btn btn-outline-mono" onclick="openModalPengaturanDisiplin()">
             <i class="bi bi-sliders2"></i> Aturan Poin &amp; Reward
           </button>
         @endif
@@ -314,7 +323,7 @@
       {{-- Header & Toolbar Terpadu --}}
       <div style="padding:14px 18px; border-bottom:1px solid var(--border); background:var(--surface); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
         <div style="font-weight:800; font-size:15px; color:var(--text); display:flex; align-items:center; gap:8px;">
-          <i class="bi bi-journals" style="color:var(--gold);"></i>
+          <i class="bi bi-journals" style="color:#000000;"></i>
           <span>Daftar Kasus &amp; Pembinaan Siswa</span>
         </div>
         <form action="{{ route('admin.disiplin.index') }}" method="GET" style="display:flex; gap:8px; align-items:center; flex-wrap:wrap; flex:1; justify-content:flex-end; max-width:650px;">
@@ -436,7 +445,7 @@
                   </td>
                   <td style="text-align:center;">
                     <div style="display:flex; align-items:center; justify-content:center; gap:5px;">
-                      <a href="{{ route('admin.disiplin.show', $kasus->id) }}" class="btn btn-sm btn-outline" style="height:30px; padding:0 10px; font-size:11px; font-weight:700;" title="Buka Dossier Lengkap">
+                      <a href="{{ route('admin.disiplin.show', $kasus->id) }}" class="btn btn-sm btn-outline-mono" style="height:30px; padding:0 10px; font-size:11px; font-weight:800;" title="Buka Dossier Lengkap">
                         Dossier
                       </a>
 
@@ -485,7 +494,7 @@
         @if($kasusList instanceof \Illuminate\Pagination\LengthAwarePaginator && $kasusList->hasPages())
           <div style="padding:16px 20px; border-top:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; background:var(--bg-2);">
             <div style="font-size:12.5px; color:var(--text-2); font-weight:600;">
-              Menampilkan <strong style="color:var(--gold);">{{ $kasusList->firstItem() }}</strong> – <strong style="color:var(--gold);">{{ $kasusList->lastItem() }}</strong> dari <strong style="color:var(--text);">{{ $kasusList->total() }}</strong> kasus disiplin
+              Menampilkan <strong style="color:#000000;">{{ $kasusList->firstItem() }}</strong> – <strong style="color:#000000;">{{ $kasusList->lastItem() }}</strong> dari <strong style="color:#000000;">{{ $kasusList->total() }}</strong> kasus disiplin
             </div>
             <div>
               {{ $kasusList->withQueryString()->links() }}

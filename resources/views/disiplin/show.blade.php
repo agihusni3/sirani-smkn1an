@@ -95,12 +95,12 @@
     <header class="header" style="margin-bottom:20px;">
       <div class="header-title">
         <div style="display:flex; align-items:center; gap:8px; font-size:12px; font-weight:700; color:var(--text-3); margin-bottom:6px;">
-          <a href="{{ route('admin.disiplin.index') }}" style="color:var(--text-2); text-decoration:none;" onmouseover="this.style.color='var(--gold)'" onmouseout="this.style.color='var(--text-2)'">Buku Kasus</a>
+          <a href="{{ route('admin.disiplin.index') }}" style="color:var(--text-2); text-decoration:none;" onmouseover="this.style.color='#000000'" onmouseout="this.style.color='var(--text-2)'">Buku Kasus</a>
           <i class="bi bi-chevron-right" style="font-size:10px; color:var(--text-3);"></i>
-          <span style="color:var(--gold); font-weight:800;">Dossier Rekam Jejak Siswa</span>
+          <span style="color:#000000; font-weight:800;">Dossier Rekam Jejak Siswa</span>
         </div>
         <h1 style="margin:0; font-size:24px; font-weight:900; color:var(--text); display:flex; align-items:center; gap:10px;">
-          <i class="bi bi-journal-bookmark-fill" style="color:var(--gold);"></i> {{ $siswa->nama }}
+          <i class="bi bi-journal-bookmark-fill" style="color:#000000;"></i> {{ $siswa->nama }}
         </h1>
         <p style="margin-top:4px; font-size:13px; color:var(--text-2); font-weight:500;">
           Portofolio Digital Pembinaan Kedisiplinan &amp; Riwayat Interaksi Kesiswaan Terpadu.
@@ -132,7 +132,7 @@
     <div class="dossier-hero" style="background:var(--bg-2); border:1px solid var(--border); border-radius:var(--r-md); padding:22px 24px; margin-bottom:24px; box-shadow:var(--shadow-sm);">
       <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:18px;">
         <div style="display:flex; gap:18px; align-items:center; flex-wrap:wrap;">
-          <div style="width:72px; height:72px; border-radius:20px; background:var(--bg-3); border:2px solid rgba(202,138,4,0.3); display:flex; align-items:center; justify-content:center; font-weight:900; font-size:26px; color:var(--gold); overflow:hidden; flex-shrink:0; box-shadow:0 4px 12px rgba(0,0,0,0.1);">
+          <div style="width:72px; height:72px; border-radius:20px; background:var(--bg-3); border:2px solid rgba(0,0,0,0.15); display:flex; align-items:center; justify-content:center; font-weight:900; font-size:26px; color:#000000; overflow:hidden; flex-shrink:0; box-shadow:0 4px 12px rgba(0,0,0,0.06);">
             @if($siswa->foto)
               <img src="{{ $siswa->foto_url }}" alt="{{ $siswa->nama }}" style="width:100%; height:100%; object-fit:cover;" />
             @else
@@ -149,7 +149,7 @@
             <div style="font-size:13px; color:var(--text-2); display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:4px;">
               <span>NIS: <strong style="color:var(--text); font-family:var(--font-mono); font-weight:800;">{{ $siswa->nis }}</strong></span>
               <span style="color:var(--border-2);">•</span>
-              <span>Kelas: <strong style="color:var(--gold); font-weight:800;">{{ $rombelAktif->nama_rombel ?? '-' }}</strong></span>
+              <span>Kelas: <strong style="color:#000000; font-weight:800;">{{ $rombelAktif->nama_rombel ?? '-' }}</strong></span>
               <span style="color:var(--border-2);">•</span>
               <span>Wali Kelas: <strong style="color:var(--text); font-weight:800;">{{ $wali->nama ?? 'Belum Ditentukan' }}</strong></span>
             </div>
@@ -182,8 +182,8 @@
           <button type="button" class="btn btn-outline" style="border-color:var(--border-2); color:var(--text); font-weight:700; font-size:12px; height:36px; padding:0 12px; display:inline-flex; align-items:center; gap:6px;" onclick="openModalTindakLanjutDossier()">
             <i class="bi bi-arrow-up-right-circle-fill" style="color:var(--navy);"></i> Eskalasi Tahap
           </button>
-          <a href="{{ route('admin.disiplin.resume.cetak', $kasus->id) }}" target="_blank" class="btn btn-outline" style="border-color:rgba(239,68,68,0.4); color:#DC2626; font-weight:800; font-size:12px; height:36px; padding:0 14px; display:inline-flex; align-items:center; gap:6px; text-decoration:none;">
-            <i class="bi bi-printer-fill"></i> Resume Kepsek A4
+          <a href="{{ route('admin.disiplin.resume.cetak', $kasus->id) }}" target="_blank" class="btn btn-outline-mono" style="font-weight:800; font-size:12px; height:36px; padding:0 14px; display:inline-flex; align-items:center; gap:6px; text-decoration:none;">
+            <i class="bi bi-printer-fill" style="color:#000000;"></i> Resume Kepsek A4
           </a>
         </div>
       </div>
@@ -198,7 +198,7 @@
         {{-- SECTION 1: TIMELINE KRONOLOGIS INTERAKSI --}}
         <div class="panel" style="margin-bottom: 24px;">
           <div class="panel-title" style="margin-bottom: 20px;">
-            <span><i class="bi bi-clock-history" style="color:var(--gold);"></i> Timeline Kronologis Pembinaan (Audit Trail)</span>
+            <span><i class="bi bi-clock-history" style="color:#000000;"></i> Timeline Kronologis Pembinaan (Audit Trail)</span>
             <button type="button" class="btn btn-sm btn-outline" onclick="openModalLog()">
               <i class="bi bi-plus"></i> Tambah Peristiwa
             </button>
@@ -250,7 +250,7 @@
         {{-- SECTION 2: BRANKAS BUKTI DIGITAL (DIGITAL EVIDENCE VAULT) --}}
         <div class="panel" style="margin-bottom: 24px;">
           <div class="panel-title" style="margin-bottom: 16px;">
-            <span><i class="bi bi-shield-lock-fill" style="color:var(--gold);"></i> Brankas Bukti Digital (Surat Pernyataan &amp; Foto)</span>
+            <span><i class="bi bi-shield-lock-fill" style="color:#000000;"></i> Brankas Bukti Digital (Surat Pernyataan &amp; Foto)</span>
             <button type="button" class="btn btn-sm btn-outline" onclick="openModalUpload()">
               <i class="bi bi-upload"></i> Unggah Berkas
             </button>
@@ -396,7 +396,7 @@
         {{-- CARD 1: SKOR & AKUMULASI POIN --}}
         <div class="panel" style="margin-bottom:20px; border:1px solid var(--border); border-radius:var(--r-md); padding:18px; background:var(--bg-2);">
           <div class="panel-title" style="margin-bottom:14px; display:flex; align-items:center; gap:8px;">
-            <i class="bi bi-speedometer2" style="color:var(--gold); font-size:18px;"></i>
+            <i class="bi bi-speedometer2" style="color:#000000; font-size:18px;"></i>
             <span style="font-weight:900; font-size:15px; color:var(--text);">Skor &amp; Kredit Disiplin</span>
           </div>
 
@@ -473,7 +473,7 @@
             </div>
             <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid var(--border); padding-top:8px; margin-top:2px;">
               <span style="color:var(--text-2); font-weight:700;">Kehadiran Efektif:</span>
-              <strong style="color:var(--gold); font-size:14px; font-weight:900;">{{ $persenKehadiran }}%</strong>
+              <strong style="color:#000000; font-size:14px; font-weight:900;">{{ $persenKehadiran }}%</strong>
             </div>
           </div>
         </div>
@@ -509,19 +509,19 @@
         {{-- CARD 3: FORMAT SURAT RESMI 1-KLIK --}}
         <div class="panel" style="margin-bottom:20px; border:1px solid var(--border); border-radius:var(--r-md); padding:18px; background:var(--bg-2);">
           <div class="panel-title" style="margin-bottom:12px; display:flex; align-items:center; gap:8px;">
-            <i class="bi bi-printer-fill" style="color:var(--gold); font-size:16px;"></i>
+            <i class="bi bi-printer-fill" style="color:#000000; font-size:16px;"></i>
             <span style="font-weight:900; font-size:15px; color:var(--text);">Berkas Cetak Resmi</span>
           </div>
 
           <div style="display:flex; flex-direction:column; gap:8px;">
-            <a href="{{ route('surat.cetak', ['siswa_id' => $siswa->id, 'kategori' => 'panggilan_ortu']) }}" target="_blank" class="btn btn-sm btn-outline" style="justify-content:flex-start; text-align:left; font-size:12px; font-weight:700; height:36px; padding:0 12px; text-decoration:none; color:var(--text);" title="Cetak Surat Panggilan Orang Tua">
-              <i class="bi bi-envelope-paper-fill" style="color:var(--gold); margin-right:6px;"></i> Surat Panggilan Ortu (A4)
+            <a href="{{ route('surat.cetak', ['siswa_id' => $siswa->id, 'kategori' => 'panggilan_ortu']) }}" target="_blank" class="btn btn-sm btn-outline-mono" style="justify-content:flex-start; text-align:left; font-size:12px; font-weight:800; height:36px; padding:0 12px; text-decoration:none;" title="Cetak Surat Panggilan Orang Tua">
+              <i class="bi bi-envelope-paper-fill" style="color:#000000; margin-right:6px;"></i> Surat Panggilan Ortu (A4)
             </a>
-            <a href="{{ route('surat.cetak', ['siswa_id' => $siswa->id, 'kategori' => 'berita_acara']) }}" target="_blank" class="btn btn-sm btn-outline" style="justify-content:flex-start; text-align:left; font-size:12px; font-weight:700; height:36px; padding:0 12px; text-decoration:none; color:var(--text);" title="Cetak Berita Acara Musyawarah">
-              <i class="bi bi-file-earmark-ruled-fill" style="color:var(--navy); margin-right:6px;"></i> Berita Acara Musyawarah (A4)
+            <a href="{{ route('surat.cetak', ['siswa_id' => $siswa->id, 'kategori' => 'berita_acara']) }}" target="_blank" class="btn btn-sm btn-outline-mono" style="justify-content:flex-start; text-align:left; font-size:12px; font-weight:800; height:36px; padding:0 12px; text-decoration:none;" title="Cetak Berita Acara Musyawarah">
+              <i class="bi bi-file-earmark-ruled-fill" style="color:#000000; margin-right:6px;"></i> Berita Acara Musyawarah (A4)
             </a>
-            <a href="{{ route('surat.cetak', ['siswa_id' => $siswa->id, 'kategori' => 'pembinaan']) }}" target="_blank" class="btn btn-sm btn-outline" style="justify-content:flex-start; text-align:left; font-size:12px; font-weight:700; height:36px; padding:0 12px; text-decoration:none; color:#DC2626; border-color:rgba(239,68,68,0.3);" title="Cetak Surat Peringatan Siswa">
-              <i class="bi bi-exclamation-triangle-fill" style="color:#DC2626; margin-right:6px;"></i> Surat Peringatan Siswa (SP)
+            <a href="{{ route('surat.cetak', ['siswa_id' => $siswa->id, 'kategori' => 'pembinaan']) }}" target="_blank" class="btn btn-sm btn-outline-mono" style="justify-content:flex-start; text-align:left; font-size:12px; font-weight:800; height:36px; padding:0 12px; text-decoration:none;" title="Cetak Surat Peringatan Siswa">
+              <i class="bi bi-exclamation-triangle-fill" style="color:#000000; margin-right:6px;"></i> Surat Peringatan Siswa (SP)
             </a>
             <a href="{{ route('admin.disiplin.resume.cetak', $kasus->id) }}" target="_blank" class="btn btn-sm btn-gold" style="justify-content:flex-start; text-align:left; font-size:12px; font-weight:800; height:36px; padding:0 12px; text-decoration:none;" title="Cetak Resume Rekam Jejak Kepsek">
               <i class="bi bi-file-earmark-medical-fill" style="margin-right:6px;"></i> Resume Rekam Jejak Kepsek (A4)
