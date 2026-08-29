@@ -283,6 +283,18 @@
       gap: 10px;
       box-shadow: var(--shadow-sm);
     }
+    .compact-search-info {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .compact-search-form {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin: 0;
+    }
 
     /* ─── Student Profile & Live Gate Widget (Dossier) ─── */
     .dossier-card {
@@ -324,14 +336,14 @@
       width: 72px;
       height: 72px;
       border-radius: 50%;
-      background: var(--gold-subtle);
-      border: 2px solid var(--gold-border);
+      background: var(--bg-subtle);
+      border: 2px solid var(--border-2);
       display: flex;
       align-items: center;
       justify-content: center;
       font-size: 26px;
       font-weight: 900;
-      color: var(--gold);
+      color: var(--text);
       flex-shrink: 0;
       overflow: hidden;
     }
@@ -357,7 +369,7 @@
     .tag-pill {
       font-size: 11.5px;
       font-weight: 700;
-      padding: 3px 9px;
+      padding: 4px 10px;
       border-radius: 6px;
       background: var(--bg-subtle);
       border: 1px solid var(--border);
@@ -368,10 +380,45 @@
       text-decoration: none;
     }
     .tag-pill.gold {
-      background: var(--gold-subtle);
-      border-color: var(--gold-border);
-      color: var(--gold);
+      background: var(--bg-subtle);
+      border-color: var(--border-2);
+      color: var(--text);
       font-weight: 800;
+    }
+
+    @media (max-width: 600px) {
+      .compact-search-card {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+        padding: 12px;
+      }
+      .compact-search-info {
+        justify-content: space-between;
+      }
+      .compact-search-form {
+        width: 100%;
+      }
+      .compact-search-form input {
+        flex: 1;
+        width: 100% !important;
+      }
+      .dossier-card {
+        padding: 18px 14px;
+        border-radius: var(--r-lg);
+      }
+      .student-info-left {
+        flex-direction: column;
+        text-align: center;
+        gap: 12px;
+      }
+      .student-meta-tags {
+        justify-content: center;
+      }
+      .student-avatar {
+        width: 64px;
+        height: 64px;
+      }
     }
 
     /* ─── Today's Live Attendance Widget ─── */
@@ -391,6 +438,8 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
+      flex-wrap: wrap;
+      gap: 6px;
     }
     .today-time-grid {
       display: grid;
@@ -415,6 +464,7 @@
       font-family: var(--font-mono);
       font-size: 16px;
       font-weight: 900;
+      color: var(--text);
       margin-top: 2px;
     }
 
@@ -444,21 +494,20 @@
     /* ─── Discipline Score & 4 KPI Cards ─── */
     .stats-overview-grid {
       display: grid;
-      grid-template-columns: 1fr;
-      gap: 12px;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
       margin-bottom: 20px;
     }
-    @media (min-width: 480px) and (max-width: 767px) {
-      .stats-overview-grid {
-        grid-template-columns: repeat(2, 1fr);
-      }
-      .discipline-score-card {
-        grid-column: 1 / -1;
-      }
+    .discipline-score-card {
+      grid-column: 1 / -1;
     }
     @media (min-width: 768px) {
       .stats-overview-grid {
         grid-template-columns: 1.35fr repeat(4, 1fr);
+        gap: 12px;
+      }
+      .discipline-score-card {
+        grid-column: auto;
       }
     }
 
@@ -775,23 +824,23 @@
     @else
       {{-- SEARCH BAR RAMPING SAAT SISWA SUDAH TERPILIH --}}
       <div class="compact-search-card">
-        <div style="display:flex; align-items:center; gap:8px;">
-          <span style="font-size:12px; font-weight:800; color:var(--text-3); text-transform:uppercase; letter-spacing:0.5px;">
-            <i class="bi bi-person-check-fill" style="color:var(--gold); margin-right:4px;"></i> Siswa Terpilih:
+        <div class="compact-search-info">
+          <span style="font-size:11.5px; font-weight:800; color:var(--text-3); text-transform:uppercase; letter-spacing:0.5px;">
+            Siswa Terpilih:
           </span>
           <strong style="color:var(--text); font-size:13px;">{{ $siswa->nama }}</strong>
           <span style="font-size:11.5px; color:var(--text-3); font-family:var(--font-mono);">(NIS: {{ $siswa->nis }})</span>
         </div>
 
-        <form method="GET" action="{{ route('portal.ortu.index') }}" style="display:flex; align-items:center; gap:6px; margin:0;">
+        <form method="GET" action="{{ route('portal.ortu.index') }}" class="compact-search-form">
           <input
             type="text"
             name="keyword"
             placeholder="Cari NIS lain..."
             class="form-control-pt"
-            style="height:32px; padding:0 10px; width:140px; font-size:12px;"
+            style="height:34px; padding:0 10px; font-size:12px;"
           />
-          <button type="submit" class="btn-search" style="padding:0 12px; height:32px; font-size:11.5px;">
+          <button type="submit" class="btn-search" style="padding:0 14px; height:34px; font-size:11.5px;">
             <i class="bi bi-search"></i> Ganti
           </button>
         </form>
