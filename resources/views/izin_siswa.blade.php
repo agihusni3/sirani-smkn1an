@@ -73,9 +73,9 @@
       background: rgba(255, 255, 255, 0.05);
     }
     .btn-toggle-kat.active {
-      background: linear-gradient(135deg, var(--gold), var(--gold-2)) !important;
-      color: #0F172A !important;
-      box-shadow: 0 2px 10px var(--gold-glow);
+      background: #000000 !important;
+      color: #FFFFFF !important;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
       border-radius: 8px !important;
     }
 

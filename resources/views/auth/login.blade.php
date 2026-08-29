@@ -121,14 +121,14 @@
       transition: all .2s ease;
     }
     .tab-btn.active {
-      background: var(--bg-2);
-      color: var(--text);
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      background: #000000;
+      color: #FFFFFF;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
     }
     .tab-btn.active-face {
-      background: linear-gradient(135deg, var(--gold), var(--gold-2));
-      color: #0F172A;
-      box-shadow: 0 4px 14px var(--gold-glow);
+      background: #000000;
+      color: #FFFFFF;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
     }
 
     .tab-panel { display: none; }
@@ -139,16 +139,13 @@
     .face-login-box {
       position: relative;
       width: 100%;
-      height: 290px;
-      border-radius: 20px;
+      height: 250px;
+      border-radius: 14px;
       overflow: hidden;
-      background: #02040A;
-      border: 2px solid var(--border-2);
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      background: #070B14;
+      border: 1.5px solid var(--border-2);
       margin-bottom: 14px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+      box-shadow: inset 0 0 24px rgba(0,0,0,0.8);
     }
     #loginVideoFeed {
       width: 100%;
@@ -157,46 +154,14 @@
       transform: scaleX(-1) translateZ(0);
       will-change: transform;
     }
-    .reticle-login {
-      position: absolute;
-      width: 180px;
-      height: 220px;
-      border: 2px dashed rgba(250, 204, 21, 0.6);
-      border-radius: 36px;
-      pointer-events: none;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 4;
-      overflow: hidden;
-      transition: all .25s ease;
-    }
-    .reticle-login.active-match {
-      border: 3.5px solid var(--green);
-      box-shadow: 0 0 40px rgba(34, 197, 94, 0.7);
-    }
-    .laser-login {
-      position: absolute;
-      left: 0;
-      right: 0;
-      top: 0;
-      height: 3px;
-      background: linear-gradient(90deg, transparent, var(--gold), #fff, var(--gold), transparent);
-      box-shadow: 0 0 12px var(--gold);
-      animation: laserSweepLogin 2.2s ease-in-out infinite;
-    }
-    @keyframes laserSweepLogin {
-      0%, 100% { transform: translateY(10px); opacity: 0.3; }
-      50% { transform: translateY(195px); opacity: 1; }
-    }
 
     .hud-login-status {
-      padding: 12px 16px;
-      border-radius: 12px;
-      background: var(--surface);
-      border: 1px solid var(--border-2);
-      font-size: 13px;
+      font-size: 12.5px;
       font-weight: 700;
+      padding: 8px 14px;
+      border-radius: 10px;
+      background: var(--surface);
+      border: 1px solid var(--border);
       color: var(--text);
       display: flex;
       align-items: center;
@@ -222,9 +187,9 @@
       width: 100%;
       height: 46px;
       border-radius: 12px;
-      border: none;
-      background: linear-gradient(135deg, var(--gold), var(--gold-2));
-      color: #0F172A;
+      border: 1px solid #000000;
+      background: #000000;
+      color: #FFFFFF;
       font-family: var(--font);
       font-size: 14px;
       font-weight: 800;
@@ -233,12 +198,14 @@
       align-items: center;
       justify-content: center;
       gap: 8px;
-      box-shadow: 0 4px 16px var(--gold-glow);
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
       transition: all .2s ease;
     }
     .btn-login:hover {
+      background: #262626;
+      border-color: #262626;
       transform: translateY(-2px);
-      box-shadow: 0 6px 22px var(--gold-glow);
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
     }
 
     .form-group { margin-bottom: 16px; text-align: left; }

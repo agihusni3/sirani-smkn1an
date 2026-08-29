@@ -1406,10 +1406,10 @@
     border-color: var(--border-2);
   }
   .page-btn.active {
-    background: var(--gold);
-    color: #000000 !important;
-    border-color: var(--gold);
-    box-shadow: 0 2px 6px var(--gold-glow);
+    background: #000000 !important;
+    color: #FFFFFF !important;
+    border-color: #000000 !important;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
     font-weight: 900;
   }
   .page-btn.disabled {

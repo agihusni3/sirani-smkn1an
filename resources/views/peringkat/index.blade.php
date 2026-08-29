@@ -44,9 +44,9 @@
       color: var(--text);
     }
     .segmented-btn.active {
-      background: linear-gradient(135deg, var(--gold), var(--gold-2));
-      color: #0F172A;
-      box-shadow: 0 2px 10px var(--gold-glow);
+      background: #000000;
+      color: #FFFFFF;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
     }
 
     /* ── Podium Grid & Dynamic Heights ── */
@@ -726,7 +726,7 @@
                   </span>
                 </td>
                 <td style="text-align:center;">
-                  <a href="{{ $kategori === 'siswa' ? route('peringkat.piagam-siswa', ['id' => $item['id'], 'rank' => $item['rank'], 'predikat' => $item['predikat'], 'periode' => $periodeLabel, 'persen' => $item['persen_kehadiran'], 'avg_masuk' => $item['avg_masuk_str'], 'durasi' => $item['total_durasi_str']]) : route('peringkat.piagam-guru', ['id' => $item['id'], 'rank' => $item['rank'], 'predikat' => $item['predikat'], 'periode' => $periodeLabel, 'persen' => $item['persen_kehadiran'], 'avg_masuk' => $item['avg_masuk_str'], 'durasi' => $item['total_durasi_str']]) }}" target="_blank" class="btn btn-sm btn-outline" style="font-size:11px; padding:4px 10px; font-weight:800; color:var(--gold); border-color:rgba(202,138,4,0.4);" title="Cetak Piagam Penghargaan">
+                  <a href="{{ $kategori === 'siswa' ? route('peringkat.piagam-siswa', ['id' => $item['id'], 'rank' => $item['rank'], 'predikat' => $item['predikat'], 'periode' => $periodeLabel, 'persen' => $item['persen_kehadiran'], 'avg_masuk' => $item['avg_masuk_str'], 'durasi' => $item['total_durasi_str']]) : route('peringkat.piagam-guru', ['id' => $item['id'], 'rank' => $item['rank'], 'predikat' => $item['predikat'], 'periode' => $periodeLabel, 'persen' => $item['persen_kehadiran'], 'avg_masuk' => $item['avg_masuk_str'], 'durasi' => $item['total_durasi_str']]) }}" target="_blank" class="btn btn-sm btn-outline" style="font-size:11px; padding:4px 10px; font-weight:800; color:#000000; border-color:var(--border-2);" title="Cetak Piagam Penghargaan">
                     <i class="bi bi-award"></i> Piagam
                   </a>
                 </td>

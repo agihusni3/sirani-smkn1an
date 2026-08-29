@@ -235,14 +235,14 @@
       flex-wrap: wrap;
     }
     .scan-btn {
-      background: var(--gold);
-      color: #0F172A;
+      background: #000000;
+      color: #FFFFFF;
       font-family: var(--font);
       font-weight: 800;
       font-size: 12.5px;
       padding: 9px 18px;
       border-radius: var(--r-sm);
-      border: none;
+      border: 1px solid #000000;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
@@ -250,7 +250,8 @@
       transition: all .2s ease;
     }
     .scan-btn:hover {
-      background: var(--gold-2);
+      background: #262626;
+      border-color: #262626;
       transform: translateY(-1px);
     }
     .scan-btn-alt {
@@ -613,8 +614,8 @@
       transition: all .2s ease;
     }
     .btn-kios-action:hover {
-      border-color: var(--gold);
-      color: var(--gold);
+      border-color: #000000;
+      color: #000000;
     }
     .btn-kios-login {
       display: inline-flex;
@@ -622,17 +623,18 @@
       gap: 6px;
       padding: 0 14px;
       height: 38px;
-      background: var(--gold);
-      border: none;
+      background: #000000;
+      border: 1px solid #000000;
       border-radius: var(--r-sm);
-      color: #0F172A;
+      color: #FFFFFF;
       font-weight: 800;
       font-size: 12.5px;
       text-decoration: none;
       transition: all .2s ease;
     }
     .btn-kios-login:hover {
-      background: var(--gold-2);
+      background: #262626;
+      border-color: #262626;
     }
 
     /* ══ FULLSCREEN PROPORTIONAL ADAPTIVE STYLES ══ */

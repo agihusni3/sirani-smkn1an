@@ -131,9 +131,9 @@
 
     .scan-form { display: flex; gap: 10px; max-width: 440px; margin: 0 auto; }
     .scan-input { flex: 1; background: var(--bg-3); border: 1px solid var(--border-2); color: var(--text); padding: 12px 16px; border-radius: var(--r-sm); font-family: var(--font-mono); font-size: 15px; outline: none; text-align: center; letter-spacing: .08em; transition: border-color .2s, box-shadow .2s; }
-    .scan-input:focus { border-color: var(--gold); box-shadow: 0 0 14px var(--gold-glow); }
-    .scan-btn { background: var(--gold); color: #0F172A; font-family: var(--font); font-weight: 800; font-size: 13px; padding: 0 20px; border-radius: var(--r-sm); border: none; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
-    .scan-btn:hover { background: var(--gold-2); }
+    .scan-input:focus { border-color: #000000; box-shadow: 0 0 14px rgba(0,0,0,0.15); }
+    .scan-btn { background: #000000; color: #FFFFFF; font-family: var(--font); font-weight: 800; font-size: 13px; padding: 0 20px; border-radius: var(--r-sm); border: 1px solid #000000; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
+    .scan-btn:hover { background: #262626; border-color: #262626; }
 
     .result-box { display: none; margin-top: 24px; padding: 20px 24px; border-radius: var(--r-md); text-align: left; animation: fadeIn .3s ease; }
     .result-box.success { display: block; background: var(--green-dim); border: 1px solid rgba(34,197,94,0.3); }
@@ -162,8 +162,8 @@
       transition: all .2s ease;
     }
     .btn-kios-action:hover {
-      border-color: var(--gold);
-      color: var(--gold);
+      border-color: #000000;
+      color: #000000;
     }
     .btn-kios-login {
       display: inline-flex;
@@ -171,17 +171,18 @@
       gap: 6px;
       padding: 0 14px;
       height: 38px;
-      background: var(--gold);
-      border: none;
+      background: #000000;
+      border: 1px solid #000000;
       border-radius: var(--r-sm);
-      color: #0F172A;
+      color: #FFFFFF;
       font-weight: 800;
       font-size: 12.5px;
       text-decoration: none;
       transition: all .2s ease;
     }
     .btn-kios-login:hover {
-      background: var(--gold-2);
+      background: #262626;
+      border-color: #262626;
     }
 
     /* ══ FULLSCREEN PROPORTIONAL ADAPTIVE STYLES ══ */
