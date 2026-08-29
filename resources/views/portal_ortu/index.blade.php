@@ -88,31 +88,32 @@
     .brand-logo {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 10px;
       text-decoration: none;
       color: var(--text);
     }
     .brand-icon {
-      width: 38px;
-      height: 38px;
-      background: var(--gold-subtle);
-      border: 1.5px solid var(--gold-border);
+      width: 36px;
+      height: 36px;
+      background: var(--bg-subtle);
+      border: 1px solid var(--border-2);
       border-radius: var(--r-sm);
       display: flex;
       align-items: center;
       justify-content: center;
-      color: var(--gold);
-      font-size: 18px;
+      color: var(--text);
+      font-size: 16px;
+      flex-shrink: 0;
     }
     .brand-text h1 {
-      font-size: 15px;
+      font-size: 14px;
       font-weight: 800;
       line-height: 1.2;
       color: var(--text);
       letter-spacing: -0.01em;
     }
     .brand-text p {
-      font-size: 11.5px;
+      font-size: 11px;
       color: var(--text-3);
       font-weight: 600;
     }
@@ -121,7 +122,7 @@
     .container {
       max-width: 1020px;
       margin: 0 auto;
-      padding: 24px 18px 48px;
+      padding: 20px 16px 40px;
       width: 100%;
       flex: 1;
     }
@@ -131,7 +132,7 @@
       background: var(--bg-card);
       border: 1px solid var(--border);
       border-radius: var(--r-xl);
-      padding: 28px 24px;
+      padding: 24px 20px;
       box-shadow: var(--shadow-sm);
       margin-bottom: 24px;
     }
@@ -139,35 +140,32 @@
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      background: var(--gold-subtle);
-      border: 1px solid var(--gold-border);
-      color: var(--gold);
-      padding: 3px 10px;
-      border-radius: 20px;
       font-size: 11px;
       font-weight: 800;
-      margin-bottom: 12px;
+      color: var(--text-3);
+      margin-bottom: 10px;
       text-transform: uppercase;
       letter-spacing: 0.5px;
     }
     .search-title {
-      font-size: 22px;
+      font-size: 21px;
       font-weight: 900;
       line-height: 1.25;
-      margin-bottom: 6px;
+      margin-bottom: 8px;
       letter-spacing: -0.02em;
       color: var(--text);
     }
     .search-desc {
-      font-size: 13.5px;
+      font-size: 13px;
       color: var(--text-2);
       max-width: 640px;
-      line-height: 1.6;
-      margin-bottom: 20px;
+      line-height: 1.55;
+      margin-bottom: 18px;
     }
 
     .search-form-box {
       max-width: 600px;
+      width: 100%;
     }
     .search-input-wrap {
       display: flex;
@@ -176,45 +174,49 @@
       border-radius: var(--r-md);
       padding: 4px;
       transition: all .2s ease;
+      gap: 4px;
     }
     .search-input-wrap:focus-within {
-      border-color: var(--gold);
+      border-color: var(--text);
       background: var(--bg-card);
-      box-shadow: 0 0 0 3px var(--gold-subtle);
     }
     .search-input {
       flex: 1;
       border: none;
       outline: none;
-      padding: 10px 14px;
-      font-size: 14px;
+      padding: 10px 12px;
+      font-size: 13.5px;
       font-weight: 600;
       color: var(--text);
       background: transparent;
       font-family: var(--font-main);
+      min-width: 0;
     }
     .search-input::placeholder {
       color: var(--text-3);
       font-weight: 500;
+      font-size: 12.5px;
     }
     .btn-search {
-      background: var(--gold);
-      color: #0F172A;
+      background: var(--text);
+      color: var(--bg);
       font-weight: 800;
-      font-size: 13px;
+      font-size: 12.5px;
       border: none;
       border-radius: var(--r-sm);
-      padding: 0 18px;
+      padding: 0 16px;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
+      justify-content: center;
       gap: 6px;
       transition: all .2s;
       font-family: var(--font-main);
+      white-space: nowrap;
+      height: 40px;
     }
     .btn-search:hover {
-      background: #EAB308;
-      transform: translateY(-1px);
+      opacity: 0.9;
     }
 
     /* ─── Highlights Features Grid ─── */
@@ -222,8 +224,8 @@
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
       gap: 14px;
-      margin-top: 24px;
-      padding-top: 20px;
+      margin-top: 22px;
+      padding-top: 18px;
       border-top: 1px solid var(--border);
     }
     .portal-feature-item {
@@ -237,11 +239,11 @@
       border-radius: 8px;
       background: var(--bg-subtle);
       border: 1px solid var(--border);
-      color: var(--gold);
+      color: var(--text);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 15px;
+      font-size: 14px;
       flex-shrink: 0;
     }
     .portal-feature-text strong {
@@ -257,6 +259,14 @@
       line-height: 1.4;
       display: block;
       margin-top: 2px;
+    }
+
+    @media (max-width: 600px) {
+      .top-nav-inner { padding: 10px 14px; }
+      .nav-actions { display: none; }
+      .search-title { font-size: 18px; }
+      .search-console-card { padding: 20px 16px; border-radius: var(--r-lg); }
+      .portal-features-grid { grid-template-columns: 1fr; }
     }
 
     /* ─── Compact Search Bar (When Student Found) ─── */
