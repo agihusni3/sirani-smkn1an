@@ -904,13 +904,13 @@
             Profil Lengkap Siswa
           </span>
           
-          <div style="display:flex; gap:6px;">
-            <button type="button" onclick="copyLinkPresensi('{{ url('/presensi-siswa/'.$siswa->nis) }}')" id="btnCopyLink" style="background:var(--bg-subtle); border:1px solid var(--border); padding:5px 12px; border-radius:var(--r-sm); font-size:11.5px; font-weight:700; color:var(--text); cursor:pointer; display:inline-flex; align-items:center; gap:5px;">
-              <i class="bi bi-link-45deg"></i> <span id="copyBtnText">Salin Tautan</span>
-            </button>
-            <button type="button" onclick="resetSiswaTersimpan()" style="background:var(--bg-subtle); border:1px solid var(--border); padding:5px 12px; border-radius:var(--r-sm); font-size:11.5px; font-weight:700; color:var(--text); cursor:pointer; display:inline-flex; align-items:center; gap:5px;">
-              <i class="bi bi-arrow-repeat"></i> Ganti Siswa
-            </button>
+          <div style="display:flex; gap:6px; flex-wrap:wrap;">
+            <a href="#riwayat-kehadiran" style="background:var(--bg-subtle); border:1px solid var(--border); padding:5px 12px; border-radius:var(--r-sm); font-size:11.5px; font-weight:800; color:var(--text); text-decoration:none; display:inline-flex; align-items:center; gap:5px;">
+              <i class="bi bi-calendar-check"></i> Rekap Absen
+            </a>
+            <a href="#portofolio-karakter" style="background:var(--bg-subtle); border:1px solid var(--border); padding:5px 12px; border-radius:var(--r-sm); font-size:11.5px; font-weight:800; color:var(--text); text-decoration:none; display:inline-flex; align-items:center; gap:5px;">
+              <i class="bi bi-shield-check"></i> Rekap Kasus
+            </a>
           </div>
         </div>
 
@@ -1407,15 +1407,6 @@
       </div>
 
       {{-- 3. PORTOFOLIO KARAKTER, KEDISIPLINAN & SELF-REWARD --}}
-      @php
-        $poinBersih = $kasusDisiplin ? $kasusDisiplin->poin_bersih : 0;
-        $totalPelanggaran = $kasusDisiplin ? $kasusDisiplin->total_poin_pelanggaran : 0;
-        $totalPemulihan = $kasusDisiplin ? $kasusDisiplin->total_poin_pemulihan : 0;
-        $a1 = $pengaturanDisiplin->ambang_tahap_1_wali ?? 10;
-        $a2 = $pengaturanDisiplin->ambang_tahap_2_bk ?? 30;
-        $a3 = $pengaturanDisiplin->ambang_tahap_3_wakasis ?? 50;
-        $a4 = $pengaturanDisiplin->ambang_tahap_4_kepsek ?? 75;
-      @endphp
       {{-- 3. PORTOFOLIO KARAKTER, KEDISIPLINAN & SELF-REWARD --}}
       @php
         $poinBersih = $kasusDisiplin ? $kasusDisiplin->poin_bersih : 0;
@@ -1426,7 +1417,7 @@
         $a3 = $pengaturanDisiplin->ambang_tahap_3_wakasis ?? 50;
         $a4 = $pengaturanDisiplin->ambang_tahap_4_kepsek ?? 75;
       @endphp
-      <div class="dossier-card" style="margin-top: 20px;">
+      <div class="dossier-card" id="portofolio-karakter" style="margin-top: 20px; scroll-margin-top: 70px;">
         <div class="dossier-header">
           <div>
             <h3 style="font-size:14.5px; font-weight:800; color:var(--text); margin:0;">Portofolio Karakter &amp; Kredit Kedisiplinan</h3>
