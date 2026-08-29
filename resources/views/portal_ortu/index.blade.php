@@ -1241,11 +1241,9 @@
                       <td style="text-align:center; font-family:var(--font-mono); font-weight:800; font-size:13px; color:var(--text);">
                         {{ $rb['total'] }}
                       </td>
-                      <td style="text-align:center; white-space:nowrap;">
+                      <td style="text-align:center; white-space:nowrap; font-family:var(--font-mono); font-weight:800; font-size:13px; color:var(--text);">
                         @if($rb['total'] > 0)
-                          <span class="badge" style="background:var(--bg-subtle); border:1px solid var(--border); color:var(--text); font-weight:800; font-size:11px; font-family:var(--font-mono);">
-                            {{ $rb['persen'] }}%
-                          </span>
+                          {{ $rb['persen'] }}%
                         @else
                           <span style="color:var(--text-3); font-size:12px;">—</span>
                         @endif
@@ -1261,10 +1259,8 @@
                     <td style="text-align:center; font-family:var(--font-mono); font-weight:900; color:var(--text);">{{ $totIzinSakit }}</td>
                     <td style="text-align:center; font-family:var(--font-mono); font-weight:900; color:var(--text);">{{ $totAlphaBolos }}</td>
                     <td style="text-align:center; font-family:var(--font-mono); font-weight:900; color:var(--text);">{{ $totSemua }}</td>
-                    <td style="text-align:center;">
-                      <span class="badge" style="background:var(--gold); color:#0F172A; font-weight:900; font-size:11px; font-family:var(--font-mono);">
-                        {{ $stats['persen'] }}%
-                      </span>
+                    <td style="text-align:center; font-family:var(--font-mono); font-weight:900; font-size:13.5px; color:var(--text);">
+                      {{ $stats['persen'] }}%
                     </td>
                   </tr>
                 </tbody>
