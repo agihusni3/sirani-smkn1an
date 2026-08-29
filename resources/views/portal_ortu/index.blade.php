@@ -919,18 +919,20 @@
       </div>
     @endif
 
-    {{-- PENGUMUMAN RESMI SEKOLAH (SAAT LANDING / SEBELUM PILIH SISWA) --}}
+    {{-- PENGUMUMAN RESMI SEKOLAH (ON-DEMAND SAAT LANDING) --}}
     @if(!$siswa && isset($pengumumans) && $pengumumans->count() > 0)
-      <div style="margin-bottom: 20px;">
-        @foreach($pengumumans as $p)
-          @php $badge = $p->kategori_badge; @endphp
-          <div style="background: var(--bg-card); border: 1px solid var(--border); border-left: 4px solid var(--gold); border-radius: var(--r-md); padding: 14px 18px; margin-bottom: 10px; box-shadow: var(--shadow-sm); display: flex; gap: 12px; align-items: flex-start;">
-            <div style="width: 32px; height: 32px; border-radius: 8px; background: var(--gold-subtle); color: var(--gold); display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; margin-top: 2px;">
-              <i class="bi {{ $badge['icon'] }}"></i>
-            </div>
-            <div style="flex: 1;">
-              <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 6px; margin-bottom: 3px;">
-                <span class="badge" style="background: var(--gold-subtle); color: var(--gold); font-weight: 800; font-size: 10px; text-transform: uppercase;">
+      <div style="margin-bottom: 20px; text-align: center;">
+        <button type="button" id="btnLandingPengumuman" onclick="toggleLandingPengumuman()" class="btn-portal-tab" style="padding: 8px 16px; font-size: 12px; margin: 0 auto; display: inline-flex;">
+          <i class="bi bi-megaphone"></i> <span>Lihat Pengumuman Sekolah</span>
+          <span style="font-size:10px; background:var(--text); color:var(--bg); padding:1px 6px; border-radius:10px; margin-left:4px;">{{ $pengumumans->count() }}</span>
+        </button>
+
+        <div id="landing-pengumuman" style="display: none; margin-top: 14px; text-align: left;">
+          @foreach($pengumumans as $p)
+            @php $badge = $p->kategori_badge; @endphp
+            <div style="background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--r-md); padding: 14px 18px; margin-bottom: 10px; box-shadow: var(--shadow-sm);">
+              <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 6px; margin-bottom: 4px;">
+                <span style="font-size:11px; font-weight:800; color:var(--text); text-transform:uppercase; letter-spacing:0.4px;">
                   {{ $badge['label'] }}
                 </span>
                 <span style="font-size: 11px; color: var(--text-3); font-weight: 600;">
@@ -948,8 +950,8 @@
                 </div>
               @endif
             </div>
-          </div>
-        @endforeach
+          @endforeach
+        </div>
       </div>
     @endif
 
@@ -1804,6 +1806,24 @@
       }
     }
     window.togglePortalSection = togglePortalSection;
+
+    function toggleLandingPengumuman() {
+      const el = document.getElementById('landing-pengumuman');
+      const btn = document.getElementById('btnLandingPengumuman');
+      if (!el) return;
+      const isHidden = (el.style.display === 'none' || !el.style.display);
+      if (isHidden) {
+        el.style.display = 'block';
+        if (btn) btn.classList.add('active');
+        setTimeout(function() {
+          el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 50);
+      } else {
+        el.style.display = 'none';
+        if (btn) btn.classList.remove('active');
+      }
+    }
+    window.toggleLandingPengumuman = toggleLandingPengumuman;
 
     document.addEventListener('DOMContentLoaded', function() {
       const secAbsen = document.getElementById('riwayat-kehadiran');
