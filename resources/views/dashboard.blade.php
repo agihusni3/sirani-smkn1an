@@ -61,10 +61,13 @@
       transition: all .2s;
     }
     .tab-pill-btn.active {
-      background: linear-gradient(135deg, var(--gold), var(--gold-2));
-      color: #0F172A;
-      border-color: var(--gold);
-      box-shadow: 0 2px 12px var(--gold-glow);
+      background: #000000 !important;
+      color: #FFFFFF !important;
+      border-color: #000000 !important;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25);
+    }
+    .tab-pill-btn.active i {
+      color: #FFFFFF !important;
     }
 
     /* Modules Grid Hub */
@@ -168,8 +171,8 @@
     @endphp
     <div class="exec-hero">
       <div>
-        <div style="display:inline-flex; align-items:center; gap:6px; background:var(--gold-dim); border:1px solid rgba(202,138,4,0.3); padding:3px 10px; border-radius:20px; font-size:11px; font-weight:800; color:var(--gold); margin-bottom:8px;">
-          <i class="bi {{ $roleIcon }}"></i> {{ $roleTitle }}
+        <div style="display:inline-flex; align-items:center; gap:6px; background:rgba(0,0,0,0.06); border:1px solid rgba(0,0,0,0.12); padding:3px 10px; border-radius:20px; font-size:11px; font-weight:800; color:#000000; margin-bottom:8px;">
+          <i class="bi {{ $roleIcon }}" style="color:#000000;"></i> {{ $roleTitle }}
         </div>
         <h2 style="font-size:22px; font-weight:900; color:var(--text); margin-bottom:4px;">
           {{ $currentUser->name ?? 'Pengguna SIRANI' }}
@@ -179,7 +182,7 @@
           @if($currentUser && $currentUser->guru && $currentUser->guru->jabatan)
             · Jabatan: <strong style="color:var(--text);">{{ $currentUser->guru->jabatan }}</strong>
           @endif
-          · Tahun Ajaran: <strong style="color:var(--gold);">{{ $taAktif->nama ?? '2026/2027' }}</strong>
+          · Tahun Ajaran: <strong style="color:#000000;">{{ $taAktif->nama ?? '2026/2027' }}</strong>
         </div>
       </div>
 
@@ -189,7 +192,7 @@
           @if($isLiburHariIni)
             <span class="badge" style="background:rgba(239,68,68,0.12); color:#DC2626; border:1px solid rgba(239,68,68,0.25); font-size:10px; font-weight:800; padding:2px 8px; border-radius:10px;">HARI LIBUR</span>
           @else
-            <span class="badge" style="background:var(--gold-dim); color:var(--gold); border:1px solid rgba(202,138,4,0.3); font-size:10px; font-weight:800; padding:2px 8px; border-radius:10px;">EFEKTIF BELAJAR</span>
+            <span class="badge" style="background:rgba(0,0,0,0.06); color:#000000; border:1px solid rgba(0,0,0,0.12); font-size:10px; font-weight:800; padding:2px 8px; border-radius:10px;">EFEKTIF BELAJAR</span>
           @endif
         </div>
         <div style="font-size:17px; font-weight:900; color:var(--text); font-family:var(--font-mono); margin:4px 0 2px;">
@@ -216,7 +219,7 @@
     <!-- ═══════════════════════════════════════════════════════════════════ -->
     @if($isAdmin || $isKepalaSekolah || $isWakasis || $isGuruBk || $isWaliKelas)
       <div class="section-divider">
-        <h2><i class="bi bi-pie-chart-fill" style="color:var(--gold);"></i> Grafik &amp; Analisis Visual Presensi</h2>
+        <h2><i class="bi bi-pie-chart-fill" style="color:#000000;"></i> Grafik &amp; Analisis Visual Presensi</h2>
         <span style="font-family:var(--font-mono); font-size:12px; color:var(--text-3); font-weight:700;">
           (Visualisasi Real-Time Siswa &amp; Kedisiplinan)
         </span>
@@ -228,10 +231,10 @@
         <!-- Grafik 1: Tren Kehadiran 30 Hari (1 Bulan) -->
         <div class="panel" style="margin-bottom: 0; display:flex; flex-direction:column;">
           <div class="panel-title" style="margin-bottom: 14px; display:flex; justify-content:space-between; align-items:center;">
-            <span style="font-size:13.5px; font-weight:800; display:flex; align-items:center; gap:8px;">
-              <i class="bi bi-graph-up-arrow" style="color:var(--gold)"></i> Tren Kehadiran Siswa (30 Hari / 1 Bulan)
+            <span style="font-size:13.5px; font-weight:800; display:flex; align-items:center; gap:8px; color:var(--text);">
+              <i class="bi bi-graph-up-arrow" style="color:#000000;"></i> Tren Kehadiran Siswa (30 Hari / 1 Bulan)
             </span>
-            <span class="badge" style="background:var(--gold-dim); color:var(--gold); border:1px solid var(--gold); font-size:10.5px; padding:2px 8px; border-radius:12px; font-weight:800;">
+            <span class="badge" style="background:rgba(0,0,0,0.06); color:#000000; border:1px solid rgba(0,0,0,0.12); font-size:10.5px; padding:2px 8px; border-radius:12px; font-weight:800;">
               30 Hari Terakhir
             </span>
           </div>
@@ -243,10 +246,10 @@
         <!-- Grafik 2: Komposisi Status Kehadiran Hari Ini (Donut) -->
         <div class="panel" style="margin-bottom: 0; display:flex; flex-direction:column;">
           <div class="panel-title" style="margin-bottom: 14px; display:flex; justify-content:space-between; align-items:center;">
-            <span style="font-size:13.5px; font-weight:800; display:flex; align-items:center; gap:8px;">
-              <i class="bi bi-pie-chart-fill" style="color:var(--green)"></i> Komposisi Status Siswa Hari Ini
+            <span style="font-size:13.5px; font-weight:800; display:flex; align-items:center; gap:8px; color:var(--text);">
+              <i class="bi bi-pie-chart-fill" style="color:#000000;"></i> Komposisi Status Siswa Hari Ini
             </span>
-            <span class="badge" style="background:var(--green-dim); color:var(--green); border:1px solid rgba(34,197,94,0.3); font-size:10.5px; padding:2px 8px; border-radius:12px; font-weight:800;">
+            <span class="badge" style="background:rgba(0,0,0,0.06); color:#000000; border:1px solid rgba(0,0,0,0.12); font-size:10.5px; padding:2px 8px; border-radius:12px; font-weight:800;">
               {{ $totalSiswaActive }} Siswa
             </span>
           </div>
@@ -262,10 +265,10 @@
           <!-- Grafik 3: Tren Kehadiran Guru & Pegawai (30 Hari / 1 Bulan) -->
           <div class="panel" style="margin-bottom: 0; display:flex; flex-direction:column;">
             <div class="panel-title" style="margin-bottom: 14px; display:flex; justify-content:space-between; align-items:center;">
-              <span style="font-size:13.5px; font-weight:800; display:flex; align-items:center; gap:8px;">
-                <i class="bi bi-graph-up-arrow" style="color:var(--navy)"></i> Tren Kehadiran Guru &amp; Pegawai (30 Hari / 1 Bulan)
+              <span style="font-size:13.5px; font-weight:800; display:flex; align-items:center; gap:8px; color:var(--text);">
+                <i class="bi bi-graph-up-arrow" style="color:#000000;"></i> Tren Kehadiran Guru &amp; Pegawai (30 Hari / 1 Bulan)
               </span>
-              <span class="badge" style="background:rgba(59,130,246,0.12); color:var(--navy); border:1px solid rgba(59,130,246,0.3); font-size:10.5px; padding:2px 8px; border-radius:12px; font-weight:800;">
+              <span class="badge" style="background:rgba(0,0,0,0.06); color:#000000; border:1px solid rgba(0,0,0,0.12); font-size:10.5px; padding:2px 8px; border-radius:12px; font-weight:800;">
                 30 Hari Terakhir
               </span>
             </div>
@@ -277,10 +280,10 @@
           <!-- Grafik 4: Komposisi Status Guru & Pegawai Hari Ini (Donut) -->
           <div class="panel" style="margin-bottom: 0; display:flex; flex-direction:column;">
             <div class="panel-title" style="margin-bottom: 14px; display:flex; justify-content:space-between; align-items:center;">
-              <span style="font-size:13.5px; font-weight:800; display:flex; align-items:center; gap:8px;">
-                <i class="bi bi-pie-chart-fill" style="color:var(--navy)"></i> Komposisi Status Guru &amp; Pegawai Hari Ini
+              <span style="font-size:13.5px; font-weight:800; display:flex; align-items:center; gap:8px; color:var(--text);">
+                <i class="bi bi-pie-chart-fill" style="color:#000000;"></i> Komposisi Status Guru &amp; Pegawai Hari Ini
               </span>
-              <span class="badge" style="background:rgba(59,130,246,0.12); color:var(--navy); border:1px solid rgba(59,130,246,0.3); font-size:10.5px; padding:2px 8px; border-radius:12px; font-weight:800;">
+              <span class="badge" style="background:rgba(0,0,0,0.06); color:#000000; border:1px solid rgba(0,0,0,0.12); font-size:10.5px; padding:2px 8px; border-radius:12px; font-weight:800;">
                 {{ $totalGuruActive }} Guru
               </span>
             </div>
@@ -347,7 +350,7 @@
     const searchInput = document.getElementById('modalSearch');
 
     searchInput.value = '';
-    modalTitle.innerHTML = `<i class="bi ${type === 'siswa' ? 'bi-people-fill' : 'bi-person-badge-fill'}" style="color:${type === 'siswa' ? 'var(--gold)' : 'var(--navy)'}; margin-right:8px;"></i> ${title}`;
+    modalTitle.innerHTML = `<i class="bi ${type === 'siswa' ? 'bi-people-fill' : 'bi-person-badge-fill'}" style="color:#000000; margin-right:8px;"></i> ${title}`;
 
     let list = [];
 
@@ -508,8 +511,8 @@
               <i class="bi bi-person-lines-fill"></i> Portal
             </a>
             ${item.siswaId ? `
-              <a href="/surat/cetak?siswa_id=${item.siswaId}&kategori=panggilan_ortu" target="_blank" class="btn btn-sm btn-outline" style="font-size:11px; padding:3px 8px; color:var(--gold); border-color:rgba(202,138,4,0.4);" title="Cetak Lembar Surat A4">
-                <i class="bi bi-printer-fill"></i> Surat
+              <a href="/surat/cetak?siswa_id=${item.siswaId}&kategori=panggilan_ortu" target="_blank" class="btn btn-sm btn-outline" style="font-size:11px; padding:3px 8px; color:#000000; border-color:#000000;" title="Cetak Lembar Surat A4">
+                <i class="bi bi-printer-fill" style="color:#000000;"></i> Surat
               </a>
             ` : ''}
           </div>
@@ -562,14 +565,14 @@
           datasets: [{
             label: '% Kehadiran Siswa',
             data: dataHadir,
-            borderColor: '#CA8A04',
-            backgroundColor: 'rgba(202, 138, 4, 0.12)',
+            borderColor: '#000000',
+            backgroundColor: 'rgba(0, 0, 0, 0.08)',
             fill: true,
             tension: 0.35,
             borderWidth: 2.5,
             pointRadius: 3,
             pointHoverRadius: 6,
-            pointBackgroundColor: '#CA8A04'
+            pointBackgroundColor: '#000000'
           }]
         },
         options: {
@@ -640,14 +643,14 @@
           datasets: [{
             label: '% Kehadiran Guru',
             data: dataHadirG,
-            borderColor: '#2563EB',
-            backgroundColor: 'rgba(37, 99, 235, 0.12)',
+            borderColor: '#000000',
+            backgroundColor: 'rgba(0, 0, 0, 0.08)',
             fill: true,
             tension: 0.35,
             borderWidth: 2.5,
             pointRadius: 3,
             pointHoverRadius: 6,
-            pointBackgroundColor: '#2563EB'
+            pointBackgroundColor: '#000000'
           }]
         },
         options: {
