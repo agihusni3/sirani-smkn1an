@@ -5,6 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>{{ $siswa ? 'Rekap Kehadiran '.$siswa->nama.' — Portal Wali Murid' : 'Portal Kehadiran Siswa & Orang Tua — SMKN 1 Air Naningan' }}</title>
   
+  {{-- PWA Meta Tags --}}
+  <link rel="manifest" href="/manifest.json" />
+  <meta name="theme-color" content="#0F172A" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="SIRANI" />
+  <link rel="apple-touch-icon" href="/icons/icon-192.png" />
+  <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png" />
+  
   {{-- Google Fonts: Plus Jakarta Sans & JetBrains Mono --}}
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -263,7 +273,7 @@
 
     @media (max-width: 600px) {
       .top-nav-inner { padding: 10px 14px; }
-      .nav-actions { display: none; }
+      .nav-actions button { padding: 5px 9px; font-size: 10.5px; }
       .search-title { font-size: 18px; }
       .search-console-card { padding: 20px 16px; border-radius: var(--r-lg); }
       .portal-features-grid { grid-template-columns: 1fr; }
@@ -802,10 +812,10 @@
         </div>
       </a>
 
-      <div class="nav-actions">
-        <span style="font-size:11.5px; font-weight:700; color:var(--text-2); display:inline-flex; align-items:center; gap:6px; background:var(--bg-subtle); padding:6px 12px; border-radius:var(--r-sm); border:1px solid var(--border);">
-          <i class="bi bi-shield-check" style="color:var(--gold);"></i> Akses Resmi Wali Murid
-        </span>
+      <div class="nav-actions" style="display:flex; align-items:center; gap:8px;">
+        <button type="button" id="btnPwaInstall" onclick="triggerPwaInstall()" style="background:var(--text); color:var(--bg); border:none; padding:6px 12px; border-radius:var(--r-sm); font-size:11.5px; font-weight:800; cursor:pointer; display:inline-flex; align-items:center; gap:5px; font-family:var(--font-main);">
+          <i class="bi bi-phone"></i> <span>Instal Aplikasi</span>
+        </button>
       </div>
     </div>
   </nav>
@@ -1818,6 +1828,44 @@
         if (btnPengumuman) btnPengumuman.classList.remove('active');
       }
     });
+    // Service Worker Registration for PWA
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function() {
+        navigator.serviceWorker.register('/sw.js').then(function(reg) {
+          console.log('SIRANI PWA ServiceWorker ready:', reg.scope);
+        }).catch(function(err) {
+          console.log('SIRANI PWA ServiceWorker error:', err);
+        });
+      });
+    }
+
+    let deferredPrompt = null;
+    window.addEventListener('beforeinstallprompt', function(e) {
+      e.preventDefault();
+      deferredPrompt = e;
+      const btn = document.getElementById('btnPwaInstall');
+      if (btn) btn.style.display = 'inline-flex';
+    });
+
+    function triggerPwaInstall() {
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.then(function(choiceResult) {
+          if (choiceResult.outcome === 'accepted') {
+            const btn = document.getElementById('btnPwaInstall');
+            if (btn) btn.style.display = 'none';
+          }
+          deferredPrompt = null;
+        });
+      } else {
+        const isIos = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+        if (isIos) {
+          alert('Panduan Instal di iPhone / iPad:\n\n1. Ketuk ikon "Bagikan / Share" (ikon kotak dengan panah ke atas di bilah bawah browser Safari).\n2. Gulir ke bawah dan pilih "Tambahkan ke Layar Utama" (Add to Home Screen).\n3. Ketuk "Tambah" di pojok kanan atas.');
+        } else {
+          alert('Panduan Instal di Android:\n\n1. Ketuk ikon menu browser (titik 3 di kanan atas).\n2. Pilih "Instal Aplikasi" atau "Tambahkan ke Layar Utama".');
+        }
+      }
+    }
   </script>
 
 </body>

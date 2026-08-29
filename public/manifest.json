@@ -1,0 +1,31 @@
+{
+  "name": "SIRANI - Portal Wali Murid SMKN 1 Air Naningan",
+  "short_name": "SIRANI Ortu",
+  "description": "Portal Resmi Pemantauan Presensi & Kedisiplinan Siswa SMKN 1 Air Naningan",
+  "start_url": "/cek-presensi",
+  "display": "standalone",
+  "background_color": "#FFFFFF",
+  "theme_color": "#0F172A",
+  "orientation": "portrait",
+  "scope": "/",
+  "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/maskable-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
