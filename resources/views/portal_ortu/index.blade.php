@@ -26,18 +26,39 @@
     :root {
       --bg: #F8FAFC;
       --bg-card: #FFFFFF;
-      --bg-subtle: #EEF2F6;
-      --border: #DCE3EB;
+      --bg-subtle: #F1F5F9;
+      --border: #E2E8F0;
       --border-2: #CBD5E1;
-      --text: #000000;
-      --text-2: #000000;
-      --text-3: #000000;
+      --text: #0F172A;
+      --text-2: #475569;
+      --text-3: #94A3B8;
+      
+      --gold: #CA8A04;
+      --gold-dark: #A16207;
+      --gold-light: #FEF08A;
+      --gold-subtle: rgba(202, 138, 4, 0.08);
+      --gold-border: rgba(202, 138, 4, 0.25);
+      
+      --green: #16A34A;
+      --green-subtle: rgba(22, 163, 74, 0.1);
+      
+      --amber: #D97706;
+      --amber-subtle: rgba(217, 119, 6, 0.1);
+      
+      --red: #DC2626;
+      --red-subtle: rgba(220, 38, 38, 0.1);
+      
+      --blue: #2563EB;
+      --blue-subtle: rgba(37, 99, 235, 0.1);
+
+      --teal: #0D9488;
+      --teal-subtle: rgba(13, 148, 136, 0.1);
       
       --r-sm: 8px;
       --r-md: 12px;
       --r-lg: 16px;
       --r-xl: 20px;
-      --shadow-sm: 0 1px 3px rgba(0,0,0,0.03);
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.04);
       --shadow-md: 0 4px 14px rgba(0,0,0,0.05);
       
       --font-main: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
@@ -49,7 +70,7 @@
     body {
       font-family: var(--font-main);
       background-color: var(--bg);
-      color: #000000;
+      color: var(--text);
       line-height: 1.5;
       min-height: 100vh;
       display: flex;
@@ -59,7 +80,7 @@
 
     /* ─── Top Navigation ─── */
     .top-nav {
-      background: #FFFFFF;
+      background: var(--bg-card);
       border-bottom: 1px solid var(--border);
       position: sticky;
       top: 0;
@@ -79,32 +100,32 @@
       align-items: center;
       gap: 10px;
       text-decoration: none;
-      color: #000000;
+      color: var(--text);
     }
     .brand-icon {
       width: 36px;
       height: 36px;
-      background: #000000;
-      border: 1px solid #000000;
+      background: var(--bg-subtle);
+      border: 1px solid var(--border-2);
       border-radius: var(--r-sm);
       display: flex;
       align-items: center;
       justify-content: center;
-      color: #FFFFFF;
+      color: var(--text);
       font-size: 16px;
       flex-shrink: 0;
     }
     .brand-text h1 {
       font-size: 14px;
-      font-weight: 900;
+      font-weight: 800;
       line-height: 1.2;
-      color: #000000;
+      color: var(--text);
       letter-spacing: -0.01em;
     }
     .brand-text p {
       font-size: 11px;
-      color: #000000;
-      font-weight: 700;
+      color: var(--text-3);
+      font-weight: 600;
     }
 
     /* ─── Container ─── */
@@ -118,7 +139,7 @@
 
     /* ─── Institutional Search Console ─── */
     .search-console-card {
-      background: #EEF2F6;
+      background: var(--bg-card);
       border: 1px solid var(--border);
       border-radius: var(--r-xl);
       padding: 24px 20px;
@@ -129,9 +150,9 @@
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      font-size: 11.5px;
-      font-weight: 900;
-      color: #000000;
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--text-3);
       margin-bottom: 10px;
       text-transform: uppercase;
       letter-spacing: 0.5px;
@@ -142,11 +163,11 @@
       line-height: 1.25;
       margin-bottom: 8px;
       letter-spacing: -0.02em;
-      color: #000000;
+      color: var(--text);
     }
     .search-desc {
       font-size: 13px;
-      color: #000000;
+      color: var(--text-2);
       max-width: 640px;
       line-height: 1.55;
       margin-bottom: 18px;
@@ -158,7 +179,7 @@
     }
     .search-input-wrap {
       display: flex;
-      background: #FFFFFF;
+      background: var(--bg-subtle);
       border: 1px solid var(--border-2);
       border-radius: var(--r-md);
       padding: 4px;
@@ -166,8 +187,8 @@
       gap: 4px;
     }
     .search-input-wrap:focus-within {
-      border-color: #000000;
-      background: #FFFFFF;
+      border-color: var(--text);
+      background: var(--bg-card);
     }
     .search-input {
       flex: 1;
@@ -175,23 +196,23 @@
       outline: none;
       padding: 10px 12px;
       font-size: 13.5px;
-      font-weight: 700;
-      color: #000000;
+      font-weight: 600;
+      color: var(--text);
       background: transparent;
       font-family: var(--font-main);
       min-width: 0;
     }
     .search-input::placeholder {
-      color: #64748B;
+      color: var(--text-3);
       font-weight: 500;
       font-size: 12.5px;
     }
     .btn-search {
-      background: #000000 !important;
-      color: #FFFFFF !important;
-      font-weight: 900;
+      background: var(--text);
+      color: var(--bg);
+      font-weight: 800;
       font-size: 12.5px;
-      border: 1px solid #000000;
+      border: none;
       border-radius: var(--r-sm);
       padding: 0 16px;
       cursor: pointer;
@@ -205,7 +226,7 @@
       height: 40px;
     }
     .btn-search:hover {
-      opacity: 0.85;
+      opacity: 0.9;
     }
 
     /* ─── Highlights Features Grid ─── */
@@ -225,10 +246,10 @@
     .portal-feature-icon {
       width: 32px;
       height: 32px;
-      border-radius: var(--r-sm);
-      background: #000000;
-      border: 1px solid #000000;
-      color: #FFFFFF;
+      border-radius: 8px;
+      background: var(--bg-subtle);
+      border: 1px solid var(--border);
+      color: var(--text);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -237,14 +258,14 @@
     }
     .portal-feature-text strong {
       font-size: 12.5px;
-      font-weight: 900;
-      color: #000000;
+      font-weight: 800;
+      color: var(--text);
       display: block;
       line-height: 1.3;
     }
     .portal-feature-text span {
       font-size: 11.5px;
-      color: #000000;
+      color: var(--text-3);
       line-height: 1.4;
       display: block;
       margin-top: 2px;
@@ -260,9 +281,9 @@
 
     /* ─── Compact Search Bar (When Student Found) ─── */
     .compact-search-card {
-      background: #EEF2F6;
+      background: var(--bg-card);
       border: 1px solid var(--border);
-      border-radius: var(--r-lg);
+      border-radius: var(--r-md);
       padding: 10px 14px;
       margin-bottom: 18px;
       display: flex;
@@ -287,7 +308,7 @@
 
     /* ─── Student Profile & Live Gate Widget (Dossier) ─── */
     .dossier-card {
-      background: #FFFFFF;
+      background: var(--bg-card);
       border: 1px solid var(--border);
       border-radius: var(--r-xl);
       padding: 22px 24px;
@@ -332,7 +353,7 @@
       justify-content: center;
       font-size: 26px;
       font-weight: 900;
-      color: #000000;
+      color: var(--text);
       flex-shrink: 0;
       overflow: hidden;
     }
@@ -344,7 +365,7 @@
     .student-name {
       font-size: 19px;
       font-weight: 900;
-      color: #000000;
+      color: var(--text);
       line-height: 1.25;
       margin-bottom: 4px;
       letter-spacing: -0.01em;
@@ -357,19 +378,22 @@
     }
     .tag-pill {
       font-size: 11.5px;
-      font-weight: 800;
+      font-weight: 700;
       padding: 4px 10px;
-      border-radius: var(--r-sm);
-      background: #EEF2F6;
-      border: 1px solid var(--border-2);
-      color: #000000 !important;
+      border-radius: 6px;
+      background: var(--bg-subtle);
+      border: 1px solid var(--border);
+      color: var(--text-2);
       display: inline-flex;
       align-items: center;
       gap: 5px;
       text-decoration: none;
     }
-    .tag-pill i {
-      color: #000000 !important;
+    .tag-pill.gold {
+      background: var(--bg-subtle);
+      border-color: var(--border-2);
+      color: var(--text);
+      font-weight: 800;
     }
 
     @media (max-width: 600px) {
@@ -430,20 +454,20 @@
       }
     }
 
-    /* ─── Today's Live Attendance Widget (Exact Match User Design) ─── */
+    /* ─── Today's Live Attendance Widget ─── */
     .today-widget {
-      background: #EEF2F6;
+      background: var(--bg-subtle);
       border: 1px solid var(--border);
-      border-radius: var(--r-xl);
-      padding: 18px 20px;
+      border-radius: var(--r-lg);
+      padding: 16px 18px;
     }
     .today-widget-title {
-      font-size: 12.5px;
-      font-weight: 900;
+      font-size: 11px;
+      font-weight: 800;
       text-transform: uppercase;
-      letter-spacing: 0.4px;
-      color: #000000;
-      margin-bottom: 14px;
+      letter-spacing: 0.5px;
+      color: var(--text-3);
+      margin-bottom: 12px;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -453,28 +477,28 @@
     .today-time-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 12px;
+      gap: 10px;
     }
     .today-time-box {
-      background: #FFFFFF;
-      border: 1px solid var(--border-2);
-      border-radius: var(--r-md);
-      padding: 14px 12px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--r-sm);
+      padding: 10px;
       text-align: center;
     }
     .today-time-label {
-      font-size: 12px;
-      font-weight: 900;
-      color: #000000;
+      font-size: 10.5px;
+      font-weight: 800;
+      color: var(--text-3);
       text-transform: uppercase;
       letter-spacing: 0.4px;
     }
     .today-time-val {
       font-family: var(--font-mono);
-      font-size: 17px;
+      font-size: 16px;
       font-weight: 900;
-      color: #000000;
-      margin-top: 4px;
+      color: var(--text);
+      margin-top: 2px;
     }
 
     /* ─── Status Badges ─── */
@@ -482,19 +506,23 @@
       display: inline-flex;
       align-items: center;
       gap: 5px;
-      font-size: 11px;
-      font-weight: 900;
-      padding: 2px 6px;
-      border-radius: 4px;
+      font-size: 10.5px;
+      font-weight: 800;
+      padding: 3px 9px;
+      border-radius: 20px;
       text-transform: uppercase;
       letter-spacing: 0.4px;
       white-space: nowrap;
       flex-shrink: 0;
       line-height: 1.3;
-      background: transparent !important;
-      color: #000000 !important;
-      border: none !important;
     }
+    .status-hadir { background: var(--green-subtle); color: var(--green); border: 1px solid rgba(22,163,74,0.25); }
+    .status-terlambat { background: var(--amber-subtle); color: var(--amber); border: 1px solid rgba(217,119,6,0.25); }
+    .status-izin, .status-sakit { background: var(--blue-subtle); color: var(--blue); border: 1px solid rgba(37,99,235,0.25); }
+    .status-bolos { background: rgba(153,27,27,0.1); color: #991B1B; border: 1px solid rgba(153,27,27,0.25); }
+    .status-alpha { background: var(--red-subtle); color: var(--red); border: 1px solid rgba(220,38,38,0.25); }
+    .status-pkl { background: var(--teal-subtle); color: var(--teal); border: 1px solid rgba(13,148,136,0.25); }
+    .status-none { background: var(--bg-card); color: var(--text-3); border: 1px solid var(--border); }
 
     /* ─── Discipline Score & 4 KPI Cards ─── */
     .stats-overview-grid {
@@ -517,11 +545,11 @@
     }
 
     .discipline-score-card {
-      background: #EEF2F6;
+      background: var(--bg-card);
       border: 1px solid var(--border);
       border-radius: var(--r-lg);
       padding: 16px 18px;
-      color: #000000;
+      color: var(--text);
       display: flex;
       flex-direction: column;
       justify-content: center;
@@ -532,19 +560,31 @@
       font-weight: 900;
       line-height: 1;
       font-family: var(--font-mono);
-      color: #000000;
+      color: var(--text);
     }
     .discipline-lbl {
       font-size: 11px;
-      font-weight: 900;
+      font-weight: 800;
       text-transform: uppercase;
       letter-spacing: 0.5px;
       margin-top: 4px;
-      color: #000000;
+      color: var(--text-3);
+    }
+    .discipline-badge {
+      display: inline-block;
+      background: var(--gold-subtle);
+      border: 1px solid var(--gold-border);
+      color: var(--gold);
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 800;
+      margin-top: 6px;
+      width: fit-content;
     }
 
     .stat-metric-card {
-      background: #EEF2F6;
+      background: var(--bg-card);
       border: 1px solid var(--border);
       border-radius: var(--r-lg);
       padding: 14px 16px;
@@ -563,13 +603,13 @@
       font-weight: 900;
       line-height: 1.1;
       font-family: var(--font-mono);
-      color: #000000;
+      color: var(--text);
       margin-top: 4px;
     }
     .stat-metric-title {
       font-size: 11px;
-      font-weight: 900;
-      color: #000000;
+      font-weight: 700;
+      color: var(--text-2);
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -577,9 +617,9 @@
 
     /* ─── Period Control ─── */
     .period-control-card {
-      background: #EEF2F6;
+      background: var(--bg-card);
       border: 1px solid var(--border);
-      border-radius: var(--r-lg);
+      border-radius: var(--r-md);
       padding: 8px 12px;
       margin-bottom: 16px;
       box-shadow: var(--shadow-sm);
@@ -591,11 +631,11 @@
     }
     .period-tabs {
       display: inline-flex;
-      background: #DCE3EB;
-      padding: 4px;
-      border-radius: var(--r-md);
-      gap: 4px;
-      border: 1px solid var(--border-2);
+      background: var(--bg-subtle);
+      padding: 3px;
+      border-radius: 10px;
+      gap: 3px;
+      border: 1px solid var(--border);
       flex-wrap: wrap;
     }
     .portal-nav-btn-group {
@@ -604,13 +644,13 @@
       gap: 6px;
     }
     .btn-portal-tab {
-      background: #000000 !important;
-      color: #FFFFFF !important;
-      border: 1px solid #000000;
+      background: var(--bg-card);
+      border: 1px solid var(--border-2);
       padding: 6px 10px;
       border-radius: var(--r-sm);
       font-size: 11.5px;
       font-weight: 800;
+      color: #0F172A;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
@@ -620,18 +660,16 @@
       font-family: var(--font-main);
       white-space: nowrap;
       text-align: center;
-      opacity: 0.75;
     }
     .btn-portal-tab:hover {
-      opacity: 0.95;
+      background: var(--bg-subtle);
+      border-color: #000000;
     }
     .btn-portal-tab.active {
       background: #000000 !important;
       color: #FFFFFF !important;
       border-color: #000000 !important;
-      opacity: 1 !important;
-      font-weight: 900;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35) !important;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25) !important;
     }
     .btn-portal-tab.active i,
     .btn-portal-tab.active span {
@@ -639,23 +677,27 @@
     }
     .portal-badge-count {
       font-size: 9.5px;
-      font-weight: 900;
-      background: #FFFFFF;
-      color: #000000;
+      font-weight: 800;
+      background: #000000;
+      color: #FFFFFF;
       padding: 1px 5px;
       border-radius: 10px;
       margin-left: 2px;
       display: inline-block;
     }
+    .btn-portal-tab.active .portal-badge-count {
+      background: #FFFFFF !important;
+      color: #000000 !important;
+    }
 
     .period-btn {
       padding: 5px 12px;
-      border-radius: var(--r-sm);
+      border-radius: 7px;
       font-size: 11.5px;
-      font-weight: 800;
-      border: 1px solid #000000;
-      background: #000000 !important;
-      color: #FFFFFF !important;
+      font-weight: 700;
+      border: none;
+      background: transparent;
+      color: var(--text-2);
       cursor: pointer;
       text-decoration: none;
       display: inline-flex;
@@ -663,18 +705,15 @@
       gap: 5px;
       transition: all .15s ease;
       white-space: nowrap;
-      opacity: 0.65;
     }
     .period-btn:hover {
-      opacity: 0.9;
-      color: #FFFFFF !important;
+      background: var(--gold-subtle);
+      color: var(--gold-dark);
     }
     .period-btn.active {
-      background: #000000 !important;
-      color: #FFFFFF !important;
-      font-weight: 900;
-      opacity: 1 !important;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+      background: var(--gold);
+      color: #0F172A;
+      font-weight: 800;
     }
 
     .period-input-wrap {
@@ -685,24 +724,24 @@
     }
     .form-control-pt {
       padding: 5px 10px;
-      border-radius: var(--r-sm);
+      border-radius: 6px;
       border: 1px solid var(--border-2);
-      background: #FFFFFF;
+      background: var(--bg-subtle);
       font-family: var(--font-main);
       font-size: 12px;
-      font-weight: 800;
-      color: #000000;
+      font-weight: 700;
+      color: var(--text);
       outline: none;
       cursor: pointer;
     }
     .form-control-pt:focus {
-      border-color: #000000;
-      background: #FFFFFF;
+      border-color: var(--gold);
+      background: var(--bg-card);
     }
 
     /* ─── Table Panel ─── */
     .panel {
-      background: #FFFFFF;
+      background: var(--bg-card);
       border: 1px solid var(--border);
       border-radius: var(--r-xl);
       padding: 0;
@@ -717,9 +756,8 @@
       justify-content: space-between;
       align-items: center;
       font-size: 14px;
-      font-weight: 900;
-      background: #F8FAFC;
-      color: #000000;
+      font-weight: 800;
+      background: #FAFBFD;
     }
     .table-wrap {
       overflow-x: auto;
@@ -733,26 +771,25 @@
       font-size: 13px;
     }
     th {
-      background: #E2E8F0;
-      color: #000000;
-      font-weight: 900;
+      background: #F1F5F9;
+      color: var(--text-2);
+      font-weight: 800;
       font-size: 11px;
       text-transform: uppercase;
       letter-spacing: 0.5px;
       padding: 12px 16px;
       text-align: left;
-      border-bottom: 2px solid #CBD5E1;
+      border-bottom: 1px solid var(--border);
       white-space: nowrap;
     }
     td {
       padding: 12px 16px;
       border-bottom: 1px solid var(--border);
-      color: #000000;
-      font-weight: 700;
+      color: var(--text);
       vertical-align: middle;
     }
     tbody tr:last-child td { border-bottom: none; }
-    tbody tr:hover { background: #F8FAFC; }
+    tbody tr:hover { background: #FAFBFD; }
 
     /* ─── Mobile Scroll Hint ─── */
     .mobile-scroll-hint {
@@ -761,8 +798,7 @@
       background: var(--bg-subtle);
       border-bottom: 1px solid var(--border);
       font-size: 11px;
-      color: #000000;
-      font-weight: 700;
+      color: var(--text-3);
       text-align: center;
     }
     @media (max-width: 768px) {
@@ -774,10 +810,9 @@
       text-align: center;
       padding: 24px 16px;
       font-size: 12px;
-      color: #000000;
-      font-weight: 700;
+      color: var(--text-3);
       border-top: 1px solid var(--border);
-      background: #FFFFFF;
+      background: var(--bg-card);
       margin-top: auto;
     }
   </style>
@@ -798,7 +833,7 @@
       </a>
 
       <div class="nav-actions" style="display:flex; align-items:center; gap:8px;">
-        <button type="button" id="btnPwaInstall" onclick="triggerPwaInstall()" style="background:#000000 !important; color:#FFFFFF !important; border:1px solid #000000; padding:6px 12px; border-radius:var(--r-sm); font-size:11.5px; font-weight:900; cursor:pointer; display:inline-flex; align-items:center; gap:5px; font-family:var(--font-main);">
+        <button type="button" id="btnPwaInstall" onclick="triggerPwaInstall()" style="background:var(--text); color:var(--bg); border:none; padding:6px 12px; border-radius:var(--r-sm); font-size:11.5px; font-weight:800; cursor:pointer; display:inline-flex; align-items:center; gap:5px; font-family:var(--font-main);">
           <i class="bi bi-phone"></i> <span>Instal Aplikasi</span>
         </button>
       </div>
@@ -823,7 +858,7 @@
         <div class="search-form-box">
           <form method="GET" action="{{ route('portal.ortu.index') }}">
             <div class="search-input-wrap">
-              <i class="bi bi-search" style="align-self:center; margin-left:12px; color:#000000; font-size:15px;"></i>
+              <i class="bi bi-search" style="align-self:center; margin-left:12px; color:var(--text-3); font-size:15px;"></i>
               <input
                 type="text"
                 name="keyword"
@@ -834,7 +869,7 @@
                 required
                 autofocus
               />
-              <button type="button" onclick="startQrScanner()" class="btn-search" style="background:#000000 !important; color:#FFFFFF !important; border:1px solid #000000; padding:0 12px;" title="Scan QR Code Kartu Pelajar">
+              <button type="button" onclick="startQrScanner()" class="btn-search" style="background:var(--bg-subtle); color:var(--text); border:1px solid var(--border-2); padding:0 12px;" title="Scan QR Code Kartu Pelajar">
                 <i class="bi bi-qr-code-scan"></i> <span style="display:none;" class="qr-btn-text">Scan</span>
               </button>
               <button type="submit" class="btn-search">
@@ -982,8 +1017,8 @@
                       if (str_starts_with($hpWaliClean, '0')) $hpWaliClean = '62' . substr($hpWaliClean, 1);
                       $pesanWaWali = rawurlencode("Halo Bapak/Ibu Wali Kelas {$waliKelas->nama}, saya orang tua dari {$siswa->nama} (Kelas " . ($rombel->nama_rombel ?? '-') . "). Ingin berkonsultasi mengenai kehadiran/perkembangan belajar ananda.");
                     @endphp
-                    <a href="https://wa.me/{{ $hpWaliClean }}?text={{ $pesanWaWali }}" target="_blank" class="tag-pill" style="background:#000000 !important; color:#FFFFFF !important; border-color:#000000; font-weight:900;" title="Konsultasi WhatsApp dengan Wali Kelas">
-                      <i class="bi bi-whatsapp" style="color:#FFFFFF !important;"></i> Hubungi Wali Kelas
+                    <a href="https://wa.me/{{ $hpWaliClean }}?text={{ $pesanWaWali }}" target="_blank" class="tag-pill" style="color:#16A34A; font-weight:800;" title="Konsultasi WhatsApp dengan Wali Kelas">
+                      <i class="bi bi-whatsapp"></i> Hubungi Wali Kelas
                     </a>
                   @endif
                 @endif
@@ -999,46 +1034,46 @@
           {{-- Kanan: Status Kehadiran Hari Ini --}}
           <div class="today-widget">
             <div class="today-widget-title">
-              <span style="font-weight:900; color:#000000; letter-spacing:0.3px;">KEHADIRAN HARI INI ({{ strtoupper(\Carbon\Carbon::today()->translatedFormat('d M Y')) }})</span>
+              <span style="font-weight:800; color:var(--text);">Kehadiran Hari Ini ({{ \Carbon\Carbon::today()->translatedFormat('d M Y') }})</span>
               <div>
                 @if($todayAbsensi)
                   @if($todayAbsensi->status === 'hadir')
-                    <span style="font-weight:900; font-size:12.5px; color:#000000; letter-spacing:0.3px;">HADIR TEPAT WAKTU</span>
+                    <span style="font-weight:800; font-size:12px; color:var(--text);">Hadir Tepat Waktu</span>
                   @elseif($todayAbsensi->status === 'terlambat')
-                    <span style="font-weight:900; font-size:12.5px; color:#000000; letter-spacing:0.3px;">TERLAMBAT</span>
+                    <span style="font-weight:800; font-size:12px; color:var(--text);">Terlambat</span>
                   @elseif($todayAbsensi->status === 'izin')
-                    <span style="font-weight:900; font-size:12.5px; color:#000000; letter-spacing:0.3px;">IZIN</span>
+                    <span style="font-weight:800; font-size:12px; color:var(--text);">Izin</span>
                   @elseif($todayAbsensi->status === 'sakit')
-                    <span style="font-weight:900; font-size:12.5px; color:#000000; letter-spacing:0.3px;">SAKIT</span>
+                    <span style="font-weight:800; font-size:12px; color:var(--text);">Sakit</span>
                   @elseif($todayAbsensi->status === 'bolos')
-                    <span style="font-weight:900; font-size:12.5px; color:#000000; letter-spacing:0.3px;">BOLOS</span>
+                    <span style="font-weight:800; font-size:12px; color:var(--text);">Bolos</span>
                   @elseif($todayAbsensi->status === 'alpha')
-                    <span style="font-weight:900; font-size:12.5px; color:#000000; letter-spacing:0.3px;">ALPHA</span>
+                    <span style="font-weight:800; font-size:12px; color:var(--text);">Alpha</span>
                   @endif
                 @elseif($siswa->status === 'pkl')
-                  <span style="font-weight:900; font-size:12.5px; color:#000000; letter-spacing:0.3px;">PKL</span>
+                  <span style="font-weight:800; font-size:12px; color:var(--text);">PKL</span>
                 @else
-                  <span style="font-weight:900; font-size:12.5px; color:#000000; letter-spacing:0.3px;">BELUM PRESENSI</span>
+                  <span style="font-weight:800; font-size:12px; color:var(--text);">Belum Presensi</span>
                 @endif
               </div>
             </div>
 
             <div class="today-time-grid">
               <div class="today-time-box">
-                <div class="today-time-label">MASUK GERBANG</div>
+                <div class="today-time-label">Masuk Gerbang</div>
                 <div class="today-time-val">
                   {{ $todayAbsensi && $todayAbsensi->jam_masuk ? substr($todayAbsensi->jam_masuk, 0, 5).' WIB' : '—' }}
                 </div>
               </div>
               <div class="today-time-box">
-                <div class="today-time-label">PULANG GERBANG</div>
+                <div class="today-time-label">Pulang Gerbang</div>
                 <div class="today-time-val">
                   {{ $todayAbsensi && $todayAbsensi->jam_pulang ? substr($todayAbsensi->jam_pulang, 0, 5).' WIB' : '—' }}
                 </div>
               </div>
             </div>
             
-            <div style="font-size:12px; color:#000000; font-weight:600; text-align:center; margin-top:14px;">
+            <div style="font-size:11px; color:var(--text-3); text-align:center; margin-top:8px;">
               {{ $todayAbsensi ? ($todayAbsensi->keterangan ?: 'Tervalidasi via Smart Gate Face ID SMKN 1 AN') : ($siswa->status === 'pkl' ? 'Siswa sedang melaksanakan PKL di Industri' : 'Belum ada rekaman Face ID pada gerbang hari ini') }}
             </div>
           </div>
@@ -1400,17 +1435,17 @@
                           <span style="font-weight:800; font-size:12.5px; color:var(--text);">Alpha</span>
                         @endif
                       </td>
-                      <td style="font-size:12.5px; color:#000000; font-weight:700; min-width:180px;">
+                      <td style="font-size:12.5px; color:var(--text-2); min-width:180px;">
                         @if($abs->keterangan)
-                          <span style="font-weight:700; color:#000000;"><i class="bi bi-chat-left-text-fill" style="color:#000000; font-size:11px; margin-right:4px;"></i>{{ $abs->keterangan }}</span>
+                          <span style="font-weight:600; color:var(--text);"><i class="bi bi-chat-left-text-fill" style="color:var(--gold); font-size:11px; margin-right:4px;"></i>{{ $abs->keterangan }}</span>
                         @elseif($abs->status === 'bolos')
-                          <span style="color:#000000; font-weight:700;"><i class="bi bi-exclamation-triangle-fill" style="color:#000000;"></i> Tidak tap pulang (tanpa izin piket)</span>
+                          <span style="color:#991B1B; font-weight:600;"><i class="bi bi-exclamation-triangle-fill"></i> Tidak tap pulang (tanpa izin piket)</span>
                         @elseif($abs->status === 'alpha')
-                          <span style="color:#000000; font-weight:700;"><i class="bi bi-x-circle-fill" style="color:#000000;"></i> Tidak hadir tanpa keterangan</span>
+                          <span style="color:#DC2626; font-weight:600;"><i class="bi bi-x-circle-fill"></i> Tidak hadir tanpa keterangan</span>
                         @elseif($abs->status === 'terlambat')
-                          <span style="color:#000000; font-weight:700;"><i class="bi bi-clock-history" style="color:#000000;"></i> Terlambat masuk gerbang</span>
+                          <span style="color:var(--amber); font-weight:600;"><i class="bi bi-clock-history"></i> Terlambat masuk gerbang</span>
                         @elseif($abs->status === 'hadir')
-                          <span style="color:#000000; font-weight:700;"><i class="bi bi-check2" style="color:#000000;"></i> Hadir pembelajaran reguler</span>
+                          <span style="color:var(--text-3);"><i class="bi bi-check2"></i> Hadir pembelajaran reguler</span>
                         @else
                           -
                         @endif
@@ -1830,16 +1865,16 @@
       }
 
       let html = '<div style="background:var(--bg-subtle); border:1px solid var(--border); border-radius:var(--r-md); padding:12px 14px; margin-bottom:18px;">';
-      html += '<div style="font-size:11.5px; font-weight:800; color:#000000; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">';
-      html += '<span><i class="bi bi-bookmark-check-fill" style="color:#000000; margin-right:4px;"></i> Profil Anak Tersimpan di HP Ini</span>';
-      html += '<button type="button" onclick="clearSavedStudents()" style="background:none; border:none; color:#000000; font-size:11px; font-weight:800; cursor:pointer;"><i class="bi bi-trash"></i> Hapus</button>';
+      html += '<div style="font-size:11.5px; font-weight:800; color:var(--text); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">';
+      html += '<span><i class="bi bi-bookmark-check-fill" style="color:var(--text); margin-right:4px;"></i> Profil Anak Tersimpan di HP Ini</span>';
+      html += '<button type="button" onclick="clearSavedStudents()" style="background:none; border:none; color:var(--text-3); font-size:11px; font-weight:700; cursor:pointer;"><i class="bi bi-trash"></i> Hapus</button>';
       html += '</div>';
 
       html += '<div style="display:flex; flex-direction:column; gap:6px;">';
       saved.forEach(function(s) {
         html += '<div style="background:var(--bg-card); border:1px solid var(--border); border-radius:var(--r-sm); padding:8px 12px; display:flex; justify-content:space-between; align-items:center; gap:8px;">';
         html += '<div style="display:flex; align-items:center; gap:10px; min-width:0;">';
-        html += '<div style="width:32px; height:32px; border-radius:50%; background:var(--bg-subtle); border:1px solid var(--border); display:flex; align-items:center; justify-content:center; font-weight:800; font-size:13px; color:#000000; flex-shrink:0; overflow:hidden;">';
+        html += '<div style="width:32px; height:32px; border-radius:50%; background:var(--bg-subtle); border:1px solid var(--border); display:flex; align-items:center; justify-content:center; font-weight:800; font-size:13px; color:var(--text); flex-shrink:0; overflow:hidden;">';
         if (s.foto) {
           html += '<img src="' + s.foto + '" style="width:100%; height:100%; object-fit:cover;">';
         } else {
@@ -1847,8 +1882,8 @@
         }
         html += '</div>';
         html += '<div style="min-width:0;">';
-        html += '<strong style="color:#000000; font-size:12.5px; display:block; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">' + s.nama + '</strong>';
-        html += '<span style="font-size:11px; color:#000000; font-family:var(--font-mono);">NIS: ' + s.nis + (s.rombel ? ' · ' + s.rombel : '') + '</span>';
+        html += '<strong style="color:var(--text); font-size:12.5px; display:block; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">' + s.nama + '</strong>';
+        html += '<span style="font-size:11px; color:var(--text-3); font-family:var(--font-mono);">NIS: ' + s.nis + (s.rombel ? ' · ' + s.rombel : '') + '</span>';
         html += '</div>';
         html += '</div>';
         html += '<a href="/presensi-siswa/' + s.nis + '" class="btn-search" style="padding:4px 12px; height:30px; font-size:11.5px; text-decoration:none; flex-shrink:0;">Buka →</a>';
@@ -2083,13 +2118,13 @@
 
   {{-- QR SCANNER MODAL --}}
   <div id="qrModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:9999; align-items:center; justify-content:center; padding:16px;">
-    <div style="background:#FFFFFF; border-radius:var(--r-lg); max-width:380px; width:100%; padding:20px; text-align:center; position:relative; box-shadow:var(--shadow-lg); border:1px solid var(--border);">
+    <div style="background:var(--bg-card); border-radius:var(--r-lg); max-width:380px; width:100%; padding:20px; text-align:center; position:relative; box-shadow:var(--shadow-lg);">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
-        <strong style="color:#000000; font-size:14px; font-weight:900;"><i class="bi bi-qr-code-scan"></i> Scan QR Kartu Pelajar</strong>
-        <button type="button" onclick="closeQrScanner()" style="background:#000000; border:none; font-size:12px; color:#FFFFFF; border-radius:4px; padding:4px 8px; cursor:pointer;" title="Tutup"><i class="bi bi-x-lg"></i></button>
+        <strong style="color:var(--text); font-size:14px;"><i class="bi bi-qr-code-scan"></i> Scan QR Kartu Pelajar</strong>
+        <button type="button" onclick="closeQrScanner()" style="background:none; border:none; font-size:18px; color:var(--text-3); cursor:pointer;"><i class="bi bi-x-lg"></i></button>
       </div>
       <div id="qr-reader" style="width:100%; border-radius:8px; overflow:hidden;"></div>
-      <div style="font-size:11.5px; color:#000000; font-weight:700; margin-top:12px;">Arahkan kamera ke QR Code pada kartu pelajar / rapor ananda.</div>
+      <div style="font-size:11.5px; color:var(--text-3); margin-top:12px;">Arahkan kamera ke QR Code pada kartu pelajar / rapor ananda.</div>
     </div>
   </div>
 
