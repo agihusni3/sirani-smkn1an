@@ -769,14 +769,14 @@
             <span>Rekapitulasi {{ ucfirst($kategori) }} ({{ ucfirst($periode) }})</span>
           </div>
           <div style="display:flex; gap:8px;">
-            <button onclick="window.print()" class="btn btn-gold" style="height:36px; font-size:12px; font-weight:800; display:inline-flex; align-items:center; gap:6px;" data-tooltip="Cetak Langsung Format A4" title="Cetak Langsung Format A4">
-              <i class="bi bi-printer-fill"></i> Cetak A4
+            <button onclick="window.print()" class="btn btn-outline" style="height:36px; font-size:12px; font-weight:800; color:#000000; border:1.5px solid #000000; background:var(--bg-2); display:inline-flex; align-items:center; gap:6px;" data-tooltip="Cetak Langsung Format A4" title="Cetak Langsung Format A4">
+              <i class="bi bi-printer-fill" style="color:#000000;"></i> Cetak A4
             </button>
-            <a href="{{ route('laporan.cetak-pdf', request()->query()) }}" target="_blank" class="btn btn-gold" style="height:36px; font-size:12px; font-weight:800; display:inline-flex; align-items:center; gap:6px;" data-tooltip="Download File PDF Resmi" title="Download File PDF Resmi">
-              <i class="bi bi-file-earmark-pdf-fill"></i> PDF Resmi
+            <a href="{{ route('laporan.cetak-pdf', request()->query()) }}" target="_blank" class="btn btn-outline" style="height:36px; font-size:12px; font-weight:800; color:#000000; border:1.5px solid #000000; background:var(--bg-2); display:inline-flex; align-items:center; gap:6px;" data-tooltip="Download File PDF Resmi" title="Download File PDF Resmi">
+              <i class="bi bi-file-earmark-pdf-fill" style="color:#000000;"></i> PDF Resmi
             </a>
-            <a href="{{ route('laporan.export-csv', request()->query()) }}" class="btn btn-gold" style="height:36px; font-size:12px; font-weight:800; display:inline-flex; align-items:center; gap:6px;" data-tooltip="Export Data ke Excel/CSV" title="Export Data ke Excel/CSV">
-              <i class="bi bi-file-earmark-excel-fill"></i> Export Excel/CSV
+            <a href="{{ route('laporan.export-csv', request()->query()) }}" class="btn btn-outline" style="height:36px; font-size:12px; font-weight:800; color:#000000; border:1.5px solid #000000; background:var(--bg-2); display:inline-flex; align-items:center; gap:6px;" data-tooltip="Export Data ke Excel/CSV" title="Export Data ke Excel/CSV">
+              <i class="bi bi-file-earmark-excel-fill" style="color:#000000;"></i> Export Excel/CSV
             </a>
           </div>
         </div>
@@ -948,14 +948,14 @@
             </span>
           </div>
           <div style="display:flex; gap:8px; align-items:center;">
-            <button onclick="window.print()" class="btn btn-gold" style="height:36px; font-size:12px; font-weight:800; display:inline-flex; align-items:center; gap:6px;" data-tooltip="Cetak Langsung Format A4" title="Cetak Langsung Format A4">
-              <i class="bi bi-printer-fill"></i> Cetak A4
+            <button onclick="window.print()" class="btn btn-outline" style="height:36px; font-size:12px; font-weight:800; color:#000000; border:1.5px solid #000000; background:var(--bg-2); display:inline-flex; align-items:center; gap:6px;" data-tooltip="Cetak Langsung Format A4" title="Cetak Langsung Format A4">
+              <i class="bi bi-printer-fill" style="color:#000000;"></i> Cetak A4
             </button>
-            <a href="{{ route('laporan.cetak-pdf', request()->query()) }}" target="_blank" class="btn btn-gold" style="height:36px; font-size:12px; font-weight:800; display:inline-flex; align-items:center; gap:6px;" data-tooltip="Download File PDF Resmi" title="Download File PDF Resmi">
-              <i class="bi bi-file-earmark-pdf-fill"></i> PDF Resmi
+            <a href="{{ route('laporan.cetak-pdf', request()->query()) }}" target="_blank" class="btn btn-outline" style="height:36px; font-size:12px; font-weight:800; color:#000000; border:1.5px solid #000000; background:var(--bg-2); display:inline-flex; align-items:center; gap:6px;" data-tooltip="Download File PDF Resmi" title="Download File PDF Resmi">
+              <i class="bi bi-file-earmark-pdf-fill" style="color:#000000;"></i> PDF Resmi
             </a>
-            <a href="{{ route('laporan.export-csv', request()->query()) }}" class="btn btn-gold" style="height:36px; font-size:12px; font-weight:800; display:inline-flex; align-items:center; gap:6px;" data-tooltip="Export Data ke Excel/CSV" title="Export Data ke Excel/CSV">
-              <i class="bi bi-file-earmark-excel-fill"></i> Export Excel/CSV
+            <a href="{{ route('laporan.export-csv', request()->query()) }}" class="btn btn-outline" style="height:36px; font-size:12px; font-weight:800; color:#000000; border:1.5px solid #000000; background:var(--bg-2); display:inline-flex; align-items:center; gap:6px;" data-tooltip="Export Data ke Excel/CSV" title="Export Data ke Excel/CSV">
+              <i class="bi bi-file-earmark-excel-fill" style="color:#000000;"></i> Export Excel/CSV
             </a>
           </div>
         </div>
@@ -1094,14 +1094,14 @@
             <span>Rincian Presensi Harian</span>
           </div>
           <div style="display:flex; gap:8px;">
-            <button onclick="window.print()" class="btn btn-gold" style="height:36px; font-size:12px; font-weight:800; display:inline-flex; align-items:center; gap:6px;" data-tooltip="Cetak Langsung Format A4" title="Cetak Langsung Format A4">
-              <i class="bi bi-printer-fill"></i> Cetak A4
+            <button onclick="window.print()" class="btn btn-outline" style="height:36px; font-size:12px; font-weight:800; color:#000000; border:1.5px solid #000000; background:var(--bg-2); display:inline-flex; align-items:center; gap:6px;" data-tooltip="Cetak Langsung Format A4" title="Cetak Langsung Format A4">
+              <i class="bi bi-printer-fill" style="color:#000000;"></i> Cetak A4
             </button>
-            <a href="{{ route('laporan.cetak-pdf', request()->query()) }}" target="_blank" class="btn btn-gold" style="height:36px; font-size:12px; font-weight:800; display:inline-flex; align-items:center; gap:6px;" data-tooltip="Download File PDF Resmi" title="Download File PDF Resmi">
-              <i class="bi bi-file-earmark-pdf-fill"></i> PDF Resmi
+            <a href="{{ route('laporan.cetak-pdf', request()->query()) }}" target="_blank" class="btn btn-outline" style="height:36px; font-size:12px; font-weight:800; color:#000000; border:1.5px solid #000000; background:var(--bg-2); display:inline-flex; align-items:center; gap:6px;" data-tooltip="Download File PDF Resmi" title="Download File PDF Resmi">
+              <i class="bi bi-file-earmark-pdf-fill" style="color:#000000;"></i> PDF Resmi
             </a>
-            <a href="{{ route('laporan.export-csv', request()->query()) }}" class="btn btn-gold" style="height:36px; font-size:12px; font-weight:800; display:inline-flex; align-items:center; gap:6px;" data-tooltip="Export Data ke Excel/CSV" title="Export Data ke Excel/CSV">
-              <i class="bi bi-file-earmark-excel-fill"></i> Export Excel/CSV
+            <a href="{{ route('laporan.export-csv', request()->query()) }}" class="btn btn-outline" style="height:36px; font-size:12px; font-weight:800; color:#000000; border:1.5px solid #000000; background:var(--bg-2); display:inline-flex; align-items:center; gap:6px;" data-tooltip="Export Data ke Excel/CSV" title="Export Data ke Excel/CSV">
+              <i class="bi bi-file-earmark-excel-fill" style="color:#000000;"></i> Export Excel/CSV
             </a>
           </div>
         </div>
