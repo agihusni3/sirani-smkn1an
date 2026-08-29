@@ -54,6 +54,17 @@
       letter-spacing: .02em;
     }
 
+    .tab-btn-modal.active {
+      background: #000000 !important;
+      color: #FFFFFF !important;
+      border-color: #000000 !important;
+      font-weight: 800;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+    }
+    .tab-btn-modal.active i {
+      color: #FFFFFF !important;
+    }
+
     .timeline-mini {
       font-size: 11px;
       color: var(--text-2);
@@ -563,11 +574,11 @@
     {{-- MODAL HEADER --}}
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px; border-bottom:1px solid var(--border); padding-bottom:14px;">
       <div>
-        <div style="display:inline-flex; align-items:center; gap:6px; background:var(--gold-dim); border:1px solid var(--gold); padding:2px 10px; border-radius:20px; font-size:10.5px; font-weight:800; color:var(--gold); margin-bottom:6px;">
-          <i class="bi bi-shield-lock-fill"></i> PUSAT KEBIJAKAN KESISWAAN
+        <div style="display:inline-flex; align-items:center; gap:6px; background:rgba(0,0,0,0.06); border:1px solid rgba(0,0,0,0.12); padding:3px 10px; border-radius:20px; font-size:10.5px; font-weight:800; color:#000000; margin-bottom:6px;">
+          <i class="bi bi-shield-lock-fill" style="color:#000000;"></i> PUSAT KEBIJAKAN KESISWAAN
         </div>
         <h3 style="font-size:19px; font-weight:900; color:var(--text); margin:0; display:flex; align-items:center; gap:8px;">
-          <i class="bi bi-sliders2" style="color:var(--gold);"></i> Aturan Poin, Pelanggaran &amp; Self-Reward
+          <i class="bi bi-sliders2" style="color:#000000;"></i> Aturan Poin, Pelanggaran &amp; Self-Reward
         </h3>
         <p style="margin:3px 0 0; font-size:12.5px; color:var(--text-3);">
           Konfigurasi otomatis bobot presensi, ambang batas 4 jenjang pembinaan, master katalog, dan pemulihan poin.
@@ -601,7 +612,7 @@
         <div style="background:var(--bg-3); border-radius:var(--r-md); padding:16px 18px; margin-bottom:18px; border:1px solid var(--border);">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
             <h4 style="font-size:13px; font-weight:800; color:var(--text); margin:0; text-transform:uppercase; letter-spacing:0.5px; display:flex; align-items:center; gap:6px;">
-              <i class="bi bi-ladder" style="color:var(--gold);"></i> 4 Jenjang Ambang Eskalasi Pembinaan (Poin Minimal)
+              <i class="bi bi-ladder" style="color:#000000;"></i> 4 Jenjang Ambang Eskalasi Pembinaan (Poin Minimal)
             </h4>
             <span style="font-size:11px; color:var(--text-3); font-weight:600;">Otomatis naik tahap saat poin tercapai</span>
           </div>
@@ -656,7 +667,7 @@
         {{-- BOBOT PRESENSI OTOMATIS --}}
         <div style="background:var(--bg-3); border-radius:var(--r-md); padding:16px 18px; margin-bottom:18px; border:1px solid var(--border);">
           <h4 style="font-size:13px; font-weight:800; color:var(--text); margin:0 0 12px; text-transform:uppercase; letter-spacing:0.5px; display:flex; align-items:center; gap:6px;">
-            <i class="bi bi-fingerprint" style="color:var(--gold);"></i> Bobot Pelanggaran Presensi Harian (Otomatis)
+            <i class="bi bi-fingerprint" style="color:#000000;"></i> Bobot Pelanggaran Presensi Harian (Otomatis)
           </h4>
           <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(160px, 1fr)); gap:12px;">
             <div>
@@ -684,7 +695,7 @@
         {{-- SELF-REWARD OTOMATIS --}}
         <div style="background:var(--bg-3); border-radius:var(--r-md); padding:16px 18px; margin-bottom:20px; border:1px solid var(--border);">
           <h4 style="font-size:13px; font-weight:800; color:var(--text); margin:0 0 12px; text-transform:uppercase; letter-spacing:0.5px; display:flex; align-items:center; gap:6px;">
-            <i class="bi bi-stars" style="color:var(--gold);"></i> Self-Reward Kehadiran Konsisten (Streak Pemulihan)
+            <i class="bi bi-stars" style="color:#000000;"></i> Self-Reward Kehadiran Konsisten (Streak Pemulihan)
           </h4>
           <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:12px;">
             <div>
@@ -824,8 +835,8 @@
 
       {{-- Form Tambah Reward Baru --}}
       <div style="background:var(--bg-2); border:1px dashed var(--border); border-radius:var(--r-md); padding:16px;">
-        <h4 style="font-size:13px; font-weight:800; color:var(--gold); margin:0 0 12px; display:flex; align-items:center; gap:6px;">
-          <i class="bi bi-plus-circle-fill"></i> Tambah Master Tindakan Reward Baru
+        <h4 style="font-size:13px; font-weight:800; color:#000000; margin:0 0 12px; display:flex; align-items:center; gap:6px;">
+          <i class="bi bi-plus-circle-fill" style="color:#000000;"></i> Tambah Master Tindakan Reward Baru
         </h4>
         <form id="formAddKatalogReward" onsubmit="handleAjaxAddReward(event)">
           @csrf
@@ -865,8 +876,8 @@
     {{-- TAB 4: SIMULATOR POIN & BATCH SYNC --}}
     <div id="paneTabSimulasi" class="modal-tab-pane" style="display:none;">
       <div style="background:var(--bg-3); border-radius:var(--r-md); padding:18px; margin-bottom:16px; border:1px solid var(--border);">
-        <h4 style="font-size:13px; font-weight:800; color:var(--gold); margin:0 0 12px; text-transform:uppercase; letter-spacing:0.5px;">
-          <i class="bi bi-calculator-fill"></i> Simulator Perhitungan Poin Interaktif
+        <h4 style="font-size:13px; font-weight:800; color:#000000; margin:0 0 12px; text-transform:uppercase; letter-spacing:0.5px;">
+          <i class="bi bi-calculator-fill" style="color:#000000;"></i> Simulator Perhitungan Poin Interaktif
         </h4>
         <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(130px, 1fr)); gap:10px; margin-bottom:14px;">
           <div>
@@ -890,7 +901,7 @@
         <div style="background:var(--bg-2); border-radius:var(--r-sm); padding:14px 18px; border:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
           <div>
             <div style="font-size:11px; color:var(--text-3);">Hasil Perhitungan Bersih:</div>
-            <div id="simHasilPoin" style="font-size:22px; font-weight:900; font-family:var(--font-mono); color:var(--gold);">13 Poin</div>
+            <div id="simHasilPoin" style="font-size:22px; font-weight:900; font-family:var(--font-mono); color:#000000;">13 Poin</div>
           </div>
           <div>
             <div style="font-size:11px; color:var(--text-3); text-align:right;">Rekomendasi Jenjang Pembinaan:</div>
@@ -908,8 +919,8 @@
         </div>
         <form action="{{ route('admin.disiplin.recalculate') }}" method="POST">
           @csrf
-          <button type="submit" class="btn btn-outline" style="border-color:var(--gold); color:var(--gold); font-weight:800; font-size:12.5px; height:38px; padding:0 16px;" onclick="return confirm('Hitung ulang seluruh poin dan tahap kedisiplinan siswa sekarang?')">
-            <i class="bi bi-arrow-repeat"></i> Hitung Ulang Semua Data
+          <button type="submit" class="btn btn-outline-mono" style="font-weight:800; font-size:12.5px; height:38px; padding:0 16px;" onclick="return confirm('Hitung ulang seluruh poin dan tahap kedisiplinan siswa sekarang?')">
+            <i class="bi bi-arrow-repeat" style="color:#000000;"></i> Hitung Ulang Semua Data
           </button>
         </form>
       </div>
