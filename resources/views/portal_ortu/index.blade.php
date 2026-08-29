@@ -2035,6 +2035,8 @@
           alert('Panduan Instal di Android:\n\n1. Ketuk ikon menu browser (titik 3 di kanan atas).\n2. Pilih "Instal Aplikasi" atau "Tambahkan ke Layar Utama".');
         }
       }
+    }
+
     // Image Zoom Lightbox Controller
     let currentZoomScale = 1;
     function openImageZoom(imgUrl, title) {
