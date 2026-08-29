@@ -644,13 +644,13 @@
       gap: 6px;
     }
     .btn-portal-tab {
-      background: var(--bg-subtle);
-      border: 1px solid var(--border);
+      background: var(--bg-card);
+      border: 1px solid var(--border-2);
       padding: 6px 10px;
       border-radius: var(--r-sm);
       font-size: 11.5px;
       font-weight: 800;
-      color: var(--text);
+      color: #0F172A;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
@@ -662,12 +662,32 @@
       text-align: center;
     }
     .btn-portal-tab:hover {
-      background: var(--border);
+      background: var(--bg-subtle);
+      border-color: #000000;
     }
     .btn-portal-tab.active {
-      background: var(--text);
-      color: var(--bg);
-      border-color: var(--text);
+      background: #000000 !important;
+      color: #FFFFFF !important;
+      border-color: #000000 !important;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25) !important;
+    }
+    .btn-portal-tab.active i,
+    .btn-portal-tab.active span {
+      color: #FFFFFF !important;
+    }
+    .portal-badge-count {
+      font-size: 9.5px;
+      font-weight: 800;
+      background: #000000;
+      color: #FFFFFF;
+      padding: 1px 5px;
+      border-radius: 10px;
+      margin-left: 2px;
+      display: inline-block;
+    }
+    .btn-portal-tab.active .portal-badge-count {
+      background: #FFFFFF !important;
+      color: #000000 !important;
     }
 
     .period-btn {
@@ -952,7 +972,7 @@
             <button type="button" id="btnTogglePengumuman" onclick="togglePortalSection('pengumuman')" class="btn-portal-tab">
               <i class="bi bi-megaphone"></i> <span>Pengumuman</span>
               @if(isset($pengumumans) && $pengumumans->count() > 0)
-                <span style="font-size:9.5px; background:var(--text); color:var(--bg); padding:1px 5px; border-radius:10px; margin-left:2px;">{{ $pengumumans->count() }}</span>
+                <span class="portal-badge-count">{{ $pengumumans->count() }}</span>
               @endif
             </button>
           </div>
