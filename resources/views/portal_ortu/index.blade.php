@@ -407,6 +407,29 @@
         padding: 18px 14px;
         border-radius: var(--r-lg);
       }
+      .dossier-header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+      }
+      .dossier-header-title {
+        text-align: center;
+      }
+      .portal-nav-btn-group {
+        display: grid !important;
+        grid-template-columns: repeat(3, 1fr) !important;
+        gap: 5px !important;
+        width: 100% !important;
+      }
+      .btn-portal-tab {
+        padding: 7px 3px !important;
+        font-size: 10.5px !important;
+        gap: 3px !important;
+        width: 100% !important;
+      }
+      .btn-portal-tab i {
+        font-size: 11px !important;
+      }
       .student-info-left {
         flex-direction: column;
         text-align: center;
@@ -605,10 +628,15 @@
       border: 1px solid var(--border);
       flex-wrap: wrap;
     }
+    .portal-nav-btn-group {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+    }
     .btn-portal-tab {
       background: var(--bg-subtle);
       border: 1px solid var(--border);
-      padding: 6px 14px;
+      padding: 6px 10px;
       border-radius: var(--r-sm);
       font-size: 11.5px;
       font-weight: 800;
@@ -616,9 +644,12 @@
       cursor: pointer;
       display: inline-flex;
       align-items: center;
-      gap: 6px;
+      justify-content: center;
+      gap: 5px;
       transition: all .2s ease;
       font-family: var(--font-main);
+      white-space: nowrap;
+      text-align: center;
     }
     .btn-portal-tab:hover {
       background: var(--border);
@@ -924,21 +955,21 @@
       {{-- 1. IDENTITAS SISWA & STATUS HARI INI (DOSSIER DIGITAL) --}}
       <div class="dossier-card">
         <div class="dossier-header">
-          <span style="font-size:11.5px; font-weight:800; color:var(--text); text-transform:uppercase; letter-spacing:0.5px;">
+          <span class="dossier-header-title" style="font-size:11.5px; font-weight:800; color:var(--text); text-transform:uppercase; letter-spacing:0.5px;">
             Profil Lengkap Siswa
           </span>
           
-          <div style="display:flex; gap:8px; flex-wrap:wrap;">
+          <div class="portal-nav-btn-group">
             <button type="button" id="btnToggleAbsen" onclick="togglePortalSection('absen')" class="btn-portal-tab">
-              <i class="bi bi-calendar-check"></i> Rekap Absen
+              <i class="bi bi-calendar-check"></i> <span>Rekap Absen</span>
             </button>
             <button type="button" id="btnToggleKasus" onclick="togglePortalSection('kasus')" class="btn-portal-tab">
-              <i class="bi bi-shield-check"></i> Rekap Kasus
+              <i class="bi bi-shield-check"></i> <span>Rekap Kasus</span>
             </button>
             <button type="button" id="btnTogglePengumuman" onclick="togglePortalSection('pengumuman')" class="btn-portal-tab">
-              <i class="bi bi-megaphone"></i> Pengumuman
+              <i class="bi bi-megaphone"></i> <span>Pengumuman</span>
               @if(isset($pengumumans) && $pengumumans->count() > 0)
-                <span style="font-size:10px; background:var(--text); color:var(--bg); padding:1px 6px; border-radius:10px; margin-left:2px;">{{ $pengumumans->count() }}</span>
+                <span style="font-size:9.5px; background:var(--text); color:var(--bg); padding:1px 5px; border-radius:10px; margin-left:2px;">{{ $pengumumans->count() }}</span>
               @endif
             </button>
           </div>
