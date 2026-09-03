@@ -250,9 +250,11 @@ Route::middleware('auth')->group(function () {
     Route::middleware('role:admin,kepala_sekolah,waka_kesiswaan,waka_kurikulum,guru_piket,staf_tu,guru')->group(function () {
         Route::get('/jadwal-sekolah', [DashboardController::class, 'jadwalSekolah'])->name('admin.jadwal.sekolah');
         Route::get('/jam-operasional', [DashboardController::class, 'jadwalSekolah'])->name('admin.jadwal.index');
-        Route::post('/jam-operasional', [DashboardController::class, 'updateJadwal'])->name('admin.jadwal.update')->middleware('role:admin,waka_kurikulum,waka_kesiswaan');
-        Route::post('/jadwal-sekolah', [DashboardController::class, 'updateJadwal'])->name('admin.jadwal.sekolah.update')->middleware('role:admin,waka_kurikulum,waka_kesiswaan');
+        Route::post('/jam-operasional', [DashboardController::class, 'updateJadwal'])->name('admin.jadwal.update')->middleware('role:admin,waka_kurikulum,waka_kesiswaan,kepala_sekolah');
+        Route::post('/jadwal-sekolah', [DashboardController::class, 'updateJadwal'])->name('admin.jadwal.sekolah.update')->middleware('role:admin,waka_kurikulum,waka_kesiswaan,kepala_sekolah');
+        Route::post('/jadwal-mingguan', [DashboardController::class, 'updateJadwalMingguan'])->name('admin.jadwal.mingguan.update')->middleware('role:admin,waka_kurikulum,waka_kesiswaan,kepala_sekolah');
     });
+
 
     // 15. Kalender Hari Libur (Read: Semua Role; CRUD: Admin & Waka Kurikulum)
     Route::get('/hari-libur', [HariLiburController::class, 'index'])->name('admin.hari-libur.index');

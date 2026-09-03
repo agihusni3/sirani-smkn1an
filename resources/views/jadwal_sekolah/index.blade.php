@@ -402,8 +402,9 @@
 
     @php
       $currentUser = auth()->user();
-      $canManageJadwal = $currentUser && ($currentUser->isAdmin() || $currentUser->isWakaKurikulum() || $currentUser->isStafTu());
+      $canManageJadwal = $currentUser && ($currentUser->isAdmin() || $currentUser->isWakaKurikulum() || $currentUser->isWakaKesiswaan() || $currentUser->isKepalaSekolah() || $currentUser->isStafTu());
     @endphp
+
 
     {{-- ══ 3. STUDIO DUA KOLOM: PRESET & FORM EDITOR vs ATURAN OPERASIONAL ══ --}}
     <div class="studio-layout">
@@ -561,9 +562,112 @@
           </div>
         </div>
       </div>
+    {{-- ══ 4. JAM OPERASIONAL MINGGUAN RUTIN (SENIN - JUMAT) ══ --}}
+    <div class="panel" style="padding:0; overflow:hidden; border:1px solid var(--border); border-radius:var(--r-md); box-shadow:var(--shadow-sm); background:var(--bg-2); margin-bottom:20px;">
+      <div style="padding:16px 20px; border-bottom:1px solid var(--border); background:var(--surface); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+        <div>
+          <div style="font-size:15px; font-weight:900; color:var(--text); display:flex; align-items:center; gap:8px;">
+            <i class="bi bi-calendar-week-fill" style="color:#000000; font-size:16px;"></i>
+            <span>Jam Operasional Mingguan Rutin (Senin s/d Jumat)</span>
+          </div>
+          <div style="font-size:12px; color:var(--text-3); margin-top:2px;">
+            Konfigurasi standar jadwal per hari sekolah. Jadwal ini otomatis diterapkan berulang setiap pekannya oleh sistem Smart Gate SIRANI.
+          </div>
+        </div>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span style="background:rgba(0,0,0,0.06); color:#000000; font-size:11px; font-weight:800; padding:4px 10px; border-radius:100px; border:1px solid var(--border-2); display:inline-flex; align-items:center; gap:4px;">
+            <i class="bi bi-arrow-repeat"></i> Berlaku Berulang Otomatis
+          </span>
+        </div>
+      </div>
+
+      <form action="{{ route('admin.jadwal.mingguan.update') }}" method="POST" style="margin:0;">
+        @csrf
+        <div class="table-responsive" style="overflow-x:auto;">
+          <table class="data-table" style="width:100%; border-collapse:collapse;">
+            <thead>
+              <tr style="background:var(--bg-3);">
+                <th style="padding:12px 16px; color:#000000; font-weight:800; width:130px;">Hari</th>
+                <th style="padding:12px 16px; color:#000000; font-weight:800; text-align:center; width:160px;">
+                  <i class="bi bi-sunrise"></i> Batas Masuk Pagi
+                </th>
+                <th style="padding:12px 16px; color:#000000; font-weight:800; text-align:center; width:160px;">
+                  <i class="bi bi-sunset"></i> Mulai Pulang Sore
+                </th>
+                <th style="padding:12px 16px; color:#000000; font-weight:800; text-align:center; width:160px;">
+                  <i class="bi bi-moon-stars"></i> Tutup Gerbang
+                </th>
+                <th style="padding:12px 16px; color:#000000; font-weight:800;">
+                  <i class="bi bi-chat-left-text"></i> Keterangan Kegiatan
+                </th>
+                <th style="padding:12px 16px; color:#000000; font-weight:800; text-align:center; width:100px;">
+                  Status
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              @foreach($jadwalMingguanList as $jm)
+                @php
+                  $isTodayDay = strtolower($jm->hari) === strtolower(\Carbon\Carbon::parse($today)->locale('id')->isoFormat('dddd'));
+                @endphp
+                <tr style="border-bottom:1px solid var(--border); background:{{ $isTodayDay ? 'rgba(0,0,0,0.02)' : 'transparent' }};">
+                  <td style="padding:12px 16px; vertical-align:middle;">
+                    <div style="display:flex; align-items:center; gap:8px;">
+                      <span style="font-weight:900; font-size:13.5px; color:#000000;">{{ $jm->hari }}</span>
+                      @if($isTodayDay)
+                        <span style="background:#000000; color:#FFFFFF; font-size:9.5px; font-weight:800; padding:2px 6px; border-radius:4px;">HARI INI</span>
+                      @endif
+                    </div>
+                  </td>
+                  <td style="padding:10px 16px; text-align:center; vertical-align:middle;">
+                    <div class="time-input-wrap" style="max-width:140px; margin:0 auto;">
+                      <input type="time" name="mingguan[{{ $jm->hari }}][jam_masuk_toleransi]" value="{{ substr($jm->jam_masuk_toleransi, 0, 5) }}" required {{ !$canManageJadwal ? 'disabled' : '' }} style="text-align:center; font-weight:800; font-family:var(--font-mono); font-size:13px;" />
+                    </div>
+                  </td>
+                  <td style="padding:10px 16px; text-align:center; vertical-align:middle;">
+                    <div class="time-input-wrap" style="max-width:140px; margin:0 auto;">
+                      <input type="time" name="mingguan[{{ $jm->hari }}][jam_pulang_mulai]" value="{{ substr($jm->jam_pulang_mulai, 0, 5) }}" required {{ !$canManageJadwal ? 'disabled' : '' }} style="text-align:center; font-weight:800; font-family:var(--font-mono); font-size:13px;" />
+                    </div>
+                  </td>
+                  <td style="padding:10px 16px; text-align:center; vertical-align:middle;">
+                    <div class="time-input-wrap" style="max-width:140px; margin:0 auto;">
+                      <input type="time" name="mingguan[{{ $jm->hari }}][jam_tutup_gerbang]" value="{{ substr($jm->jam_tutup_gerbang ?? '17:00', 0, 5) }}" required {{ !$canManageJadwal ? 'disabled' : '' }} style="text-align:center; font-weight:800; font-family:var(--font-mono); font-size:13px;" />
+                    </div>
+                  </td>
+                  <td style="padding:10px 16px; vertical-align:middle;">
+                    <input type="text" name="mingguan[{{ $jm->hari }}][keterangan]" value="{{ $jm->keterangan }}" placeholder="Keterangan hari {{ $jm->hari }}" {{ !$canManageJadwal ? 'disabled' : '' }} style="width:100%; height:34px; font-size:12px; background:var(--bg-3); border:1px solid var(--border-2); border-radius:6px; padding:0 10px;" />
+                  </td>
+                  <td style="padding:10px 16px; text-align:center; vertical-align:middle;">
+                    <input type="hidden" name="mingguan[{{ $jm->hari }}][is_aktif]" value="1" />
+                    <span style="display:inline-flex; align-items:center; gap:4px; font-size:11px; font-weight:800; color:#16A34A; background:rgba(22,163,74,0.1); padding:3px 8px; border-radius:6px;">
+                      <i class="bi bi-check-circle-fill"></i> Aktif
+                    </span>
+                  </td>
+                </tr>
+              @endforeach
+            </tbody>
+          </table>
+        </div>
+
+        @if($canManageJadwal)
+          <div style="padding:14px 20px; border-top:1px solid var(--border); background:var(--surface); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+            <label style="display:flex; align-items:center; gap:8px; cursor:pointer; margin:0; font-size:12.5px; font-weight:700; color:var(--text);">
+              <input type="checkbox" name="terapkan_hari_ini" value="1" checked style="width:16px; height:16px; cursor:pointer;" />
+              <span>Terapkan juga ke jadwal hari ini ({{ \Carbon\Carbon::parse($today)->locale('id')->isoFormat('dddd') }}) secara langsung</span>
+            </label>
+            <button type="submit" class="btn btn-primary" style="background:#000000; color:#FFFFFF; height:38px; padding:0 22px; font-weight:800; font-size:12.5px; border-radius:8px; display:inline-flex; align-items:center; gap:6px;">
+              <i class="bi bi-floppy-fill"></i> Simpan Jam Operasional Mingguan
+            </button>
+          </div>
+        @else
+          <div style="padding:12px 20px; border-top:1px solid var(--border); background:var(--bg-3); font-size:12px; color:var(--text-3); font-weight:600;">
+            <i class="bi bi-lock-fill"></i> Pengubahan jam operasional mingguan dibatasi untuk Admin, Kepala Sekolah, Waka Kurikulum, dan Waka Kesiswaan.
+          </div>
+        @endif
+      </form>
     </div>
 
-    {{-- ══ 4. RIWAYAT PERUBAHAN JADWAL (TABEL TERPADU) ══ --}}
+    {{-- ══ 5. RIWAYAT PERUBAHAN JADWAL (TABEL TERPADU) ══ --}}
     <div class="panel" style="padding:0; overflow:hidden; border:1px solid var(--border); border-radius:var(--r-md); box-shadow:var(--shadow-sm); background:var(--bg-2); margin-bottom:24px;">
       <div style="padding:14px 18px; border-bottom:1px solid var(--border); background:var(--surface); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
         <div style="font-size:15px; font-weight:800; color:#000000; display:flex; align-items:center; gap:8px;">
@@ -571,6 +675,7 @@
           <span>Riwayat Jadwal Operasional (10 Hari Terakhir)</span>
         </div>
       </div>
+
 
       @if($riwayatJadwal->isEmpty())
         <div style="text-align:center; padding:32px; color:var(--text-3); font-size:13px;">

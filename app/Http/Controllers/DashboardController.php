@@ -782,7 +782,7 @@ class DashboardController extends Controller
 
 
     /**
-     * Halaman Pengaturan Jam Operasional Sekolah (Admin).
+     * Halaman Pengaturan Jam Operasional Sekolah (Admin & Waka).
      */
     public function jadwalSekolah()
     {
@@ -790,12 +790,15 @@ class DashboardController extends Controller
         $jadwalHariIni = JadwalHariIni::getJadwalAktif($today);
         $taAktif = TahunAjaran::where('is_active', true)->first();
 
-        // Riwayat 7 hari terakhir
+        // Ambil konfigurasi jam operasional mingguan Senin - Jumat
+        $jadwalMingguanList = \App\Models\JadwalMingguan::getJadwalSeninJumat();
+
+        // Riwayat 10 hari terakhir
         $riwayatJadwal = JadwalHariIni::orderBy('tanggal', 'desc')
             ->limit(10)
             ->get();
 
-        return view('jadwal_sekolah.index', compact('today', 'jadwalHariIni', 'taAktif', 'riwayatJadwal'));
+        return view('jadwal_sekolah.index', compact('today', 'jadwalHariIni', 'taAktif', 'riwayatJadwal', 'jadwalMingguanList'));
     }
 
     /**
@@ -816,7 +819,6 @@ class DashboardController extends Controller
         $jadwal = JadwalHariIni::getJadwalAktif($today);
         $jamTutup = $request->filled('jam_tutup_gerbang') ? ($request->input('jam_tutup_gerbang') . ':00') : ($jadwal->jam_tutup_gerbang ?? '17:00:00');
 
-
         $jadwal->update([
             'jam_masuk_toleransi' => $request->input('jam_masuk_toleransi') . ':00',
             'jam_pulang_mulai'    => $request->input('jam_pulang_mulai') . ':00',
@@ -828,4 +830,66 @@ class DashboardController extends Controller
         return redirect()->route('admin.jadwal.index')
             ->with('success', 'Jadwal jam masuk, jam pulang, & batas tutup gerbang hari ini berhasil diperbarui!');
     }
+
+    /**
+     * Update jam operasional mingguan (Senin sampai Jumat)
+     */
+    public function updateJadwalMingguan(\Illuminate\Http\Request $request)
+    {
+        $request->validate([
+            'mingguan' => 'required|array',
+            'mingguan.*.jam_masuk_toleransi' => 'required|date_format:H:i',
+            'mingguan.*.jam_pulang_mulai' => 'required|date_format:H:i',
+            'mingguan.*.jam_tutup_gerbang' => 'required|date_format:H:i',
+            'mingguan.*.keterangan' => 'nullable|string|max:255',
+        ]);
+
+        $userName = auth()->user()->name ?? 'Pengguna';
+        $userRole = auth()->user()->role ?? 'Admin';
+
+        foreach ($request->input('mingguan') as $hari => $data) {
+            \App\Models\JadwalMingguan::updateOrCreate(
+                ['hari' => $hari],
+                [
+                    'jam_masuk_toleransi' => $data['jam_masuk_toleransi'] . ':00',
+                    'jam_pulang_mulai' => $data['jam_pulang_mulai'] . ':00',
+                    'jam_tutup_gerbang' => $data['jam_tutup_gerbang'] . ':00',
+                    'is_aktif' => isset($data['is_aktif']) ? (bool) $data['is_aktif'] : true,
+                    'keterangan' => $data['keterangan'] ?? "Jadwal Reguler {$hari}",
+                    'diubah_oleh' => "{$userName} ({$userRole})",
+                ]
+            );
+        }
+
+        // Jika dicentang untuk langsung diterapkan ke hari ini
+        if ($request->boolean('terapkan_hari_ini')) {
+            $today = Carbon::today()->toDateString();
+            $namaHariMap = [
+                Carbon::MONDAY => 'Senin',
+                Carbon::TUESDAY => 'Selasa',
+                Carbon::WEDNESDAY => 'Rabu',
+                Carbon::THURSDAY => 'Kamis',
+                Carbon::FRIDAY => 'Jumat',
+                Carbon::SATURDAY => 'Sabtu',
+                Carbon::SUNDAY => 'Minggu',
+            ];
+            $hariIni = $namaHariMap[Carbon::today()->dayOfWeek] ?? 'Senin';
+            $tplHariIni = \App\Models\JadwalMingguan::getByHari($hariIni);
+
+            if ($tplHariIni) {
+                $jadwal = JadwalHariIni::getJadwalAktif($today);
+                $jadwal->update([
+                    'jam_masuk_toleransi' => $tplHariIni->jam_masuk_toleransi,
+                    'jam_pulang_mulai' => $tplHariIni->jam_pulang_mulai,
+                    'jam_tutup_gerbang' => $tplHariIni->jam_tutup_gerbang,
+                    'keterangan' => $tplHariIni->keterangan ?: "Jadwal Reguler {$hariIni}",
+                    'diubah_oleh' => "{$userName} ({$userRole}) - Terapkan Template",
+                ]);
+            }
+        }
+
+        return redirect()->route('admin.jadwal.index')
+            ->with('success', 'Jam operasional mingguan (Senin sampai Jumat) berhasil diperbarui dan disimpan!');
+    }
 }
+

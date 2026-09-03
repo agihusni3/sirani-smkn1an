@@ -57,22 +57,43 @@ class JadwalHariIni extends Model
             return $jadwal;
         }
 
-        // Default: Hari Jumat jam pulang 11:30, Senin-Kamis 15:30, Tutup Gerbang 17:00
-        $isJumat = ($date->dayOfWeek === Carbon::FRIDAY);
-        $jamPulangDefault = $isJumat ? '11:30:00' : '15:30:00';
-        $ketDefault = $isJumat ? 'Jadwal Hari Jumat (Pulang Cepat)' : 'Jadwal Reguler';
+        // Ambil konfigurasi jam operasional mingguan jika ada (Senin - Jumat)
+        $namaHariMap = [
+            Carbon::MONDAY => 'Senin',
+            Carbon::TUESDAY => 'Selasa',
+            Carbon::WEDNESDAY => 'Rabu',
+            Carbon::THURSDAY => 'Kamis',
+            Carbon::FRIDAY => 'Jumat',
+            Carbon::SATURDAY => 'Sabtu',
+            Carbon::SUNDAY => 'Minggu',
+        ];
+        $namaHari = $namaHariMap[$date->dayOfWeek] ?? 'Senin';
+        $jadwalMingguan = class_exists(JadwalMingguan::class) ? JadwalMingguan::getByHari($namaHari) : null;
+
+        if ($jadwalMingguan && $jadwalMingguan->is_aktif) {
+            $jamMasuk = $jadwalMingguan->jam_masuk_toleransi;
+            $jamPulang = $jadwalMingguan->jam_pulang_mulai;
+            $jamTutup = $jadwalMingguan->jam_tutup_gerbang;
+            $ket = $jadwalMingguan->keterangan ?: "Jadwal {$namaHari}";
+        } else {
+            $isJumat = ($date->dayOfWeek === Carbon::FRIDAY);
+            $jamMasuk = '07:15:00';
+            $jamPulang = $isJumat ? '11:30:00' : '15:30:00';
+            $jamTutup = '17:00:00';
+            $ket = $isJumat ? 'Jadwal Hari Jumat (Pulang Cepat)' : 'Jadwal Reguler';
+        }
 
         return self::create([
             'tanggal' => $dateStr,
-            'jam_masuk_toleransi' => '07:15:00',
-            'jam_pulang_mulai' => $jamPulangDefault,
-            'jam_tutup_gerbang' => '17:00:00',
-            'keterangan' => $ketDefault,
-            'diubah_oleh' => 'Sistem Otomatis',
+            'jam_masuk_toleransi' => $jamMasuk,
+            'jam_pulang_mulai' => $jamPulang,
+            'jam_tutup_gerbang' => $jamTutup,
+            'keterangan' => $ket,
+            'diubah_oleh' => "Sistem Otomatis (Template {$namaHari})",
             'is_sesi_buka' => false,
         ]);
-
     }
+
 
     /**
      * Cek apakah sesi gerbang saat ini terbuka
