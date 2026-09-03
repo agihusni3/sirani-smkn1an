@@ -619,9 +619,22 @@ class RfidController extends Controller
         $libur = HariLibur::where('tanggal', Carbon::today()->toDateString())->first();
         $pengumumanKios = Pengumuman::where('tampilkan_di_kios', true)->latest()->first();
 
+        $today = Carbon::today()->toDateString();
+
         // Hitung statistik hari ini
         $totalSiswaAktif = Siswa::whereIn('status', ['aktif', 'pkl'])->count();
         $totalKartuRfid = KartuRfid::where('status', 'aktif')->count();
+        $totalHadirHariIni = Absensi::where('tanggal', $today)->where('status', 'hadir')->count();
+        $totalTerlambatHariIni = Absensi::where('tanggal', $today)->where('status', 'terlambat')->count();
+        $totalPulangHariIni = Absensi::where('tanggal', $today)->whereNotNull('jam_pulang')->count();
+
+        // Ambil 5 scan terakhir hari ini
+        $initialRecentScans = Absensi::where('tanggal', $today)
+            ->whereNotNull('jam_masuk')
+            ->orderBy('updated_at', 'desc')
+            ->limit(5)
+            ->with(['siswa.siswaRombel.rombel', 'guru'])
+            ->get();
 
         return view('rfid.kiosk', compact(
             'jadwal',
@@ -629,10 +642,14 @@ class RfidController extends Controller
             'libur',
             'pengumumanKios',
             'totalSiswaAktif',
-            'totalKartuRfid'
+            'totalKartuRfid',
+            'totalHadirHariIni',
+            'totalTerlambatHariIni',
+            'totalPulangHariIni',
+            'initialRecentScans'
         ));
-
     }
+
 
     /**
      * Endpoint API / Web untuk pemrosesan Tap Kartu RFID
