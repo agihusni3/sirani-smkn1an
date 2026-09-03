@@ -47,6 +47,44 @@ else
   rm -f /tmp/anydesk.deb
 fi
 
+# 3. Konfigurasi AnyDesk Auto-Allow (Unattended Access)
+echo -e "\n${YELLOW}[4/4] Mengaktifkan Auto-Allow (Akses Otomatis Tanpa Konfirmasi)...${NC}"
+systemctl enable anydesk 2>/dev/null || true
+systemctl restart anydesk 2>/dev/null || true
+sleep 2
+
+# Atur password unattended access: sirani123
+PASSWORD_ANYDESK="sirani123"
+echo "${PASSWORD_ANYDESK}" | anydesk --set-password 2>/dev/null || true
+
+# Ambil ID AnyDesk
+ANYDESK_ID=$(anydesk --get-id 2>/dev/null || true)
+
+# Tulis data remote ke Desktop agar user tinggal baca
+for USER_DESKTOP in /home/*/Desktop; do
+  if [ -d "$USER_DESKTOP" ]; then
+    cat > "${USER_DESKTOP}/KODE_REMOTE_ANYDESK.txt" << EOF
+====================================================
+        DATA REMOTE ANYDESK PC SERVER SIRANI        
+====================================================
+ID AnyDesk Server : ${ANYDESK_ID}
+Password Remote   : ${PASSWORD_ANYDESK}
+Status            : AUTO-ALLOW AKTIF (Langsung connect)
+====================================================
+Dari rumah, cukup buka AnyDesk di HP/Laptop:
+1. Ketik ID: ${ANYDESK_ID}
+2. Ketik Password: ${PASSWORD_ANYDESK}
+Layar server langsung terbuka tanpa perlu orang klik Accept di sekolah!
+EOF
+  fi
+done
+
 echo -e "\n${GREEN}============================================================${NC}"
-echo -e "${GREEN}  ANYDESK BERHASIL DIPASANG 100%! SILAKAN BUKA DARI MENU    ${NC}"
+echo -e "${GREEN}  ANYDESK AUTO-ALLOW BERHASIL DIAKTIFKAN! 🎉                 ${NC}"
 echo -e "${GREEN}============================================================${NC}"
+echo -e ""
+echo -e "ID AnyDesk Server : ${YELLOW}${ANYDESK_ID}${NC}"
+echo -e "Password Remote   : ${YELLOW}${PASSWORD_ANYDESK}${NC}"
+echo -e ""
+echo -e "Catatan ini juga sudah disimpan di Layar Desktop Anda: KODE_REMOTE_ANYDESK.txt"
+
