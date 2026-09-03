@@ -20,24 +20,24 @@
     :root, [data-theme="light"] {
       --bg: #F8FAFC;
       --bg-gradient: radial-gradient(circle at 50% -20%, #E2E8F0 0%, #F8FAFC 100%);
-      --card-bg: rgba(255, 255, 255, 0.88);
-      --card-border: rgba(15, 23, 42, 0.08);
-      --card-shadow: 0 20px 40px -15px rgba(15, 23, 42, 0.07);
+      --card-bg: rgba(255, 255, 255, 0.92);
+      --card-border: rgba(15, 23, 42, 0.09);
+      --card-shadow: 0 20px 50px rgba(15, 23, 42, 0.08);
       --surface: rgba(15, 23, 42, 0.03);
-      --surface-2: rgba(15, 23, 42, 0.05);
+      --surface-2: rgba(15, 23, 42, 0.06);
       --text-main: #0F172A;
       --text-sub: #475569;
       --text-muted: #94A3B8;
-      --emerald: #10B981;
-      --emerald-glow: rgba(16, 185, 129, 0.15);
-      --amber: #F59E0B;
-      --amber-glow: rgba(245, 158, 11, 0.15);
-      --cyan: #06B6D4;
-      --cyan-glow: rgba(6, 182, 212, 0.15);
-      --rose: #F43F5E;
-      --rose-glow: rgba(244, 63, 94, 0.15);
-      --scanner-ring: rgba(16, 185, 129, 0.35);
-      --laser-color: #10B981;
+      --emerald: #16A34A;
+      --emerald-glow: rgba(22, 163, 74, 0.18);
+      --amber: #D97706;
+      --amber-glow: rgba(217, 119, 6, 0.18);
+      --cyan: #0284C7;
+      --cyan-glow: rgba(2, 132, 199, 0.18);
+      --rose: #DC2626;
+      --rose-glow: rgba(220, 38, 38, 0.18);
+      --scanner-ring: rgba(22, 163, 74, 0.35);
+      --laser-color: #16A34A;
       --font-main: 'Plus Jakarta Sans', sans-serif;
       --font-mono: 'JetBrains Mono', monospace;
     }
@@ -45,23 +45,23 @@
     [data-theme="dark"] {
       --bg: #070B14;
       --bg-gradient: radial-gradient(circle at 50% -20%, #111C35 0%, #070B14 100%);
-      --card-bg: rgba(13, 20, 34, 0.85);
-      --card-border: rgba(255, 255, 255, 0.08);
-      --card-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
+      --card-bg: rgba(13, 20, 34, 0.88);
+      --card-border: rgba(255, 255, 255, 0.09);
+      --card-shadow: 0 25px 50px -10px rgba(0, 0, 0, 0.65);
       --surface: rgba(255, 255, 255, 0.04);
-      --surface-2: rgba(255, 255, 255, 0.07);
+      --surface-2: rgba(255, 255, 255, 0.08);
       --text-main: #F8FAFC;
       --text-sub: #94A3B8;
       --text-muted: #64748B;
       --emerald: #10B981;
-      --emerald-glow: rgba(16, 185, 129, 0.2);
+      --emerald-glow: rgba(16, 185, 129, 0.22);
       --amber: #F59E0B;
-      --amber-glow: rgba(245, 158, 11, 0.2);
+      --amber-glow: rgba(245, 158, 11, 0.22);
       --cyan: #38BDF8;
-      --cyan-glow: rgba(56, 189, 248, 0.2);
+      --cyan-glow: rgba(56, 189, 248, 0.22);
       --rose: #FB7185;
-      --rose-glow: rgba(251, 113, 133, 0.2);
-      --scanner-ring: rgba(16, 185, 129, 0.4);
+      --rose-glow: rgba(251, 113, 133, 0.22);
+      --scanner-ring: rgba(16, 185, 129, 0.45);
       --laser-color: #38BDF8;
       --font-main: 'Plus Jakarta Sans', sans-serif;
       --font-mono: 'JetBrains Mono', monospace;
@@ -76,19 +76,16 @@
       min-height: 100vh;
       display: flex;
       flex-direction: column;
+      justify-content: space-between;
       overflow-x: hidden;
       user-select: none;
       transition: background .25s ease, color .25s ease;
     }
 
-    /* Ambient Background Elements */
+    /* Ambient Background Orbs */
     .ambient-glow {
-      position: fixed;
-      pointer-events: none;
-      z-index: 0;
-      border-radius: 50%;
-      filter: blur(140px);
-      opacity: 0.22;
+      position: fixed; pointer-events: none; z-index: 0; border-radius: 50%;
+      filter: blur(140px); opacity: 0.22;
     }
     .ambient-glow-1 { width: 600px; height: 600px; background: #06B6D4; top: -180px; left: -150px; }
     .ambient-glow-2 { width: 550px; height: 550px; background: #10B981; bottom: -150px; right: -120px; }
@@ -129,10 +126,10 @@
     .header-status-badge {
       display: inline-flex;
       align-items: center;
-      gap: 7px;
-      padding: 5px 12px;
+      gap: 6px;
+      padding: 4px 10px;
       border-radius: 100px;
-      font-size: 11.5px;
+      font-size: 11px;
       font-weight: 800;
       font-family: var(--font-mono);
       letter-spacing: 0.3px;
@@ -149,18 +146,18 @@
     }
 
     .pulse-dot {
-      width: 7px; height: 7px; border-radius: 50%;
+      width: 6px; height: 6px; border-radius: 50%;
       background: currentColor;
-      box-shadow: 0 0 10px currentColor;
+      box-shadow: 0 0 8px currentColor;
       animation: pulseGlow 1.8s infinite;
     }
     @keyframes pulseGlow {
       0% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.4; transform: scale(0.85); }
+      50% { opacity: 0.35; transform: scale(0.85); }
       100% { opacity: 1; transform: scale(1); }
     }
 
-    .header-right { display: flex; align-items: center; gap: 12px; }
+    .header-right { display: flex; align-items: center; gap: 10px; }
     .live-clock-pill {
       background: var(--surface);
       border: 1px solid var(--card-border);
@@ -168,8 +165,8 @@
       padding: 6px 14px;
       text-align: right;
     }
-    .clock-hms { font-family: var(--font-mono); font-size: 15.5px; font-weight: 900; color: var(--text-main); letter-spacing: 0.5px; }
-    .clock-ymd { font-size: 11px; color: var(--text-muted); font-weight: 600; }
+    .clock-hms { font-family: var(--font-mono); font-size: 15px; font-weight: 900; color: var(--text-main); }
+    .clock-ymd { font-size: 10.5px; color: var(--text-muted); font-weight: 600; }
 
     .action-btn {
       width: 38px; height: 38px;
@@ -193,57 +190,55 @@
       z-index: 10;
       flex: 1;
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 24px;
-    }
-
-    .kiosk-grid {
+      padding: 24px 20px;
+      max-width: 820px;
       width: 100%;
-      max-width: 1080px;
-      display: grid;
-      grid-template-columns: 1fr 1.15fr;
-      gap: 24px;
-    }
-    @media (max-width: 920px) {
-      .kiosk-grid { grid-template-columns: 1fr; }
+      margin: 0 auto;
     }
 
-    /* Common Card Styling */
-    .kiosk-card {
+    /* Center Stage Container */
+    .kiosk-stage-box {
+      width: 100%;
+      transition: all .3s ease;
+    }
+
+    /* Fade Enter Transition */
+    .kios-fade-enter {
+      animation: kiosFadeIn .32s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    @keyframes kiosFadeIn {
+      from { opacity: 0; transform: scale(0.96) translateY(6px); }
+      to { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    /* ══ STATE 1: CENTRAL SCANNER CARD ══ */
+    .scanner-main-card {
       background: var(--card-bg);
       backdrop-filter: blur(20px);
-      border: 1px solid var(--card-border);
-      border-radius: 24px;
-      padding: 30px;
+      border: 1.5px solid var(--card-border);
+      border-radius: 28px;
+      padding: 40px 32px;
       box-shadow: var(--card-shadow);
+      text-align: center;
       display: flex;
       flex-direction: column;
-      position: relative;
-      overflow: hidden;
-      transition: all .3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-    .kiosk-card:hover {
-      border-color: rgba(255,255,255,0.14);
-    }
-
-    /* ─── SCANNER HOLOGRAPHIC TARGET ZONE ─── */
-    .tap-zone {
       align-items: center;
       justify-content: center;
-      text-align: center;
+      position: relative;
+      overflow: hidden;
     }
 
-    /* Cybernetic Scanner Frame */
-    .scanner-holo-portal {
+    /* Cybernetic Scanner Holographic Portal */
+    .scanner-portal {
       width: 170px; height: 170px;
       position: relative;
       display: flex; align-items: center; justify-content: center;
       margin-bottom: 24px;
     }
-
-    /* Rotating Outer Ring */
-    .holo-ring-outer {
+    .portal-ring-outer {
       position: absolute; inset: 0;
       border-radius: 50%;
       border: 2px dashed var(--scanner-ring);
@@ -253,9 +248,7 @@
       from { transform: rotate(0deg); }
       to { transform: rotate(360deg); }
     }
-
-    /* Middle Breathing Circle */
-    .holo-ring-inner {
+    .portal-ring-inner {
       position: absolute; inset: 12px;
       border-radius: 50%;
       background: radial-gradient(circle, var(--emerald-glow) 0%, transparent 70%);
@@ -266,65 +259,57 @@
       0% { transform: scale(0.96); opacity: 0.6; }
       100% { transform: scale(1.04); opacity: 1; }
     }
-
-    /* Cyber Corner Brackets */
-    .holo-reticle {
+    .portal-reticle {
       position: absolute; inset: 26px;
-      border-radius: 20px;
+      border-radius: 22px;
       border: 1px solid rgba(255, 255, 255, 0.08);
       overflow: hidden;
       display: flex; align-items: center; justify-content: center;
       background: var(--surface);
     }
-    
-    /* Animated Laser Scanner Line */
-    .laser-beam {
+    .portal-laser {
       position: absolute;
-      left: 0; right: 0; height: 2px;
-      background: linear-gradient(90deg, transparent, var(--laser-color), transparent);
+      left: 0; right: 0; height: 2.5px;
+      background: linear-gradient(90deg, transparent, var(--laser-color), #fff, var(--laser-color), transparent);
       box-shadow: 0 0 14px var(--laser-color);
-      animation: scanSweep 2.4s ease-in-out infinite alternate;
+      animation: scanSweep 2.2s ease-in-out infinite alternate;
       z-index: 2;
     }
     @keyframes scanSweep {
-      0% { top: 8%; opacity: 0.2; }
+      0% { top: 6%; opacity: 0.3; }
       50% { opacity: 1; }
-      100% { top: 92%; opacity: 0.2; }
+      100% { top: 94%; opacity: 0.3; }
     }
-
-    /* Iconic Glyph in Center */
-    .holo-icon {
-      font-size: 50px;
+    .portal-glyph {
+      font-size: 52px;
       color: var(--text-main);
       z-index: 3;
-      filter: drop-shadow(0 0 10px rgba(16,185,129,0.3));
-      transition: all .25s ease;
+      filter: drop-shadow(0 0 12px var(--emerald-glow));
     }
 
-    .tap-title-big {
-      font-size: 21px;
+    .scanner-title {
+      font-size: 23px;
       font-weight: 900;
       letter-spacing: -0.4px;
       color: var(--text-main);
       margin-bottom: 8px;
     }
-    .tap-desc-txt {
-      font-size: 13px;
+    .scanner-desc {
+      font-size: 13.5px;
       color: var(--text-sub);
-      max-width: 320px;
+      max-width: 440px;
       line-height: 1.55;
     }
 
-    /* Protocol Pills */
-    .protocol-chips {
-      margin-top: 22px;
+    .scanner-protocols {
+      margin-top: 24px;
       display: flex;
-      gap: 8px;
+      gap: 10px;
       flex-wrap: wrap;
       justify-content: center;
     }
-    .protocol-chip {
-      padding: 5px 11px;
+    .protocol-pill {
+      padding: 6px 12px;
       border-radius: 8px;
       background: var(--surface);
       border: 1px solid var(--card-border);
@@ -335,13 +320,11 @@
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      letter-spacing: 0.2px;
     }
 
-    /* Live Sensor Radar Status */
-    .sensor-live-bar {
+    .scanner-status-indicator {
       margin-top: 24px;
-      padding: 8px 16px;
+      padding: 8px 18px;
       border-radius: 100px;
       background: var(--surface);
       border: 1px solid var(--card-border);
@@ -354,197 +337,195 @@
       font-family: var(--font-mono);
     }
 
-    /* ─── RESULT & MONITOR FEED CARD ─── */
-    .monitor-card {
-      justify-content: space-between;
+    /* ══ STATE 2: RESPONSE IDENTITAS LENGKAP (SMART GATE) ══ */
+    .identity-result-card {
+      width: 100%;
+      background: var(--card-bg);
+      backdrop-filter: blur(22px);
+      border: 2px solid var(--emerald);
+      border-radius: 28px;
+      padding: 34px 38px;
+      box-shadow: 0 25px 60px -10px rgba(0,0,0,0.4), 0 0 35px var(--emerald-glow);
+      text-align: left;
+      transition: all .3s ease;
     }
-    .monitor-card.success-border { border-color: rgba(16,185,129,0.45); }
-    .monitor-card.warning-border { border-color: rgba(245,158,11,0.45); }
-    .monitor-card.error-border { border-color: rgba(244,63,94,0.45); }
+    .identity-result-card.status-hadir {
+      border-color: var(--emerald);
+      box-shadow: 0 25px 60px -10px rgba(0,0,0,0.4), 0 0 35px var(--emerald-glow);
+    }
+    .identity-result-card.status-terlambat {
+      border-color: var(--amber);
+      box-shadow: 0 25px 60px -10px rgba(0,0,0,0.4), 0 0 35px var(--amber-glow);
+    }
+    .identity-result-card.status-pulang {
+      border-color: var(--cyan);
+      box-shadow: 0 25px 60px -10px rgba(0,0,0,0.4), 0 0 35px var(--cyan-glow);
+    }
+    .identity-result-card.status-error {
+      border-color: var(--rose);
+      box-shadow: 0 25px 60px -10px rgba(0,0,0,0.4), 0 0 35px var(--rose-glow);
+    }
 
-    .card-top-hud {
+    .identity-top-bar {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding-bottom: 14px;
+      padding-bottom: 16px;
       border-bottom: 1px solid var(--card-border);
-      margin-bottom: 16px;
+      margin-bottom: 22px;
     }
-    .card-top-title {
-      font-size: 11.5px;
+    .result-badge-large {
+      font-family: var(--font-mono);
+      font-size: 13.5px;
       font-weight: 900;
+      letter-spacing: 0.6px;
       text-transform: uppercase;
-      letter-spacing: 0.8px;
+      padding: 6px 18px;
+      border-radius: 100px;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+    }
+    .result-badge-large.hadir {
+      background: var(--emerald-glow);
+      color: var(--emerald);
+      border: 1px solid var(--emerald);
+    }
+    .result-badge-large.terlambat {
+      background: var(--amber-glow);
+      color: var(--amber);
+      border: 1px solid var(--amber);
+    }
+    .result-badge-large.pulang {
+      background: var(--cyan-glow);
+      color: var(--cyan);
+      border: 1px solid var(--cyan);
+    }
+    .result-badge-large.error {
+      background: var(--rose-glow);
+      color: var(--rose);
+      border: 1px solid var(--rose);
+    }
+
+    .identity-gate-label {
+      font-size: 12px;
+      font-weight: 700;
       color: var(--text-muted);
-      display: flex;
+      display: inline-flex;
       align-items: center;
       gap: 6px;
-    }
-
-    /* Standby State Graphic */
-    .standby-state-box {
-      padding: 24px 0;
-      text-align: center;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 190px;
-    }
-    .standby-icon-halo {
-      width: 70px; height: 70px;
-      border-radius: 20px;
       background: var(--surface);
       border: 1px solid var(--card-border);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 32px;
-      color: var(--text-muted);
-      margin-bottom: 12px;
+      padding: 5px 12px;
+      border-radius: 100px;
+      font-family: var(--font-mono);
     }
-    .standby-title { font-size: 15px; font-weight: 800; color: var(--text-main); }
-    .standby-desc { font-size: 12px; color: var(--text-sub); max-width: 320px; line-height: 1.45; margin-top: 4px; }
 
-    /* Live Daily Counters in Standby */
-    .daily-stats-row {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 8px;
-      width: 100%;
-      margin-top: 16px;
-    }
-    .stat-pill {
-      background: var(--surface);
-      border: 1px solid var(--card-border);
-      border-radius: 12px;
-      padding: 10px 8px;
-      text-align: center;
-    }
-    .stat-pill-val { font-size: 16px; font-weight: 900; font-family: var(--font-mono); }
-    .stat-pill-label { font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.4px; margin-top: 2px; }
-
-    /* Active Result Presentation */
-    .person-result-wrap {
+    .identity-body {
       display: flex;
       align-items: center;
-      gap: 20px;
-      padding: 10px 0 16px 0;
+      gap: 26px;
+      margin-bottom: 22px;
     }
-    .person-photo-frame {
-      width: 90px; height: 90px;
-      border-radius: 22px;
-      background: var(--surface);
-      border: 2.5px solid var(--emerald);
-      box-shadow: 0 0 20px var(--emerald-glow);
-      object-fit: cover;
+    @media (max-width: 640px) {
+      .identity-body { flex-direction: column; text-align: center; }
+    }
+
+    .identity-avatar-wrap {
+      position: relative;
+      width: 110px; height: 110px;
+      border-radius: 24px;
+      overflow: hidden;
+      border: 3px solid var(--emerald);
+      box-shadow: 0 0 25px var(--emerald-glow);
       flex-shrink: 0;
-      transition: border-color .3s, box-shadow .3s;
+      background: var(--surface);
     }
-    .person-name-big {
-      font-size: 22px;
+    .identity-avatar-img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .identity-details { flex: 1; min-width: 0; }
+    .identity-name-text {
+      font-size: 26px;
       font-weight: 900;
       letter-spacing: -0.4px;
       color: var(--text-main);
-      line-height: 1.2;
+      line-height: 1.25;
+      margin-bottom: 6px;
     }
-    .person-class-sub {
-      font-size: 13.5px;
-      color: var(--text-sub);
+    .identity-sub-text {
+      font-size: 14.5px;
       font-weight: 700;
-      margin-top: 5px;
+      color: var(--text-sub);
+      margin-bottom: 10px;
       display: flex;
       align-items: center;
       gap: 6px;
     }
-    .person-nisn-badge {
-      display: inline-block;
-      padding: 3px 8px;
-      border-radius: 6px;
-      background: var(--surface-2);
-      border: 1px solid var(--card-border);
-      font-family: var(--font-mono);
-      font-size: 11px;
-      font-weight: 800;
-      color: var(--text-main);
-      margin-top: 6px;
-    }
-
-    .badge-status-highlight {
+    .identity-time-pill {
       display: inline-flex;
       align-items: center;
-      gap: 8px;
-      padding: 8px 18px;
-      border-radius: 12px;
-      font-size: 13.5px;
-      font-weight: 900;
+      gap: 6px;
+      background: var(--surface-2);
+      border: 1px solid var(--card-border);
+      padding: 4px 12px;
+      border-radius: 8px;
       font-family: var(--font-mono);
-      letter-spacing: 0.5px;
-      text-transform: uppercase;
-      margin-top: 10px;
-    }
-    .badge-status-highlight.hadir {
-      background: var(--emerald-glow);
-      color: var(--emerald);
-      border: 1.5px solid var(--emerald);
-    }
-    .badge-status-highlight.terlambat {
-      background: var(--amber-glow);
-      color: var(--amber);
-      border: 1.5px solid var(--amber);
-    }
-    .badge-status-highlight.pulang {
-      background: var(--cyan-glow);
-      color: var(--cyan);
-      border: 1.5px solid var(--cyan);
-    }
-    .badge-status-highlight.error {
-      background: var(--rose-glow);
-      color: var(--rose);
-      border: 1.5px solid var(--rose);
+      font-size: 12.5px;
+      font-weight: 800;
+      color: var(--text-main);
     }
 
-    .feedback-msg {
-      font-size: 13.5px;
-      font-weight: 700;
-      margin-top: 12px;
-      padding: 10px 14px;
-      border-radius: 10px;
+    .identity-notification-box {
+      padding: 12px 18px;
+      border-radius: 12px;
       background: var(--surface);
       border: 1px solid var(--card-border);
+      font-size: 13.5px;
+      font-weight: 700;
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 10px;
     }
 
-    /* Recent Scans Mini List */
-    .recent-feed-section {
-      border-top: 1px solid var(--card-border);
-      padding-top: 14px;
-      margin-top: auto;
+    /* Auto Reset Countdown Bar */
+    .countdown-section {
+      margin-top: 22px;
+      padding-top: 16px;
+      border-top: 1px dashed var(--card-border);
     }
-    .recent-feed-head {
-      font-size: 11px;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: 0.6px;
-      color: var(--text-muted);
+    .countdown-track {
+      width: 100%;
+      height: 6px;
+      background: var(--surface-2);
+      border-radius: 10px;
+      overflow: hidden;
       margin-bottom: 8px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
     }
-    .recent-feed-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 7px 0;
-      border-bottom: 1px solid var(--card-border);
-      font-size: 12.5px;
-      animation: fadeInSlide .3s ease-out;
+    .countdown-fill {
+      height: 100%;
+      width: 100%;
+      background: var(--emerald);
+      border-radius: 10px;
+      transition: width 0.1s linear;
     }
-    .recent-feed-item:last-child { border-bottom: none; }
-    @keyframes fadeInSlide {
-      from { opacity: 0; transform: translateY(-4px); }
-      to { opacity: 1; transform: translateY(0); }
+    .countdown-caption {
+      font-size: 12px;
+      color: var(--text-muted);
+      font-weight: 600;
+      text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    .countdown-caption strong {
+      color: var(--emerald);
+      font-family: var(--font-mono);
+      font-size: 13.5px;
     }
 
     /* Footer */
@@ -562,7 +543,7 @@
       backdrop-filter: blur(16px);
     }
 
-    /* Hidden scanner input capturing scanner keypresses */
+    /* Hidden USB Scanner Input */
     #rfidInput {
       position: absolute;
       opacity: 0;
@@ -608,7 +589,7 @@
     </div>
 
     <!-- Voice Announcement Toggle -->
-    <button type="button" class="action-btn" id="btnVoiceToggle" onclick="toggleVoice()" title="Suara Pengumuman Suara (Aktif/Mute)">
+    <button type="button" class="action-btn" id="btnVoiceToggle" onclick="toggleVoice()" title="Suara Pengumuman (Aktif/Mute)">
       <i class="bi bi-volume-up-fill" id="voiceIcon"></i>
     </button>
 
@@ -633,134 +614,95 @@
 <main onclick="focusScanner()">
   <input type="text" id="rfidInput" autofocus autocomplete="off" />
 
-  <div class="kiosk-grid">
+  <div class="kiosk-stage-box">
 
-    <!-- LEFT: SCANNER SENSOR TARGET ZONE -->
-    <div class="kiosk-card tap-zone">
-      
-      <!-- Holographic Reticle Portal -->
-      <div class="scanner-holo-portal" id="holoPortal">
-        <div class="holo-ring-outer"></div>
-        <div class="holo-ring-inner"></div>
-        <div class="holo-reticle">
-          <div class="laser-beam"></div>
-          <i class="bi bi-upc-scan holo-icon" id="holoIcon"></i>
+    <!-- ══ STATE 1: CENTRAL SCANNER CARD (STANDBY) ══ -->
+    <div id="scannerState" class="scanner-main-card">
+      <div class="scanner-portal">
+        <div class="portal-ring-outer"></div>
+        <div class="portal-ring-inner"></div>
+        <div class="portal-reticle">
+          <div class="portal-laser"></div>
+          <i class="bi bi-upc-scan portal-glyph"></i>
         </div>
       </div>
 
-      <div class="tap-title-big" id="tapTitle">Tempelkan Kartu / Scan Barcode</div>
-      <div class="tap-desc-txt" id="tapDesc">
-        Dekatkan Kartu Pelajar RFID / e-KTP ke sensor atau arahkan Barcode NISN siswa ke pemindai scanner.
+      <h1 class="scanner-title">Tempelkan Kartu RFID / Scan Barcode</h1>
+      <p class="scanner-desc">
+        Dekatkan Kartu Pelajar RFID / e-KTP ke sensor pembaca atau arahkan Barcode / QR Code NISN siswa ke scanner USB.
+      </p>
+
+      <div class="scanner-protocols">
+        <span class="protocol-pill"><i class="bi bi-credit-card-2-front"></i> RFID 13.56 MHz / 125 kHz</span>
+        <span class="protocol-pill"><i class="bi bi-upc"></i> Barcode 1D / 2D</span>
+        <span class="protocol-pill"><i class="bi bi-qr-code"></i> QR Code Siswa</span>
       </div>
 
-      <!-- Protocol Supported Chips -->
-      <div class="protocol-chips">
-        <span class="protocol-chip"><i class="bi bi-credit-card-2-front"></i> RFID 13.56 MHz / 125 kHz</span>
-        <span class="protocol-chip"><i class="bi bi-upc"></i> Barcode 1D / 2D</span>
-        <span class="protocol-chip"><i class="bi bi-qr-code"></i> QR Code NISN</span>
-      </div>
-
-      <!-- Real-Time Radar Status Indicator -->
-      <div class="sensor-live-bar" id="sensorIndicator">
+      <div class="scanner-status-indicator" id="scannerStatus">
         <span class="pulse-dot"></span>
-        <span>PEMINDAI SIAP MEMINDAI • RESPON &lt; 0.1s</span>
+        <span>PEMINDAI SIAP MENERIMA INPUT</span>
       </div>
     </div>
 
-    <!-- RIGHT: REAL-TIME SCAN MONITOR & RECENT FEED -->
-    <div class="kiosk-card monitor-card" id="monitorCard">
-      
-      <div>
-        <div class="card-top-hud">
-          <span class="card-top-title">
-            <i class="bi bi-cpu-fill" style="color:var(--cyan);"></i> Monitor Hasil Pemindaian
-          </span>
-          <span id="badgeAction" class="badge-status-highlight hadir" style="display:none; margin:0;"></span>
+    <!-- ══ STATE 2: RESPONSE IDENTITAS LENGKAP (KETIKA SCAN BERHASIL) ══ -->
+    <div id="responseState" class="kios-fade-enter" style="display:none;">
+      <div class="identity-result-card" id="identityCard">
+
+        {{-- Top Header Row --}}
+        <div class="identity-top-bar">
+          <div class="result-badge-large hadir" id="resBadge">
+            <i class="bi bi-check-circle-fill"></i>
+            <span id="resBadgeText">BERHASIL HADIR</span>
+          </div>
+          <div class="identity-gate-label">
+            <i class="bi bi-shield-check" style="color:var(--emerald);"></i>
+            <span>Smart Gate Presensi SMKN 1 Air Naningan</span>
+          </div>
         </div>
 
-        <!-- Standby Idle State -->
-        <div class="standby-state-box" id="standbyBox">
-          <div class="standby-icon-halo">
-            <i class="bi bi-person-bounding-box"></i>
-          </div>
-          <div class="standby-title">Menunggu Kartu atau Barcode</div>
-          <div class="standby-desc">
-            Data kehadiran siswa, rombel, jam tiba, dan notifikasi ke orang tua akan langsung tampil di sini seketika.
+        {{-- Body: Foto & Identitas --}}
+        <div class="identity-body">
+          <div class="identity-avatar-wrap" id="avatarWrap">
+            <img id="resPhoto" class="identity-avatar-img" src="/img/user-default.png" alt="Foto Profil" />
           </div>
 
-          <!-- Quick Statistics Counters -->
-          <div class="daily-stats-row">
-            <div class="stat-pill">
-              <div class="stat-pill-val" style="color:var(--emerald);">{{ $totalHadirHariIni ?? 0 }}</div>
-              <div class="stat-pill-label">Hadir Tepat</div>
+          <div class="identity-details">
+            <div class="identity-name-text" id="resName">-</div>
+            <div class="identity-sub-text" id="resSub">
+              <i class="bi bi-mortarboard-fill"></i>
+              <span id="resSubTxt">-</span>
             </div>
-            <div class="stat-pill">
-              <div class="stat-pill-val" style="color:var(--amber);">{{ $totalTerlambatHariIni ?? 0 }}</div>
-              <div class="stat-pill-label">Terlambat</div>
-            </div>
-            <div class="stat-pill">
-              <div class="stat-pill-val" style="color:var(--cyan);">{{ $totalPulangHariIni ?? 0 }}</div>
-              <div class="stat-pill-label">Sudah Pulang</div>
+            <div class="identity-time-pill" id="resTimePill">
+              <i class="bi bi-clock-fill" style="color:var(--emerald);"></i>
+              <span id="resTimeTxt">-</span>
             </div>
           </div>
         </div>
 
-        <!-- Active Result Data State -->
-        <div class="person-result-wrap" id="personResultWrap" style="display:none;">
-          <img src="/img/user-default.png" alt="Foto Siswa" class="person-photo-frame" id="personPhoto" />
-          <div>
-            <div class="person-name-big" id="personName">-</div>
-            <div class="person-class-sub" id="personSub">-</div>
-            <div class="person-nisn-badge" id="personTag">-</div>
+        {{-- Pesan Notifikasi --}}
+        <div class="identity-notification-box" id="resMessageBox">
+          <i class="bi bi-check-circle-fill" id="resMessageIcon" style="font-size:18px; color:var(--emerald);"></i>
+          <span id="resMessageTxt">Presensi berhasil dicatat. Notifikasi otomatis dikirimkan ke orang tua.</span>
+        </div>
+
+        {{-- Auto-Reset Countdown Bar --}}
+        <div class="countdown-section">
+          <div class="countdown-track">
+            <div class="countdown-fill" id="countdownFill"></div>
+          </div>
+          <div class="countdown-caption">
+            <i class="bi bi-arrow-repeat"></i>
+            <span>Kembali ke mode pemindaian dalam <strong id="countdownSec">4</strong> detik...</span>
           </div>
         </div>
 
-        <!-- Feedback Notification Bar -->
-        <div id="resultMessage" class="feedback-msg" style="display:none;">
-          <i class="bi bi-info-circle-fill"></i>
-          <span id="resultMessageTxt">Presensi berhasil dicatat.</span>
-        </div>
       </div>
-
-      <!-- RECENT SCANS LOG FEED -->
-      <div class="recent-feed-section">
-        <div class="recent-feed-head">
-          <span><i class="bi bi-clock-history"></i> Log Presensi Terkini</span>
-          <span style="font-family:var(--font-mono); font-size:10px; color:var(--text-muted);">Real-time Sync</span>
-        </div>
-        <div id="recentList">
-          @if(isset($initialRecentScans) && $initialRecentScans->isNotEmpty())
-            @foreach($initialRecentScans as $rec)
-              @php
-                $p = $rec->pemilik;
-                $nama = $p->nama ?? 'Pengguna';
-                $sub = ($rec->pemilik_type === 'siswa') ? ($p->siswaRombel?->rombel?->nama_rombel ?? 'Siswa') : 'Guru';
-                $jam = $rec->jam_pulang ?: $rec->jam_masuk;
-                $st = $rec->status ?: 'hadir';
-              @endphp
-              <div class="recent-feed-item">
-                <div>
-                  <strong style="color:var(--text-main);">{{ $nama }}</strong>
-                  <span style="color:var(--text-muted); font-size:11px;"> • {{ $sub }}</span>
-                </div>
-                <div style="display:flex; align-items:center; gap:8px;">
-                  <span class="person-nisn-badge" style="padding:2px 6px; font-size:10px; text-transform:uppercase;">{{ $st }}</span>
-                  <span style="font-family:var(--font-mono); font-size:11px; color:var(--text-muted);">{{ substr($jam ?? '', 0, 5) }} WIB</span>
-                </div>
-              </div>
-            @endforeach
-          @else
-            <div style="font-size:12px; color:var(--text-muted); padding:4px 0;">Menunggu pemindaian presensi pertama hari ini...</div>
-          @endif
-        </div>
-      </div>
-
     </div>
 
   </div>
 </main>
 
-<!-- FOOTER INFORMATION -->
+<!-- FOOTER -->
 <footer>
   <div>
     <strong>SMKN 1 Air Naningan</strong> &bull; SIRANI Smart Gate Terminal &bull; T.A. 2026/2027
@@ -775,14 +717,14 @@
   let scannerBuffer = '';
   let scannerTimeout = null;
   let voiceEnabled = true;
-  const recentItems = [];
+  let countdownTimer = null;
 
   function focusScanner() {
     const inp = document.getElementById('rfidInput');
     if (inp) inp.focus();
   }
 
-  // Live Digital Clock Updater
+  // Live Clock
   function updateClock() {
     const now = new Date();
     const h = String(now.getHours()).padStart(2, '0');
@@ -794,7 +736,7 @@
   setInterval(updateClock, 1000);
   updateClock();
 
-  // Fullscreen Mode
+  // Fullscreen
   function toggleFullscreen() {
     if (!document.fullscreenElement) {
       document.documentElement.requestFullscreen().catch(() => {});
@@ -805,7 +747,7 @@
     }
   }
 
-  // Theme Mode
+  // Theme
   function toggleTheme() {
     const cur = document.documentElement.getAttribute('data-theme') || 'dark';
     const next = cur === 'dark' ? 'light' : 'dark';
@@ -842,7 +784,7 @@
     }
   }
 
-  // Audio Beep Chime
+  // Audio Beep
   function playBeep(type = 'success') {
     try {
       const ctx = new (window.AudioContext || window.webkitAudioContext)();
@@ -868,13 +810,13 @@
     } catch (e) {}
   }
 
-  // Process RFID or Barcode Code
+  // Process RFID / Barcode input
   async function processCode(code) {
     const cleanCode = code.trim();
     if (!cleanCode || cleanCode.length < 3) return;
 
-    const ind = document.getElementById('sensorIndicator');
-    if (ind) ind.innerHTML = '<span class="pulse-dot" style="background:var(--cyan); box-shadow:0 0 10px var(--cyan);"></span><span>MEMPROSES DATA PRESENSI...</span>';
+    const ind = document.getElementById('scannerStatus');
+    if (ind) ind.innerHTML = '<span class="pulse-dot" style="background:var(--cyan);"></span><span>MEMPROSES DATA PRESENSI...</span>';
 
     const csrf = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
 
@@ -890,72 +832,86 @@
       });
 
       const data = await res.json();
-      renderScanResult(data);
+      showIdentityResult(data);
     } catch (err) {
-      renderScanResult({
+      showIdentityResult({
         success: false,
         message: 'Gagal menghubungi server presensi. Pastikan koneksi stabil.'
       });
     } finally {
-      if (ind) ind.innerHTML = '<span class="pulse-dot"></span><span>PEMINDAI SIAP MEMINDAI • RESPON &lt; 0.1s</span>';
+      if (ind) ind.innerHTML = '<span class="pulse-dot"></span><span>PEMINDAI SIAP MENERIMA INPUT</span>';
       focusScanner();
     }
   }
 
-  // Render Result Feedback
-  function renderScanResult(res) {
-    const card = document.getElementById('monitorCard');
-    const standby = document.getElementById('standbyBox');
-    const personWrap = document.getElementById('personResultWrap');
-    const badge = document.getElementById('badgeAction');
-    const photo = document.getElementById('personPhoto');
-    const nameEl = document.getElementById('personName');
-    const subEl = document.getElementById('personSub');
-    const tagEl = document.getElementById('personTag');
-    const msgBox = document.getElementById('resultMessage');
-    const msgTxt = document.getElementById('resultMessageTxt');
+  // Switch to Full Identity Result View
+  function showIdentityResult(res) {
+    const scannerState = document.getElementById('scannerState');
+    const responseState = document.getElementById('responseState');
+    const card = document.getElementById('identityCard');
+    const badge = document.getElementById('resBadge');
+    const badgeTxt = document.getElementById('resBadgeText');
+    const photo = document.getElementById('resPhoto');
+    const avatarWrap = document.getElementById('avatarWrap');
+    const nameEl = document.getElementById('resName');
+    const subTxt = document.getElementById('resSubTxt');
+    const timeTxt = document.getElementById('resTimeTxt');
+    const msgBox = document.getElementById('resMessageBox');
+    const msgIcon = document.getElementById('resMessageIcon');
+    const msgTxt = document.getElementById('resMessageTxt');
+    const countdownFill = document.getElementById('countdownFill');
 
-    standby.style.display = 'none';
-    personWrap.style.display = 'flex';
-    badge.style.display = 'inline-flex';
-    msgBox.style.display = 'flex';
+    // Switch view
+    scannerState.style.display = 'none';
+    responseState.style.display = 'block';
 
     if (res.success && res.data) {
       playBeep('success');
       const d = res.data;
       const st = (d.status || 'hadir').toLowerCase();
 
-      // Border and Shadow Glow
-      if (st === 'terlambat') {
-        card.className = 'kiosk-card monitor-card warning-border';
-        photo.style.borderColor = 'var(--amber)';
-        photo.style.boxShadow = '0 0 20px var(--amber-glow)';
-      } else if (st === 'pulang') {
-        card.className = 'kiosk-card monitor-card success-border';
-        photo.style.borderColor = 'var(--cyan)';
-        photo.style.boxShadow = '0 0 20px var(--cyan-glow)';
-      } else {
-        card.className = 'kiosk-card monitor-card success-border';
-        photo.style.borderColor = 'var(--emerald)';
-        photo.style.boxShadow = '0 0 20px var(--emerald-glow)';
-      }
-
       photo.src = d.foto || d.foto_url || '/img/user-default.png';
       nameEl.textContent = d.nama || 'Pengguna';
 
       const subInfo = (d.sub || d.rombel_atau_jabatan || '').trim();
       const idInfo = (d.identitas || '').trim();
-      subEl.innerHTML = subInfo ? `<i class="bi bi-mortarboard-fill"></i> ${subInfo}` : (idInfo ? `NISN: ${idInfo}` : '-');
+      subTxt.textContent = subInfo ? `${subInfo} • ${idInfo}` : (idInfo || 'Warga Sekolah');
 
-      const isGuru = (d.tipe === 'guru' || d.type === 'guru');
-      const roleText = isGuru ? 'Guru / Pegawai' : 'Siswa';
-      const jamText = d.jam || d.jam_masuk || d.jam_pulang || '';
-      tagEl.textContent = jamText ? `${roleText} • ${jamText} WIB` : roleText;
+      const jam = d.jam || d.jam_masuk || d.jam_pulang || '';
+      timeTxt.textContent = jam ? `Presensi Pukul ${jam} WIB` : 'Presensi Berhasil Dicatat';
 
-      badge.className = 'badge-status-highlight ' + st;
-      badge.innerHTML = `<i class="bi bi-check-circle-fill"></i> ${st.toUpperCase()}`;
-
-      msgTxt.textContent = res.message || 'Presensi berhasil dicatat.';
+      // Status variations
+      if (st === 'terlambat') {
+        card.className = 'identity-result-card status-terlambat';
+        badge.className = 'result-badge-large terlambat';
+        badgeTxt.textContent = 'TERLAMBAT';
+        avatarWrap.style.borderColor = 'var(--amber)';
+        avatarWrap.style.boxShadow = '0 0 25px var(--amber-glow)';
+        countdownFill.style.background = 'var(--amber)';
+        msgIcon.className = 'bi bi-exclamation-circle-fill';
+        msgIcon.style.color = 'var(--amber)';
+        msgTxt.textContent = res.message || 'Presensi terlambat dicatat.';
+      } else if (st === 'pulang') {
+        card.className = 'identity-result-card status-pulang';
+        badge.className = 'result-badge-large pulang';
+        badgeTxt.textContent = 'BERHASIL PULANG';
+        avatarWrap.style.borderColor = 'var(--cyan)';
+        avatarWrap.style.boxShadow = '0 0 25px var(--cyan-glow)';
+        countdownFill.style.background = 'var(--cyan)';
+        msgIcon.className = 'bi bi-check-circle-fill';
+        msgIcon.style.color = 'var(--cyan)';
+        msgTxt.textContent = res.message || 'Presensi pulang berhasil dicatat. Hati-hati di jalan!';
+      } else {
+        card.className = 'identity-result-card status-hadir';
+        badge.className = 'result-badge-large hadir';
+        badgeTxt.textContent = 'BERHASIL HADIR';
+        avatarWrap.style.borderColor = 'var(--emerald)';
+        avatarWrap.style.boxShadow = '0 0 25px var(--emerald-glow)';
+        countdownFill.style.background = 'var(--emerald)';
+        msgIcon.className = 'bi bi-check-circle-fill';
+        msgIcon.style.color = 'var(--emerald)';
+        msgTxt.textContent = res.message || 'Presensi masuk berhasil dicatat.';
+      }
 
       // Voice greeting
       const speechNama = (d.nama || '').split(',')[0].trim();
@@ -967,44 +923,63 @@
         speak(`Selamat pagi, ${speechNama}, presensi berhasil.`);
       }
 
-      // Prepend to recent feed
-      addRecentItem(d.nama, d.sub || d.rombel_atau_jabatan || '', st, d.jam || 'Baru saja');
     } else {
       playBeep('error');
-      card.className = 'kiosk-card monitor-card error-border';
+      card.className = 'identity-result-card status-error';
+      badge.className = 'result-badge-large error';
+      badgeTxt.textContent = 'DITOLAK';
       photo.src = '/img/user-default.png';
-      photo.style.borderColor = 'var(--rose)';
-      photo.style.boxShadow = '0 0 20px var(--rose-glow)';
+      avatarWrap.style.borderColor = 'var(--rose)';
+      avatarWrap.style.boxShadow = '0 0 25px var(--rose-glow)';
+      countdownFill.style.background = 'var(--rose)';
       nameEl.textContent = 'Pemindaian Gagal';
-      subEl.innerHTML = '<i class="bi bi-shield-x"></i> Kartu / Barcode Tidak Valid';
-      tagEl.textContent = 'Akses Ditolak';
-      badge.className = 'badge-status-highlight error';
-      badge.innerHTML = '<i class="bi bi-x-circle-fill"></i> DITOLAK';
-      msgTxt.textContent = res.message || 'Kartu belum terdaftar atau gerbang ditutup.';
+      subTxt.textContent = 'Kartu atau Barcode Tidak Terdaftar';
+      timeTxt.textContent = 'Sistem Smart Gate';
+      msgIcon.className = 'bi bi-x-circle-fill';
+      msgIcon.style.color = 'var(--rose)';
+      msgTxt.textContent = res.message || 'Kartu belum terdaftar atau gerbang sedang ditutup.';
       speak('Kartu tidak valid atau belum terdaftar.');
     }
+
+    startCountdown(4);
   }
 
-  function addRecentItem(nama, sub, status, time) {
-    const list = document.getElementById('recentList');
-    recentItems.unshift({ nama, sub, status, time });
-    if (recentItems.length > 5) recentItems.pop();
+  // Countdown timer to return to scanner
+  function startCountdown(totalSec) {
+    if (countdownTimer) clearInterval(countdownTimer);
 
-    list.innerHTML = recentItems.map(item => `
-      <div class="recent-feed-item">
-        <div>
-          <strong style="color:var(--text-main);">${item.nama}</strong>
-          ${item.sub ? `<span style="color:var(--text-muted); font-size:11px;"> • ${item.sub}</span>` : ''}
-        </div>
-        <div style="display:flex; align-items:center; gap:8px;">
-          <span class="person-nisn-badge" style="padding:2px 6px; font-size:10px; text-transform:uppercase;">${item.status}</span>
-          <span style="font-family:var(--font-mono); font-size:11px; color:var(--text-muted);">${item.time}</span>
-        </div>
-      </div>
-    `).join('');
+    const fill = document.getElementById('countdownFill');
+    const secTxt = document.getElementById('countdownSec');
+    let remainMs = totalSec * 1000;
+    const intervalMs = 100;
+
+    secTxt.textContent = totalSec;
+    fill.style.width = '100%';
+
+    countdownTimer = setInterval(() => {
+      remainMs -= intervalMs;
+      const pct = (remainMs / (totalSec * 1000)) * 100;
+      fill.style.width = Math.max(0, pct) + '%';
+      secTxt.textContent = Math.ceil(remainMs / 1000);
+
+      if (remainMs <= 0) {
+        clearInterval(countdownTimer);
+        returnToScanner();
+      }
+    }, intervalMs);
   }
 
-  // Keystroke listener for USB Barcode & RFID Reader
+  // Return back to central scanner
+  function returnToScanner() {
+    if (countdownTimer) clearInterval(countdownTimer);
+    document.getElementById('responseState').style.display = 'none';
+    const sc = document.getElementById('scannerState');
+    sc.style.display = 'flex';
+    sc.classList.add('kios-fade-enter');
+    focusScanner();
+  }
+
+  // Global key listener for USB barcode/RFID reader keyboard emulation
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') {
       if (scannerBuffer.length >= 3) {
