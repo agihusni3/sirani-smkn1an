@@ -146,8 +146,15 @@ server {
     location ~ /\.(?!well-known).* {
         deny all;
     }
+
+    # Proteksi Ketat: Blokir akses langsung ke file database, env, sql, atau log
+    location ~* \.(sqlite|sqlite3|db|sql|log|env|bak)$ {
+        deny all;
+        return 404;
+    }
 }
 EOF
+
 
 ln -sf ${NGINX_CONF} /etc/nginx/sites-enabled/sirani
 rm -f /etc/nginx/sites-enabled/default
