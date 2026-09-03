@@ -217,8 +217,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      flex-wrap: wrap;
-      gap: 10px;
+      gap: 12px;
     }
     .piket-segmented-tabs {
       background: var(--bg-3);
@@ -233,7 +232,7 @@
       border: none;
       background: transparent;
       padding: 0 12px;
-      height: 27px;
+      height: 28px;
       border-radius: calc(var(--r-sm) - 2px);
       font-size: 12px;
       font-weight: 700;
@@ -265,6 +264,7 @@
       position: relative;
       width: 100%;
       max-width: 260px;
+      flex-shrink: 0;
     }
     .piket-search-input {
       width: 100%;
@@ -292,12 +292,22 @@
       pointer-events: none;
     }
 
-    /* Filter Chips */
+    /* Filter Chips Horizontal Strip */
     .piket-chips-strip {
       display: flex;
       align-items: center;
       gap: 5px;
-      flex-wrap: wrap;
+      overflow-x: auto;
+      white-space: nowrap;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+      padding: 2px 0;
+      flex: 1;
+      min-width: 0;
+    }
+    .piket-chips-strip::-webkit-scrollbar {
+      display: none;
     }
     .piket-chip {
       background: var(--bg-3);
@@ -313,6 +323,7 @@
       display: inline-flex;
       align-items: center;
       gap: 5px;
+      flex-shrink: 0;
     }
     .piket-chip:hover {
       color: #000000;
@@ -333,6 +344,54 @@
     .piket-chip.active .piket-chip-badge {
       background: rgba(255,255,255,0.22);
       color: #FFFFFF;
+    }
+
+    /* ══ RESPONSIVE MOBILE MODE (< 768px) ══ */
+    @media (max-width: 768px) {
+      .piket-toolbar-actions-row {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+      }
+      /* Posisi tombol aksi (Notifikasi, Presensi Manual, Catat Izin) DI ATAS */
+      .piket-toolbar-btns {
+        order: 1;
+        width: 100%;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 6px;
+      }
+      .piket-toolbar-btns .btn {
+        width: 100%;
+        padding: 0 4px !important;
+        font-size: 11px !important;
+        justify-content: center;
+        text-align: center;
+      }
+      /* Posisi Peserta Didik & Guru DI BAWAH tombol aksi */
+      .piket-segmented-tabs {
+        order: 2;
+        width: 100%;
+        display: flex;
+      }
+      .piket-segmented-btn {
+        flex: 1;
+        justify-content: center;
+        height: 32px;
+      }
+      .piket-toolbar-filters-row {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+      }
+      .piket-search-box {
+        max-width: 100%;
+        order: 1;
+      }
+      .piket-chips-strip {
+        order: 2;
+        width: 100%;
+      }
     }
 
     /* ══ TABLE CONTAINER & STATUS PILLS ══ */
