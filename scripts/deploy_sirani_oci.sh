@@ -24,25 +24,25 @@ if [ "$EUID" -ne 0 ]; then
   exit 1
 fi
 
-# 2. Update Sistem & Buka Firewall iptables
-echo -e "\n${YELLOW}[1/7] Memperbarui indeks paket dan membuka port 80 & 443 di firewall...${NC}"
-apt update || true
-apt --fix-broken install -y || true
-apt install -y software-properties-common curl git unzip
+# 2. Bersihkan repositori pihak ketiga yang rusak & buka firewall
+echo -e "\n${YELLOW}[1/7] Membersihkan repositori dan membuka port 80 & 443 di firewall...${NC}"
+rm -f /etc/apt/sources.list.d/google-chrome* /etc/apt/sources.list.d/onlyoffice* 2>/dev/null || true
 
 # Buka port 80 dan 443 di iptables (jika ada)
 iptables -I INPUT 6 -m state --state NEW -p tcp --dport 80 -j ACCEPT 2>/dev/null || true
 iptables -I INPUT 6 -m state --state NEW -p tcp --dport 443 -j ACCEPT 2>/dev/null || true
 
-# 3. Tambahkan Repositori PHP 8.3 & Pasang LEMP Stack
-echo -e "\n${YELLOW}[2/7] Menginstal Nginx, PHP 8.3, dan Ekstensi yang Dibutuhkan...${NC}"
-add-apt-repository ppa:ondrej/php -y || true
-apt update || true
+# 3. Pasang PPA PHP Resmi & LEMP Stack
+echo -e "\n${YELLOW}[2/7] Menambahkan repositori PHP 8.3 dan memasang paket...${NC}"
+apt install -y software-properties-common curl git unzip
+add-apt-repository -y ppa:ondrej/php
+apt update
 
 DEBIAN_FRONTEND=noninteractive apt install -y nginx supervisor \
   php8.3-fpm php8.3-cli php8.3-common php8.3-sqlite3 \
   php8.3-curl php8.3-mbstring php8.3-xml php8.3-zip \
   php8.3-bcmath php8.3-intl php8.3-gd
+
 
 
 systemctl enable nginx
