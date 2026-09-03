@@ -228,7 +228,22 @@
       flex-direction: column;
       gap: 10px;
     }
-    .piket-toolbar-top {
+    .piket-toolbar-actions-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border);
+    }
+    .piket-toolbar-btns {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .piket-toolbar-filters-row {
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -469,34 +484,6 @@
         </div>
       </div>
 
-      {{-- Action Hub: Switcher Peserta Didik & Guru Sejajar dengan Aksi --}}
-      <div class="piket-clean-actions">
-        {{-- Segmented View Switcher (Peserta Didik vs Guru) --}}
-        <div class="piket-segmented-tabs">
-          <button type="button" class="piket-segmented-btn piket-main-btn active" id="btnViewSiswa" onclick="switchMainView('siswa', this)">
-            <i class="bi bi-people-fill"></i> Peserta Didik
-            <span class="piket-segmented-count">{{ $totalSiswaAktif }}</span>
-          </button>
-          <button type="button" class="piket-segmented-btn piket-main-btn" id="btnViewGuru" onclick="switchMainView('guru', this)">
-            <i class="bi bi-person-badge-fill"></i> Guru &amp; Pegawai
-            <span class="piket-segmented-count">{{ $guruBelumHadirList->count() + $absensiGuruHariIni->count() }}</span>
-          </button>
-        </div>
-
-        <div class="piket-btn-divider"></div>
-
-        {{-- Akses Menuju Notifikasi WhatsApp --}}
-        <a href="{{ route('notifikasi.index') }}" class="piket-act-btn piket-act-btn--wa" title="Buka Meja Notifikasi WhatsApp">
-          <i class="bi bi-whatsapp"></i> Notifikasi
-        </a>
-
-        <button type="button" class="piket-act-btn piket-act-btn--primary" onclick="openModal('modalPresensiManual')" title="Input presensi manual siswa / guru">
-          <i class="bi bi-plus-circle-fill"></i> Presensi Manual
-        </button>
-        <button type="button" class="piket-act-btn piket-act-btn--outline" onclick="openModal('modalCatatIzinPiket')" title="Catat perizinan atau surat sakit">
-          <i class="bi bi-envelope-paper-fill"></i> Catat Izin
-        </button>
-      </div>
     </div>
 
     {{-- ══ 2. STRIP PETUGAS PIKET HARI INI ══ --}}
@@ -589,7 +576,35 @@
 
     {{-- ══ 4. UNIFIED CONTROL TOOLBAR ══ --}}
     <div class="piket-unified-toolbar no-print">
-      <div class="piket-toolbar-top">
+      {{-- Baris 1: Tab Switcher Peserta Didik & Guru (Kiri) + Semua Tombol Aksi (Kanan) --}}
+      <div class="piket-toolbar-actions-row">
+        <div class="piket-segmented-tabs">
+          <button type="button" class="piket-segmented-btn piket-main-btn active" id="btnViewSiswa" onclick="switchMainView('siswa', this)">
+            <i class="bi bi-people-fill"></i> Peserta Didik
+            <span class="piket-segmented-count">{{ $totalSiswaAktif }}</span>
+          </button>
+          <button type="button" class="piket-segmented-btn piket-main-btn" id="btnViewGuru" onclick="switchMainView('guru', this)">
+            <i class="bi bi-person-badge-fill"></i> Guru &amp; Pegawai
+            <span class="piket-segmented-count">{{ $guruBelumHadirList->count() + $absensiGuruHariIni->count() }}</span>
+          </button>
+        </div>
+
+        <div class="piket-toolbar-btns">
+          {{-- Akses Menuju Notifikasi WhatsApp --}}
+          <a href="{{ route('notifikasi.index') }}" class="piket-act-btn piket-act-btn--wa" title="Buka Meja Notifikasi WhatsApp">
+            <i class="bi bi-whatsapp"></i> Notifikasi
+          </a>
+          <button type="button" class="piket-act-btn piket-act-btn--primary" onclick="openModal('modalPresensiManual')" title="Input presensi manual siswa / guru">
+            <i class="bi bi-plus-circle-fill"></i> Presensi Manual
+          </button>
+          <button type="button" class="piket-act-btn piket-act-btn--outline" onclick="openModal('modalCatatIzinPiket')" title="Catat perizinan atau surat sakit">
+            <i class="bi bi-envelope-paper-fill"></i> Catat Izin
+          </button>
+        </div>
+      </div>
+
+      {{-- Baris 2: Filter Chips di Kiri, Search Bar di Kanan --}}
+      <div class="piket-toolbar-filters-row">
         {{-- Filter Chips Strip untuk Siswa --}}
         <div id="filterChipsSiswa" class="piket-chips-strip filter-pills">
           <button type="button" class="piket-chip filter-pill active" data-filter="all" onclick="filterSiswaTable('all', this)">
