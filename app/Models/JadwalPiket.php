@@ -54,11 +54,6 @@ class JadwalPiket extends Model
             return false;
         }
 
-        // Kepala Sekolah selalu memiliki hak akses pengawasan
-        if ($guru->jabatan === 'Kepala Sekolah') {
-            return true;
-        }
-
         $hari = self::getHariIndonesia($tanggal);
 
         // Hari Sabtu & Minggu adalah hari libur sekolah (tidak ada tugas piket)

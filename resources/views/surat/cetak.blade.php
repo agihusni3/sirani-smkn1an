@@ -388,8 +388,8 @@
 
     .lampiran-stats-grid {
       display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      gap: 6px;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 5px;
       margin-bottom: 12px;
       font-family: 'Plus Jakarta Sans', sans-serif;
     }
@@ -440,6 +440,56 @@
     @page {
       size: A4 portrait;
       margin: 0;
+    }
+
+    .print-sheet-wrapper {
+      width: 100%;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding-bottom: 30px;
+    }
+
+    @media (max-width: 820px) {
+      body {
+        padding: 10px 0 30px;
+        align-items: stretch;
+        overflow-x: auto;
+      }
+      .print-actions-bar {
+        width: calc(100% - 16px);
+        margin: 0 8px 14px;
+        position: sticky;
+        top: 6px;
+        z-index: 1000;
+        padding: 10px 14px;
+      }
+      .print-title-info {
+        font-size: 12px;
+      }
+      .btn-action-group {
+        width: 100%;
+        display: flex;
+        gap: 8px;
+      }
+      .btn-back {
+        flex: 1;
+        justify-content: center;
+        padding: 8px 10px;
+        font-size: 12px;
+      }
+      .btn-print {
+        flex: 1.5;
+        justify-content: center;
+        padding: 8px 12px;
+        font-size: 12px;
+      }
+      .print-sheet-wrapper {
+        align-items: flex-start;
+        padding: 0 8px 30px;
+      }
     }
 
     @media print {
@@ -525,6 +575,9 @@
     </div>
   </div>
 
+  {{-- WRAPPER LEMBAR CETAK RESMI --}}
+  <div class="print-sheet-wrapper">
+
   {{-- ========================================================
        HALAMAN 1: LEMBAR SURAT RESMI / BERITA ACARA DINAMIS
        ======================================================== --}}
@@ -587,9 +640,9 @@
             <td><strong>{{ $siswa->nama }}</strong></td>
           </tr>
           <tr>
-            <td>Nomor Induk Siswa (NIS)</td>
+            <td>Nomor Induk Siswa Nasional (NISN)</td>
             <td>:</td>
-            <td>{{ $siswa->nis }} / NISN: {{ $siswa->nisn ?: '-' }}</td>
+            <td>{{ $siswa->nisn ?: '-' }}</td>
           </tr>
           <tr>
             <td>Kelas / Keahlian</td>
@@ -639,35 +692,34 @@
       </div>
 
       {{-- 4 TANDA TANGAN (KOLOM SEIMBANG) --}}
-      <div class="ttd-section" style="margin-top:12px;">
+      <div class="ttd-section" style="margin-top:16px;">
         <table class="ttd-table" style="font-size:10pt;">
           <tr>
-            <td style="width:50%; padding-bottom:14px;">
+            <td style="width:50%; padding-bottom:18px;">
               Siswa yang Bersangkutan,
-              <div class="ttd-space" style="height:44px;"></div>
+              <div class="ttd-space" style="height:48px;"></div>
               <div class="ttd-name">{{ $siswa->nama }}</div>
-              <div class="ttd-nip">NIS. {{ $siswa->nis }}</div>
+              <div class="ttd-nip">NISN. {{ $siswa->nisn ?: '-' }}</div>
             </td>
-            <td style="width:50%; padding-bottom:14px;">
+            <td style="width:50%; padding-bottom:18px;">
               Orang Tua / Wali Siswa,
-              <div class="ttd-space" style="height:44px;"></div>
+              <div class="ttd-space" style="height:48px;"></div>
               <div class="ttd-name">{{ $namaWaliHadir }}</div>
-              <div class="ttd-nip">(Tanda Tangan &amp; Nama Terang)</div>
             </td>
           </tr>
           <tr>
             <td style="width:50%;">
               Wali Kelas {{ $rombel->nama_rombel ?? '' }},
-              <div class="ttd-space" style="height:44px;"></div>
-              <div class="ttd-name">{{ $waliKelas ? $waliKelas->nama : '( ........................................ )' }}</div>
-              <div class="ttd-nip">{{ $waliKelas && $waliKelas->nip ? 'NIP. '.$waliKelas->nip : 'NIP. -' }}</div>
+              <div class="ttd-space" style="height:48px;"></div>
+              <div class="ttd-name">{{ $waliKelas ? $waliKelas->nama : ($rombel?->waliKelas?->nama ?? '-') }}</div>
+              <div class="ttd-nip">{{ $waliKelas && $waliKelas->nip ? 'NIP. '.$waliKelas->nip : ($rombel?->waliKelas?->nip ? 'NIP. '.$rombel->waliKelas->nip : 'NIP. -') }}</div>
             </td>
             <td style="width:50%;">
               Mengetahui,<br />
               <strong>Kepala Sekolah</strong>
-              <div class="ttd-space" style="height:44px;"></div>
-              <div class="ttd-name">{{ $sekolah->nama_kepala_sekolah ?: 'Drs. H. Ahmad Sudrajat, M.Pd.' }}</div>
-              <div class="ttd-nip">NIP. {{ $sekolah->nip_kepala_sekolah ?: '19750510 200003 1 005' }}</div>
+              <div class="ttd-space" style="height:48px;"></div>
+              <div class="ttd-name">{{ $sekolah->nama_kepala_sekolah ?: ($sekolah->nama_kepsek ?: 'Drs. H. Ahmad Sudrajat, M.Pd.') }}</div>
+              <div class="ttd-nip">NIP. {{ $sekolah->nip_kepala_sekolah ?: ($sekolah->nip_kepsek ?: '19750510 200003 1 005') }}</div>
             </td>
           </tr>
         </table>
@@ -723,9 +775,9 @@
             <td><strong>{{ $siswa->nama }}</strong></td>
           </tr>
           <tr>
-            <td>NIS / NISN</td>
+            <td>NISN</td>
             <td>:</td>
-            <td>{{ $siswa->nis }} / {{ $siswa->nisn ?: '-' }}</td>
+            <td>{{ $siswa->nisn ?: '-' }}</td>
           </tr>
           <tr>
             <td>Kelas / Rombel</td>
@@ -793,15 +845,15 @@
               Mengetahui,<br />
               <strong>Kepala Sekolah</strong>
               <div class="ttd-space"></div>
-              <div class="ttd-name">{{ $sekolah->nama_kepala_sekolah ?: 'Drs. H. Ahmad Sudrajat, M.Pd.' }}</div>
-              <div class="ttd-nip">NIP. {{ $sekolah->nip_kepala_sekolah ?: '19750510 200003 1 005' }}</div>
+              <div class="ttd-name">{{ $sekolah->nama_kepala_sekolah ?: ($sekolah->nama_kepsek ?: 'Drs. H. Ahmad Sudrajat, M.Pd.') }}</div>
+              <div class="ttd-nip">NIP. {{ $sekolah->nip_kepala_sekolah ?: ($sekolah->nip_kepsek ?: '19750510 200003 1 005') }}</div>
             </td>
             <td>
-              {{ $sekolah->kecamatan }}, {{ \Carbon\Carbon::today()->translatedFormat('d F Y') }}<br />
+              {{ $sekolah->kecamatan ?? 'Air Naningan' }}, {{ \Carbon\Carbon::today()->translatedFormat('d F Y') }}<br />
               <strong>Wali Kelas {{ $rombel->nama_rombel ?? '' }}</strong>
               <div class="ttd-space"></div>
-              <div class="ttd-name">{{ $waliKelas ? $waliKelas->nama : '( ........................................ )' }}</div>
-              <div class="ttd-nip">{{ $waliKelas && $waliKelas->nip ? 'NIP. '.$waliKelas->nip : 'NIP. -' }}</div>
+              <div class="ttd-name">{{ $waliKelas ? $waliKelas->nama : ($rombel?->waliKelas?->nama ?? '-') }}</div>
+              <div class="ttd-nip">{{ $waliKelas && $waliKelas->nip ? 'NIP. '.$waliKelas->nip : ($rombel?->waliKelas?->nip ? 'NIP. '.$rombel->waliKelas->nip : 'NIP. -') }}</div>
             </td>
           </tr>
         </table>
@@ -847,9 +899,9 @@
         <td><strong>{{ $rombel->nama_rombel ?? '-' }}</strong></td>
       </tr>
       <tr>
-        <td>NIS / NISN</td>
+        <td>NISN</td>
         <td>:</td>
-        <td>{{ $siswa->nis }} / {{ $siswa->nisn ?: '-' }}</td>
+        <td>{{ $siswa->nisn ?: '-' }}</td>
         <td>Wali Kelas</td>
         <td>:</td>
         <td>{{ $waliKelas->nama ?? '-' }}</td>
@@ -857,14 +909,14 @@
       <tr>
         <td>Periode Evaluasi</td>
         <td>:</td>
-        <td><strong>Bulan {{ \Carbon\Carbon::createFromFormat('Y-m', $bulanSelected)->translatedFormat('F Y') }}</strong></td>
+        <td><strong>{{ $periodeTeks ?? 'Rekapitulasi Semester Berjalan' }}</strong></td>
         <td>Wali Murid</td>
         <td>:</td>
         <td>{{ $siswa->nama_ortu ?: '-' }}</td>
       </tr>
     </table>
 
-    {{-- 5 KOTAK STATISTIK BULANAN --}}
+    {{-- 6 KOTAK STATISTIK BULANAN & KEDISIPLINAN --}}
     <div class="lampiran-stats-grid">
       <div class="lampiran-stat-box">
         <div class="lampiran-stat-num">{{ $stats['hadir'] }}</div>
@@ -875,12 +927,16 @@
         <div class="lampiran-stat-label">Terlambat</div>
       </div>
       <div class="lampiran-stat-box">
-        <div class="lampiran-stat-num" style="color:#1D4ED8;">{{ $stats['izin'] + $stats['sakit'] }}</div>
+        <div class="lampiran-stat-num" style="color:#1D4ED8;">{{ $stats['izin'] }}</div>
         <div class="lampiran-stat-label">Izin / Sakit</div>
       </div>
       <div class="lampiran-stat-box">
         <div class="lampiran-stat-num" style="color:#DC2626;">{{ $stats['alpha'] }}</div>
-        <div class="lampiran-stat-label">Alpha / Bolos</div>
+        <div class="lampiran-stat-label">Alpha</div>
+      </div>
+      <div class="lampiran-stat-box">
+        <div class="lampiran-stat-num" style="color:#991B1B;">{{ $stats['bolos'] }}</div>
+        <div class="lampiran-stat-label">Bolos</div>
       </div>
       <div class="lampiran-stat-box" style="background:#FEF9C3;">
         <div class="lampiran-stat-num" style="color:#854D0E;">{{ $stats['persen'] }}%</div>
@@ -945,21 +1001,22 @@
           <td>
             Mengetahui,<br />
             <strong>Guru Bimbingan &amp; Konseling (BK)</strong>
-            <div class="ttd-space" style="height:44px;"></div>
-            <div class="ttd-name">( ................................................. )</div>
-            <div class="ttd-nip">NIP. -</div>
+            <div class="ttd-space" style="height:48px;"></div>
+            <div class="ttd-name">{{ $guruBk ? $guruBk->nama : 'Ari Apriansah,S.Pd.' }}</div>
+            <div class="ttd-nip">NIP. {{ $guruBk && $guruBk->nip ? $guruBk->nip : '198704222024211008' }}</div>
           </td>
           <td>
-            {{ $sekolah->kecamatan }}, {{ \Carbon\Carbon::today()->translatedFormat('d F Y') }}<br />
+            {{ $sekolah->kecamatan ?? 'Air Naningan' }}, {{ \Carbon\Carbon::today()->translatedFormat('d F Y') }}<br />
             <strong>Wali Kelas {{ $rombel->nama_rombel ?? '' }}</strong>
-            <div class="ttd-space" style="height:44px;"></div>
-            <div class="ttd-name">{{ $waliKelas ? $waliKelas->nama : '( ................................................. )' }}</div>
-            <div class="ttd-nip">{{ $waliKelas && $waliKelas->nip ? 'NIP. '.$waliKelas->nip : 'NIP. -' }}</div>
+            <div class="ttd-space" style="height:48px;"></div>
+            <div class="ttd-name">{{ $waliKelas ? $waliKelas->nama : ($rombel?->waliKelas?->nama ?? '-') }}</div>
+            <div class="ttd-nip">{{ $waliKelas && $waliKelas->nip ? 'NIP. '.$waliKelas->nip : ($rombel?->waliKelas?->nip ? 'NIP. '.$rombel->waliKelas->nip : 'NIP. -') }}</div>
           </td>
         </tr>
       </table>
     </div>
 
+  </div>
   </div>
 
   {{-- JAVASCRIPT LOGIC --}}

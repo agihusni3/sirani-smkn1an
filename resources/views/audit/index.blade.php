@@ -3,284 +3,436 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Audit Trail — SIRANI</title>
+  <title>Audit Trail &amp; Log Aktivitas — SIRANI</title>
   @include('partials.styles')
   <style>
-    .audit-filters {
+    /* ── Executive Audit Page Styling ── */
+    .audit-kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .audit-kpi-card {
       background: var(--bg-2);
       border: 1px solid var(--border);
       border-radius: var(--r-md);
-      padding: 18px 20px;
-      margin-bottom: 24px;
+      padding: 16px 20px;
       display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-      align-items: flex-end;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      box-shadow: var(--shadow-sm);
+      transition: all .2s ease;
     }
-    .audit-filters .f-group {
+    .audit-kpi-card:hover {
+      border-color: var(--border-2);
+      transform: translateY(-2px);
+    }
+
+    .audit-kpi-info {
       display: flex;
       flex-direction: column;
-      gap: 5px;
-      flex: 1;
-      min-width: 150px;
+      gap: 4px;
     }
-    .audit-filters label {
+    .audit-kpi-lbl {
       font-size: 11px;
-      font-weight: 700;
+      font-weight: 800;
       text-transform: uppercase;
-      letter-spacing: 0.5px;
-      color: var(--text-2);
+      letter-spacing: 0.6px;
+      color: var(--text-3);
     }
-    .audit-filters select,
-    .audit-filters input {
+    .audit-kpi-val {
+      font-size: 26px;
+      font-weight: 900;
+      font-family: var(--font-mono);
+      color: var(--text);
+      line-height: 1.1;
+    }
+    .audit-kpi-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
       background: var(--bg-3);
       border: 1px solid var(--border-2);
-      color: var(--text);
-      padding: 8px 12px;
-      border-radius: var(--r-sm);
-      font-size: 13px;
-    }
-    .audit-table { width: 100%; border-collapse: collapse; }
-    .audit-table th {
-      text-align: left;
-      font-size: 10.5px;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      color: var(--text-2);
-      padding: 10px 14px;
-      border-bottom: 1px solid var(--border-2);
-      background: var(--bg-3);
-    }
-    .audit-table td {
-      padding: 11px 14px;
-      border-bottom: 1px solid var(--border);
-      font-size: 13px;
-      vertical-align: top;
-    }
-    .audit-table tr:hover td { background: var(--surface); }
-
-    /* Badge Aksi */
-    .badge-aksi {
-      display: inline-block;
-      font-size: 10.5px;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: 0.4px;
-      padding: 3px 9px;
-      border-radius: 20px;
-      white-space: nowrap;
-    }
-    .badge-create   { background: rgba(22,163,74,0.12);  color: #16A34A; }
-    .badge-update   { background: rgba(59,130,246,0.12); color: #2563EB; }
-    .badge-delete   { background: rgba(220,38,38,0.1);   color: #DC2626; }
-    .badge-transisi { background: rgba(139,92,246,0.12); color: #7C3AED; }
-    .badge-koreksi  { background: rgba(245,158,11,0.12); color: #D97706; }
-    .badge-scan     { background: rgba(20,184,166,0.12); color: #0D9488; }
-    .badge-login    { background: rgba(202,138,4,0.12);  color: #CA8A04; }
-    .badge-logout   { background: rgba(100,116,139,0.1); color: #64748B; }
-    .badge-default  { background: var(--bg-3); color: var(--text-2); }
-
-    .modul-badge {
-      display: inline-block;
-      font-size: 10px;
-      font-weight: 700;
-      padding: 2px 8px;
-      border-radius: 6px;
-      background: var(--bg-3);
-      color: var(--text-2);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-    .detail-link {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      font-size: 12px;
-      color: var(--gold);
-      text-decoration: none;
-      font-weight: 600;
-    }
-    .detail-link:hover { text-decoration: underline; }
-
-    .stat-strip {
       display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-      margin-bottom: 20px;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      color: var(--text);
+      flex-shrink: 0;
     }
-    .stat-chip {
+
+    /* ── Main Panel & Toolbar ── */
+    .audit-panel {
       background: var(--bg-2);
       border: 1px solid var(--border);
-      border-radius: var(--r-sm);
-      padding: 10px 16px;
+      border-radius: var(--r-lg);
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+      margin-bottom: 30px;
+    }
+
+    .audit-panel-header {
+      padding: 18px 22px;
+      background: var(--bg-2);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .audit-panel-title {
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--text);
       display: flex;
       align-items: center;
       gap: 10px;
+    }
+
+    .audit-filter-bar {
+      padding: 14px 22px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      display: grid;
+      grid-template-columns: 2fr 1.2fr 1.2fr 1.4fr auto;
+      gap: 10px;
+      align-items: center;
+    }
+    @media (max-width: 1024px) {
+      .audit-filter-bar {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+    @media (max-width: 640px) {
+      .audit-filter-bar {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .audit-filter-input {
+      width: 100%;
+      height: 38px;
+      background: var(--bg-2);
+      border: 1.5px solid var(--border-2);
+      border-radius: var(--r-sm);
+      padding: 0 12px;
       font-size: 13px;
+      color: var(--text);
+      transition: all .15s ease;
     }
-    .stat-chip .val {
-      font-size: 20px;
-      font-weight: 900;
-      color: var(--gold);
+    .audit-filter-input:focus {
+      border-color: var(--text);
+      box-shadow: 0 0 0 2px var(--border-2);
     }
-    .stat-chip .lbl { color: var(--text-2); font-size: 12px; }
+
+    /* ── Table Styling ── */
+    .audit-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+    }
+    .audit-table th {
+      background: var(--bg-3);
+      color: var(--text-2);
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      padding: 12px 18px;
+      border-bottom: 1.5px solid var(--border-2);
+      white-space: nowrap;
+    }
+    .audit-table td {
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--border);
+      font-size: 13px;
+      vertical-align: middle;
+      color: var(--text);
+    }
+    .audit-table tr:hover td {
+      background: var(--surface);
+    }
+
+    /* ── Badges ── */
+    .badge-aksi {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.3px;
+      padding: 4px 10px;
+      border-radius: 20px;
+      white-space: nowrap;
+      border: 1px solid transparent;
+    }
+    .badge-create        { background: rgba(34, 197, 94, 0.12);  color: #16A34A; border-color: rgba(34, 197, 94, 0.25); }
+    .badge-update        { background: rgba(59, 130, 246, 0.12); color: #2563EB; border-color: rgba(59, 130, 246, 0.25); }
+    .badge-delete        { background: rgba(239, 68, 68, 0.12);  color: #DC2626; border-color: rgba(239, 68, 68, 0.25); }
+    .badge-transisi      { background: rgba(168, 85, 247, 0.12); color: #9333EA; border-color: rgba(168, 85, 247, 0.25); }
+    .badge-koreksi       { background: rgba(245, 158, 11, 0.12); color: #D97706; border-color: rgba(245, 158, 11, 0.25); }
+    .badge-scan          { background: rgba(6, 182, 212, 0.12);  color: #0891B2; border-color: rgba(6, 182, 212, 0.25); }
+    .badge-login         { background: rgba(234, 179, 8, 0.12);  color: #CA8A04; border-color: rgba(234, 179, 8, 0.25); }
+    .badge-face          { background: rgba(99, 102, 241, 0.12); color: #4F46E5; border-color: rgba(99, 102, 241, 0.25); }
+    .badge-logout        { background: rgba(107, 114, 128, 0.12);color: #4B5563; border-color: rgba(107, 114, 128, 0.25); }
+    .badge-gerbang-buka  { background: rgba(16, 185, 129, 0.14); color: #059669; border-color: rgba(16, 185, 129, 0.30); }
+    .badge-gerbang-tutup { background: rgba(244, 63, 94, 0.14);  color: #E11D48; border-color: rgba(244, 63, 94, 0.30); }
+    .badge-default       { background: var(--bg-3); color: var(--text-2); border-color: var(--border-2); }
+
+    [data-theme="dark"] .badge-create        { color: #4ADE80 !important; background: rgba(74, 222, 128, 0.16) !important; border-color: rgba(74, 222, 128, 0.3) !important; }
+    [data-theme="dark"] .badge-update        { color: #60A5FA !important; background: rgba(96, 165, 250, 0.16) !important; border-color: rgba(96, 165, 250, 0.3) !important; }
+    [data-theme="dark"] .badge-delete        { color: #F87171 !important; background: rgba(248, 113, 113, 0.16) !important; border-color: rgba(248, 113, 113, 0.3) !important; }
+    [data-theme="dark"] .badge-transisi      { color: #C084FC !important; background: rgba(192, 132, 252, 0.16) !important; border-color: rgba(192, 132, 252, 0.3) !important; }
+    [data-theme="dark"] .badge-koreksi       { color: #FBBF24 !important; background: rgba(251, 191, 36, 0.16) !important; border-color: rgba(251, 191, 36, 0.3) !important; }
+    [data-theme="dark"] .badge-scan          { color: #22D3EE !important; background: rgba(34, 211, 238, 0.16) !important; border-color: rgba(34, 211, 238, 0.3) !important; }
+    [data-theme="dark"] .badge-login         { color: #FDE047 !important; background: rgba(253, 224, 71, 0.16) !important; border-color: rgba(253, 224, 71, 0.3) !important; }
+    [data-theme="dark"] .badge-face          { color: #818CF8 !important; background: rgba(129, 140, 248, 0.16) !important; border-color: rgba(129, 140, 248, 0.3) !important; }
+    [data-theme="dark"] .badge-logout        { color: #9CA3AF !important; background: rgba(156, 163, 175, 0.16) !important; border-color: rgba(156, 163, 175, 0.3) !important; }
+    [data-theme="dark"] .badge-gerbang-buka  { color: #34D399 !important; background: rgba(52, 211, 153, 0.16) !important; border-color: rgba(52, 211, 153, 0.3) !important; }
+    [data-theme="dark"] .badge-gerbang-tutup { color: #FB7185 !important; background: rgba(251, 113, 133, 0.16) !important; border-color: rgba(251, 113, 133, 0.3) !important; }
+
+    .modul-capsule {
+      display: inline-flex;
+      align-items: center;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 10.5px;
+      font-weight: 800;
+      font-family: var(--font-mono);
+      background: var(--bg-3);
+      color: var(--text-2);
+      border: 1px solid var(--border-2);
+      text-transform: uppercase;
+    }
+
+    .btn-detail-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: var(--bg-3);
+      border: 1px solid var(--border-2);
+      color: var(--text);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      transition: all .15s ease;
+      font-size: 14px;
+    }
+    .btn-detail-icon:hover {
+      background: var(--text);
+      color: var(--bg);
+      border-color: var(--text);
+      transform: scale(1.05);
+    }
   </style>
+</head>
 <body>
 <div class="app-container">
   @include('partials.sidebar')
 
   <main class="main-content">
-    {{-- Header --}}
-    <header class="header" style="margin-bottom:20px;">
-      <div class="header-title">
-        <h1 style="margin:0; font-size:22px; display:flex; align-items:center; gap:8px;">
-          <i class="bi bi-shield-lock-fill" style="color:var(--gold);"></i> Audit Trail &amp; Log Aktivitas
-        </h1>
-        <p style="margin-top:2px; font-size:13px; color:var(--text-3);">
-          Riwayat seluruh perubahan data, transisi akademik, koreksi absensi, dan aktivitas sistem.
-        </p>
-      </div>
-      @include('partials.header_actions')
-    </header>
+    {{-- ULTRA COMPACT SLIM HEADER BAR --}}
+    <div class="panel no-print" style="background:var(--bg-2); border:1px solid var(--border); padding:10px 16px; margin-bottom:12px; border-radius:var(--r-md); box-shadow:var(--shadow-sm);">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+        <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+          <h1 style="margin:0; font-size:16px; font-weight:900; color:var(--text); display:inline-flex; align-items:center; gap:6px;">
+            <i class="bi bi-shield-lock-fill" style="color:#000000; font-size:16px;"></i> Audit Trail &amp; Log Aktivitas
+          </h1>
+          <span style="color:var(--border-2); font-weight:300;">|</span>
+          <span style="font-size:11.5px; color:var(--text-3);">
+            Rekam jejak mutasi data, sesi smart gate, &amp; keamanan sistem
+          </span>
+        </div>
 
-    {{-- Stat Strip --}}
+        <div style="display:flex; align-items:center; gap:8px;">
+          @include('partials.header_actions')
+        </div>
+      </div>
+    </div>
+
+    {{-- 3 Executive KPI Cards --}}
     @php
       $totalHariIni = \App\Models\AuditLog::whereDate('created_at', today())->count();
       $totalMingguIni = \App\Models\AuditLog::whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()])->count();
       $totalAll = \App\Models\AuditLog::count();
     @endphp
-    <div class="stat-strip">
-      <div class="stat-chip">
-        <i class="bi bi-calendar-day" style="color:var(--gold); font-size:18px;"></i>
-        <div>
-          <div class="val">{{ $totalHariIni }}</div>
-          <div class="lbl">Log hari ini</div>
+    <div class="audit-kpi-grid">
+      <div class="audit-kpi-card">
+        <div class="audit-kpi-info">
+          <div class="audit-kpi-lbl">Log Hari Ini</div>
+          <div class="audit-kpi-val">{{ number_format($totalHariIni) }}</div>
+        </div>
+        <div class="audit-kpi-icon">
+          <i class="bi bi-calendar2-day-fill"></i>
         </div>
       </div>
-      <div class="stat-chip">
-        <i class="bi bi-calendar-week" style="color:#3B82F6; font-size:18px;"></i>
-        <div>
-          <div class="val">{{ $totalMingguIni }}</div>
-          <div class="lbl">Minggu ini</div>
+
+      <div class="audit-kpi-card">
+        <div class="audit-kpi-info">
+          <div class="audit-kpi-lbl">Log Minggu Ini</div>
+          <div class="audit-kpi-val">{{ number_format($totalMingguIni) }}</div>
+        </div>
+        <div class="audit-kpi-icon">
+          <i class="bi bi-calendar2-week-fill"></i>
         </div>
       </div>
-      <div class="stat-chip">
-        <i class="bi bi-database" style="color:#10B981; font-size:18px;"></i>
-        <div>
-          <div class="val">{{ number_format($totalAll) }}</div>
-          <div class="lbl">Total log</div>
+
+      <div class="audit-kpi-card">
+        <div class="audit-kpi-info">
+          <div class="audit-kpi-lbl">Total Riwayat Log</div>
+          <div class="audit-kpi-val">{{ number_format($totalAll) }}</div>
+        </div>
+        <div class="audit-kpi-icon">
+          <i class="bi bi-database-fill-check"></i>
         </div>
       </div>
     </div>
 
-    {{-- Tabel Log & Filter Terpadu --}}
-    <div class="panel" style="overflow:hidden; padding:0; border:1px solid var(--border); border-radius:var(--r-md); box-shadow:var(--shadow-sm); background:var(--bg-2); margin-bottom:24px;">
-      <div style="padding:14px 18px; border-bottom:1px solid var(--border); background:var(--surface); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
-        <div style="font-weight:800; font-size:15px; color:var(--text); display:flex; align-items:center; gap:8px;">
-          <i class="bi bi-shield-lock-fill" style="color:var(--gold);"></i>
-          <span>Daftar Riwayat Aktivitas &amp; Audit Trail</span>
+    {{-- Panel Utama Audit Trail --}}
+    <div class="audit-panel">
+      <div class="audit-panel-header">
+        <div class="audit-panel-title">
+          <i class="bi bi-list-columns-reverse"></i>
+          <span>Daftar Riwayat Aktivitas &amp; Integritas Data</span>
+        </div>
+        <div style="font-size:12px; color:var(--text-3); font-family:var(--font-mono);">
+          Menampilkan <strong>{{ $logs->count() }}</strong> dari <strong>{{ $logs->total() }}</strong> entri log
         </div>
       </div>
 
       {{-- Toolbar Filter Terpadu --}}
-      <div style="padding:12px 18px; border-bottom:1px solid var(--border); background:var(--surface);">
-        <form method="GET" action="{{ route('audit.index') }}" style="display:flex; flex-wrap:wrap; gap:8px; align-items:center;">
-          <div style="flex:1.5; min-width:180px;">
-            <input type="text" name="cari" placeholder="Cari deskripsi log..." value="{{ $filters['cari'] ?? '' }}" class="input-field" style="width:100%; height:36px; font-size:12px; background:var(--bg-2); border:1px solid var(--border-2); border-radius:var(--r-sm); padding:0 12px;" />
-          </div>
+      <form method="GET" action="{{ route('audit.index') }}" class="audit-filter-bar">
+        <div>
+          <input 
+            type="text" 
+            name="cari" 
+            placeholder="Cari kata kunci deskripsi log..." 
+            value="{{ $filters['cari'] ?? '' }}" 
+            class="audit-filter-input" 
+          />
+        </div>
 
-          <div style="min-width:130px;">
-            <select name="modul" class="input-field" style="width:100%; height:36px; font-size:12px; background:var(--bg-2); border:1px solid var(--border-2); border-radius:var(--r-sm);" onchange="this.form.submit()">
-              <option value="">Semua Modul</option>
-              @foreach($modulOptions as $m)
-                <option value="{{ $m }}" @selected(($filters['modul'] ?? '') === $m)>{{ ucfirst($m) }}</option>
-              @endforeach
-            </select>
-          </div>
+        <div>
+          <select name="modul" class="audit-filter-input" onchange="this.form.submit()">
+            <option value="">Semua Modul</option>
+            @foreach($modulOptions as $m)
+              <option value="{{ $m }}" @selected(($filters['modul'] ?? '') === $m)>{{ strtoupper($m) }}</option>
+            @endforeach
+          </select>
+        </div>
 
-          <div style="min-width:130px;">
-            <select name="aksi" class="input-field" style="width:100%; height:36px; font-size:12px; background:var(--bg-2); border:1px solid var(--border-2); border-radius:var(--r-sm);" onchange="this.form.submit()">
-              <option value="">Semua Aksi</option>
-              @foreach($aksiOptions as $a)
-                <option value="{{ $a }}" @selected(($filters['aksi'] ?? '') === $a)>{{ ucfirst($a) }}</option>
-              @endforeach
-            </select>
-          </div>
+        <div>
+          <select name="aksi" class="audit-filter-input" onchange="this.form.submit()">
+            <option value="">Semua Aksi</option>
+            @foreach($aksiOptions as $a)
+              <option value="{{ $a }}" @selected(($filters['aksi'] ?? '') === $a)>{{ ucwords(str_replace('_', ' ', $a)) }}</option>
+            @endforeach
+          </select>
+        </div>
 
-          <div style="min-width:140px;">
-            <select name="user_id" class="input-field" style="width:100%; height:36px; font-size:12px; background:var(--bg-2); border:1px solid var(--border-2); border-radius:var(--r-sm);" onchange="this.form.submit()">
-              <option value="">Semua Pengguna</option>
-              @foreach($users as $u)
-                <option value="{{ $u->id }}" @selected(($filters['user_id'] ?? '') == $u->id)>{{ $u->name }}</option>
-              @endforeach
-            </select>
-          </div>
+        <div>
+          <select name="user_id" class="audit-filter-input" onchange="this.form.submit()">
+            <option value="">Semua Pengguna</option>
+            @foreach($users as $u)
+              <option value="{{ $u->id }}" @selected(($filters['user_id'] ?? '') == $u->id)>{{ $u->name }}</option>
+            @endforeach
+          </select>
+        </div>
 
-          <button type="submit" class="btn btn-outline" style="height:36px; padding:0 12px; font-size:12px; font-weight:700;">
-            <i class="bi bi-search"></i> Cari
+        <div style="display: flex; gap: 8px;">
+          <button type="submit" class="btn btn-primary" style="height:38px; padding:0 14px; font-size:12.5px; font-weight:800; display:inline-flex; align-items:center; gap:6px;">
+            <i class="bi bi-search"></i> Filter
           </button>
 
           @if(!empty($filters['cari']) || !empty($filters['modul']) || !empty($filters['aksi']) || !empty($filters['user_id']) || !empty($filters['dari']) || !empty($filters['sampai']))
-            <a href="{{ route('audit.index') }}" class="btn btn-outline" style="height:36px; padding:0 10px; font-size:12px; color:var(--red); border-color:rgba(239,68,68,0.4);" title="Reset Filter">
-              Reset
+            <a href="{{ route('audit.index') }}" class="btn btn-outline" style="height:38px; padding:0 12px; font-size:12.5px; font-weight:700; color:var(--red); border-color:rgba(239,68,68,0.4);" title="Reset Filter">
+              <i class="bi bi-x-circle"></i>
             </a>
           @endif
-        </form>
-      </div>
+        </div>
+      </form>
 
+      {{-- Tabel Riwayat --}}
       <div style="overflow-x:auto;">
         <table class="audit-table">
           <thead>
             <tr>
-              <th style="width:160px;">Waktu</th>
-              <th style="width:100px;">Aksi</th>
-              <th style="width:90px;">Modul</th>
-              <th>Deskripsi</th>
-              <th style="width:140px;">Pengguna</th>
-              <th style="width:60px;"></th>
+              <th style="width: 150px;">Waktu &amp; Tanggal</th>
+              <th style="width: 140px;">Aksi</th>
+              <th style="width: 110px;">Modul</th>
+              <th>Deskripsi Aktivitas</th>
+              <th style="width: 220px;">Pengguna &amp; IP Address</th>
+              <th style="width: 60px; text-align: center;">Detail</th>
             </tr>
           </thead>
           <tbody>
             @forelse($logs as $log)
               <tr>
-                <td style="white-space:nowrap; color:var(--text-2); font-size:12px;">
-                  {{ $log->created_at->timezone('Asia/Jakarta')->format('d M Y') }}<br>
-                  <span style="color:var(--text-3);">{{ $log->created_at->timezone('Asia/Jakarta')->format('H:i:s') }} WIB</span>
+                <td>
+                  <div style="font-weight: 700; font-size: 12.5px; color: var(--text);">
+                    {{ $log->created_at->timezone('Asia/Jakarta')->format('d M Y') }}
+                  </div>
+                  <div style="font-family: var(--font-mono); font-size: 11px; color: var(--text-3); margin-top: 2px;">
+                    {{ $log->created_at->timezone('Asia/Jakarta')->format('H:i:s') }} WIB
+                  </div>
                 </td>
                 <td>
-                  <span class="badge-aksi {{ $log->badgeClass() }}">{{ $log->aksiLabel() }}</span>
+                  <span class="badge-aksi {{ $log->badgeClass() }}">
+                    {{ $log->aksiLabel() }}
+                  </span>
                 </td>
                 <td>
-                  <span class="modul-badge">{{ $log->modul }}</span>
+                  <span class="modul-capsule">{{ $log->modul }}</span>
                 </td>
-                <td style="color:var(--text); line-height:1.5;">
-                  {{ $log->deskripsi }}
+                <td>
+                  <div style="font-size: 13px; color: var(--text); line-height: 1.45;">
+                    {{ $log->deskripsi }}
+                  </div>
                   @if($log->target_type && $log->target_id)
-                    <br><span style="font-size:11px; color:var(--text-3);">{{ $log->target_type }} #{{ $log->target_id }}</span>
+                    <div style="font-size: 11px; font-family: var(--font-mono); color: var(--text-3); margin-top: 3px;">
+                      Ref: {{ $log->target_type }} #{{ $log->target_id }}
+                    </div>
                   @endif
                 </td>
                 <td>
                   @if($log->user)
-                    <div style="font-size:13px; font-weight:600;">{{ $log->user->name }}</div>
-                    <div style="font-size:11px; color:var(--text-3);">{{ $log->ip_address }}</div>
+                    <div style="font-weight: 700; font-size: 12.5px; color: var(--text);">
+                      {{ $log->user->name }}
+                    </div>
+                    <div style="display: inline-flex; align-items: center; gap: 4px; font-family: var(--font-mono); font-size: 10.5px; color: var(--text-3); margin-top: 2px; background: var(--bg-3); padding: 1px 6px; border-radius: 4px; border: 1px solid var(--border-2);">
+                      <i class="bi bi-hdd-network"></i> {{ $log->ip_address ?? '127.0.0.1' }}
+                    </div>
                   @else
-                    <span style="color:var(--text-3); font-size:12px;">Sistem / Face ID</span>
+                    <div style="font-weight: 700; font-size: 12.5px; color: var(--text-2);">
+                      Sistem Otomatis
+                    </div>
+                    <div style="display: inline-flex; align-items: center; gap: 4px; font-family: var(--font-mono); font-size: 10.5px; color: var(--text-3); margin-top: 2px; background: var(--bg-3); padding: 1px 6px; border-radius: 4px; border: 1px solid var(--border-2);">
+                      <i class="bi bi-camera-video-fill"></i> Smart Gate Kiosk
+                    </div>
                   @endif
                 </td>
-                <td>
+                <td style="text-align: center;">
                   @if($log->data_lama || $log->data_baru)
-                    <a href="{{ route('audit.show', $log->id) }}" class="detail-link" title="Lihat perubahan data">
-                      <i class="bi bi-eye"></i>
+                    <a href="{{ route('audit.show', $log->id) }}" class="btn-detail-icon" title="Lihat Rekam Perubahan Data">
+                      <i class="bi bi-eye-fill"></i>
                     </a>
+                  @else
+                    <span style="color: var(--text-3); font-size: 12px;">—</span>
                   @endif
                 </td>
               </tr>
             @empty
               <tr>
-                <td colspan="6" style="text-align:center; padding:40px; color:var(--text-3);">
-                  <i class="bi bi-inbox" style="font-size:32px; display:block; margin-bottom:8px;"></i>
-                  Tidak ada log yang sesuai filter.
+                <td colspan="6" style="text-align: center; padding: 48px 20px; color: var(--text-3);">
+                  <i class="bi bi-shield-check" style="font-size: 40px; display: block; margin-bottom: 12px; color: var(--text-3);"></i>
+                  <div style="font-weight: 700; font-size: 14px; color: var(--text-2); margin-bottom: 4px;">Tidak Ada Log Aktivitas</div>
+                  <p style="font-size: 12px; color: var(--text-3); margin: 0;">Tidak ditemukan catatan log dengan kriteria filter saat ini.</p>
                 </td>
               </tr>
             @endforelse
@@ -288,8 +440,12 @@
         </table>
       </div>
 
+      {{-- Pagination --}}
       @if($logs->hasPages())
-        <div style="padding:16px 20px; border-top:1px solid var(--border);">
+        <div style="padding: 16px 22px; border-top: 1px solid var(--border); background: var(--bg-2); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+          <div style="font-size: 12px; color: var(--text-3);">
+            Menampilkan halaman <strong>{{ $logs->currentPage() }}</strong> dari <strong>{{ $logs->lastPage() }}</strong>
+          </div>
           {{ $logs->links('partials.pagination') }}
         </div>
       @endif

@@ -30,8 +30,8 @@
       display: none;
     }
     .segmented-control input[type="radio"]:checked + label {
-      background: linear-gradient(135deg, var(--gold), var(--gold-2));
-      color: #0F172A;
+      background: #000000;
+      color: #FFFFFF;
       box-shadow: var(--shadow-sm);
     }
 
@@ -54,8 +54,8 @@
       user-select: none;
     }
     .picker-trigger:hover, .picker-trigger.focused {
-      border-color: var(--gold);
-      box-shadow: 0 0 0 2px var(--gold-glow);
+      border-color: #000000;
+      box-shadow: 0 0 0 2px rgba(0,0,0,0.15);
     }
     .btn-clear-selection {
       background: transparent;
@@ -147,13 +147,24 @@
 <div class="app-container">
   @include('partials.sidebar')
   <main class="main-content">
-    <header class="header">
-      <div class="header-title">
-        <h1><i class="bi bi-keyboard-fill" style="color:var(--gold); margin-right:8px;"></i>Presensi Manual</h1>
-        <p>Pencatatan presensi masuk dan pulang secara manual bagi siswa atau guru yang terkendala pemindaian Face ID.</p>
+    {{-- ULTRA COMPACT SLIM HEADER BAR --}}
+    <div class="panel no-print" style="background:var(--bg-2); border:1px solid var(--border); padding:10px 16px; margin-bottom:12px; border-radius:var(--r-md); box-shadow:var(--shadow-sm);">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+        <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+          <h1 style="margin:0; font-size:16px; font-weight:900; color:var(--text); display:inline-flex; align-items:center; gap:6px;">
+            <i class="bi bi-keyboard-fill" style="color:#000000; font-size:16px;"></i> Presensi Manual
+          </h1>
+          <span style="color:var(--border-2); font-weight:300;">|</span>
+          <span style="font-size:11.5px; color:var(--text-3);">
+            Pencatatan presensi darurat siswa &amp; guru
+          </span>
+        </div>
+
+        <div style="display:flex; align-items:center; gap:8px;">
+          @include('partials.header_actions')
+        </div>
       </div>
-      @include('partials.header_actions')
-    </header>
+    </div>
 
     @if(session('success'))<div class="alert-success" style="margin-bottom:18px;"><i class="bi bi-check-circle-fill" style="margin-right:6px;"></i>{{ session('success') }}</div>@endif
     @if(session('error'))<div class="alert-error" style="margin-bottom:18px;"><i class="bi bi-exclamation-triangle-fill" style="margin-right:6px;"></i>{{ session('error') }}</div>@endif
@@ -188,10 +199,10 @@
             <div id="pickerTrigger" class="picker-trigger" style="height:42px; background:var(--bg-3);" onclick="togglePickerDropdown()">
               <div id="selectedView" style="display:none; align-items:center; justify-content:space-between; width:100%;">
                 <div style="display:flex; align-items:center; gap:8px; overflow:hidden;">
-                  <img id="selectedFoto" src="" alt="Foto" style="width:26px; height:26px; border-radius:50%; object-fit:cover; border:1.5px solid var(--gold); flex-shrink:0;" />
+                  <img id="selectedFoto" src="" alt="Foto" style="width:26px; height:26px; border-radius:50%; object-fit:cover; border:1.5px solid rgba(0,0,0,0.15); flex-shrink:0;" />
                   <div style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
                     <strong id="selectedNama" style="color:var(--text); font-size:13px;"></strong>
-                    <span id="selectedMeta" style="font-size:11px; color:var(--gold); font-family:var(--font-mono); margin-left:6px; font-weight:700;"></span>
+                    <span id="selectedMeta" style="font-size:11px; color:#000000; font-family:var(--font-mono); margin-left:6px; font-weight:700;"></span>
                   </div>
                 </div>
                 <button type="button" class="btn-clear-selection" onclick="clearSelection(event)">
@@ -220,20 +231,20 @@
                   <div class="picker-item" 
                        data-id="{{ $s->id }}" 
                        data-nama="{{ strtolower($s->nama) }}" 
-                       data-nis="{{ strtolower($s->nis) }}" 
+                       data-nisn="{{ strtolower($s->nisn ?? '') }}" 
                        data-rombel="{{ strtolower($rombelNama) }}" 
-                       onclick="selectPickerItem('{{ $s->id }}', '{{ addslashes($s->nama) }}', 'NIS: {{ $s->nis }} · {{ $rombelNama }}', '{{ $s->foto_url }}')">
+                       onclick="selectPickerItem('{{ $s->id }}', '{{ addslashes($s->nama) }}', 'NISN: {{ $s->nisn ?: '-' }} · {{ $rombelNama }}', '{{ $s->foto_url }}')">
                     <div style="display:flex; align-items:center; gap:10px;">
                       <div class="avatar-circle avatar-sm gold-border">
                         <img src="{{ $s->foto_url }}" alt="{{ $s->nama }}" class="avatar-img" />
                       </div>
                       <div>
                         <div style="font-weight:700; font-size:13px; color:var(--text);">{{ $s->nama }}</div>
-                        <div style="font-size:11px; color:var(--text-3); font-family:var(--font-mono);">NIS: {{ $s->nis }}</div>
+                        <div style="font-size:11px; color:var(--text-3); font-family:var(--font-mono);">NISN: {{ $s->nisn ?: '-' }}</div>
                       </div>
                     </div>
                     <div style="text-align:right; flex-shrink:0;">
-                      <span class="btn btn-outline" style="padding:2px 8px; font-size:11px; pointer-events:none; font-weight:700; color:var(--gold); border-color:rgba(202,138,4,0.3);">
+                      <span class="btn btn-outline" style="padding:2px 8px; font-size:11px; pointer-events:none; font-weight:700; color:#000000; border-color:rgba(0,0,0,0.2);">
                         {{ $rombelNama }}
                       </span>
                     </div>
@@ -307,13 +318,13 @@
     <div class="panel">
       <div class="panel-title" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
         <div style="display:flex; align-items:center; gap:8px;">
-          <span><i class="bi bi-journal-text" style="color:var(--gold); margin-right:4px;"></i>Log Presensi Manual Hari Ini</span>
-          <span style="font-family:var(--font-mono);font-size:12px;color:var(--gold);font-weight:600;" id="logCountBadge">
+          <span><i class="bi bi-journal-text" style="color:#000000; margin-right:4px;"></i>Log Presensi Manual Hari Ini</span>
+          <span style="font-family:var(--font-mono);font-size:12px;color:#000000;font-weight:700;" id="logCountBadge">
             {{ $presensiManualHariIni->count() }} Entri
           </span>
         </div>
         <div style="position:relative; width:280px;">
-          <i class="bi bi-search" style="position:absolute; left:12px; top:50%; transform:translateY(-50%); color:var(--gold); font-size:12px;"></i>
+          <i class="bi bi-search" style="position:absolute; left:12px; top:50%; transform:translateY(-50%); color:#000000; font-size:12px;"></i>
           <input type="text" placeholder="Cari nama, rombel, status..." oninput="filterLogPresensi(this.value)" style="width:100%; padding-left:34px; height:36px; font-size:12px; border-radius:var(--r-sm);" />
         </div>
       </div>
@@ -336,7 +347,7 @@
               @php
                 $isSiswa = ($log->pemilik_type === 'siswa');
                 $nama = $isSiswa ? ($log->siswa->nama ?? '-') : ($log->guru->nama ?? '-');
-                $identitas = $isSiswa ? ($log->siswa->nis ?? '-') : ($log->guru->nip ?? '-');
+                $identitas = $isSiswa ? ($log->siswa->nisn ?? '-') : ($log->guru->nip ?? '-');
                 $rombelJabatan = $isSiswa 
                   ? (($log->siswaRombel && $log->siswaRombel->rombel) ? $log->siswaRombel->rombel->nama_rombel : 'Tanpa Rombel')
                   : ($log->guru->jabatan ?? '-');
@@ -345,7 +356,7 @@
               <tr>
                 <td style="font-family:var(--font-mono); color:var(--text-3); font-size:12px;">{{ $log->created_at->format('H:i:s') }}</td>
                 <td>
-                  <span class="btn btn-outline" style="padding:2px 8px; font-size:10px; pointer-events:none; border-color:{{ $isSiswa ? 'rgba(202,138,4,0.3)' : 'rgba(59,130,246,0.3)' }}; color:{{ $isSiswa ? 'var(--gold)' : 'var(--navy)' }};">
+                  <span class="btn btn-outline" style="padding:2px 8px; font-size:10px; pointer-events:none; border-color:{{ $isSiswa ? 'rgba(0,0,0,0.2)' : 'rgba(59,130,246,0.3)' }}; color:{{ $isSiswa ? '#000000' : 'var(--navy)' }}; font-weight:700;">
                     {{ $isSiswa ? 'SISWA' : 'GURU/STAF' }}
                   </span>
                 </td>
@@ -486,10 +497,10 @@
     items.forEach(item => {
       let match = false;
       if (activeKategori === 'siswa') {
-        const nama = item.getAttribute('data-nama');
-        const nis = item.getAttribute('data-nis');
-        const rombel = item.getAttribute('data-rombel');
-        if (nama.includes(query) || nis.includes(query) || rombel.includes(query)) {
+        const nama = item.getAttribute('data-nama') || '';
+        const nisn = item.getAttribute('data-nisn') || '';
+        const rombel = item.getAttribute('data-rombel') || '';
+        if (nama.includes(query) || nisn.includes(query) || rombel.includes(query)) {
           match = true;
         }
       } else {

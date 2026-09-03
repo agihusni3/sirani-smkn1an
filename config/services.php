@@ -35,9 +35,5 @@ return [
         ],
     ],
 
-    // InsightFace Python Microservice (ArcFace R100, 99.83% Akurasi)
-    'insightface' => [
-        'url' => env('INSIGHTFACE_URL', 'http://127.0.0.1:8001'),
-    ],
-
 ];
+

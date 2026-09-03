@@ -147,13 +147,40 @@
     .no-print-bar {
       background: #0F172A;
       color: #fff;
-      padding: 12px 24px;
+      padding: 12px 20px;
       display: flex;
       justify-content: space-between;
       align-items: center;
       border-radius: 8px;
       margin-bottom: 20px;
       font-family: sans-serif;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    @media (max-width: 820px) {
+      body {
+        padding: 10px 12px 30px;
+        overflow-x: auto;
+      }
+      .no-print-bar {
+        position: sticky;
+        top: 6px;
+        z-index: 1000;
+        padding: 10px 14px;
+      }
+      .no-print-bar > div:first-child {
+        font-size: 12px !important;
+      }
+      .no-print-bar > div:last-child {
+        width: 100%;
+        display: flex;
+        gap: 8px;
+      }
+      .no-print-bar button {
+        flex: 1;
+        padding: 8px 10px !important;
+        font-size: 12px !important;
+      }
     }
     @media print {
       .no-print-bar { display: none !important; }
@@ -167,7 +194,7 @@
   <div style="font-size:14px; font-weight:bold;">Dokumen Resume Yuridis Rekam Jejak Kesiswaan — Siap Cetak (A4)</div>
   <div style="display:flex; gap:8px;">
     <button type="button" onclick="window.print()" style="background:#CA8A04; color:#fff; border:none; padding:8px 16px; border-radius:6px; font-weight:bold; cursor:pointer;">
-      🖨️ Cetak Dokumen A4
+      Cetak Dokumen A4
     </button>
     <button type="button" onclick="window.close()" style="background:#334155; color:#fff; border:none; padding:8px 16px; border-radius:6px; cursor:pointer;">
       Tutup
@@ -210,9 +237,9 @@
     <td style="width:73%;"><strong>{{ $siswa->nama }}</strong></td>
   </tr>
   <tr>
-    <td>Nomor Induk Siswa (NIS/NISN)</td>
+    <td>Nomor Induk Siswa Nasional (NISN)</td>
     <td>:</td>
-    <td>{{ $siswa->nis }} / {{ $siswa->nisn ?: '-' }}</td>
+    <td>{{ $siswa->nisn ?: '-' }}</td>
   </tr>
   <tr>
     <td>Kelas / Kompetensi Keahlian</td>
@@ -316,31 +343,31 @@
 {{-- 5. LEMBAR PENGESAHAN & TANDA TANGAN --}}
 <div class="signature-grid">
   <div class="signature-box">
-    <div>Wali Kelas,</div>
+    <div>Wali Kelas {{ $rombel->nama_rombel ?? '' }},</div>
     <div class="signature-space"></div>
     <div style="font-weight:bold; text-decoration:underline;">{{ $wali->nama ?? '..................................' }}</div>
-    <div>NIP. {{ $wali->nip ?? '..................................' }}</div>
+    <div>NIP. {{ $wali->nip ?? '-' }}</div>
   </div>
 
   <div class="signature-box">
     <div>Guru Bimbingan &amp; Konseling (BK),</div>
     <div class="signature-space"></div>
-    <div style="font-weight:bold; text-decoration:underline;">{{ $kasus->diverifikasi_oleh ?: '..................................' }}</div>
-    <div>NIP. ..................................</div>
+    <div style="font-weight:bold; text-decoration:underline;">{{ $guruBk->nama ?? ($kasus->diverifikasi_oleh ?: 'Ari Apriansah,S.Pd.') }}</div>
+    <div>NIP. {{ $guruBk->nip ?? '198704222024211008' }}</div>
   </div>
 
   <div class="signature-box">
     <div>Waka Bidang Kesiswaan,</div>
     <div class="signature-space"></div>
-    <div style="font-weight:bold; text-decoration:underline;">..................................</div>
-    <div>NIP. ..................................</div>
+    <div style="font-weight:bold; text-decoration:underline;">{{ $wakasis->nama ?? '..................................' }}</div>
+    <div>NIP. {{ $wakasis->nip ?? '-' }}</div>
   </div>
 
   <div class="signature-box">
     <div>Mengetahui &amp; Mengesahkan,<br>Kepala SMKN 1 Air Naningan</div>
     <div class="signature-space"></div>
-    <div style="font-weight:bold; text-decoration:underline;">{{ $sekolah->nama_kepsek ?? '..................................' }}</div>
-    <div>NIP. {{ $sekolah->nip_kepsek ?? '..................................' }}</div>
+    <div style="font-weight:bold; text-decoration:underline;">{{ $sekolah->nama_kepsek ?: ($sekolah->nama_kepala_sekolah ?: 'Drs. H. Ahmad Sudrajat, M.Pd.') }}</div>
+    <div>NIP. {{ $sekolah->nip_kepsek ?: ($sekolah->nip_kepala_sekolah ?: '19750510 200003 1 005') }}</div>
   </div>
 </div>
 

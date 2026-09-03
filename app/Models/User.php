@@ -20,6 +20,7 @@ class User extends Authenticatable
      */
     protected $fillable = [
         'name',
+        'username',
         'email',
         'password',
         'guru_id',
@@ -83,8 +84,8 @@ class User extends Authenticatable
 
     public function isGuruBk(): bool
     {
-        // Kepala Sekolah tidak boleh terdeteksi sebagai Guru BK
-        if ($this->isKepalaSekolah()) {
+        // Kepala Sekolah, Waka Kesiswaan & Waka Kurikulum tidak boleh terdeteksi sebagai Guru BK
+        if ($this->isKepalaSekolah() || $this->isWakaKesiswaan() || $this->isWakaKurikulum()) {
             return false;
         }
         return $this->role === 'guru_bk' || ($this->guru && (str_contains(strtolower($this->guru->jabatan ?? ''), 'bimbingan konseling') || str_contains(strtolower($this->guru->jabatan ?? ''), 'bk')));
@@ -92,9 +93,8 @@ class User extends Authenticatable
 
     public function isWaliKelas(): bool
     {
-        // Kepala Sekolah tidak boleh terdeteksi sebagai Wali Kelas
-        // meskipun guru-nya punya relasi rombel.
-        if ($this->isKepalaSekolah()) {
+        // Kepala Sekolah, Waka Kesiswaan & Waka Kurikulum tidak boleh terdeteksi sebagai Wali Kelas
+        if ($this->isKepalaSekolah() || $this->isWakaKesiswaan() || $this->isWakaKurikulum()) {
             return false;
         }
 
@@ -125,15 +125,37 @@ class User extends Authenticatable
             && !$this->isAdmin() 
             && !$this->isKepalaSekolah() 
             && !$this->isWakaKesiswaan() 
-            && !$this->isWakaKurikulum()
+            && !$this->isWakaKurikulum() 
             && !$this->isGuruBk() 
             && !$this->isWaliKelas() 
-            && !$this->isStafTu()
+            && !$this->isStafTu() 
             && !$this->isGuruPiket());
     }
 
     public function isGuruPiket(): bool
     {
+        // Hanya Kepala Sekolah eksekutif yang tidak bertugas piket gerbang harian
+        if ($this->isKepalaSekolah()) {
+            return false;
+        }
+
+        if ($this->role === 'guru_piket') {
+            return true;
+        }
+
+        if ($this->guru) {
+            return \App\Models\JadwalPiket::where('guru_id', $this->guru->id)->exists();
+        }
+
+        return false;
+    }
+
+    public function isPiketHariIni(): bool
+    {
+        if ($this->isKepalaSekolah()) {
+            return false;
+        }
+
         if ($this->role === 'guru_piket') {
             return true;
         }
@@ -143,11 +165,6 @@ class User extends Authenticatable
         }
 
         return false;
-    }
-
-    public function isPiketHariIni(): bool
-    {
-        return $this->isGuruPiket();
     }
 
     public function getWaliRombelIds(): array

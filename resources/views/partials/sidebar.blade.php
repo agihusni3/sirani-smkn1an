@@ -4,10 +4,10 @@
     margin-bottom: 22px;
   }
   .nav-label {
-    font-size: 10.5px;
+    font-size: 10px;
     font-weight: 800;
     text-transform: uppercase;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.1em;
     color: var(--text-3);
     margin-bottom: 8px;
     padding: 0 12px;
@@ -48,7 +48,7 @@
   .nav-left-part {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
     min-width: 0;
   }
   .nav-icon {
@@ -99,6 +99,7 @@
       z-index: 1030;
       align-items: center;
       justify-content: space-around;
+      padding: 0 4px;
       padding-bottom: env(safe-area-inset-bottom, 0px);
       box-shadow: 0 -4px 20px rgba(0,0,0,0.06);
     }
@@ -109,12 +110,12 @@
       justify-content: center;
       flex: 1;
       height: 100%;
-      color: var(--text-2);
+      color: var(--text-3);
       text-decoration: none;
-      font-size: 10.5px;
+      font-size: 10px;
       font-weight: 700;
       gap: 3px;
-      transition: color 0.15s ease;
+      transition: all 0.18s ease;
       user-select: none;
       background: none;
       border: none;
@@ -123,14 +124,22 @@
     .mobile-nav-link i {
       font-size: 18px;
       line-height: 1;
+      transition: transform 0.18s ease;
+    }
+    .mobile-nav-link:hover {
+      color: var(--text);
     }
     .mobile-nav-link.active, .mobile-nav-link:active {
       color: #000000;
       font-weight: 900;
     }
-    /* Add bottom padding to main content to not overlap bottom bar */
-    .main-content {
-      padding-bottom: 80px !important;
+    .mobile-nav-link.active i {
+      transform: scale(1.1);
+      color: #000000;
+    }
+    [data-theme="dark"] .mobile-nav-link.active,
+    [data-theme="dark"] .mobile-nav-link.active i {
+      color: #FFFFFF !important;
     }
   }
 </style>
@@ -146,10 +155,10 @@
   $isStafTu = $user ? $user->isStafTu() : false;
   $isGuruPiket = $user ? $user->isGuruPiket() : false;
   $isGuru = $user ? $user->isGuru() : false;
-  $isPiketHariIni = $user && $user->guru ? \App\Models\JadwalPiket::isGuruPiketHariIni($user->guru->id) : false;
+  $isPiketHariIni = ($user && !$isKepsek && !$isWakasis && $user->guru) ? \App\Models\JadwalPiket::isGuruPiketHariIni($user->guru->id) : false;
 @endphp
 
-{{-- Mobile Top Bar --}}
+{{-- Mobile Top Bar with Integrated Actions (Theme + Account + Menu) --}}
 <div class="mobile-topbar no-print">
   <div style="display:flex; align-items:center; gap:10px;">
     <div style="width:34px; height:34px; border-radius:8px; background:var(--surface); border:1px solid var(--border); display:flex; align-items:center; justify-content:center; padding:3px;">
@@ -160,13 +169,16 @@
       <span style="font-size:10px; color:var(--text-3); font-weight:600;">SMKN 1 Air Naningan</span>
     </div>
   </div>
-  <button type="button" class="mobile-hamburger-btn" id="mobileMenuToggle" aria-label="Buka Menu">
-    <i class="bi bi-list"></i>
-  </button>
+  <div style="display:flex; align-items:center; gap:6px;">
+    @include('partials.header_actions')
+    <button type="button" class="mobile-hamburger-btn" id="mobileMenuToggle" onclick="window.toggleSmknSidebar(event)" aria-label="Buka Menu">
+      <i class="bi bi-list"></i>
+    </button>
+  </div>
 </div>
 
 {{-- Backdrop Overlay for Mobile Drawer --}}
-<div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+<div class="sidebar-backdrop" id="sidebarBackdrop" onclick="window.closeSmknSidebar()"></div>
 
 {{-- Sidebar Navigation: Structured & Role-Based with Icons --}}
 <aside class="sidebar" id="appSidebar">
@@ -180,12 +192,12 @@
         <div style="font-size:11px; color:var(--text-3); font-weight:600;">{{ $user ? $user->role_display_name : 'SMKN 1 Air Naningan' }}</div>
       </div>
     </div>
-    <button type="button" class="sidebar-close-btn" id="sidebarCloseBtn" aria-label="Tutup Menu">
+    <button type="button" class="sidebar-close-btn" id="sidebarCloseBtn" onclick="window.closeSmknSidebar()" aria-label="Tutup Menu">
       <i class="bi bi-x-lg"></i>
     </button>
   </div>
 
-  {{-- 1. UTAMA --}}
+  {{-- 1. NAVIGASI UTAMA --}}
   <div class="nav-group">
     <div class="nav-label">Navigasi Utama</div>
     <a href="/dashboard" class="nav-item {{ request()->is('dashboard') ? 'active' : '' }}">
@@ -194,44 +206,59 @@
         <span class="nav-text">Dasbor Utama</span>
       </div>
     </a>
-    @if($isAdmin || $isWakasis || $isGuruPiket || $isPiketHariIni)
-      <a href="/piket" class="nav-item {{ request()->is('piket*') ? 'active' : '' }}">
+    @if($user && $user->guru)
+      <a href="javascript:void(0)" onclick="window.openModalKartuGuruSaya()" class="nav-item" style="color:var(--text); font-weight:700; cursor:pointer;" title="Buka Kartu & QR Presensi Guru">
         <div class="nav-left-part">
-          <i class="bi bi-person-badge-fill nav-icon"></i>
-          <span class="nav-text">Meja Piket Harian</span>
+          <i class="bi bi-qr-code-scan nav-icon" style="color:#0284c7;"></i>
+          <span class="nav-text">QR Presensi</span>
         </div>
+        <span class="nav-count-badge" style="background:#f0f9ff; color:#0284c7; border-color:#bae6fd;">QR</span>
       </a>
     @endif
-    @if($isAdmin)
-      <a href="/" class="nav-item {{ request()->is('kios-wajah*') || request()->is('/') ? 'active' : '' }}" target="_blank">
+    @php
+      $canAccessSmartGate = $isAdmin || $isStafTu || $isGuruPiket || $isPiketHariIni;
+    @endphp
+    @if($canAccessSmartGate)
+      <a href="/smart-gate" class="nav-item {{ request()->is('smart-gate*') || request()->is('kios-rfid*') || request()->is('rfid') ? 'active' : '' }}" target="_blank">
         <div class="nav-left-part">
-          <i class="bi bi-camera-video-fill nav-icon"></i>
-          <span class="nav-text">Smart Gate Kiosk</span>
+          <i class="bi bi-upc-scan nav-icon"></i>
+          <span class="nav-text">Smart Gate Presensi</span>
         </div>
         <span class="nav-count-badge">Live</span>
       </a>
-      <a href="/cek-presensi" class="nav-item {{ request()->is('cek-presensi*') ? 'active' : '' }}" target="_blank">
-        <div class="nav-left-part">
-          <i class="bi bi-search nav-icon"></i>
-          <span class="nav-text">Portal Siswa &amp; Ortu</span>
-        </div>
-      </a>
     @endif
+
+    {{-- Portal Siswa (Mandiri) --}}
+    <a href="/portal-siswa" class="nav-item {{ request()->is('portal-siswa*') ? 'active' : '' }}" target="_blank" title="Buka Portal Mandiri Siswa (QR Presensi, Riwayat & Pengumuman)">
+      <div class="nav-left-part">
+        <i class="bi bi-person-workspace nav-icon" style="color:#059669;"></i>
+        <span class="nav-text">Portal Siswa</span>
+      </div>
+      <span class="nav-count-badge" style="background:#ecfdf5; color:#059669; border-color:#a7f3d0;">Siswa</span>
+    </a>
+
+    {{-- Portal Orang Tua (Cek Presensi Mandiri) --}}
+    <a href="/cek-presensi" class="nav-item {{ request()->is('cek-presensi*') ? 'active' : '' }}" target="_blank" title="Buka Portal Orang Tua (Cek Presensi Anak Mandiri)">
+      <div class="nav-left-part">
+        <i class="bi bi-people-fill nav-icon" style="color:#0284c7;"></i>
+        <span class="nav-text">Portal Orang Tua</span>
+      </div>
+      <span class="nav-count-badge" style="background:#f0f9ff; color:#0284c7; border-color:#bae6fd;">Ortu</span>
+    </a>
   </div>
 
-  {{-- 2. PRESENSI & KESISWAAN --}}
-  @if($isAdmin || $isKepsek || $isWakasis || $isWakaKurikulum || $isBK || $isWali || $isStafTu || $isGuruPiket || $isPiketHariIni)
+  {{-- 2. OPERASIONAL HARIAN --}}
+  @if($isAdmin || $isGuruPiket || $isPiketHariIni || $isKepsek || $isWakasis || $isWakaKurikulum || $isBK || $isWali || $isStafTu)
     <div class="nav-group">
-      <div class="nav-label">Presensi &amp; Kesiswaan</div>
-      @if($isAdmin || $isKepsek || $isWakasis || $isBK || $isWali || $isStafTu || $isGuruPiket)
-        <a href="/laporan" class="nav-item {{ request()->is('laporan*') ? 'active' : '' }}">
+      <div class="nav-label">Operasional Harian</div>
+      @if($isAdmin || $isWakasis || $isGuruPiket || $isPiketHariIni)
+        <a href="/piket" class="nav-item {{ request()->is('piket*') ? 'active' : '' }}">
           <div class="nav-left-part">
-            <i class="bi bi-bar-chart-line-fill nav-icon"></i>
-            <span class="nav-text">Rekap Presensi</span>
+            <i class="bi bi-person-badge-fill nav-icon"></i>
+            <span class="nav-text">Piket Harian</span>
           </div>
         </a>
       @endif
-
       @if($isAdmin || $isGuruPiket || $isPiketHariIni)
         <a href="/izin-siswa" class="nav-item {{ request()->is('izin*') ? 'active' : '' }}">
           <div class="nav-left-part">
@@ -240,7 +267,14 @@
           </div>
         </a>
       @endif
-
+      @if($isAdmin || $isKepsek || $isWakasis || $isWakaKurikulum || $isStafTu)
+        <a href="/jadwal-piket" class="nav-item {{ request()->is('jadwal-piket*') ? 'active' : '' }}">
+          <div class="nav-left-part">
+            <i class="bi bi-calendar2-check-fill nav-icon"></i>
+            <span class="nav-text">Jadwal Petugas Piket</span>
+          </div>
+        </a>
+      @endif
       @if($isAdmin || $isKepsek || $isWakasis || $isBK || $isWali)
         <a href="/disiplin" class="nav-item {{ request()->is('disiplin*') ? 'active' : '' }}">
           <div class="nav-left-part">
@@ -248,130 +282,139 @@
             <span class="nav-text">Buku Kasus Disiplin</span>
           </div>
           @php
-            $sidebarDisiplinCount = \App\Models\KasusDisiplin::where('is_active', true)->where('status_tahap', '!=', 'selesai_pembinaan')->forUser($user)->count();
+            $sidebarDisiplinQuery = \App\Models\KasusDisiplin::where('is_active', true)->where('status_tahap', '!=', 'selesai_pembinaan');
+            if ($isAdmin) {
+                $sidebarDisiplinCount = (clone $sidebarDisiplinQuery)->count();
+            } elseif ($isKepsek) {
+                $sidebarDisiplinCount = (clone $sidebarDisiplinQuery)->where('status_tahap', 'tahap_4_kepsek')->count();
+            } elseif ($isWakasis) {
+                $sidebarDisiplinCount = (clone $sidebarDisiplinQuery)->where('status_tahap', 'tahap_3_wakasis')->count();
+            } elseif ($isBK) {
+                $sidebarDisiplinCount = (clone $sidebarDisiplinQuery)->where('status_tahap', 'tahap_2_bk')->count();
+            } elseif ($isWali) {
+                $sidebarDisiplinCount = (clone $sidebarDisiplinQuery)
+                    ->forUser($user)
+                    ->where('status_tahap', 'tahap_1_wali_kelas')
+                    ->count();
+            } else {
+                $sidebarDisiplinCount = 0;
+            }
           @endphp
           @if($sidebarDisiplinCount > 0)
             <span class="nav-count-badge">{{ $sidebarDisiplinCount }}</span>
           @endif
         </a>
       @endif
-
-      @if(!$isWali && !$isGuru)
-        <a href="/peringkat" class="nav-item {{ request()->is('peringkat*') ? 'active' : '' }}">
-          <div class="nav-left-part">
-            <i class="bi bi-trophy-fill nav-icon"></i>
-            <span class="nav-text">Peringkat Kehadiran</span>
-          </div>
-        </a>
-      @endif
-
-      @if($isAdmin || $isWakasis || $isBK)
-        <a href="/surat" class="nav-item {{ request()->is('surat*') ? 'active' : '' }}">
-          <div class="nav-left-part">
-            <i class="bi bi-envelope-paper-fill nav-icon"></i>
-            <span class="nav-text">Surat Panggilan Ortu</span>
-          </div>
-        </a>
-      @endif
-
-      @if($isAdmin || $isKepsek || $isWakasis || $isWakaKurikulum || $isWali)
-        <a href="/notifikasi" class="nav-item {{ request()->is('notifikasi*') ? 'active' : '' }}">
-          <div class="nav-left-part">
-            <i class="bi bi-bell-fill nav-icon"></i>
-            <span class="nav-text">Pusat Notifikasi WA</span>
-          </div>
-        </a>
-      @endif
-
-      @if($isAdmin || $isKepsek || $isWakasis || $isWakaKurikulum)
-        <a href="/pengumuman" class="nav-item {{ request()->is('pengumuman*') ? 'active' : '' }}">
-          <div class="nav-left-part">
-            <i class="bi bi-megaphone-fill nav-icon"></i>
-            <span class="nav-text">Pengumuman Sekolah</span>
-          </div>
-        </a>
-      @endif
     </div>
   @endif
 
-  {{-- 3. JADWAL & OPERASIONAL --}}
-  @if($isAdmin || $isKepsek || $isWakasis || $isWakaKurikulum || $isStafTu || $isGuru)
-    <div class="nav-group">
-      <div class="nav-label">Jadwal &amp; Operasional</div>
+  {{-- 3. REKAPITULASI & LAPORAN --}}
+  <div class="nav-group">
+    <div class="nav-label">Rekapitulasi &amp; Laporan</div>
+    <a href="/laporan" class="nav-item {{ request()->is('laporan*') ? 'active' : '' }}">
+      <div class="nav-left-part">
+        <i class="bi bi-bar-chart-line-fill nav-icon"></i>
+        <span class="nav-text">Rekap Presensi</span>
+      </div>
+    </a>
+    @if($isAdmin || $isKepsek || $isWakasis || $isWakaKurikulum || $isBK || $isStafTu || $isGuruPiket || $isPiketHariIni)
+      <a href="/peringkat" class="nav-item {{ request()->is('peringkat*') ? 'active' : '' }}">
+        <div class="nav-left-part">
+          <i class="bi bi-trophy-fill nav-icon"></i>
+          <span class="nav-text">Peringkat Kehadiran</span>
+        </div>
+      </a>
+    @endif
+    @if($isAdmin || $isWakasis || $isWakaKurikulum || $isBK || $isWali || $isGuruPiket || $isPiketHariIni)
+      <a href="/notifikasi" class="nav-item {{ request()->is('notifikasi*') || request()->is('pengumuman*') ? 'active' : '' }}">
+        <div class="nav-left-part">
+          <i class="bi bi-bell-fill nav-icon"></i>
+          <span class="nav-text">Notifikasi &amp; Broadcast</span>
+        </div>
+      </a>
+    @endif
+  </div>
+
+  {{-- 4. MASTER DATA --}}
+  <div class="nav-group">
+    <div class="nav-label">Master Data</div>
+    @if($isAdmin || $isWakasis || $isStafTu || $isWakaKurikulum)
+      <a href="/siklus-siswa" class="nav-item {{ request()->is('siklus-siswa*') ? 'active' : '' }}">
+        <div class="nav-left-part">
+          <i class="bi bi-arrow-repeat nav-icon"></i>
+          <span class="nav-text">Siklus Akademik Siswa</span>
+        </div>
+      </a>
+    @endif
+    <a href="/siswa" class="nav-item {{ request()->is('siswa*') ? 'active' : '' }}">
+      <div class="nav-left-part">
+        <i class="bi bi-people-fill nav-icon"></i>
+        <span class="nav-text">Data Siswa</span>
+      </div>
+    </a>
+    @if($isAdmin || $isKepsek || $isWakasis || $isWakaKurikulum || $isStafTu)
+      <a href="/guru" class="nav-item {{ request()->is('guru*') ? 'active' : '' }}">
+        <div class="nav-left-part">
+          <i class="bi bi-person-badge-fill nav-icon"></i>
+          <span class="nav-text">Data Guru &amp; Pegawai</span>
+        </div>
+      </a>
+    @endif
+    @if($isAdmin || $isStafTu)
+      <a href="/kartu-rfid" class="nav-item {{ request()->is('kartu-rfid*') || request()->is('manajemen-rfid*') ? 'active' : '' }}">
+        <div class="nav-left-part">
+          <i class="bi bi-person-vcard-fill nav-icon"></i>
+          <span class="nav-text">Kartu Barcode &amp; RFID</span>
+        </div>
+      </a>
+    @endif
+    @if(!$isWali)
+      <a href="/rombel" class="nav-item {{ request()->is('rombel*') ? 'active' : '' }}">
+        <div class="nav-left-part">
+          <i class="bi bi-building nav-icon"></i>
+          <span class="nav-text">Rombongan Belajar</span>
+        </div>
+      </a>
+    @endif
+  </div>
+
+  {{-- 5. JADWAL & KALENDER --}}
+  <div class="nav-group">
+    <div class="nav-label">Jadwal &amp; Kalender</div>
+    @if($isAdmin || $isKepsek || $isWakasis || $isWakaKurikulum || $isGuruPiket || $isPiketHariIni || $isStafTu || $isGuru)
       <a href="/jadwal-sekolah" class="nav-item {{ request()->is('jadwal-sekolah*') ? 'active' : '' }}">
         <div class="nav-left-part">
           <i class="bi bi-clock-history nav-icon"></i>
           <span class="nav-text">Jam Sekolah &amp; Sesi</span>
         </div>
       </a>
-      <a href="/jadwal-piket" class="nav-item {{ request()->is('jadwal-piket*') ? 'active' : '' }}">
-        <div class="nav-left-part">
-          <i class="bi bi-calendar2-check-fill nav-icon"></i>
-          <span class="nav-text">Jadwal Petugas Piket</span>
-        </div>
-      </a>
-      <a href="/hari-libur" class="nav-item {{ request()->is('hari-libur*') ? 'active' : '' }}">
-        <div class="nav-left-part">
-          <i class="bi bi-calendar2-week-fill nav-icon"></i>
-          <span class="nav-text">Kalender Hari Libur</span>
-        </div>
-      </a>
-    </div>
-  @endif
+    @endif
+    <a href="/hari-libur" class="nav-item {{ request()->is('hari-libur*') ? 'active' : '' }}">
+      <div class="nav-left-part">
+        <i class="bi bi-calendar2-week-fill nav-icon"></i>
+        <span class="nav-text">Kalender Akademik</span>
+      </div>
+    </a>
+  </div>
 
-  {{-- 4. MASTER DATA --}}
-  @if($isAdmin || $isKepsek || $isWakasis || $isBK || $isWali || $isStafTu)
+  {{-- 6. SISTEM & PENGAWASAN --}}
+  @if($isAdmin || $isKepsek || $isWakasis)
     <div class="nav-group">
-      <div class="nav-label">Master Data</div>
-      <a href="/siswa" class="nav-item {{ request()->is('siswa*') ? 'active' : '' }}">
-        <div class="nav-left-part">
-          <i class="bi bi-people-fill nav-icon"></i>
-          <span class="nav-text">Data Siswa</span>
-        </div>
-      </a>
-      @if($isAdmin || $isWakasis || $isStafTu || $isWakaKurikulum)
-        <a href="/siklus-siswa" class="nav-item {{ request()->is('siklus-siswa*') ? 'active' : '' }}">
+      <div class="nav-label">Sistem &amp; Pengawasan</div>
+      @if($isAdmin)
+        <a href="/pengaturan-sekolah" class="nav-item {{ request()->is('pengaturan-sekolah*') ? 'active' : '' }}">
           <div class="nav-left-part">
-            <i class="bi bi-arrow-repeat nav-icon"></i>
-            <span class="nav-text">Siklus Akademik Siswa</span>
+            <i class="bi bi-bank2 nav-icon"></i>
+            <span class="nav-text">Profil &amp; Kop Surat</span>
+          </div>
+        </a>
+        <a href="/backup" class="nav-item {{ request()->is('backup*') ? 'active' : '' }}">
+          <div class="nav-left-part">
+            <i class="bi bi-database-down nav-icon"></i>
+            <span class="nav-text">Pencadangan Data</span>
           </div>
         </a>
       @endif
-      @if($isAdmin || $isStafTu)
-        <a href="/guru" class="nav-item {{ request()->is('guru*') ? 'active' : '' }}">
-          <div class="nav-left-part">
-            <i class="bi bi-person-badge-fill nav-icon"></i>
-            <span class="nav-text">Data Guru &amp; Pegawai</span>
-          </div>
-        </a>
-      @endif
-      @if(!$isWali)
-        <a href="/rombel" class="nav-item {{ request()->is('rombel*') ? 'active' : '' }}">
-          <div class="nav-left-part">
-            <i class="bi bi-building nav-icon"></i>
-            <span class="nav-text">Rombongan Belajar</span>
-          </div>
-        </a>
-      @endif
-    </div>
-  @endif
-
-  {{-- 5. SISTEM --}}
-  @if($isAdmin)
-    <div class="nav-group">
-      <div class="nav-label">Sistem &amp; Pengaturan</div>
-      <a href="/pengaturan-sekolah" class="nav-item {{ request()->is('pengaturan-sekolah*') ? 'active' : '' }}">
-        <div class="nav-left-part">
-          <i class="bi bi-bank2 nav-icon"></i>
-          <span class="nav-text">Profil &amp; Kop Surat</span>
-        </div>
-      </a>
-      <a href="/backup" class="nav-item {{ request()->is('backup*') ? 'active' : '' }}">
-        <div class="nav-left-part">
-          <i class="bi bi-database-down nav-icon"></i>
-          <span class="nav-text">Pencadangan Data</span>
-        </div>
-      </a>
       <a href="/audit" class="nav-item {{ request()->is('audit*') ? 'active' : '' }}">
         <div class="nav-left-part">
           <i class="bi bi-shield-lock-fill nav-icon"></i>
@@ -388,59 +431,118 @@
     <i class="bi bi-grid-1x2-fill"></i>
     <span>Dasbor</span>
   </a>
-  @if($isAdmin || $isWakasis || $isGuruPiket || $isPiketHariIni)
-    <a href="/piket" class="mobile-nav-link {{ request()->is('piket*') ? 'active' : '' }}">
-      <i class="bi bi-person-badge-fill"></i>
-      <span>Piket</span>
+
+  {{-- Tab 2 Sesuai Izin Role --}}
+  @if($isAdmin || $isGuruPiket || $isPiketHariIni)
+    <a href="/izin-siswa" class="mobile-nav-link {{ request()->is('izin*') ? 'active' : '' }}">
+      <i class="bi bi-file-earmark-check-fill"></i>
+      <span>Perizinan</span>
+    </a>
+  @elseif($isBK || $isWali || $isWakasis)
+    <a href="/disiplin" class="mobile-nav-link {{ request()->is('disiplin*') ? 'active' : '' }}">
+      <i class="bi bi-journals"></i>
+      <span>Disiplin</span>
+    </a>
+  @else
+    <a href="/siswa" class="mobile-nav-link {{ request()->is('siswa*') ? 'active' : '' }}">
+      <i class="bi bi-people-fill"></i>
+      <span>Siswa</span>
     </a>
   @endif
+
+  {{-- Tab 3: Rekap Presensi --}}
   <a href="/laporan" class="mobile-nav-link {{ request()->is('laporan*') ? 'active' : '' }}">
     <i class="bi bi-bar-chart-line-fill"></i>
     <span>Rekap</span>
   </a>
-  <a href="/kios-wajah" target="_blank" class="mobile-nav-link {{ request()->is('kios-wajah*') || request()->is('/') ? 'active' : '' }}">
-    <i class="bi bi-camera-video-fill"></i>
-    <span>Kiosk</span>
-  </a>
-  <button type="button" class="mobile-nav-link" onclick="document.getElementById('mobileMenuToggle')?.click()" aria-label="Buka Menu Lengkap">
+
+  {{-- Tab 4 Sesuai Izin Role --}}
+  @if($isAdmin || $isGuruPiket || $isPiketHariIni)
+    <a href="/piket" class="mobile-nav-link {{ request()->is('piket*') ? 'active' : '' }}">
+      <i class="bi bi-person-badge-fill"></i>
+      <span>Piket</span>
+    </a>
+  @elseif($isBK || $isWali || $isWakasis || $isKepsek)
+    <a href="/disiplin" class="mobile-nav-link {{ request()->is('disiplin*') ? 'active' : '' }}">
+      <i class="bi bi-journals"></i>
+      <span>Disiplin</span>
+    </a>
+  @elseif($isWakaKurikulum)
+    <a href="/jadwal-piket" class="mobile-nav-link {{ request()->is('jadwal-piket*') ? 'active' : '' }}">
+      <i class="bi bi-calendar2-check-fill"></i>
+      <span>Piket</span>
+    </a>
+  @elseif($isStafTu)
+    <a href="/guru" class="mobile-nav-link {{ request()->is('guru*') ? 'active' : '' }}">
+      <i class="bi bi-person-badge-fill"></i>
+      <span>Guru</span>
+    </a>
+  @else
+    <a href="/notifikasi" class="mobile-nav-link {{ request()->is('notifikasi*') || request()->is('pengumuman*') ? 'active' : '' }}">
+      <i class="bi bi-bell-fill"></i>
+      <span>Notifikasi</span>
+    </a>
+  @endif
+
+  {{-- Tab 5: Lainnya --}}
+  <button type="button" class="mobile-nav-link" id="mobileMenuToggleBottom" onclick="window.toggleSmknSidebar(event)" aria-label="Buka Menu Lengkap">
     <i class="bi bi-list"></i>
     <span>Lainnya</span>
   </button>
 </nav>
 
 <script>
-  (function() {
-    function initSidebar() {
-      const toggleBtn = document.getElementById('mobileMenuToggle');
-      const closeBtn = document.getElementById('sidebarCloseBtn');
-      const sidebar = document.getElementById('appSidebar');
-      const backdrop = document.getElementById('sidebarBackdrop');
+  window.openSmknSidebar = function(e) {
+    if (e && e.stopPropagation) e.stopPropagation();
+    const sidebar = document.getElementById('appSidebar');
+    const backdrop = document.getElementById('sidebarBackdrop');
+    if (sidebar) {
+      sidebar.classList.add('mobile-open');
+    }
+    if (backdrop) {
+      backdrop.classList.add('active');
+    }
+    document.body.style.overflow = 'hidden';
+  };
 
-      function openSidebar() {
-        if (sidebar) sidebar.classList.add('mobile-open');
-        if (backdrop) backdrop.classList.add('active');
-      }
+  window.closeSmknSidebar = function(e) {
+    if (e && e.stopPropagation) e.stopPropagation();
+    const sidebar = document.getElementById('appSidebar');
+    const backdrop = document.getElementById('sidebarBackdrop');
+    if (sidebar) {
+      sidebar.classList.remove('mobile-open');
+    }
+    if (backdrop) {
+      backdrop.classList.remove('active');
+    }
+    document.body.style.overflow = '';
+  };
 
-      function closeSidebar() {
-        if (sidebar) sidebar.classList.remove('mobile-open');
-        if (backdrop) backdrop.classList.remove('active');
-      }
+  window.toggleSmknSidebar = function(e) {
+    if (e && e.stopPropagation) e.stopPropagation();
+    const sidebar = document.getElementById('appSidebar');
+    if (sidebar && sidebar.classList.contains('mobile-open')) {
+      window.closeSmknSidebar(e);
+    } else {
+      window.openSmknSidebar(e);
+    }
+  };
 
-      if (toggleBtn) toggleBtn.addEventListener('click', openSidebar);
-      if (closeBtn) closeBtn.addEventListener('click', closeSidebar);
-      if (backdrop) backdrop.addEventListener('click', closeSidebar);
+  window.addEventListener('resize', function() {
+    if (window.innerWidth > 1024) {
+      window.closeSmknSidebar();
+    }
+  });
 
-      window.addEventListener('resize', function() {
-        if (window.innerWidth > 1024) {
-          closeSidebar();
+  // Pastikan klik pada link navigasi di dalam drawer otomatis menutup drawer di mobile
+  document.addEventListener('DOMContentLoaded', function() {
+    const navItems = document.querySelectorAll('#appSidebar .nav-item');
+    navItems.forEach(item => {
+      item.addEventListener('click', function() {
+        if (window.innerWidth <= 1024) {
+          window.closeSmknSidebar();
         }
       });
-    }
-
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', initSidebar);
-    } else {
-      initSidebar();
-    }
-  })();
+    });
+  });
 </script>

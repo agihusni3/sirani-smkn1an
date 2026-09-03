@@ -38,7 +38,7 @@ class DisiplinNotificationService
                 $targetPejabat['nama'],
                 $targetPejabat['jabatan'],
                 $siswa->nama,
-                $siswa->nis,
+                $siswa->nisn ?: '-',
                 $namaRombel,
                 $tahapBaru,
                 $kasus->poin_bersih,
@@ -153,7 +153,7 @@ class DisiplinNotificationService
                 $targetPejabat['nama'],
                 $targetPejabat['jabatan'],
                 $siswa->nama,
-                $siswa->nis,
+                $siswa->nisn ?: '-',
                 $namaRombel,
                 $tahapLabel,
                 $kasus->poin_bersih
@@ -329,7 +329,7 @@ class DisiplinNotificationService
         string $namaPejabat,
         string $jabatan,
         string $namaSiswa,
-        string $nis,
+        string $nisn,
         string $rombel,
         string $tahap,
         int $poin,
@@ -345,7 +345,7 @@ class DisiplinNotificationService
              . "Diberitahukan bahwa terdapat kasus kedisiplinan siswa yang telah dilimpahkan ke *{$tahapLabel}*:\n\n"
              . "👤 *Identitas Siswa:*\n"
              . "• Nama : *{$namaSiswa}*\n"
-             . "• NIS  : {$nis}\n"
+             . "• NISN : {$nisn}\n"
              . "• Kelas: {$rombel}\n\n"
              . "📊 *Statistik Pelanggaran:*\n"
              . "• Akumulasi Poin : *{$poin} Poin*\n"
@@ -392,7 +392,7 @@ class DisiplinNotificationService
         string $namaPejabat,
         string $jabatan,
         string $namaSiswa,
-        string $nis,
+        string $nisn,
         string $rombel,
         string $tahapLabel,
         int $poin
@@ -401,7 +401,7 @@ class DisiplinNotificationService
              . "Yth. Bapak/Ibu *{$namaPejabat}* ({$jabatan})\n"
              . "SMK Negeri 1 Air Naningan\n\n"
              . "Mengingatkan kembali bahwa kasus kedisiplinan siswa berikut *MASIH MENUNGGU TINDAK LANJUT*:\n\n"
-             . "👤 *Siswa:* {$namaSiswa} (NIS: {$nis})\n"
+             . "👤 *Siswa:* {$namaSiswa} (NISN: {$nisn})\n"
              . "🏛️ *Kelas:* {$rombel}\n"
              . "⚖️ *Tahap Saat Ini:* *{$tahapLabel}* (Akumulasi: {$poin} Poin)\n\n"
              . "Mohon dapat meluangkan waktu untuk mencatat hasil pembinaan/konseling melalui menu *Buku Kasus & Disiplin (/disiplin)* di sistem SIRANI.\n\n"

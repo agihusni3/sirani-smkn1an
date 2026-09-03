@@ -70,11 +70,11 @@
     }
     .btn-toggle-kat:hover {
       color: var(--text);
-      background: rgba(255, 255, 255, 0.05);
+      background: var(--surface);
     }
     .btn-toggle-kat.active {
-      background: #000000 !important;
-      color: #FFFFFF !important;
+      background: var(--text) !important;
+      color: var(--bg) !important;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
       border-radius: 8px !important;
     }
@@ -98,8 +98,8 @@
       user-select: none;
     }
     .person-picker-trigger:hover, .person-picker-trigger.focused {
-      border-color: var(--gold);
-      box-shadow: 0 0 0 2px var(--gold-glow);
+      border-color: var(--text);
+      box-shadow: 0 0 0 2px var(--border-2);
     }
     .btn-clear-person {
       background: transparent;
@@ -117,17 +117,19 @@
     .btn-clear-person:hover {
       color: var(--red);
     }
+
+    /* Dropdown List Panel */
     .person-dropdown-panel {
-      display: none;
       position: absolute;
-      top: calc(100% + 6px);
+      top: calc(100% + 4px);
       left: 0;
       right: 0;
       background: var(--bg-2);
       border: 1.5px solid var(--border-2);
       border-radius: var(--r-sm);
-      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-      z-index: 1050;
+      box-shadow: var(--shadow-lg);
+      z-index: 1000;
+      display: none;
       overflow: hidden;
     }
     .person-dropdown-panel.open {
@@ -139,55 +141,53 @@
       overflow-y: auto;
     }
     .person-picker-item {
-      padding: 9px 12px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      border-bottom: 1px solid var(--border);
+      padding: 9px 12px;
       cursor: pointer;
-      transition: background .15s;
-      gap: 10px;
+      border-bottom: 1px solid var(--border-2);
+      transition: background .12s;
       text-align: left;
     }
     .person-picker-item:last-child {
       border-bottom: none;
     }
     .person-picker-item:hover {
-      background: var(--gold-dim);
+      background: var(--surface);
     }
 
     /* ── Tab Navigasi Riwayat ── */
     .izin-nav-tabs {
       display: flex;
-      gap: 8px;
-      border-bottom: 2px solid var(--border);
-      margin-bottom: 18px;
-      padding-bottom: 10px;
+      gap: 6px;
+      border-bottom: 1.5px solid var(--border);
+      margin-bottom: 12px;
+      padding-bottom: 0px;
     }
     .izin-tab-btn {
       background: var(--bg-3);
-      border: 1px solid var(--border);
-      padding: 9px 18px;
-      font-size: 13px;
+      border: 1px solid var(--border-2);
+      padding: 6px 14px;
+      font-size: 11.5px;
       font-weight: 800;
       color: var(--text-2);
       cursor: pointer;
-      border-radius: var(--r-sm);
+      border-radius: 6px;
       display: inline-flex;
       align-items: center;
-      gap: 8px;
-      transition: all .2s ease;
+      gap: 6px;
+      transition: all .15s ease;
     }
     .izin-tab-btn:hover {
-      color: var(--text);
-      background: rgba(255, 255, 255, 0.05);
-      border-color: var(--border-2);
+      color: #000000;
+      border-color: #000000;
     }
     .izin-tab-btn.active {
       color: #FFFFFF !important;
       background: #000000 !important;
       border-color: #000000 !important;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
     }
     .izin-tab-btn.active i {
       color: #FFFFFF !important;
@@ -223,15 +223,38 @@
       box-sizing: border-box;
     }
     .file-upload-label:hover {
-      border-color: var(--gold);
-      color: var(--gold);
-      background: var(--gold-dim);
+      border-color: #000000;
+      color: #000000;
+      background: rgba(0, 0, 0, 0.04);
     }
     .file-upload-label.has-file {
       border-style: solid;
-      border-color: var(--green);
+      border-color: #000000;
       color: var(--text);
-      background: var(--green-dim);
+      background: rgba(0, 0, 0, 0.05);
+      font-weight: 700;
+    }
+
+    /* ── Mobile Responsive Optimization ── */
+    @media (max-width: 768px) {
+      .izin-nav-tabs {
+        gap: 6px !important;
+        margin-bottom: 10px !important;
+      }
+      .izin-tab-btn {
+        flex: 1 !important;
+        justify-content: center !important;
+        padding: 6px 10px !important;
+        font-size: 11.5px !important;
+      }
+      .izin-form-card {
+        padding: 14px 16px !important;
+      }
+      .table-responsive table.data-table th,
+      .table-responsive table.data-table td {
+        padding: 6px 8px !important;
+        font-size: 11.5px !important;
+      }
     }
   </style>
 </head>
@@ -239,34 +262,35 @@
 <div class="app-container">
   @include('partials.sidebar')
   <main class="main-content">
-    <header class="header">
-      <div class="header-title">
-        <h1><i class="bi bi-file-earmark-check-fill" style="color:var(--gold); margin-right:8px;"></i>Perizinan Siswa &amp; Guru</h1>
-        <p>Pencatatan izin Sakit, Izin Keperluan, Dispensasi, Dinas Luar, &amp; Pulang Awal yang terhubung langsung ke absensi harian.</p>
-      </div>
-      @include('partials.header_actions')
-    </header>
+    
+    {{-- ULTRA COMPACT SLIM HEADER & TOGGLE BAR --}}
+    <div class="panel no-print" style="background:var(--bg-2); border:1px solid var(--border); padding:10px 16px; margin-bottom:14px; border-radius:var(--r-md); box-shadow:var(--shadow-sm);">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+        <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+          <h1 style="margin:0; font-size:16px; font-weight:900; color:var(--text); display:inline-flex; align-items:center; gap:6px;">
+            <i class="bi bi-file-earmark-check-fill" style="color:#000000; font-size:16px;"></i> Perizinan Siswa &amp; Guru
+          </h1>
+          <span style="color:var(--border-2); font-weight:300;">|</span>
+          <span style="font-size:11.5px; color:var(--text-3);">
+            Sakit, Izin Keperluan, Dispensasi, &amp; Dinas Luar
+          </span>
+        </div>
 
-    @if(session('success'))<div class="alert-success" style="margin-bottom:18px;"><i class="bi bi-check-circle-fill" style="margin-right:6px;"></i>{{ session('success') }}</div>@endif
-    @if(session('error'))<div class="alert-error" style="margin-bottom:18px;"><i class="bi bi-exclamation-triangle-fill" style="margin-right:6px;"></i>{{ session('error') }}</div>@endif
-    @if(isset($errors) && $errors->any())<div class="alert-error" style="margin-bottom:18px;">@foreach($errors->all() as $err)<div><i class="bi bi-x-circle-fill" style="margin-right:6px;"></i>{{ $err }}</div>@endforeach</div>@endif
-
-    {{-- TOOLBAR & TOMBOL TOGGLE CATAT PERIZINAN BARU --}}
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px; flex-wrap:wrap; gap:10px;">
-      <div style="font-size:13px; font-weight:700; color:var(--text-2);">
-        <i class="bi bi-file-earmark-medical" style="margin-right:4px;"></i> Pencatatan perizinan resmi siswa &amp; guru
+        <div style="display:flex; align-items:center; gap:8px;">
+          <button type="button" id="btnToggleFormIzin" onclick="toggleFormIzin()" class="btn btn-sm btn-gold" style="height:32px; padding:0 14px; font-size:11.5px; font-weight:800; display:inline-flex; align-items:center; gap:5px; border-radius:6px;">
+            <i class="bi bi-plus-circle-fill" id="iconToggleIzin"></i>
+            <span id="textToggleIzin">Catat Perizinan Baru</span>
+          </button>
+          @include('partials.header_actions')
+        </div>
       </div>
-      <button type="button" id="btnToggleFormIzin" onclick="toggleFormIzin()" class="btn btn-gold" style="height:38px; padding:0 16px; font-size:12.5px; font-weight:800; display:inline-flex; align-items:center; gap:6px;">
-        <i class="bi bi-plus-circle-fill" id="iconToggleIzin"></i>
-        <span id="textToggleIzin">Catat Perizinan Baru</span>
-      </button>
     </div>
 
     {{-- PANEL CATAT PERIZINAN BARU (HIDDEN DEFAULT / TOGGLE) --}}
     <div class="izin-form-card" id="panelFormIzin" style="display:none; margin-bottom:24px; animation:fadeIn 0.25s ease;">
       <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:20px; padding-bottom:14px; border-bottom:1px solid var(--border);">
         <div style="display:flex; align-items:center; gap:8px;">
-          <div style="width:32px; height:32px; border-radius:8px; background:var(--green-dim); color:var(--green); display:flex; align-items:center; justify-content:center; font-size:16px;">
+          <div style="width:32px; height:32px; border-radius:8px; background:rgba(0,0,0,0.06); color:#000000; display:flex; align-items:center; justify-content:center; font-size:16px;">
             <i class="bi bi-plus-circle-fill"></i>
           </div>
           <div>
@@ -312,10 +336,10 @@
             <div id="personPickerTrigger" class="person-picker-trigger" onclick="togglePersonPickerDropdown()">
               <div id="personSelectedView" style="display:none; align-items:center; justify-content:space-between; width:100%;">
                 <div style="display:flex; align-items:center; gap:8px; overflow:hidden;">
-                  <img id="selectedPersonFoto" src="/img/user-default.png" alt="Foto" style="width:26px; height:26px; border-radius:50%; object-fit:cover; border:1.5px solid var(--gold); flex-shrink:0;" />
+                  <img id="selectedPersonFoto" src="/img/user-default.png" alt="Foto" style="width:26px; height:26px; border-radius:50%; object-fit:cover; border:1.5px solid rgba(0,0,0,0.15); flex-shrink:0;" />
                   <div style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
                     <strong id="selectedPersonNama" style="color:var(--text); font-size:13px;"></strong>
-                    <span id="selectedPersonMeta" style="font-size:11px; color:var(--gold); font-family:var(--font-mono); margin-left:6px; font-weight:700;"></span>
+                    <span id="selectedPersonMeta" style="font-size:11px; color:#000000; font-family:var(--font-mono); margin-left:6px; font-weight:800;"></span>
                   </div>
                 </div>
                 <button type="button" class="btn-clear-person" onclick="clearSelectedPerson(event)" title="Ganti Pilihan">
@@ -323,7 +347,7 @@
                 </button>
               </div>
               <div id="personPlaceholderView" style="display:flex; align-items:center; gap:8px; color:var(--text-3); font-size:12.5px;">
-                <i class="bi bi-search" style="color:var(--gold);"></i>
+                <i class="bi bi-search" style="color:#000000;"></i>
                 <span id="personPlaceholderText">Ketik nama, NIS, atau kelas...</span>
               </div>
             </div>
@@ -332,7 +356,7 @@
             <div id="personDropdownPanel" class="person-dropdown-panel">
               <div style="padding:8px 10px; border-bottom:1px solid var(--border-2); background:var(--bg-3);">
                 <div style="position:relative;">
-                  <i class="bi bi-search" style="position:absolute; left:10px; top:50%; transform:translateY(-50%); color:var(--gold); font-size:12px;"></i>
+                  <i class="bi bi-search" style="position:absolute; left:10px; top:50%; transform:translateY(-50%); color:#000000; font-size:12px;"></i>
                   <input type="text" id="personSearchBox" placeholder="Ketik untuk mencari..." oninput="filterPersonPickerList(this.value)" style="width:100%; padding-left:32px; height:34px; font-size:12px; border-radius:var(--r-sm);" autocomplete="off" />
                 </div>
               </div>
@@ -346,20 +370,20 @@
                   <div class="person-picker-item picker-item-siswa" 
                        data-id="{{ $s->id }}" 
                        data-nama="{{ strtolower($s->nama) }}" 
-                       data-nis="{{ strtolower($s->nis) }}" 
+                       data-nisn="{{ strtolower($s->nisn ?? '') }}" 
                        data-rombel="{{ strtolower($rombelNama) }}" 
-                       onclick="selectSiswaItem('{{ $s->id }}', '{{ addslashes($s->nama) }}', '{{ $s->nis }}', '{{ $rombelNama }}', '{{ $s->foto_url }}')">
+                       onclick="selectSiswaItem('{{ $s->id }}', '{{ addslashes($s->nama) }}', '{{ $s->nisn ?: '-' }}', '{{ $rombelNama }}', '{{ $s->foto_url }}')">
                     <div style="display:flex; align-items:center; gap:8px;">
-                      <div class="avatar-circle avatar-sm gold-border">
+                      <div class="avatar-circle avatar-sm">
                         <img src="{{ $s->foto_url }}" alt="{{ $s->nama }}" class="avatar-img" />
                       </div>
                       <div>
                         <div style="font-weight:700; font-size:12.5px; color:var(--text);">{{ $s->nama }}</div>
-                        <div style="font-size:11px; color:var(--text-3); font-family:var(--font-mono);">NIS: {{ $s->nis }}</div>
+                        <div style="font-size:11px; color:var(--text-3); font-family:var(--font-mono);">NISN: {{ $s->nisn ?: '-' }}</div>
                       </div>
                     </div>
                     <div style="text-align:right; flex-shrink:0;">
-                      <span class="badge" style="background:var(--gold-dim); color:var(--gold); border:1px solid rgba(202,138,4,0.2); font-size:10.5px; padding:1px 6px;">
+                      <span class="badge" style="background:rgba(0,0,0,0.06); color:#000000; border:1px solid rgba(0,0,0,0.12); font-size:10.5px; padding:1px 6px;">
                         {{ $rombelNama }}
                       </span>
                     </div>
@@ -376,7 +400,7 @@
                        data-jabatan="{{ strtolower($g->jabatan ?? '') }}" 
                        onclick="selectGuruItem('{{ $g->id }}', '{{ addslashes($g->nama) }}', '{{ $g->nip ?? '-' }}', '{{ $g->jabatan ?? 'Guru' }}', '{{ $g->foto_url ?? '/img/user-default.png' }}')">
                     <div style="display:flex; align-items:center; gap:8px;">
-                      <div class="avatar-circle avatar-sm gold-border">
+                      <div class="avatar-circle avatar-sm">
                         <img src="{{ $g->foto_url ?? '/img/user-default.png' }}" alt="{{ $g->nama }}" class="avatar-img" />
                       </div>
                       <div>
@@ -385,7 +409,7 @@
                       </div>
                     </div>
                     <div style="text-align:right; flex-shrink:0;">
-                      <span class="badge" style="background:var(--green-dim); color:var(--green); border:1px solid rgba(22,163,74,0.2); font-size:10.5px; padding:1px 6px;">
+                      <span class="badge" style="background:rgba(0,0,0,0.06); color:#000000; border:1px solid rgba(0,0,0,0.12); font-size:10.5px; padding:1px 6px;">
                         {{ $g->jabatan ?? 'Guru' }}
                       </span>
                     </div>
@@ -444,7 +468,7 @@
               <input type="file" name="file_pendukung" id="inputFilePendukung" accept=".pdf,.jpg,.jpeg,.png,.webp" onchange="onFileSelected(this)" style="display:none !important;" />
               <label for="inputFilePendukung" class="file-upload-label" id="fileUploadLabel">
                 <div style="display:flex; align-items:center; gap:6px; overflow:hidden; white-space:nowrap; text-overflow:ellipsis; max-width:calc(100% - 70px);">
-                  <i class="bi bi-paperclip" style="color:var(--gold); font-size:15px; flex-shrink:0;"></i>
+                  <i class="bi bi-paperclip" style="color:#000000; font-size:15px; flex-shrink:0;"></i>
                   <span id="fileUploadText" style="text-overflow:ellipsis; overflow:hidden; font-weight:600; font-size:12px;">Pilih Surat / Foto</span>
                 </div>
                 <span class="badge" style="background:var(--bg-2); border:1px solid var(--border-2); color:var(--text); font-size:10.5px; padding:3px 8px; flex-shrink:0; font-weight:800;">Browse</span>
@@ -481,15 +505,15 @@
       </div>
 
       {{-- TAB 1: RIWAYAT IZIN SISWA --}}
-      <div class="izin-tab-pane {{ !request()->has('page_guru') ? 'active' : '' }}" id="tab-riwayat-siswa" style="border:1px solid var(--border); border-radius:var(--r-md); overflow:hidden; background:var(--bg-2); box-shadow:var(--shadow-sm); margin-top:14px;">
-        <div style="padding:12px 18px; border-bottom:1px solid var(--border); background:var(--surface); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
-          <div style="font-weight:800; font-size:14px; color:var(--text); display:flex; align-items:center; gap:8px;">
-            <i class="bi bi-people-fill" style="color:var(--gold);"></i>
+      <div class="izin-tab-pane {{ !request()->has('page_guru') ? 'active' : '' }}" id="tab-riwayat-siswa" style="border:1px solid var(--border); border-radius:var(--r-md); overflow:hidden; background:var(--bg-2); box-shadow:var(--shadow-sm); margin-top:8px;">
+        <div style="padding:8px 12px; border-bottom:1px solid var(--border); background:var(--surface); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+          <div style="font-weight:800; font-size:12.5px; color:var(--text); display:flex; align-items:center; gap:6px;">
+            <i class="bi bi-people-fill" style="color:#000000;"></i>
             <span>Daftar Riwayat Perizinan Siswa</span>
           </div>
-          <div style="position:relative; width:280px;">
-            <i class="bi bi-search" style="position:absolute; left:12px; top:50%; transform:translateY(-50%); color:var(--gold); font-size:12px;"></i>
-            <input type="text" placeholder="Cari nama, NIS, jenis..." oninput="filterTableIzin('tableIzinSiswa', this.value)" style="width:100%; padding-left:34px; height:36px; font-size:12px; border-radius:var(--r-sm); background:var(--bg-2); border:1px solid var(--border-2);" />
+          <div style="position:relative; width:100%; max-width:230px;">
+            <i class="bi bi-search" style="position:absolute; left:10px; top:50%; transform:translateY(-50%); color:#000000; font-size:11px;"></i>
+            <input type="text" placeholder="Cari nama, NISN, jenis..." oninput="filterTableIzin('tableIzinSiswa', this.value)" style="width:100%; padding-left:28px; height:30px; font-size:11.5px; border-radius:var(--r-sm); background:var(--bg-2); border:1px solid var(--border-2);" />
           </div>
         </div>
 
@@ -499,7 +523,7 @@
               <tr>
                 <th style="width:42px; text-align:center;">No</th>
                 <th>Tanggal</th>
-                <th>NIS</th>
+                <th>NISN</th>
                 <th>Nama Siswa</th>
                 <th>Jenis Izin</th>
                 <th style="text-align:center;">Status</th>
@@ -516,7 +540,7 @@
                   <td>
                     <div style="font-family:var(--font-mono); color:var(--text); font-weight:800; font-size:12.5px;">{{ $izin->tanggal }}</div>
                   </td>
-                  <td style="font-family:var(--font-mono); font-size:12.5px; font-weight:700; color:var(--text-2);">{{ $izin->siswa->nis ?? '-' }}</td>
+                  <td style="font-family:var(--font-mono); font-size:12.5px; font-weight:700; color:var(--text-2);">{{ $izin->siswa->nisn ?? '-' }}</td>
                   <td>
                     <strong style="color:var(--text); font-size:13px;">{{ $izin->siswa->nama ?? '-' }}</strong>
                   </td>
@@ -544,8 +568,8 @@
                   </td>
                   <td style="text-align:center;">
                     @if($izin->file_pendukung)
-                      <a href="{{ asset('storage/' . $izin->file_pendukung) }}" target="_blank" class="btn btn-sm btn-outline" style="padding:3px 8px; font-size:11px; font-weight:700; display:inline-flex; align-items:center; gap:4px; border-color:rgba(202,138,4,0.3); color:var(--gold);" title="Buka berkas bukti">
-                        <i class="bi bi-file-earmark-medical-fill"></i> Lihat Bukti
+                      <a href="{{ asset('storage/' . $izin->file_pendukung) }}" target="_blank" class="btn btn-sm btn-outline-mono" style="padding:3px 8px; font-size:11px; font-weight:800; display:inline-flex; align-items:center; gap:4px;" title="Buka berkas bukti">
+                        <i class="bi bi-file-earmark-medical-fill" style="color:#000000;"></i> Lihat Bukti
                       </a>
                     @else
                       <span style="color:var(--text-3); font-size:11px;">-</span>
@@ -579,7 +603,7 @@
         @if($izins instanceof \Illuminate\Pagination\LengthAwarePaginator && $izins->hasPages())
           <div style="padding:14px 18px; border-top:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; background:var(--bg-2);">
             <div style="font-size:12.5px; color:var(--text-2); font-weight:600;">
-              Menampilkan <strong style="color:var(--gold);">{{ $izins->firstItem() }}</strong> – <strong style="color:var(--gold);">{{ $izins->lastItem() }}</strong> dari <strong style="color:var(--text);">{{ $izins->total() }}</strong> izin siswa
+              Menampilkan <strong style="color:#000000;">{{ $izins->firstItem() }}</strong> – <strong style="color:#000000;">{{ $izins->lastItem() }}</strong> dari <strong style="color:var(--text);">{{ $izins->total() }}</strong> izin siswa
             </div>
             <div>
               {{ $izins->appends(request()->except('page_siswa'))->links() }}
@@ -589,15 +613,15 @@
       </div>
 
       {{-- TAB 2: RIWAYAT IZIN GURU --}}
-      <div class="izin-tab-pane {{ request()->has('page_guru') ? 'active' : '' }}" id="tab-riwayat-guru" style="border:1px solid var(--border); border-radius:var(--r-md); overflow:hidden; background:var(--bg-2); box-shadow:var(--shadow-sm); margin-top:14px;">
-        <div style="padding:12px 18px; border-bottom:1px solid var(--border); background:var(--surface); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
-          <div style="font-weight:800; font-size:14px; color:var(--text); display:flex; align-items:center; gap:8px;">
-            <i class="bi bi-person-badge-fill" style="color:var(--gold);"></i>
+      <div class="izin-tab-pane {{ request()->has('page_guru') ? 'active' : '' }}" id="tab-riwayat-guru" style="border:1px solid var(--border); border-radius:var(--r-md); overflow:hidden; background:var(--bg-2); box-shadow:var(--shadow-sm); margin-top:8px;">
+        <div style="padding:8px 12px; border-bottom:1px solid var(--border); background:var(--surface); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+          <div style="font-weight:800; font-size:12.5px; color:var(--text); display:flex; align-items:center; gap:6px;">
+            <i class="bi bi-person-badge-fill" style="color:#000000;"></i>
             <span>Daftar Riwayat Perizinan Guru &amp; Pegawai</span>
           </div>
-          <div style="position:relative; width:280px;">
-            <i class="bi bi-search" style="position:absolute; left:12px; top:50%; transform:translateY(-50%); color:var(--gold); font-size:12px;"></i>
-            <input type="text" placeholder="Cari nama, NIP, jenis..." oninput="filterTableIzin('tableIzinGuru', this.value)" style="width:100%; padding-left:34px; height:36px; font-size:12px; border-radius:var(--r-sm); background:var(--bg-2); border:1px solid var(--border-2);" />
+          <div style="position:relative; width:100%; max-width:230px;">
+            <i class="bi bi-search" style="position:absolute; left:10px; top:50%; transform:translateY(-50%); color:#000000; font-size:11px;"></i>
+            <input type="text" placeholder="Cari nama, NIP, jenis..." oninput="filterTableIzin('tableIzinGuru', this.value)" style="width:100%; padding-left:28px; height:30px; font-size:11.5px; border-radius:var(--r-sm); background:var(--bg-2); border:1px solid var(--border-2);" />
           </div>
         </div>
 
@@ -634,7 +658,7 @@
                       $badgeStyleGuru = match($izinG->jenis) {
                         'sakit' => 'background:rgba(59,130,246,0.12); color:#2563EB;',
                         'izin' => 'background:rgba(245,158,11,0.12); color:#D97706;',
-                        'dinas_luar' => 'background:rgba(16,185,129,0.12); color:#059669;',
+                        'dinas_luar' => 'background:rgba(168,85,247,0.12); color:#9333EA;',
                         'cuti' => 'background:rgba(6,182,212,0.12); color:#0891B2;',
                         'pulang_cepat' => 'background:rgba(168,85,247,0.12); color:#9333EA;',
                         default => 'background:var(--bg-3); color:var(--text-2);'
@@ -654,8 +678,8 @@
                   </td>
                   <td style="text-align:center;">
                     @if($izinG->file_pendukung)
-                      <a href="{{ asset('storage/' . $izinG->file_pendukung) }}" target="_blank" class="btn btn-sm btn-outline" style="padding:3px 8px; font-size:11px; font-weight:700; display:inline-flex; align-items:center; gap:4px; border-color:rgba(202,138,4,0.3); color:var(--gold);" title="Buka berkas bukti">
-                        <i class="bi bi-file-earmark-medical-fill"></i> Lihat Bukti
+                      <a href="{{ asset('storage/' . $izinG->file_pendukung) }}" target="_blank" class="btn btn-sm btn-outline-mono" style="padding:3px 8px; font-size:11px; font-weight:800; display:inline-flex; align-items:center; gap:4px;" title="Buka berkas bukti">
+                        <i class="bi bi-file-earmark-medical-fill" style="color:#000000;"></i> Lihat Bukti
                       </a>
                     @else
                       <span style="color:var(--text-3); font-size:11px;">-</span>
@@ -689,7 +713,7 @@
         @if($izinGurus instanceof \Illuminate\Pagination\LengthAwarePaginator && $izinGurus->hasPages())
           <div style="padding:14px 18px; border-top:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; background:var(--bg-2);">
             <div style="font-size:12.5px; color:var(--text-2); font-weight:600;">
-              Menampilkan <strong style="color:var(--gold);">{{ $izinGurus->firstItem() }}</strong> – <strong style="color:var(--gold);">{{ $izinGurus->lastItem() }}</strong> dari <strong style="color:var(--text);">{{ $izinGurus->total() }}</strong> izin guru
+              Menampilkan <strong style="color:#000000;">{{ $izinGurus->firstItem() }}</strong> – <strong style="color:#000000;">{{ $izinGurus->lastItem() }}</strong> dari <strong style="color:var(--text);">{{ $izinGurus->total() }}</strong> izin guru
             </div>
             <div>
               {{ $izinGurus->appends(request()->except('page_guru'))->links() }}

@@ -23,7 +23,7 @@
       transition: all .2s ease;
     }
     .kpi-disiplin-card:hover {
-      border-color: var(--gold);
+      border-color: #000000;
       transform: translateY(-2px);
     }
     .kpi-disiplin-card.active {
@@ -72,7 +72,7 @@
       background: var(--bg-3);
       padding: 6px 10px;
       border-radius: var(--r-sm);
-      border-left: 3px solid var(--gold);
+      border-left: 3px solid #000000;
       margin-top: 4px;
     }
 
@@ -96,20 +96,20 @@
       border-radius: 8px;
       font-size: 11.5px;
       font-weight: 800;
-      color: var(--gold);
-      background: var(--gold-dim);
-      border: 1px solid rgba(202, 138, 4, 0.35);
+      color: #000000;
+      background: rgba(0,0,0,0.05);
+      border: 1px solid rgba(0,0,0,0.15);
       text-decoration: none;
       transition: all 0.2s ease;
       box-shadow: 0 1px 3px rgba(0,0,0,0.05);
       margin-bottom: 5px;
     }
     .btn-dossier-compact:hover {
-      background: var(--gold);
-      color: #000;
-      border-color: var(--gold);
+      background: #000000;
+      color: #FFFFFF;
+      border-color: #000000;
       transform: translateY(-1px);
-      box-shadow: 0 4px 10px var(--gold-glow);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
     }
     .action-toolbar-row {
       display: flex;
@@ -144,7 +144,7 @@
       border-color: var(--border-2);
       box-shadow: 0 3px 8px rgba(0,0,0,0.12);
     }
-    .btn-tool-item.tool-edit:hover { background: rgba(202,138,4,0.15); color: var(--gold); border-color: var(--gold); }
+    .btn-tool-item.tool-edit:hover { background: rgba(0,0,0,0.08); color: #000000; border-color: #000000; }
     .btn-tool-item.tool-resume:hover { background: rgba(220,38,38,0.15); color: #DC2626; border-color: #DC2626; }
     .btn-tool-item.tool-check:hover { background: rgba(22,163,74,0.15); color: #16A34A; border-color: #16A34A; }
     .btn-tool-item.tool-delete:hover { background: rgba(220,38,38,0.15); color: #DC2626; border-color: #DC2626; }
@@ -260,24 +260,29 @@
   @include('partials.sidebar')
 
   <main class="main-content">
-    <header class="header" style="margin-bottom:20px;">
-      <div class="header-title">
-        <h1 style="margin:0; font-size:22px;">Buku Kasus &amp; Penegakan Disiplin Siswa</h1>
-        <p style="margin-top:2px; font-size:13px; color:var(--text-3);">
-          Alur Pembinaan Berjenjang: Wali Kelas &rarr; Guru BK &rarr; Waka Kesiswaan &rarr; Kepala Sekolah
-        </p>
-      </div>
+    {{-- ULTRA COMPACT SLIM HEADER BAR --}}
+    <div class="panel no-print" style="background:var(--bg-2); border:1px solid var(--border); padding:10px 16px; margin-bottom:12px; border-radius:var(--r-md); box-shadow:var(--shadow-sm);">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+        <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+          <h1 style="margin:0; font-size:16px; font-weight:900; color:var(--text); display:inline-flex; align-items:center; gap:6px;">
+            <i class="bi bi-shield-exclamation" style="color:#000000; font-size:16px;"></i> Penegakan Disiplin &amp; Poin Siswa
+          </h1>
+          <span style="color:var(--border-2); font-weight:300;">|</span>
+          <span style="font-size:11.5px; color:var(--text-3);">
+            Alur Pembinaan: Wali Kelas &rarr; Guru BK &rarr; Wakasis &rarr; Kepsek
+          </span>
+        </div>
 
-      <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
-        @if($user->isAdmin() || $user->isWakaKesiswaan())
-          <button type="button" class="btn btn-outline-mono" onclick="openModalPengaturanDisiplin()">
-            <i class="bi bi-sliders2"></i> Aturan Poin &amp; Reward
-          </button>
-        @endif
-
-        @include('partials.header_actions')
+        <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+          @if($user->isAdmin() || $user->isWakaKesiswaan())
+            <button type="button" class="btn btn-sm btn-outline" onclick="openModalPengaturanDisiplin()" style="height:32px; padding:0 10px; font-size:11.5px; font-weight:800; color:#000000; border:1px solid var(--border-2); background:var(--bg-2); display:inline-flex; align-items:center; gap:4px; border-radius:6px;">
+              <i class="bi bi-sliders2"></i> Aturan Poin
+            </button>
+          @endif
+          @include('partials.header_actions')
+        </div>
       </div>
-    </header>
+    </div>
 
     @if(session('success'))
       <div class="alert-success" style="margin-bottom:16px;">
@@ -290,39 +295,33 @@
       </div>
     @endif
 
-    {{-- KPI COUNTER CARDS --}}
+    {{-- KPI COUNTER CARDS (ALUR PEMBINAAN KEDISIPLINAN) --}}
     <div class="kpi-disiplin-grid">
-      <a href="{{ route('admin.disiplin.index') }}" class="kpi-disiplin-card {{ empty($tahapFilter) ? 'active' : '' }}">
-        <div class="tahap-pill-counter" style="color:var(--text); font-weight:800;"><i class="bi bi-collection-fill"></i> Semua Kasus</div>
-        <div class="kpi-disiplin-num" style="color:var(--text);">{{ $totalKasus }}</div>
-        <div style="font-size:10.5px; color:var(--text-2);">Total kasus aktif</div>
-      </a>
-
-      <a href="{{ route('admin.disiplin.index', ['tahap' => 'tahap_1_wali_kelas']) }}" class="kpi-disiplin-card {{ $tahapFilter === 'tahap_1_wali_kelas' ? 'active' : '' }}">
+      <a href="{{ route('admin.disiplin.index', array_filter(['tahap' => 'tahap_1_wali_kelas', 'rombel_id' => $rombelId, 'search' => $search])) }}" class="kpi-disiplin-card {{ $tahapFilter === 'tahap_1_wali_kelas' ? 'active' : '' }}">
         <div class="tahap-pill-counter" style="color:var(--text); font-weight:800;"><i class="bi bi-person-fill"></i> Tahap 1: Wali</div>
         <div class="kpi-disiplin-num" style="color:var(--text);">{{ $statTahap1 }}</div>
         <div style="font-size:10.5px; color:var(--text-2);">Pembinaan awal</div>
       </a>
 
-      <a href="{{ route('admin.disiplin.index', ['tahap' => 'tahap_2_bk']) }}" class="kpi-disiplin-card {{ $tahapFilter === 'tahap_2_bk' ? 'active' : '' }}">
+      <a href="{{ route('admin.disiplin.index', array_filter(['tahap' => 'tahap_2_bk', 'rombel_id' => $rombelId, 'search' => $search])) }}" class="kpi-disiplin-card {{ $tahapFilter === 'tahap_2_bk' ? 'active' : '' }}">
         <div class="tahap-pill-counter" style="color:var(--text); font-weight:800;"><i class="bi bi-heart-pulse-fill"></i> Tahap 2: BK</div>
         <div class="kpi-disiplin-num" style="color:var(--text);">{{ $statTahap2 }}</div>
         <div style="font-size:10.5px; color:var(--text-2);">Panggilan &amp; konseling</div>
       </a>
 
-      <a href="{{ route('admin.disiplin.index', ['tahap' => 'tahap_3_wakasis']) }}" class="kpi-disiplin-card {{ $tahapFilter === 'tahap_3_wakasis' ? 'active' : '' }}">
+      <a href="{{ route('admin.disiplin.index', array_filter(['tahap' => 'tahap_3_wakasis', 'rombel_id' => $rombelId, 'search' => $search])) }}" class="kpi-disiplin-card {{ $tahapFilter === 'tahap_3_wakasis' ? 'active' : '' }}">
         <div class="tahap-pill-counter" style="color:var(--text); font-weight:800;"><i class="bi bi-shield-shaded"></i> Tahap 3: Wakasis</div>
         <div class="kpi-disiplin-num" style="color:var(--text);">{{ $statTahap3 }}</div>
         <div style="font-size:10.5px; color:var(--text-2);">Sidang &amp; sanksi SP 3</div>
       </a>
 
-      <a href="{{ route('admin.disiplin.index', ['tahap' => 'tahap_4_kepsek']) }}" class="kpi-disiplin-card {{ $tahapFilter === 'tahap_4_kepsek' ? 'active' : '' }}">
+      <a href="{{ route('admin.disiplin.index', array_filter(['tahap' => 'tahap_4_kepsek', 'rombel_id' => $rombelId, 'search' => $search])) }}" class="kpi-disiplin-card {{ $tahapFilter === 'tahap_4_kepsek' ? 'active' : '' }}">
         <div class="tahap-pill-counter" style="color:var(--text); font-weight:800;"><i class="bi bi-award-fill"></i> Tahap 4: Kepsek</div>
         <div class="kpi-disiplin-num" style="color:var(--text);">{{ $statTahap4 }}</div>
         <div style="font-size:10.5px; color:var(--text-2);">Pengesahan keputusan</div>
       </a>
 
-      <a href="{{ route('admin.disiplin.index', ['tahap' => 'selesai_pembinaan']) }}" class="kpi-disiplin-card {{ $tahapFilter === 'selesai_pembinaan' ? 'active' : '' }}">
+      <a href="{{ route('admin.disiplin.index', array_filter(['tahap' => 'selesai_pembinaan', 'rombel_id' => $rombelId, 'search' => $search])) }}" class="kpi-disiplin-card {{ $tahapFilter === 'selesai_pembinaan' ? 'active' : '' }}">
         <div class="tahap-pill-counter" style="color:var(--text); font-weight:800;"><i class="bi bi-check-circle-fill"></i> Selesai</div>
         <div class="kpi-disiplin-num" style="color:var(--text);">{{ $statSelesai }}</div>
         <div style="font-size:10.5px; color:var(--text-2);">Disiplin pulih</div>
@@ -332,20 +331,21 @@
     {{-- KONTEN UTAMA: KANBAN ATAU TABEL TERPADU --}}
     <div class="panel" style="padding:0; overflow:hidden; border:1px solid var(--border); border-radius:var(--r-md); box-shadow:var(--shadow-sm); background:var(--bg-2); margin-bottom:24px;">
       {{-- Header & Toolbar Terpadu --}}
-      <div style="padding:14px 18px; border-bottom:1px solid var(--border); background:var(--surface); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
-        <div style="font-weight:800; font-size:15px; color:var(--text); display:flex; align-items:center; gap:8px;">
+      <div style="padding:8px 12px; border-bottom:1px solid var(--border); background:var(--surface); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+        <div style="font-weight:800; font-size:13.5px; color:var(--text); display:flex; align-items:center; gap:6px;">
           <i class="bi bi-journals" style="color:#000000;"></i>
           <span>Daftar Kasus &amp; Pembinaan Siswa</span>
         </div>
-        <form action="{{ route('admin.disiplin.index') }}" method="GET" style="display:flex; gap:8px; align-items:center; flex-wrap:wrap; flex:1; justify-content:flex-end; max-width:650px;">
+        <form action="{{ route('admin.disiplin.index') }}" method="GET" style="display:flex; gap:6px; align-items:center; flex-wrap:wrap; flex:1; justify-content:flex-end; max-width:520px;">
           <input type="hidden" name="tahap" value="{{ $tahapFilter }}" />
           
-          <div style="flex:1.5; min-width:180px;">
-            <input type="text" name="search" class="input-field" placeholder="Cari nama siswa / NIS..." value="{{ $search }}" style="width:100%; height:36px; font-size:12px; background:var(--bg-2); border:1px solid var(--border-2); border-radius:var(--r-sm); padding:0 12px;" />
+          <div style="position:relative; flex:1; min-width:140px;">
+            <i class="bi bi-search" style="position:absolute; left:10px; top:50%; transform:translateY(-50%); color:var(--text-3); font-size:11px;"></i>
+            <input type="text" name="search" class="input-field" placeholder="Cari nama siswa / NISN..." value="{{ $search }}" style="width:100%; height:32px; font-size:11.5px; background:var(--bg-2); border:1px solid var(--border-2); border-radius:var(--r-sm); padding-left:28px; padding-right:8px;" />
           </div>
 
-          <div style="min-width:160px;">
-            <select name="rombel_id" class="input-field" style="width:100%; height:36px; font-size:12px; background:var(--bg-2); border:1px solid var(--border-2); border-radius:var(--r-sm);" onchange="this.form.submit()">
+          <div style="width:130px; flex-shrink:0;">
+            <select name="rombel_id" class="input-field" style="width:100%; height:32px; font-size:11.5px; background:var(--bg-2); border:1px solid var(--border-2); border-radius:var(--r-sm); padding:0 8px;" onchange="this.form.submit()">
               <option value="">Semua Rombel</option>
               @foreach($rombels as $r)
                 <option value="{{ $r->id }}" {{ $rombelId == $r->id ? 'selected' : '' }}>
@@ -355,12 +355,12 @@
             </select>
           </div>
 
-          <button type="submit" class="btn btn-outline" style="height:36px; padding:0 12px; font-size:12px; font-weight:700;">
-            <i class="bi bi-search"></i> Cari
+          <button type="submit" class="btn btn-sm btn-outline" style="height:32px; padding:0 10px; font-size:11.5px; font-weight:800; border-radius:var(--r-sm); flex-shrink:0;">
+            Cari
           </button>
 
           @if($search || $rombelId || $tahapFilter)
-            <a href="{{ route('admin.disiplin.index') }}" class="btn btn-outline" style="height:36px; padding:0 10px; font-size:12px; color:var(--red); border-color:rgba(239,68,68,0.4);" title="Reset Filter">
+            <a href="{{ route('admin.disiplin.index') }}" class="btn btn-sm btn-outline" style="height:32px; padding:0 8px; font-size:11px; font-weight:800; color:var(--red); border-color:rgba(239,68,68,0.4); border-radius:var(--r-sm); flex-shrink:0;" title="Reset Filter">
               Reset
             </a>
           @endif
@@ -418,7 +418,7 @@
                       <div style="min-width:0;">
                         <strong style="color:var(--text); font-size:13px; display:block; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ $siswa->nama ?? '-' }}</strong>
                         <div style="font-size:11px; color:var(--text-3); font-family:var(--font-mono); margin-top:2px;">
-                          {{ $siswa->nis ?? '-' }} · <span style="color:var(--text); font-weight:700;">{{ $rombelAktif->nama_rombel ?? '-' }}</span>
+                          NISN: {{ $siswa->nisn ?: '-' }} · <span style="color:var(--text); font-weight:700;">{{ $rombelAktif->nama_rombel ?? '-' }}</span>
                         </div>
                       </div>
                     </div>
@@ -491,10 +491,23 @@
                 </tr>
               @empty
                 <tr>
-                  <td colspan="6" style="text-align:center; padding:40px; color:var(--text-3);">
-                    <div style="font-size:38px; margin-bottom:8px;">🛡️</div>
-                    <div style="font-weight:700; font-size:14.5px; color:var(--text);">Tidak ada catatan kasus disiplin aktif</div>
-                    <p style="font-size:12px; margin-top:4px;">Semua siswa dalam kondisi tertib atau belum ada kasus yang dilaporkan.</p>
+                  <td colspan="6" style="text-align:center; padding:45px 20px; color:var(--text-3);">
+                    @if($user->isWaliKelas() && in_array($tahapFilter, ['tahap_2_bk', 'tahap_3_wakasis', 'tahap_4_kepsek']))
+                      <div style="font-weight:800; font-size:14px; color:var(--text); margin-bottom:4px;">
+                        Data Kasus Pada Tahap Ini Dikelola Oleh Pejabat Terkait
+                      </div>
+                      <p style="font-size:12px; color:var(--text-2); max-width:480px; margin:0 auto; line-height:1.5;">
+                        Sesuai tata kelola kerahasiaan &amp; wewenang pembinaan berjenjang, rincian kasus pada tahap ini dikelola langsung oleh 
+                        <strong>{{ $tahapFilter === 'tahap_2_bk' ? 'Guru BK' : ($tahapFilter === 'tahap_3_wakasis' ? 'Waka Kesiswaan' : 'Kepala Sekolah') }}</strong>.
+                      </p>
+                    @else
+                      <div style="font-weight:800; font-size:14px; color:var(--text); margin-bottom:4px;">
+                        Tidak Ada Catatan Kasus Disiplin
+                      </div>
+                      <p style="font-size:12px; color:var(--text-2); margin:0;">
+                        Semua siswa dalam kondisi tertib atau belum ada kasus pada filter yang dipilih.
+                      </p>
+                    @endif
                   </td>
                 </tr>
               @endforelse
@@ -522,13 +535,13 @@
   <div class="modal-card" style="max-width:540px; padding:24px;">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
       <h3 style="font-size:17px; font-weight:900; color:var(--text); margin:0;">
-        <i class="bi bi-pencil-square" style="color:var(--gold);"></i> Tindak Lanjut Pembinaan Siswa
+        <i class="bi bi-pencil-square" style="color:#000000;"></i> Tindak Lanjut Pembinaan Siswa
       </h3>
       <button type="button" class="btn btn-sm btn-outline" onclick="closeModalTindakLanjut()"><i class="bi bi-x-lg"></i></button>
     </div>
 
     <div style="background:var(--bg-3); border-radius:var(--r-sm); padding:10px 14px; margin-bottom:14px; font-size:12.5px;">
-      Siswa: <strong style="color:var(--gold);" id="tlSiswaNama">-</strong>
+      Siswa: <strong style="color:#000000; font-weight:900;" id="tlSiswaNama">-</strong>
     </div>
 
     <form id="formTindakLanjut" method="POST" action="">

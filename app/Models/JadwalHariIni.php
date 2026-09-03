@@ -42,6 +42,18 @@ class JadwalHariIni extends Model
 
         $jadwal = self::where('tanggal', $dateStr)->first();
         if ($jadwal) {
+            // Otomatis tutup sesi jika sudah melewati jam_tutup_gerbang pada hari ini
+            if ($jadwal->is_sesi_buka && $date->isToday() && $jadwal->jam_tutup_gerbang) {
+                $nowStr = Carbon::now()->format('H:i:s');
+                if ($nowStr >= $jadwal->jam_tutup_gerbang) {
+                    $jadwal->update([
+                        'is_sesi_buka' => false,
+                        'waktu_tutup_sesi' => now(),
+                        'diubah_oleh' => 'Sistem Otomatis (Batas Jam Tutup)',
+                    ]);
+                    $jadwal->is_sesi_buka = false;
+                }
+            }
             return $jadwal;
         }
 
@@ -57,7 +69,7 @@ class JadwalHariIni extends Model
             'jam_tutup_gerbang' => '18:00:00',
             'keterangan' => $ketDefault,
             'diubah_oleh' => 'Sistem Otomatis',
-            'is_sesi_buka' => true,
+            'is_sesi_buka' => false,
         ]);
     }
 

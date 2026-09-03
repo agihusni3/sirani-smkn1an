@@ -250,8 +250,8 @@ class PeringkatController extends Controller
             $result[] = [
                 'id' => $s->id,
                 'nama' => $s->nama,
-                'nis' => $s->nis,
-                'ident' => $s->nis,
+                'nisn' => $s->nisn,
+                'ident' => $s->nisn,
                 'rombel' => $rombelNama,
                 'sub' => $rombelNama,
                 'foto' => $s->foto ?? null,
@@ -523,7 +523,7 @@ class PeringkatController extends Controller
             'tipe' => 'siswa',
             'person' => $siswa,
             'nama' => $siswa->nama,
-            'nomorInduk' => "NIS: {$siswa->nis} / NISN: " . ($siswa->nisn ?? '-'),
+            'nomorInduk' => "NISN: " . ($siswa->nisn ?: '-'),
             'instansi' => "Kelas: " . ($rombel?->nama_rombel ?? '-'),
             'rank' => $rank,
             'predikat' => $predikat,
@@ -689,7 +689,7 @@ class PeringkatController extends Controller
 
             fputcsv($file, [
                 'Peringkat',
-                $kategori === 'siswa' ? 'NIS' : 'NIP',
+                $kategori === 'siswa' ? 'NISN' : 'NIP',
                 'Nama Lengkap',
                 $kategori === 'siswa' ? 'Rombel / Kelas' : 'Jabatan',
                 'Hadir Tepat Waktu',

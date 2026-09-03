@@ -57,9 +57,28 @@ class KasusDisiplinController extends Controller
             ->forUser($user);
 
         // Filter Tahap
-        $tahapFilter = $request->input('tahap');
-        if ($tahapFilter && in_array($tahapFilter, ['tahap_1_wali_kelas', 'tahap_2_bk', 'tahap_3_wakasis', 'tahap_4_kepsek', 'selesai_pembinaan'])) {
-            $query->where('status_tahap', $tahapFilter);
+        if ($request->has('tahap')) {
+            $tahapFilter = $request->input('tahap');
+            if ($tahapFilter && in_array($tahapFilter, ['tahap_1_wali_kelas', 'tahap_2_bk', 'tahap_3_wakasis', 'tahap_4_kepsek', 'selesai_pembinaan'])) {
+                $query->where('status_tahap', $tahapFilter);
+            }
+        } else {
+            if ($user->isWaliKelas() && !$user->isAdmin() && !$user->isKepalaSekolah() && !$user->isWakaKesiswaan() && !$user->isGuruBk()) {
+                $tahapFilter = 'tahap_1_wali_kelas';
+                $query->where('status_tahap', 'tahap_1_wali_kelas');
+            } elseif ($user->isGuruBk() && !$user->isAdmin() && !$user->isKepalaSekolah() && !$user->isWakaKesiswaan() && !$user->isWaliKelas()) {
+                $tahapFilter = 'tahap_2_bk';
+                $query->where('status_tahap', 'tahap_2_bk');
+            } elseif ($user->isWakaKesiswaan() && !$user->isAdmin() && !$user->isKepalaSekolah() && !$user->isGuruBk() && !$user->isWaliKelas()) {
+                $tahapFilter = 'tahap_3_wakasis';
+                $query->where('status_tahap', 'tahap_3_wakasis');
+            } elseif ($user->isKepalaSekolah() && !$user->isAdmin() && !$user->isWakaKesiswaan() && !$user->isGuruBk() && !$user->isWaliKelas()) {
+                $tahapFilter = 'tahap_4_kepsek';
+                $query->where('status_tahap', 'tahap_4_kepsek');
+            } else {
+                $tahapFilter = 'tahap_1_wali_kelas';
+                $query->where('status_tahap', 'tahap_1_wali_kelas');
+            }
         }
 
         // Filter Rombel
@@ -71,11 +90,11 @@ class KasusDisiplinController extends Controller
         }
 
         // Search Siswa
-        $search = $request->input('search');
+        $search = $request->input('search') ?: $request->input('q');
         if ($search) {
             $query->whereHas('siswa', function ($q) use ($search) {
                 $q->where('nama', 'like', "%{$search}%")
-                  ->orWhere('nis', 'like', "%{$search}%");
+                  ->orWhere('nisn', 'like', "%{$search}%");
             });
         }
 
@@ -90,8 +109,13 @@ class KasusDisiplinController extends Controller
             ->paginate(10)
             ->withQueryString();
 
-        // 3. Statistik Hitungan per Tahap (Scoped for user)
+        // 3. Statistik Hitungan Angka per Tahap (Ringkasan statistik di kartu KPI sesuai wewenang/kelas user)
         $baseStatQuery = KasusDisiplin::where('is_active', true)->forUser($user);
+        if ($rombelId) {
+            $baseStatQuery->whereHas('siswa.siswaRombels', function ($q) use ($rombelId) {
+                $q->where('rombel_id', $rombelId)->where('status_keanggotaan', 'aktif');
+            });
+        }
         $statTahap1    = (clone $baseStatQuery)->where('status_tahap', 'tahap_1_wali_kelas')->count();
         $statTahap2    = (clone $baseStatQuery)->where('status_tahap', 'tahap_2_bk')->count();
         $statTahap3    = (clone $baseStatQuery)->where('status_tahap', 'tahap_3_wakasis')->count();
@@ -99,10 +123,9 @@ class KasusDisiplinController extends Controller
         $statSelesai   = (clone $baseStatQuery)->where('status_tahap', 'selesai_pembinaan')->count();
         $totalKasus    = (clone $baseStatQuery)->count();
 
-        $rombels = Rombel::orderBy('tingkat')->orderBy('nama_rombel')->get();
-
         if ($user->isWaliKelas() && !$user->isAdmin() && !$user->isKepalaSekolah() && !$user->isWakaKesiswaan() && !$user->isGuruBk()) {
             $rombelIds = $user->guru ? $user->guru->rombels()->pluck('id') : collect();
+            $rombels = Rombel::whereIn('id', $rombelIds)->orderBy('tingkat')->orderBy('nama_rombel')->get();
             $allSiswa = Siswa::where('status', 'aktif')
                 ->whereHas('siswaRombels', function ($q) use ($rombelIds) {
                     $q->whereIn('rombel_id', $rombelIds)->where('status_keanggotaan', 'aktif');
@@ -110,6 +133,7 @@ class KasusDisiplinController extends Controller
                 ->orderBy('nama')
                 ->get();
         } else {
+            $rombels = Rombel::orderBy('tingkat')->orderBy('nama_rombel')->get();
             $allSiswa = Siswa::where('status', 'aktif')->orderBy('nama')->get();
         }
 
@@ -134,15 +158,32 @@ class KasusDisiplinController extends Controller
     }
 
     /**
-     * Helper validasi hak akses perwalian untuk Wali Kelas.
+     * Helper validasi hak akses perwalian & kerahasiaan kasus per role.
      */
     private function checkAksesKasus($user, KasusDisiplin $kasus): void
     {
-        if ($user->isWaliKelas() && !$user->isAdmin() && !$user->isKepalaSekolah() && !$user->isWakaKesiswaan() && !$user->isGuruBk()) {
+        if ($user->isAdmin()) return; // Admin memiliki akses penuh
+
+        // 1. Wali Kelas: Eksklusif hanya siswa di rombel perwaliannya
+        if ($user->isWaliKelas() && !$user->isKepalaSekolah() && !$user->isWakaKesiswaan() && !$user->isGuruBk()) {
             $rombelIds = $user->guru ? $user->guru->rombels()->pluck('id')->toArray() : [];
             $siswaRombelId = $kasus->siswa->siswaRombels()->where('status_keanggotaan', 'aktif')->value('rombel_id');
             if (!in_array($siswaRombelId, $rombelIds)) {
-                abort(403, 'Akses ditolak: Anda hanya berwenang mengakses data siswa di kelas yang Anda walikan.');
+                abort(403, 'Akses ditolak: Anda hanya berwenang mengakses berkas disiplin siswa di kelas yang Anda walikan.');
+            }
+        }
+
+        // 2. Guru BK: Hanya kasus yang sudah masuk/dieskalasi ke ranah BK (Tahap 2 ke atas)
+        if ($user->isGuruBk() && !$user->isKepalaSekolah() && !$user->isWakaKesiswaan() && !$user->isWaliKelas()) {
+            if ($kasus->status_tahap === 'tahap_1_wali_kelas' && empty($kasus->catatan_bk) && empty($kasus->tanggal_panggilan_bk)) {
+                abort(403, 'Akses ditolak: Kasus ini masih berada dalam pembinaan internal Wali Kelas dan belum dieskalasi ke BK.');
+            }
+        }
+
+        // 3. Kepala Sekolah: Hanya kasus eksekutif (Tahap 3 & 4 / telaah SK)
+        if ($user->isKepalaSekolah() && !$user->isWakaKesiswaan() && !$user->isGuruBk() && !$user->isWaliKelas()) {
+            if (in_array($kasus->status_tahap, ['tahap_1_wali_kelas', 'tahap_2_bk'])) {
+                abort(403, 'Akses ditolak: Kasus ini masih dalam tahap pembinaan awal dan belum diajukan ke Kepala Sekolah.');
             }
         }
     }
@@ -367,7 +408,50 @@ class KasusDisiplinController extends Controller
 
         $kasus->touch();
 
-        return back()->with('success', 'Catatan log interaksi berhasil ditambahkan ke timeline kasus.');
+        return back()->with('success', 'Catatan peristiwa berhasil ditambahkan ke timeline kasus.');
+    }
+
+    /**
+     * Update catatan log timeline pembinaan.
+     */
+    public function updateLog(Request $request, $id, $logId)
+    {
+        $kasus = KasusDisiplin::findOrFail($id);
+        $user = auth()->user();
+        $this->checkAksesKasus($user, $kasus);
+        $this->validateWewenangTahap($user, $kasus->status_tahap);
+
+        $log = KasusDisiplinLog::where('kasus_disiplin_id', $id)->findOrFail($logId);
+
+        $request->validate([
+            'judul_kegiatan'   => 'required|string|max:255',
+            'uraian_tindakan'  => 'required|string|max:2000',
+            'tanggal_kegiatan' => 'required|date',
+        ]);
+
+        $log->update([
+            'judul_kegiatan'   => $request->input('judul_kegiatan'),
+            'uraian_tindakan'  => $request->input('uraian_tindakan'),
+            'tanggal_kegiatan' => $request->input('tanggal_kegiatan'),
+        ]);
+
+        return back()->with('success', 'Catatan peristiwa timeline berhasil diperbarui.');
+    }
+
+    /**
+     * Hapus catatan log timeline pembinaan.
+     */
+    public function destroyLog($id, $logId)
+    {
+        $kasus = KasusDisiplin::findOrFail($id);
+        $user = auth()->user();
+        $this->checkAksesKasus($user, $kasus);
+        $this->validateWewenangTahap($user, $kasus->status_tahap);
+
+        $log = KasusDisiplinLog::where('kasus_disiplin_id', $id)->findOrFail($logId);
+        $log->delete();
+
+        return back()->with('success', 'Catatan peristiwa timeline berhasil dihapus.');
     }
 
     /**
@@ -383,6 +467,7 @@ class KasusDisiplinController extends Controller
         $request->validate([
             'judul_dokumen' => 'required|string|max:255',
             'kategori'      => 'required|in:surat_pernyataan,foto_dokumentasi,berita_acara,surat_dokter,lainnya',
+            'tahap'         => 'nullable|in:tahap_1_wali_kelas,tahap_2_bk,tahap_3_wakasis,tahap_4_kepsek,selesai_pembinaan',
             'file'          => 'required|file|mimes:jpg,jpeg,png,webp,pdf|max:5120', // Max 5MB
         ]);
 
@@ -395,12 +480,13 @@ class KasusDisiplinController extends Controller
                 'kasus_disiplin_id' => $kasus->id,
                 'judul_dokumen'     => $request->input('judul_dokumen'),
                 'kategori'          => $request->input('kategori'),
+                'tahap'             => $request->input('tahap', $kasus->status_tahap),
                 'file_path'         => $path,
                 'file_type'         => $file->getMimeType(),
                 'diupload_oleh'     => $user->name ?? 'Petugas',
             ]);
 
-            return back()->with('success', 'Dokumen bukti fisik berhasil diunggah ke brankas digital.');
+            return back()->with('success', 'Dokumen bukti fisik berhasil diunggah dan tersemat pada ' . ($request->input('tahap') ? str_replace('_', ' ', strtoupper($request->input('tahap'))) : 'tahap aktif') . '.');
         }
 
         return back()->with('error', 'Gagal mengunggah berkas.');
@@ -544,8 +630,29 @@ class KasusDisiplinController extends Controller
 
         $siswa   = $kasus->siswa;
         $sekolah = PengaturanSekolah::getAktif();
-        $rombel  = $siswa->siswaRombels->where('status_keanggotaan', 'aktif')->first()?->rombel;
-        $wali    = $rombel?->waliKelas;
+        $rombel  = $siswa->siswaRombels->where('status_keanggotaan', 'aktif')->first()?->rombel
+            ?? $siswa->siswaRombels->last()?->rombel;
+        $wali    = $rombel?->waliKelas ?: \App\Models\Guru::where('status', 'aktif')->whereNotNull('nama')->first();
+
+        $guruBk  = \App\Models\User::where('role', 'guru_bk')->with('guru')->first()?->guru
+            ?? \App\Models\Guru::where('status', 'aktif')
+                ->where(function ($q) {
+                    $q->where('jabatan', 'like', '%BK%')
+                      ->orWhere('jabatan', 'like', '%Bimbingan%')
+                      ->orWhere('jabatan', 'like', '%Konseling%');
+                })
+                ->first()
+            ?? $wali;
+
+        $wakasis = \App\Models\User::where('role', 'waka_kesiswaan')->with('guru')->first()?->guru
+            ?? \App\Models\Guru::where('status', 'aktif')
+                ->where(function ($q) {
+                    $q->where('jabatan', 'like', '%Kesiswaan%')
+                      ->orWhere('jabatan', 'like', '%Wakasis%')
+                      ->orWhere('jabatan', 'like', '%Waka%');
+                })
+                ->first()
+            ?? $wali;
 
         // Hitung total alpha & bolos
         $totalAlpha = Absensi::where('pemilik_type', 'siswa')->where('pemilik_id', $siswa->id)->where('status', 'alpha')->count();
@@ -553,6 +660,47 @@ class KasusDisiplinController extends Controller
         $totalTerlambat = Absensi::where('pemilik_type', 'siswa')->where('pemilik_id', $siswa->id)->where('status', 'terlambat')->count();
 
         return view('disiplin.cetak_resume', compact(
+            'kasus',
+            'siswa',
+            'sekolah',
+            'rombel',
+            'wali',
+            'guruBk',
+            'wakasis',
+            'totalAlpha',
+            'totalBolos',
+            'totalTerlambat'
+        ));
+    }
+
+    /**
+     * Cetak Lembar "Surat Keputusan (SK) Kepala Sekolah" mengenai Penetapan Sanksi / Tindak Lanjut Kesiswaan Final.
+     */
+    public function cetakSkKepsek($id)
+    {
+        $kasus = KasusDisiplin::with([
+            'siswa.siswaRombels.rombel.waliKelas',
+            'siswa.siswaRombels.rombel.jurusan',
+            'logs',
+            'dokumens',
+            'tahunAjaran'
+        ])->findOrFail($id);
+
+        $user = auth()->user();
+        $this->checkAksesKasus($user, $kasus);
+
+        $siswa   = $kasus->siswa;
+        $sekolah = PengaturanSekolah::getAktif();
+        $rombel  = $siswa->siswaRombels->where('status_keanggotaan', 'aktif')->first()?->rombel
+            ?? $siswa->siswaRombels->last()?->rombel;
+        $wali    = $rombel?->waliKelas ?: \App\Models\Guru::where('status', 'aktif')->whereNotNull('nama')->first();
+
+        // Hitung total alpha, bolos, terlambat
+        $totalAlpha = Absensi::where('pemilik_type', 'siswa')->where('pemilik_id', $siswa->id)->where('status', 'alpha')->count();
+        $totalBolos = Absensi::where('pemilik_type', 'siswa')->where('pemilik_id', $siswa->id)->where('status', 'bolos')->count();
+        $totalTerlambat = Absensi::where('pemilik_type', 'siswa')->where('pemilik_id', $siswa->id)->where('status', 'terlambat')->count();
+
+        return view('disiplin.cetak_sk', compact(
             'kasus',
             'siswa',
             'sekolah',

@@ -84,31 +84,37 @@ class AuditLog extends Model
 
     public function badgeClass(): string
     {
-        return match ($this->aksi) {
-            'create'   => 'badge-create',
-            'update'   => 'badge-update',
-            'delete'   => 'badge-delete',
-            'transisi' => 'badge-transisi',
-            'koreksi'  => 'badge-koreksi',
-            'scan'     => 'badge-scan',
-            'login'    => 'badge-login',
-            'logout'   => 'badge-logout',
-            default    => 'badge-default',
+        return match (strtolower($this->aksi)) {
+            'create'             => 'badge-create',
+            'update'             => 'badge-update',
+            'delete'             => 'badge-delete',
+            'transisi'           => 'badge-transisi',
+            'koreksi'            => 'badge-koreksi',
+            'scan'               => 'badge-scan',
+            'login'              => 'badge-login',
+            'login_face'         => 'badge-face',
+            'logout'             => 'badge-logout',
+            'buka_sesi_gerbang'  => 'badge-gerbang-buka',
+            'tutup_sesi_gerbang' => 'badge-gerbang-tutup',
+            default              => 'badge-default',
         };
     }
 
     public function aksiLabel(): string
     {
-        return match ($this->aksi) {
-            'create'   => 'Tambah',
-            'update'   => 'Ubah',
-            'delete'   => 'Hapus',
-            'transisi' => 'Transisi',
-            'koreksi'  => 'Koreksi',
-            'scan'     => 'Face ID (Smart Gate)',
-            'login'    => 'Login',
-            'logout'   => 'Logout',
-            default    => ucfirst($this->aksi),
+        return match (strtolower($this->aksi)) {
+            'create'             => 'Tambah Data',
+            'update'             => 'Ubah Data',
+            'delete'             => 'Hapus Data',
+            'transisi'           => 'Transisi',
+            'koreksi'            => 'Koreksi',
+            'scan'               => 'Smart Gate Scan',
+            'login'              => 'Login Akun',
+            'login_face'         => 'Face ID Login',
+            'logout'             => 'Logout',
+            'buka_sesi_gerbang'  => 'Buka Gerbang',
+            'tutup_sesi_gerbang' => 'Tutup Gerbang',
+            default              => ucwords(str_replace('_', ' ', $this->aksi)),
         };
     }
 

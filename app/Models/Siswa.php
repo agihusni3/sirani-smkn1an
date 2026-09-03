@@ -17,7 +17,7 @@ class Siswa extends Model
     {
         parent::boot();
         static::created(function ($m) {
-            AuditLog::catat('create', 'siswa', "Siswa baru ditambahkan: {$m->nama} (NIS: {$m->nis})", null, $m->only(['nis','nisn','nama','status']), $m);
+            AuditLog::catat('create', 'siswa', "Siswa baru ditambahkan: {$m->nama} (NISN: {$m->nisn})", null, $m->only(['nisn','nama','status']), $m);
         });
         static::updated(function ($m) {
             if ($m->wasChanged()) {
@@ -25,33 +25,32 @@ class Siswa extends Model
             }
         });
         static::deleted(function ($m) {
-            AuditLog::catat('delete', 'siswa', "Siswa dihapus: {$m->nama} (NIS: {$m->nis})", $m->only(['nis','nisn','nama','status']), null, $m);
+            AuditLog::catat('delete', 'siswa', "Siswa dihapus: {$m->nama} (NISN: {$m->nisn})", $m->only(['nisn','nama','status']), null, $m);
         });
     }
 
     protected $fillable = [
-        'nis',
         'nisn',
         'nama',
         'nama_ortu',
         'no_hp_ortu',
         'no_hp_siswa',
         'foto',
-        'face_embedding',
-        'face_registered_at',
         'status',
     ];
 
-    protected $casts = [
-        'face_embedding' => 'array',
-        'face_registered_at' => 'datetime',
-    ];
+    protected $casts = [];
 
     protected $appends = ['foto_url', 'nomor_hp_ortu'];
 
     public function getNomorHpOrtuAttribute(): ?string
     {
         return $this->attributes['no_hp_ortu'] ?? $this->attributes['nomor_hp_ortu'] ?? null;
+    }
+
+    public function getNoHpAttribute(): ?string
+    {
+        return $this->attributes['no_hp_siswa'] ?? null;
     }
 
     public function getFotoUrlAttribute(): string
@@ -82,5 +81,48 @@ class Siswa extends Model
     public function notifikasiOrtus(): HasMany
     {
         return $this->hasMany(NotifikasiOrtu::class, 'siswa_id');
+    }
+
+    public function kartuRfid(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(KartuRfid::class, 'pemilik_id')->where('pemilik_type', 'siswa')->where('status', 'aktif');
+    }
+
+    public function kartuRfids(): HasMany
+    {
+        return $this->hasMany(KartuRfid::class, 'pemilik_id')->where('pemilik_type', 'siswa');
+    }
+
+    /**
+     * Standarisasi nomor HP ke format 628...
+     */
+    public static function normalizePhone(?string $phone): string
+    {
+        if (empty($phone)) return '';
+        $clean = preg_replace('/[^0-9]/', '', $phone);
+        if (empty($clean)) return '';
+
+        if (str_starts_with($clean, '08')) {
+            $clean = '628' . substr($clean, 2);
+        } elseif (str_starts_with($clean, '8')) {
+            $clean = '628' . substr($clean, 1);
+        }
+
+        return $clean;
+    }
+
+    /**
+     * Cek apakah nomor HP siswa dan nomor HP ortu terdeteksi sama (duplikat bentrok)
+     */
+    public function hasDuplicateContact(): bool
+    {
+        $siswaHp = static::normalizePhone($this->no_hp_siswa);
+        $ortuHp  = static::normalizePhone($this->no_hp_ortu);
+
+        if (empty($siswaHp) || empty($ortuHp)) {
+            return false;
+        }
+
+        return $siswaHp === $ortuHp;
     }
 }

@@ -20,16 +20,19 @@
       padding: 0;
     }
     body {
-      background-color: #525659;
+      background-color: #334155;
       font-family: 'Times New Roman', Times, serif;
       color: #000000;
       font-size: 10pt;
       line-height: 1.35;
       -webkit-font-smoothing: antialiased;
+      margin: 0;
+      padding: 20px 0 40px;
+      min-height: 100vh;
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 24px 0 40px;
+      overflow-x: auto;
     }
     .print-actions-bar {
       width: 210mm;
@@ -38,13 +41,14 @@
       border: 1px solid #334155;
       border-radius: 12px;
       padding: 12px 18px;
-      margin-bottom: 18px;
+      margin-bottom: 16px;
       box-shadow: 0 10px 25px -5px rgba(0,0,0,0.4);
       display: flex;
       justify-content: space-between;
       align-items: center;
       flex-wrap: wrap;
       gap: 10px;
+      box-sizing: border-box;
     }
     .print-title-info {
       color: #FFFFFF;
@@ -100,15 +104,64 @@
       gap: 6px;
       text-decoration: none;
     }
+    .print-sheet-wrapper {
+      width: 100%;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      display: flex;
+      justify-content: center;
+      padding-bottom: 30px;
+    }
 
     /* KERTAS A4 PORTRAIT */
     .a4-sheet {
       width: 210mm;
+      min-width: 210mm;
       min-height: 297mm;
       background: #FFFFFF;
       padding: 12mm 15mm 15mm 15mm;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-      position: relative;
+      box-shadow: 0 4px 25px rgba(0,0,0,0.35);
+      box-sizing: border-box;
+      margin: 0 auto;
+    }
+
+    @media (max-width: 820px) {
+      body {
+        padding: 10px 0 30px;
+        align-items: stretch;
+      }
+      .print-actions-bar {
+        width: calc(100% - 16px);
+        margin: 0 8px 14px;
+        position: sticky;
+        top: 6px;
+        z-index: 1000;
+        padding: 10px 14px;
+      }
+      .print-title-info {
+        font-size: 12px;
+      }
+      .btn-action-group {
+        width: 100%;
+        display: flex;
+        gap: 8px;
+      }
+      .btn-back {
+        flex: 1;
+        justify-content: center;
+        padding: 8px 10px;
+        font-size: 12px;
+      }
+      .btn-print {
+        flex: 1.5;
+        justify-content: center;
+        padding: 8px 12px;
+        font-size: 12px;
+      }
+      .print-sheet-wrapper {
+        justify-content: flex-start;
+        padding: 0 8px 30px;
+      }
     }
 
     /* KOP SURAT DINAS */
@@ -142,7 +195,7 @@
     .kop-text {
       flex: 1;
       text-align: center;
-      padding: 0 6px;
+      padding: 0 8px;
       margin: 0;
       min-width: 0;
     }
@@ -200,18 +253,24 @@
     /* TABEL DATA */
     .table-data {
       width: 100%;
+      table-layout: fixed;
       border-collapse: collapse;
-      font-size: 9pt;
+      font-size: 8.5pt;
       margin-bottom: 16px;
+      word-wrap: break-word;
     }
     .table-data th, .table-data td {
       border: 1px solid #000000;
-      padding: 4px 6px;
+      padding: 5px 6px;
+      vertical-align: middle;
+      word-break: break-word;
+      overflow: hidden;
     }
     .table-data th {
       background-color: #F1F5F9;
       text-align: center;
       font-weight: 700;
+      font-size: 8.5pt;
     }
     .table-data td.text-center {
       text-align: center;
@@ -277,8 +336,9 @@
     </div>
   </div>
 
-  {{-- LEMBAR A4 RESMI --}}
-  <div class="a4-sheet">
+  {{-- WRAPPER LEMBAR A4 RESMI --}}
+  <div class="print-sheet-wrapper">
+    <div class="a4-sheet">
 
     {{-- KOP SURAT DINAS --}}
     <div class="kop-container">
@@ -314,12 +374,12 @@
     <table class="table-data">
       <thead>
         <tr>
-          <th style="width:4%;">No</th>
+          <th style="width:5%;">No</th>
           <th style="width:18%;">NIP</th>
-          <th>Nama Lengkap Guru / Staf</th>
-          <th style="width:20%;">Jabatan / Peran</th>
-          <th style="width:16%;">Kontak WhatsApp</th>
-          <th style="width:12%;">Akun Login</th>
+          <th style="width:22%;">Nama Lengkap Guru / Staf</th>
+          <th style="width:16%;">Jabatan / Peran</th>
+          <th style="width:13%;">Kontak WhatsApp</th>
+          <th style="width:18%;">Akun Login</th>
           <th style="width:8%;">Status</th>
         </tr>
       </thead>
@@ -327,12 +387,12 @@
         @forelse($gurus as $idx => $g)
           <tr>
             <td class="text-center">{{ $idx + 1 }}</td>
-            <td class="text-center" style="font-family:'JetBrains Mono', monospace; font-weight:600;">{{ $g->nip ?? '-' }}</td>
+            <td class="text-center" style="font-family:'JetBrains Mono', monospace; font-size:8pt; font-weight:600;">{{ $g->nip ?? '-' }}</td>
             <td><strong>{{ $g->nama }}</strong></td>
-            <td>{{ $g->jabatan }}</td>
-            <td class="text-center" style="font-family:'JetBrains Mono', monospace;">{{ $g->no_hp ?: '-' }}</td>
-            <td style="font-family:'JetBrains Mono', monospace; font-size:8.5pt;">{{ $g->user ? $g->user->email : '-' }}</td>
-            <td class="text-center">{{ strtoupper($g->status) }}</td>
+            <td style="font-size:8pt;">{{ $g->jabatan }}</td>
+            <td class="text-center" style="font-family:'JetBrains Mono', monospace; font-size:8pt;">{{ $g->no_hp ?: '-' }}</td>
+            <td style="font-family:'JetBrains Mono', monospace; font-size:7.5pt; word-break:break-all;">{{ $g->user ? $g->user->email : '-' }}</td>
+            <td class="text-center" style="font-size:8pt; font-weight:700;">{{ strtoupper($g->status) }}</td>
           </tr>
         @empty
           <tr>
@@ -368,6 +428,7 @@
       </table>
     </div>
 
+  </div>
   </div>
 
 </body>

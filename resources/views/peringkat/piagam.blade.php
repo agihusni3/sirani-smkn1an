@@ -337,6 +337,47 @@
       color: #64748B;
     }
 
+    .print-sheet-wrapper {
+      width: 100%;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      display: flex;
+      justify-content: center;
+      padding-bottom: 30px;
+    }
+
+    @media (max-width: 820px) {
+      body {
+        padding: 10px 0 30px;
+        align-items: stretch;
+        overflow-x: auto;
+      }
+      .toolbar-wrapper {
+        width: calc(100% - 16px);
+        margin: 0 8px 14px;
+        position: sticky;
+        top: 6px;
+        z-index: 1000;
+        padding: 10px 14px;
+      }
+      .toolbar-main {
+        gap: 8px;
+      }
+      .toolbar-actions {
+        width: 100%;
+      }
+      .toolbar-btn, .btn-print {
+        flex: 1;
+        justify-content: center;
+        padding: 8px 10px;
+        font-size: 12px;
+      }
+      .print-sheet-wrapper {
+        justify-content: flex-start;
+        padding: 0 8px 30px;
+      }
+    }
+
     @media print {
       body {
         background: transparent;
@@ -464,6 +505,7 @@
 </div>
 
 <!-- ══ Certificate Canvas ══ -->
+<div class="print-sheet-wrapper">
 <div class="cert-canvas-wrapper" id="certCanvas">
   <!-- Template Background Image Layer -->
   <img src="{{ $customBgUrl }}" alt="Template Piagam" class="cert-background-img" id="certBgImg" style="{{ ($hasCustomBg && $showBg) ? 'display:block;' : 'display:none;' }}" />
@@ -520,6 +562,7 @@
       </div>
     </div>
   </div>
+</div>
 </div>
 
 <script>

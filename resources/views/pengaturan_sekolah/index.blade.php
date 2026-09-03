@@ -10,28 +10,39 @@
 <div class="app-container">
   @include('partials.sidebar')
   <main class="main-content">
-    <header class="header">
-      <div class="header-title">
-        <h1><i class="bi bi-bank2" style="color:var(--gold); margin-right:8px;"></i>Pengaturan Profil Sekolah &amp; Kop Dinas</h1>
-        <p>Konfigurasi identitas resmi SMKN 1 Air Naningan, kop surat kesiswaan, dan tanda tangan Kepala Sekolah.</p>
+    {{-- ULTRA COMPACT SLIM HEADER BAR --}}
+    <div class="panel no-print" style="background:var(--bg-2); border:1px solid var(--border); padding:10px 16px; margin-bottom:12px; border-radius:var(--r-md); box-shadow:var(--shadow-sm);">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+        <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+          <h1 style="margin:0; font-size:16px; font-weight:900; color:var(--text); display:inline-flex; align-items:center; gap:6px;">
+            <i class="bi bi-bank2" style="color:#000000; font-size:16px;"></i> Pengaturan Profil Sekolah &amp; Kop Dinas
+          </h1>
+          <span style="color:var(--border-2); font-weight:300;">|</span>
+          <span style="font-size:11.5px; color:var(--text-3);">
+            Identitas instansi, kop dinas, &amp; tanda tangan
+          </span>
+        </div>
+
+        <div style="display:flex; align-items:center; gap:8px;">
+          @include('partials.header_actions')
+        </div>
       </div>
-      @include('partials.header_actions')
-    </header>
+    </div>
 
     @if(session('success'))
-      <div class="alert-success" style="margin-bottom:20px;">
+      <div class="alert-success" style="margin-bottom:12px;">
         <i class="bi bi-check-circle-fill" style="margin-right:6px;"></i>{{ session('success') }}
       </div>
     @endif
     @if(session('error'))
-      <div class="alert-error" style="margin-bottom:20px;">
+      <div class="alert-error" style="margin-bottom:12px;">
         <i class="bi bi-exclamation-triangle-fill" style="margin-right:6px;"></i>{{ session('error') }}
       </div>
     @endif
 
     {{-- LIVE KOP PREVIEW --}}
     <div class="panel" style="margin-bottom:24px;">
-      <div style="font-size:12px; font-weight:800; color:var(--gold); text-transform:uppercase; letter-spacing:0.6px; margin-bottom:14px;">
+      <div style="font-size:12px; font-weight:800; color:#000000; text-transform:uppercase; letter-spacing:0.6px; margin-bottom:14px;">
         <i class="bi bi-eye-fill"></i> Pratinjau Kop Surat Resmi Instansi
       </div>
       
@@ -78,7 +89,7 @@
       
       <div class="panel" style="margin-bottom:24px;">
         <h3 style="font-size:15px; font-weight:800; margin-bottom:18px; color:var(--text); border-bottom:1px solid var(--border); padding-bottom:10px;">
-          <i class="bi bi-building" style="color:var(--gold); margin-right:6px;"></i> 1. Identitas Dinas &amp; Nama Sekolah
+          <i class="bi bi-building" style="color:#000000; margin-right:6px;"></i> 1. Identitas Dinas &amp; Nama Sekolah
         </h3>
 
         <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:16px; margin-bottom:16px;">
@@ -104,7 +115,7 @@
         </div>
 
         <h3 style="font-size:15px; font-weight:800; margin:24px 0 18px; color:var(--text); border-bottom:1px solid var(--border); padding-bottom:10px;">
-          <i class="bi bi-geo-alt-fill" style="color:var(--gold); margin-right:6px;"></i> 2. Alamat &amp; Kontak Sekolah
+          <i class="bi bi-geo-alt-fill" style="color:#000000; margin-right:6px;"></i> 2. Alamat &amp; Kontak Sekolah
         </h3>
 
         <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr)); gap:16px; margin-bottom:16px;">
@@ -145,7 +156,7 @@
         </div>
 
         <h3 style="font-size:15px; font-weight:800; margin:24px 0 18px; color:var(--text); border-bottom:1px solid var(--border); padding-bottom:10px;">
-          <i class="bi bi-person-badge-fill" style="color:var(--gold); margin-right:6px;"></i> 3. Pimpinan Sekolah &amp; Logo Instansi
+          <i class="bi bi-person-badge-fill" style="color:#000000; margin-right:6px;"></i> 3. Pimpinan Sekolah &amp; Logo Instansi
         </h3>
 
         <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:16px; margin-bottom:20px;">
@@ -162,10 +173,10 @@
           <div style="grid-column:1 / -1;">
             <label style="display:flex; justify-content:space-between; font-size:12px; font-weight:800; color:var(--text-2); margin-bottom:6px;">
               <span>Ganti Logo Sekolah (PNG / JPG Transparan)</span>
-              <span style="color:var(--gold); font-size:11px;"><i class="bi bi-crop"></i> Auto-Crop Aktif</span>
+              <span style="color:#000000; font-size:11px; font-weight:800;"><i class="bi bi-crop"></i> Auto-Crop Aktif</span>
             </label>
             <div style="display:flex; align-items:center; gap:12px;">
-              <div id="logo_preview_wrap" style="width:48px; height:48px; border-radius:10px; border:1.5px solid var(--gold); background:var(--bg-3); display:flex; align-items:center; justify-content:center; overflow:hidden; flex-shrink:0; padding:3px;">
+              <div id="logo_preview_wrap" style="width:48px; height:48px; border-radius:10px; border:1.5px solid rgba(0,0,0,0.15); background:var(--bg-3); display:flex; align-items:center; justify-content:center; overflow:hidden; flex-shrink:0; padding:3px;">
                 <img id="logo_preview_img" src="{{ $sekolah->logo_url ?? '/img/logo.png' }}" style="width:100%; height:100%; object-fit:contain;" />
               </div>
               <div style="flex:1;">

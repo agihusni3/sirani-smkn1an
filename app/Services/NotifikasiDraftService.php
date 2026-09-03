@@ -90,13 +90,13 @@ class NotifikasiDraftService
         $jam = $params['jam'] ?? Carbon::now()->format('H:i:s');
         $batasJam = $params['batas_jam'] ?? '07:15';
         $keterangan = $params['keterangan'] ?? '-';
-        $linkPortal = url('/presensi-siswa/' . $siswa->nis);
+        $linkPortal = url('/portal-siswa/' . ($siswa->nisn ?: $siswa->id));
         $linkCetakSurat = url('/surat/cetak?siswa_id=' . $siswa->id . '&kategori=panggilan_ortu');
         $linkDasborWali = url('/wali-kelas/dashboard');
 
         $replacements = [
             '{nama_siswa}'           => $siswa->nama,
-            '{nis}'                  => $siswa->nis,
+            '{nis}'                  => $siswa->nisn ?: '-',
             '{nisn}'                 => $siswa->nisn ?: '-',
             '{kelas}'                => $namaRombel,
             '{rombel}'               => $namaRombel,
@@ -259,12 +259,12 @@ class NotifikasiDraftService
             $rekomendasiTindakan = 'Berikan teguran lisan & motivasi kedisiplinan';
         }
 
-        $template = $setting->template_wali_kelas ?: "🚨 *PERINGATAN KESISWAAN SMKN 1 AIR NANINGAN*\nStatus: {tingkat_urgensi}\n\nYth. Bapak/Ibu Wali Kelas *{nama_wali_kelas}* ({kelas}),\n\nSiswa binaan Anda telah memenuhi ketentuan batas pelanggaran kehadiran:\n\n👤 *Data Siswa:*\n• Nama : *{nama_siswa}* (NIS: {nis})\n• Kelas : {kelas} ({jurusan})\n• Kontak Ortu : {nama_ortu} ({no_hp_ortu})\n\n📊 *Akumulasi Pelanggaran: {total_pelanggaran}x Pelanggaran*\n• Alpha : {total_alpha}x\n• Bolos : {total_bolos}x\n• Terlambat : {total_terlambat}x\n\n📋 *Rincian Tanggal Ketidakhadiran:*\n{rincian_pelanggaran}\n\n⚠️ *Rekomendasi Tindakan:*\n{rekomendasi_tindakan}\n\n📄 Lembar Cetak Surat A4: {link_cetak_surat}\n📊 Dasbor Wali Kelas: {link_dasbor_wali}\n\n_Sistem Otomatis SIRANI SMKN 1 Air Naningan_";
+        $template = $setting->template_wali_kelas ?: "🚨 *PERINGATAN KESISWAAN SMKN 1 AIR NANINGAN*\nStatus: {tingkat_urgensi}\n\nYth. Bapak/Ibu Wali Kelas *{nama_wali_kelas}* ({kelas}),\n\nSiswa binaan Anda telah memenuhi ketentuan batas pelanggaran kehadiran:\n\n👤 *Data Siswa:*\n• Nama : *{nama_siswa}* (NISN: {nisn})\n• Kelas : {kelas} ({jurusan})\n• Kontak Ortu : {nama_ortu} ({no_hp_ortu})\n\n📊 *Akumulasi Pelanggaran: {total_pelanggaran}x Pelanggaran*\n• Alpha : {total_alpha}x\n• Bolos : {total_bolos}x\n• Terlambat : {total_terlambat}x\n\n📋 *Rincian Tanggal Ketidakhadiran:*\n{rincian_pelanggaran}\n\n⚠️ *Rekomendasi Tindakan:*\n{rekomendasi_tindakan}\n\n📄 Lembar Cetak Surat A4: {link_cetak_surat}\n📊 Dasbor Wali Kelas: {link_dasbor_wali}\n\n_Sistem Otomatis SIRANI SMKN 1 Air Naningan_";
 
         $replacements = [
             '{nama_wali_kelas}'      => $waliKelas->nama,
             '{nama_siswa}'           => $siswa->nama,
-            '{nis}'                  => $siswa->nis,
+            '{nis}'                  => $siswa->nisn ?: '-',
             '{nisn}'                 => $siswa->nisn ?: '-',
             '{kelas}'                => $namaRombel,
             '{rombel}'               => $namaRombel,
@@ -280,7 +280,7 @@ class NotifikasiDraftService
             '{rekomendasi_tindakan}' => $rekomendasiTindakan,
             '{link_cetak_surat}'     => url('/surat/cetak?siswa_id=' . $siswa->id . '&kategori=panggilan_ortu'),
             '{link_dasbor_wali}'     => url('/wali-kelas/dashboard'),
-            '{link_portal_ortu}'     => url('/presensi-siswa/' . $siswa->nis),
+            '{link_portal_ortu}'     => url('/portal-siswa/' . ($siswa->nisn ?: $siswa->id)),
         ];
 
         $pesanParsed = str_replace(array_keys($replacements), array_values($replacements), $template);

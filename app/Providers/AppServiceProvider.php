@@ -21,8 +21,15 @@ class AppServiceProvider extends ServiceProvider
     {
         \Illuminate\Pagination\Paginator::defaultView('partials.pagination');
 
-        if (request()->server('HTTP_X_FORWARDED_PROTO') === 'https' || request()->isSecure() || str_contains(request()->getHttpHost(), 'trycloudflare.com')) {
-            \Illuminate\Support\Facades\URL::forceScheme('https');
+        if (!$this->app->runningInConsole()) {
+            try {
+                $req = $this->app->make('request');
+                if ($req && ($req->server('HTTP_X_FORWARDED_PROTO') === 'https' || $req->isSecure() || str_contains($req->getHttpHost(), 'trycloudflare.com') || str_contains($req->getHttpHost(), 'ngrok-free.dev') || str_contains($req->getHttpHost(), 'ngrok.app') || str_contains($req->getHttpHost(), 'ngrok.io'))) {
+                    \Illuminate\Support\Facades\URL::forceScheme('https');
+                }
+            } catch (\Throwable $e) {
+                // Ignore if request is not yet bound
+            }
         }
     }
 }

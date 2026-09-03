@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>{{ $siswa ? 'Rekap Kehadiran '.$siswa->nama.' — Portal Wali Murid' : 'Portal Kehadiran Siswa & Orang Tua — SMKN 1 Air Naningan' }}</title>
+  <title>{{ $siswa ? ($modeAkses === 'siswa' ? 'Kartu & Presensi Siswa '.$siswa->nama.' — SIRANI' : 'Rekap Kehadiran '.$siswa->nama.' — Portal Wali Murid') : 'Portal Kehadiran Siswa & Orang Tua — SMKN 1 Air Naningan' }}</title>
   
   {{-- PWA Meta Tags --}}
   <link rel="manifest" href="/manifest.json" />
@@ -20,6 +20,11 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;600;700;800;900&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+  
+  {{-- QR Code Generator & Canvas Exporter --}}
+  <script src="/qrcode.min.js"></script>
+  <script src="/html2canvas.min.js"></script>
+
   @vite(['resources/css/app.css', 'resources/js/app.js'])
 
   <style>
@@ -396,6 +401,289 @@
       font-weight: 800;
     }
 
+    /* ─── Portal Top 3 Tabs Navigation ─── */
+    .portal-main-tabs {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+    .portal-main-tab {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      padding: 10px 14px;
+      font-size: 12px;
+      font-weight: 800;
+      border-radius: 12px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      color: var(--text-2);
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      font-family: var(--font-main);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+      white-space: nowrap;
+    }
+    .portal-main-tab i {
+      font-size: 13px;
+    }
+    .portal-main-tab.active {
+      background: #0f172a;
+      color: #ffffff;
+      border-color: #0f172a;
+      box-shadow: 0 4px 12px rgba(15,23,42,0.25);
+    }
+    .portal-main-tab:hover:not(.active) {
+      background: var(--bg-subtle);
+      color: var(--text);
+      border-color: var(--border-2);
+    }
+
+    /* ─── Card Siswa Emerald (SMKN 1 AN Theme) ─── */
+    .card-siswa-emerald {
+      background: linear-gradient(135deg, #064e3b 0%, #065f46 50%, #047857 100%);
+      border-radius: 18px;
+      padding: 16px 18px;
+      color: #ffffff;
+      box-shadow: 0 8px 24px rgba(6,78,59,0.25);
+      position: relative;
+      overflow: hidden;
+    }
+    .card-siswa-emerald-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+    .card-siswa-emerald-logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .card-siswa-emerald-logo img, .card-siswa-emerald-logo .logo-icon-em {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+    .card-siswa-emerald-logo span {
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.6px;
+      color: #ffffff;
+      text-transform: uppercase;
+    }
+    .card-siswa-emerald-badge {
+      background: rgba(255,255,255,0.2);
+      border: 1px solid rgba(255,255,255,0.3);
+      backdrop-filter: blur(4px);
+      color: #ffffff;
+      font-size: 9.5px;
+      font-weight: 800;
+      padding: 2.5px 9px;
+      border-radius: 20px;
+      letter-spacing: 0.5px;
+    }
+    .card-siswa-emerald-body {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .card-siswa-emerald-avatar {
+      width: 56px;
+      height: 56px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #b45309, #d97706);
+      border: 2px solid rgba(255,255,255,0.4);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      font-weight: 900;
+      color: #ffffff;
+      flex-shrink: 0;
+      overflow: hidden;
+    }
+    .card-siswa-emerald-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .card-siswa-emerald-info {
+      flex: 1;
+      min-width: 0;
+    }
+    .card-siswa-emerald-name {
+      font-size: 16px;
+      font-weight: 900;
+      color: #ffffff;
+      line-height: 1.25;
+      margin-bottom: 2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .card-siswa-emerald-nisn {
+      font-size: 12px;
+      font-weight: 700;
+      color: rgba(255,255,255,0.85);
+      margin-bottom: 2px;
+      font-family: var(--font-mono);
+      letter-spacing: 0.3px;
+    }
+    .card-siswa-emerald-kelas {
+      font-size: 11.5px;
+      font-weight: 600;
+      color: rgba(255,255,255,0.85);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* ─── Card Scanner Gerbang & Kiosk (Putih) ─── */
+    .card-scanner-kiosk {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 22px 20px 20px;
+      margin-top: 14px;
+      text-align: center;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+    }
+    .card-scanner-kiosk-title {
+      font-size: 12px;
+      font-weight: 900;
+      color: #334155;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+    .qr-interactive-box {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 16px;
+      padding: 14px 14px 10px;
+      display: inline-block;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.05);
+      transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s;
+    }
+    .qr-interactive-box:hover {
+      transform: scale(1.02);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+    }
+    .qr-code-canvas-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto;
+    }
+    .qr-code-number-label {
+      font-size: 15px;
+      font-weight: 900;
+      font-family: var(--font-mono);
+      color: #0f172a;
+      letter-spacing: 2px;
+      margin-top: 8px;
+      text-align: center;
+    }
+    .qr-tap-instruction {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      color: #64748b;
+      font-size: 11px;
+      font-weight: 700;
+      margin-top: 12px;
+      margin-bottom: 18px;
+      cursor: pointer;
+    }
+    .btn-qr-action-download {
+      width: 100%;
+      padding: 12px 16px;
+      background: #f8fafc;
+      border: 1px solid #cbd5e1;
+      border-radius: 12px;
+      font-size: 12.5px;
+      font-weight: 800;
+      color: #334155;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      cursor: pointer;
+      font-family: var(--font-main);
+      transition: all 0.2s;
+    }
+    .btn-qr-action-download:hover {
+      background: #f1f5f9;
+      border-color: #94a3b8;
+      color: #0f172a;
+    }
+    .btn-qr-action-wa {
+      width: 100%;
+      padding: 12px 16px;
+      background: #16a34a;
+      border: none;
+      border-radius: 12px;
+      font-size: 12.5px;
+      font-weight: 800;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      text-decoration: none;
+      font-family: var(--font-main);
+      margin-top: 10px;
+      box-shadow: 0 4px 14px rgba(22,163,74,0.3);
+      transition: all 0.2s;
+    }
+    .btn-qr-action-wa:hover {
+      background: #15803d;
+      transform: translateY(-1px);
+    }
+
+    /* ─── Fullscreen Auto-Zoom & Pure White Max Brightness Overlay ─── */
+    #qrZoomOverlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 999999;
+      background: #ffffff;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      padding: 30px 20px 24px;
+      user-select: none;
+      cursor: pointer;
+      animation: zoomFadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes zoomFadeIn {
+      from { opacity: 0; transform: scale(0.94); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    .zoom-overlay-header {
+      text-align: center;
+      width: 100%;
+    }
+    .zoom-overlay-body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      flex: 1;
+    }
+    .zoom-overlay-footer {
+      text-align: center;
+      width: 100%;
+    }
+
     @media (max-width: 600px) {
       .compact-search-card {
         flex-direction: column;
@@ -430,6 +718,9 @@
         grid-template-columns: repeat(3, 1fr) !important;
         gap: 5px !important;
         width: 100% !important;
+      }
+      .portal-nav-btn-group.has-barcode {
+        grid-template-columns: repeat(2, 1fr) !important;
       }
       .btn-portal-tab {
         padding: 7px 3px !important;
@@ -643,6 +934,9 @@
       grid-template-columns: repeat(3, 1fr);
       gap: 6px;
     }
+    .portal-nav-btn-group.has-barcode {
+      grid-template-columns: repeat(4, 1fr);
+    }
     .btn-portal-tab {
       background: var(--bg-card);
       border: 1px solid var(--border-2);
@@ -832,7 +1126,7 @@
           <i class="bi bi-mortarboard-fill"></i>
         </div>
         <div class="brand-text">
-          <h1>SIRANI · Portal Wali Murid</h1>
+          <h1>SIRANI · Portal Presensi Siswa &amp; Orang Tua</h1>
           <p>SMK Negeri 1 Air Naningan</p>
         </div>
       </a>
@@ -852,12 +1146,12 @@
       {{-- SEARCH CONSOLE (HERO SELAMAT DATANG) --}}
       <section class="search-console-card">
         <span class="search-badge">
-          <i class="bi bi-shield-check"></i> Layanan Informasi Presensi Siswa
+          <i class="bi bi-shield-check"></i> Layanan Presensi Terpadu Siswa &amp; Orang Tua
         </span>
         <div id="savedStudentsContainer" style="display:none;"></div>
 
         <p class="search-desc">
-          Selamat datang di portal presensi mandiri SMKN 1 Air Naningan. Masukkan <strong>NIS</strong>, <strong>NISN</strong>, atau <strong>Nomor WhatsApp Orang Tua</strong> untuk memantau catatan absensi Face ID, riwayat izin, dan kedisiplinan ananda secara real-time.
+          Selamat datang di portal presensi mandiri SMKN 1 Air Naningan. Masukkan <strong>NISN</strong> atau <strong>Nomor WhatsApp Orang Tua</strong> untuk memantau catatan absensi, riwayat kehadiran, dan kedisiplinan secara real-time.
         </p>
 
         <div class="search-form-box">
@@ -869,7 +1163,7 @@
                 name="keyword"
                 class="search-input"
                 value="{{ $keyword }}"
-                placeholder="Ketik NIS, NISN, atau No. WhatsApp..."
+                placeholder="Ketik NISN atau No. WhatsApp..."
                 autocomplete="off"
                 required
                 autofocus
@@ -891,11 +1185,11 @@
         <div class="portal-features-grid">
           <div class="portal-feature-item">
             <div class="portal-feature-icon">
-              <i class="bi bi-camera-video-fill"></i>
+              <i class="bi bi-qr-code-scan"></i>
             </div>
             <div class="portal-feature-text">
-              <strong>Smart Gate Face ID</strong>
-              <span>Pindaian otomatis di gerbang sekolah secara akurat &amp; real-time.</span>
+              <strong>Smart Gate RFID &amp; QR</strong>
+              <span>Presensi otomatis via kartu RFID &amp; QR Code di gerbang sekolah.</span>
             </div>
           </div>
           <div class="portal-feature-item">
@@ -958,135 +1252,206 @@
       </div>
 
     @elseif($siswa)
-      {{-- HASIL REKAP DATA SISWA --}}
+      {{-- HASIL DATA SISWA TERPILIH --}}
 
-      {{-- 1. IDENTITAS SISWA & STATUS HARI INI (DOSSIER DIGITAL) --}}
-      <div class="dossier-card">
-        <div class="dossier-header">
-          <span class="dossier-header-title" style="font-size:11.5px; font-weight:800; color:var(--text); text-transform:uppercase; letter-spacing:0.5px;">
-            Profil Lengkap Siswa
-          </span>
-          
-          <div class="portal-nav-btn-group">
-            <button type="button" id="btnToggleAbsen" onclick="togglePortalSection('absen')" class="btn-portal-tab">
-              <i class="bi bi-calendar-check"></i> <span>Rekap Absen</span>
-            </button>
-            <button type="button" id="btnToggleKasus" onclick="togglePortalSection('kasus')" class="btn-portal-tab">
-              <i class="bi bi-shield-check"></i> <span>Rekap Kasus</span>
-            </button>
-            <button type="button" id="btnTogglePengumuman" onclick="togglePortalSection('pengumuman')" class="btn-portal-tab">
-              <i class="bi bi-megaphone"></i> <span>Pengumuman</span>
-              @if(isset($pengumumans) && $pengumumans->count() > 0)
-                <span class="portal-badge-count">{{ $pengumumans->count() }}</span>
-              @endif
-            </button>
+      {{-- 3 TAB NAVIGASI UTAMA ATAS SESUAI DESAIN --}}
+      <div class="portal-main-tabs">
+        <button type="button" id="btnTabKartuQr" onclick="switchPortalMainTab('kartu-qr')" class="portal-main-tab active">
+          <i class="bi bi-qr-code"></i> <span>Kartu &amp; QR Code</span>
+        </button>
+        <button type="button" id="btnTabAbsen" onclick="switchPortalMainTab('absen')" class="portal-main-tab">
+          <i class="bi bi-calendar3"></i> <span>Riwayat Absensi</span>
+        </button>
+        <button type="button" id="btnTabPengumuman" onclick="switchPortalMainTab('pengumuman')" class="portal-main-tab">
+          <i class="bi bi-megaphone-fill"></i> <span>Pengumuman</span>
+          @if(isset($pengumumans) && $pengumumans->count() > 0)
+            <span class="portal-badge-count">{{ $pengumumans->count() }}</span>
+          @endif
+        </button>
+      </div>
+
+      {{-- TAB 1: KARTU & QR CODE SCANNER (EMERALD CARD + SCANNER KIOSK) --}}
+      <div id="section-kartu-qr" style="display: block;">
+        {{-- AREA KARTU DIGITAL SISWA UTUH (DITAMPILKAN & DIUNDUH SECARA IDENTIK) --}}
+        <div id="kartuSiswaDigitalArea" style="padding:12px; border-radius:24px; background:var(--bg-2, #0f172a); margin-bottom:14px; transition:background-color .25s ease;">
+          {{-- CARD SISWA HIJAU EMERALD SMKN 1 AIR NANINGAN --}}
+          <div class="card-siswa-emerald">
+            <div class="card-siswa-emerald-header">
+              <div class="card-siswa-emerald-logo">
+                <div style="width:24px; height:24px; background:rgba(255,255,255,0.25); border-radius:50%; display:flex; align-items:center; justify-content:center; border:1px solid rgba(255,255,255,0.4);">
+                  <i class="bi bi-mortarboard-fill" style="font-size:12px; color:#fff;"></i>
+                </div>
+                <span>SMK NEGERI 1 AIR NANINGAN</span>
+              </div>
+              <div class="card-siswa-emerald-badge">SISWA</div>
+            </div>
+            <div class="card-siswa-emerald-body">
+              <div class="card-siswa-emerald-avatar">
+                @if($siswa->foto && file_exists(public_path('storage/'.$siswa->foto)))
+                  <img src="{{ asset('storage/'.$siswa->foto) }}" alt="{{ $siswa->nama }}" />
+                @else
+                  {{ strtoupper(substr($siswa->nama, 0, 1)) }}
+                @endif
+              </div>
+              <div class="card-siswa-emerald-info">
+                <div class="card-siswa-emerald-name">{{ $siswa->nama }}</div>
+                <div class="card-siswa-emerald-nisn">NISN: {{ $siswa->nisn ?: $siswa->nis }}</div>
+                <div class="card-siswa-emerald-kelas">{{ $rombel->nama_rombel ?? 'X' }} - {{ $rombel->jurusan->nama_jurusan ?? 'Semua Jurusan' }}</div>
+              </div>
+            </div>
+          </div>
+
+          {{-- CARD SCANNER GERBANG & KIOSK (PUTIH) --}}
+          <div class="card-scanner-kiosk" style="margin-bottom:0;">
+            <div class="card-scanner-kiosk-title">SCANNER GERBANG &amp; KIOSK</div>
+
+            {{-- KOTAK QR INTERAKTIF --}}
+            <div class="qr-interactive-box" onclick="toggleQrFullscreenZoom(true)" title="Sentuh untuk zoom &amp; maksimalkan kecerahan">
+              <div id="scannerQrContainer" class="qr-code-canvas-wrap" style="min-width:190px; min-height:190px; display:flex; align-items:center; justify-content:center;"></div>
+
+              <div class="qr-code-number-label">{{ $codeValue }}</div>
+            </div>
+
+            {{-- PETUNJUK TAP TO ZOOM --}}
+            <div class="qr-tap-instruction" onclick="toggleQrFullscreenZoom(true)">
+              <i class="bi bi-arrows-fullscreen"></i>
+              <span>Sentuh gambar QR untuk memperbesar &amp; maksimalkan kecerahan</span>
+            </div>
           </div>
         </div>
 
-        <div class="dossier-body">
-          {{-- Kiri: Biodata Siswa --}}
-          <div class="student-info-left">
-            <div class="student-avatar">
-              @if($siswa->foto)
-                <img src="{{ asset('storage/'.$siswa->foto) }}" alt="{{ $siswa->nama }}" />
-              @else
-                {{ strtoupper(substr($siswa->nama, 0, 1)) }}
-              @endif
-            </div>
-            <div>
-              <h2 class="student-name">{{ $siswa->nama }}</h2>
-              <div style="font-size:12px; color:var(--text-2); display:flex; flex-wrap:wrap; gap:6px; justify-content:center;">
-                <span>NIS: <strong style="font-family:var(--font-mono); color:var(--text);">{{ $siswa->nis }}</strong></span>
-                <span>•</span>
-                <span>NISN: <strong style="font-family:var(--font-mono); color:var(--text);">{{ $siswa->nisn ?: '-' }}</strong></span>
-              </div>
-              <div class="student-meta-tags">
-                <span class="tag-pill">
-                  <i class="bi bi-building"></i> Kelas {{ $rombel->nama_rombel ?? 'Belum Ada Rombel' }}
-                </span>
-                <span class="tag-pill">
-                  <i class="bi bi-book-half"></i> {{ $rombel->jurusan->nama_jurusan ?? '-' }}
-                </span>
-                @if($siswa->status === 'pkl')
-                  <span class="tag-pill" style="color:var(--text); font-weight:800;">
-                    <i class="bi bi-briefcase"></i> Praktik Kerja (PKL)
-                  </span>
-                @endif
-                @if($waliKelas)
-                  <span class="tag-pill">
-                    <i class="bi bi-person"></i> Wali Kelas: {{ $waliKelas->nama }}
-                  </span>
-                  @if($waliKelas->no_hp)
-                    @php
-                      $hpWaliClean = preg_replace('/[^0-9]/', '', $waliKelas->no_hp);
-                      if (str_starts_with($hpWaliClean, '0')) $hpWaliClean = '62' . substr($hpWaliClean, 1);
-                      $pesanWaWali = rawurlencode("Halo Bapak/Ibu Wali Kelas {$waliKelas->nama}, saya orang tua dari {$siswa->nama} (Kelas " . ($rombel->nama_rombel ?? '-') . "). Ingin berkonsultasi mengenai kehadiran/perkembangan belajar ananda.");
-                    @endphp
-                    <a href="https://wa.me/{{ $hpWaliClean }}?text={{ $pesanWaWali }}" target="_blank" class="tag-pill" style="color:#16A34A; font-weight:800;" title="Konsultasi WhatsApp dengan Wali Kelas">
-                      <i class="bi bi-whatsapp"></i> Hubungi Wali Kelas
-                    </a>
-                  @endif
-                @endif
-                @if($siswa->nama_ortu)
-                  <span class="tag-pill">
-                    <i class="bi bi-people"></i> Wali Murid: {{ $siswa->nama_ortu }}
-                  </span>
-                @endif
-              </div>
-            </div>
-          </div>
+        {{-- TOMBOL AKSI KARTU --}}
+        <div style="display:flex; flex-direction:column; gap:10px;">
+          {{-- TOMBOL 1: SIMPAN GAMBAR KARTU IDENTIK --}}
+          <button type="button" id="btnDownloadSiswaCard" onclick="downloadSiswaFullCard()" class="btn-qr-action-download">
+            <i class="bi bi-download"></i> Simpan Gambar Kartu ke Galeri HP
+          </button>
 
-          {{-- Kanan: Status Kehadiran Hari Ini --}}
-          <div class="today-widget">
-            <div class="today-widget-title">
-              <span style="font-weight:800; color:var(--text);">Kehadiran Hari Ini ({{ \Carbon\Carbon::today()->translatedFormat('d M Y') }})</span>
-              <div>
-                @if($todayAbsensi)
-                  @if($todayAbsensi->status === 'hadir')
-                    <span style="font-weight:800; font-size:12px; color:var(--text);">Hadir Tepat Waktu</span>
-                  @elseif($todayAbsensi->status === 'terlambat')
-                    <span style="font-weight:800; font-size:12px; color:var(--text);">Terlambat</span>
-                  @elseif($todayAbsensi->status === 'izin')
-                    <span style="font-weight:800; font-size:12px; color:var(--text);">Izin</span>
-                  @elseif($todayAbsensi->status === 'sakit')
-                    <span style="font-weight:800; font-size:12px; color:var(--text);">Sakit</span>
-                  @elseif($todayAbsensi->status === 'bolos')
-                    <span style="font-weight:800; font-size:12px; color:var(--text);">Bolos</span>
-                  @elseif($todayAbsensi->status === 'alpha')
-                    <span style="font-weight:800; font-size:12px; color:var(--text);">Alpha</span>
-                  @endif
-                @elseif($siswa->status === 'pkl')
-                  <span style="font-weight:800; font-size:12px; color:var(--text);">PKL</span>
-                @else
-                  <span style="font-weight:800; font-size:12px; color:var(--text);">Belum Presensi</span>
-                @endif
-              </div>
-            </div>
-
-            <div class="today-time-grid">
-              <div class="today-time-box">
-                <div class="today-time-label">Masuk Gerbang</div>
-                <div class="today-time-val">
-                  {{ $todayAbsensi && $todayAbsensi->jam_masuk ? substr($todayAbsensi->jam_masuk, 0, 5).' WIB' : '—' }}
-                </div>
-              </div>
-              <div class="today-time-box">
-                <div class="today-time-label">Pulang Gerbang</div>
-                <div class="today-time-val">
-                  {{ $todayAbsensi && $todayAbsensi->jam_pulang ? substr($todayAbsensi->jam_pulang, 0, 5).' WIB' : '—' }}
-                </div>
-              </div>
-            </div>
-            
-            <div style="font-size:11px; color:var(--text-3); text-align:center; margin-top:8px;">
-              {{ $todayAbsensi ? ($todayAbsensi->keterangan ?: 'Tervalidasi via Smart Gate Face ID SMKN 1 AN') : ($siswa->status === 'pkl' ? 'Siswa sedang melaksanakan PKL di Industri' : 'Belum ada rekaman Face ID pada gerbang hari ini') }}
-            </div>
-          </div>
+          {{-- TOMBOL 2: KIRIM VIA WHATSAPP --}}
+          @php
+            $pesanWaGateway = rawurlencode("Halo, ini Kartu Presensi Siswa {$siswa->nama} (NISN: " . ($siswa->nisn ?: $siswa->nis) . ") SMKN 1 Air Naningan. Dapat digunakan untuk scan presensi di gerbang & kiosk sekolah.");
+          @endphp
+          <a href="https://wa.me/?text={{ $pesanWaGateway }}" target="_blank" class="btn-qr-action-wa">
+            <i class="bi bi-whatsapp"></i> Kirim via WhatsApp Gateway
+          </a>
         </div>
       </div>
 
-      {{-- 2. REKAPITULASI & RIWAYAT KEHADIRAN TERPADU --}}
-      <div id="riwayat-kehadiran" style="scroll-margin-top: 70px; display: {{ (request()->has('periode') || request()->has('tanggal') || request()->has('bulan') || request()->has('tahun')) ? 'block' : 'none' }};">
+
+      {{-- TAB 2: RIWAYAT ABSENSI & DOSSIER SISWA --}}
+      <div id="section-absen-wrap" style="display: none;">
+        {{-- DOSSIER DIGITAL DETAIL --}}
+        <div class="dossier-card">
+          <div class="dossier-header">
+            <span class="dossier-header-title" style="font-size:11.5px; font-weight:800; color:var(--text); text-transform:uppercase; letter-spacing:0.5px;">
+              Profil Lengkap &amp; Kehadiran Hari Ini
+            </span>
+          </div>
+
+          <div class="dossier-body">
+            {{-- Kiri: Biodata Siswa --}}
+            <div class="student-info-left">
+              <div class="student-avatar">
+                @if($siswa->foto)
+                  <img src="{{ asset('storage/'.$siswa->foto) }}" alt="{{ $siswa->nama }}" />
+                @else
+                  {{ strtoupper(substr($siswa->nama, 0, 1)) }}
+                @endif
+              </div>
+              <div>
+                <h2 class="student-name">{{ $siswa->nama }}</h2>
+                <div style="font-size:12px; color:var(--text-2); display:flex; flex-wrap:wrap; gap:6px; justify-content:center;">
+                  <span>NIS: <strong style="font-family:var(--font-mono); color:var(--text);">{{ $siswa->nis }}</strong></span>
+                  <span>•</span>
+                  <span>NISN: <strong style="font-family:var(--font-mono); color:var(--text);">{{ $siswa->nisn ?: '-' }}</strong></span>
+                </div>
+                <div class="student-meta-tags">
+                  <span class="tag-pill">
+                    <i class="bi bi-building"></i> Kelas {{ $rombel->nama_rombel ?? 'Belum Ada Rombel' }}
+                  </span>
+                  <span class="tag-pill">
+                    <i class="bi bi-book-half"></i> {{ $rombel->jurusan->nama_jurusan ?? '-' }}
+                  </span>
+                  @if($siswa->status === 'pkl')
+                    <span class="tag-pill" style="color:var(--text); font-weight:800;">
+                      <i class="bi bi-briefcase"></i> Praktik Kerja (PKL)
+                    </span>
+                  @endif
+                  @if($waliKelas)
+                    <span class="tag-pill">
+                      <i class="bi bi-person"></i> Wali Kelas: {{ $waliKelas->nama }}
+                    </span>
+                    @if($waliKelas->no_hp)
+                      @php
+                        $hpWaliClean = preg_replace('/[^0-9]/', '', $waliKelas->no_hp);
+                        if (str_starts_with($hpWaliClean, '0')) $hpWaliClean = '62' . substr($hpWaliClean, 1);
+                        $pesanWaWali = rawurlencode("Halo Bapak/Ibu Wali Kelas {$waliKelas->nama}, saya orang tua dari {$siswa->nama} (Kelas " . ($rombel->nama_rombel ?? '-') . "). Ingin berkonsultasi mengenai kehadiran/perkembangan belajar ananda.");
+                      @endphp
+                      <a href="https://wa.me/{{ $hpWaliClean }}?text={{ $pesanWaWali }}" target="_blank" class="tag-pill" style="color:#16A34A; font-weight:800;" title="Konsultasi WhatsApp dengan Wali Kelas">
+                        <i class="bi bi-whatsapp"></i> Hubungi Wali Kelas
+                      </a>
+                    @endif
+                  @endif
+                  @if($siswa->nama_ortu)
+                    <span class="tag-pill">
+                      <i class="bi bi-people"></i> Wali Murid: {{ $siswa->nama_ortu }}
+                    </span>
+                  @endif
+                </div>
+              </div>
+            </div>
+
+            {{-- Kanan: Status Kehadiran Hari Ini --}}
+            <div class="today-widget">
+              <div class="today-widget-title">
+                <span style="font-weight:800; color:var(--text);">Kehadiran Hari Ini ({{ \Carbon\Carbon::today()->translatedFormat('d M Y') }})</span>
+                <div>
+                  @if($todayAbsensi)
+                    @if($todayAbsensi->status === 'hadir')
+                      <span style="font-weight:800; font-size:12px; color:var(--text);">Hadir Tepat Waktu</span>
+                    @elseif($todayAbsensi->status === 'terlambat')
+                      <span style="font-weight:800; font-size:12px; color:var(--text);">Terlambat</span>
+                    @elseif($todayAbsensi->status === 'izin')
+                      <span style="font-weight:800; font-size:12px; color:var(--text);">Izin</span>
+                    @elseif($todayAbsensi->status === 'sakit')
+                      <span style="font-weight:800; font-size:12px; color:var(--text);">Sakit</span>
+                    @elseif($todayAbsensi->status === 'bolos')
+                      <span style="font-weight:800; font-size:12px; color:var(--text);">Bolos</span>
+                    @elseif($todayAbsensi->status === 'alpha')
+                      <span style="font-weight:800; font-size:12px; color:var(--text);">Alpha</span>
+                    @endif
+                  @elseif($siswa->status === 'pkl')
+                    <span style="font-weight:800; font-size:12px; color:var(--text);">PKL</span>
+                  @else
+                    <span style="font-weight:800; font-size:12px; color:var(--text);">Belum Presensi</span>
+                  @endif
+                </div>
+              </div>
+
+              <div class="today-time-grid">
+                <div class="today-time-box">
+                  <div class="today-time-label">Masuk Gerbang</div>
+                  <div class="today-time-val">
+                    {{ $todayAbsensi && $todayAbsensi->jam_masuk ? substr($todayAbsensi->jam_masuk, 0, 5).' WIB' : '—' }}
+                  </div>
+                </div>
+                <div class="today-time-box">
+                  <div class="today-time-label">Pulang Gerbang</div>
+                  <div class="today-time-val">
+                    {{ $todayAbsensi && $todayAbsensi->jam_pulang ? substr($todayAbsensi->jam_pulang, 0, 5).' WIB' : '—' }}
+                  </div>
+                </div>
+              </div>
+              
+              <div style="font-size:11px; color:var(--text-3); text-align:center; margin-top:8px;">
+                {{ $todayAbsensi ? ($todayAbsensi->keterangan ?: 'Tervalidasi via Smart Gate RFID/QR SMKN 1 AN') : ($siswa->status === 'pkl' ? 'Siswa sedang melaksanakan PKL di Industri' : 'Belum ada rekaman presensi di gerbang hari ini') }}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {{-- RIWAYAT KEHADIRAN TERPADU --}}
+        <div id="riwayat-kehadiran" style="scroll-margin-top: 70px;">
         
         {{-- KARTU SKOR DISIPLIN & 4 METRIK KEHADIRAN (KPI) --}}
         <div class="stats-overview-grid">
@@ -1608,6 +1973,7 @@
           </span>
         </div>
       </div>
+      </div>
 
       {{-- 4. PENGUMUMAN RESMI SEKOLAH --}}
       <div class="dossier-card" id="section-pengumuman" style="margin-top: 20px; scroll-margin-top: 70px; display: none;">
@@ -1732,104 +2098,346 @@
     function resetSiswaTersimpan() {
       window.location.href = '/cek-presensi';
     }
-    function togglePortalSection(type) {
-      const secAbsen = document.getElementById('riwayat-kehadiran');
-      const secKasus = document.getElementById('portofolio-karakter');
-      const secPengumuman = document.getElementById('section-pengumuman');
-      const btnAbsen = document.getElementById('btnToggleAbsen');
-      const btnKasus = document.getElementById('btnToggleKasus');
-      const btnPengumuman = document.getElementById('btnTogglePengumuman');
 
-      if (type === 'absen') {
-        if (!secAbsen) return;
-        const isHidden = (secAbsen.style.display === 'none' || !secAbsen.style.display);
-        if (isHidden) {
-          secAbsen.style.display = 'block';
-          if (secKasus) secKasus.style.display = 'none';
-          if (secPengumuman) secPengumuman.style.display = 'none';
-          if (btnAbsen) btnAbsen.classList.add('active');
-          if (btnKasus) btnKasus.classList.remove('active');
-          if (btnPengumuman) btnPengumuman.classList.remove('active');
-          setTimeout(function() {
-            secAbsen.scrollIntoView({ behavior: 'smooth', block: 'start' });
-          }, 50);
-        } else {
-          secAbsen.style.display = 'none';
-          if (btnAbsen) btnAbsen.classList.remove('active');
+    // ===== MAIN TABS SWITCHER (KARTU & QR, RIWAYAT ABSENSI, PENGUMUMAN) =====
+    function switchPortalMainTab(tabName) {
+      const secKartuQr = document.getElementById('section-kartu-qr');
+      const secAbsenWrap = document.getElementById('section-absen-wrap');
+      const secPengumuman = document.getElementById('section-pengumuman');
+      
+      const btnKartuQr = document.getElementById('btnTabKartuQr');
+      const btnAbsen = document.getElementById('btnTabAbsen');
+      const btnPengumuman = document.getElementById('btnTabPengumuman');
+
+      if (tabName === 'kartu-qr') {
+        if (secKartuQr) secKartuQr.style.display = 'block';
+        if (secAbsenWrap) secAbsenWrap.style.display = 'none';
+        if (secPengumuman) secPengumuman.style.display = 'none';
+
+        if (btnKartuQr) btnKartuQr.classList.add('active');
+        if (btnAbsen) btnAbsen.classList.remove('active');
+        if (btnPengumuman) btnPengumuman.classList.remove('active');
+        if (typeof renderPortalQrCode === 'function') {
+          setTimeout(renderPortalQrCode, 50);
         }
-      } else if (type === 'kasus') {
-        if (!secKasus) return;
-        const isHidden = (secKasus.style.display === 'none' || !secKasus.style.display);
-        if (isHidden) {
-          secKasus.style.display = 'block';
-          if (secAbsen) secAbsen.style.display = 'none';
-          if (secPengumuman) secPengumuman.style.display = 'none';
-          if (btnKasus) btnKasus.classList.add('active');
-          if (btnAbsen) btnAbsen.classList.remove('active');
-          if (btnPengumuman) btnPengumuman.classList.remove('active');
-          setTimeout(function() {
-            secKasus.scrollIntoView({ behavior: 'smooth', block: 'start' });
-          }, 50);
-        } else {
-          secKasus.style.display = 'none';
-          if (btnKasus) btnKasus.classList.remove('active');
+      } else if (tabName === 'absen') {
+        if (secKartuQr) secKartuQr.style.display = 'none';
+        if (secAbsenWrap) secAbsenWrap.style.display = 'block';
+        if (secPengumuman) secPengumuman.style.display = 'none';
+
+        if (btnKartuQr) btnKartuQr.classList.remove('active');
+        if (btnAbsen) btnAbsen.classList.add('active');
+        if (btnPengumuman) btnPengumuman.classList.remove('active');
+      } else if (tabName === 'pengumuman') {
+        if (secKartuQr) secKartuQr.style.display = 'none';
+        if (secAbsenWrap) secAbsenWrap.style.display = 'none';
+        if (secPengumuman) secPengumuman.style.display = 'block';
+
+        if (btnKartuQr) btnKartuQr.classList.remove('active');
+        if (btnAbsen) btnAbsen.classList.remove('active');
+        if (btnPengumuman) btnPengumuman.classList.add('active');
+      }
+    }
+    window.switchPortalMainTab = switchPortalMainTab;
+
+    @if($siswa)
+    // ===== QR CODE & BARCODE SCANNER KIOSK & AUTO-ZOOM MAX BRIGHTNESS =====
+    const KARTU_CODE_VALUE = @json($codeValue);
+    let screenWakeLock = null;
+
+    function renderPortalQrCode() {
+      const codeVal = KARTU_CODE_VALUE || '{{ $siswa->nisn ?? $siswa->nis }}';
+      if (!codeVal) return;
+
+      // 1. Render Normal Scanner QR Code (2D)
+      const containerScanner = document.getElementById('scannerQrContainer');
+      if (containerScanner) {
+        containerScanner.innerHTML = '';
+        if (typeof QRCode !== 'undefined') {
+          try {
+            new QRCode(containerScanner, {
+              text: codeVal,
+              width: 190,
+              height: 190,
+              colorDark: '#000000',
+              colorLight: '#ffffff',
+              correctLevel: (typeof QRCode.CorrectLevel !== 'undefined') ? QRCode.CorrectLevel.M : 0
+            });
+          } catch(e) {
+            console.warn('QR render error:', e);
+          }
         }
-      } else if (type === 'pengumuman') {
-        if (!secPengumuman) return;
-        const isHidden = (secPengumuman.style.display === 'none' || !secPengumuman.style.display);
-        if (isHidden) {
-          secPengumuman.style.display = 'block';
-          if (secAbsen) secAbsen.style.display = 'none';
-          if (secKasus) secKasus.style.display = 'none';
-          if (btnPengumuman) btnPengumuman.classList.add('active');
-          if (btnAbsen) btnAbsen.classList.remove('active');
-          if (btnKasus) btnKasus.classList.remove('active');
-          setTimeout(function() {
-            secPengumuman.scrollIntoView({ behavior: 'smooth', block: 'start' });
-          }, 50);
-        } else {
-          secPengumuman.style.display = 'none';
-          if (btnPengumuman) btnPengumuman.classList.remove('active');
+      }
+
+      // 2. Render Fullscreen Zoomed QR Code (2D)
+      const containerZoomed = document.getElementById('zoomedQrContainer');
+      if (containerZoomed) {
+        containerZoomed.innerHTML = '';
+        if (typeof QRCode !== 'undefined') {
+          try {
+            new QRCode(containerZoomed, {
+              text: codeVal,
+              width: 240,
+              height: 240,
+              colorDark: '#000000',
+              colorLight: '#ffffff',
+              correctLevel: (typeof QRCode.CorrectLevel !== 'undefined') ? QRCode.CorrectLevel.H : 0
+            });
+          } catch(e) {
+            console.warn('QR Zoom render error:', e);
+          }
         }
       }
     }
-    window.togglePortalSection = togglePortalSection;
 
-    document.addEventListener('DOMContentLoaded', function() {
-      const secAbsen = document.getElementById('riwayat-kehadiran');
-      const btnAbsen = document.getElementById('btnToggleAbsen');
-      const secKasus = document.getElementById('portofolio-karakter');
-      const btnKasus = document.getElementById('btnToggleKasus');
-      const secPengumuman = document.getElementById('section-pengumuman');
-      const btnPengumuman = document.getElementById('btnTogglePengumuman');
+    // AUTO-ZOOM & MAX BRIGHTNESS TOGGLE
+    async function toggleQrFullscreenZoom(isOpen) {
+      const overlay = document.getElementById('qrZoomOverlay');
+      if (!overlay) return;
 
-      const urlParams = new URLSearchParams(window.location.search);
-      const hash = window.location.hash;
+      if (isOpen) {
+        overlay.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+        renderPortalQrCode();
 
-      if (hash === '#portofolio-karakter') {
-        if (secKasus) secKasus.style.display = 'block';
-        if (secAbsen) secAbsen.style.display = 'none';
-        if (secPengumuman) secPengumuman.style.display = 'none';
-        if (btnKasus) btnKasus.classList.add('active');
-        if (btnAbsen) btnAbsen.classList.remove('active');
-        if (btnPengumuman) btnPengumuman.classList.remove('active');
-      } else if (hash === '#section-pengumuman' || hash === '#pengumuman') {
-        if (secPengumuman) secPengumuman.style.display = 'block';
-        if (secAbsen) secAbsen.style.display = 'none';
-        if (secKasus) secKasus.style.display = 'none';
-        if (btnPengumuman) btnPengumuman.classList.add('active');
-        if (btnAbsen) btnAbsen.classList.remove('active');
-        if (btnKasus) btnKasus.classList.remove('active');
-      } else if (hash === '#riwayat-kehadiran' || urlParams.has('periode') || urlParams.has('tanggal') || urlParams.has('bulan') || urlParams.has('tahun')) {
-        if (secAbsen) secAbsen.style.display = 'block';
-        if (secKasus) secKasus.style.display = 'none';
-        if (secPengumuman) secPengumuman.style.display = 'none';
-        if (btnAbsen) btnAbsen.classList.add('active');
-        if (btnKasus) btnKasus.classList.remove('active');
-        if (btnPengumuman) btnPengumuman.classList.remove('active');
+        // Aktifkan Screen WakeLock API agar layar HP tetap menyala terang (tidak mati/redup saat antre scan)
+        try {
+          if ('wakeLock' in navigator && navigator.wakeLock) {
+            screenWakeLock = await navigator.wakeLock.request('screen');
+          }
+        } catch(err) {
+          console.log('WakeLock not supported or denied', err);
+        }
+      } else {
+        overlay.style.display = 'none';
+        document.body.style.overflow = '';
+
+        // Lepaskan WakeLock (kecerahan kembali normal)
+        if (screenWakeLock !== null) {
+          try {
+            await screenWakeLock.release();
+            screenWakeLock = null;
+          } catch(err) {}
+        }
+      }
+    }
+    window.toggleQrFullscreenZoom = toggleQrFullscreenZoom;
+
+    // SIMPAN GAMBAR KARTU SISWA UTUH KE GALERI HP
+    async function downloadSiswaFullCard() {
+      const cardElement = document.getElementById('kartuSiswaDigitalArea');
+      if (!cardElement) return;
+
+      const btn = document.getElementById('btnDownloadSiswaCard');
+      const origHtml = btn ? btn.innerHTML : '';
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Merender Gambar Kartu...';
       }
 
+      try {
+        await new Promise(r => setTimeout(r, 80));
+
+        const isDark = document.documentElement.classList.contains('dark') || document.body.classList.contains('dark');
+        const bgColor = isDark ? '#0f172a' : '#ffffff';
+
+        const canvas = await html2canvas(cardElement, {
+          scale: 3,
+          useCORS: true,
+          allowTaint: true,
+          backgroundColor: bgColor,
+          logging: false,
+          scrollX: 0,
+          scrollY: -window.scrollY
+        });
+
+        const safeFilename = 'KARTU_PRESENSI_{{ Str::slug($siswa->nama) }}_{{ $codeValue }}.png';
+
+        if (navigator.canShare && window.File) {
+          try {
+            canvas.toBlob(async (blob) => {
+              if (blob) {
+                const file = new File([blob], safeFilename, { type: 'image/png' });
+                if (navigator.canShare({ files: [file] })) {
+                  await navigator.share({
+                    files: [file],
+                    title: 'Kartu Presensi Siswa',
+                    text: 'Kartu Presensi Digital SMKN 1 Air Naningan - {{ $siswa->nama }}'
+                  });
+                  return;
+                }
+              }
+              triggerSiswaDownload(canvas, safeFilename);
+            }, 'image/png');
+            return;
+          } catch(e) {
+            triggerSiswaDownload(canvas, safeFilename);
+            return;
+          }
+        }
+
+        triggerSiswaDownload(canvas, safeFilename);
+      } catch (err) {
+        console.error('Gagal render kartu siswa:', err);
+        // Fallback
+        const containerScanner = document.getElementById('scannerQrContainer');
+        const qrCanvasOrImg = containerScanner?.querySelector('canvas') || containerScanner?.querySelector('img');
+        if (qrCanvasOrImg) {
+          const link = document.createElement('a');
+          link.download = 'QR_Presensi_{{ Str::slug($siswa->nama) }}_{{ $codeValue }}.png';
+          link.href = (qrCanvasOrImg.tagName === 'CANVAS') ? qrCanvasOrImg.toDataURL('image/png') : qrCanvasOrImg.src;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+        } else {
+          alert('Gagal mengunduh kartu. Silakan muat ulang halaman.');
+        }
+      } finally {
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = origHtml;
+        }
+      }
+    }
+
+    function triggerSiswaDownload(canvas, filename) {
+      const link = document.createElement('a');
+      link.download = filename;
+      link.href = canvas.toDataURL('image/png');
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    window.downloadSiswaFullCard = downloadSiswaFullCard;
+    window.downloadQrOnly = downloadSiswaFullCard;
+
+    window.renderPortalQrCode = renderPortalQrCode;
+
+    function openKartuDigital() {
+      const modal = document.getElementById('kartuDigitalModal');
+      if (!modal) return;
+      modal.style.display = 'flex';
+      document.body.style.overflow = 'hidden';
+      if (!kartuQrRendered) {
+        renderKartuQr();
+        kartuQrRendered = true;
+      }
+      // Animasi masuk
+      const inner = modal.querySelector('[onclick="event.stopPropagation()"]');
+      if (inner) {
+        inner.style.opacity = '0';
+        inner.style.transform = 'translateY(20px) scale(0.96)';
+        requestAnimationFrame(() => {
+          inner.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+          inner.style.opacity = '1';
+          inner.style.transform = 'translateY(0) scale(1)';
+        });
+      }
+    }
+
+    function closeKartuDigital(e) {
+      if (e && e.target && !e.target.closest('[onclick="event.stopPropagation()"]') === false) return;
+      const modal = document.getElementById('kartuDigitalModal');
+      if (!modal) return;
+      modal.style.display = 'none';
+      document.body.style.overflow = '';
+    }
+
+    let kartuQrRendered = false;
+    function renderKartuQr() {
+      const codeVal = KARTU_CODE_VALUE || '{{ $siswa->nisn ?? $siswa->nis }}';
+      if (!codeVal) return;
+
+      // Render QR Code di Modal Kartu Digital
+      const qrContainer = document.getElementById('kartuQrContainer');
+      if (qrContainer && typeof QRCode !== 'undefined') {
+        try {
+          qrContainer.innerHTML = '';
+          new QRCode(qrContainer, {
+            text: codeVal,
+            width: 120,
+            height: 120,
+            colorDark: '#0f172a',
+            colorLight: '#ffffff',
+            correctLevel: (typeof QRCode.CorrectLevel !== 'undefined') ? QRCode.CorrectLevel.M : 0
+          });
+        } catch(e) {
+          console.warn('QR render error:', e);
+        }
+      }
+    }
+
+    async function downloadKartuDigital() {
+      const card = document.getElementById('kartuDigitalCard');
+      if (!card) return;
+      try {
+        if (typeof html2canvas !== 'undefined') {
+          const canvas = await html2canvas(card, { scale: 3, useCORS: true, backgroundColor: null });
+          const link = document.createElement('a');
+          link.download = 'kartu-pelajar-{{ Str::slug($siswa->nama) }}.png';
+          link.href = canvas.toDataURL('image/png');
+          link.click();
+        } else {
+          const printContent = card.outerHTML;
+          const printWin = window.open('', '_blank', 'width=400,height=600');
+          printWin.document.write(`<html><head><title>Kartu Pelajar Digital</title><style>body{margin:0;padding:16px;background:#1e293b;display:flex;justify-content:center;align-items:center;min-height:100vh;font-family:system-ui,sans-serif;}</style></head><body>${printContent}</body></html>`);
+          printWin.document.close();
+          printWin.focus();
+          setTimeout(() => { printWin.print(); printWin.close(); }, 500);
+        }
+      } catch(e) {
+        alert('Fitur unduh memerlukan koneksi internet untuk library tambahan. Coba gunakan Screenshot layar.');
+      }
+    }
+
+    async function shareKartuDigital() {
+      const card = document.getElementById('kartuDigitalCard');
+      if (!card) return;
+      try {
+        if (navigator.share) {
+          const shareUrl = window.location.href;
+          await navigator.share({
+            title: 'Kartu Pelajar Digital - {{ $siswa->nama }}',
+            text: 'Lihat kartu pelajar digital {{ $siswa->nama }} ({{ $siswa->nis }}) di portal SIRANI SMKN 1 Air Naningan.',
+            url: shareUrl
+          });
+        } else {
+          const url = window.location.href;
+          navigator.clipboard.writeText(url).then(() => {
+            alert('Link portal berhasil disalin ke clipboard!');
+          });
+        }
+      } catch(e) {
+        console.warn('Share error:', e);
+      }
+    }
+
+    window.openKartuDigital = openKartuDigital;
+    window.closeKartuDigital = closeKartuDigital;
+    window.downloadKartuDigital = downloadKartuDigital;
+    window.shareKartuDigital = shareKartuDigital;
+    @endif
+
+    document.addEventListener('DOMContentLoaded', function() {
       @if($siswa)
+        // Render QR Code & Barcode pada kartu scanner gerbang & kiosk
+        if (typeof renderPortalQrCode === 'function') {
+          renderPortalQrCode();
+        }
+
+        // Cek URL params / hash untuk navigasi tab
+        const urlParams = new URLSearchParams(window.location.search);
+        const hash = window.location.hash;
+
+        if (hash === '#riwayat-kehadiran' || hash === '#absen' || urlParams.has('periode') || urlParams.has('tanggal') || urlParams.has('bulan') || urlParams.has('tahun')) {
+          switchPortalMainTab('absen');
+        } else if (hash === '#section-pengumuman' || hash === '#pengumuman') {
+          switchPortalMainTab('pengumuman');
+        } else {
+          switchPortalMainTab('kartu-qr');
+        }
+
         saveSiswaToLocalStorage({
           nis: "{{ $siswa->nis }}",
           nama: "{{ $siswa->nama }}",
@@ -1838,6 +2446,14 @@
         });
       @else
         renderSavedStudents();
+      @endif
+    });
+
+    window.addEventListener('load', function() {
+      @if($siswa)
+        if (typeof renderPortalQrCode === 'function') {
+          renderPortalQrCode();
+        }
       @endif
     });
 
@@ -2120,6 +2736,184 @@
       <i class="bi bi-info-circle"></i> <strong>Ketuk 2x</strong> pada gambar untuk Zoom · Gunakan tombol <i class="bi bi-zoom-in"></i> / <i class="bi bi-zoom-out"></i> untuk mengatur skala
     </div>
   </div>
+
+  @if($siswa)
+  {{-- KARTU DIGITAL SISWA MODAL — REDESIGN PREMIUM --}}
+  <div id="kartuDigitalModal" style="display:none; position:fixed; inset:0; z-index:99998; align-items:center; justify-content:center; padding:20px; background:rgba(2,8,23,0.92); backdrop-filter:blur(20px) saturate(1.5);" onclick="closeKartuDigital(event)">
+    <div style="width:100%; max-width:400px; position:relative;" onclick="event.stopPropagation()">
+
+      {{-- Close --}}
+      <button onclick="closeKartuDigital()" style="position:absolute; top:-18px; right:-10px; z-index:10; background:rgba(255,255,255,0.1); backdrop-filter:blur(10px); border:1px solid rgba(255,255,255,0.2); width:36px; height:36px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:14px; color:#fff; cursor:pointer; transition:all .2s;" onmouseover="this.style.background='rgba(255,255,255,0.2)'" onmouseout="this.style.background='rgba(255,255,255,0.1)'">
+        <i class="bi bi-x-lg"></i>
+      </button>
+
+      {{-- === KARTU UTAMA === --}}
+      <div id="kartuDigitalCard" style="border-radius:24px; overflow:hidden; box-shadow:0 32px 80px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.08); font-family:var(--font-main); position:relative;">
+
+        {{-- ===== SISI DEPAN KARTU ===== --}}
+        {{-- Background gradient utama --}}
+        <div style="background:linear-gradient(135deg, #0a0f1e 0%, #0d1f4a 30%, #1a1060 60%, #2d0a4e 100%); padding:0; position:relative; min-height:220px; overflow:hidden;">
+
+          {{-- Holographic stripe horizontal --}}
+          <div style="position:absolute; top:0; left:0; right:0; height:3px; background:linear-gradient(90deg, #6366f1, #8b5cf6, #ec4899, #f59e0b, #10b981, #6366f1); background-size:200% 100%; animation:holoShift 3s linear infinite;"></div>
+
+          {{-- Grid pattern overlay --}}
+          <div style="position:absolute; inset:0; opacity:0.04; background-image:linear-gradient(rgba(255,255,255,0.8) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.8) 1px, transparent 1px); background-size:24px 24px;"></div>
+
+          {{-- Glow orbs dekoratif --}}
+          <div style="position:absolute; top:-60px; right:-60px; width:200px; height:200px; border-radius:50%; background:radial-gradient(circle, rgba(139,92,246,0.25) 0%, transparent 70%);"></div>
+          <div style="position:absolute; bottom:-80px; left:-40px; width:220px; height:220px; border-radius:50%; background:radial-gradient(circle, rgba(99,102,241,0.2) 0%, transparent 70%);"></div>
+          <div style="position:absolute; top:50%; right:30px; width:80px; height:80px; border-radius:50%; background:radial-gradient(circle, rgba(236,72,153,0.15) 0%, transparent 70%);"></div>
+
+          {{-- === ROW 1: Logo + Tahun === --}}
+          <div style="padding:18px 20px 0; display:flex; align-items:center; justify-content:space-between; position:relative; z-index:2;">
+            <div style="display:flex; align-items:center; gap:10px;">
+              {{-- Logo badge --}}
+              <div style="width:36px; height:36px; background:linear-gradient(135deg,rgba(139,92,246,0.4),rgba(99,102,241,0.3)); border:1px solid rgba(255,255,255,0.2); border-radius:10px; display:flex; align-items:center; justify-content:center; backdrop-filter:blur(4px);">
+                <i class="bi bi-mortarboard-fill" style="color:#c4b5fd; font-size:16px;"></i>
+              </div>
+              <div>
+                <div style="font-size:7.5px; font-weight:800; color:rgba(196,181,253,0.8); letter-spacing:2px; text-transform:uppercase; line-height:1;">KARTU PELAJAR DIGITAL</div>
+                <div style="font-size:12px; font-weight:900; color:#fff; line-height:1.3; margin-top:2px;">SMK Negeri 1 Air Naningan</div>
+              </div>
+            </div>
+            {{-- Contactless icon + TA --}}
+            <div style="text-align:right;">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" style="opacity:0.6; display:block; margin-left:auto; margin-bottom:3px;">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z" fill="rgba(139,92,246,0.3)" stroke="rgba(196,181,253,0.6)" stroke-width="1.5"/>
+                <path d="M8 12c0-2.21 1.79-4 4-4s4 1.79 4 4" stroke="rgba(196,181,253,0.8)" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+                <path d="M6 12c0-3.31 2.69-6 6-6s6 2.69 6 6" stroke="rgba(167,139,250,0.5)" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+              </svg>
+              <div style="font-size:9px; font-weight:800; color:rgba(196,181,253,0.7); line-height:1;">TA {{ date('Y') }}/{{ date('Y')+1 }}</div>
+              <div style="font-size:7px; color:rgba(255,255,255,0.3); margin-top:1px; letter-spacing:0.5px;">SIRANI · v2</div>
+            </div>
+          </div>
+
+          {{-- === ROW 2: Foto + Info === --}}
+          <div style="padding:14px 20px 20px; display:flex; gap:16px; align-items:flex-end; position:relative; z-index:2;">
+            {{-- Foto --}}
+            <div style="flex-shrink:0; position:relative;">
+              {{-- Ring glow --}}
+              <div style="position:absolute; inset:-3px; border-radius:16px; background:linear-gradient(135deg, #6366f1, #8b5cf6, #ec4899); padding:2px; opacity:0.8;">
+                <div style="width:100%; height:100%; background:#0d1f4a; border-radius:14px;"></div>
+              </div>
+              @if($siswa->foto)
+                <img src="{{ asset('storage/'.$siswa->foto) }}" alt="{{ $siswa->nama }}" style="position:relative; z-index:1; width:76px; height:92px; object-fit:cover; border-radius:14px; display:block;" />
+              @else
+                <div style="position:relative; z-index:1; width:76px; height:92px; background:linear-gradient(135deg,#312e81,#4c1d95,#6d28d9); border-radius:14px; display:flex; align-items:center; justify-content:center; font-size:32px; font-weight:900; color:rgba(255,255,255,0.9); font-family:var(--font-main);">{{ strtoupper(substr($siswa->nama, 0, 1)) }}</div>
+              @endif
+            </div>
+
+            {{-- Info --}}
+            <div style="flex:1; min-width:0; padding-bottom:4px;">
+              <div style="font-size:18px; font-weight:900; color:#fff; line-height:1.15; margin-bottom:10px; letter-spacing:-0.3px;">{{ $siswa->nama }}</div>
+              <div style="display:flex; flex-direction:column; gap:4px;">
+                <div style="display:flex; align-items:center; gap:0;">
+                  <span style="font-size:9px; color:rgba(196,181,253,0.6); font-weight:700; text-transform:uppercase; letter-spacing:0.8px; width:32px;">NIS</span>
+                  <span style="font-size:11px; color:#e2e8f0; font-weight:800; font-family:var(--font-mono); letter-spacing:1px;">{{ $siswa->nis ?: '—' }}</span>
+                </div>
+                <div style="display:flex; align-items:center; gap:0;">
+                  <span style="font-size:9px; color:rgba(196,181,253,0.6); font-weight:700; text-transform:uppercase; letter-spacing:0.8px; width:32px;">NISN</span>
+                  <span style="font-size:11px; color:#e2e8f0; font-weight:800; font-family:var(--font-mono); letter-spacing:1px;">{{ $siswa->nisn ?: '—' }}</span>
+                </div>
+                <div style="margin-top:4px; display:flex; gap:5px; flex-wrap:wrap;">
+                  <span style="background:rgba(99,102,241,0.25); border:1px solid rgba(99,102,241,0.4); color:#c4b5fd; font-size:9.5px; font-weight:800; padding:3px 9px; border-radius:20px; display:inline-flex; align-items:center; gap:4px; backdrop-filter:blur(4px);">
+                    <i class="bi bi-building" style="font-size:8px;"></i> {{ $rombel->nama_rombel ?? '—' }}
+                  </span>
+                  <span style="background:rgba(236,72,153,0.2); border:1px solid rgba(236,72,153,0.35); color:#f9a8d4; font-size:9px; font-weight:700; padding:3px 9px; border-radius:20px; display:inline-flex; align-items:center; gap:4px; backdrop-filter:blur(4px);">
+                    <i class="bi bi-tools" style="font-size:8px;"></i> {{ Str::words($rombel->jurusan->nama_jurusan ?? '—', 3, '…') }}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {{-- Chip EMV --}}
+          <div style="position:absolute; bottom:16px; right:20px; z-index:2;">
+            <div style="width:32px; height:24px; background:linear-gradient(135deg,#d4a017,#f5d06b,#b8860b); border-radius:5px; position:relative; overflow:hidden; box-shadow:0 2px 8px rgba(0,0,0,0.4);">
+              <div style="position:absolute; inset:0; background:repeating-linear-gradient(0deg, transparent, transparent 6px, rgba(0,0,0,0.15) 6px, rgba(0,0,0,0.15) 7px);"></div>
+              <div style="position:absolute; left:50%; top:0; bottom:0; width:1px; background:rgba(0,0,0,0.2); transform:translateX(-50%);"></div>
+            </div>
+          </div>
+        </div>
+
+        {{-- ===== BAGIAN BAWAH: BARCODE + QR ===== --}}
+        <div style="background:#f8fafc; padding:16px 20px 14px;">
+          {{-- Garis dekoratif atas --}}
+          <div style="height:3px; background:linear-gradient(90deg, #6366f1, #8b5cf6, #ec4899, #f59e0b); border-radius:2px; margin-bottom:14px; opacity:0.6;"></div>
+
+          {{-- QR Code Section - full width --}}
+          <div style="text-align:center;">
+            <div style="display:flex; align-items:center; justify-content:center; gap:5px; margin-bottom:8px;">
+              <i class="bi bi-qr-code" style="font-size:10px; color:#8b5cf6;"></i>
+              <span style="font-size:8.5px; font-weight:800; color:#8b5cf6; text-transform:uppercase; letter-spacing:1.2px;">QR Presensi · ID: {{ $codeValue }}</span>
+            </div>
+            <div style="background:#fff; border-radius:10px; padding:8px; border:1px solid #e2e8f0; box-shadow:0 1px 4px rgba(0,0,0,0.06); display:inline-block;">
+              <div id="kartuQrContainer" style="width:120px; height:120px; display:flex; align-items:center; justify-content:center;"></div>
+            </div>
+            <div style="font-size:8.5px; color:#94a3b8; text-align:center; margin-top:6px; font-family:var(--font-mono); letter-spacing:2px;">{{ $codeValue }}</div>
+          </div>
+
+          {{-- Footer --}}
+          <div style="margin-top:12px; display:flex; justify-content:space-between; align-items:center;">
+            <div style="display:flex; align-items:center; gap:5px;">
+              <div style="width:5px; height:5px; border-radius:50%; background:linear-gradient(135deg,#6366f1,#ec4899);"></div>
+              <span style="font-size:8px; color:#94a3b8; font-weight:700; letter-spacing:0.3px;">SMKN 1 Air Naningan · Tanggamus · Lampung</span>
+            </div>
+            <span style="font-size:7.5px; color:#cbd5e1; font-family:var(--font-mono); letter-spacing:0.5px;">portal.sirani</span>
+          </div>
+        </div>
+      </div>
+
+      {{-- ===== TOMBOL AKSI ===== --}}
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:14px;">
+        <button onclick="downloadKartuDigital()" style="background:#fff; color:#0f172a; border:none; padding:11px 16px; border-radius:14px; font-size:12px; font-weight:800; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:7px; font-family:var(--font-main); box-shadow:0 4px 20px rgba(0,0,0,0.4); transition:all .2s; letter-spacing:0.2px;" onmouseover="this.style.transform='translateY(-1px)';this.style.boxShadow='0 8px 24px rgba(0,0,0,0.5)'" onmouseout="this.style.transform='';this.style.boxShadow='0 4px 20px rgba(0,0,0,0.4)'">
+          <i class="bi bi-download" style="font-size:13px;"></i> Unduh Kartu
+        </button>
+        <button onclick="shareKartuDigital()" style="background:linear-gradient(135deg,rgba(99,102,241,0.2),rgba(139,92,246,0.2)); color:#e2e8f0; border:1px solid rgba(139,92,246,0.4); padding:11px 16px; border-radius:14px; font-size:12px; font-weight:800; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:7px; font-family:var(--font-main); transition:all .2s; backdrop-filter:blur(10px); letter-spacing:0.2px;" onmouseover="this.style.background='linear-gradient(135deg,rgba(99,102,241,0.35),rgba(139,92,246,0.35))';this.style.transform='translateY(-1px)'" onmouseout="this.style.background='linear-gradient(135deg,rgba(99,102,241,0.2),rgba(139,92,246,0.2))';this.style.transform=''">
+          <i class="bi bi-share" style="font-size:13px;"></i> Bagikan
+        </button>
+      </div>
+
+      {{-- Label kecil --}}
+      <div style="text-align:center; margin-top:10px; font-size:10px; color:rgba(255,255,255,0.25); letter-spacing:0.5px; font-family:var(--font-main);">
+        Kartu ini merupakan identitas digital resmi siswa SMKN 1 Air Naningan
+      </div>
+    </div>
+  </div>
+
+  {{-- FULLSCREEN AUTO-ZOOM & MAX BRIGHTNESS (PURE WHITE SCREEN) OVERLAY --}}
+  <div id="qrZoomOverlay" onclick="toggleQrFullscreenZoom(false)" title="Sentuh untuk minimize &amp; kembalikan kecerahan normal">
+    <div class="zoom-overlay-header">
+      <div style="font-size:11px; font-weight:800; color:#64748b; letter-spacing:1.5px; text-transform:uppercase;">SMK NEGERI 1 AIR NANINGAN</div>
+      <div style="font-size:15px; font-weight:900; color:#0f172a; margin-top:2px; letter-spacing:0.5px;">SCANNER GERBANG &amp; KIOSK</div>
+    </div>
+    <div class="zoom-overlay-body">
+      <div style="background:#ffffff; padding:18px 18px 12px; border-radius:24px; box-shadow:0 16px 50px rgba(0,0,0,0.12); border:2px solid #e2e8f0; display:inline-block; max-width:92vw;">
+        <div id="zoomedQrContainer" style="min-width:240px; min-height:240px; display:flex; align-items:center; justify-content:center; margin:0 auto;"></div>
+        <div style="font-family:var(--font-mono); font-size:22px; font-weight:900; letter-spacing:3px; color:#0f172a; margin-top:10px; text-align:center;">{{ $codeValue }}</div>
+      </div>
+      <div style="margin-top:14px; text-align:center;">
+        <div style="font-size:18px; font-weight:900; color:#0f172a; line-height:1.2;">{{ $siswa->nama }}</div>
+        <div style="font-size:13px; font-weight:700; color:#64748b; margin-top:3px;">{{ $rombel->nama_rombel ?? 'X' }} · {{ $rombel->jurusan->nama_jurusan ?? 'Semua Jurusan' }}</div>
+      </div>
+    </div>
+    <div class="zoom-overlay-footer">
+      <div style="display:inline-flex; align-items:center; gap:8px; background:#0f172a; color:#ffffff; padding:10px 22px; border-radius:30px; font-size:12px; font-weight:800; box-shadow:0 4px 18px rgba(0,0,0,0.25);">
+        <i class="bi bi-hand-index-thumb"></i>
+        <span>Sentuh layar untuk minimize &amp; kembalikan kecerahan</span>
+      </div>
+    </div>
+  </div>
+
+  {{-- CSS Animasi Holo --}}
+  <style>
+    @keyframes holoShift {
+      0% { background-position: 0% 0%; }
+      100% { background-position: 200% 0%; }
+    }
+  </style>
+  @endif
 
   {{-- QR SCANNER MODAL --}}
   <div id="qrModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:9999; align-items:center; justify-content:center; padding:16px;">

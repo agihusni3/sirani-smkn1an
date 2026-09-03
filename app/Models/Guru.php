@@ -36,15 +36,11 @@ class Guru extends Model
         'hari_mengajar',
         'no_hp',
         'foto',
-        'face_embedding',
-        'face_registered_at',
         'status',
     ];
 
     protected $casts = [
         'hari_mengajar' => 'array',
-        'face_embedding' => 'array',
-        'face_registered_at' => 'datetime',
     ];
 
     protected $appends = ['foto_url', 'label_kepegawaian'];
@@ -137,5 +133,15 @@ class Guru extends Model
     public function rombels(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(Rombel::class, 'wali_kelas_id');
+    }
+
+    public function kartuRfid(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(KartuRfid::class, 'pemilik_id')->where('pemilik_type', 'guru')->where('status', 'aktif');
+    }
+
+    public function kartuRfids(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(KartuRfid::class, 'pemilik_id')->where('pemilik_type', 'guru');
     }
 }

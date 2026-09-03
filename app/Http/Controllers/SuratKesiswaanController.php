@@ -35,8 +35,8 @@ class SuratKesiswaanController extends Controller
             $siswa = Siswa::with('siswaRombels.rombel.waliKelas', 'siswaRombels.rombel.jurusan')->find($request->get('siswa_id'));
         }
 
-        if (!$siswa && $request->has('nis')) {
-            $siswa = Siswa::with('siswaRombels.rombel.waliKelas', 'siswaRombels.rombel.jurusan')->where('nis', $request->get('nis'))->first();
+        if (!$siswa && $request->has('nisn')) {
+            $siswa = Siswa::with('siswaRombels.rombel.waliKelas', 'siswaRombels.rombel.jurusan')->where('nisn', $request->get('nisn'))->first();
         }
 
         if (!$siswa) {
@@ -58,9 +58,24 @@ class SuratKesiswaanController extends Controller
             return redirect()->back()->with('error', 'Data siswa untuk pembuatan surat tidak ditemukan.');
         }
 
-        $siswaRombel = $siswa->siswaRombels->where('status_keanggotaan', 'aktif')->first();
+        $siswaRombel = $siswa->siswaRombels->where('status_keanggotaan', 'aktif')->first()
+            ?? $siswa->siswaRombels->last();
         $rombel = $siswaRombel?->rombel;
         $waliKelas = $rombel?->waliKelas;
+        if (!$waliKelas) {
+            $waliKelas = \App\Models\Guru::where('status', 'aktif')->whereNotNull('nama')->first();
+        }
+
+        $guruBk = \App\Models\User::where('role', 'guru_bk')->with('guru')->first()?->guru
+            ?? \App\Models\Guru::where('status', 'aktif')
+                ->where(function ($q) {
+                    $q->where('jabatan', 'like', '%BK%')
+                      ->orWhere('jabatan', 'like', '%Bimbingan%')
+                      ->orWhere('jabatan', 'like', '%Konseling%');
+                })
+                ->first()
+            ?? $waliKelas;
+
         $sekolah = PengaturanSekolah::getAktif();
 
         // Parameter surat
@@ -100,36 +115,48 @@ class SuratKesiswaanController extends Controller
         $statusPembinaan = $request->get('status_pembinaan', $notifikasi?->status_pembinaan ?? 'selesai');
 
         // Data Lampiran Rekap Absensi Siswa
-        $bulanSelected = $request->get('bulan', Carbon::today()->format('Y-m'));
-        try {
-            $startOfMonth = Carbon::createFromFormat('Y-m', $bulanSelected)->startOfMonth();
-            $endOfMonth = Carbon::createFromFormat('Y-m', $bulanSelected)->endOfMonth();
-        } catch (\Exception $e) {
-            $bulanSelected = Carbon::today()->format('Y-m');
-            $startOfMonth = Carbon::today()->startOfMonth();
-            $endOfMonth = Carbon::today()->endOfMonth();
+        $bulanParam = $request->get('bulan');
+        $absensiBaseQuery = Absensi::where(function ($q) use ($siswa) {
+            $q->where(function ($sq) use ($siswa) {
+                $sq->where('pemilik_id', $siswa->id)->where('pemilik_type', 'siswa');
+            })->orWhere('siswa_id', $siswa->id);
+        });
+
+        if ($bulanParam) {
+            try {
+                $startOfMonth = Carbon::createFromFormat('Y-m', $bulanParam)->startOfMonth();
+                $endOfMonth   = Carbon::createFromFormat('Y-m', $bulanParam)->endOfMonth();
+                $absensis = (clone $absensiBaseQuery)
+                    ->whereBetween('tanggal', [$startOfMonth->toDateString(), $endOfMonth->toDateString()])
+                    ->orderBy('tanggal', 'desc')
+                    ->get();
+                $periodeTeks = 'Bulan ' . Carbon::createFromFormat('Y-m', $bulanParam)->translatedFormat('F Y');
+            } catch (\Exception $e) {
+                $absensis = (clone $absensiBaseQuery)->orderBy('tanggal', 'desc')->get();
+                $periodeTeks = 'Rekapitulasi Semester Berjalan (TP ' . ($sekolah->tahun_ajaran_aktif ?? '2026/2027') . ')';
+            }
+        } else {
+            // Default: Tampilkan seluruh rekapitulasi semester berjalan yang tersinkron dengan buku kasus disiplin
+            $absensis = (clone $absensiBaseQuery)
+                ->orderBy('tanggal', 'desc')
+                ->get();
+            $periodeTeks = 'Rekapitulasi Semester Berjalan (TP ' . ($sekolah->tahun_ajaran_aktif ?? '2026/2027') . ')';
         }
 
-        $absensis = Absensi::where('pemilik_type', 'siswa')
-            ->where('pemilik_id', $siswa->id)
-            ->whereBetween('tanggal', [$startOfMonth->toDateString(), $endOfMonth->toDateString()])
-            ->orderBy('tanggal', 'desc')
-            ->get();
-
-        $hadir = $absensis->where('status', 'hadir')->count();
+        $hadir     = $absensis->where('status', 'hadir')->count();
         $terlambat = $absensis->where('status', 'terlambat')->count();
-        $izin = $absensis->where('status', 'izin')->count();
-        $sakit = $absensis->where('status', 'sakit')->count();
-        $alpha = $absensis->where('status', 'alpha')->count();
-        $totalHari = $hadir + $terlambat + $izin + $sakit + $alpha;
-        $persen = $totalHari > 0 ? round((($hadir + $terlambat) / $totalHari) * 100, 1) : 100;
+        $izin      = $absensis->whereIn('status', ['izin', 'sakit'])->count();
+        $alpha     = $absensis->where('status', 'alpha')->count();
+        $bolos     = $absensis->where('status', 'bolos')->count();
+        $totalHari = $hadir + $terlambat + $izin + $alpha + $bolos;
+        $persen    = $totalHari > 0 ? round((($hadir + $terlambat) / $totalHari) * 100, 1) : ($alpha + $bolos > 0 ? 0 : 100);
 
         $stats = [
             'hadir'     => $hadir,
             'terlambat' => $terlambat,
             'izin'      => $izin,
-            'sakit'     => $sakit,
             'alpha'     => $alpha,
+            'bolos'     => $bolos,
             'persen'    => $persen,
         ];
 
@@ -138,6 +165,7 @@ class SuratKesiswaanController extends Controller
             'siswa',
             'rombel',
             'waliKelas',
+            'guruBk',
             'notifikasi',
             'judulSurat',
             'nomorSurat',
@@ -153,7 +181,7 @@ class SuratKesiswaanController extends Controller
             'statusPembinaan',
             'absensis',
             'stats',
-            'bulanSelected'
+            'periodeTeks'
         ));
     }
 

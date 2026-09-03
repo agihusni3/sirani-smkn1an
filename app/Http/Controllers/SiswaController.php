@@ -12,19 +12,22 @@ class SiswaController extends Controller
 {
     public function index(Request $request)
     {
+        $search = $request->input('search') ?: $request->input('q');
+        $rombelId = $request->input('rombel_id');
+        $status = $request->input('status');
+        $statusPkl = $request->input('status_pkl');
+        $biometrikStatus = $request->input('biometrik_status');
+        $rfidFilter = $request->input('rfid_status');
+        $sort = $request->input('sort', 'nama_asc');
+
         $currentUser = auth()->user();
         $isWaliOnly = $currentUser && $currentUser->isWaliKelas() && !$currentUser->isAdmin() && !$currentUser->isWakaKesiswaan() && !$currentUser->isGuruBk();
         $waliRombelIds = $isWaliOnly ? $currentUser->getWaliRombelIds() : [];
 
-        $query = Siswa::with(['siswaRombels.rombel', 'siswaRombels.tahunAjaran']);
+        $query = Siswa::with(['siswaRombels' => function ($q) {
+            $q->where('status_keanggotaan', 'aktif')->with('rombel');
+        }, 'kartuRfid']);
 
-        $search = $request->input('q');
-        $rombelId = $request->input('rombel_id');
-        $statusPkl = $request->input('status_pkl');
-        $biometrikStatus = $request->input('face_id', $request->input('rfid')); // Filter Face ID
-        $sort = $request->input('sort', 'nama_asc');
-
-        // Batasi hanya untuk rombel binaan jika pengguna adalah Wali Kelas
         if ($isWaliOnly) {
             $query->whereHas('siswaRombels', function ($q) use ($waliRombelIds) {
                 $q->whereIn('rombel_id', $waliRombelIds)->where('status_keanggotaan', 'aktif');
@@ -38,45 +41,57 @@ class SiswaController extends Controller
         if ($search) {
             $query->where(function ($q) use ($search) {
                 $q->where('nama', 'like', "%{$search}%")
-                  ->orWhere('nis', 'like', "%{$search}%")
                   ->orWhere('nisn', 'like', "%{$search}%")
                   ->orWhere('nama_ortu', 'like', "%{$search}%")
                   ->orWhere('no_hp_ortu', 'like', "%{$search}%");
             });
         }
 
+        if ($status) {
+            $query->where('status', $status);
+        }
+
         if ($statusPkl) {
             $query->where('status_pkl', $statusPkl);
         }
 
-        if ($biometrikStatus === 'ada') {
-            $query->whereNotNull('face_embedding');
-        } elseif ($biometrikStatus === 'belum') {
-            $query->whereNull('face_embedding');
+
+        if ($rfidFilter === 'ada') {
+            $query->whereHas('kartuRfid');
+        } elseif ($rfidFilter === 'belum') {
+            $query->whereDoesntHave('kartuRfid');
         }
 
         $tab = $request->input('tab', 'aktif');
-        if ($tab === 'alumni') {
-            $query->where('status', 'lulus');
-        } elseif ($tab === 'semua') {
-            // tampilkan seluruh riwayat
-        } else {
-            $query->whereIn('status', ['aktif', 'pkl']);
+        if (!$status) {
+            if ($tab === 'alumni') {
+                $query->where('status', 'lulus');
+            } elseif ($tab === 'semua') {
+                // tampilkan seluruh riwayat
+            } else {
+                $query->whereIn('status', ['aktif', 'pkl']);
+            }
         }
 
         // Sorting
         switch ($sort) {
+            case 'terbaru':
+            case 'terakhir_input':
+            case 'created_desc':
+                $query->orderBy('id', 'desc');
+                break;
+            case 'terlama':
+            case 'created_asc':
+                $query->orderBy('id', 'asc');
+                break;
             case 'nama_desc':
                 $query->orderBy('nama', 'desc');
                 break;
-            case 'nis_asc':
-                $query->orderBy('nis', 'asc');
+            case 'nisn_asc':
+                $query->orderBy('nisn', 'asc');
                 break;
-            case 'nis_desc':
-                $query->orderBy('nis', 'desc');
-                break;
-            case 'terbaru':
-                $query->orderBy('created_at', 'desc');
+            case 'nisn_desc':
+                $query->orderBy('nisn', 'desc');
                 break;
             case 'nama_asc':
             default:
@@ -111,14 +126,26 @@ class SiswaController extends Controller
         $waliRombel = $isWaliOnly && !empty($waliRombelIds) ? Rombel::find($waliRombelIds[0]) : null;
         $rfidStatus = $biometrikStatus;
 
-        return view('siswa.index', compact('siswas', 'rombels', 'taAktif', 'search', 'rombelId', 'rfidStatus', 'statusPkl', 'sort', 'tab', 'statTotal', 'statAlumni', 'statPkl', 'statRombel', 'isWaliOnly', 'waliRombel'));
+        return view('siswa.index', compact('siswas', 'rombels', 'taAktif', 'search', 'rombelId', 'status', 'rfidStatus', 'statusPkl', 'sort', 'tab', 'statTotal', 'statAlumni', 'statPkl', 'statRombel', 'isWaliOnly', 'waliRombel'));
     }
 
     public function store(Request $request)
     {
+        $currentUser = auth()->user();
+        $isWaliOnly = $currentUser && $currentUser->isWaliKelas() && !$currentUser->isAdmin() && !$currentUser->isWakaKesiswaan() && !$currentUser->isGuruBk();
+        $waliRombelIds = $isWaliOnly ? $currentUser->getWaliRombelIds() : [];
+
+        if ($isWaliOnly) {
+            if (empty($waliRombelIds)) {
+                return redirect()->back()->with('error', 'Akses Ditolak: Anda belum ditugaskan sebagai wali kelas di rombel manapun.');
+            }
+            if (!in_array($request->input('rombel_id'), $waliRombelIds)) {
+                return redirect()->back()->with('error', 'Akses Ditolak: Anda hanya dapat menambahkan siswa ke kelas yang Anda bina.');
+            }
+        }
+
         $request->validate([
-            'nis'         => 'required|unique:siswas,nis',
-            'nisn'        => 'nullable|unique:siswas,nisn',
+            'nisn'        => 'required|unique:siswas,nisn',
             'nama'        => 'required|string',
             'rombel_id'   => 'required|exists:rombels,id',
             'nama_ortu'   => 'nullable|string',
@@ -138,8 +165,7 @@ class SiswaController extends Controller
         }
 
         $siswa = Siswa::create([
-            'nis'         => $request->input('nis'),
-            'nisn'        => $request->input('nisn') ?: null,
+            'nisn'        => $request->input('nisn'),
             'nama'        => $request->input('nama'),
             'nama_ortu'   => $request->input('nama_ortu') ?: null,
             'no_hp_ortu'  => $request->input('no_hp_ortu') ?: null,
@@ -161,9 +187,22 @@ class SiswaController extends Controller
     public function update(Request $request, $id)
     {
         $siswa = Siswa::findOrFail($id);
+        $currentUser = auth()->user();
+        $isWaliOnly = $currentUser && $currentUser->isWaliKelas() && !$currentUser->isAdmin() && !$currentUser->isWakaKesiswaan() && !$currentUser->isGuruBk();
+        $waliRombelIds = $isWaliOnly ? $currentUser->getWaliRombelIds() : [];
+
+        if ($isWaliOnly) {
+            $belongsToWali = $siswa->siswaRombels()->whereIn('rombel_id', $waliRombelIds)->where('status_keanggotaan', 'aktif')->exists();
+            if (!$belongsToWali) {
+                return redirect()->back()->with('error', 'Akses Ditolak: Anda hanya dapat mengubah data siswa di kelas yang Anda bina.');
+            }
+            if ($request->filled('rombel_id') && !in_array($request->input('rombel_id'), $waliRombelIds)) {
+                return redirect()->back()->with('error', 'Akses Ditolak: Anda tidak dapat memindahkan siswa ke luar kelas binaan Anda.');
+            }
+        }
+
         $request->validate([
-            'nis'         => 'required|unique:siswas,nis,' . $id,
-            'nisn'        => 'nullable|unique:siswas,nisn,' . $id,
+            'nisn'        => 'required|unique:siswas,nisn,' . $id,
             'nama'        => 'required|string',
             'nama_ortu'   => 'nullable|string',
             'no_hp_ortu'  => 'nullable|string',
@@ -181,8 +220,7 @@ class SiswaController extends Controller
         }
 
         $siswa->update([
-            'nis'         => $request->input('nis'),
-            'nisn'        => $request->input('nisn') ?: null,
+            'nisn'        => $request->input('nisn'),
             'nama'        => $request->input('nama'),
             'nama_ortu'   => $request->input('nama_ortu') ?: null,
             'no_hp_ortu'  => $request->input('no_hp_ortu') ?: null,
@@ -213,6 +251,17 @@ class SiswaController extends Controller
     public function destroy($id)
     {
         $siswa = Siswa::findOrFail($id);
+        $currentUser = auth()->user();
+        $isWaliOnly = $currentUser && $currentUser->isWaliKelas() && !$currentUser->isAdmin() && !$currentUser->isWakaKesiswaan() && !$currentUser->isGuruBk();
+        $waliRombelIds = $isWaliOnly ? $currentUser->getWaliRombelIds() : [];
+
+        if ($isWaliOnly) {
+            $belongsToWali = $siswa->siswaRombels()->whereIn('rombel_id', $waliRombelIds)->where('status_keanggotaan', 'aktif')->exists();
+            if (!$belongsToWali) {
+                return redirect()->back()->with('error', 'Akses Ditolak: Anda hanya dapat menghapus data siswa di kelas yang Anda bina.');
+            }
+        }
+
         $nama = $siswa->nama;
         if ($siswa->foto && \Illuminate\Support\Facades\Storage::disk('public')->exists($siswa->foto)) {
             \Illuminate\Support\Facades\Storage::disk('public')->delete($siswa->foto);
@@ -253,13 +302,12 @@ class SiswaController extends Controller
             fprintf($file, chr(0xEF).chr(0xBB).chr(0xBF)); // BOM UTF-8
             fwrite($file, "sep=;\n");
 
-            fputcsv($file, ['No', 'NIS', 'NISN', 'Nama Siswa', 'Nama Ortu / Wali', 'No HP / WhatsApp Ortu', 'No HP / WhatsApp Siswa', 'Rombel Kelas', 'Status Keaktifan', 'Biometrik Wajah AI'], ';');
+            fputcsv($file, ['No', 'NISN', 'Nama Siswa', 'Nama Ortu / Wali', 'No HP / WhatsApp Ortu', 'No HP / WhatsApp Siswa', 'Rombel Kelas', 'Status Keaktifan'], ';');
 
             foreach ($siswas as $idx => $s) {
                 $sr = $s->siswaRombels->firstWhere('status_keanggotaan', 'aktif');
                 fputcsv($file, [
                     $idx + 1,
-                    '="' . $s->nis . '"',
                     $s->nisn ? '="' . $s->nisn . '"' : '-',
                     $s->nama,
                     $s->nama_ortu ?? '-',
@@ -267,7 +315,6 @@ class SiswaController extends Controller
                     $s->no_hp_siswa ? '="' . $s->no_hp_siswa . '"' : '-',
                     $sr->rombel->nama_rombel ?? '-',
                     strtoupper($s->status),
-                    $s->face_embedding ? 'Terdaftar AI' : 'Belum Rekam',
                 ], ';');
             }
             fclose($file);
@@ -286,24 +333,41 @@ class SiswaController extends Controller
         $waliRombelIds = $isWaliOnly ? $currentUser->getWaliRombelIds() : [];
 
         $rombelId = $request->query('rombel_id');
-        $query = Siswa::with(['siswaRombels.rombel'])->orderBy('nama');
+        $ids = $request->query('ids') ?: $request->input('ids');
+        $selectedIds = [];
+        if (!empty($ids)) {
+            $selectedIds = is_array($ids) ? $ids : array_filter(explode(',', $ids));
+        }
+
+        $query = Siswa::with(['siswaRombels.rombel.jurusan'])->orderBy('nama');
         
         $rombel = null;
-        if ($isWaliOnly) {
+        if (!empty($selectedIds)) {
+            $query->whereIn('id', $selectedIds);
+            if ($isWaliOnly) {
+                $rombels = Rombel::whereIn('id', $waliRombelIds)->orderBy('nama_rombel')->get();
+            } else {
+                $rombels = Rombel::orderBy('nama_rombel')->get();
+            }
+        } elseif ($isWaliOnly) {
             $effectiveRombelId = $rombelId && in_array($rombelId, $waliRombelIds) ? $rombelId : ($waliRombelIds[0] ?? null);
             if ($effectiveRombelId) {
                 $rombel = Rombel::with('jurusan')->find($effectiveRombelId);
                 $query->whereHas('siswaRombels', fn($q) => $q->where('rombel_id', $effectiveRombelId)->where('status_keanggotaan', 'aktif'));
             }
-        } elseif ($rombelId) {
-            $rombel = Rombel::with('jurusan')->find($rombelId);
-            $query->whereHas('siswaRombels', fn($q) => $q->where('rombel_id', $rombelId)->where('status_keanggotaan', 'aktif'));
+            $rombels = Rombel::whereIn('id', $waliRombelIds)->orderBy('nama_rombel')->get();
+        } else {
+            if ($rombelId) {
+                $rombel = Rombel::with('jurusan')->find($rombelId);
+                $query->whereHas('siswaRombels', fn($q) => $q->where('rombel_id', $rombelId)->where('status_keanggotaan', 'aktif'));
+            }
+            $rombels = Rombel::orderBy('nama_rombel')->get();
         }
 
         $siswas = $query->get();
         $sekolah = \App\Models\PengaturanSekolah::getAktif();
 
-        return view('siswa.cetak_pdf', compact('siswas', 'rombel', 'sekolah'));
+        return view('siswa.cetak_pdf', compact('siswas', 'rombel', 'rombelId', 'rombels', 'sekolah', 'isWaliOnly', 'selectedIds'));
     }
 
     /**
@@ -322,10 +386,10 @@ class SiswaController extends Controller
         $callback = function () {
             $file = fopen('php://output', 'w');
             fprintf($file, chr(0xEF).chr(0xBB).chr(0xBF)); // BOM UTF-8
-            fputcsv($file, ['NIS', 'NISN', 'Nama Lengkap Siswa', 'Nama Orang Tua / Wali', 'No HP WhatsApp Ortu', 'No HP WhatsApp Siswa', 'Nama Kelas (Rombel)', 'Status (Aktif/PKL/Lulus)'], ';');
-            fputcsv($file, ['2026101', '0091234001', 'Ahmad Dani Pratama', 'Bpk. Subagio', '081234567890', '081398765432', 'X RPL 1', 'Aktif'], ';');
-            fputcsv($file, ['2026102', '0091234002', 'Siti Rahmawati', 'Ibu Maryam', '081234567891', '', 'X APHP 1', 'Aktif'], ';');
-            fputcsv($file, ['2026103', '0091234003', 'Bagus Saputra', 'Bpk. Herman', '081234567892', '', 'X TSM 1', 'Aktif'], ';');
+            fputcsv($file, ['NISN', 'Nama Lengkap Siswa', 'Nama Orang Tua / Wali', 'No HP WhatsApp Ortu', 'No HP WhatsApp Siswa', 'Nama Kelas (Rombel)', 'Status (Aktif/PKL/Lulus)'], ';');
+            fputcsv($file, ['0091234001', 'Ahmad Dani Pratama', 'Bpk. Subagio', '081234567890', '081398765432', 'X RPL 1', 'Aktif'], ';');
+            fputcsv($file, ['0091234002', 'Siti Rahmawati', 'Ibu Maryam', '081234567891', '', 'X APHP 1', 'Aktif'], ';');
+            fputcsv($file, ['0091234003', 'Bagus Saputra', 'Bpk. Herman', '081234567892', '', 'X TSM 1', 'Aktif'], ';');
             fclose($file);
         };
 
@@ -383,10 +447,7 @@ class SiswaController extends Controller
 
         foreach ($firstRow as $colIdx => $colName) {
             $cleanName = strtolower(trim(preg_replace('/[^a-zA-Z0-9]/', '', (string)$colName)));
-            if (in_array($cleanName, ['nis', 'nomorinduk', 'nomorinduksiswa', 'noinduk'])) {
-                $headerMap['nis'] = $colIdx;
-                $hasHeader = true;
-            } elseif (in_array($cleanName, ['nisn', 'nomornisn'])) {
+            if (in_array($cleanName, ['nisn', 'nomornisn', 'nis', 'nomorinduk', 'noinduk'])) {
                 $headerMap['nisn'] = $colIdx;
                 $hasHeader = true;
             } elseif (in_array($cleanName, ['nama', 'namasiswa', 'namalengkap', 'namapesertadidik'])) {
@@ -420,7 +481,6 @@ class SiswaController extends Controller
 
         \Illuminate\Support\Facades\DB::transaction(function () use ($lines, $startIndex, $delimiter, $hasHeader, $headerMap, $taAktif, &$imported) {
             $rombelMap = Rombel::pluck('id', 'nama_rombel')->toArray();
-            // Case-insensitive mapping untuk nama rombel (misal "x rpl 1" -> "X RPL 1")
             $rombelLowerMap = [];
             foreach ($rombelMap as $namaR => $idR) {
                 $rombelLowerMap[strtolower(str_replace(' ', '', $namaR))] = $idR;
@@ -441,7 +501,6 @@ class SiswaController extends Controller
                     return trim($val, "'\" \t\n\r\0\x0B");
                 }, $row);
 
-                $nis = null;
                 $nisn = null;
                 $nama = null;
                 $namaOrtu = null;
@@ -451,7 +510,6 @@ class SiswaController extends Controller
                 $status = 'aktif';
 
                 if ($hasHeader && isset($headerMap['nama'])) {
-                    $nis = isset($headerMap['nis']) ? ($cleanRow[$headerMap['nis']] ?? null) : null;
                     $nisn = isset($headerMap['nisn']) ? ($cleanRow[$headerMap['nisn']] ?? null) : null;
                     $nama = $cleanRow[$headerMap['nama']] ?? null;
                     $namaOrtu = isset($headerMap['nama_ortu']) ? ($cleanRow[$headerMap['nama_ortu']] ?? null) : null;
@@ -460,18 +518,17 @@ class SiswaController extends Controller
                     $namaRombel = isset($headerMap['rombel']) ? ($cleanRow[$headerMap['rombel']] ?? null) : null;
                     $status = isset($headerMap['status']) ? ($cleanRow[$headerMap['status']] ?? null) : null;
                 } else {
-                    // Positional default parsing
-                    $nis = !empty($cleanRow[0]) ? $cleanRow[0] : null;
-                    $nisn = !empty($cleanRow[1]) ? $cleanRow[1] : null;
-                    $nama = !empty($cleanRow[2]) ? $cleanRow[2] : null;
-                    $namaOrtu = !empty($cleanRow[3]) ? $cleanRow[3] : null;
-                    $noHpOrtu = !empty($cleanRow[4]) ? $cleanRow[4] : null;
-                    $noHpSiswa = !empty($cleanRow[5]) && (str_starts_with($cleanRow[5], '08') || str_starts_with($cleanRow[5], '62') || str_starts_with($cleanRow[5], '8')) ? $cleanRow[5] : null;
-                    $namaRombel = !empty($cleanRow[5]) && !$noHpSiswa ? $cleanRow[5] : (!empty($cleanRow[6]) ? $cleanRow[6] : null);
-                    $status = !empty($cleanRow[7]) ? $cleanRow[7] : (!empty($cleanRow[6]) && !$noHpSiswa ? $cleanRow[6] : 'aktif');
+                    // Positional default parsing: [NISN, Nama, Nama Ortu, No HP Ortu, No HP Siswa, Rombel, Status]
+                    $nisn = !empty($cleanRow[0]) ? $cleanRow[0] : null;
+                    $nama = !empty($cleanRow[1]) ? $cleanRow[1] : null;
+                    $namaOrtu = !empty($cleanRow[2]) ? $cleanRow[2] : null;
+                    $noHpOrtu = !empty($cleanRow[3]) ? $cleanRow[3] : null;
+                    $noHpSiswa = !empty($cleanRow[4]) && (str_starts_with($cleanRow[4], '08') || str_starts_with($cleanRow[4], '62') || str_starts_with($cleanRow[4], '8')) ? $cleanRow[4] : null;
+                    $namaRombel = !empty($cleanRow[4]) && !$noHpSiswa ? $cleanRow[4] : (!empty($cleanRow[5]) ? $cleanRow[5] : null);
+                    $status = !empty($cleanRow[6]) ? $cleanRow[6] : (!empty($cleanRow[5]) && !$noHpSiswa ? $cleanRow[5] : 'aktif');
                 }
 
-                if (empty($nis) || empty($nama)) continue;
+                if (empty($nisn) || empty($nama)) continue;
 
                 // Sanitasi Status
                 $validStatuses = ['aktif', 'pkl', 'lulus', 'pindah', 'keluar'];
@@ -481,19 +538,12 @@ class SiswaController extends Controller
                 if ($noHpOrtu && str_starts_with($noHpOrtu, '8')) $noHpOrtu = '0' . $noHpOrtu;
                 if ($noHpSiswa && str_starts_with($noHpSiswa, '8')) $noHpSiswa = '0' . $noHpSiswa;
 
-                // Cari siswa berdasarkan NIS atau NISN terlebih dahulu untuk menghindari UNIQUE constraint violation
-                $existingSiswa = null;
-                if (!empty($nis)) {
-                    $existingSiswa = Siswa::where('nis', $nis)->first();
-                }
-                if (!$existingSiswa && !empty($nisn)) {
-                    $existingSiswa = Siswa::where('nisn', $nisn)->first();
-                }
+                // Cari siswa berdasarkan NISN
+                $existingSiswa = Siswa::where('nisn', $nisn)->first();
 
                 if ($existingSiswa) {
                     $existingSiswa->update([
-                        'nis'         => $nis,
-                        'nisn'        => $nisn ?: $existingSiswa->nisn,
+                        'nisn'        => $nisn,
                         'nama'        => $nama,
                         'nama_ortu'   => $namaOrtu ?: $existingSiswa->nama_ortu,
                         'no_hp_ortu'  => $noHpOrtu ?: $existingSiswa->no_hp_ortu,
@@ -503,8 +553,7 @@ class SiswaController extends Controller
                     $siswa = $existingSiswa;
                 } else {
                     $siswa = Siswa::create([
-                        'nis'         => $nis,
-                        'nisn'        => $nisn ?: null,
+                        'nisn'        => $nisn,
                         'nama'        => $nama,
                         'nama_ortu'   => $namaOrtu ?: null,
                         'no_hp_ortu'  => $noHpOrtu ?: null,
@@ -519,15 +568,19 @@ class SiswaController extends Controller
                         $targetRombelId = $rombelMap[$namaRombel];
                     } else {
                         $normalizedKey = strtolower(str_replace(' ', '', $namaRombel));
-                        if (isset($rombelLowerMap[$normalizedKey])) {
-                            $targetRombelId = $rombelLowerMap[$normalizedKey];
-                        }
+                        $targetRombelId = $rombelLowerMap[$normalizedKey] ?? null;
                     }
 
                     if ($targetRombelId) {
                         SiswaRombel::updateOrCreate(
-                            ['siswa_id' => $siswa->id, 'tahun_ajaran_id' => $taAktif->id],
-                            ['rombel_id' => $targetRombelId, 'status_keanggotaan' => in_array($status, ['aktif', 'pkl']) ? 'aktif' : $status]
+                            [
+                                'siswa_id' => $siswa->id,
+                                'tahun_ajaran_id' => $taAktif->id,
+                            ],
+                            [
+                                'rombel_id' => $targetRombelId,
+                                'status_keanggotaan' => 'aktif',
+                            ]
                         );
                     }
                 }
@@ -536,6 +589,6 @@ class SiswaController extends Controller
             }
         });
 
-        return redirect()->back()->with('success', "Proses import selesai. Berhasil memproses {$imported} data siswa.");
+        return redirect()->back()->with('success', "Berhasil mengimpor {$imported} data siswa.");
     }
 }

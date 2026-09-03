@@ -108,6 +108,14 @@ class KasusDisiplin extends Model
      */
     public static function syncFromPresensi(int $siswaId): self
     {
+        // Guard: pastikan siswa_id valid dan masih ada di tabel siswas
+        // Mencegah FOREIGN KEY constraint error jika data absensi adalah orphan (siswa telah dihapus)
+        $siswa = \App\Models\Siswa::find($siswaId);
+        if (!$siswa) {
+            // Siswa tidak ditemukan, kembalikan instance kosong tanpa menyimpan
+            return new self(['siswa_id' => $siswaId]);
+        }
+
         $setting = PengaturanDisiplin::getPengaturan();
         $taAktif = TahunAjaran::where('is_active', true)->first();
         $taId = $taAktif ? $taAktif->id : null;
@@ -173,18 +181,30 @@ class KasusDisiplin extends Model
     }
 
     /**
-     * Filter data kasus berdasarkan role user yang login.
+     * Filter data kasus berdasarkan kerahasiaan & wewenang role user yang login.
      */
     public function scopeForUser($query, $user)
     {
         if (!$user) return $query;
+        // Admin dan Kepala Sekolah memiliki akses supervisi penuh ke seluruh data kasus sekolah
+        if ($user->isAdmin() || $user->isKepalaSekolah()) return $query;
 
-        // Jika Wali Kelas dan bukan Admin/Kepsek/Wakasis/BK
-        if ($user->isWaliKelas() && !$user->isAdmin() && !$user->isKepalaSekolah() && !$user->isWakaKesiswaan() && !$user->isGuruBk()) {
+        // 1. Wali Kelas: Eksklusif memantau semua status kasus HANYA untuk siswa di rombel perwaliannya sendiri
+        if ($user->isWaliKelas() && !$user->isWakaKesiswaan() && !$user->isGuruBk()) {
             $rombelIds = $user->guru ? $user->guru->rombels()->pluck('id') : collect();
             return $query->whereHas('siswa.siswaRombels', function ($q) use ($rombelIds) {
                 $q->whereIn('rombel_id', $rombelIds)->where('status_keanggotaan', 'aktif');
             });
+        }
+
+        // 2. Guru BK: Kasus yang telah masuk/dieskalasi ke ranah BK (Tahap 2, 3, 4, Selesai)
+        if ($user->isGuruBk() && !$user->isWakaKesiswaan() && !$user->isWaliKelas()) {
+            return $query->whereIn('status_tahap', ['tahap_2_bk', 'tahap_3_wakasis', 'tahap_4_kepsek', 'selesai_pembinaan']);
+        }
+
+        // 3. Waka Kesiswaan: Kasus yang masuk ke ranah Kesiswaan (Tahap 2, 3, 4, Selesai)
+        if ($user->isWakaKesiswaan() && !$user->isGuruBk() && !$user->isWaliKelas()) {
+            return $query->whereIn('status_tahap', ['tahap_2_bk', 'tahap_3_wakasis', 'tahap_4_kepsek', 'selesai_pembinaan']);
         }
 
         return $query;
@@ -199,16 +219,16 @@ class KasusDisiplin extends Model
 
         switch ($this->status_tahap) {
             case 'tahap_1_wali_kelas':
-                return '<div class="tahap-badge-wrap tahap-1"><div class="tahap-title">Tahap 1 · Wali Kelas</div><div class="tahap-sub">' . $setting->ambang_tahap_1_wali . '–' . ($setting->ambang_tahap_2_bk - 1) . ' Poin (Pembinaan Awal)</div></div>';
+                return '<span class="badge" style="background:#000000; color:#FFFFFF; font-weight:800; font-size:11px; padding:3px 9px; border-radius:6px; display:inline-flex; align-items:center; gap:5px;"><i class="bi bi-shield-exclamation"></i> Tahap 1 · Wali Kelas</span>';
             case 'tahap_2_bk':
-                return '<div class="tahap-badge-wrap tahap-2"><div class="tahap-title">Tahap 2 · Guru BK</div><div class="tahap-sub">' . $setting->ambang_tahap_2_bk . '–' . ($setting->ambang_tahap_3_wakasis - 1) . ' Poin (Musyawarah)</div></div>';
+                return '<span class="badge" style="background:#000000; color:#FFFFFF; font-weight:800; font-size:11px; padding:3px 9px; border-radius:6px; display:inline-flex; align-items:center; gap:5px;"><i class="bi bi-person-exclamation"></i> Tahap 2 · Guru BK</span>';
             case 'tahap_3_wakasis':
-                return '<div class="tahap-badge-wrap tahap-3"><div class="tahap-title">Tahap 3 · Wakasis</div><div class="tahap-sub">' . $setting->ambang_tahap_3_wakasis . '–' . ($setting->ambang_tahap_4_kepsek - 1) . ' Poin (Sidang Disiplin)</div></div>';
+                return '<span class="badge" style="background:#000000; color:#FFFFFF; font-weight:800; font-size:11px; padding:3px 9px; border-radius:6px; display:inline-flex; align-items:center; gap:5px;"><i class="bi bi-gavel"></i> Tahap 3 · Wakasis</span>';
             case 'tahap_4_kepsek':
-                return '<div class="tahap-badge-wrap tahap-4"><div class="tahap-title">Tahap 4 · Kepala Sekolah</div><div class="tahap-sub">≥' . $setting->ambang_tahap_4_kepsek . ' Poin (Keputusan Akhir)</div></div>';
+                return '<span class="badge" style="background:#000000; color:#FFFFFF; font-weight:800; font-size:11px; padding:3px 9px; border-radius:6px; display:inline-flex; align-items:center; gap:5px;"><i class="bi bi-award"></i> Tahap 4 · Kepala Sekolah</span>';
             case 'selesai_pembinaan':
             default:
-                return '<div class="tahap-badge-wrap tahap-selesai"><div class="tahap-title">Selesai Pembinaan</div><div class="tahap-sub">Kondisi Siswa Tertib</div></div>';
+                return '<span class="badge" style="background:var(--bg-3); color:var(--text); border:1px solid var(--border-2); font-weight:800; font-size:11px; padding:3px 9px; border-radius:6px; display:inline-flex; align-items:center; gap:5px;"><i class="bi bi-check-circle-fill"></i> Selesai Pembinaan</span>';
         }
     }
 }

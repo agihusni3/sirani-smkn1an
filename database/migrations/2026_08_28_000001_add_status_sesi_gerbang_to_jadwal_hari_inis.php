@@ -9,7 +9,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('jadwal_hari_inis', function (Blueprint $table) {
-            $table->boolean('is_sesi_buka')->default(true)->after('keterangan');
+            $table->boolean('is_sesi_buka')->default(false)->after('keterangan');
             $table->string('dibuka_oleh', 100)->nullable()->after('is_sesi_buka');
             $table->dateTime('waktu_buka_sesi')->nullable()->after('dibuka_oleh');
             $table->dateTime('waktu_tutup_sesi')->nullable()->after('waktu_buka_sesi');

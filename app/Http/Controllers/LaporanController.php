@@ -18,22 +18,20 @@ class LaporanController extends Controller
     public function index(Request $request)
     {
         $user   = auth()->user();
-        $role   = $user->role ?: ($user->fresh()?->role ?? '');
+        $role   = $user?->role ?: ($user?->fresh()?->role ?? '');
 
         // ── HAK AKSES BERDASARKAN ROLE ────────────────────────────────────────
         // Role yang boleh akses presensi guru
         $canAccessGuru = in_array($role, ['admin', 'kepala_sekolah', 'waka_kesiswaan']);
 
         // Wali Kelas: hanya bisa lihat rombel binaan sendiri
-        $isWaliKelas     = $role === 'wali_kelas';
+        $waliRombel = $this->getWaliRombel($user);
+        $isWaliKelas = ($role === 'wali_kelas') || ($waliRombel !== null && !in_array($role, ['admin', 'kepala_sekolah', 'waka_kesiswaan', 'waka_kurikulum', 'guru_bk', 'guru_piket', 'staf_tu']));
         $waliRombelId    = null;
         $waliRombelNama  = null;
-        if ($isWaliKelas) {
-            $waliRombel = $this->getWaliRombel($user);
-            if ($waliRombel) {
-                $waliRombelId   = $waliRombel->id;
-                $waliRombelNama = $waliRombel->nama_rombel;
-            }
+        if ($isWaliKelas && $waliRombel) {
+            $waliRombelId   = $waliRombel->id;
+            $waliRombelNama = $waliRombel->nama_rombel;
         }
         // ─────────────────────────────────────────────────────────────────────
 
@@ -52,9 +50,10 @@ class LaporanController extends Controller
         $bulan = $request->input('bulan', Carbon::today()->format('Y-m'));
         $tahun = $request->input('tahun', Carbon::today()->format('Y'));
 
-        // Untuk wali_kelas: paksa rombel_id ke rombel binaan, abaikan input dari request
-        if ($isWaliKelas && $waliRombelId) {
-            $rombelId = $waliRombelId;
+        // Untuk wali_kelas: paksa rombel_id ke rombel binaan (atau -1 jika belum ada rombel), abaikan input dari request
+        if ($isWaliKelas) {
+            $rombelId = $waliRombelId ?: -1;
+            $kategori = 'siswa';
         } else {
             $rombelId = $request->input('rombel_id');
         }
@@ -63,11 +62,15 @@ class LaporanController extends Controller
         $guruId = $request->input('guru_id');
 
         // Untuk wali_kelas di mode individu: hanya siswa dari rombel binaannya
-        if ($isWaliKelas && $siswaId && $waliRombelId) {
-            $allowed = \App\Models\Siswa::whereHas('siswaRombels', function ($q) use ($waliRombelId) {
-                $q->where('rombel_id', $waliRombelId)->where('status_keanggotaan', 'aktif');
-            })->pluck('id')->contains($siswaId);
-            if (!$allowed) {
+        if ($isWaliKelas && $siswaId) {
+            if ($waliRombelId) {
+                $allowed = \App\Models\Siswa::whereHas('siswaRombels', function ($q) use ($waliRombelId) {
+                    $q->where('rombel_id', $waliRombelId)->where('status_keanggotaan', 'aktif');
+                })->pluck('id')->contains($siswaId);
+                if (!$allowed) {
+                    $siswaId = null;
+                }
+            } else {
                 $siswaId = null;
             }
         }
@@ -93,6 +96,15 @@ class LaporanController extends Controller
             $startDate = $tanggalMulai;
             $endDate = $tanggalSelesai;
             $periodeText = "Individu: " . Carbon::parse($startDate)->translatedFormat('d M Y') . " s/d " . Carbon::parse($endDate)->translatedFormat('d M Y');
+        }
+
+        // ── AUTO-EVALUASI OTOMATIS (ON-ACCESS EVALUATION) ──
+        if ($kategori === 'siswa') {
+            if ($periode === 'harian') {
+                \App\Services\EvaluasiPresensiService::evaluasiOtomatisJikaWaktunya($tanggal);
+            } else {
+                \App\Services\EvaluasiPresensiService::evaluasiOtomatisJikaWaktunya(Carbon::today()->toDateString());
+            }
         }
 
         // ── QUERY UTAMA ────────────────────────────────────────────────────────
@@ -172,18 +184,18 @@ class LaporanController extends Controller
 
             if ($kategori === 'siswa') {
                 $siswaQuery = Siswa::where('status', 'aktif')
-                    ->with(['siswaRombels' => fn($q) => $q->where('status_keanggotaan', 'aktif')->with('rombel:id,nama_rombel')]);
+                    ->with(['siswaRombels' => fn($q) => $q->where('status_keanggotaan', 'aktif')->with('rombel:id,nama_rombel,tingkat')]);
                 if ($rombelId) {
                     $siswaQuery->whereHas('siswaRombels', fn($q) => $q->where('rombel_id', $rombelId)->where('status_keanggotaan', 'aktif'));
                 }
-                $daftarSiswa = $siswaQuery->orderBy('nama')->get();
+                $daftarSiswa = $this->sortSiswaByTingkatAndRombel($siswaQuery->get());
 
                 $rekapCollection = $daftarSiswa->values()->map(function ($s) use ($aggrMap) {
                     $a = $aggrMap->get($s->id);
                     $rombelNama = $s->siswaRombels->first()?->rombel?->nama_rombel ?? '-';
                     return (object) [
                         'id'          => $s->id,
-                        'nis'         => $s->nis,
+                        'nisn'        => $s->nisn,
                         'nama'        => $s->nama,
                         'rombel'      => $rombelNama,
                         'total_hadir' => (int)($a->total_hadir ?? 0),
@@ -247,7 +259,7 @@ class LaporanController extends Controller
         if ($isWaliKelas && $waliRombelId) {
             $rombels = \App\Models\Rombel::where('id', $waliRombelId)->get();
             // Siswa hanya dari rombel binaan
-            $siswas = Siswa::where('status', 'aktif')
+            $siswasRaw = Siswa::where('status', 'aktif')
                 ->whereHas('siswaRombels', function ($q) use ($waliRombelId) {
                     $q->where('rombel_id', $waliRombelId)->where('status_keanggotaan', 'aktif');
                 })
@@ -256,18 +268,20 @@ class LaporanController extends Controller
                         $q->where('tahun_ajaran_id', $taAktif->id)->where('status_keanggotaan', 'aktif')->with('rombel');
                     }
                 }])
-                ->orderBy('nama')->get();
+                ->get();
+            $siswas = $this->sortSiswaByTingkatAndRombel($siswasRaw);
         } else {
-            $rombels = Rombel::orderBy('nama_rombel')->get();
-            $siswas = Siswa::where('status', 'aktif')
-                ->select('id', 'nis', 'nama')
+            $rombels = $this->sortRombelByTingkat(Rombel::all());
+            $siswasRaw = Siswa::where('status', 'aktif')
+                ->select('id', 'nisn', 'nama')
                 ->with(['siswaRombels' => function ($q) use ($taAktif) {
                     if ($taAktif) {
                         $q->where('tahun_ajaran_id', $taAktif->id)->where('status_keanggotaan', 'aktif')
-                          ->select('id', 'siswa_id', 'rombel_id')->with('rombel:id,nama_rombel');
+                          ->select('id', 'siswa_id', 'rombel_id')->with('rombel:id,nama_rombel,tingkat');
                     }
                 }])
-                ->orderBy('nama')->get();
+                ->get();
+            $siswas = $this->sortSiswaByTingkatAndRombel($siswasRaw);
         }
         $gurus = $canAccessGuru ? Guru::where('status', 'aktif')->orderBy('nama')->get() : collect();
 
@@ -317,13 +331,11 @@ class LaporanController extends Controller
         $role   = $user->role ?: ($user->fresh()?->role ?? '');
 
         $canAccessGuru = in_array($role, ['admin', 'kepala_sekolah', 'waka_kesiswaan']);
-        $isWaliKelas   = $role === 'wali_kelas';
+        $waliRombel = $this->getWaliRombel($user);
+        $isWaliKelas = ($role === 'wali_kelas') || ($waliRombel !== null && !in_array($role, ['admin', 'kepala_sekolah', 'waka_kesiswaan', 'waka_kurikulum', 'guru_bk', 'guru_piket', 'staf_tu']));
         $waliRombelId  = null;
-        if ($isWaliKelas) {
-            $waliRombel = $this->getWaliRombel($user);
-            if ($waliRombel) {
-                $waliRombelId = $waliRombel->id;
-            }
+        if ($isWaliKelas && $waliRombel) {
+            $waliRombelId = $waliRombel->id;
         }
 
         $kategori = $request->input('kategori', 'siswa');
@@ -338,8 +350,9 @@ class LaporanController extends Controller
         $bulan  = $request->input('bulan', Carbon::today()->format('Y-m'));
         $tahun  = $request->input('tahun', Carbon::today()->format('Y'));
 
-        if ($isWaliKelas && $waliRombelId) {
-            $rombelId = $waliRombelId;
+        if ($isWaliKelas) {
+            $rombelId = $waliRombelId ?: -1;
+            $kategori = 'siswa';
         } else {
             $rombelId = $request->input('rombel_id');
         }
@@ -347,11 +360,15 @@ class LaporanController extends Controller
         $siswaId  = $request->input('siswa_id');
         $guruId   = $request->input('guru_id');
 
-        if ($isWaliKelas && $siswaId && $waliRombelId) {
-            $allowed = \App\Models\Siswa::whereHas('siswaRombels', function ($q) use ($waliRombelId) {
-                $q->where('rombel_id', $waliRombelId)->where('status_keanggotaan', 'aktif');
-            })->pluck('id')->contains($siswaId);
-            if (!$allowed) {
+        if ($isWaliKelas && $siswaId) {
+            if ($waliRombelId) {
+                $allowed = \App\Models\Siswa::whereHas('siswaRombels', function ($q) use ($waliRombelId) {
+                    $q->where('rombel_id', $waliRombelId)->where('status_keanggotaan', 'aktif');
+                })->pluck('id')->contains($siswaId);
+                if (!$allowed) {
+                    $siswaId = null;
+                }
+            } else {
                 $siswaId = null;
             }
         }
@@ -399,15 +416,15 @@ class LaporanController extends Controller
             // ── FORMAT REKAP AGREGAT: MINGGUAN / BULANAN / TAHUNAN ──
             if (in_array($periode, ['mingguan', 'bulanan', 'tahunan'])) {
                 if ($kategori === 'siswa') {
-                    fputcsv($file, ['No', 'NIS', 'Nama Siswa', 'Kelas', 'Hadir', 'Telat', 'Sakit', 'Izin', 'Alpha', 'Bolos', 'Total Hari'], ';');
+                    fputcsv($file, ['No', 'NISN', 'Nama Siswa', 'Kelas', 'Hadir', 'Telat', 'Sakit', 'Izin', 'Alpha', 'Bolos', 'Total Hari'], ';');
                     $siswaQuery = Siswa::where('status', 'aktif')
                         ->with(['siswaRombels' => function ($q) {
-                            $q->where('status_keanggotaan', 'aktif')->with('rombel');
+                            $q->where('status_keanggotaan', 'aktif')->with('rombel:id,nama_rombel,tingkat');
                         }]);
                     if ($rombelId) {
                         $siswaQuery->whereHas('siswaRombels', fn($q) => $q->where('rombel_id', $rombelId)->where('status_keanggotaan', 'aktif'));
                     }
-                    $daftarSiswa = $siswaQuery->orderBy('nama')->get();
+                    $daftarSiswa = $this->sortSiswaByTingkatAndRombel($siswaQuery->get());
                     $absensiBySiswa = $laporans->groupBy('pemilik_id');
 
                     foreach ($daftarSiswa as $i => $s) {
@@ -415,7 +432,7 @@ class LaporanController extends Controller
                         $rombelNama = $s->siswaRombels->first()?->rombel?->nama_rombel ?? '-';
                         fputcsv($file, [
                             $i + 1,
-                            '="' . $s->nis . '"',
+                            $s->nisn ? '="' . $s->nisn . '"' : '-',
                             $s->nama,
                             $rombelNama,
                             $absenSiswa->where('status', 'hadir')->count(),
@@ -452,15 +469,15 @@ class LaporanController extends Controller
             } else {
                 // ── FORMAT RINCIAN: HARIAN & PER INDIVIDU ──
                 if ($kategori === 'siswa') {
-                    fputcsv($file, ['No', 'Tanggal', 'NIS', 'Nama Siswa', 'Kelas', 'Status', 'Jam Masuk', 'Jam Pulang', 'Keterangan/Sumber'], ';');
+                    fputcsv($file, ['No', 'Tanggal', 'NISN', 'Nama Siswa', 'Kelas', 'Status', 'Jam Masuk', 'Jam Pulang', 'Keterangan/Sumber'], ';');
                     foreach ($laporans as $i => $lap) {
-                        $nis = $lap->siswa->nis ?? ($lap->siswaRombel->siswa->nis ?? '-');
+                        $nisn = $lap->siswa->nisn ?? ($lap->siswaRombel->siswa->nisn ?? '-');
                         $nama = $lap->siswa->nama ?? ($lap->siswaRombel->siswa->nama ?? '-');
                         $rombel = $lap->siswaRombel->rombel->nama_rombel ?? ($lap->siswa->siswaRombels->first()?->rombel?->nama_rombel ?? '-');
                         fputcsv($file, [
                             $i + 1,
                             $lap->tanggal,
-                            '="' . $nis . '"',
+                            $nisn !== '-' ? '="' . $nisn . '"' : '-',
                             $nama,
                             $rombel,
                             strtoupper($lap->status),
@@ -505,13 +522,11 @@ class LaporanController extends Controller
         $role   = $user->role ?: ($user->fresh()?->role ?? '');
 
         $canAccessGuru = in_array($role, ['admin', 'kepala_sekolah', 'waka_kesiswaan']);
-        $isWaliKelas   = $role === 'wali_kelas';
+        $waliRombel = $this->getWaliRombel($user);
+        $isWaliKelas = ($role === 'wali_kelas') || ($waliRombel !== null && !in_array($role, ['admin', 'kepala_sekolah', 'waka_kesiswaan', 'waka_kurikulum', 'guru_bk', 'guru_piket', 'staf_tu']));
         $waliRombelId  = null;
-        if ($isWaliKelas) {
-            $waliRombel = $this->getWaliRombel($user);
-            if ($waliRombel) {
-                $waliRombelId = $waliRombel->id;
-            }
+        if ($isWaliKelas && $waliRombel) {
+            $waliRombelId = $waliRombel->id;
         }
 
         $kategori = $request->input('kategori', 'siswa');
@@ -527,8 +542,9 @@ class LaporanController extends Controller
         $bulan = $request->input('bulan', Carbon::today()->format('Y-m'));
         $tahun = $request->input('tahun', Carbon::today()->format('Y'));
 
-        if ($isWaliKelas && $waliRombelId) {
-            $rombelId = $waliRombelId;
+        if ($isWaliKelas) {
+            $rombelId = $waliRombelId ?: -1;
+            $kategori = 'siswa';
         } else {
             $rombelId = $request->input('rombel_id');
         }
@@ -536,11 +552,15 @@ class LaporanController extends Controller
         $siswaId = $request->input('siswa_id');
         $guruId = $request->input('guru_id');
 
-        if ($isWaliKelas && $siswaId && $waliRombelId) {
-            $allowed = \App\Models\Siswa::whereHas('siswaRombels', function ($q) use ($waliRombelId) {
-                $q->where('rombel_id', $waliRombelId)->where('status_keanggotaan', 'aktif');
-            })->pluck('id')->contains($siswaId);
-            if (!$allowed) {
+        if ($isWaliKelas && $siswaId) {
+            if ($waliRombelId) {
+                $allowed = \App\Models\Siswa::whereHas('siswaRombels', function ($q) use ($waliRombelId) {
+                    $q->where('rombel_id', $waliRombelId)->where('status_keanggotaan', 'aktif');
+                })->pluck('id')->contains($siswaId);
+                if (!$allowed) {
+                    $siswaId = null;
+                }
+            } else {
                 $siswaId = null;
             }
         }
@@ -598,12 +618,12 @@ class LaporanController extends Controller
             if ($kategori === 'siswa') {
                 $siswaQuery = Siswa::where('status', 'aktif')
                     ->with(['siswaRombels' => function ($q) {
-                        $q->where('status_keanggotaan', 'aktif')->with('rombel');
+                        $q->where('status_keanggotaan', 'aktif')->with('rombel:id,nama_rombel,tingkat');
                     }]);
                 if ($rombelId) {
                     $siswaQuery->whereHas('siswaRombels', fn($q) => $q->where('rombel_id', $rombelId)->where('status_keanggotaan', 'aktif'));
                 }
-                $daftarSiswa = $siswaQuery->orderBy('nama')->get();
+                $daftarSiswa = $this->sortSiswaByTingkatAndRombel($siswaQuery->get());
                 $absensiBySiswa = $laporans->groupBy('pemilik_id');
 
                 $rekapData = $daftarSiswa->map(function ($s, $idx) use ($absensiBySiswa) {
@@ -623,7 +643,6 @@ class LaporanController extends Controller
                     return (object) [
                         'no'          => $idx + 1,
                         'id'          => $s->id,
-                        'nis'         => $s->nis,
                         'nisn'        => $s->nisn,
                         'nama'        => $s->nama,
                         'rombel'      => $rombelNama,
@@ -692,6 +711,24 @@ class LaporanController extends Controller
     public function update(Request $request, $id)
     {
         $absensi = Absensi::findOrFail($id);
+        $user    = auth()->user();
+        $today   = \Carbon\Carbon::today()->toDateString();
+
+        // 1. Batasan Waktu: Hanya data presensi pada hari ini yang dapat dikoreksi
+        if ($absensi->tanggal !== $today) {
+            return redirect()->back()->with('error', 'Koreksi presensi hanya diizinkan untuk data absensi pada hari ini (' . \Carbon\Carbon::today()->translatedFormat('d F Y') . '). Catatan hari sebelumnya tidak dapat diubah.');
+        }
+
+        // 2. Hak Akses: Hanya Guru Piket yang terjadwal bertugas hari ini (atau Admin) yang berhak mengoreksi
+        $isAuthorized = $user && (
+            $user->isAdmin() || 
+            ($user->guru && \App\Models\JadwalPiket::isGuruPiketHariIni($user->guru->id, $today))
+        );
+
+        if (!$isAuthorized) {
+            return redirect()->back()->with('error', 'Akses ditolak: Hanya Guru Piket yang terjadwal bertugas pada hari ini yang berwenang melakukan koreksi presensi.');
+        }
+
         $request->validate([
             'status'     => 'required|in:hadir,terlambat,alpha,sakit,izin,dispen,bolos',
             'jam_masuk'  => 'nullable',
@@ -775,6 +812,24 @@ class LaporanController extends Controller
     public function destroy($id)
     {
         $absensi = Absensi::findOrFail($id);
+        $user    = auth()->user();
+        $today   = \Carbon\Carbon::today()->toDateString();
+
+        // 1. Batasan Waktu: Hanya data presensi pada hari ini yang dapat dihapus
+        if ($absensi->tanggal !== $today) {
+            return redirect()->back()->with('error', 'Penghapusan presensi hanya diizinkan untuk data absensi pada hari ini (' . \Carbon\Carbon::today()->translatedFormat('d F Y') . ').');
+        }
+
+        // 2. Hak Akses: Hanya Guru Piket yang terjadwal bertugas hari ini (atau Admin) yang berhak
+        $isAuthorized = $user && (
+            $user->isAdmin() || 
+            ($user->guru && \App\Models\JadwalPiket::isGuruPiketHariIni($user->guru->id, $today))
+        );
+
+        if (!$isAuthorized) {
+            return redirect()->back()->with('error', 'Akses ditolak: Hanya Guru Piket yang terjadwal bertugas pada hari ini yang berwenang menghapus catatan presensi.');
+        }
+
         $siswaId = $absensi->pemilik_type === 'siswa' ? ($absensi->pemilik_id ?: ($absensi->siswaRombel?->siswa_id)) : null;
         $tanggal = $absensi->tanggal;
 
@@ -795,14 +850,26 @@ class LaporanController extends Controller
     {
         if (!$user) return null;
 
-        if ($user->guru_id) {
-            $currentGuru = \App\Models\Guru::find($user->guru_id);
+        $guruId = $user->guru_id;
+        if (!$guruId && $user->email) {
+            $guru = \App\Models\Guru::where('email', $user->email)->first();
+            if (!$guru && $user->name) {
+                $guru = \App\Models\Guru::where('nama', $user->name)->first();
+            }
+            if ($guru) {
+                $guruId = $guru->id;
+            }
+        }
+
+        if ($guruId) {
+            $rombel = \App\Models\Rombel::where('wali_kelas_id', $guruId)->first();
+            if ($rombel) return $rombel;
+
+            $currentGuru = \App\Models\Guru::find($guruId);
             if ($currentGuru) {
                 $rombel = $currentGuru->rombels()->first();
                 if ($rombel) return $rombel;
             }
-            $rombel = \App\Models\Rombel::where('wali_kelas_id', $user->guru_id)->first();
-            if ($rombel) return $rombel;
         }
 
         if (str_contains($user->email ?? '', 'walikelas')) {
@@ -814,5 +881,63 @@ class LaporanController extends Controller
         }
 
         return null;
+    }
+
+    /**
+     * Urutkan koleksi siswa berdasarkan:
+     * 1. Tingkat Angkatan (X -> XI -> XII)
+     * 2. Nama Rombel (X APHP 1, X RPL 1, X TSM 1, dst secara natural)
+     * 3. Nama Siswa (Alfabetis A-Z)
+     */
+    private function sortSiswaByTingkatAndRombel($collection)
+    {
+        $tingkatMap = ['X' => 10, 'XI' => 11, 'XII' => 12];
+        return $collection->sort(function ($a, $b) use ($tingkatMap) {
+            $rombelA = is_object($a) && property_exists($a, 'rombel')
+                ? $a->rombel
+                : ($a->siswaRombels->first()?->rombel?->nama_rombel ?? 'ZZZ');
+            $rombelB = is_object($b) && property_exists($b, 'rombel')
+                ? $b->rombel
+                : ($b->siswaRombels->first()?->rombel?->nama_rombel ?? 'ZZZ');
+
+            $tA = 99;
+            $tB = 99;
+
+            if (preg_match('/^(XII|XI|X)\b/i', (string)$rombelA, $mA)) {
+                $tA = $tingkatMap[strtoupper($mA[1])] ?? 99;
+            }
+            if (preg_match('/^(XII|XI|X)\b/i', (string)$rombelB, $mB)) {
+                $tB = $tingkatMap[strtoupper($mB[1])] ?? 99;
+            }
+
+            if ($tA !== $tB) {
+                return $tA <=> $tB;
+            }
+
+            $cmpRombel = strnatcasecmp((string)$rombelA, (string)$rombelB);
+            if ($cmpRombel !== 0) {
+                return $cmpRombel;
+            }
+
+            $namaA = is_object($a) ? ($a->nama ?? '') : '';
+            $namaB = is_object($b) ? ($b->nama ?? '') : '';
+            return strcasecmp((string)$namaA, (string)$namaB);
+        })->values();
+    }
+
+    /**
+     * Urutkan koleksi Rombel berdasarkan Tingkat Angkatan (X -> XI -> XII) lalu nama rombel
+     */
+    private function sortRombelByTingkat($rombels)
+    {
+        $tingkatMap = ['X' => 10, 'XI' => 11, 'XII' => 12];
+        return $rombels->sort(function ($a, $b) use ($tingkatMap) {
+            $tA = $tingkatMap[strtoupper($a->tingkat ?? '')] ?? 99;
+            $tB = $tingkatMap[strtoupper($b->tingkat ?? '')] ?? 99;
+            if ($tA !== $tB) {
+                return $tA <=> $tB;
+            }
+            return strnatcasecmp($a->nama_rombel ?? '', $b->nama_rombel ?? '');
+        })->values();
     }
 }

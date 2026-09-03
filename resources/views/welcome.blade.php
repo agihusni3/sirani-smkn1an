@@ -119,12 +119,12 @@
     .tap-card { max-width: 720px; margin: 0 auto; background: var(--bg-2); border: 1px solid var(--border-2); border-radius: var(--r-xl); padding: 36px 32px; box-shadow: 0 20px 50px rgba(0,0,0,0.18); }
 
     .pulse-container { position: relative; width: 130px; height: 130px; margin: 0 auto 24px; display: flex; align-items: center; justify-content: center; }
-    .pulse-ring { position: absolute; border-radius: 50%; border: 2px solid var(--gold); top: 50%; left: 50%; transform: translate(-50%, -50%); animation: pulse-expand 2.5s ease-out infinite; }
+    .pulse-ring { position: absolute; border-radius: 50%; border: 2px solid #000000; top: 50%; left: 50%; transform: translate(-50%, -50%); animation: pulse-expand 2.5s ease-out infinite; }
     .pulse-ring:nth-child(2) { animation-delay: .8s; }
     .pulse-ring:nth-child(3) { animation-delay: 1.6s; }
     @keyframes pulse-expand { 0% { width: 80px; height: 80px; opacity: 1; } 100% { width: 200px; height: 200px; opacity: 0; } }
 
-    .pulse-core { width: 90px; height: 90px; border-radius: 50%; background: var(--gold-dim); border: 2px solid var(--gold); display: flex; align-items: center; justify-content: center; font-size: 34px; color: var(--gold); box-shadow: 0 0 25px var(--gold-glow); }
+    .pulse-core { width: 90px; height: 90px; border-radius: 50%; background: #000000; border: 2px solid #000000; display: flex; align-items: center; justify-content: center; font-size: 34px; color: #FFFFFF; box-shadow: 0 4px 20px rgba(0,0,0,0.25); }
 
     .tap-title { font-size: 24px; font-weight: 900; margin-bottom: 6px; letter-spacing: -0.02em; color: var(--text); }
     .tap-subtitle { color: var(--text-2); font-size: 13.5px; max-width: 540px; margin: 0 auto 24px; font-weight: 500; line-height: 1.55; }
@@ -436,7 +436,7 @@
     <div class="brand-title">
       <div style="display:flex; align-items:center; gap:8px;">
         <span style="letter-spacing:-0.03em; font-weight:900;">SIRANI</span>
-        <span class="ai-badge" style="font-family:var(--font-mono); font-size:10px; background:var(--gold-dim); border:1px solid rgba(250,204,21,0.3); color:var(--gold); padding:2px 7px; border-radius:6px; font-weight:800;">TAP RFID</span>
+        <span class="ai-badge" style="font-family:var(--font-mono); font-size:10px; background:var(--bg-3); border:1px solid var(--border-2); color:var(--text); padding:2px 7px; border-radius:6px; font-weight:800;">TAP RFID</span>
       </div>
       <span class="brand-slogan">SMKN 1 Air Naningan</span>
     </div>
@@ -449,10 +449,11 @@
       <div class="kios-clock-date" id="kiosLiveDate">Memuat tanggal...</div>
     </div>
 
-    <!-- Switch to Face Kiosk Button -->
-    <a href="/kios-wajah" class="btn-kios-action" style="color:var(--gold); border-color:var(--gold);" title="Smart Gate Face ID">
-      <i class="bi bi-camera-video-fill"></i>
+    <!-- Switch to Smart Gate Button -->
+    <a href="/smart-gate" class="btn-kios-action" style="color:var(--text); border-color:var(--border-2);" title="Smart Gate Presensi">
+      <i class="bi bi-upc-scan"></i>
     </a>
+
 
     <!-- Fullscreen Button -->
     <button id="btnFullscreenKios" type="button" class="btn-kios-action" title="Layar Penuh">
@@ -493,8 +494,8 @@
       @endif
 
       @if($pengumumanKios)
-        <div style="background:var(--gold-dim); border:1px solid var(--border-2); border-radius:10px; padding:5px 14px; display:inline-flex; align-items:center; gap:8px; margin-bottom:14px; font-weight:700; color:var(--gold); font-size:11.5px; max-width:90%;">
-          <span style="font-family:var(--font-mono); font-size:9.5px; font-weight:800; background:var(--gold); color:#0F172A; padding:1px 5px; border-radius:4px;">INFO</span>
+        <div style="background:var(--bg-3); border:1px solid var(--border-2); border-radius:10px; padding:5px 14px; display:inline-flex; align-items:center; gap:8px; margin-bottom:14px; font-weight:700; color:var(--text); font-size:11.5px; max-width:90%;">
+          <span style="font-family:var(--font-mono); font-size:9.5px; font-weight:800; background:var(--text); color:var(--bg); padding:1px 5px; border-radius:4px;">INFO</span>
           <span style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;"><strong>{{ $pengumumanKios->judul }}:</strong> {{ \Illuminate\Support\Str::limit($pengumumanKios->isi_pesan, 60) }}</span>
         </div>
       @endif
@@ -534,7 +535,7 @@
             <div id="resultSub" class="identity-sub">-</div>
             
             <div class="identity-time-tag">
-              <i class="bi bi-clock-fill" style="color:var(--gold);"></i>
+              <i class="bi bi-clock-fill" style="color:var(--text-2);"></i>
               <span id="resultTime">-</span>
             </div>
           </div>
@@ -676,8 +677,8 @@
     flex-shrink: 0;
     border-radius: 24px;
     overflow: hidden;
-    border: 3.5px solid var(--gold);
-    box-shadow: 0 0 30px var(--gold-glow);
+    border: 3.5px solid var(--border-2);
+    box-shadow: 0 0 30px rgba(0,0,0,0.25);
     background: var(--bg-2);
   }
   .identity-photo-img {
@@ -769,7 +770,7 @@
   .kios-countdown-bar {
     height: 100%;
     width: 100%;
-    background: linear-gradient(90deg, var(--gold), var(--gold-2));
+    background: var(--text);
     border-radius: 10px;
     transition: width 0.1s linear;
   }
@@ -783,7 +784,7 @@
     font-weight: 600;
   }
   .kios-countdown-text strong {
-    color: var(--gold);
+    color: var(--text);
     font-family: var(--font-mono);
     font-size: 15px;
   }
@@ -1078,9 +1079,9 @@
         
         if (res.type === 'pulang_cepat') {
           resultStatus.textContent = 'PULANG CEPAT (IZIN)';
-          resultStatus.style.color = 'var(--gold)';
-          resultStatus.style.borderColor = 'var(--gold)';
-          resultStatus.style.background = 'var(--gold-dim)';
+          resultStatus.style.color = '#F59E0B';
+          resultStatus.style.borderColor = '#F59E0B';
+          resultStatus.style.background = 'rgba(245,158,11,0.15)';
         } else if (res.type === 'jam_pulang') {
           resultStatus.textContent = 'BERHASIL PULANG';
           resultStatus.style.color = '#38BDF8';

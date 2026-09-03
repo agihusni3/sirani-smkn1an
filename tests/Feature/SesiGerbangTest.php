@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\Guru;
 use App\Models\JadwalHariIni;
 use App\Models\Jurusan;
+use App\Models\KartuRfid;
 use App\Models\Rombel;
 use App\Models\Siswa;
 use App\Models\SiswaRombel;
@@ -44,29 +45,29 @@ class SesiGerbangTest extends TestCase
         ]);
     }
 
-    public function test_scan_wajah_ditolak_jika_sesi_gerbang_ditutup()
+    public function test_scan_gerbang_ditolak_jika_sesi_gerbang_ditutup()
     {
         $today = Carbon::today()->toDateString();
         $jadwal = JadwalHariIni::getJadwalAktif($today);
         $jadwal->update(['is_sesi_buka' => false, 'dibuka_oleh' => 'Petugas']);
 
         $siswa = Siswa::create([
-            'nis'            => '2026101',
-            'nama'           => 'Rahmat Hidayat',
-            'status'         => 'aktif',
-            'face_embedding' => array_fill(0, 128, 0.5),
+            'nisn'   => '2026101',
+            'nama'   => 'Rahmat Hidayat',
+            'status' => 'aktif',
         ]);
 
-        $res = $this->postJson('/api/v1/face-scan', [
-            'type'   => 'siswa',
-            'id'     => $siswa->id,
-            'device' => 'face_kiosk',
+        $kartu = KartuRfid::pair('RFID10101', 'siswa', $siswa->id);
+
+        $res = $this->postJson('/api/v1/rfid-scan', [
+            'uid' => $kartu->uid,
         ]);
 
-        $res->assertOk();
+        $res->assertStatus(422);
         $res->assertJson([
-            'status' => 'warning',
-            'type'   => 'gerbang_ditutup',
+            'success' => false,
+            'status'  => 'warning',
+            'type'    => 'gerbang_ditutup',
         ]);
 
         $this->assertDatabaseMissing('absensis', [
@@ -95,7 +96,7 @@ class SesiGerbangTest extends TestCase
         $this->assertTrue(JadwalHariIni::isSesiAktif($today));
     }
 
-    public function test_scan_wajah_berhasil_ketika_sesi_gerbang_aktif()
+    public function test_scan_gerbang_berhasil_ketika_sesi_gerbang_aktif()
     {
         $today = Carbon::today()->toDateString();
         $jadwal = JadwalHariIni::getJadwalAktif($today);
@@ -111,10 +112,9 @@ class SesiGerbangTest extends TestCase
         ]);
 
         $siswa = Siswa::create([
-            'nis'            => '2026102',
-            'nama'           => 'Ahmad Dani',
-            'status'         => 'aktif',
-            'face_embedding' => array_fill(0, 128, 0.5),
+            'nisn'   => '2026102',
+            'nama'   => 'Ahmad Dani',
+            'status' => 'aktif',
         ]);
 
         SiswaRombel::create([
@@ -124,10 +124,10 @@ class SesiGerbangTest extends TestCase
             'status_keanggotaan' => 'aktif',
         ]);
 
-        $res = $this->postJson('/api/v1/face-scan', [
-            'type'   => 'siswa',
-            'id'     => $siswa->id,
-            'device' => 'face_kiosk',
+        $kartu = KartuRfid::pair('RFID10202', 'siswa', $siswa->id);
+
+        $res = $this->postJson('/api/v1/rfid-scan', [
+            'uid' => $kartu->uid,
         ]);
 
         $res->assertOk();

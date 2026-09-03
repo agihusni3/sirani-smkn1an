@@ -8,40 +8,40 @@
   <style>
     .guru-stat-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 14px;
-      margin-bottom: 20px;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 10px;
+      margin-bottom: 12px;
     }
     .guru-stat-card {
       background: var(--bg-2);
-      border: 1px solid var(--border);
-      border-radius: var(--r-md);
-      padding: 14px 18px;
+      border: 1px solid var(--border-2);
+      border-radius: var(--r-sm);
+      padding: 10px 14px;
       display: flex;
       align-items: center;
-      gap: 14px;
-      transition: all .2s ease;
+      gap: 12px;
+      transition: all .15s ease;
+      box-shadow: var(--shadow-sm);
     }
     .guru-stat-card:hover {
-      border-color: var(--border-2);
-      transform: translateY(-2px);
+      border-color: #000000;
     }
     .guru-stat-icon {
-      width: 42px;
-      height: 42px;
-      border-radius: 12px;
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 20px;
+      font-size: 15px;
       flex-shrink: 0;
     }
     .guru-stat-val {
-      font-size: 22px;
+      font-size: 20px;
       font-weight: 900;
-      font-family: var(--font);
+      font-family: var(--font-mono);
       line-height: 1.1;
-      color: var(--text);
+      color: #000000;
     }
     .guru-stat-lbl {
       font-size: 11.5px;
@@ -58,6 +58,52 @@
     }
     @media (max-width: 992px) {
       .guru-form-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    @media (max-width: 768px) {
+      .guru-stat-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 8px !important;
+      }
+      .guru-stat-card {
+        padding: 8px 10px !important;
+        gap: 10px !important;
+      }
+      .guru-stat-val {
+        font-size: 18px !important;
+      }
+      .guru-stat-icon {
+        width: 32px !important;
+        height: 32px !important;
+        font-size: 15px !important;
+      }
+
+      /* Toolbar Mobile Responsive */
+      .guru-table-toolbar {
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 6px !important;
+      }
+      .guru-table-title {
+        width: 100% !important;
+      }
+      .guru-table-form {
+        width: 100% !important;
+        max-width: 100% !important;
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 6px !important;
+      }
+      .guru-search-box {
+        width: 100% !important;
+      }
+      .guru-filter-group {
+        width: 100% !important;
+        display: flex !important;
+        gap: 4px !important;
+      }
+      .guru-filter-group select {
+        font-size: 10.5px !important;
+      }
     }
     @media (max-width: 640px) {
       .guru-form-grid { grid-template-columns: 1fr; }
@@ -114,31 +160,45 @@
 <div class="app-container">
   @include('partials.sidebar')
   <main class="main-content">
-    <header class="header" style="margin-bottom:20px;">
-      <div class="header-title">
-        <h1 style="margin:0; font-size:22px; display:flex; align-items:center; gap:8px;">
-          <i class="bi bi-person-badge-fill" style="color:var(--gold);"></i> Master Data Guru &amp; Pegawai
-        </h1>
-        <p style="margin-top:2px; font-size:13px; color:var(--text-3);">
-          Kelola data pendidik, tenaga kependidikan, nomor WhatsApp, dan hak akses login.
-        </p>
-      </div>
+    @php
+      $currentUser = auth()->user();
+      $isAdmin = $currentUser && $currentUser->isAdmin();
+      $isStafTu = $currentUser && $currentUser->isStafTu();
+    @endphp
 
-      <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-        <button type="button" id="btnToggleTambahGuru" onclick="toggleTambahGuru()" class="btn btn-gold" style="height:38px; padding:0 16px; font-size:12.5px; font-weight:800; display:inline-flex; align-items:center; gap:6px;">
-          <i class="bi bi-person-plus-fill"></i> <span id="textToggleTambahGuru">+ Tambah Guru</span>
-        </button>
-        <button type="button" onclick="openModal('importGuruModal')" class="btn btn-outline" style="height:38px; padding:0 14px; font-size:12.5px; font-weight:700;">
-          <i class="bi bi-file-earmark-arrow-up-fill" style="margin-right:4px;"></i>Import CSV
-        </button>
-        <a href="/guru/export" class="btn btn-outline" style="height:38px; padding:0 14px; font-size:12.5px; font-weight:700; text-decoration:none; color:var(--green); border-color:var(--green);" title="Unduh CSV Kompatibel Excel">
-          <i class="bi bi-file-earmark-excel-fill" style="margin-right:4px;"></i>Export Excel
-        </a>
-        <a href="/guru/cetak-pdf" target="_blank" class="btn btn-outline" style="height:38px; padding:0 14px; font-size:12.5px; font-weight:700; text-decoration:none; color:var(--text);" title="Cetak Format A4 Kop Dinas">
-          <i class="bi bi-file-earmark-pdf-fill" style="margin-right:4px; color:var(--gold);"></i>Cetak PDF
-        </a>
+    {{-- ULTRA COMPACT SLIM HEADER BAR --}}
+    <div class="panel no-print" style="background:var(--bg-2); border:1px solid var(--border); padding:10px 16px; margin-bottom:12px; border-radius:var(--r-md); box-shadow:var(--shadow-sm);">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+        <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+          <h1 style="margin:0; font-size:16px; font-weight:900; color:var(--text); display:inline-flex; align-items:center; gap:6px;">
+            <i class="bi bi-person-badge-fill" style="color:#000000; font-size:16px;"></i> Data Guru &amp; Pegawai
+          </h1>
+          <span style="color:var(--border-2); font-weight:300;">|</span>
+          <span style="font-size:11.5px; color:var(--text-3);">
+            Total: <strong style="color:#000000;">{{ $statTotal }}</strong> Personel
+          </span>
+        </div>
+
+        <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+          @if($isAdmin || $isStafTu)
+            <button type="button" id="btnToggleTambahGuru" onclick="toggleTambahGuru()" class="btn btn-sm btn-gold" style="height:32px; padding:0 12px; font-size:11.5px; font-weight:800; display:inline-flex; align-items:center; gap:5px; border-radius:6px; cursor:pointer;">
+              <i class="bi bi-person-plus-fill" id="iconToggleTambahGuru"></i>
+              <span id="textToggleTambahGuru">Tambah Guru</span>
+            </button>
+            <button type="button" onclick="openModal('importGuruModal')" class="btn btn-sm btn-outline" style="height:32px; padding:0 10px; font-size:11.5px; font-weight:800; color:#000000; border:1px solid var(--border-2); background:var(--bg-2); display:inline-flex; align-items:center; gap:4px; border-radius:6px;">
+              <i class="bi bi-file-earmark-arrow-up-fill" style="color:#000000;"></i> Import CSV
+            </button>
+          @endif
+          <a href="/guru/export" class="btn btn-sm btn-outline" style="height:32px; padding:0 10px; font-size:11.5px; font-weight:800; text-decoration:none; color:#000000; border:1px solid var(--border-2); background:var(--bg-2); display:inline-flex; align-items:center; gap:4px; border-radius:6px;" title="Unduh CSV Kompatibel Excel">
+            <i class="bi bi-file-earmark-excel-fill" style="color:#000000;"></i> Excel
+          </a>
+          <a href="/guru/cetak-pdf" target="_blank" class="btn btn-sm btn-outline" style="height:32px; padding:0 10px; font-size:11.5px; font-weight:800; text-decoration:none; color:#000000; border:1px solid var(--border-2); background:var(--bg-2); display:inline-flex; align-items:center; gap:4px; border-radius:6px;" title="Cetak Format A4 Kop Dinas">
+            <i class="bi bi-file-earmark-pdf-fill" style="color:#000000;"></i> PDF
+          </a>
+          @include('partials.header_actions')
+        </div>
       </div>
-    </header>
+    </div>
 
     @if(session('success'))<div class="alert-success" style="margin-bottom:16px;"><i class="bi bi-check-circle-fill" style="margin-right:6px;"></i>{{ session('success') }}</div>@endif
     @if(session('error'))<div class="alert-error" style="margin-bottom:16px;"><i class="bi bi-exclamation-triangle-fill" style="margin-right:6px;"></i>{{ session('error') }}</div>@endif
@@ -147,7 +207,7 @@
     {{-- KPI STAT CARDS --}}
     <div class="guru-stat-grid">
       <div class="guru-stat-card">
-        <div class="guru-stat-icon" style="background:var(--bg-3); border:1px solid var(--border-2); color:var(--gold);">
+        <div class="guru-stat-icon" style="background:var(--bg-3); border:1px solid var(--border-2); color:#000000;">
           <i class="bi bi-people-fill"></i>
         </div>
         <div>
@@ -157,7 +217,7 @@
       </div>
 
       <div class="guru-stat-card">
-        <div class="guru-stat-icon" style="background:var(--bg-3); border:1px solid var(--border-2); color:var(--gold);">
+        <div class="guru-stat-icon" style="background:var(--bg-3); border:1px solid var(--border-2); color:#000000;">
           <i class="bi bi-mortarboard-fill"></i>
         </div>
         <div>
@@ -166,18 +226,9 @@
         </div>
       </div>
 
-      <div class="guru-stat-card">
-        <div class="guru-stat-icon" style="background:var(--bg-3); border:1px solid var(--border-2); color:var(--gold);">
-          <i class="bi bi-camera-video-fill"></i>
-        </div>
-        <div>
-          <div class="guru-stat-val">{{ \App\Models\Guru::whereNotNull('face_embedding')->count() }}</div>
-          <div class="guru-stat-lbl">Face ID Terdaftar</div>
-        </div>
-      </div>
 
       <div class="guru-stat-card">
-        <div class="guru-stat-icon" style="background:var(--bg-3); border:1px solid var(--border-2); color:var(--gold);">
+        <div class="guru-stat-icon" style="background:var(--bg-3); border:1px solid var(--border-2); color:#000000;">
           <i class="bi bi-shield-lock-fill"></i>
         </div>
         <div>
@@ -187,16 +238,17 @@
       </div>
     </div>
 
+    @if($isAdmin || $isStafTu)
     <!-- Form Tambah Guru (Collapsible / Triggered) -->
-    <div class="panel" id="panelTambahGuru" style="{{ (isset($errors) && $errors->any()) ? 'display:block;' : 'display:none;' }} margin-bottom: 20px; border-color: rgba(234, 179, 8, 0.4); background: linear-gradient(180deg, rgba(234, 179, 8, 0.04) 0%, var(--panel) 100%);">
+    <div class="panel" id="panelTambahGuru" style="{{ (isset($errors) && $errors->any()) ? 'display:block;' : 'display:none;' }} margin-bottom: 20px; border-color: var(--border); background: var(--bg-2);">
       <div class="panel-title" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px; padding-bottom:12px; border-bottom:1px solid var(--border);">
         <div style="display:flex; align-items:center; gap:8px;">
-          <div class="stat-icon" style="width:36px; height:36px; border-radius:8px; background:rgba(234, 179, 8, 0.15); color:var(--gold); display:flex; align-items:center; justify-content:center; font-size:18px;">
+          <div class="stat-icon" style="width:36px; height:36px; border-radius:8px; background:rgba(0,0,0,0.06); color:#000000; display:flex; align-items:center; justify-content:center; font-size:18px;">
             <i class="bi bi-person-plus-fill"></i>
           </div>
           <div>
             <span style="font-weight:800; font-size:15px; color:var(--text);">Form Tambah Guru &amp; Tenaga Kependidikan</span>
-            <div style="font-size:12px; color:var(--text-3);">Lengkapi profil tenaga pendidik/kependidikan untuk presensi Face ID.</div>
+            <div style="font-size:12px; color:var(--text-3);">Lengkapi profil tenaga pendidik/kependidikan.</div>
           </div>
         </div>
         <button type="button" onclick="toggleTambahGuru(false)" class="btn btn-outline" style="height:32px; width:32px; padding:0; display:inline-flex; align-items:center; justify-content:center; border-radius:6px; color:var(--text-3);" title="Tutup Form">
@@ -259,7 +311,7 @@
           <div class="form-group" style="margin-bottom:0;">
             <label style="margin-bottom:6px; font-weight:700; font-size:12px; text-transform:uppercase; letter-spacing:0.4px; color:var(--text-2); display:flex; justify-content:space-between;">
               <span>Foto Profil</span>
-              <span style="color:var(--gold); font-size:11px; text-transform:none;"><i class="bi bi-crop"></i> Auto-Crop Aktif</span>
+              <span style="color:#000000; font-size:11px; text-transform:none; font-weight:700;"><i class="bi bi-crop"></i> Auto-Crop Aktif</span>
             </label>
             <div style="display:flex; align-items:center; gap:10px;">
               <div id="tambah_guru_foto_preview" style="width:40px; height:40px; border-radius:50%; border:1.5px solid var(--border-2); background:var(--bg-3); display:flex; align-items:center; justify-content:center; overflow:hidden; flex-shrink:0;">
@@ -270,10 +322,10 @@
           </div>
 
           {{-- Baris 3: Jadwal Hari Mengajar (Centang Hari Aktif) --}}
-          <div id="tambah_hari_mengajar_box" style="grid-column: 1 / -1; background:rgba(202,138,4,0.06); border:1px solid rgba(202,138,4,0.25); border-radius:var(--r-md); padding:12px 14px;">
+          <div id="tambah_hari_mengajar_box" style="grid-column: 1 / -1; background:var(--bg-3); border:1px solid var(--border-2); border-radius:var(--r-md); padding:12px 14px;">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; flex-wrap:wrap; gap:6px;">
               <label style="font-weight:800; font-size:12px; color:var(--text); margin:0;">
-                <i class="bi bi-calendar-check-fill" style="color:var(--gold); margin-right:4px;"></i> Jadwal Hari Wajib Mengajar / Hadir:
+                <i class="bi bi-calendar-check-fill" style="color:#000000; margin-right:4px;"></i> Jadwal Hari Wajib Mengajar / Hadir:
               </label>
               <span style="font-size:11px; color:var(--text-3);">Centang hari di mana guru honorer wajib hadir di sekolah</span>
             </div>
@@ -296,92 +348,77 @@
         </div>
       </form>
     </div>
+    @endif
 
     <!-- Tabel Daftar Guru & Toolbar Terpadu -->
     <div class="panel" style="padding:0; overflow:hidden; border:1px solid var(--border); border-radius:var(--r-md); box-shadow:var(--shadow-sm); background:var(--bg-2); margin-bottom:24px;">
-      {{-- Header Tabel --}}
-      <div style="padding:14px 18px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
-        <div style="font-weight:800; font-size:15px; color:var(--text); display:flex; align-items:center; gap:8px;">
-          <i class="bi bi-people-fill" style="color:var(--gold);"></i>
-          <span>Daftar Guru &amp; Tenaga Kependidikan</span>
+      {{-- Header & Toolbar Terpadu --}}
+      <div class="guru-table-toolbar" style="padding:8px 12px; border-bottom:1px solid var(--border); background:var(--surface); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+        <div class="guru-table-title" style="font-weight:800; font-size:13.5px; color:var(--text); display:flex; align-items:center; gap:6px;">
+          <i class="bi bi-people-fill" style="color:#000000;"></i>
+          <span>Daftar Guru &amp; Pegawai</span>
         </div>
-        <div>
-          <button type="button" onclick="toggleTambahGuru(true)" class="btn btn-gold" style="padding:6px 14px; font-size:12px; font-weight:800; border-radius:var(--r-sm);">
-            <i class="bi bi-plus-lg"></i> Tambah Guru
-          </button>
-        </div>
-      </div>
 
-      {{-- Toolbar Search & Filter Terpadu --}}
-      <div style="padding:12px 18px; border-bottom:1px solid var(--border); background:var(--surface);">
-        <form method="GET" action="{{ route('guru.index') }}" style="display:flex; flex-wrap:wrap; gap:8px; align-items:center;">
-          <div style="flex:1.8; min-width:200px;">
-            <input type="text" name="q" value="{{ $search }}" placeholder="Cari nama guru, NIP, jabatan..." class="input-field" style="width:100%; height:36px; font-size:12.5px; background:var(--bg-2); border:1px solid var(--border-2); border-radius:var(--r-sm); padding:0 12px;" />
+        <form method="GET" action="{{ route('guru.index') }}" class="guru-table-form" style="display:flex; gap:6px; align-items:center; flex-wrap:wrap; flex:1; justify-content:flex-end; max-width:640px;">
+          <div class="guru-search-box" style="position:relative; flex:1.5; min-width:130px;">
+            <i class="bi bi-search" style="position:absolute; left:10px; top:50%; transform:translateY(-50%); color:var(--text-3); font-size:11px;"></i>
+            <input type="text" name="q" value="{{ $search }}" placeholder="Cari nama, NIP, jabatan..." class="input-field" style="width:100%; height:32px; font-size:11.5px; background:var(--bg-2); border:1px solid var(--border-2); border-radius:var(--r-sm); padding-left:28px; padding-right:8px;" />
           </div>
 
-          <div style="min-width:140px;">
-            <select name="kepegawaian" class="input-field" style="width:100%; height:36px; font-size:12px; background:var(--bg-2); border:1px solid var(--border-2); border-radius:var(--r-sm);" onchange="this.form.submit()">
-              <option value="">Semua Pegawai</option>
-              <option value="pns" {{ ($kepegawaian ?? '') === 'pns' ? 'selected' : '' }}>PNS</option>
-              <option value="pppk" {{ ($kepegawaian ?? '') === 'pppk' ? 'selected' : '' }}>PPPK</option>
-              <option value="honor" {{ ($kepegawaian ?? '') === 'honor' ? 'selected' : '' }}>Guru Honor (GTT)</option>
-              <option value="tendik" {{ ($kepegawaian ?? '') === 'tendik' ? 'selected' : '' }}>Tendik / TU</option>
-            </select>
+          <div class="guru-filter-group" style="display:flex; gap:6px; align-items:center; flex-wrap:wrap; flex:2;">
+            <div style="min-width:110px; flex:1;">
+              <select name="jenis" class="input-field" style="width:100%; height:32px; font-size:11.5px; background:var(--bg-2); border:1px solid var(--border-2); border-radius:var(--r-sm); padding:0 6px;" onchange="this.form.submit()">
+                <option value="">Kepegawaian</option>
+                <option value="pns" {{ ($jenis ?? '') === 'pns' ? 'selected' : '' }}>PNS</option>
+                <option value="pppk" {{ ($jenis ?? '') === 'pppk' ? 'selected' : '' }}>PPPK</option>
+                <option value="honor" {{ ($jenis ?? '') === 'honor' ? 'selected' : '' }}>Honor (GTT)</option>
+                <option value="tendik" {{ ($jenis ?? '') === 'tendik' ? 'selected' : '' }}>Tendik/TU</option>
+              </select>
+            </div>
+
+            <div style="min-width:90px; flex:1;">
+              <select name="status" class="input-field" style="width:100%; height:32px; font-size:11.5px; background:var(--bg-2); border:1px solid var(--border-2); border-radius:var(--r-sm); padding:0 6px;" onchange="this.form.submit()">
+                <option value="">Status</option>
+                <option value="aktif" {{ ($status ?? '') === 'aktif' ? 'selected' : '' }}>Aktif</option>
+                <option value="nonaktif" {{ ($status ?? '') === 'nonaktif' ? 'selected' : '' }}>Nonaktif</option>
+              </select>
+            </div>
+
+            <div style="min-width:105px; flex:1;">
+              <select name="sort" class="input-field" style="width:100%; height:32px; font-size:11.5px; background:var(--bg-2); border:1px solid var(--border-2); border-radius:var(--r-sm); padding:0 6px;" onchange="this.form.submit()">
+                <option value="hirarki" {{ ($sort ?? 'hirarki') === 'hirarki' ? 'selected' : '' }}>Hirarki</option>
+                <option value="nama_asc" {{ ($sort ?? '') === 'nama_asc' ? 'selected' : '' }}>Nama (A-Z)</option>
+                <option value="nip_asc" {{ ($sort ?? '') === 'nip_asc' ? 'selected' : '' }}>NIP (Kecil)</option>
+                <option value="terbaru" {{ ($sort ?? '') === 'terbaru' ? 'selected' : '' }}>Terbaru</option>
+              </select>
+            </div>
+
+            <button type="submit" class="btn btn-sm btn-outline" style="height:32px; padding:0 10px; font-size:11.5px; font-weight:800; border-radius:var(--r-sm); flex-shrink:0;">
+              Cari
+            </button>
+
+            @if($search || ($jenis ?? '') || ($status ?? ''))
+              <a href="{{ route('guru.index') }}" class="btn btn-sm btn-outline" style="height:32px; padding:0 8px; font-size:11px; font-weight:800; color:var(--red); border-color:rgba(239,68,68,0.4); border-radius:var(--r-sm); flex-shrink:0;" title="Reset Filter">
+                Reset
+              </a>
+            @endif
           </div>
-
-          <div style="min-width:140px;">
-            <select name="kategori" class="input-field" style="width:100%; height:36px; font-size:12px; background:var(--bg-2); border:1px solid var(--border-2); border-radius:var(--r-sm);" onchange="this.form.submit()">
-              <option value="">Semua Jabatan</option>
-              <option value="wali_kelas" {{ $kategori === 'wali_kelas' ? 'selected' : '' }}>Wali Kelas</option>
-              <option value="bk" {{ $kategori === 'bk' ? 'selected' : '' }}>Guru BK</option>
-              <option value="pimpinan" {{ $kategori === 'pimpinan' ? 'selected' : '' }}>Pimpinan / Waka</option>
-              <option value="staf" {{ $kategori === 'staf' ? 'selected' : '' }}>Tata Usaha / Staf</option>
-            </select>
-          </div>
-
-          <div style="min-width:130px;">
-            <select name="face_id" class="input-field" style="width:100%; height:36px; font-size:12px; background:var(--bg-2); border:1px solid var(--border-2); border-radius:var(--r-sm);" onchange="this.form.submit()">
-              <option value="">Status Face ID</option>
-              <option value="ada" {{ $rfidStatus === 'ada' ? 'selected' : '' }}>Terdaftar Face ID</option>
-              <option value="belum" {{ $rfidStatus === 'belum' ? 'selected' : '' }}>Belum Face ID</option>
-            </select>
-          </div>
-
-          <div style="min-width:130px;">
-            <select name="sort" class="input-field" style="width:100%; height:36px; font-size:12px; font-weight:700; background:var(--bg-2); border:1px solid var(--border-2); border-radius:var(--r-sm);" onchange="this.form.submit()">
-              <option value="nama_asc" {{ $sort === 'nama_asc' ? 'selected' : '' }}>Nama (A - Z)</option>
-              <option value="nama_desc" {{ $sort === 'nama_desc' ? 'selected' : '' }}>Nama (Z - A)</option>
-              <option value="nip_asc" {{ $sort === 'nip_asc' ? 'selected' : '' }}>NIP (Terkecil)</option>
-              <option value="nip_desc" {{ $sort === 'nip_desc' ? 'selected' : '' }}>NIP (Terbesar)</option>
-              <option value="terbaru" {{ $sort === 'terbaru' ? 'selected' : '' }}>Data Terbaru</option>
-            </select>
-          </div>
-
-          <button type="submit" class="btn btn-outline" style="height:36px; padding:0 12px; font-size:12px; font-weight:700;">
-            <i class="bi bi-search"></i> Cari
-          </button>
-
-          @if($search || $kategori || ($kepegawaian ?? '') || $rfidStatus || $status || ($sort && $sort !== 'nama_asc'))
-            <a href="{{ route('guru.index') }}" class="btn btn-outline" style="height:36px; padding:0 10px; font-size:12px; color:var(--red); border-color:rgba(239,68,68,0.4);" title="Reset Filter">
-              Reset
-            </a>
-          @endif
         </form>
       </div>
 
       <div class="table-responsive" style="overflow-x:auto;">
         <table class="data-table" style="width:100%; border-collapse:collapse;">
           <thead>
-            <tr style="background:var(--bg-3);">
-              <th style="width:45px; text-align:center; padding:12px 8px;">No</th>
-              <th style="min-width:240px; padding:12px 12px;">Guru &amp; Identitas</th>
-              <th style="min-width:160px; padding:12px 12px;">Jabatan &amp; Tugas</th>
-              <th style="min-width:120px; padding:12px 12px;">Status Pegawai</th>
-              <th style="min-width:140px; padding:12px 12px;">Kontak WhatsApp</th>
-              <th style="min-width:140px; padding:12px 12px;">Face ID</th>
-              <th style="min-width:140px; padding:12px 12px;">Akun Sistem</th>
-              <th style="width:85px; text-align:center; padding:12px 8px;">Status</th>
-              <th style="width:90px; text-align:center; padding:12px 8px;">Aksi</th>
+            <tr>
+              <th style="width:36px; text-align:center;">No</th>
+              <th>Guru &amp; Identitas</th>
+              <th>Jabatan</th>
+              <th>Status Kepegawaian</th>
+              <th>Kontak WhatsApp</th>
+              <th style="text-align:center;">Kartu RFID</th>
+              <th>Akun Login</th>
+              <th style="text-align:center;">Status</th>
+              <th style="width:80px; text-align:center;">Aksi</th>
             </tr>
           </thead>
           <tbody>
@@ -390,20 +427,22 @@
                 $cleanHp = preg_replace('/[^0-9]/', '', $g->no_hp ?? '');
                 if (str_starts_with($cleanHp, '0')) { $cleanHp = '62' . substr($cleanHp, 1); }
               @endphp
-              <tr style="border-bottom:1px solid var(--border);">
-                <td style="text-align:center; font-weight:700; color:var(--text); font-size:12px; vertical-align:middle;">
+              <tr>
+                <td style="text-align:center; font-weight:700; color:var(--text); font-family:var(--font-mono); font-size:12px; vertical-align:middle;">
                   {{ $gurus->firstItem() + $idx }}
                 </td>
                 <td style="vertical-align:middle; padding:12px 12px;">
                   <div style="display:flex; align-items:center; gap:10px;">
-                    <img src="{{ $g->foto_url }}" alt="{{ $g->nama }}" style="width:38px; height:38px; border-radius:50%; object-fit:cover; border:2px solid rgba(202,138,4,0.3); flex-shrink:0;" />
+                    <div class="avatar-circle avatar-md">
+                      <img src="{{ $g->foto_url }}" alt="{{ $g->nama }}" class="avatar-img" />
+                    </div>
                     <div style="min-width:0;">
                       <div style="font-weight:800; font-size:13px; color:var(--text); line-height:1.25;">{{ $g->nama }}</div>
-                      <div style="font-size:11px; font-family:var(--font-mono); color:var(--text); margin-top:2px;">
+                      <div style="font-size:11px; font-family:var(--font-mono); color:var(--text-3); margin-top:2px;">
                         {{ $g->nip ? 'NIP: ' . $g->nip : 'Non-NIP' }}
                       </div>
                       @if($g->rombelWali)
-                        <span class="badge" style="background:rgba(202,138,4,0.12); color:var(--gold); border:1px solid rgba(202,138,4,0.3); font-size:9.5px; font-weight:800; margin-top:3px; display:inline-block;">
+                        <span class="badge" style="background:rgba(0,0,0,0.06); color:#000000; border:1px solid rgba(0,0,0,0.12); font-size:9.5px; font-weight:700; margin-top:3px; display:inline-block;">
                           Wali Kelas: {{ $g->rombelWali->nama_rombel }}
                         </span>
                       @endif
@@ -411,67 +450,93 @@
                   </div>
                 </td>
                 <td style="vertical-align:middle; padding:12px 12px;">
-                  <div style="font-size:12.5px; font-weight:800; color:var(--text);">{{ $g->jabatan }}</div>
-                  @if($g->isHonor() && !empty($g->hari_mengajar))
-                    <div style="font-size:10.5px; color:var(--text); margin-top:2px;">
-                      Jadwal: {{ implode(', ', $g->hari_mengajar) }}
-                    </div>
-                  @endif
+                  <div style="font-size:12.5px; font-weight:700; color:var(--text);">{{ $g->jabatan }}</div>
                 </td>
                 <td style="vertical-align:middle; padding:12px 12px;">
-                  <span class="badge {{ $g->jenis_kepegawaian === 'pns' ? 'badge-pns' : ($g->jenis_kepegawaian === 'pppk' ? 'badge-pppk' : 'badge-honor') }}" style="font-weight:800; font-size:10.5px;">
+                  <span style="font-size:11.5px; font-weight:700; color:var(--text-2); text-transform:uppercase; letter-spacing:0.3px;">
                     {{ $g->label_kepegawaian }}
                   </span>
                 </td>
                 <td style="vertical-align:middle; padding:10px 12px; white-space:nowrap;">
                   @if($g->no_hp)
-                    <a href="https://wa.me/{{ $cleanHp }}" target="_blank" style="color:#16A34A; font-size:11px; font-weight:800; text-decoration:none; display:inline-flex; align-items:center; gap:4px; background:rgba(22,163,74,0.1); padding:0 10px; height:30px; border-radius:6px; border:1px solid rgba(22,163,74,0.25); white-space:nowrap;" title="Chat WhatsApp">
-                      <i class="bi bi-whatsapp"></i> {{ $g->no_hp }}
+                    <a href="https://wa.me/{{ $cleanHp }}" target="_blank" style="font-size:12px; font-weight:700; font-family:var(--font-mono); text-decoration:none; display:inline-block; color:var(--text); white-space:nowrap; transition:color .15s ease;" onmouseover="this.style.color='#25D366'" onmouseout="this.style.color='var(--text)'" title="Chat WhatsApp">
+                      {{ $g->no_hp }}
                     </a>
                   @else
-                    <span style="color:var(--text); font-size:12px;">-</span>
+                    <span style="color:var(--text-3); font-size:12px;">-</span>
                   @endif
                 </td>
-                <td style="vertical-align:middle; padding:10px 12px; white-space:nowrap;">
-                  @if($g->face_embedding)
-                    <div style="display:inline-flex; align-items:center; gap:4px; white-space:nowrap;">
-                      <button type="button" onclick="openViewFaceModal('guru', {{ $g->id }}, '{{ addslashes($g->nama) }}', '{{ $g->nip ? 'NIP: ' . $g->nip : $g->label_kepegawaian }}', '{{ $g->foto_url }}', '{{ $g->face_registered_at?->translatedFormat('d F Y, H:i') ?? 'Terdaftar Aktif' }}')" class="btn btn-sm" style="padding:0 9px; height:30px; font-size:11px; font-weight:800; background:rgba(16,185,129,0.12); color:#10B981; border:1px solid rgba(16,185,129,0.28); border-radius:6px; display:inline-flex; align-items:center; gap:4px; white-space:nowrap;" title="Lihat Status Biometrik">
-                        <i class="bi bi-eye-fill"></i> Terdaftar
+
+                {{-- Kartu RFID --}}
+                <td style="vertical-align:middle; text-align:center; padding:10px 12px; white-space:nowrap;">
+                  @php $kartu = $g->kartuRfid; @endphp
+                  @if($kartu)
+                    @if($isAdmin || $isStafTu)
+                      <button type="button"
+                        onclick="openRfidPairModal('guru', {{ $g->id }}, '{{ addslashes($g->nama) }}', '{{ $g->nip ? 'NIP: ' . $g->nip : $g->label_kepegawaian }}', '{{ $g->foto_url }}', '{{ $kartu->uid }}')"
+                        style="background:transparent; border:none; padding:4px 0; font-size:12px; font-weight:700; color:var(--text); cursor:pointer; font-family:var(--font-mono); white-space:nowrap;"
+                        title="Klik untuk Ubah / Lepas Kartu RFID">
+                        {{ $kartu->uid }}
                       </button>
-                      <button type="button" onclick="quickDeleteFace('guru', {{ $g->id }}, '{{ addslashes($g->nama) }}')" class="btn btn-sm btn-outline" style="width:30px; height:30px; padding:0; font-size:11px; color:#EF4444; border-color:rgba(239,68,68,0.3); border-radius:6px; display:inline-flex; align-items:center; justify-content:center;" title="Hapus Face ID">
-                        <i class="bi bi-trash3-fill"></i>
-                      </button>
-                    </div>
+                    @else
+                      <span style="font-size:11.5px; font-weight:700; color:var(--text); font-family:var(--font-mono);">
+                        {{ $kartu->uid }}
+                      </span>
+                    @endif
                   @else
-                    <button type="button" onclick="openFaceEnrollModal('guru', {{ $g->id }}, '{{ addslashes($g->nama) }}', '{{ $g->nip ? 'NIP: ' . $g->nip : $g->label_kepegawaian }}', '{{ $g->foto_url }}')" class="btn btn-sm btn-outline" style="padding:0 9px; height:30px; font-size:11px; font-weight:800; color:var(--gold); border-color:var(--gold); border-radius:6px; display:inline-flex; align-items:center; gap:4px; white-space:nowrap;" title="Daftarkan Wajah">
-                      <i class="bi bi-camera-fill"></i> Rekam Wajah
-                    </button>
+                    @if($isAdmin || $isStafTu)
+                      <button type="button"
+                        onclick="openRfidPairModal('guru', {{ $g->id }}, '{{ addslashes($g->nama) }}', '{{ $g->nip ? 'NIP: ' . $g->nip : $g->label_kepegawaian }}', '{{ $g->foto_url }}', '')"
+                        style="background:transparent; border:none; padding:4px 0; font-size:11.5px; font-weight:800; color:var(--text-2); cursor:pointer; white-space:nowrap;"
+                        onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--text-2)'"
+                        title="Daftarkan Kartu RFID">
+                        + RFID
+                      </button>
+                    @else
+                      <span style="font-size:11px; font-weight:600; color:var(--text-3);">-</span>
+                    @endif
                   @endif
                 </td>
                 <td style="vertical-align:middle; padding:10px 12px; white-space:nowrap;">
                   @if($g->user)
-                    <button type="button" onclick="openAkunModal({{ json_encode($g) }})" class="btn btn-sm btn-outline" style="padding:0 10px; height:30px; font-size:11px; font-weight:800; border-radius:6px; display:inline-flex; align-items:center; gap:6px; white-space:nowrap; background:var(--bg-2); border-color:var(--border-2); color:var(--text);" title="Klik untuk lihat &amp; atur akun (Email: {{ $g->user->email }})">
-                      <i class="bi bi-person-badge-fill" style="color:var(--gold);"></i>
-                      <span>Lihat Akun</span>
-                      <span style="background:rgba(147,51,234,0.12); color:#9333EA; font-size:9px; font-weight:800; text-transform:uppercase; border:1px solid rgba(147,51,234,0.28); padding:1px 5px; border-radius:4px; line-height:1;">
-                        {{ str_replace('_', ' ', $g->user->role) }}
-                      </span>
-                    </button>
+                    @if($isAdmin || $isStafTu)
+                      <button type="button" onclick="openAkunModal({{ json_encode($g) }})" style="background:transparent; border:none; padding:2px 0; font-size:12px; font-weight:700; color:var(--text); cursor:pointer; white-space:nowrap; text-align:left;" title="Klik untuk atur akun (Nickname: {{ $g->user->username }})">
+                        <span style="text-transform:capitalize; display:block;">{{ str_replace('_', ' ', $g->user->role) }}</span>
+                        <span style="font-size:10.5px; color:var(--text-3); font-family:var(--font-mono); font-weight:600;">{{ $g->user->username ?: ($g->user->email ? explode('@', $g->user->email)[0] : '-') }}</span>
+                      </button>
+                    @else
+                      <div>
+                        <span style="font-size:12px; font-weight:700; color:var(--text); text-transform:capitalize; display:block;">
+                          {{ str_replace('_', ' ', $g->user->role) }}
+                        </span>
+                        <span style="font-size:10.5px; color:var(--text-3); font-family:var(--font-mono);">
+                          {{ $g->user->username ?: ($g->user->email ? explode('@', $g->user->email)[0] : '-') }}
+                        </span>
+                      </div>
+                    @endif
                   @else
-                    <button type="button" onclick="openAkunModal({{ json_encode($g) }})" class="btn btn-sm btn-outline" style="padding:0 10px; height:30px; font-size:11px; font-weight:800; color:var(--gold); border-color:var(--gold); border-radius:6px; display:inline-flex; align-items:center; gap:4px; white-space:nowrap;" title="Buat Akun Login Sistem">
-                      <i class="bi bi-person-plus-fill"></i> + Buat Akun
-                    </button>
+                    @if($isAdmin || $isStafTu)
+                      <button type="button" onclick="openAkunModal({{ json_encode($g) }})" style="background:transparent; border:none; padding:4px 0; font-size:11.5px; font-weight:800; color:var(--text-2); cursor:pointer; white-space:nowrap;" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--text-2)'" title="Buat Akun Login dengan Nickname/Username">
+                        + Buat Akun
+                      </button>
+                    @else
+                      <span style="color:var(--text-3); font-size:11px;">-</span>
+                    @endif
                   @endif
                 </td>
                 <td style="vertical-align:middle; text-align:center; padding:10px 8px; white-space:nowrap;">
-                  @if($g->status === 'aktif')
-                    <span class="badge" style="background:rgba(34,197,94,0.12); color:#16A34A; font-weight:800; font-size:10px;">AKTIF</span>
-                  @else
-                    <span class="badge" style="background:rgba(239,68,68,0.12); color:#DC2626; font-weight:800; font-size:10px;">NONAKTIF</span>
-                  @endif
+                  <span style="font-weight:800; font-size:11px; text-transform:uppercase; color:{{ $g->status === 'aktif' ? 'var(--text)' : 'var(--text-3)' }};">
+                    {{ $g->status }}
+                  </span>
                 </td>
                 <td style="vertical-align:middle; text-align:center; padding:10px 8px; white-space:nowrap;">
                   <div style="display:flex; gap:4px; justify-content:center; align-items:center;">
+                    <a href="{{ route('kartu.digital.guru', ['id' => $g->id]) }}" target="_blank"
+                       class="btn-icon btn-icon-view"
+                       style="width:30px; height:30px; text-decoration:none;"
+                       title="Lihat Barcode &amp; Kartu Digital Guru">
+                       <i class="bi bi-qr-code-scan"></i>
+                    </a>
                     <button type="button" onclick="openEditGuru({{ json_encode($g) }})" class="btn-icon btn-icon-edit" style="width:30px; height:30px;" title="Edit Data Guru">
                       <i class="bi bi-pencil-square"></i>
                     </button>
@@ -512,7 +577,7 @@
   <div class="modal-card" style="max-width:540px; padding:24px;">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
       <h3 style="font-size:17px; font-weight:900; color:var(--text); margin:0;">
-        <i class="bi bi-pencil-square" style="color:var(--gold);"></i> Edit Data Guru / Pegawai
+        <i class="bi bi-pencil-square" style="color:#000000;"></i> Edit Data Guru / Pegawai
       </h3>
       <button type="button" class="btn btn-sm btn-outline" onclick="closeModal('editGuruModal')"><i class="bi bi-x-lg"></i></button>
     </div>
@@ -546,10 +611,10 @@
           </select>
         </div>
 
-        <div id="edit_hari_mengajar_box" style="background:rgba(202,138,4,0.06); border:1px solid rgba(202,138,4,0.25); border-radius:var(--r-md); padding:10px 12px;">
+        <div id="edit_hari_mengajar_box" style="background:var(--bg-3); border:1px solid var(--border-2); border-radius:var(--r-md); padding:10px 12px;">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; flex-wrap:wrap; gap:4px;">
             <label style="font-weight:800; font-size:11.5px; color:var(--text); margin:0;">
-              <i class="bi bi-calendar-check-fill" style="color:var(--gold); margin-right:4px;"></i> Jadwal Hari Wajib Mengajar / Hadir:
+              <i class="bi bi-calendar-check-fill" style="color:#000000; margin-right:4px;"></i> Jadwal Hari Wajib Mengajar / Hadir:
             </label>
             <span style="font-size:10.5px; color:var(--text-3);">Centang hari wajib hadir</span>
           </div>
@@ -572,10 +637,10 @@
         <div>
           <label class="form-label" style="font-weight:700; font-size:12px; display:flex; justify-content:space-between; margin-bottom:4px;">
             <span>Ganti Foto Profil</span>
-            <span style="color:var(--gold); font-size:11px;"><i class="bi bi-crop"></i> Auto-Crop Aktif</span>
+            <span style="color:#000000; font-size:11px; font-weight:700;"><i class="bi bi-crop"></i> Auto-Crop Aktif</span>
           </label>
           <div style="display:flex; align-items:center; gap:10px;">
-            <div id="edit_guru_foto_preview" style="width:40px; height:40px; border-radius:50%; border:1.5px solid var(--gold); background:var(--bg-3); display:flex; align-items:center; justify-content:center; overflow:hidden; flex-shrink:0;">
+            <div id="edit_guru_foto_preview" style="width:40px; height:40px; border-radius:50%; border:1.5px solid rgba(0,0,0,0.15); background:var(--bg-3); display:flex; align-items:center; justify-content:center; overflow:hidden; flex-shrink:0;">
               <img id="edit_guru_foto_img" src="/img/user-default.png" style="width:100%; height:100%; object-fit:cover;" />
             </div>
             <input type="file" name="foto" id="inputFotoGuruEdit" accept="image/*" onchange="initPhotoCrop(this, 'edit_guru_foto_img', '1:1', 'Potong Foto Profil Guru')" class="input-field" style="flex:1;" />
@@ -596,7 +661,7 @@
   <div class="modal-card" style="max-width:480px; padding:24px;">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
       <h3 style="font-size:17px; font-weight:900; color:var(--text); margin:0;">
-        <i class="bi bi-person-lock" style="color:var(--gold);"></i> Atur Akun Login Pengguna
+        <i class="bi bi-person-lock" style="color:#000000;"></i> Atur Akun Login Pengguna
       </h3>
       <button type="button" class="btn btn-sm btn-outline" onclick="closeModal('akunGuruModal')"><i class="bi bi-x-lg"></i></button>
     </div>
@@ -610,13 +675,19 @@
       @csrf
       <div style="display:flex; flex-direction:column; gap:12px;">
         <div>
-          <label class="form-label" style="font-weight:700; font-size:12px; display:block; margin-bottom:4px;">Email Akun Login <span style="color:var(--red);">*</span></label>
-          <input type="email" id="akun_email" name="email" required class="input-field" style="width:100%;" />
+          <label class="form-label" style="font-weight:700; font-size:12px; display:block; margin-bottom:4px;">Nickname / Username Login <span style="color:var(--red);">*</span></label>
+          <input type="text" id="akun_username" name="username" required class="input-field" placeholder="Contoh: sugeng, agihusni, atau NIP" style="width:100%;" />
+          <span style="font-size:10.5px; color:var(--text-3); margin-top:2px; display:block;">Bisa berupa nama panggilan (contoh: agihusni, sugeng, budi), inisial, atau NIP tanpa spasi. <strong>Tidak wajib menggunakan email</strong>.</span>
+        </div>
+
+        <div>
+          <label class="form-label" style="font-weight:700; font-size:12px; display:block; margin-bottom:4px;">Email (Opsional / Tidak Wajib)</label>
+          <input type="email" id="akun_email" name="email" class="input-field" placeholder="Boleh dikosongkan (tidak wajib)" style="width:100%;" />
         </div>
 
         <div>
           <label class="form-label" style="font-weight:700; font-size:12px; display:block; margin-bottom:4px;">Kata Sandi (Password)</label>
-          <input type="password" id="akun_password" name="password" class="input-field" placeholder="Minimal 6 karakter" style="width:100%;" />
+          <input type="password" id="akun_password" name="password" class="input-field" placeholder="Minimal 4 karakter" style="width:100%;" />
           <span style="font-size:10.5px; color:var(--text-3); margin-top:2px; display:block;" id="akun_password_hint">Biarkan kosong jika tidak ingin mengubah password lama.</span>
         </div>
 
@@ -652,21 +723,21 @@
   <div class="modal-card" style="max-width:520px; padding:24px;">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
       <h3 style="font-size:17px; font-weight:900; color:var(--text); margin:0;">
-        <i class="bi bi-file-earmark-arrow-up-fill" style="color:var(--gold);"></i> Import Data Guru &amp; Pegawai
+        <i class="bi bi-file-earmark-arrow-up-fill" style="color:#000000;"></i> Import Data Guru &amp; Pegawai
       </h3>
       <button type="button" class="btn btn-sm btn-outline" onclick="closeModal('importGuruModal')"><i class="bi bi-x-lg"></i></button>
     </div>
 
     <div style="background:var(--surface); border:1px solid var(--border-2); border-radius:12px; padding:12px 14px; margin-bottom:16px; font-size:12px; line-height:1.5;">
-      <div style="font-weight:800; color:var(--gold); display:flex; align-items:center; gap:6px; margin-bottom:4px;">
+      <div style="font-weight:800; color:#000000; display:flex; align-items:center; gap:6px; margin-bottom:4px;">
         <i class="bi bi-info-circle-fill"></i> Format Kolom CSV Fleksibel
       </div>
       <div style="color:var(--text-2);">
         Sistem otomatis mengenali format kolom (Nama, NIP, Jabatan/Mapel, Status Kepegawaian, dan No WhatsApp).
       </div>
       <div style="margin-top:8px;">
-        <a href="{{ route('guru.template-csv') }}" class="btn btn-sm btn-outline" style="font-weight:700; font-size:11.5px; display:inline-flex; align-items:center; gap:6px; background:var(--bg-2);">
-          <i class="bi bi-download" style="color:var(--gold);"></i> Unduh Contoh Template CSV Guru
+        <a href="{{ route('guru.template-csv') }}" class="btn btn-sm btn-outline-mono" style="font-weight:800; font-size:11.5px; display:inline-flex; align-items:center; gap:6px; background:var(--bg-2); text-decoration:none;">
+          <i class="bi bi-download" style="color:#000000;"></i> Unduh Contoh Template CSV Guru
         </a>
       </div>
     </div>
@@ -707,7 +778,12 @@
     const show = (forceState !== undefined) ? forceState : isHidden;
     
     panel.style.display = show ? 'block' : 'none';
-    text.innerText = show ? 'Tutup Form' : '+ Tambah Guru';
+    if (text) {
+      text.innerText = show ? 'Tutup Form' : 'Tambah Guru';
+    }
+    if (show) {
+      panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
   }
 
   function openEditGuru(guru) {
@@ -741,8 +817,9 @@
     const delContainer = document.getElementById('akunDeleteBtnContainer');
     
     if (guru.user) {
-      document.getElementById('akun_email').value = guru.user.email;
-      document.getElementById('akun_role').value = guru.user.role;
+      document.getElementById('akun_username').value = guru.user.username || (guru.user.email ? guru.user.email.split('@')[0] : (guru.nip || ''));
+      document.getElementById('akun_email').value = guru.user.email || '';
+      document.getElementById('akun_role').value = guru.user.role || 'guru';
       document.getElementById('akun_password').value = '';
       document.getElementById('akun_password_hint').style.display = 'block';
       form.action = '/guru/' + guru.id + '/akun';
@@ -753,8 +830,11 @@
         </form>
       `;
     } else {
-      let defaultEmail = guru.nama.toLowerCase().replace(/[^a-z0-9]/g, '.').replace(/\.+/g, '.').replace(/^\.|\.$/g, '') + '@smkn1airnaningan.sch.id';
-      document.getElementById('akun_email').value = defaultEmail;
+      let cleanName = (guru.nama || '').toLowerCase().replace(/[^a-z0-9]/g, ' ').trim();
+      let defaultUsername = guru.nip ? guru.nip : (cleanName.split(/\s+/)[0] || 'guru');
+      
+      document.getElementById('akun_username').value = defaultUsername;
+      document.getElementById('akun_email').value = '';
 
       const jab = (guru.jabatan || '').toLowerCase();
       let defaultRole = 'guru';
@@ -780,6 +860,8 @@
   function closeModal(id) { document.getElementById(id).classList.remove('active'); }
 </script>
 
-@include('partials.face_enroll_modal')
+@if($isAdmin || $isStafTu)
+  @include('partials.rfid_pair_modal')
+@endif
 </body>
 </html>

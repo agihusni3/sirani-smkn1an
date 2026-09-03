@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Daftar Siswa Terdaftar {{ $rombel ? '- ' . $rombel->nama_rombel : '' }} - SMKN 1 Air Naningan</title>
+  <title>Daftar Siswa Terdaftar {{ !empty($rombel) ? '- ' . $rombel->nama_rombel : '' }} - SMKN 1 Air Naningan</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
@@ -20,16 +20,19 @@
       padding: 0;
     }
     body {
-      background-color: #525659;
+      background-color: #334155;
       font-family: 'Times New Roman', Times, serif;
       color: #000000;
       font-size: 10pt;
       line-height: 1.35;
       -webkit-font-smoothing: antialiased;
+      margin: 0;
+      padding: 20px 0 40px;
+      min-height: 100vh;
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 24px 0 40px;
+      overflow-x: auto;
     }
     .print-actions-bar {
       width: 210mm;
@@ -38,13 +41,14 @@
       border: 1px solid #334155;
       border-radius: 12px;
       padding: 12px 18px;
-      margin-bottom: 18px;
+      margin-bottom: 16px;
       box-shadow: 0 10px 25px -5px rgba(0,0,0,0.4);
       display: flex;
       justify-content: space-between;
       align-items: center;
       flex-wrap: wrap;
       gap: 10px;
+      box-sizing: border-box;
     }
     .print-title-info {
       color: #FFFFFF;
@@ -100,15 +104,64 @@
       gap: 6px;
       text-decoration: none;
     }
+    .print-sheet-wrapper {
+      width: 100%;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      display: flex;
+      justify-content: center;
+      padding-bottom: 30px;
+    }
 
     /* KERTAS A4 PORTRAIT */
     .a4-sheet {
       width: 210mm;
+      min-width: 210mm;
       min-height: 297mm;
       background: #FFFFFF;
       padding: 12mm 15mm 15mm 15mm;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-      position: relative;
+      box-shadow: 0 4px 25px rgba(0,0,0,0.35);
+      box-sizing: border-box;
+      margin: 0 auto;
+    }
+
+    @media (max-width: 820px) {
+      body {
+        padding: 10px 0 30px;
+        align-items: stretch;
+      }
+      .print-actions-bar {
+        width: calc(100% - 16px);
+        margin: 0 8px 14px;
+        position: sticky;
+        top: 6px;
+        z-index: 1000;
+        padding: 10px 14px;
+      }
+      .print-title-info {
+        font-size: 12px;
+      }
+      .btn-action-group {
+        width: 100%;
+        display: flex;
+        gap: 8px;
+      }
+      .btn-back {
+        flex: 1;
+        justify-content: center;
+        padding: 8px 10px;
+        font-size: 12px;
+      }
+      .btn-print {
+        flex: 1.5;
+        justify-content: center;
+        padding: 8px 12px;
+        font-size: 12px;
+      }
+      .print-sheet-wrapper {
+        justify-content: flex-start;
+        padding: 0 8px 30px;
+      }
     }
 
     /* KOP SURAT DINAS */
@@ -142,7 +195,7 @@
     .kop-text {
       flex: 1;
       text-align: center;
-      padding: 0 6px;
+      padding: 0 8px;
       margin: 0;
       min-width: 0;
     }
@@ -200,18 +253,24 @@
     /* TABEL DATA */
     .table-data {
       width: 100%;
+      table-layout: fixed;
       border-collapse: collapse;
-      font-size: 9pt;
+      font-size: 8.5pt;
       margin-bottom: 16px;
+      word-wrap: break-word;
     }
     .table-data th, .table-data td {
       border: 1px solid #000000;
-      padding: 3px 5px;
+      padding: 4px 6px;
+      vertical-align: middle;
+      word-break: break-word;
+      overflow: hidden;
     }
     .table-data th {
       background-color: #F1F5F9;
       text-align: center;
       font-weight: 700;
+      font-size: 8.5pt;
     }
     .table-data td.text-center {
       text-align: center;
@@ -235,7 +294,7 @@
       padding: 4px;
     }
     .ttd-space {
-      height: 48px;
+      height: 50px;
     }
     .ttd-name {
       font-weight: 700;
@@ -264,10 +323,27 @@
   <div class="print-actions-bar no-print">
     <div class="print-title-info">
       <i class="bi bi-file-earmark-pdf-fill" style="color:#FACC15; font-size:18px;"></i>
-      <span>Daftar Peserta Didik Terdaftar (Buku Induk A4)</span>
+      <span>Daftar Siswa (Format Standar A4)</span>
       <span class="badge-a4">A4 Portrait</span>
+      @if(!empty($selectedIds))
+        <span style="background:#22C55E; color:#FFFFFF; font-size:11px; font-weight:800; padding:2px 8px; border-radius:12px; margin-left:6px; display:inline-flex; align-items:center; gap:4px;">
+          <i class="bi bi-check-circle-fill"></i> {{ $siswas->count() }} Siswa Terpilih
+        </span>
+      @endif
     </div>
-    <div class="btn-action-group">
+    <div class="btn-action-group" style="display:flex; align-items:center; gap:8px;">
+      {{-- Filter Rombel --}}
+      @if(!empty($rombels))
+        <select class="select-rombel-tool" onchange="location.href='{{ url('/siswa/cetak-pdf') }}' + (this.value ? '?rombel_id=' + this.value : '')" style="background:#1E293B; color:#FFFFFF; border:1px solid rgba(255,255,255,0.25); padding:6px 12px; border-radius:6px; font-size:12px; font-weight:700; outline:none; cursor:pointer;">
+          <option value="">-- Semua Rombel ({{ $siswas->count() }} Siswa) --</option>
+          @foreach($rombels as $r)
+            <option value="{{ $r->id }}" {{ ($rombelId == $r->id) ? 'selected' : '' }}>
+              {{ $r->nama_rombel }}
+            </option>
+          @endforeach
+        </select>
+      @endif
+
       <a href="{{ url('/siswa') }}" class="btn-back">
         <i class="bi bi-arrow-left"></i> Kembali ke Data Siswa
       </a>
@@ -277,8 +353,9 @@
     </div>
   </div>
 
-  {{-- LEMBAR A4 RESMI --}}
-  <div class="a4-sheet">
+  {{-- WRAPPER LEMBAR A4 RESMI --}}
+  <div class="print-sheet-wrapper">
+    <div class="a4-sheet">
 
     {{-- KOP SURAT DINAS --}}
     <div class="kop-container">
@@ -308,8 +385,8 @@
     <div class="judul-laporan">
       <h2>DAFTAR PESERTA DIDIK TERDAFTAR</h2>
       <div class="sub-judul">
-        {{ $rombel ? 'Kelas / Rombel: ' . $rombel->nama_rombel . ' (' . ($rombel->jurusan->nama_jurusan ?? '-') . ')' : 'Seluruh Rombel & Tingkat Kelas' }}
-        · Tahun Pelajaran 2026/2027
+        {{ !empty($rombel) ? 'Kelas / Rombel: ' . $rombel->nama_rombel . (!empty($rombel->jurusan->nama_jurusan) ? ' (' . $rombel->jurusan->nama_jurusan . ')' : '') : 'Seluruh Rombel & Tingkat Kelas' }}
+        · Tahun Pelajaran {{ $sekolah->tahun_ajaran_aktif ?? '2026/2027' }}
       </div>
     </div>
 
@@ -318,31 +395,29 @@
       <thead>
         <tr>
           <th style="width:4%;">No</th>
-          <th style="width:13%;">NIS</th>
-          <th style="width:13%;">NISN</th>
-          <th>Nama Lengkap Siswa</th>
-          <th style="width:18%;">Orang Tua / Wali</th>
-          <th style="width:14%;">Kontak WhatsApp</th>
-          <th style="width:10%;">Kelas</th>
-          <th style="width:8%;">Status</th>
+          <th style="width:14%;">NISN</th>
+          <th style="width:22%;">Nama Lengkap Siswa</th>
+          <th style="width:15%;">No. WA Siswa</th>
+          <th style="width:17%;">Orang Tua / Wali</th>
+          <th style="width:15%;">No. WA Ortu</th>
+          <th style="width:13%;">Kelas</th>
         </tr>
       </thead>
       <tbody>
         @forelse($siswas as $idx => $s)
-          @php $sr = $s->siswaRombel->firstWhere('status_keanggotaan', 'aktif'); @endphp
+          @php $sr = $s->siswaRombels->firstWhere('status_keanggotaan', 'aktif'); @endphp
           <tr>
             <td class="text-center">{{ $idx + 1 }}</td>
-            <td class="text-center" style="font-family:'JetBrains Mono', monospace; font-weight:600;">{{ $s->nis }}</td>
-            <td class="text-center" style="font-family:'JetBrains Mono', monospace;">{{ $s->nisn ?? '-' }}</td>
+            <td class="text-center" style="font-family:'JetBrains Mono', monospace; font-size:8.5pt; font-weight:700;">{{ $s->nisn ?? '-' }}</td>
             <td><strong>{{ $s->nama }}</strong></td>
-            <td>{{ $s->nama_ortu ?: '-' }}</td>
-            <td class="text-center" style="font-family:'JetBrains Mono', monospace;">{{ $s->no_hp_ortu ?: '-' }}</td>
-            <td class="text-center">{{ $sr->rombel->nama_rombel ?? '-' }}</td>
-            <td class="text-center">{{ strtoupper($s->status) }}</td>
+            <td class="text-center" style="font-family:'JetBrains Mono', monospace; font-size:8pt;">{{ $s->no_hp ?: '-' }}</td>
+            <td style="font-size:8pt;">{{ $s->nama_ortu ?: '-' }}</td>
+            <td class="text-center" style="font-family:'JetBrains Mono', monospace; font-size:8pt;">{{ $s->no_hp_ortu ?: '-' }}</td>
+            <td class="text-center" style="font-size:8pt; font-weight:700;">{{ $sr->rombel->nama_rombel ?? '-' }}</td>
           </tr>
         @empty
           <tr>
-            <td colspan="8" class="text-center" style="padding:16px; color:#666;">Tidak ada data siswa terdaftar.</td>
+            <td colspan="7" class="text-center" style="padding:16px; color:#666;">Tidak ada data siswa terdaftar.</td>
           </tr>
         @endforelse
       </tbody>
@@ -374,6 +449,7 @@
       </table>
     </div>
 
+  </div>
   </div>
 
 </body>

@@ -71,7 +71,7 @@ class NotifikasiController extends Controller
                   ->orWhere('judul', 'like', "%{$search}%")
                   ->orWhereHas('siswa', function ($sq) use ($search) {
                       $sq->where('nama', 'like', "%{$search}%")
-                         ->orWhere('nis', 'like', "%{$search}%");
+                         ->orWhere('nisn', 'like', "%{$search}%");
                   });
             });
         }
@@ -286,7 +286,7 @@ class NotifikasiController extends Controller
         ]);
 
         $dummySiswa = Siswa::first() ?? Siswa::create([
-            'nis'   => '999999',
+            'nisn'  => '9999990001',
             'nama'  => 'Siswa Percobaan',
             'status'=> 'aktif',
         ]);

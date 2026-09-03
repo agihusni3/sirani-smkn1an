@@ -11,13 +11,13 @@ class GuruController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Guru::with(['user', 'rombels']);
+        $query = Guru::with(['user', 'rombels.tahunAjaran', 'kartuRfid']);
 
         $search = $request->input('q');
         $kategori = $request->input('kategori'); // wali_kelas, bk, pimpinan, staf, guru
-        $kepegawaian = $request->input('kepegawaian'); // pns, pppk, honor, tendik
+        $kepegawaian = $request->input('kepegawaian') ?: $request->input('jenis'); // pns, pppk, honor, tendik
         $status = $request->input('status'); // aktif, nonaktif
-        $biometrikStatus = $request->input('face_id', $request->input('rfid')); // Filter Face ID: ada, belum
+        $rfidFilter = $request->input('rfid'); // Filter RFID: ada, belum
 
         if ($search) {
             $query->where(function ($q) use ($search) {
@@ -39,10 +39,11 @@ class GuruController extends Controller
             $query->where('jenis_kepegawaian', $kepegawaian);
         }
 
-        if ($biometrikStatus === 'ada') {
-            $query->whereNotNull('face_embedding');
-        } elseif ($biometrikStatus === 'belum') {
-            $query->whereNull('face_embedding');
+
+        if ($rfidFilter === 'ada') {
+            $query->whereHas('kartuRfid');
+        } elseif ($rfidFilter === 'belum') {
+            $query->whereDoesntHave('kartuRfid');
         }
 
         if ($kategori === 'wali_kelas') {
@@ -67,9 +68,12 @@ class GuruController extends Controller
             });
         }
 
-        // Sorting
-        $sort = $request->input('sort', 'nama_asc');
+        // Sorting (Default: Hirarki Jabatan Organisasi)
+        $sort = $request->input('sort', 'hirarki');
         switch ($sort) {
+            case 'nama_asc':
+                $query->orderBy('nama', 'asc');
+                break;
             case 'nama_desc':
                 $query->orderBy('nama', 'desc');
                 break;
@@ -82,9 +86,20 @@ class GuruController extends Controller
             case 'terbaru':
                 $query->orderBy('created_at', 'desc');
                 break;
-            case 'nama_asc':
+            case 'hirarki':
             default:
-                $query->orderBy('nama', 'asc');
+                $query->orderByRaw("
+                    CASE 
+                        WHEN jabatan LIKE '%Kepala Sekolah%' THEN 1
+                        WHEN jabatan LIKE '%Waka%' OR jabatan LIKE '%Wakil%' THEN 2
+                        WHEN jabatan LIKE '%Kaprog%' OR jabatan LIKE '%Ketua%' THEN 3
+                        WHEN jabatan LIKE '%BK%' OR jabatan LIKE '%Bimbingan%' THEN 4
+                        WHEN jabatan LIKE '%Wali Kelas%' THEN 5
+                        WHEN jabatan LIKE '%Guru%' THEN 6
+                        WHEN jabatan LIKE '%Tata Usaha%' OR jabatan LIKE '%TU%' OR jabatan LIKE '%Staf%' OR jabatan LIKE '%Operator%' OR jabatan LIKE '%Tendik%' THEN 7
+                        ELSE 8
+                    END ASC, nama ASC
+                ");
                 break;
         }
 
@@ -94,7 +109,7 @@ class GuruController extends Controller
         $statTotal = Guru::count();
         $statWali = Guru::whereHas('rombels')->count();
         $statAkun = Guru::whereHas('user')->count();
-        $rfidStatus = $biometrikStatus;
+        $rfidStatus = $rfidFilter;
 
         return view('guru.index', compact('gurus', 'statTotal', 'statWali', 'statAkun', 'search', 'kategori', 'kepegawaian', 'status', 'rfidStatus', 'sort'));
     }
@@ -130,7 +145,22 @@ class GuruController extends Controller
         ]);
 
         if ($request->filled('email_akun') && $request->filled('password_akun')) {
-            $role = ($request->input('jabatan') === 'Kepala Sekolah') ? 'kepala_sekolah' : 'guru';
+            $jabatanLower = strtolower($request->input('jabatan', ''));
+            $defaultRole = 'guru';
+            if (str_contains($jabatanLower, 'kepala sekolah')) {
+                $defaultRole = 'kepala_sekolah';
+            } elseif (str_contains($jabatanLower, 'waka kesiswaan') || str_contains($jabatanLower, 'wakil kepala sekolah bidang kesiswaan')) {
+                $defaultRole = 'waka_kesiswaan';
+            } elseif (str_contains($jabatanLower, 'waka kurikulum') || str_contains($jabatanLower, 'wakil kepala sekolah bidang kurikulum') || str_contains($jabatanLower, 'kurikulum')) {
+                $defaultRole = 'waka_kurikulum';
+            } elseif (str_contains($jabatanLower, 'bimbingan konseling') || str_contains($jabatanLower, 'bk')) {
+                $defaultRole = 'guru_bk';
+            } elseif (str_contains($jabatanLower, 'tata usaha') || str_contains($jabatanLower, 'tu') || str_contains($jabatanLower, 'tendik')) {
+                $defaultRole = 'staf_tu';
+            }
+
+            $role = $request->input('role_akun') ?: ($request->input('role') ?: $defaultRole);
+
             User::create([
                 'name' => $guru->nama,
                 'email' => $request->input('email_akun'),
@@ -209,7 +239,7 @@ class GuruController extends Controller
             fprintf($file, chr(0xEF).chr(0xBB).chr(0xBF)); // BOM UTF-8
             fwrite($file, "sep=;\n");
 
-            fputcsv($file, ['No', 'NIP', 'Nama Guru / Pegawai', 'Jabatan / Peran', 'No HP / WhatsApp', 'Status Kepegawaian', 'Biometrik Wajah AI'], ';');
+            fputcsv($file, ['No', 'NIP', 'Nama Guru / Pegawai', 'Jabatan / Peran', 'No HP / WhatsApp', 'Status Kepegawaian'], ';');
 
             foreach ($gurus as $idx => $g) {
                 fputcsv($file, [
@@ -219,7 +249,6 @@ class GuruController extends Controller
                     $g->jabatan,
                     $g->no_hp ? '="' . $g->no_hp . '"' : '-',
                     strtoupper($g->status),
-                    $g->face_embedding ? 'Terdaftar AI' : 'Belum Rekam',
                 ], ';');
             }
             fclose($file);
@@ -493,45 +522,69 @@ class GuruController extends Controller
     }
 
     /**
-     * Buat atau perbarui akun login (Email & Password) untuk Guru / Kepala Sekolah.
+     * Buat atau perbarui akun login (Nickname, Username & Password) untuk Guru / Staf.
      */
     public function storeAkun(Request $request, $id)
     {
         $guru = Guru::findOrFail($id);
 
+        // Jika username/nickname tidak diisi, buat otomatis dari input / NIP / nama guru
+        $usernameInput = $request->input('username') ?: $request->input('nickname');
+        if (empty($usernameInput)) {
+            if ($request->filled('email')) {
+                $usernameInput = explode('@', $request->input('email'))[0];
+            } elseif (!empty($guru->nip)) {
+                $usernameInput = $guru->nip;
+            } else {
+                $usernameInput = Str::slug($guru->nama, '');
+            }
+        }
+        $username = strtolower(trim(preg_replace('/\s+/', '', (string)$usernameInput)));
+        $request->merge(['username' => $username]);
+
         $userId = $guru->user ? $guru->user->id : null;
         $request->validate([
-            'email'    => 'required|email|unique:users,email,' . ($userId ?? 'NULL') . ',id',
-            'password' => $userId ? 'nullable|min:6' : 'required|min:6',
+            'username' => 'required|string|max:100|unique:users,username,' . ($userId ?? 'NULL') . ',id',
+            'email'    => 'nullable|email|max:255|unique:users,email,' . ($userId ?? 'NULL') . ',id',
+            'password' => $userId ? 'nullable|min:4' : 'required|min:4',
             'role'     => 'nullable|in:admin,kepala_sekolah,waka_kesiswaan,waka_kurikulum,guru_bk,wali_kelas,guru_piket,staf_tu,guru',
+        ], [
+            'username.required' => 'Nickname / Username login wajib diisi.',
+            'username.unique'   => 'Nickname / Username ini sudah digunakan oleh akun lain.',
+            'email.unique'      => 'Email ini sudah terdaftar pada akun lain.',
+            'password.required' => 'Kata sandi wajib diisi (minimal 4 karakter).',
+            'password.min'      => 'Kata sandi minimal 4 karakter.',
         ]);
 
         $defaultRole = ($guru->jabatan === 'Kepala Sekolah') ? 'kepala_sekolah' : 'guru';
         $role = $request->input('role') ?: $defaultRole;
+        $email = $request->filled('email') ? trim($request->input('email')) : ($username . '@sirani.local');
 
         if ($guru->user) {
             $updateData = [
-                'name'  => $guru->nama,
-                'email' => $request->input('email'),
-                'role'  => $role,
+                'name'     => $guru->nama,
+                'username' => $username,
+                'email'    => $email,
+                'role'     => $role,
             ];
             if ($request->filled('password')) {
                 $updateData['password'] = Hash::make($request->input('password'));
             }
             $guru->user->update($updateData);
 
-            return redirect()->back()->with('success', "Akun login untuk {$guru->nama} berhasil diperbarui.");
+            return redirect()->back()->with('success', "Akun login untuk {$guru->nama} berhasil diperbarui (Nickname/Username: {$username}).");
         }
 
         User::create([
             'name'     => $guru->nama,
-            'email'    => $request->input('email'),
+            'username' => $username,
+            'email'    => $email,
             'password' => Hash::make($request->input('password')),
             'guru_id'  => $guru->id,
             'role'     => $role,
         ]);
 
-        return redirect()->back()->with('success', "Akun login baru untuk {$guru->nama} berhasil dibuat.");
+        return redirect()->back()->with('success', "Akun login baru untuk {$guru->nama} berhasil dibuat (Nickname/Username: {$username}).");
     }
 
     /**

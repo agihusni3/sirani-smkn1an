@@ -30,7 +30,6 @@ class SiklusSiswaController extends Controller
         if ($search) {
             $query->where(function ($q) use ($search) {
                 $q->where('nama', 'like', "%{$search}%")
-                  ->orWhere('nis', 'like', "%{$search}%")
                   ->orWhere('nisn', 'like', "%{$search}%")
                   ->orWhereHas('siswaRombel.rombel', function ($rq) use ($search) {
                       $rq->where('nama_rombel', 'like', "%{$search}%");
@@ -52,11 +51,11 @@ class SiklusSiswaController extends Controller
             case 'nama_desc':
                 $query->orderBy('nama', 'desc');
                 break;
-            case 'nis_asc':
-                $query->orderBy('nis', 'asc');
+            case 'nisn_asc':
+                $query->orderBy('nisn', 'asc');
                 break;
-            case 'nis_desc':
-                $query->orderBy('nis', 'desc');
+            case 'nisn_desc':
+                $query->orderBy('nisn', 'desc');
                 break;
             case 'terbaru':
                 $query->orderBy('created_at', 'desc');

@@ -34,5 +34,9 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        //
+        $exceptions->render(function (\Illuminate\Http\Exceptions\PostTooLargeException $e, $request) {
+            if ($request->is('backup*')) {
+                return redirect()->route('admin.backup.index')->with('error', 'Ukuran file yang diunggah melebihi batas upload HTTP server. Silakan gunakan tombol "Pulihkan" langsung dari tabel Arsip Cadangan Server di bawah (Instan 1 detik).');
+            }
+        });
     })->create();

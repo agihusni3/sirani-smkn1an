@@ -29,83 +29,104 @@
     @php
       $currentUser = auth()->user();
       $isAdmin = $currentUser && $currentUser->isAdmin();
+      $isWakaKurikulum = $currentUser && $currentUser->isWakaKurikulum();
+      $isStafTu = $currentUser && $currentUser->isStafTu();
+      $canManageRombel = $isAdmin || $isWakaKurikulum || $isStafTu;
     @endphp
 
-    <header class="header">
-      <div class="header-title">
-        <h1><i class="bi bi-building" style="color:var(--gold); margin-right:8px;"></i>Rombel &amp; Jurusan</h1>
-        <p>Kelola rombel kelas, program keahlian (jurusan), tahun ajaran, dan penugasan wali kelas</p>
+    {{-- ULTRA COMPACT SLIM HEADER BAR --}}
+    <div class="panel no-print" style="background:var(--bg-2); border:1px solid var(--border); padding:10px 16px; margin-bottom:12px; border-radius:var(--r-md); box-shadow:var(--shadow-sm);">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+        <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+          <h1 style="margin:0; font-size:16px; font-weight:900; color:var(--text); display:inline-flex; align-items:center; gap:6px;">
+            <i class="bi bi-building" style="color:#000000; font-size:16px;"></i> Rombel &amp; Jurusan
+          </h1>
+          <span style="color:var(--border-2); font-weight:300;">|</span>
+          <span style="font-size:11.5px; color:var(--text-3);">
+            Kelola rombel kelas, jurusan, &amp; wali kelas
+          </span>
+        </div>
+
+        <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+          @if($canManageRombel)
+            <button type="button" id="btnToggleTambahRombel" onclick="toggleTambahRombel()" class="btn btn-sm btn-gold" style="height:32px; padding:0 12px; font-size:11.5px; font-weight:800; display:inline-flex; align-items:center; gap:5px; border-radius:6px; cursor:pointer;">
+              <i class="bi bi-plus-circle-fill" id="iconToggleTambahRombel"></i>
+              <span id="textToggleTambahRombel">Tambah Rombel</span>
+            </button>
+            <button type="button" onclick="openModal('modalJurusan')" class="btn btn-sm btn-outline" style="height:32px; padding:0 10px; font-size:11.5px; font-weight:800; color:#000000; border:1px solid var(--border-2); background:var(--bg-2); display:inline-flex; align-items:center; gap:4px; border-radius:6px;">
+              <i class="bi bi-mortarboard-fill" style="color:#000000;"></i> Jurusan ({{ $jurusans->count() }})
+            </button>
+            <button type="button" onclick="openModal('modalTahunAjaran')" class="btn btn-sm btn-outline" style="height:32px; padding:0 10px; font-size:11.5px; font-weight:800; color:#000000; border:1px solid var(--border-2); background:var(--bg-2); display:inline-flex; align-items:center; gap:4px; border-radius:6px;">
+              <i class="bi bi-calendar-range-fill" style="color:#000000;"></i> T.A. ({{ $tahunAjarans->count() }})
+            </button>
+          @endif
+          @include('partials.header_actions')
+        </div>
       </div>
-      @include('partials.header_actions')
-    </header>
+    </div>
 
     @if(session('success'))
-      <div class="alert-success" style="margin-bottom:20px;">
+      <div class="alert-success" style="margin-bottom:12px;">
         <i class="bi bi-check-circle-fill" style="margin-right:6px;"></i>{{ session('success') }}
       </div>
     @endif
 
     @if(session('error'))
-      <div class="alert-error" style="margin-bottom:20px;">
+      <div class="alert-error" style="margin-bottom:12px;">
         <i class="bi bi-exclamation-triangle-fill" style="margin-right:6px;"></i>{{ session('error') }}
       </div>
     @endif
 
     @if(isset($errors) && $errors->any())
-      <div class="alert-error" style="margin-bottom:20px;">
+      <div class="alert-error" style="margin-bottom:12px;">
         @foreach($errors->all() as $err)
           <div><i class="bi bi-x-circle-fill" style="margin-right:6px;"></i>{{ $err }}</div>
         @endforeach
       </div>
     @endif
 
-    {{-- Panel Tambah Rombel (Hanya Admin) --}}
-    @if($isAdmin)
-    <div class="panel" style="margin-bottom:24px;">
-      <div class="panel-title" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:18px;">
+    {{-- Panel Tambah Rombel (Collapsible / Triggered) --}}
+    @if($canManageRombel)
+    <div class="panel" id="panelTambahRombel" style="{{ (isset($errors) && $errors->any()) ? 'display:block;' : 'display:none;' }} margin-bottom:20px; border-color:var(--border); background:var(--bg-2);">
+      <div class="panel-title" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; padding-bottom:10px; border-bottom:1px solid var(--border);">
         <div style="display:flex; align-items:center; gap:8px;">
-          <i class="bi bi-plus-circle-fill" style="color:var(--gold);"></i>
-          <span>Tambah Rombel Kelas Baru</span>
+          <i class="bi bi-plus-circle-fill" style="color:#000000;"></i>
+          <span style="font-weight:800; font-size:14.5px; color:var(--text);">Tambah Rombel Kelas Baru</span>
         </div>
-        <div style="display:flex; gap:8px; align-items:center;">
-          <button type="button" onclick="openModal('modalJurusan')" class="btn-badge-action btn-outline">
-            <i class="bi bi-mortarboard-fill" style="color:var(--gold);"></i> Kelola Jurusan ({{ $jurusans->count() }})
-          </button>
-          <button type="button" onclick="openModal('modalTahunAjaran')" class="btn-badge-action btn-outline">
-            <i class="bi bi-calendar-range-fill" style="color:var(--gold);"></i> Kelola Tahun Ajaran ({{ $tahunAjarans->count() }})
-          </button>
-        </div>
+        <button type="button" onclick="toggleTambahRombel(false)" class="btn btn-outline" style="height:30px; width:30px; padding:0; display:inline-flex; align-items:center; justify-content:center; border-radius:6px; color:var(--text-3);" title="Tutup Form">
+          <i class="bi bi-x-lg"></i>
+        </button>
       </div>
 
       <form action="/rombel" method="POST">
         @csrf
-        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap:16px 20px; align-items:flex-end;">
-          <div class="form-group">
-            <label>Tahun Ajaran <span style="color:var(--red);">*</span></label>
-            <select name="tahun_ajaran_id" required style="width:100%; height:42px;">
+        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap:12px; align-items:flex-end;">
+          <div class="form-group" style="margin-bottom:0;">
+            <label style="font-size:11px; font-weight:800; text-transform:uppercase; color:var(--text-2); margin-bottom:4px; display:block;">Tahun Ajaran <span style="color:var(--red);">*</span></label>
+            <select name="tahun_ajaran_id" required class="input-field" style="width:100%; height:34px; font-size:12px; padding:0 8px;">
               @foreach($tahunAjarans as $ta)
                 <option value="{{ $ta->id }}" {{ $ta->is_active ? 'selected' : '' }}>{{ $ta->nama }} @if($ta->is_active)(Aktif)@endif</option>
               @endforeach
             </select>
           </div>
 
-          <div class="form-group">
-            <label>Tingkat <span style="color:var(--red);">*</span></label>
-            <select name="tingkat" id="rombel_tingkat" required style="width:100%; height:42px;" onchange="generateNamaRombel()">
+          <div class="form-group" style="margin-bottom:0;">
+            <label style="font-size:11px; font-weight:800; text-transform:uppercase; color:var(--text-2); margin-bottom:4px; display:block;">Tingkat <span style="color:var(--red);">*</span></label>
+            <select name="tingkat" id="rombel_tingkat" required class="input-field" style="width:100%; height:34px; font-size:12px; padding:0 8px;" onchange="generateNamaRombel()">
               <option value="X">X (Sepuluh)</option>
               <option value="XI">XI (Sebelas)</option>
               <option value="XII">XII (Dua Belas)</option>
             </select>
           </div>
 
-          <div class="form-group">
-            <label>Jurusan <span style="color:var(--red);">*</span></label>
+          <div class="form-group" style="margin-bottom:0;">
+            <label style="font-size:11px; font-weight:800; text-transform:uppercase; color:var(--text-2); margin-bottom:4px; display:block;">Jurusan <span style="color:var(--red);">*</span></label>
             @if($jurusans->isEmpty())
-              <button type="button" onclick="openModal('modalJurusan')" class="btn btn-outline" style="width:100%; height:42px; color:var(--red); border-color:var(--red);">
-                <i class="bi bi-plus-circle"></i> Tambah Jurusan Dulu
+              <button type="button" onclick="openModal('modalJurusan')" class="btn btn-outline" style="width:100%; height:34px; color:var(--red); border-color:var(--red); font-size:11.5px;">
+                <i class="bi bi-plus-circle"></i> Tambah Jurusan
               </button>
             @else
-              <select name="jurusan_id" id="rombel_jurusan" required style="width:100%; height:42px;" onchange="generateNamaRombel()">
+              <select name="jurusan_id" id="rombel_jurusan" required class="input-field" style="width:100%; height:34px; font-size:12px; padding:0 8px;" onchange="generateNamaRombel()">
                 @foreach($jurusans as $j)
                   <option value="{{ $j->id }}" data-kode="{{ $j->kode_jurusan }}">{{ $j->kode_jurusan }} — {{ $j->nama_jurusan }}</option>
                 @endforeach
@@ -113,14 +134,14 @@
             @endif
           </div>
 
-          <div class="form-group">
-            <label>Nama Rombel <span style="color:var(--red);">*</span></label>
-            <input type="text" name="nama_rombel" id="rombel_nama_output" required placeholder="Contoh: X RPL 1" style="width:100%; font-family:var(--font-mono); font-weight:800; color:var(--gold); background:var(--bg-2); height:42px;" />
+          <div class="form-group" style="margin-bottom:0;">
+            <label style="font-size:11px; font-weight:800; text-transform:uppercase; color:var(--text-2); margin-bottom:4px; display:block;">Nama Rombel <span style="color:var(--red);">*</span></label>
+            <input type="text" name="nama_rombel" id="rombel_nama_output" required placeholder="Contoh: X RPL 1" class="input-field" style="width:100%; height:34px; font-size:12px; font-family:var(--font-mono); font-weight:800; padding:0 8px;" />
           </div>
 
-          <div class="form-group">
-            <label>Wali Kelas (Opsional)</label>
-            <select name="wali_kelas_id" style="width:100%; height:42px;">
+          <div class="form-group" style="margin-bottom:0;">
+            <label style="font-size:11px; font-weight:800; text-transform:uppercase; color:var(--text-2); margin-bottom:4px; display:block;">Wali Kelas (Opsional)</label>
+            <select name="wali_kelas_id" class="input-field" style="width:100%; height:34px; font-size:12px; padding:0 8px;">
               <option value="">-- Pilih Wali Kelas --</option>
               @foreach($gurus as $g)
                 <option value="{{ $g->id }}">{{ $g->nama }} ({{ $g->nip ?? 'Non-NIP' }})</option>
@@ -129,8 +150,8 @@
           </div>
 
           <div>
-            <button type="submit" class="btn btn-gold" style="width:100%; height:42px; display:inline-flex; align-items:center; justify-content:center; gap:8px; font-weight:800;">
-              <i class="bi bi-save-fill"></i>Simpan Rombel
+            <button type="submit" class="btn btn-gold" style="width:100%; height:34px; display:inline-flex; align-items:center; justify-content:center; gap:6px; font-weight:800; font-size:12px; border-radius:var(--r-sm);">
+              <i class="bi bi-save-fill"></i> Simpan Rombel
             </button>
           </div>
         </div>
@@ -140,92 +161,97 @@
 
     {{-- Panel Daftar Rombel dengan Search & Sort Terpadu --}}
     <div class="panel" style="padding:0; overflow:hidden; border:1px solid var(--border); border-radius:var(--r-md); box-shadow:var(--shadow-sm); background:var(--bg-2); margin-bottom:24px;">
-      <div class="panel-title" style="padding:14px 18px; margin:0; border-bottom:1px solid var(--border); background:var(--surface); display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:14px;">
-        <div style="display:flex; align-items:center; gap:8px; font-weight:800; font-size:15px; color:var(--text);">
-          <i class="bi bi-building" style="color:var(--gold);"></i>
+      <div class="panel-title" style="padding:8px 12px; margin:0; border-bottom:1px solid var(--border); background:var(--surface); display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:8px;">
+        <div style="display:flex; align-items:center; gap:6px; font-weight:800; font-size:13.5px; color:var(--text);">
+          <i class="bi bi-building" style="color:#000000;"></i>
           <span>Daftar Rombel Kelas</span>
+          <span id="rombelCountBadge" style="background:var(--bg-3); border:1px solid var(--border-2); color:var(--text-2); font-size:10.5px; font-weight:700; padding:1px 6px; border-radius:4px;" class="font-mono">
+            {{ $rombels->count() }} Rombel
+          </span>
         </div>
 
         {{-- Search Input --}}
-        <div style="position:relative; width:100%; max-width:300px;">
-          <i class="bi bi-search" style="position:absolute; left:12px; top:50%; transform:translateY(-50%); color:var(--text-3); font-size:12px; pointer-events:none;"></i>
-          <input type="text" id="searchRombel" onkeyup="filterRombelTable()" placeholder="Cari rombel, tingkat, jurusan..." style="width:100%; height:36px; padding-left:34px; font-size:12.5px; background:var(--bg-2); border:1px solid var(--border-2); border-radius:var(--r-sm); color:var(--text);" />
+        <div style="position:relative; width:100%; max-width:260px;">
+          <i class="bi bi-search" style="position:absolute; left:10px; top:50%; transform:translateY(-50%); color:var(--text-3); font-size:11px; pointer-events:none;"></i>
+          <input type="text" id="searchRombel" onkeyup="filterRombelTable()" placeholder="Cari rombel, tingkat..." class="input-field" style="width:100%; height:32px; padding-left:28px; font-size:11.5px; background:var(--bg-2); border:1px solid var(--border-2); border-radius:var(--r-sm); color:var(--text);" />
         </div>
       </div>
 
       <div class="table-responsive" style="overflow-x:auto;">
-        <table class="data-table" id="tableRombel">
+        <table class="data-table" id="tableRombel" style="width:100%; border-collapse:collapse;">
           <thead>
             <tr>
-              <th onclick="sortRombelTable(0)" style="cursor:pointer; user-select:none;" title="Klik untuk mengurutkan">
-                Rombel <i class="bi bi-arrow-down-up" style="margin-left:4px; font-size:11px; opacity:0.7;"></i>
+              <th onclick="sortRombelTable(0)" style="cursor:pointer; user-select:none; white-space:nowrap;" title="Klik untuk mengurutkan">
+                Rombel <i class="bi bi-arrow-down-up" style="margin-left:4px; font-size:10px; opacity:0.7;"></i>
               </th>
-              <th onclick="sortRombelTable(1)" style="cursor:pointer; user-select:none;" title="Klik untuk mengurutkan">
-                Tingkat <i class="bi bi-arrow-down-up" style="margin-left:4px; font-size:11px; opacity:0.7;"></i>
+              <th onclick="sortRombelTable(1)" style="cursor:pointer; user-select:none; white-space:nowrap;" title="Klik untuk mengurutkan">
+                Tingkat <i class="bi bi-arrow-down-up" style="margin-left:4px; font-size:10px; opacity:0.7;"></i>
               </th>
               <th onclick="sortRombelTable(2)" style="cursor:pointer; user-select:none;" title="Klik untuk mengurutkan">
-                Jurusan <i class="bi bi-arrow-down-up" style="margin-left:4px; font-size:11px; opacity:0.7;"></i>
+                Jurusan <i class="bi bi-arrow-down-up" style="margin-left:4px; font-size:10px; opacity:0.7;"></i>
               </th>
               <th onclick="sortRombelTable(3)" style="cursor:pointer; user-select:none;" title="Klik untuk mengurutkan">
-                Wali Kelas <i class="bi bi-arrow-down-up" style="margin-left:4px; font-size:11px; opacity:0.7;"></i>
+                Wali Kelas <i class="bi bi-arrow-down-up" style="margin-left:4px; font-size:10px; opacity:0.7;"></i>
               </th>
-              <th onclick="sortRombelTable(4)" style="cursor:pointer; user-select:none;" title="Klik untuk mengurutkan">
-                Tahun Ajaran <i class="bi bi-arrow-down-up" style="margin-left:4px; font-size:11px; opacity:0.7;"></i>
+              <th onclick="sortRombelTable(4)" style="cursor:pointer; user-select:none; white-space:nowrap;" title="Klik untuk mengurutkan">
+                Tahun Ajaran <i class="bi bi-arrow-down-up" style="margin-left:4px; font-size:10px; opacity:0.7;"></i>
               </th>
-              @if($isAdmin)
-                <th style="text-align:right;">Aksi</th>
+              @if($canManageRombel)
+                <th style="text-align:right; white-space:nowrap;">Aksi</th>
               @endif
             </tr>
           </thead>
           <tbody id="rombelTableBody">
             @forelse($rombels as $r)
               <tr class="rombel-row">
-                <td data-sort="{{ $r->nama_rombel }}">
-                  <strong style="color:var(--text); font-family:var(--font-mono); font-weight:800; font-size:13.5px;">{{ $r->nama_rombel }}</strong>
+                <td data-sort="{{ $r->nama_rombel }}" style="white-space:nowrap;">
+                  <strong style="color:var(--text); font-family:var(--font-mono); font-weight:800; font-size:13px;">{{ $r->nama_rombel }}</strong>
                 </td>
-                <td data-sort="{{ $r->tingkat }}">
-                  <span style="background:var(--surface); border:1px solid var(--border-2); padding:3px 8px; border-radius:4px; font-size:11.5px; font-weight:700; font-family:var(--font-mono); color:var(--text-2);">
-                    Tk. {{ $r->tingkat }}
-                  </span>
+                <td data-sort="{{ $r->tingkat }}" style="white-space:nowrap; font-weight:700; color:var(--text-2); font-size:12px; font-family:var(--font-mono);">
+                  Tk. {{ $r->tingkat }}
                 </td>
                 <td data-sort="{{ $r->jurusan->nama_jurusan ?? '' }}">
-                  <div style="font-weight:600; color:var(--text);">{{ $r->jurusan->nama_jurusan ?? '-' }}</div>
+                  <div style="font-weight:600; font-size:12.5px; color:var(--text); line-height:1.3;">{{ $r->jurusan->nama_jurusan ?? '-' }}</div>
                   @if($r->jurusan && $r->jurusan->kode_jurusan)
-                    <div style="font-size:11px; color:var(--text-3); font-family:var(--font-mono);">Kode: {{ $r->jurusan->kode_jurusan }}</div>
+                    <div style="font-size:11px; color:var(--text-3); font-family:var(--font-mono); margin-top:2px;">Kode: {{ $r->jurusan->kode_jurusan }}</div>
                   @endif
                 </td>
                 <td data-sort="{{ $r->waliKelas->nama ?? '' }}">
                   @if($r->waliKelas)
                     <div>
-                      <strong style="color:var(--text); font-size:13px;">{{ $r->waliKelas->nama }}</strong>
-                      <div style="font-size:11px; color:var(--text-3); font-family:var(--font-mono);">{{ $r->waliKelas->nip ?? '-' }}</div>
+                      <strong style="color:var(--text); font-size:12.5px;">{{ $r->waliKelas->nama }}</strong>
+                      @if($r->waliKelas->nip)
+                        <div style="font-size:11px; color:var(--text-3); font-family:var(--font-mono); margin-top:1px;">{{ $r->waliKelas->nip }}</div>
+                      @endif
                     </div>
                   @else
-                    <span style="color:var(--text-3); font-style:italic; font-size:12px;">Belum Ditugaskan</span>
+                    <span style="color:var(--text-3); font-style:italic; font-size:11.5px;">Belum Ditugaskan</span>
                   @endif
                 </td>
-                <td data-sort="{{ $r->tahunAjaran->nama ?? '' }}" style="font-family:var(--font-mono); font-size:12.5px;">
+                <td data-sort="{{ $r->tahunAjaran->nama ?? '' }}" style="white-space:nowrap; font-family:var(--font-mono); font-size:12px; color:var(--text-2);">
                   {{ $r->tahunAjaran->nama ?? '-' }}
                 </td>
-                @if($isAdmin)
-                <td style="text-align:right;">
+                @if($canManageRombel)
+                <td style="text-align:right; white-space:nowrap;">
                   <div style="display:inline-flex; gap:6px;">
                     <button type="button" onclick="openEditRombel({{ json_encode($r) }})" class="btn-icon btn-icon-edit" data-tooltip="Edit Rombel & Wali Kelas">
                       <i class="bi bi-pencil-square"></i>
                     </button>
-                    <form action="/rombel/{{ $r->id }}" method="POST" onsubmit="return confirm('Hapus rombel {{ $r->nama_rombel }}?')" style="display:inline; margin:0;">
-                      @csrf @method('DELETE')
-                      <button type="submit" class="btn-icon btn-icon-danger" data-tooltip="Hapus Rombel">
-                        <i class="bi bi-trash3-fill"></i>
-                      </button>
-                    </form>
+                    @if($isAdmin)
+                      <form action="/rombel/{{ $r->id }}" method="POST" onsubmit="return confirm('Hapus rombel {{ $r->nama_rombel }}?')" style="display:inline; margin:0;">
+                        @csrf @method('DELETE')
+                        <button type="submit" class="btn-icon btn-icon-danger" data-tooltip="Hapus Rombel">
+                          <i class="bi bi-trash3-fill"></i>
+                        </button>
+                      </form>
+                    @endif
                   </div>
                 </td>
                 @endif
               </tr>
             @empty
               <tr id="emptyRow">
-                <td colspan="{{ $isAdmin ? '6' : '5' }}" style="text-align:center; padding:30px; color:var(--text-3);">Belum ada data rombel kelas.</td>
+                <td colspan="{{ $canManageRombel ? '6' : '5' }}" style="text-align:center; padding:30px; color:var(--text-3);">Belum ada data rombel kelas.</td>
               </tr>
             @endforelse
           </tbody>
@@ -235,12 +261,12 @@
   </main>
 </div>
 
-@if($isAdmin)
+@if($canManageRombel)
 <!-- Modal Edit Rombel -->
 <div id="editRombelModal" class="modal-overlay">
   <div class="modal-card">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; border-bottom:1px solid var(--border); padding-bottom:12px;">
-      <h3 style="font-size:18px; font-weight:800; color:var(--text);"><i class="bi bi-pencil-square" style="color:var(--gold); margin-right:8px;"></i>Edit Rombel &amp; Wali Kelas</h3>
+      <h3 style="font-size:18px; font-weight:800; color:var(--text);"><i class="bi bi-pencil-square" style="color:#000000; margin-right:8px;"></i>Edit Rombel &amp; Wali Kelas</h3>
       <button onclick="closeModal('editRombelModal')" style="background:none; border:none; color:var(--text-3); font-size:20px; cursor:pointer;"><i class="bi bi-x-lg"></i></button>
     </div>
     <form id="editRombelForm" method="POST">
@@ -283,14 +309,14 @@
 <div id="modalJurusan" class="modal-overlay">
   <div class="modal-card" style="max-width: 600px;">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px; border-bottom:1px solid var(--border); padding-bottom:12px;">
-      <h3 style="font-size:17px; font-weight:800; color:var(--text);"><i class="bi bi-mortarboard-fill" style="color:var(--gold); margin-right:8px;"></i>Kelola Program Keahlian / Jurusan</h3>
+      <h3 style="font-size:17px; font-weight:800; color:var(--text);"><i class="bi bi-mortarboard-fill" style="color:#000000; margin-right:8px;"></i>Kelola Program Keahlian / Jurusan</h3>
       <button onclick="closeModal('modalJurusan')" style="background:none; border:none; color:var(--text-3); font-size:20px; cursor:pointer;"><i class="bi bi-x-lg"></i></button>
     </div>
 
     {{-- Form Tambah Jurusan --}}
     <form action="{{ route('jurusan.store') }}" method="POST" style="margin-bottom:20px; background:var(--bg-3); padding:14px; border-radius:var(--r-sm);">
       @csrf
-      <div style="font-size:12px; font-weight:700; color:var(--gold); margin-bottom:8px; text-transform:uppercase;">+ Tambah Jurusan Baru</div>
+      <div style="font-size:12px; font-weight:700; color:#000000; margin-bottom:8px; text-transform:uppercase;">+ Tambah Jurusan Baru</div>
       <div style="display:grid; grid-template-columns: 120px 1fr auto; gap:10px; align-items:flex-end;">
         <div>
           <label style="font-size:11px; font-weight:700;">Kode (Singkatan)</label>
@@ -319,7 +345,7 @@
         <tbody>
           @forelse($jurusans as $j)
             <tr>
-              <td style="padding:8px 12px; font-family:var(--font-mono); font-weight:800; color:var(--gold);">{{ $j->kode_jurusan }}</td>
+              <td style="padding:8px 12px; font-family:var(--font-mono); font-weight:800; color:#000000;">{{ $j->kode_jurusan }}</td>
               <td style="padding:8px 12px; font-weight:600;">{{ $j->nama_jurusan }}</td>
               <td style="padding:8px 12px; text-align:right;">
                 <form action="{{ route('jurusan.destroy', $j->id) }}" method="POST" onsubmit="return confirm('Hapus jurusan {{ $j->kode_jurusan }}?')" style="display:inline;">
@@ -341,14 +367,14 @@
 <div id="modalTahunAjaran" class="modal-overlay">
   <div class="modal-card" style="max-width: 540px;">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px; border-bottom:1px solid var(--border); padding-bottom:12px;">
-      <h3 style="font-size:17px; font-weight:800; color:var(--text);"><i class="bi bi-calendar-range-fill" style="color:var(--gold); margin-right:8px;"></i>Kelola Tahun Ajaran</h3>
+      <h3 style="font-size:17px; font-weight:800; color:var(--text);"><i class="bi bi-calendar-range-fill" style="color:#000000; margin-right:8px;"></i>Kelola Tahun Ajaran</h3>
       <button onclick="closeModal('modalTahunAjaran')" style="background:none; border:none; color:var(--text-3); font-size:20px; cursor:pointer;"><i class="bi bi-x-lg"></i></button>
     </div>
 
     {{-- Form Tambah Tahun Ajaran --}}
     <form action="/tahun-ajaran" method="POST" style="margin-bottom:20px; background:var(--bg-3); padding:14px; border-radius:var(--r-sm);">
       @csrf
-      <div style="font-size:12px; font-weight:700; color:var(--gold); margin-bottom:8px; text-transform:uppercase;">+ Tambah Tahun Ajaran Baru</div>
+      <div style="font-size:12px; font-weight:700; color:#000000; margin-bottom:8px; text-transform:uppercase;">+ Tambah Tahun Ajaran Baru</div>
       <div style="display:flex; gap:10px; align-items:flex-end;">
         <div style="flex:1;">
           <label style="font-size:11px; font-weight:700;">Nama Tahun Ajaran</label>
@@ -456,6 +482,22 @@
     });
 
     rows.forEach(row => tbody.appendChild(row));
+  }
+
+  function toggleTambahRombel(forceState) {
+    const panel = document.getElementById('panelTambahRombel');
+    const text = document.getElementById('textToggleTambahRombel');
+    if (!panel) return;
+    const isHidden = (panel.style.display === 'none' || panel.style.display === '');
+    const show = (forceState !== undefined) ? forceState : isHidden;
+    
+    panel.style.display = show ? 'block' : 'none';
+    if (text) {
+      text.innerText = show ? 'Tutup Form' : 'Tambah Rombel';
+    }
+    if (show) {
+      panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
   }
 
   function openEditRombel(rombel) {

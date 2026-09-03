@@ -199,8 +199,11 @@ class BackupDatabaseController extends Controller
      */
     public function restore(Request $request)
     {
+        @ini_set('memory_limit', '2048M');
+        @set_time_limit(600);
+
         $request->validate([
-            'backup_file' => 'required|file|max:512000', // Maks 500MB
+            'backup_file' => 'required|file|max:1024000', // Maks 1GB
         ]);
 
         try {
@@ -217,9 +220,12 @@ class BackupDatabaseController extends Controller
                     File::copy($sqlitePath, $safetySnapshot);
                 }
 
-                if ($extension === 'sqlite' || $extension === 'db') {
-                    // Timpa file database.sqlite langsung
+                if (in_array($extension, ['sqlite', 'db', 'sqlite3'])) {
+                    // Putuskan koneksi DB sebelum file database.sqlite ditimpa
+                    DB::disconnect();
                     File::copy($file->getRealPath(), $sqlitePath);
+                    DB::purge();
+                    DB::reconnect();
                 } elseif ($extension === 'sql') {
                     // Impor script SQL ke SQLite
                     $sqlContent = File::get($file->getRealPath());
@@ -231,7 +237,7 @@ class BackupDatabaseController extends Controller
                 \Illuminate\Support\Facades\Artisan::call('view:clear');
                 \Illuminate\Support\Facades\Artisan::call('cache:clear');
 
-                return back()->with('success', 'Database berhasil dipulihkan (Restore Sukses) dari file: ' . $file->getClientOriginalName());
+                return redirect()->route('admin.backup.index')->with('success', 'Database berhasil dipulihkan (Restore Sukses) dari file: ' . $file->getClientOriginalName());
             }
 
             return back()->with('error', 'Fitur restore otomatis saat ini dikonfigurasi untuk driver SQLite.');

@@ -10,8 +10,9 @@ use App\Models\Siswa;
 use App\Models\SiswaRombel;
 use App\Models\TahunAjaran;
 use App\Models\JadwalHariIni;
+use App\Models\KartuRfid;
 use App\Models\User;
-use App\Services\FaceScanService;
+use App\Services\RfidScanService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
 use Tests\TestCase;
@@ -23,7 +24,8 @@ class JadwalHarianScanTest extends TestCase
     protected TahunAjaran $ta;
     protected Rombel $rombel;
     protected Siswa $siswa;
-    protected FaceScanService $scanService;
+    protected KartuRfid $kartu;
+    protected RfidScanService $scanService;
 
     protected function setUp(): void
     {
@@ -39,11 +41,9 @@ class JadwalHarianScanTest extends TestCase
         ]);
 
         $this->siswa = Siswa::create([
-            'nis' => '20249999',
+            'nisn' => '20249999',
             'nama' => 'Bintang Pratama',
             'status' => 'aktif',
-            'face_embedding' => [0.11, 0.22, 0.33],
-            'face_registered_at' => now(),
         ]);
 
         SiswaRombel::create([
@@ -53,7 +53,8 @@ class JadwalHarianScanTest extends TestCase
             'status_keanggotaan' => 'aktif',
         ]);
 
-        $this->scanService = new FaceScanService();
+        $this->kartu = KartuRfid::pair('RFID9999', 'siswa', $this->siswa->id);
+        $this->scanService = new RfidScanService();
     }
 
     public function test_penetapan_jadwal_hari_ini_oleh_admin(): void
@@ -61,11 +62,9 @@ class JadwalHarianScanTest extends TestCase
         $admin = User::factory()->create(['role' => 'admin']);
 
         $response = $this->actingAs($admin)->post(route('admin.jadwal.update'), [
-            'jam_masuk_mulai' => '06:00',
             'jam_masuk_toleransi' => '07:15',
-            'jam_masuk_selesai' => '08:00',
             'jam_pulang_mulai' => '13:00',
-            'jam_pulang_selesai' => '17:00',
+            'jam_tutup_gerbang' => '17:00',
             'keterangan' => 'Pulang Cepat Rapat Guru',
         ]);
 
@@ -76,25 +75,30 @@ class JadwalHarianScanTest extends TestCase
         $this->assertEquals('Pulang Cepat Rapat Guru', $jadwal->keterangan);
     }
 
-    public function test_scan_wajah_masuk_dan_pulang_tercatat_akurat(): void
+    public function test_scan_barcode_masuk_dan_pulang_tercatat_akurat(): void
     {
         // 1. Scan Masuk pagi jam 07:00
         Carbon::setTestNow(Carbon::parse('2026-08-14 07:00:00'));
-        $resMasuk = $this->scanService->scanPerson('siswa', $this->siswa->id);
-        $this->assertEquals('success', $resMasuk['status']);
+        $today = Carbon::today()->toDateString();
+        $jadwal = JadwalHariIni::getJadwalAktif($today);
+        $jadwal->update(['is_sesi_buka' => true]);
+
+        $resMasuk = $this->scanService->scanRfid($this->kartu->uid);
+        $this->assertTrue($resMasuk['success']);
         $this->assertEquals('jam_masuk', $resMasuk['type']);
 
-        // 2. Scan siang sebelum jam pulang (10:00) -> status sudah masuk
+        // 2. Scan siang sebelum jam pulang (10:00) -> status belum waktunya pulang
         Carbon::setTestNow(Carbon::parse('2026-08-14 10:00:00'));
-        $resDebounce = $this->scanService->scanPerson('siswa', $this->siswa->id);
-        $this->assertEquals('info', $resDebounce['status']);
-        $this->assertEquals('sudah_masuk', $resDebounce['type']);
+        $resDebounce = $this->scanService->scanRfid($this->kartu->uid);
+        $this->assertFalse($resDebounce['success']);
+        $this->assertEquals('belum_waktunya_pulang', $resDebounce['type']);
 
         // 3. Scan sore jam kepulangan (15:35)
         Carbon::setTestNow(Carbon::parse('2026-08-14 15:35:00'));
-        $resPulang = $this->scanService->scanPerson('siswa', $this->siswa->id);
-        $this->assertEquals('success', $resPulang['status']);
+        $resPulang = $this->scanService->scanRfid($this->kartu->uid);
+        $this->assertTrue($resPulang['success']);
         $this->assertEquals('jam_pulang', $resPulang['type']);
+
 
         $absensi = \App\Models\Absensi::where('pemilik_id', $this->siswa->id)->first();
         $this->assertEquals('15:35:00', $absensi->jam_pulang);
@@ -113,7 +117,7 @@ class JadwalHarianScanTest extends TestCase
 
         $response = $this->actingAs($admin)->get(route('admin.jadwal.index'));
         $response->assertStatus(200);
-        $response->assertSee('Jam Operasional Sekolah');
+        $response->assertSee('Jam Sekolah &amp; Sesi Operasional', false);
     }
 
     public function test_admin_bisa_update_jam_operasional(): void
@@ -153,6 +157,6 @@ class JadwalHarianScanTest extends TestCase
 
         $response = $this->actingAs($piket)->get(route('admin.jadwal.index'));
         $response->assertStatus(200);
-        $response->assertSee('Jam Operasional Sekolah');
+        $response->assertSee('Jam Sekolah &amp; Sesi Operasional', false);
     }
 }

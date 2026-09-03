@@ -91,11 +91,11 @@ class Pengumuman extends Model
     public function getKategoriBadgeAttribute(): array
     {
         return match ($this->kategori) {
-            'darurat'      => ['bg' => 'rgba(220,38,38,0.15)', 'color' => '#DC2626', 'label' => 'PENTING / DARURAT', 'icon' => 'bi-exclamation-triangle-fill'],
-            'kedisiplinan' => ['bg' => 'rgba(234,179,8,0.15)', 'color' => '#CA8A04', 'label' => 'KEDISIPLINAN', 'icon' => 'bi-shield-check'],
-            'kegiatan'     => ['bg' => 'rgba(59,130,246,0.15)', 'color' => '#2563EB', 'label' => 'KEGIATAN SEKOLAH', 'icon' => 'bi-calendar-event-fill'],
-            'akademik'     => ['bg' => 'rgba(147,51,234,0.15)', 'color' => '#7E22CE', 'label' => 'AKADEMIK & KBM', 'icon' => 'bi-book-fill'],
-            default        => ['bg' => 'rgba(16,185,129,0.15)', 'color' => '#10B981', 'label' => 'PENGUMUMAN UMUM', 'icon' => 'bi-megaphone-fill'],
+            'darurat'      => ['bg' => 'var(--bg-3)', 'color' => 'var(--text)', 'label' => 'PENTING / DARURAT', 'icon' => 'bi-exclamation-triangle-fill'],
+            'kedisiplinan' => ['bg' => 'var(--bg-3)', 'color' => 'var(--text)', 'label' => 'KEDISIPLINAN', 'icon' => 'bi-shield-check'],
+            'kegiatan'     => ['bg' => 'var(--bg-3)', 'color' => 'var(--text)', 'label' => 'KEGIATAN SEKOLAH', 'icon' => 'bi-calendar-event-fill'],
+            'akademik'     => ['bg' => 'var(--bg-3)', 'color' => 'var(--text)', 'label' => 'AKADEMIK & KBM', 'icon' => 'bi-book-fill'],
+            default        => ['bg' => 'var(--bg-3)', 'color' => 'var(--text)', 'label' => 'PENGUMUMAN UMUM', 'icon' => 'bi-megaphone-fill'],
         };
     }
 }

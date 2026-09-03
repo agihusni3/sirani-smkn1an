@@ -11,20 +11,26 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('absensis', function (Blueprint $table) {
-            $table->index('tanggal', 'idx_absensis_tanggal');
-            $table->index(['pemilik_type', 'tanggal', 'status'], 'idx_absensis_type_tgl_status');
-            $table->index(['pemilik_type', 'status', 'pemilik_id'], 'idx_absensis_type_status_id');
-            $table->index(['pemilik_type', 'pemilik_id', 'tanggal'], 'idx_absensis_type_id_tgl');
-        });
+        try {
+            Schema::table('absensis', function (Blueprint $table) {
+                $table->index('tanggal', 'idx_absensis_tanggal');
+                $table->index(['pemilik_type', 'tanggal', 'status'], 'idx_absensis_type_tgl_status');
+                $table->index(['pemilik_type', 'status', 'pemilik_id'], 'idx_absensis_type_status_id');
+                $table->index(['pemilik_type', 'pemilik_id', 'tanggal'], 'idx_absensis_type_id_tgl');
+            });
+        } catch (\Throwable $e) {}
 
-        Schema::table('siswa_rombels', function (Blueprint $table) {
-            $table->index(['status_keanggotaan', 'rombel_id', 'siswa_id'], 'idx_siswa_rombels_aktif');
-        });
+        try {
+            Schema::table('siswa_rombels', function (Blueprint $table) {
+                $table->index(['status_keanggotaan', 'rombel_id', 'siswa_id'], 'idx_siswa_rombels_aktif');
+            });
+        } catch (\Throwable $e) {}
 
-        Schema::table('siswas', function (Blueprint $table) {
-            $table->index('status', 'idx_siswas_status');
-        });
+        try {
+            Schema::table('siswas', function (Blueprint $table) {
+                $table->index('status', 'idx_siswas_status');
+            });
+        } catch (\Throwable $e) {}
     }
 
     /**

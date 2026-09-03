@@ -44,29 +44,69 @@ class PortalOrtuController extends Controller
             'predikat'  => 'Sangat Baik',
         ];
 
-        if ($keyword !== '') {
-            // 1. Coba pencarian langsung via NIS / NISN (Indexed - Sangat Cepat)
-            $siswa = Siswa::where('nis', $keyword)
-                ->orWhere('nisn', $keyword)
-                ->first();
+        $modeAkses = $request->get('mode') ?: $request->get('role') ?: null;
+        $codeValue = '';
 
-            // 2. Jika tidak ditemukan, coba cari via Nomor HP/WA Orang Tua
-            if (!$siswa) {
-                $cleanPhone = preg_replace('/[^0-9]/', '', $keyword);
-                if (!empty($cleanPhone) && strlen($cleanPhone) >= 9) {
-                    $phoneTrim = ltrim($cleanPhone, '0');
-                    if (str_starts_with($phoneTrim, '62')) {
-                        $phoneTrim = substr($phoneTrim, 2);
+        if ($keyword !== '') {
+            $cleanPhone = preg_replace('/[^0-9]/', '', $keyword);
+            $phoneTrim = ltrim($cleanPhone, '0');
+            if (str_starts_with($phoneTrim, '62')) {
+                $phoneTrim = substr($phoneTrim, 2);
+            }
+
+            // Deteksi apakah keyword berbentuk nomor HP:
+            // Nomor HP Indonesia: dimulai 08..., +62..., 628..., atau 8xxx (min 9 digit)
+            $looksLikePhone = (
+                str_starts_with($keyword, '08') ||
+                str_starts_with($keyword, '+62') ||
+                str_starts_with($keyword, '628') ||
+                (str_starts_with($cleanPhone, '8') && strlen($cleanPhone) >= 9 && strlen($cleanPhone) <= 13)
+            );
+
+            // 1. Coba pencarian via Nomor HP HANYA jika format terlihat seperti nomor HP
+            if ($looksLikePhone && !empty($cleanPhone) && strlen($cleanPhone) >= 9) {
+                $siswaByHpSiswa = Siswa::where(function ($q) use ($cleanPhone, $phoneTrim) {
+                    $q->where('no_hp_siswa', 'LIKE', "%{$cleanPhone}%")
+                      ->orWhere('no_hp_siswa', 'LIKE', "%{$phoneTrim}%");
+                })->with('kartuRfid')->first();
+
+                if ($siswaByHpSiswa) {
+                    $siswa = $siswaByHpSiswa;
+                    $modeAkses = $modeAkses ?: 'siswa'; // Search dengan No HP Siswa -> Mode Siswa
+                } else {
+                    // Coba via Nomor HP Orang Tua
+                    $siswaByHpOrtu = Siswa::where(function ($q) use ($cleanPhone, $phoneTrim) {
+                        $q->where('no_hp_ortu', 'LIKE', "%{$cleanPhone}%")
+                          ->orWhere('no_hp_ortu', 'LIKE', "%{$phoneTrim}%");
+                    })->with('kartuRfid')->first();
+
+                    if ($siswaByHpOrtu) {
+                        $siswa = $siswaByHpOrtu;
+                        $modeAkses = $modeAkses ?: 'ortu'; // Search dengan No HP Ortu -> Mode Ortu
                     }
-                    $siswa = Siswa::where('no_hp_ortu', 'LIKE', "%{$cleanPhone}%")
-                        ->orWhere('no_hp_ortu', 'LIKE', "%{$phoneTrim}%")
-                        ->orWhere('no_hp_siswa', 'LIKE', "%{$cleanPhone}%")
-                        ->orWhere('no_hp_siswa', 'LIKE', "%{$phoneTrim}%")
-                        ->first();
                 }
             }
 
+            // 2. Jika bukan nomor HP atau belum ketemu, cari via NISN / NIS / ID (Mode Orang Tua)
+            if (!$siswa) {
+                $siswa = Siswa::where('nisn', $keyword)
+                    ->orWhere('nis', $keyword)
+                    ->orWhere('id', $keyword)
+                    ->with('kartuRfid')
+                    ->first();
+
+                if ($siswa) {
+                    $modeAkses = $modeAkses ?: 'ortu'; // Search dengan NISN/NIS -> Mode Orang Tua
+                }
+            }
+
+            // Default mode jika belum terdeteksi
+            $modeAkses = $modeAkses ?: 'ortu';
+
+
             if ($siswa) {
+                $siswa->loadMissing('kartuRfid');
+                $codeValue = $siswa->kartuRfid?->uid ?? $siswa->nisn;
                 // Ambil Rombel aktif dan Wali Kelas
                 $siswaRombel = $siswa->siswaRombels()
                     ->where('status_keanggotaan', 'aktif')
@@ -221,16 +261,20 @@ class PortalOrtuController extends Controller
             'pengumumans',
             'kasusDisiplin',
             'pengaturanDisiplin',
-            'rekapBulananTahunan'
+            'rekapBulananTahunan',
+            'modeAkses',
+            'codeValue'
         ));
     }
 
     /**
      * Akses langsung rekapitulasi kehadiran siswa via URL /presensi-siswa/{nis} atau /cek-presensi/{nis}.
      */
-    public function detail($nis, Request $request)
+    public function detail($nis, ?Request $request = null)
     {
-        $request->merge(['keyword' => $nis]);
-        return $this->index($request);
+        $req = $request ?: request();
+        $req->merge(['keyword' => $nis]);
+        return $this->index($req);
     }
 }
+

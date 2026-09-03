@@ -8,46 +8,64 @@
   <style>
     .ann-stat-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 14px;
-      margin-bottom: 20px;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 10px;
+      margin-bottom: 12px;
     }
     .ann-stat-card {
       background: var(--bg-2);
-      border: 1px solid var(--border);
-      border-radius: var(--r-md);
-      padding: 14px 18px;
+      border: 1px solid var(--border-2);
+      border-radius: var(--r-sm);
+      padding: 10px 14px;
       display: flex;
       align-items: center;
-      gap: 14px;
-      transition: all .2s ease;
+      gap: 12px;
+      transition: all .15s ease;
+      box-shadow: var(--shadow-sm);
     }
     .ann-stat-card:hover {
-      border-color: var(--border-2);
-      transform: translateY(-2px);
+      border-color: #000000;
     }
     .ann-stat-icon {
-      width: 42px;
-      height: 42px;
-      border-radius: 12px;
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 20px;
+      font-size: 15px;
       flex-shrink: 0;
     }
     .ann-stat-val {
-      font-size: 22px;
+      font-size: 20px;
       font-weight: 900;
-      font-family: var(--font);
+      font-family: var(--font-mono);
       line-height: 1.1;
-      color: var(--text);
+      color: #000000;
     }
     .ann-stat-lbl {
       font-size: 11.5px;
       color: var(--text-3);
       font-weight: 600;
       margin-top: 2px;
+    }
+    @media (max-width: 768px) {
+      .ann-stat-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 8px !important;
+      }
+      .ann-stat-card {
+        padding: 8px 10px !important;
+        gap: 10px !important;
+      }
+      .ann-stat-val {
+        font-size: 18px !important;
+      }
+      .ann-stat-icon {
+        width: 32px !important;
+        height: 32px !important;
+        font-size: 15px !important;
+      }
     }
 
     /* Modern Hover Tooltip */
@@ -103,33 +121,45 @@
   <main class="main-content">
     
     {{-- HEADER --}}
-    <header class="header" style="margin-bottom:20px;">
-      <div class="header-title">
-        <h1 style="margin:0; font-size:22px; display:flex; align-items:center; gap:8px;">
-          <i class="bi bi-megaphone-fill" style="color:var(--gold);"></i> Pusat Pengumuman &amp; Broadcast Sekolah
-        </h1>
-        <p style="margin-top:2px; font-size:13px; color:var(--text-3);">
-          Kirim informasi resmi, edaran kegiatan, kedisiplinan, dan broadcast WhatsApp massal ke siswa &amp; orang tua.
-        </p>
-      </div>
+    @php
+      $currentUser = auth()->user();
+      $canManagePengumuman = $currentUser && ($currentUser->isAdmin() || $currentUser->isWakasis() || $currentUser->isWakaKurikulum());
+    @endphp
 
-      <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-        <button type="button" id="btnTogglePengumuman" onclick="toggleFormPengumuman()" class="btn btn-gold" style="height:38px; padding:0 16px; font-size:12.5px; font-weight:800; display:inline-flex; align-items:center; gap:6px;">
-          <i class="bi bi-send-fill"></i> <span id="textTogglePengumuman">+ Buat Pengumuman Baru</span>
-        </button>
+    {{-- ULTRA COMPACT SLIM HEADER BAR --}}
+    <div class="panel no-print" style="background:var(--bg-2); border:1px solid var(--border); padding:10px 16px; margin-bottom:12px; border-radius:var(--r-md); box-shadow:var(--shadow-sm);">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+        <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+          <h1 style="margin:0; font-size:16px; font-weight:900; color:var(--text); display:inline-flex; align-items:center; gap:6px;">
+            <i class="bi bi-megaphone-fill" style="color:#000000; font-size:16px;"></i> Pengumuman &amp; Broadcast Sekolah
+          </h1>
+          <span style="color:var(--border-2); font-weight:300;">|</span>
+          <span style="font-size:11.5px; color:var(--text-3);">
+            Informasi edaran &amp; broadcast WhatsApp massal
+          </span>
+        </div>
+
+        <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+          @if($canManagePengumuman)
+            <button type="button" id="btnTogglePengumuman" onclick="toggleFormPengumuman()" class="btn btn-sm btn-gold" style="height:32px; padding:0 12px; font-size:11.5px; font-weight:800; display:inline-flex; align-items:center; gap:5px; border-radius:6px;">
+              <i class="bi bi-plus-circle-fill"></i> <span id="textTogglePengumuman">Buat Pengumuman</span>
+            </button>
+          @endif
+          @include('partials.header_actions')
+        </div>
       </div>
-    </header>
+    </div>
 
     @if(session('success'))<div class="alert-success" style="margin-bottom:16px;"><i class="bi bi-check-circle-fill" style="margin-right:6px;"></i>{{ session('success') }}</div>@endif
     @if(session('error'))<div class="alert-error" style="margin-bottom:16px;"><i class="bi bi-exclamation-triangle-fill" style="margin-right:6px;"></i>{{ session('error') }}</div>@endif
     @if(isset($errors) && $errors->any())<div class="alert-error" style="margin-bottom:16px;">@foreach($errors->all() as $err)<div><i class="bi bi-x-circle-fill" style="margin-right:6px;"></i>{{ $err }}</div>@endforeach</div>@endif
 
     {{-- SUB-NAVIGASI MODUL WHATSAPP: NOTIFIKASI OTOMATIS vs BROADCAST PENGUMUMAN --}}
-    <div style="display:flex; gap:10px; margin-bottom:20px; border-bottom:1px solid var(--border); padding-bottom:12px; flex-wrap:wrap;">
-      <a href="/notifikasi" class="btn btn-outline" style="font-weight:700; font-size:12.5px; border-radius:20px; padding:7px 18px; text-decoration:none; display:inline-flex; align-items:center; gap:6px;">
+    <div style="display:flex; gap:6px; margin-bottom:12px; border-bottom:1px solid var(--border); padding-bottom:8px; overflow-x:auto; flex-wrap:nowrap; -webkit-overflow-scrolling:touch; scrollbar-width:none;">
+      <a href="/notifikasi" class="btn btn-sm btn-outline" style="font-weight:700; font-size:11.5px; border-radius:16px; padding:4px 14px; text-decoration:none; display:inline-flex; align-items:center; gap:5px; white-space:nowrap; flex-shrink:0;">
         <i class="bi bi-chat-text-fill"></i> Notifikasi Presensi &amp; Disiplin
       </a>
-      <a href="/pengumuman" class="btn btn-gold" style="font-weight:800; font-size:12.5px; border-radius:20px; padding:7px 18px; text-decoration:none; display:inline-flex; align-items:center; gap:6px;">
+      <a href="/pengumuman" class="btn btn-sm btn-gold" style="font-weight:800; font-size:11.5px; border-radius:16px; padding:4px 14px; text-decoration:none; display:inline-flex; align-items:center; gap:5px; white-space:nowrap; flex-shrink:0;">
         <i class="bi bi-megaphone-fill"></i> Broadcast &amp; Pengumuman Sekolah
       </a>
     </div>
@@ -137,7 +167,7 @@
     {{-- KPI STATS --}}
     <div class="ann-stat-grid">
       <div class="ann-stat-card">
-        <div class="ann-stat-icon" style="background:rgba(234,179,8,0.12); color:#CA8A04;">
+        <div class="ann-stat-icon" style="background:rgba(0,0,0,0.06); color:var(--text);">
           <i class="bi bi-megaphone-fill"></i>
         </div>
         <div>
@@ -147,7 +177,7 @@
       </div>
 
       <div class="ann-stat-card">
-        <div class="ann-stat-icon" style="background:rgba(34,197,94,0.12); color:#16A34A;">
+        <div class="ann-stat-icon" style="background:rgba(0,0,0,0.06); color:var(--text);">
           <i class="bi bi-broadcast-pin"></i>
         </div>
         <div>
@@ -157,7 +187,7 @@
       </div>
 
       <div class="ann-stat-card">
-        <div class="ann-stat-icon" style="background:rgba(37,99,235,0.12); color:#2563EB;">
+        <div class="ann-stat-icon" style="background:rgba(0,0,0,0.06); color:var(--text);">
           <i class="bi bi-whatsapp"></i>
         </div>
         <div>
@@ -167,7 +197,7 @@
       </div>
 
       <div class="ann-stat-card">
-        <div class="ann-stat-icon" style="background:rgba(147,51,234,0.12); color:#7E22CE;">
+        <div class="ann-stat-icon" style="background:rgba(0,0,0,0.06); color:var(--text);">
           <i class="bi bi-window-sidebar"></i>
         </div>
         <div>
@@ -177,11 +207,12 @@
       </div>
     </div>
 
+    @if($canManagePengumuman)
     <!-- FORM BUAT PENGUMUMAN BARU (COLLAPSIBLE) -->
-    <div class="panel" id="panelPengumuman" style="{{ (isset($errors) && $errors->any()) ? 'display:block;' : 'display:none;' }} margin-bottom: 20px; border-color: rgba(234, 179, 8, 0.4); background: linear-gradient(180deg, rgba(234, 179, 8, 0.04) 0%, var(--panel) 100%);">
+    <div class="panel" id="panelPengumuman" style="{{ (isset($errors) && $errors->any()) ? 'display:block;' : 'display:none;' }} margin-bottom: 20px; border-color: var(--border); background: var(--bg-2);">
       <div class="panel-title" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px; padding-bottom:12px; border-bottom:1px solid var(--border);">
         <div style="display:flex; align-items:center; gap:8px;">
-          <div class="stat-icon" style="width:36px; height:36px; border-radius:8px; background:rgba(234, 179, 8, 0.15); color:var(--gold); display:flex; align-items:center; justify-content:center; font-size:18px;">
+          <div class="stat-icon" style="width:36px; height:36px; border-radius:8px; background:rgba(0,0,0,0.06); color:#000000; display:flex; align-items:center; justify-content:center; font-size:18px;">
             <i class="bi bi-send-plus-fill"></i>
           </div>
           <div>
@@ -324,7 +355,7 @@
             {{-- Checkbox WA & Opsi Penerima --}}
             <div style="border-bottom:1px solid var(--border); padding-bottom:10px;">
               <label style="display:inline-flex; align-items:center; gap:8px; font-size:13px; font-weight:800; cursor:pointer; color:var(--text);">
-                <input type="checkbox" name="kirim_wa" id="checkboxKirimWa" value="1" checked onchange="document.getElementById('waTargetOptions').style.display = this.checked ? 'block' : 'none';" style="width:16px; height:16px; accent-color:#22C55E;" />
+                <input type="checkbox" name="kirim_wa" id="checkboxKirimWa" value="1" checked onchange="document.getElementById('waTargetOptions').style.display = this.checked ? 'block' : 'none';" style="width:16px; height:16px; accent-color:var(--text);" />
                 <span>Kirim Broadcast WhatsApp Massal</span>
               </label>
 
@@ -333,15 +364,15 @@
                 <div style="font-size:11px; font-weight:700; color:var(--text-3); margin-bottom:6px;">PILIH TUJUAN NOMOR WHATSAPP:</div>
                 <div style="display:flex; flex-wrap:wrap; gap:16px;">
                   <label style="display:inline-flex; align-items:center; gap:6px; font-size:12px; font-weight:700; cursor:pointer; color:var(--text);">
-                    <input type="radio" name="target_penerima_wa" value="ortu" checked style="accent-color:#22C55E;" />
+                    <input type="radio" name="target_penerima_wa" value="ortu" checked style="accent-color:var(--text);" />
                     <span>Orang Tua / Wali Saja</span>
                   </label>
                   <label style="display:inline-flex; align-items:center; gap:6px; font-size:12px; font-weight:700; cursor:pointer; color:var(--text);">
-                    <input type="radio" name="target_penerima_wa" value="siswa" style="accent-color:#3B82F6;" />
+                    <input type="radio" name="target_penerima_wa" value="siswa" style="accent-color:var(--text);" />
                     <span>Siswa Pribadi Saja (Tanpa melibatkan Ortu)</span>
                   </label>
                   <label style="display:inline-flex; align-items:center; gap:6px; font-size:12px; font-weight:700; cursor:pointer; color:var(--text);">
-                    <input type="radio" name="target_penerima_wa" value="keduanya" style="accent-color:#EAB308;" />
+                    <input type="radio" name="target_penerima_wa" value="keduanya" style="accent-color:var(--text);" />
                     <span>Kirim ke Keduanya (Ortu &amp; Siswa)</span>
                   </label>
                 </div>
@@ -350,11 +381,11 @@
 
             <div style="display:flex; flex-wrap:wrap; gap:16px;">
               <label style="display:inline-flex; align-items:center; gap:8px; font-size:12.5px; font-weight:700; cursor:pointer; color:var(--text);">
-                <input type="checkbox" name="tampil_portal" value="1" checked style="width:16px; height:16px; accent-color:var(--gold);" />
+                <input type="checkbox" name="tampil_portal" value="1" checked style="width:16px; height:16px; accent-color:#000000;" />
                 <span>Tampilkan Banner di Portal Siswa &amp; Wali Murid</span>
               </label>
               <label style="display:inline-flex; align-items:center; gap:8px; font-size:12.5px; font-weight:700; cursor:pointer; color:var(--text);">
-                <input type="checkbox" name="tampil_kios" value="1" checked style="width:16px; height:16px; accent-color:#3B82F6;" />
+                <input type="checkbox" name="tampil_kios" value="1" checked style="width:16px; height:16px; accent-color:#000000;" />
                 <span>Tampilkan Running Text di Layar Kios Gerbang</span>
               </label>
             </div>
@@ -369,68 +400,64 @@
         </div>
       </form>
     </div>
+    @endif
 
-    <!-- TABEL RIWAYAT PENGUMUMAN & TOOLBAR TERPADU -->
+    {{-- TABEL PENGUMUMAN AKTIF & RIWAYAT --}}
     <div class="panel" style="padding:0; overflow:hidden; border:1px solid var(--border); border-radius:var(--r-md); box-shadow:var(--shadow-sm); background:var(--bg-2); margin-bottom:24px;">
-      {{-- Header Tabel --}}
-      <div style="padding:14px 18px; border-bottom:1px solid var(--border); background:var(--surface); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
-        <div style="font-weight:800; font-size:15px; color:var(--text); display:flex; align-items:center; gap:8px;">
-          <i class="bi bi-clock-history" style="color:var(--gold);"></i>
-          <span>Riwayat Pengumuman &amp; Broadcast</span>
+      {{-- Header & Toolbar Terpadu --}}
+      <div style="padding:8px 12px; border-bottom:1px solid var(--border); background:var(--surface); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+        <div style="font-weight:800; font-size:13.5px; color:var(--text); display:flex; align-items:center; gap:6px;">
+          <i class="bi bi-collection-fill" style="color:#000000;"></i>
+          <span>Daftar Pengumuman Terbit</span>
+          <span style="background:var(--bg-3); border:1px solid var(--border-2); color:var(--text-2); font-size:10.5px; font-weight:700; padding:1px 6px; border-radius:4px;" class="font-mono">
+            {{ $pengumumans->total() }}
+          </span>
         </div>
-      </div>
 
-      {{-- Toolbar Search & Filter Terpadu --}}
-      <div style="padding:12px 18px; border-bottom:1px solid var(--border); background:var(--surface);">
-        <form method="GET" action="{{ route('pengumuman.index') }}" style="display:flex; flex-wrap:wrap; gap:8px; align-items:center;">
-          <div style="flex:1.8; min-width:200px;">
-            <input type="text" name="q" value="{{ $search }}" placeholder="Cari judul pengumuman, pesan, target..." class="input-field" style="width:100%; height:36px; font-size:12.5px; background:var(--bg-2); border:1px solid var(--border-2); border-radius:var(--r-sm); padding:0 12px;" />
-          </div>
-
-          <div style="min-width:140px;">
-            <select name="kategori" class="input-field" style="width:100%; height:36px; font-size:12px; background:var(--bg-2); border:1px solid var(--border-2); border-radius:var(--r-sm);" onchange="this.form.submit()">
+        {{-- Filter Kategori --}}
+        <form method="GET" action="{{ route('pengumuman.index') }}" style="display:flex; gap:6px; align-items:center; flex-wrap:wrap; flex:1; justify-content:flex-end; max-width:480px;">
+          <div style="width:130px; flex-shrink:0;">
+            <select name="kategori" class="input-field" style="width:100%; height:32px; font-size:11.5px; background:var(--bg-2); border:1px solid var(--border-2); border-radius:var(--r-sm); padding:0 6px;" onchange="this.form.submit()">
               <option value="">Semua Kategori</option>
-              <option value="umum" {{ $kategori === 'umum' ? 'selected' : '' }}>Pengumuman Umum</option>
-              <option value="kedisiplinan" {{ $kategori === 'kedisiplinan' ? 'selected' : '' }}>Kedisiplinan</option>
-              <option value="kegiatan" {{ $kategori === 'kegiatan' ? 'selected' : '' }}>Kegiatan</option>
-              <option value="akademik" {{ $kategori === 'akademik' ? 'selected' : '' }}>Akademik</option>
-              <option value="darurat" {{ $kategori === 'darurat' ? 'selected' : '' }}>Penting / Darurat</option>
+              <option value="umum" {{ request('kategori') === 'umum' ? 'selected' : '' }}>Umum</option>
+              <option value="kegiatan" {{ request('kategori') === 'kegiatan' ? 'selected' : '' }}>Kegiatan</option>
+              <option value="kedisiplinan" {{ request('kategori') === 'kedisiplinan' ? 'selected' : '' }}>Kedisiplinan</option>
+              <option value="akademik" {{ request('kategori') === 'akademik' ? 'selected' : '' }}>Akademik</option>
+              <option value="libur" {{ request('kategori') === 'libur' ? 'selected' : '' }}>Hari Libur</option>
             </select>
           </div>
 
-          <div style="min-width:130px;">
-            <select name="status" class="input-field" style="width:100%; height:36px; font-size:12px; background:var(--bg-2); border:1px solid var(--border-2); border-radius:var(--r-sm);" onchange="this.form.submit()">
-              <option value="">Status Pengumuman</option>
-              <option value="aktif" {{ $status === 'aktif' ? 'selected' : '' }}>Sedang Aktif</option>
-              <option value="nonaktif" {{ $status === 'nonaktif' ? 'selected' : '' }}>Nonaktif</option>
+          <div style="width:125px; flex-shrink:0;">
+            <select name="status" class="input-field" style="width:100%; height:32px; font-size:11.5px; background:var(--bg-2); border:1px solid var(--border-2); border-radius:var(--r-sm); padding:0 6px;" onchange="this.form.submit()">
+              <option value="">Semua Status</option>
+              <option value="aktif" {{ request('status') === 'aktif' ? 'selected' : '' }}>Tayang Aktif</option>
+              <option value="nonaktif" {{ request('status') === 'nonaktif' ? 'selected' : '' }}>Nonaktif</option>
             </select>
           </div>
 
-          <button type="submit" class="btn btn-outline" style="height:36px; padding:0 12px; font-size:12px; font-weight:700;">
-            <i class="bi bi-search"></i> Cari
-          </button>
-
-          @if($search || $kategori || $status)
-            <a href="{{ route('pengumuman.index') }}" class="btn btn-outline" style="height:36px; padding:0 10px; font-size:12px; color:var(--red); border-color:rgba(239,68,68,0.4);" title="Reset Filter">
+          @if(request('kategori') || request('status'))
+            <a href="{{ route('pengumuman.index') }}" class="btn btn-sm btn-outline" style="height:32px; padding:0 8px; font-size:11px; font-weight:800; color:var(--red); border-color:rgba(239,68,68,0.4); border-radius:var(--r-sm); flex-shrink:0;" title="Reset Filter">
               Reset
             </a>
           @endif
         </form>
       </div>
 
-      <div class="table-responsive" style="overflow-x:auto;">
-        <table class="data-table">
+      <div class="table-responsive">
+        <table class="data-table" style="margin:0;">
           <thead>
             <tr>
-              <th style="width:36px; text-align:center;">No</th>
-              <th>Judul &amp; Pesan</th>
+              <th style="width:40px; text-align:center;">#</th>
+              <th>Topik &amp; Isi Pengumuman</th>
               <th>Kategori</th>
               <th>Target Penerima</th>
               <th>Saluran Publikasi</th>
               <th>Masa Tayang</th>
               <th>Status WA</th>
               <th style="text-align:center;">Tayang</th>
-              <th style="width:90px; text-align:center;">Aksi</th>
+              @if($canManagePengumuman)
+                <th style="width:90px; text-align:center;">Aksi</th>
+              @endif
             </tr>
           </thead>
           <tbody>
@@ -446,7 +473,7 @@
                   <div style="display:flex; gap:10px; align-items:flex-start;">
                     @if($p->banner_url)
                       <a href="{{ $p->banner_url }}" target="_blank" title="Klik untuk lihat gambar poster penuh" style="flex-shrink:0;">
-                        <img src="{{ $p->banner_url }}" alt="Poster" style="width:48px; height:48px; border-radius:6px; object-fit:cover; border:1.5px solid var(--gold); box-shadow:0 2px 6px rgba(0,0,0,0.15);" />
+                        <img src="{{ $p->banner_url }}" alt="Poster" style="width:48px; height:48px; border-radius:6px; object-fit:cover; border:1.5px solid rgba(0,0,0,0.15); box-shadow:0 2px 6px rgba(0,0,0,0.15);" />
                       </a>
                     @endif
                     <div style="flex:1;">
@@ -461,47 +488,47 @@
                   </div>
                 </td>
                 <td>
-                  <span class="badge" style="background:{{ $badge['bg'] }}; color:{{ $badge['color'] }}; font-weight:800; font-size:10.5px;">
-                    <i class="bi {{ $badge['icon'] }}"></i> {{ $badge['label'] }}
+                  <span style="color:var(--text); font-weight:800; font-size:11px; text-transform:uppercase;">
+                    {{ $badge['label'] }}
                   </span>
                 </td>
                 <td>
-                  <span class="badge" style="background:rgba(59,130,246,0.1); color:#2563EB; font-weight:700; font-size:11px;">
+                  <span style="color:var(--text); font-weight:700; font-size:11px;">
                     {{ $p->target_nama ?: 'Semua Siswa' }}
                   </span>
                 </td>
                 <td>
                   <div style="display:flex; gap:4px; flex-wrap:wrap;">
                     @if($p->kirim_wa)
-                      <span class="badge" style="background:rgba(34,197,94,0.15); color:#16A34A; font-size:10px; font-weight:800;">
-                        <i class="bi bi-whatsapp"></i> WA
+                      <span style="color:var(--text); font-size:11px; font-weight:800;">
+                        WA
                       </span>
                     @endif
                     @if($p->tampil_portal)
-                      <span class="badge" style="background:rgba(234,179,8,0.15); color:#CA8A04; font-size:10px; font-weight:800;">
-                        <i class="bi bi-window"></i> Portal
+                      <span style="color:var(--text); font-size:11px; font-weight:800;">
+                        Portal
                       </span>
                     @endif
                     @if($p->tampil_kios)
-                      <span class="badge" style="background:rgba(59,130,246,0.15); color:#2563EB; font-size:10px; font-weight:800;">
-                        <i class="bi bi-display"></i> Kios
+                      <span style="color:var(--text); font-size:11px; font-weight:800;">
+                        Kios
                       </span>
                     @endif
                   </div>
                 </td>
                 <td style="font-size:11.5px; color:var(--text-2);">
                   @if($p->tanggal_mulai)
-                    <div><i class="bi bi-calendar-check"></i> {{ $p->tanggal_mulai->format('d/m/Y') }}</div>
+                    <div>{{ $p->tanggal_mulai->format('d/m/Y') }}</div>
                   @endif
                   @if($p->tanggal_selesai)
                     <div style="color:var(--text-3); font-size:10.5px;">s.d {{ $p->tanggal_selesai->format('d/m/Y') }}</div>
                   @else
-                    <div style="color:#16A34A; font-size:10px; font-weight:700;">Berlaku Terus</div>
+                    <div style="color:var(--text); font-size:10px; font-weight:700;">Berlaku Terus</div>
                   @endif
                 </td>
                 <td>
                   @if($p->kirim_wa)
-                    <span class="badge" style="background:rgba(34,197,94,0.12); color:#16A34A; font-weight:800; font-size:10.5px;">
+                    <span class="badge" style="background:var(--bg-3); color:var(--text); border:1px solid var(--border-2); font-weight:800; font-size:10.5px;">
                       {{ $p->total_terkirim }} / {{ $p->total_target }} WA
                     </span>
                   @else
@@ -509,21 +536,29 @@
                   @endif
                 </td>
                 <td style="text-align:center;">
-                  <form action="{{ route('pengumuman.toggle', $p->id) }}" method="POST" style="display:inline;">
-                    @csrf
-                    <button type="submit" class="btn btn-sm {{ $p->is_active ? 'btn-outline' : 'btn-outline' }}" style="padding:2px 8px; font-size:10.5px; font-weight:800; color:{{ $p->is_active ? '#16A34A' : 'var(--text-3)' }}; border-color:{{ $p->is_active ? '#16A34A' : 'var(--border)' }};" data-tooltip="Klik untuk {{ $p->is_active ? 'Nonaktifkan' : 'Aktifkan' }}">
+                  @if($canManagePengumuman)
+                    <form action="{{ route('pengumuman.toggle', $p->id) }}" method="POST" style="display:inline;">
+                      @csrf
+                      <button type="submit" class="btn btn-sm" style="padding:2px 8px; font-size:10.5px; font-weight:800; color:{{ $p->is_active ? 'var(--text)' : 'var(--text-3)' }}; border:1px solid {{ $p->is_active ? 'var(--text)' : 'var(--border)' }};" data-tooltip="Klik untuk {{ $p->is_active ? 'Nonaktifkan' : 'Aktifkan' }}">
+                        {{ $p->is_active ? 'AKTIF' : 'OFF' }}
+                      </button>
+                    </form>
+                  @else
+                    <span class="badge" style="background:{{ $p->is_active ? 'rgba(34,197,94,0.12)' : 'var(--bg-3)' }}; color:{{ $p->is_active ? '#16A34A' : 'var(--text-3)' }}; font-weight:800; font-size:10.5px; padding:2px 8px; border-radius:6px;">
                       {{ $p->is_active ? 'AKTIF' : 'OFF' }}
-                    </button>
-                  </form>
+                    </span>
+                  @endif
                 </td>
-                <td style="text-align:center;">
-                  <form action="{{ route('pengumuman.destroy', $p->id) }}" method="POST" onsubmit="return confirm('Hapus pengumuman ini?')" style="display:inline; margin:0;">
-                    @csrf @method('DELETE')
-                    <button type="submit" class="btn-icon btn-icon-danger" data-tooltip="Hapus Pengumuman" title="Hapus Pengumuman">
-                      <i class="bi bi-trash3-fill"></i>
-                    </button>
-                  </form>
-                </td>
+                @if($canManagePengumuman)
+                  <td style="text-align:center;">
+                    <form action="{{ route('pengumuman.destroy', $p->id) }}" method="POST" onsubmit="return confirm('Hapus pengumuman ini?')" style="display:inline; margin:0;">
+                      @csrf @method('DELETE')
+                      <button type="submit" class="btn-icon btn-icon-danger" data-tooltip="Hapus Pengumuman" title="Hapus Pengumuman">
+                        <i class="bi bi-trash3-fill"></i>
+                      </button>
+                    </form>
+                  </td>
+                @endif
               </tr>
             @empty
               <tr>

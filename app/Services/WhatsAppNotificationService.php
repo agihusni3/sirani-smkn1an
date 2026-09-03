@@ -27,7 +27,7 @@ class WhatsAppNotificationService
 
             return [
                 'success' => false,
-                'message' => 'Nomor WhatsApp tujuan tidak valid.',
+                'message' => 'Nomor WhatsApp tujuan (' . ($notifikasi->no_tujuan ?? 'kosong') . ') tidak valid atau terlalu pendek.',
             ];
         }
 
@@ -54,9 +54,10 @@ class WhatsAppNotificationService
                 $endpoint = $setting->wa_endpoint_url ?: 'https://api.fonnte.com/send';
                 $response = Http::withHeaders([
                     'Authorization' => $setting->wa_api_token,
-                ])->connectTimeout(2)->timeout(3)->post($endpoint, [
+                ])->connectTimeout(5)->timeout(15)->post($endpoint, [
                     'target'  => $noWa,
                     'message' => $notifikasi->pesan,
+                    'delay'   => (string) rand(5, 7),
                 ]);
 
                 if ($response->successful()) {
@@ -162,8 +163,8 @@ class WhatsAppNotificationService
         $setting = PengaturanNotifikasi::getPengaturan();
         $noWa = NotifikasiOrtu::formatNomorWa($noTujuan);
 
-        if (!$noWa || strlen($noWa) < 9) {
-            return ['success' => false, 'message' => 'Nomor WhatsApp tidak valid.'];
+        if (!$noWa || strlen($noWa) < 10) {
+            return ['success' => false, 'message' => "Nomor WhatsApp ({$noTujuan}) tidak valid atau terlalu pendek. Pastikan nomor HP diawali 08xx / 628xx dan minimal 10 digit."];
         }
 
         if (!$setting->is_active || $setting->wa_provider === 'simulasi' || empty($setting->wa_api_token)) {
@@ -176,9 +177,10 @@ class WhatsAppNotificationService
                 $endpoint = $setting->wa_endpoint_url ?: 'https://api.fonnte.com/send';
                 $response = Http::withHeaders([
                     'Authorization' => $setting->wa_api_token,
-                ])->connectTimeout(2)->timeout(3)->post($endpoint, [
+                ])->connectTimeout(5)->timeout(15)->post($endpoint, [
                     'target'  => $noWa,
                     'message' => $pesan,
+                    'delay'   => (string) rand(5, 7),
                 ]);
 
                 return ['success' => $response->successful(), 'response' => $response->body()];

@@ -99,9 +99,9 @@
 
     /* Juara 1 (Emas / Utama) */
     .podium-card.rank-1 {
-      border: 2px solid var(--gold);
-      background: linear-gradient(180deg, rgba(202, 138, 4, 0.15) 0%, rgba(202, 138, 4, 0.04) 40%, var(--bg-2) 100%);
-      box-shadow: 0 8px 30px var(--gold-glow);
+      border: 2px solid #000000;
+      background: linear-gradient(180deg, rgba(0, 0, 0, 0.06) 0%, rgba(0, 0, 0, 0.02) 40%, var(--bg-2) 100%);
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
       padding: 28px 20px;
     }
     @media (min-width: 861px) {
@@ -141,9 +141,9 @@
       width: 68px;
       height: 68px;
       font-size: 34px;
-      background: rgba(202, 138, 4, 0.2);
-      border-color: var(--gold);
-      box-shadow: 0 0 16px rgba(202, 138, 4, 0.35);
+      background: rgba(0, 0, 0, 0.08);
+      border-color: #000000;
+      box-shadow: 0 0 16px rgba(0, 0, 0, 0.15);
     }
     .rank-2 .trophy-avatar {
       background: rgba(148, 163, 184, 0.2);
@@ -167,9 +167,9 @@
       margin-bottom: 10px;
     }
     .badge-rank-1 {
-      background: linear-gradient(135deg, var(--gold), var(--gold-2));
-      color: #0F172A;
-      box-shadow: 0 2px 8px var(--gold-glow);
+      background: #000000;
+      color: #FFFFFF;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
     }
     .badge-rank-2 {
       background: #94A3B8;
@@ -208,8 +208,8 @@
       text-align: left;
     }
     .rank-1 .podium-stats-box {
-      background: rgba(202, 138, 4, 0.1);
-      border-color: rgba(202, 138, 4, 0.25);
+      background: rgba(0, 0, 0, 0.04);
+      border-color: rgba(0, 0, 0, 0.12);
     }
 
     .podium-stat-score {
@@ -221,7 +221,7 @@
       border-bottom: 1px solid var(--border);
     }
     .rank-1 .podium-stat-score {
-      border-color: rgba(202, 138, 4, 0.2);
+      border-color: rgba(0, 0, 0, 0.1);
     }
     .podium-pct-val {
       font-size: 26px;
@@ -231,7 +231,7 @@
       line-height: 1;
     }
     .rank-1 .podium-pct-val {
-      color: var(--gold);
+      color: #000000;
       font-size: 28px;
     }
 
@@ -261,12 +261,12 @@
       font-weight: 800;
     }
     .rank-1 .stat-row-val {
-      color: var(--gold-dark);
+      color: #000000;
     }
 
     .badge-gold-rank {
-      background: linear-gradient(135deg, var(--gold), var(--gold-2));
-      color: #0F172A;
+      background: #000000;
+      color: #FFFFFF;
       font-weight: 900;
       padding: 3px 8px;
       border-radius: 10px;
@@ -292,6 +292,55 @@
       display: inline-block;
     }
 
+    /* Mobile Responsive Optimizations */
+    @media (max-width: 768px) {
+      .podium-section {
+        margin-bottom: 16px;
+      }
+      .podium-card {
+        padding: 12px 10px !important;
+      }
+      .podium-card.rank-1 {
+        padding: 14px 12px !important;
+      }
+      .trophy-avatar {
+        width: 42px !important;
+        height: 42px !important;
+        font-size: 20px !important;
+        margin-bottom: 6px !important;
+      }
+      .rank-1 .trophy-avatar {
+        width: 48px !important;
+        height: 48px !important;
+        font-size: 24px !important;
+      }
+      .badge-rank-title {
+        padding: 2px 8px !important;
+        font-size: 10px !important;
+        margin-bottom: 6px !important;
+      }
+      .podium-user-name {
+        font-size: 13.5px !important;
+        margin-bottom: 2px !important;
+      }
+      .podium-user-meta {
+        font-size: 11px !important;
+        margin-bottom: 10px !important;
+      }
+      .podium-stats-box {
+        padding: 8px !important;
+        margin-bottom: 8px !important;
+      }
+      .podium-pct-val {
+        font-size: 20px !important;
+      }
+      .stat-row-item {
+        padding: 3px 6px !important;
+        font-size: 10.5px !important;
+        margin-bottom: 3px !important;
+      }
+    }
+
     /* Predikat badge di tabel — tanpa background dan tanpa border */
     #tableLeaderboard .badge {
       background: transparent !important;
@@ -304,63 +353,68 @@
 <div class="app-container">
   @include('partials.sidebar')
   <main class="main-content">
-    <header class="header">
-      <div class="header-title">
-        <h1><i class="bi bi-trophy-fill" style="color:var(--gold); margin-right:8px;"></i>Peringkat &amp; Apresiasi Kehadiran</h1>
-        <p>Leaderboard presisi tinggi (dihitung hingga satuan Jam, Menit, dan Detik) untuk menentukan keteladanan siswa dan dewan guru.</p>
-      </div>
-      @include('partials.header_actions')
-    </header>
-
-    <!-- ══ Category & Filter Card ══ -->
-    <div class="panel" style="margin-bottom:24px;">
-      <form method="GET" action="{{ route('peringkat.index') }}" id="formPeringkat">
-        <div class="filter-header-bar">
-          {{-- Kategori Switcher --}}
-          <div class="segmented-control">
-            <button type="button" class="segmented-btn {{ $kategori === 'siswa' ? 'active' : '' }}" onclick="document.getElementById('inputKategori').value='siswa'; document.getElementById('formPeringkat').submit();">
-              <i class="bi bi-people-fill"></i> Peserta Didik (Siswa)
-            </button>
-            <button type="button" class="segmented-btn {{ $kategori === 'guru' ? 'active' : '' }}" onclick="document.getElementById('inputKategori').value='guru'; document.getElementById('formPeringkat').submit();">
-              <i class="bi bi-person-badge-fill"></i> Guru &amp; Tenaga Pendidik
-            </button>
-            <input type="hidden" name="kategori" id="inputKategori" value="{{ $kategori }}" />
-          </div>
-
-          {{-- Action Export --}}
-          <div style="display:flex; gap:8px;">
-            <a href="{{ route('peringkat.export-csv', request()->all()) }}" class="btn btn-gold" style="height:38px; padding:0 16px; font-size:12.5px; font-weight:800; text-decoration:none; display:inline-flex; align-items:center; gap:6px;">
-              <i class="bi bi-file-earmark-arrow-down-fill"></i> Export Rekap Presisi CSV
-            </a>
-          </div>
+    {{-- ULTRA COMPACT SLIM HEADER BAR --}}
+    <div class="panel no-print" style="background:var(--bg-2); border:1px solid var(--border); padding:10px 16px; margin-bottom:12px; border-radius:var(--r-md); box-shadow:var(--shadow-sm);">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+        <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+          <h1 style="margin:0; font-size:16px; font-weight:900; color:var(--text); display:inline-flex; align-items:center; gap:6px;">
+            <i class="bi bi-trophy-fill" style="color:#000000; font-size:16px;"></i> Peringkat Kehadiran
+          </h1>
+          <span style="color:var(--border-2); font-weight:300;">|</span>
+          <span style="font-size:11.5px; color:var(--text-3);">
+            Leaderboard keteladanan presisi waktu
+          </span>
         </div>
 
-        {{-- Filter Parameters --}}
-        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap:12px; align-items:flex-end;">
+        <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+          {{-- Category Switcher --}}
+          <div style="display:inline-flex; background:var(--bg-3); border:1.5px solid var(--border-2); border-radius:8px; padding:2px; gap:2px;">
+            <button type="button" class="btn btn-sm" onclick="document.getElementById('inputKategori').value='siswa'; document.getElementById('formPeringkat').submit();" style="height:28px; padding:0 12px; font-size:11.5px; font-weight:800; border-radius:6px; border:none; {{ $kategori === 'siswa' ? 'background:#000000; color:#FFFFFF;' : 'background:transparent; color:var(--text-2);' }}">
+              <i class="bi bi-people-fill"></i> Siswa
+            </button>
+            <button type="button" class="btn btn-sm" onclick="document.getElementById('inputKategori').value='guru'; document.getElementById('formPeringkat').submit();" style="height:28px; padding:0 12px; font-size:11.5px; font-weight:800; border-radius:6px; border:none; {{ $kategori === 'guru' ? 'background:#000000; color:#FFFFFF;' : 'background:transparent; color:var(--text-2);' }}">
+              <i class="bi bi-person-badge-fill"></i> Guru
+            </button>
+          </div>
+
+          {{-- Export CSV --}}
+          <a href="{{ route('peringkat.export-csv', request()->all()) }}" class="btn btn-sm btn-outline" style="height:32px; padding:0 10px; font-size:11.5px; font-weight:800; color:#000000; border:1px solid var(--border-2); background:var(--bg-2); display:inline-flex; align-items:center; gap:4px; border-radius:6px; text-decoration:none;">
+            <i class="bi bi-file-earmark-arrow-down-fill"></i> Export CSV
+          </a>
+
+          @include('partials.header_actions')
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ Filter Parameters Card ══ -->
+    <div class="panel" style="margin-bottom:14px; padding:10px 14px;">
+      <form method="GET" action="{{ route('peringkat.index') }}" id="formPeringkat">
+        <input type="hidden" name="kategori" id="inputKategori" value="{{ $kategori }}" />
+        
+        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap:8px; align-items:flex-end;">
           {{-- Periode Tipe --}}
           <div class="form-group" style="margin-bottom:0;">
-            <label style="font-size:11px; font-weight:800; text-transform:uppercase; color:var(--text-2); margin-bottom:6px; display:block;">Pilihan Periode</label>
-            <select name="periode" id="selectPeriode" class="input-field" style="width:100%; height:40px; font-size:12.5px; font-weight:700;" onchange="document.getElementById('formPeringkat').submit();">
-              <option value="semester" {{ $periode === 'semester' ? 'selected' : '' }}>Semester Akademik</option>
+            <label style="font-size:10.5px; font-weight:800; text-transform:uppercase; color:var(--text-2); margin-bottom:4px; display:block;">Periode</label>
+            <select name="periode" id="selectPeriode" class="input-field" style="width:100%; height:32px; font-size:11.5px; font-weight:700; padding:0 8px;" onchange="document.getElementById('formPeringkat').submit();">
+              <option value="semester" {{ $periode === 'semester' ? 'selected' : '' }}>Semester</option>
               <option value="bulan" {{ $periode === 'bulan' ? 'selected' : '' }}>Bulanan</option>
-              <option value="kustom" {{ $periode === 'kustom' ? 'selected' : '' }}>Rentang Kustom</option>
+              <option value="kustom" {{ $periode === 'kustom' ? 'selected' : '' }}>Kustom</option>
             </select>
           </div>
 
           @if($periode === 'semester')
-            {{-- Semester Ganjil / Genap --}}
             <div class="form-group" style="margin-bottom:0;">
-              <label style="font-size:11px; font-weight:800; text-transform:uppercase; color:var(--text-2); margin-bottom:6px; display:block;">Semester</label>
-              <select name="semester" class="input-field" style="width:100%; height:40px; font-size:12.5px;" onchange="document.getElementById('formPeringkat').submit();">
-                <option value="ganjil" {{ $semesterTipe === 'ganjil' ? 'selected' : '' }}>Semester Ganjil (Jul - Des)</option>
-                <option value="genap" {{ $semesterTipe === 'genap' ? 'selected' : '' }}>Semester Genap (Jan - Jun)</option>
+              <label style="font-size:10.5px; font-weight:800; text-transform:uppercase; color:var(--text-2); margin-bottom:4px; display:block;">Semester</label>
+              <select name="semester" class="input-field" style="width:100%; height:32px; font-size:11.5px; padding:0 8px;" onchange="document.getElementById('formPeringkat').submit();">
+                <option value="ganjil" {{ $semesterTipe === 'ganjil' ? 'selected' : '' }}>Ganjil (Jul - Des)</option>
+                <option value="genap" {{ $semesterTipe === 'genap' ? 'selected' : '' }}>Genap (Jan - Jun)</option>
               </select>
             </div>
 
-            {{-- Tahun Ajaran --}}
             <div class="form-group" style="margin-bottom:0;">
-              <label style="font-size:11px; font-weight:800; text-transform:uppercase; color:var(--text-2); margin-bottom:6px; display:block;">Tahun Ajaran</label>
-              <select name="tahun_ajaran_id" class="input-field" style="width:100%; height:40px; font-size:12.5px;" onchange="document.getElementById('formPeringkat').submit();">
+              <label style="font-size:10.5px; font-weight:800; text-transform:uppercase; color:var(--text-2); margin-bottom:4px; display:block;">Tahun Ajaran</label>
+              <select name="tahun_ajaran_id" class="input-field" style="width:100%; height:32px; font-size:11.5px; padding:0 8px;" onchange="document.getElementById('formPeringkat').submit();">
                 @foreach($semuaTa as $ta)
                   <option value="{{ $ta->id }}" {{ $taPilihan && $taPilihan->id == $ta->id ? 'selected' : '' }}>{{ $ta->nama }}</option>
                 @endforeach
@@ -368,25 +422,25 @@
             </div>
           @elseif($periode === 'bulan')
             <div class="form-group" style="margin-bottom:0;">
-              <label style="font-size:11px; font-weight:800; text-transform:uppercase; color:var(--text-2); margin-bottom:6px; display:block;">Pilih Bulan</label>
-              <input type="month" name="bulan" value="{{ $bulan }}" class="input-field" style="width:100%; height:40px; font-size:12.5px;" onchange="document.getElementById('formPeringkat').submit();" />
+              <label style="font-size:10.5px; font-weight:800; text-transform:uppercase; color:var(--text-2); margin-bottom:4px; display:block;">Pilih Bulan</label>
+              <input type="month" name="bulan" value="{{ $bulan }}" class="input-field" style="width:100%; height:32px; font-size:11.5px; padding:0 8px;" onchange="document.getElementById('formPeringkat').submit();" />
             </div>
           @else
             <div class="form-group" style="margin-bottom:0;">
-              <label style="font-size:11px; font-weight:800; text-transform:uppercase; color:var(--text-2); margin-bottom:6px; display:block;">Tanggal Mulai</label>
-              <input type="date" name="tanggal_mulai" value="{{ $startDate }}" class="input-field" style="width:100%; height:40px; font-size:12.5px;" />
+              <label style="font-size:10.5px; font-weight:800; text-transform:uppercase; color:var(--text-2); margin-bottom:4px; display:block;">Tgl Mulai</label>
+              <input type="date" name="tanggal_mulai" value="{{ $startDate }}" class="input-field" style="width:100%; height:32px; font-size:11.5px; padding:0 8px;" />
             </div>
             <div class="form-group" style="margin-bottom:0;">
-              <label style="font-size:11px; font-weight:800; text-transform:uppercase; color:var(--text-2); margin-bottom:6px; display:block;">Tanggal Selesai</label>
-              <input type="date" name="tanggal_selesai" value="{{ $effectiveEndDate }}" class="input-field" style="width:100%; height:40px; font-size:12.5px;" />
+              <label style="font-size:10.5px; font-weight:800; text-transform:uppercase; color:var(--text-2); margin-bottom:4px; display:block;">Tgl Selesai</label>
+              <input type="date" name="tanggal_selesai" value="{{ $effectiveEndDate }}" class="input-field" style="width:100%; height:32px; font-size:11.5px; padding:0 8px;" />
             </div>
           @endif
 
           @if($kategori === 'siswa')
             <div class="form-group" style="margin-bottom:0;">
-              <label style="font-size:11px; font-weight:800; text-transform:uppercase; color:var(--text-2); margin-bottom:6px; display:block;">Filter Kelas / Rombel</label>
-              <select name="rombel_id" class="input-field" style="width:100%; height:40px; font-size:12.5px;" onchange="document.getElementById('formPeringkat').submit();" {{ $isWaliKelas ? 'disabled' : '' }}>
-                <option value="">Semua Rombel (Sekolah)</option>
+              <label style="font-size:10.5px; font-weight:800; text-transform:uppercase; color:var(--text-2); margin-bottom:4px; display:block;">Kelas / Rombel</label>
+              <select name="rombel_id" class="input-field" style="width:100%; height:32px; font-size:11.5px; padding:0 8px;" onchange="document.getElementById('formPeringkat').submit();" {{ $isWaliKelas ? 'disabled' : '' }}>
+                <option value="">Semua Rombel</option>
                 @foreach($rombels as $r)
                   <option value="{{ $r->id }}" {{ $rombelId == $r->id ? 'selected' : '' }}>{{ $r->nama_rombel }}</option>
                 @endforeach
@@ -395,8 +449,8 @@
           @endif
 
           <div>
-            <button type="submit" class="btn btn-gold" style="height:40px; width:100%; font-weight:800; font-size:12.5px;">
-              <i class="bi bi-funnel-fill"></i> Terapkan Filter
+            <button type="submit" class="btn btn-sm btn-gold" style="height:32px; width:100%; font-weight:800; font-size:11.5px; border-radius:6px;">
+              <i class="bi bi-funnel-fill"></i> Terapkan
             </button>
           </div>
         </div>
@@ -447,18 +501,18 @@
                     <span class="stat-row-val">{{ $top2['avg_masuk_str'] }}</span>
                   </div>
                   <div class="stat-row-item">
-                    <span class="stat-row-label"><i class="bi bi-lightning-charge-fill" style="color:var(--gold);"></i> Rekor Terpagi:</span>
+                    <span class="stat-row-label"><i class="bi bi-lightning-charge-fill" style="color:#000000;"></i> Rekor Terpagi:</span>
                     <span class="stat-row-val">{{ $top2['terpagi_str'] }}</span>
                   </div>
                   <div class="stat-row-item">
-                    <span class="stat-row-label"><i class="bi bi-hourglass-split" style="color:#3B82F6;"></i> Total Durasi:</span>
+                    <span class="stat-row-label"><i class="bi bi-hourglass-split" style="color:#000000;"></i> Total Durasi:</span>
                     <span class="stat-row-val">{{ $top2['total_durasi_str'] }}</span>
                   </div>
                 </div>
               </div>
 
-              <a href="{{ $kategori === 'siswa' ? route('peringkat.piagam-siswa', ['id' => $top2['id'], 'rank' => 2, 'predikat' => $top2['predikat'], 'periode' => $periodeLabel, 'persen' => $top2['persen_kehadiran'], 'avg_masuk' => $top2['avg_masuk_str'], 'durasi' => $top2['total_durasi_str']]) : route('peringkat.piagam-guru', ['id' => $top2['id'], 'rank' => 2, 'predikat' => $top2['predikat'], 'periode' => $periodeLabel, 'persen' => $top2['persen_kehadiran'], 'avg_masuk' => $top2['avg_masuk_str'], 'durasi' => $top2['total_durasi_str']]) }}" target="_blank" class="btn btn-sm btn-outline" style="width:100%; font-size:12px; font-weight:800; padding:8px 0;">
-                <i class="bi bi-award-fill"></i> Cetak Piagam
+              <a href="{{ $kategori === 'siswa' ? route('peringkat.piagam-siswa', ['id' => $top2['id'], 'rank' => 2, 'predikat' => $top2['predikat'], 'periode' => $periodeLabel, 'persen' => $top2['persen_kehadiran'], 'avg_masuk' => $top2['avg_masuk_str'], 'durasi' => $top2['total_durasi_str']]) : route('peringkat.piagam-guru', ['id' => $top2['id'], 'rank' => 2, 'predikat' => $top2['predikat'], 'periode' => $periodeLabel, 'persen' => $top2['persen_kehadiran'], 'avg_masuk' => $top2['avg_masuk_str'], 'durasi' => $top2['total_durasi_str']]) }}" target="_blank" class="btn btn-sm btn-outline-mono" style="width:100%; font-size:12px; font-weight:800; padding:8px 0; text-decoration:none;">
+                <i class="bi bi-award-fill" style="color:#000000;"></i> Cetak Piagam
               </a>
             </div>
 
@@ -470,7 +524,7 @@
                   <span class="badge-rank-title badge-rank-1">👑 JUARA 1 TELADAN UTAMA</span>
                 </div>
                 <h4 class="podium-user-name">{{ $top1['nama'] }}</h4>
-                <div class="podium-user-meta" style="color:var(--gold);">{{ $top1['ident'] }} · {{ $top1['sub'] }}</div>
+                <div class="podium-user-meta" style="color:#000000; font-weight:800;">{{ $top1['ident'] }} · {{ $top1['sub'] }}</div>
 
                 <div class="podium-stats-box">
                   <div class="podium-stat-score">
@@ -478,21 +532,21 @@
                     <span style="font-size:11.5px; color:var(--text-2); font-weight:800;">{{ $top1['predikat'] }} ({{ $top1['hadir_tepat'] }}x Tepat)</span>
                   </div>
                   <div class="stat-row-item">
-                    <span class="stat-row-label"><i class="bi bi-clock-history" style="color:var(--gold);"></i> Rata-rata Masuk:</span>
+                    <span class="stat-row-label"><i class="bi bi-clock-history" style="color:#000000;"></i> Rata-rata Masuk:</span>
                     <span class="stat-row-val">{{ $top1['avg_masuk_str'] }}</span>
                   </div>
                   <div class="stat-row-item">
-                    <span class="stat-row-label"><i class="bi bi-lightning-charge-fill" style="color:var(--gold);"></i> Rekor Terpagi:</span>
+                    <span class="stat-row-label"><i class="bi bi-lightning-charge-fill" style="color:#000000;"></i> Rekor Terpagi:</span>
                     <span class="stat-row-val">{{ $top1['terpagi_str'] }}</span>
                   </div>
                   <div class="stat-row-item">
-                    <span class="stat-row-label"><i class="bi bi-hourglass-split" style="color:var(--gold);"></i> Total Durasi:</span>
+                    <span class="stat-row-label"><i class="bi bi-hourglass-split" style="color:#000000;"></i> Total Durasi:</span>
                     <span class="stat-row-val">{{ $top1['total_durasi_str'] }}</span>
                   </div>
                 </div>
               </div>
 
-              <a href="{{ $kategori === 'siswa' ? route('peringkat.piagam-siswa', ['id' => $top1['id'], 'rank' => 1, 'predikat' => $top1['predikat'], 'periode' => $periodeLabel, 'persen' => $top1['persen_kehadiran'], 'avg_masuk' => $top1['avg_masuk_str'], 'durasi' => $top1['total_durasi_str']]) : route('peringkat.piagam-guru', ['id' => $top1['id'], 'rank' => 1, 'predikat' => $top1['predikat'], 'periode' => $periodeLabel, 'persen' => $top1['persen_kehadiran'], 'avg_masuk' => $top1['avg_masuk_str'], 'durasi' => $top1['total_durasi_str']]) }}" target="_blank" class="btn btn-gold" style="width:100%; font-size:13px; font-weight:900; padding:10px 0;">
+              <a href="{{ $kategori === 'siswa' ? route('peringkat.piagam-siswa', ['id' => $top1['id'], 'rank' => 1, 'predikat' => $top1['predikat'], 'periode' => $periodeLabel, 'persen' => $top1['persen_kehadiran'], 'avg_masuk' => $top1['avg_masuk_str'], 'durasi' => $top1['total_durasi_str']]) : route('peringkat.piagam-guru', ['id' => $top1['id'], 'rank' => 1, 'predikat' => $top1['predikat'], 'periode' => $periodeLabel, 'persen' => $top1['persen_kehadiran'], 'avg_masuk' => $top1['avg_masuk_str'], 'durasi' => $top1['total_durasi_str']]) }}" target="_blank" class="btn btn-gold" style="width:100%; font-size:13px; font-weight:900; padding:10px 0; text-decoration:none;">
                 <i class="bi bi-award-fill"></i> Cetak Piagam Penghargaan
               </a>
             </div>
@@ -513,22 +567,22 @@
                     <span style="font-size:11px; color:var(--text-2); font-weight:700;">{{ $top3['predikat'] }} ({{ $top3['hadir_tepat'] }}x Tepat)</span>
                   </div>
                   <div class="stat-row-item">
-                    <span class="stat-row-label"><i class="bi bi-clock-history" style="color:#CD7F32;"></i> Rata-rata Masuk:</span>
+                    <span class="stat-row-label"><i class="bi bi-clock-history" style="color:#000000;"></i> Rata-rata Masuk:</span>
                     <span class="stat-row-val">{{ $top3['avg_masuk_str'] }}</span>
                   </div>
                   <div class="stat-row-item">
-                    <span class="stat-row-label"><i class="bi bi-lightning-charge-fill" style="color:var(--gold);"></i> Rekor Terpagi:</span>
+                    <span class="stat-row-label"><i class="bi bi-lightning-charge-fill" style="color:#000000;"></i> Rekor Terpagi:</span>
                     <span class="stat-row-val">{{ $top3['terpagi_str'] }}</span>
                   </div>
                   <div class="stat-row-item">
-                    <span class="stat-row-label"><i class="bi bi-hourglass-split" style="color:#3B82F6;"></i> Total Durasi:</span>
+                    <span class="stat-row-label"><i class="bi bi-hourglass-split" style="color:#000000;"></i> Total Durasi:</span>
                     <span class="stat-row-val">{{ $top3['total_durasi_str'] }}</span>
                   </div>
                 </div>
               </div>
 
-              <a href="{{ $kategori === 'siswa' ? route('peringkat.piagam-siswa', ['id' => $top3['id'], 'rank' => 3, 'predikat' => $top3['predikat'], 'periode' => $periodeLabel, 'persen' => $top3['persen_kehadiran'], 'avg_masuk' => $top3['avg_masuk_str'], 'durasi' => $top3['total_durasi_str']]) : route('peringkat.piagam-guru', ['id' => $top3['id'], 'rank' => 3, 'predikat' => $top3['predikat'], 'periode' => $periodeLabel, 'persen' => $top3['persen_kehadiran'], 'avg_masuk' => $top3['avg_masuk_str'], 'durasi' => $top3['total_durasi_str']]) }}" target="_blank" class="btn btn-sm btn-outline" style="width:100%; font-size:12px; font-weight:800; padding:8px 0;">
-                <i class="bi bi-award-fill"></i> Cetak Piagam
+              <a href="{{ $kategori === 'siswa' ? route('peringkat.piagam-siswa', ['id' => $top3['id'], 'rank' => 3, 'predikat' => $top3['predikat'], 'periode' => $periodeLabel, 'persen' => $top3['persen_kehadiran'], 'avg_masuk' => $top3['avg_masuk_str'], 'durasi' => $top3['total_durasi_str']]) : route('peringkat.piagam-guru', ['id' => $top3['id'], 'rank' => 3, 'predikat' => $top3['predikat'], 'periode' => $periodeLabel, 'persen' => $top3['persen_kehadiran'], 'avg_masuk' => $top3['avg_masuk_str'], 'durasi' => $top3['total_durasi_str']]) }}" target="_blank" class="btn btn-sm btn-outline-mono" style="width:100%; font-size:12px; font-weight:800; padding:8px 0; text-decoration:none;">
+                <i class="bi bi-award-fill" style="color:#000000;"></i> Cetak Piagam
               </a>
             </div>
           </div>
@@ -544,7 +598,7 @@
                   <span class="badge-rank-title badge-rank-1">👑 JUARA 1 TELADAN UTAMA</span>
                 </div>
                 <h4 class="podium-user-name">{{ $top1['nama'] }}</h4>
-                <div class="podium-user-meta" style="color:var(--gold);">{{ $top1['ident'] }} · {{ $top1['sub'] }}</div>
+                <div class="podium-user-meta" style="color:#000000; font-weight:800;">{{ $top1['ident'] }} · {{ $top1['sub'] }}</div>
 
                 <div class="podium-stats-box">
                   <div class="podium-stat-score">
@@ -552,21 +606,21 @@
                     <span style="font-size:11.5px; color:var(--text-2); font-weight:800;">{{ $top1['predikat'] }} ({{ $top1['hadir_tepat'] }}x Tepat)</span>
                   </div>
                   <div class="stat-row-item">
-                    <span class="stat-row-label"><i class="bi bi-clock-history" style="color:var(--gold);"></i> Rata-rata Masuk:</span>
+                    <span class="stat-row-label"><i class="bi bi-clock-history" style="color:#000000;"></i> Rata-rata Masuk:</span>
                     <span class="stat-row-val">{{ $top1['avg_masuk_str'] }}</span>
                   </div>
                   <div class="stat-row-item">
-                    <span class="stat-row-label"><i class="bi bi-lightning-charge-fill" style="color:var(--gold);"></i> Rekor Terpagi:</span>
+                    <span class="stat-row-label"><i class="bi bi-lightning-charge-fill" style="color:#000000;"></i> Rekor Terpagi:</span>
                     <span class="stat-row-val">{{ $top1['terpagi_str'] }}</span>
                   </div>
                   <div class="stat-row-item">
-                    <span class="stat-row-label"><i class="bi bi-hourglass-split" style="color:var(--gold);"></i> Total Durasi:</span>
+                    <span class="stat-row-label"><i class="bi bi-hourglass-split" style="color:#000000;"></i> Total Durasi:</span>
                     <span class="stat-row-val">{{ $top1['total_durasi_str'] }}</span>
                   </div>
                 </div>
               </div>
 
-              <a href="{{ $kategori === 'siswa' ? route('peringkat.piagam-siswa', ['id' => $top1['id'], 'rank' => 1, 'predikat' => $top1['predikat'], 'periode' => $periodeLabel, 'persen' => $top1['persen_kehadiran'], 'avg_masuk' => $top1['avg_masuk_str'], 'durasi' => $top1['total_durasi_str']]) : route('peringkat.piagam-guru', ['id' => $top1['id'], 'rank' => 1, 'predikat' => $top1['predikat'], 'periode' => $periodeLabel, 'persen' => $top1['persen_kehadiran'], 'avg_masuk' => $top1['avg_masuk_str'], 'durasi' => $top1['total_durasi_str']]) }}" target="_blank" class="btn btn-gold" style="width:100%; font-size:13px; font-weight:900; padding:10px 0;">
+              <a href="{{ $kategori === 'siswa' ? route('peringkat.piagam-siswa', ['id' => $top1['id'], 'rank' => 1, 'predikat' => $top1['predikat'], 'periode' => $periodeLabel, 'persen' => $top1['persen_kehadiran'], 'avg_masuk' => $top1['avg_masuk_str'], 'durasi' => $top1['total_durasi_str']]) : route('peringkat.piagam-guru', ['id' => $top1['id'], 'rank' => 1, 'predikat' => $top1['predikat'], 'periode' => $periodeLabel, 'persen' => $top1['persen_kehadiran'], 'avg_masuk' => $top1['avg_masuk_str'], 'durasi' => $top1['total_durasi_str']]) }}" target="_blank" class="btn btn-gold" style="width:100%; font-size:13px; font-weight:900; padding:10px 0; text-decoration:none;">
                 <i class="bi bi-award-fill"></i> Cetak Piagam Penghargaan
               </a>
             </div>
@@ -587,22 +641,22 @@
                     <span style="font-size:11px; color:var(--text-2); font-weight:700;">{{ $top2['predikat'] }} ({{ $top2['hadir_tepat'] }}x Tepat)</span>
                   </div>
                   <div class="stat-row-item">
-                    <span class="stat-row-label"><i class="bi bi-clock-history" style="color:#94A3B8;"></i> Rata-rata Masuk:</span>
+                    <span class="stat-row-label"><i class="bi bi-clock-history" style="color:#000000;"></i> Rata-rata Masuk:</span>
                     <span class="stat-row-val">{{ $top2['avg_masuk_str'] }}</span>
                   </div>
                   <div class="stat-row-item">
-                    <span class="stat-row-label"><i class="bi bi-lightning-charge-fill" style="color:var(--gold);"></i> Rekor Terpagi:</span>
+                    <span class="stat-row-label"><i class="bi bi-lightning-charge-fill" style="color:#000000;"></i> Rekor Terpagi:</span>
                     <span class="stat-row-val">{{ $top2['terpagi_str'] }}</span>
                   </div>
                   <div class="stat-row-item">
-                    <span class="stat-row-label"><i class="bi bi-hourglass-split" style="color:#3B82F6;"></i> Total Durasi:</span>
+                    <span class="stat-row-label"><i class="bi bi-hourglass-split" style="color:#000000;"></i> Total Durasi:</span>
                     <span class="stat-row-val">{{ $top2['total_durasi_str'] }}</span>
                   </div>
                 </div>
               </div>
 
-              <a href="{{ $kategori === 'siswa' ? route('peringkat.piagam-siswa', ['id' => $top2['id'], 'rank' => 2, 'predikat' => $top2['predikat'], 'periode' => $periodeLabel, 'persen' => $top2['persen_kehadiran'], 'avg_masuk' => $top2['avg_masuk_str'], 'durasi' => $top2['total_durasi_str']]) : route('peringkat.piagam-guru', ['id' => $top2['id'], 'rank' => 2, 'predikat' => $top2['predikat'], 'periode' => $periodeLabel, 'persen' => $top2['persen_kehadiran'], 'avg_masuk' => $top2['avg_masuk_str'], 'durasi' => $top2['total_durasi_str']]) }}" target="_blank" class="btn btn-sm btn-outline" style="width:100%; font-size:12px; font-weight:800; padding:8px 0;">
-                <i class="bi bi-award-fill"></i> Cetak Piagam
+              <a href="{{ $kategori === 'siswa' ? route('peringkat.piagam-siswa', ['id' => $top2['id'], 'rank' => 2, 'predikat' => $top2['predikat'], 'periode' => $periodeLabel, 'persen' => $top2['persen_kehadiran'], 'avg_masuk' => $top2['avg_masuk_str'], 'durasi' => $top2['total_durasi_str']]) : route('peringkat.piagam-guru', ['id' => $top2['id'], 'rank' => 2, 'predikat' => $top2['predikat'], 'periode' => $periodeLabel, 'persen' => $top2['persen_kehadiran'], 'avg_masuk' => $top2['avg_masuk_str'], 'durasi' => $top2['total_durasi_str']]) }}" target="_blank" class="btn btn-sm btn-outline-mono" style="width:100%; font-size:12px; font-weight:800; padding:8px 0; text-decoration:none;">
+                <i class="bi bi-award-fill" style="color:#000000;"></i> Cetak Piagam
               </a>
             </div>
           </div>
@@ -617,7 +671,7 @@
                   <span class="badge-rank-title badge-rank-1">👑 JUARA 1 TELADAN UTAMA</span>
                 </div>
                 <h4 class="podium-user-name">{{ $top1['nama'] }}</h4>
-                <div class="podium-user-meta" style="color:var(--gold);">{{ $top1['ident'] }} · {{ $top1['sub'] }}</div>
+                <div class="podium-user-meta" style="color:#000000; font-weight:800;">{{ $top1['ident'] }} · {{ $top1['sub'] }}</div>
 
                 <div class="podium-stats-box">
                   <div class="podium-stat-score">
@@ -625,21 +679,21 @@
                     <span style="font-size:11.5px; color:var(--text-2); font-weight:800;">{{ $top1['predikat'] }} ({{ $top1['hadir_tepat'] }}x Tepat)</span>
                   </div>
                   <div class="stat-row-item">
-                    <span class="stat-row-label"><i class="bi bi-clock-history" style="color:var(--gold);"></i> Rata-rata Masuk:</span>
+                    <span class="stat-row-label"><i class="bi bi-clock-history" style="color:#000000;"></i> Rata-rata Masuk:</span>
                     <span class="stat-row-val">{{ $top1['avg_masuk_str'] }}</span>
                   </div>
                   <div class="stat-row-item">
-                    <span class="stat-row-label"><i class="bi bi-lightning-charge-fill" style="color:var(--gold);"></i> Rekor Terpagi:</span>
+                    <span class="stat-row-label"><i class="bi bi-lightning-charge-fill" style="color:#000000;"></i> Rekor Terpagi:</span>
                     <span class="stat-row-val">{{ $top1['terpagi_str'] }}</span>
                   </div>
                   <div class="stat-row-item">
-                    <span class="stat-row-label"><i class="bi bi-hourglass-split" style="color:var(--gold);"></i> Total Durasi:</span>
+                    <span class="stat-row-label"><i class="bi bi-hourglass-split" style="color:#000000;"></i> Total Durasi:</span>
                     <span class="stat-row-val">{{ $top1['total_durasi_str'] }}</span>
                   </div>
                 </div>
               </div>
 
-              <a href="{{ $kategori === 'siswa' ? route('peringkat.piagam-siswa', ['id' => $top1['id'], 'rank' => 1, 'predikat' => $top1['predikat'], 'periode' => $periodeLabel, 'persen' => $top1['persen_kehadiran'], 'avg_masuk' => $top1['avg_masuk_str'], 'durasi' => $top1['total_durasi_str']]) : route('peringkat.piagam-guru', ['id' => $top1['id'], 'rank' => 1, 'predikat' => $top1['predikat'], 'periode' => $periodeLabel, 'persen' => $top1['persen_kehadiran'], 'avg_masuk' => $top1['avg_masuk_str'], 'durasi' => $top1['total_durasi_str']]) }}" target="_blank" class="btn btn-gold" style="width:100%; font-size:13px; font-weight:900; padding:10px 0;">
+              <a href="{{ $kategori === 'siswa' ? route('peringkat.piagam-siswa', ['id' => $top1['id'], 'rank' => 1, 'predikat' => $top1['predikat'], 'periode' => $periodeLabel, 'persen' => $top1['persen_kehadiran'], 'avg_masuk' => $top1['avg_masuk_str'], 'durasi' => $top1['total_durasi_str']]) : route('peringkat.piagam-guru', ['id' => $top1['id'], 'rank' => 1, 'predikat' => $top1['predikat'], 'periode' => $periodeLabel, 'persen' => $top1['persen_kehadiran'], 'avg_masuk' => $top1['avg_masuk_str'], 'durasi' => $top1['total_durasi_str']]) }}" target="_blank" class="btn btn-gold" style="width:100%; font-size:13px; font-weight:900; padding:10px 0; text-decoration:none;">
                 <i class="bi bi-award-fill"></i> Cetak Piagam Penghargaan
               </a>
             </div>
@@ -652,7 +706,7 @@
     <div class="panel" style="padding:0; overflow:hidden; border:1px solid var(--border); border-radius:var(--r-md); box-shadow:var(--shadow-sm); background:var(--bg-2); margin-bottom:24px;">
       <div class="panel-title" style="padding:14px 18px; margin:0; border-bottom:1px solid var(--border); background:var(--surface); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
         <div style="display:flex; align-items:center; gap:8px; font-weight:800; font-size:15px; color:var(--text);">
-          <i class="bi bi-trophy-fill" style="color:var(--gold);"></i>
+          <i class="bi bi-trophy-fill" style="color:#000000;"></i>
           <span>Tabel Peringkat Presisi Waktu</span>
         </div>
         <div style="width:260px; position:relative;">
@@ -726,8 +780,8 @@
                   </span>
                 </td>
                 <td style="text-align:center;">
-                  <a href="{{ $kategori === 'siswa' ? route('peringkat.piagam-siswa', ['id' => $item['id'], 'rank' => $item['rank'], 'predikat' => $item['predikat'], 'periode' => $periodeLabel, 'persen' => $item['persen_kehadiran'], 'avg_masuk' => $item['avg_masuk_str'], 'durasi' => $item['total_durasi_str']]) : route('peringkat.piagam-guru', ['id' => $item['id'], 'rank' => $item['rank'], 'predikat' => $item['predikat'], 'periode' => $periodeLabel, 'persen' => $item['persen_kehadiran'], 'avg_masuk' => $item['avg_masuk_str'], 'durasi' => $item['total_durasi_str']]) }}" target="_blank" class="btn btn-sm btn-outline" style="font-size:11px; padding:4px 10px; font-weight:800; color:#000000; border-color:var(--border-2);" title="Cetak Piagam Penghargaan">
-                    <i class="bi bi-award"></i> Piagam
+                  <a href="{{ $kategori === 'siswa' ? route('peringkat.piagam-siswa', ['id' => $item['id'], 'rank' => $item['rank'], 'predikat' => $item['predikat'], 'periode' => $periodeLabel, 'persen' => $item['persen_kehadiran'], 'avg_masuk' => $item['avg_masuk_str'], 'durasi' => $item['total_durasi_str']]) : route('peringkat.piagam-guru', ['id' => $item['id'], 'rank' => $item['rank'], 'predikat' => $item['predikat'], 'periode' => $periodeLabel, 'persen' => $item['persen_kehadiran'], 'avg_masuk' => $item['avg_masuk_str'], 'durasi' => $item['total_durasi_str']]) }}" target="_blank" class="btn btn-sm btn-outline-mono" style="font-size:11px; padding:4px 10px; font-weight:800; text-decoration:none;" title="Cetak Piagam Penghargaan">
+                    <i class="bi bi-award" style="color:#000000;"></i> Piagam
                   </a>
                 </td>
               </tr>
@@ -746,7 +800,7 @@
       @if($leaderboard instanceof \Illuminate\Pagination\LengthAwarePaginator && $leaderboard->hasPages())
         <div style="padding:14px 18px; border-top:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; background:var(--bg-2);">
           <div style="font-size:12.5px; color:var(--text-2); font-weight:600;">
-            Menampilkan <strong style="color:var(--gold);">{{ $leaderboard->firstItem() }}</strong> – <strong style="color:var(--gold);">{{ $leaderboard->lastItem() }}</strong> dari <strong style="color:var(--text);">{{ $leaderboard->total() }}</strong> peringkat {{ $kategori }}
+            Menampilkan <strong style="color:#000000;">{{ $leaderboard->firstItem() }}</strong> – <strong style="color:#000000;">{{ $leaderboard->lastItem() }}</strong> dari <strong style="color:var(--text);">{{ $leaderboard->total() }}</strong> peringkat {{ $kategori }}
           </div>
           <div>
             {{ $leaderboard->withQueryString()->links() }}

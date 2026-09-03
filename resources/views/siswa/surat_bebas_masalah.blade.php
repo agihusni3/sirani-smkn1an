@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Surat Keterangan Bebas Masalah — {{ $siswa->nama }} ({{ $siswa->nis }})</title>
+  <title>Surat Keterangan Bebas Masalah — {{ $siswa->nama }} ({{ $siswa->nisn ?: $siswa->id }})</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -332,6 +332,55 @@
       font-family: 'Plus Jakarta Sans', sans-serif;
     }
 
+    .print-sheet-wrapper {
+      width: 100%;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      display: flex;
+      justify-content: center;
+      padding-bottom: 30px;
+    }
+
+    @media (max-width: 820px) {
+      body {
+        padding: 10px 0 30px;
+        align-items: stretch;
+        overflow-x: auto;
+      }
+      .print-actions-bar {
+        width: calc(100% - 16px);
+        margin: 0 8px 14px;
+        position: sticky;
+        top: 6px;
+        z-index: 1000;
+        padding: 10px 14px;
+      }
+      .print-title-info {
+        font-size: 12px;
+      }
+      .btn-action-group {
+        width: 100%;
+        display: flex;
+        gap: 8px;
+      }
+      .btn-back {
+        flex: 1;
+        justify-content: center;
+        padding: 8px 10px;
+        font-size: 12px;
+      }
+      .btn-print {
+        flex: 1.5;
+        justify-content: center;
+        padding: 8px 12px;
+        font-size: 12px;
+      }
+      .print-sheet-wrapper {
+        justify-content: flex-start;
+        padding: 0 8px 30px;
+      }
+    }
+
     /* PRINT STYLES */
     @media print {
       body {
@@ -375,8 +424,9 @@
     </div>
   </div>
 
-  {{-- A4 PAGE SHEET --}}
-  <div class="a4-page">
+  {{-- WRAPPER LEMBAR CETAK RESMI --}}
+  <div class="print-sheet-wrapper">
+    <div class="a4-page">
     <div>
       {{-- 1. KOP SURAT DINAS RESMI --}}
       <div class="kop-container">
@@ -410,11 +460,6 @@
           <td class="bio-label">Nama Lengkap Siswa</td>
           <td class="bio-sep">:</td>
           <td class="bio-val" style="font-size:11.5pt; text-transform:uppercase;">{{ $siswa->nama }}</td>
-        </tr>
-        <tr>
-          <td class="bio-label">Nomor Induk Siswa (NIS)</td>
-          <td class="bio-sep">:</td>
-          <td class="bio-val">{{ $siswa->nis }}</td>
         </tr>
         <tr>
           <td class="bio-label">Nomor Induk Siswa Nasional (NISN)</td>
@@ -549,6 +594,7 @@
         <div>Dicetak Otomatis pada {{ date('d/m/Y H:i') }} WIB | ID: {{ $nomorSurat }}</div>
       </div>
     </div>
+  </div>
   </div>
 
 </body>

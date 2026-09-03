@@ -40,14 +40,4 @@ class Absensi extends Model
     {
         return $this->belongsTo(Guru::class, 'pemilik_id');
     }
-
-    /** Label Sumber Presensi Terstandarisasi */
-    public function getSumberAbsenLabelAttribute(): string
-    {
-        return match ($this->sumber_absen) {
-            'manual_piket', 'manual_izin_piket' => 'Manual Piket',
-            'koreksi_piket_manual'              => 'Koreksi Piket',
-            default                             => 'Face ID (Smart Gate)',
-        };
-    }
 }

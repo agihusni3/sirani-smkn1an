@@ -33,13 +33,13 @@
     }
     .segmented-btn:hover { color: var(--text); }
     .segmented-btn.active {
-      background: #000000 !important;
-      color: #FFFFFF !important;
+      background: var(--text) !important;
+      color: var(--bg) !important;
       font-weight: 800;
       box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25);
     }
     .segmented-btn.active i {
-      color: #FFFFFF !important;
+      color: var(--bg) !important;
     }
 
     /* Executive Filter Panel */
@@ -66,71 +66,102 @@
       align-items: center;
       gap: 6px;
     }
-    .period-chip:hover { color: var(--text); background: rgba(255,255,255,0.06); border-color: var(--border-2); }
+    .period-chip:hover { color: var(--text); background: var(--surface); border-color: var(--border-2); }
     .period-chip.active { 
-      background: #000000 !important; 
-      color: #FFFFFF !important; 
-      border-color: #000000 !important; 
+      background: var(--text) !important; 
+      color: var(--bg) !important; 
+      border-color: var(--text) !important; 
       font-weight: 800; 
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25); 
     }
     .period-chip.active i {
-      color: #FFFFFF !important;
+      color: var(--bg) !important;
     }
 
     /* Executive KPI Grid */
     .lp-kpi-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(145px, 1fr));
-      gap: 12px;
-      margin-bottom: 24px;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 8px;
+      margin-bottom: 12px;
     }
     .lp-kpi-card {
       background: var(--bg-2);
-      border: 1px solid var(--border);
-      border-radius: var(--r-md);
-      padding: 14px 16px;
+      border: 1px solid var(--border-2);
+      border-radius: var(--r-sm);
+      padding: 10px 12px;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      transition: all .2s ease;
+      gap: 2px;
+      transition: all .15s ease;
       box-shadow: var(--shadow-sm);
     }
     .lp-kpi-card:hover {
-      border-color: var(--border-2);
-      transform: translateY(-2px);
+      border-color: #000000;
     }
     .lp-kpi-head {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 8px;
+      margin-bottom: 2px;
     }
     .lp-kpi-title {
-      font-size: 10.5px;
+      font-size: 10px;
       font-weight: 800;
       text-transform: uppercase;
-      letter-spacing: 0.5px;
-      color: #000000;
+      letter-spacing: 0.4px;
+      color: var(--text-3);
     }
     .lp-kpi-icon {
-      width: 28px;
-      height: 28px;
-      border-radius: 8px;
+      width: 26px;
+      height: 26px;
+      border-radius: 6px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 14px;
-      background: rgba(0, 0, 0, 0.06);
+      font-size: 12px;
+      background: var(--bg-3);
       color: #000000;
-      border: 1px solid rgba(0, 0, 0, 0.12);
+      border: 1px solid var(--border-2);
+      flex-shrink: 0;
     }
     .lp-kpi-val {
-      font-size: 24px;
+      font-size: 20px;
       font-weight: 900;
       font-family: var(--font-mono);
-      color: #000000;
       line-height: 1.1;
+      color: #000000;
+    }
+      font-family: var(--font-mono);
+      color: var(--text);
+      line-height: 1.1;
+    }
+
+    @media (max-width: 1024px) {
+      .segmented-control {
+        display: flex !important;
+        width: 100% !important;
+        margin-bottom: 14px !important;
+      }
+      .segmented-btn {
+        flex: 1 !important;
+        justify-content: center !important;
+        text-align: center !important;
+        padding: 9px 8px !important;
+        font-size: 12px !important;
+      }
+      .lp-kpi-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 10px !important;
+        margin-bottom: 16px !important;
+      }
+      .lp-kpi-card {
+        padding: 12px 14px !important;
+      }
+      .lp-kpi-val {
+        font-size: 22px !important;
+      }
     }
 
     /* ── Searchable Combobox for Laporan Individu ── */
@@ -149,8 +180,8 @@
       user-select: none;
     }
     .lp-picker-trigger:hover, .lp-picker-trigger.focused {
-      border-color: var(--gold);
-      box-shadow: 0 0 0 2px var(--gold-glow);
+      border-color: var(--text);
+      box-shadow: 0 0 0 2px var(--border-2);
     }
     .btn-clear-lp {
       background: transparent;
@@ -175,7 +206,7 @@
       background: var(--bg-2);
       border: 1.5px solid var(--border-2);
       border-radius: var(--r-sm);
-      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+      box-shadow: var(--shadow-lg);
       z-index: 1050;
       overflow: hidden;
     }
@@ -194,7 +225,7 @@
       gap: 10px;
     }
     .lp-picker-item:last-child { border-bottom: none; }
-    .lp-picker-item:hover { background: var(--gold-dim); }
+    .lp-picker-item:hover { background: var(--surface); }
 
     /* ── STYLING KOP & DOKUMEN CETAK (PRINT / PDF) ── */
     .print-only { display: none; }
@@ -294,7 +325,7 @@
       .kop-text p {
         font-size: 8pt !important;
         margin: 2px 0 0 0 !important;
-        color: #333 !important;
+        color: #000 !important;
         line-height: 1.3 !important;
       }
       .kop-line-double {
@@ -320,7 +351,7 @@
       .doc-title-box p {
         font-size: 9.5pt !important;
         margin: 0 !important;
-        color: #444 !important;
+        color: #000 !important;
       }
 
       /* TABEL CETAK */
@@ -372,30 +403,53 @@
   @include('partials.sidebar')
 
   <main class="main-content">
-    <header class="header no-print" style="margin-bottom:20px;">
-      <div class="header-title">
-        <h1 style="margin:0; font-size:22px; display:flex; align-items:center; gap:8px;">
-          <i class="bi bi-file-earmark-bar-graph-fill" style="color:var(--gold);"></i> Rekap Presensi &amp; Laporan
-        </h1>
-        <p style="margin-top:2px; font-size:13px; color:var(--text-3);">
-          Audit riwayat kehadiran, rekapitulasi berkala, dan penerbitan laporan resmi A4.
-        </p>
-      </div>
+    @php
+      $userLogin = auth()->user();
+      $todayDate = \Carbon\Carbon::today()->toDateString();
+      $isPiketBertugasHariIni = $userLogin && (
+          $userLogin->isAdmin() || 
+          ($userLogin->guru && \App\Models\JadwalPiket::isGuruPiketHariIni($userLogin->guru->id, $todayDate))
+      );
+    @endphp
 
-      <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-        @include('partials.header_actions')
+    {{-- ULTRA COMPACT SLIM HEADER & SWITCHER BAR --}}
+    <div class="panel no-print" style="background:var(--bg-2); border:1px solid var(--border); padding:10px 16px; margin-bottom:12px; border-radius:var(--r-md); box-shadow:var(--shadow-sm);">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+        <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+          <h1 style="margin:0; font-size:16px; font-weight:900; color:var(--text); display:inline-flex; align-items:center; gap:6px;">
+            <i class="bi bi-file-earmark-bar-graph-fill" style="color:#000000; font-size:16px;"></i> Rekap Presensi &amp; Laporan
+          </h1>
+          <span style="color:var(--border-2); font-weight:300;">|</span>
+          <span style="font-size:11.5px; color:var(--text-3);">
+            Periode: <strong style="color:#000000;">{{ $periodeText }}</strong>
+          </span>
+        </div>
+
+        <div style="display:flex; align-items:center; gap:8px;">
+          <div class="segmented-control no-print" style="margin-bottom:0; background:var(--bg-3); border:1px solid var(--border-2); border-radius:6px; padding:2px; gap:2px;">
+            <a href="/laporan?kategori=siswa&periode={{ $periode }}" class="segmented-btn {{ $kategori === 'siswa' ? 'active' : '' }}" style="height:28px; font-size:11px; font-weight:800; padding:0 12px; border-radius:4px;">
+              <i class="bi bi-people-fill"></i> Siswa
+            </a>
+            @if($canAccessGuru ?? false)
+              <a href="/laporan?kategori=guru&periode={{ $periode }}" class="segmented-btn {{ $kategori === 'guru' ? 'active' : '' }}" style="height:28px; font-size:11px; font-weight:800; padding:0 12px; border-radius:4px;">
+                <i class="bi bi-person-badge-fill"></i> Guru &amp; Pegawai
+              </a>
+            @endif
+          </div>
+          @include('partials.header_actions')
+        </div>
       </div>
-    </header>
+    </div>
 
     @if(session('success'))
-      <div class="alert alert-success no-print" style="margin-bottom: 20px;">
+      <div class="alert alert-success no-print" style="margin-bottom: 12px;">
         <i class="bi bi-check-circle-fill"></i>
         <span>{{ session('success') }}</span>
       </div>
     @endif
 
     @if(session('error'))
-      <div class="alert alert-error no-print" style="margin-bottom: 20px;">
+      <div class="alert alert-error no-print" style="margin-bottom: 12px;">
         <i class="bi bi-exclamation-triangle-fill"></i>
         <span>{{ session('error') }}</span>
       </div>
@@ -428,24 +482,10 @@
       </div>
     </div>
 
-    <!-- ═══════════════════════════════════════════════════════════════════ -->
-    <!-- TAB SWITCHER: SISWA VS GURU (NO-PRINT) -->
-    <!-- ═══════════════════════════════════════════════════════════════════ -->
-    <div class="segmented-control no-print">
-      <a href="/laporan?kategori=siswa&periode={{ $periode }}" class="segmented-btn {{ $kategori === 'siswa' ? 'active' : '' }}">
-        <i class="bi bi-people-fill"></i> Presensi Siswa
-      </a>
-      @if($canAccessGuru ?? false)
-        <a href="/laporan?kategori=guru&periode={{ $periode }}" class="segmented-btn {{ $kategori === 'guru' ? 'active' : '' }}">
-          <i class="bi bi-person-badge-fill"></i> Presensi Guru &amp; Pegawai
-        </a>
-      @endif
-    </div>
-
     @if($isWaliKelas ?? false)
-      <div class="no-print" style="margin-bottom: 16px; background: rgba(202,138,4,0.1); border: 1px solid var(--gold); border-radius: var(--r-sm); padding: 10px 14px; color: var(--text); display: flex; align-items: center; gap: 10px; font-size: 13px;">
+      <div class="no-print" style="margin-bottom: 16px; background: rgba(0,0,0,0.04); border: 1px solid var(--border); border-radius: var(--r-sm); padding: 10px 14px; color: var(--text); display: flex; align-items: center; gap: 10px; font-size: 13px;">
         <div>
-          <strong>Akses Wali Kelas:</strong> Menampilkan rekapitulasi data khusus untuk rombel binaan Anda: <strong style="color:var(--gold);">{{ $waliRombelNama ?? 'Kelas Anda' }}</strong>.
+          <strong>Akses Wali Kelas:</strong> Menampilkan rekapitulasi data khusus untuk rombel binaan Anda: <strong style="color:#000000; font-weight:800;">{{ $waliRombelNama ?? 'Kelas Anda' }}</strong>.
         </div>
       </div>
     @endif
@@ -458,77 +498,77 @@
       <div class="lp-kpi-card">
         <div class="lp-kpi-head">
           <span class="lp-kpi-title">Total Rekap</span>
-          <div class="lp-kpi-icon">
+          <div class="lp-kpi-icon" style="background:var(--bg-3); color:#000000; border:1px solid var(--border-2);">
             <i class="bi bi-folder-symlink-fill"></i>
           </div>
         </div>
-        <div class="lp-kpi-val">{{ $totalRecord }}</div>
+        <div class="lp-kpi-val" style="color:#000000;">{{ $totalRecord }}</div>
       </div>
 
       {{-- Hadir Tepat --}}
       <div class="lp-kpi-card">
         <div class="lp-kpi-head">
           <span class="lp-kpi-title">Hadir Tepat</span>
-          <div class="lp-kpi-icon">
+          <div class="lp-kpi-icon" style="background:var(--bg-3); color:#000000; border:1px solid var(--border-2);">
             <i class="bi bi-check-circle-fill"></i>
           </div>
         </div>
-        <div class="lp-kpi-val">{{ $totalHadir }}</div>
+        <div class="lp-kpi-val" style="color:#000000;">{{ $totalHadir }}</div>
       </div>
 
       {{-- Terlambat --}}
       <div class="lp-kpi-card">
         <div class="lp-kpi-head">
           <span class="lp-kpi-title">Terlambat</span>
-          <div class="lp-kpi-icon">
+          <div class="lp-kpi-icon" style="background:var(--bg-3); color:#000000; border:1px solid var(--border-2);">
             <i class="bi bi-clock-history"></i>
           </div>
         </div>
-        <div class="lp-kpi-val">{{ $totalTerlambat }}</div>
+        <div class="lp-kpi-val" style="color:#000000;">{{ $totalTerlambat }}</div>
       </div>
 
       {{-- Izin / Sakit --}}
       <div class="lp-kpi-card">
         <div class="lp-kpi-head">
           <span class="lp-kpi-title">Izin / Sakit</span>
-          <div class="lp-kpi-icon">
+          <div class="lp-kpi-icon" style="background:var(--bg-3); color:#000000; border:1px solid var(--border-2);">
             <i class="bi bi-envelope-open-fill"></i>
           </div>
         </div>
-        <div class="lp-kpi-val">{{ $totalIzin }}</div>
+        <div class="lp-kpi-val" style="color:#000000;">{{ $totalIzin }}</div>
       </div>
 
       {{-- Alpha --}}
       <div class="lp-kpi-card">
         <div class="lp-kpi-head">
           <span class="lp-kpi-title">Alpha</span>
-          <div class="lp-kpi-icon">
+          <div class="lp-kpi-icon" style="background:var(--bg-3); color:#000000; border:1px solid var(--border-2);">
             <i class="bi bi-exclamation-triangle-fill"></i>
           </div>
         </div>
-        <div class="lp-kpi-val">{{ $totalAlpha }}</div>
+        <div class="lp-kpi-val" style="color:#000000;">{{ $totalAlpha }}</div>
       </div>
 
       {{-- Bolos --}}
       <div class="lp-kpi-card">
         <div class="lp-kpi-head">
           <span class="lp-kpi-title">Bolos</span>
-          <div class="lp-kpi-icon">
+          <div class="lp-kpi-icon" style="background:var(--bg-3); color:#000000; border:1px solid var(--border-2);">
             <i class="bi bi-x-octagon-fill"></i>
           </div>
         </div>
-        <div class="lp-kpi-val">{{ $totalBolos }}</div>
+        <div class="lp-kpi-val" style="color:#000000;">{{ $totalBolos }}</div>
       </div>
 
       {{-- Kehadiran % --}}
       <div class="lp-kpi-card">
         <div class="lp-kpi-head">
           <span class="lp-kpi-title">Kehadiran</span>
-          <div class="lp-kpi-icon">
+          <div class="lp-kpi-icon" style="background:var(--bg-3); color:#000000; border:1px solid var(--border-2);">
             <i class="bi bi-pie-chart-fill"></i>
           </div>
         </div>
-        <div class="lp-kpi-val">{{ $persentase }}%</div>
+        <div class="lp-kpi-val" style="color:#000000;">{{ $persentase }}%</div>
       </div>
     </div>
 
@@ -538,7 +578,7 @@
     <div class="lp-filter-panel no-print">
       <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:18px; padding-bottom:14px; border-bottom:1px solid var(--border);">
         <div style="font-weight:800; font-size:12.5px; text-transform:uppercase; letter-spacing:0.8px; color:var(--text); display:flex; align-items:center; gap:8px;">
-          <i class="bi bi-sliders" style="color:var(--gold); font-size:15px;"></i> Parameter Rentang Waktu &amp; Filter Data
+          <i class="bi bi-sliders" style="color:#000000; font-size:15px;"></i> Parameter Rentang Waktu &amp; Filter Data
         </div>
 
         <!-- Periode Chip Buttons -->
@@ -627,10 +667,10 @@
                 <div id="lpSiswaTrigger" class="lp-picker-trigger" onclick="toggleLpSiswaDropdown()">
                   <div id="lpSiswaSelectedView" style="{{ $selectedSiswa ? 'display:flex;' : 'display:none;' }} align-items:center; justify-content:space-between; width:100%;">
                     <div style="display:flex; align-items:center; gap:8px; overflow:hidden;">
-                      <img id="lpSiswaFoto" src="{{ $selectedSiswa ? $selectedSiswa->foto_url : '/img/user-default.png' }}" alt="Foto" style="width:26px; height:26px; border-radius:50%; object-fit:cover; border:1.5px solid var(--gold); flex-shrink:0;" />
+                      <img id="lpSiswaFoto" src="{{ $selectedSiswa ? $selectedSiswa->foto_url : '/img/user-default.png' }}" alt="Foto" style="width:26px; height:26px; border-radius:50%; object-fit:cover; border:1.5px solid rgba(0,0,0,0.15); flex-shrink:0;" />
                       <div style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
                         <strong id="lpSiswaNama" style="color:var(--text); font-size:13px;">{{ $selectedSiswa ? $selectedSiswa->nama : '' }}</strong>
-                        <span id="lpSiswaMeta" style="font-size:11px; color:var(--gold); font-family:var(--font-mono); margin-left:6px; font-weight:700;">{{ $selectedSiswa ? 'NIS: ' . $selectedSiswa->nis . ($selectedSiswaRombel ? ' · ' . $selectedSiswaRombel : '') : '' }}</span>
+                        <span id="lpSiswaMeta" style="font-size:11px; color:#000000; font-family:var(--font-mono); margin-left:6px; font-weight:700;">{{ $selectedSiswa ? 'NISN: ' . ($selectedSiswa->nisn ?: '-') . ($selectedSiswaRombel ? ' · ' . $selectedSiswaRombel : '') : '' }}</span>
                       </div>
                     </div>
                     <button type="button" class="btn-clear-lp" onclick="clearLpSiswa(event)" title="Ganti Siswa">
@@ -638,8 +678,8 @@
                     </button>
                   </div>
                   <div id="lpSiswaPlaceholder" style="{{ $selectedSiswa ? 'display:none;' : 'display:flex;' }} align-items:center; gap:8px; color:var(--text-3); font-size:12.5px;">
-                    <i class="bi bi-search" style="color:var(--gold);"></i>
-                    <span>Ketik nama, NIS, atau kelas...</span>
+                    <i class="bi bi-search" style="color:#000000;"></i>
+                    <span>Ketik nama, NISN, atau kelas...</span>
                   </div>
                 </div>
 
@@ -647,8 +687,8 @@
                 <div id="lpSiswaDropdown" class="lp-dropdown-panel">
                   <div style="padding:8px 10px; border-bottom:1px solid var(--border-2); background:var(--bg-3);">
                     <div style="position:relative;">
-                      <i class="bi bi-search" style="position:absolute; left:10px; top:50%; transform:translateY(-50%); color:var(--gold); font-size:12px;"></i>
-                      <input type="text" id="lpSiswaSearchBox" placeholder="Ketik nama, NIS, kelas..." oninput="filterLpSiswaList(this.value)" style="width:100%; padding-left:32px; height:34px; font-size:12px; border-radius:var(--r-sm);" autocomplete="off" />
+                      <i class="bi bi-search" style="position:absolute; left:10px; top:50%; transform:translateY(-50%); color:#000000; font-size:12px;"></i>
+                      <input type="text" id="lpSiswaSearchBox" placeholder="Ketik nama, NISN, kelas..." oninput="filterLpSiswaList(this.value)" style="width:100%; padding-left:32px; height:34px; font-size:12px; border-radius:var(--r-sm);" autocomplete="off" />
                     </div>
                   </div>
                   <div id="lpSiswaListContainer" style="max-height:260px; overflow-y:auto;">
@@ -659,20 +699,20 @@
                       <div class="lp-picker-item lp-item-siswa" 
                            data-id="{{ $s->id }}" 
                            data-nama="{{ strtolower($s->nama) }}" 
-                           data-nis="{{ strtolower($s->nis) }}" 
+                           data-nisn="{{ strtolower($s->nisn ?? '') }}" 
                            data-rombel="{{ strtolower($rombelNama) }}"
-                           onclick="selectLpSiswa('{{ $s->id }}', '{{ addslashes($s->nama) }}', '{{ $s->nis }}', '{{ $rombelNama }}', '{{ $s->foto_url }}')">
+                           onclick="selectLpSiswa('{{ $s->id }}', '{{ addslashes($s->nama) }}', '{{ $s->nisn ?: '-' }}', '{{ $rombelNama }}', '{{ $s->foto_url }}')">
                         <div style="display:flex; align-items:center; gap:8px;">
                           <div class="avatar-circle avatar-sm gold-border">
                             <img src="{{ $s->foto_url }}" alt="{{ $s->nama }}" class="avatar-img" />
                           </div>
                           <div>
                             <div style="font-weight:700; font-size:12.5px; color:var(--text);">{{ $s->nama }}</div>
-                            <div style="font-size:11px; color:var(--text-3); font-family:var(--font-mono);">NIS: {{ $s->nis }}</div>
+                            <div style="font-size:11px; color:var(--text-3); font-family:var(--font-mono);">NISN: {{ $s->nisn ?: '-' }}</div>
                           </div>
                         </div>
                         @if($rombelNama)
-                          <span class="badge" style="background:var(--gold-dim); color:var(--gold); border:1px solid rgba(202,138,4,0.2); font-size:10.5px; padding:1px 6px;">
+                          <span class="badge" style="background:rgba(0,0,0,0.06); color:#000000; border:1px solid rgba(0,0,0,0.12); font-size:10.5px; padding:1px 6px; font-weight:800;">
                             {{ $rombelNama }}
                           </span>
                         @endif
@@ -698,10 +738,10 @@
                 <div id="lpGuruTrigger" class="lp-picker-trigger" onclick="toggleLpGuruDropdown()">
                   <div id="lpGuruSelectedView" style="{{ $selectedGuru ? 'display:flex;' : 'display:none;' }} align-items:center; justify-content:space-between; width:100%;">
                     <div style="display:flex; align-items:center; gap:8px; overflow:hidden;">
-                      <img id="lpGuruFoto" src="{{ $selectedGuru ? ($selectedGuru->foto_url ?? '/img/user-default.png') : '/img/user-default.png' }}" alt="Foto" style="width:26px; height:26px; border-radius:50%; object-fit:cover; border:1.5px solid var(--gold); flex-shrink:0;" />
+                      <img id="lpGuruFoto" src="{{ $selectedGuru ? ($selectedGuru->foto_url ?? '/img/user-default.png') : '/img/user-default.png' }}" alt="Foto" style="width:26px; height:26px; border-radius:50%; object-fit:cover; border:1.5px solid rgba(0,0,0,0.15); flex-shrink:0;" />
                       <div style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
                         <strong id="lpGuruNama" style="color:var(--text); font-size:13px;">{{ $selectedGuru ? $selectedGuru->nama : '' }}</strong>
-                        <span id="lpGuruMeta" style="font-size:11px; color:var(--gold); font-family:var(--font-mono); margin-left:6px; font-weight:700;">{{ $selectedGuru ? ($selectedGuru->nip ? 'NIP: ' . $selectedGuru->nip : ($selectedGuru->jabatan ?? 'Guru')) : '' }}</span>
+                        <span id="lpGuruMeta" style="font-size:11px; color:#000000; font-family:var(--font-mono); margin-left:6px; font-weight:700;">{{ $selectedGuru ? ($selectedGuru->nip ? 'NIP: ' . $selectedGuru->nip : ($selectedGuru->jabatan ?? 'Guru')) : '' }}</span>
                       </div>
                     </div>
                     <button type="button" class="btn-clear-lp" onclick="clearLpGuru(event)" title="Ganti Guru">
@@ -709,7 +749,7 @@
                     </button>
                   </div>
                   <div id="lpGuruPlaceholder" style="{{ $selectedGuru ? 'display:none;' : 'display:flex;' }} align-items:center; gap:8px; color:var(--text-3); font-size:12.5px;">
-                    <i class="bi bi-search" style="color:var(--gold);"></i>
+                    <i class="bi bi-search" style="color:#000000;"></i>
                     <span>Ketik nama guru, NIP, atau jabatan...</span>
                   </div>
                 </div>
@@ -718,7 +758,7 @@
                 <div id="lpGuruDropdown" class="lp-dropdown-panel">
                   <div style="padding:8px 10px; border-bottom:1px solid var(--border-2); background:var(--bg-3);">
                     <div style="position:relative;">
-                      <i class="bi bi-search" style="position:absolute; left:10px; top:50%; transform:translateY(-50%); color:var(--gold); font-size:12px;"></i>
+                      <i class="bi bi-search" style="position:absolute; left:10px; top:50%; transform:translateY(-50%); color:#000000; font-size:12px;"></i>
                       <input type="text" id="lpGuruSearchBox" placeholder="Ketik nama guru, NIP, jabatan..." oninput="filterLpGuruList(this.value)" style="width:100%; padding-left:32px; height:34px; font-size:12px; border-radius:var(--r-sm);" autocomplete="off" />
                     </div>
                   </div>
@@ -772,18 +812,12 @@
       <div class="panel" style="padding:0; overflow:hidden; border:1px solid var(--border); border-radius:var(--r-md); box-shadow:var(--shadow-sm); background:var(--bg-2); margin-bottom:24px;">
         <div class="panel-title no-print" style="padding:14px 18px; margin:0; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
           <div style="font-weight:800; font-size:15px; color:var(--text); display:flex; align-items:center; gap:8px;">
-            <i class="bi bi-file-earmark-spreadsheet-fill" style="color:var(--gold);"></i>
+            <i class="bi bi-file-earmark-spreadsheet-fill" style="color:#000000;"></i>
             <span>Rekapitulasi {{ ucfirst($kategori) }} ({{ ucfirst($periode) }})</span>
           </div>
-          <div style="display:flex; gap:8px;">
-            <button onclick="window.print()" class="btn btn-outline" style="height:36px; font-size:12px; font-weight:800; color:#000000; border:1.5px solid #000000; background:var(--bg-2); display:inline-flex; align-items:center; gap:6px;" title="Cetak Langsung Format A4">
-              <i class="bi bi-printer-fill" style="color:#000000;"></i> Cetak A4
-            </button>
-            <a href="{{ route('laporan.cetak-pdf', request()->query()) }}" target="_blank" class="btn btn-outline" style="height:36px; font-size:12px; font-weight:800; color:#000000; border:1.5px solid #000000; background:var(--bg-2); display:inline-flex; align-items:center; gap:6px;" title="Download File PDF Resmi">
-              <i class="bi bi-file-earmark-pdf-fill" style="color:#000000;"></i> PDF Resmi
-            </a>
-            <a href="{{ route('laporan.export-csv', request()->query()) }}" class="btn btn-outline" style="height:36px; font-size:12px; font-weight:800; color:#000000; border:1.5px solid #000000; background:var(--bg-2); display:inline-flex; align-items:center; gap:6px;" title="Export Data ke Excel/CSV">
-              <i class="bi bi-file-earmark-excel-fill" style="color:#000000;"></i> Export Excel/CSV
+          <div>
+            <a href="{{ route('laporan.cetak-pdf', request()->query()) }}" target="_blank" class="btn btn-outline" style="height:36px; font-size:12px; font-weight:800; color:#000000; border:1.5px solid #000000; background:var(--bg-2); display:inline-flex; align-items:center; gap:6px;" title="Buka Dokumen PDF Resmi">
+              <i class="bi bi-file-earmark-pdf-fill" style="color:#000000;"></i> Cetak PDF
             </a>
           </div>
         </div>
@@ -794,7 +828,7 @@
               <tr>
                 <th style="width:36px; text-align:center;">No</th>
                 @if($kategori === 'siswa')
-                  <th style="width:90px; text-align:center;">NIS</th>
+                  <th style="width:110px; text-align:center;">NISN</th>
                   <th style="text-align:left;">Nama Siswa</th>
                   <th style="width:120px; text-align:center;">Kelas</th>
                 @else
@@ -824,8 +858,8 @@
                     {{ $rekapData->firstItem() + $i }}
                   </td>
                   @if($kategori === 'siswa')
-                    <td style="text-align:center; font-family:var(--font-mono); font-weight:700; color:var(--gold); font-size:12px;">
-                      {{ $item->nis }}
+                    <td style="text-align:center; font-family:var(--font-mono); font-weight:700; color:#000000; font-size:12px;">
+                      {{ $item->nisn ?? '-' }}
                     </td>
                     <td>
                       <strong style="color:var(--text); font-size:13.5px;">{{ $item->nama }}</strong>
@@ -834,7 +868,7 @@
                       {{ $item->rombel }}
                     </td>
                   @else
-                    <td style="text-align:center; font-family:var(--font-mono); font-weight:700; color:var(--gold); font-size:12px;">
+                    <td style="text-align:center; font-family:var(--font-mono); font-weight:700; color:#000000; font-size:12px;">
                       {{ $item->nip ?: '-' }}
                     </td>
                     <td>
@@ -849,13 +883,13 @@
                     </td>
                     <td style="font-size:12px; color:var(--text-2);">{{ $item->jabatan }}</td>
                   @endif
-                  <td style="text-align:center; font-weight:800; color:#16A34A;">{{ $item->total_hadir }}</td>
-                  <td style="text-align:center; font-weight:800; color:#CA8A04;">{{ $item->total_telat }}</td>
-                  <td style="text-align:center; font-weight:800; color:#9333EA;">{{ $item->total_sakit ?? 0 }}</td>
-                  <td style="text-align:center; font-weight:800; color:#2563EB;">{{ $item->total_izin }}</td>
-                  <td style="text-align:center; font-weight:800; color:#DC2626;">{{ $item->total_alpha }}</td>
-                  <td style="text-align:center; font-weight:800; color:#991B1B;">{{ $item->total_bolos }}</td>
-                  <td style="text-align:center; font-weight:800; font-size:13px;">{{ $item->total_hari }}</td>
+                  <td style="text-align:center; font-weight:700; color:var(--text); font-family:var(--font-mono); font-size:12.5px;">{{ $item->total_hadir }}</td>
+                  <td style="text-align:center; font-weight:700; color:var(--text); font-family:var(--font-mono); font-size:12.5px;">{{ $item->total_telat }}</td>
+                  <td style="text-align:center; font-weight:700; color:var(--text); font-family:var(--font-mono); font-size:12.5px;">{{ $item->total_sakit ?? 0 }}</td>
+                  <td style="text-align:center; font-weight:700; color:var(--text); font-family:var(--font-mono); font-size:12.5px;">{{ $item->total_izin }}</td>
+                  <td style="text-align:center; font-weight:700; color:var(--text); font-family:var(--font-mono); font-size:12.5px;">{{ $item->total_alpha }}</td>
+                  <td style="text-align:center; font-weight:700; color:var(--text); font-family:var(--font-mono); font-size:12.5px;">{{ $item->total_bolos }}</td>
+                  <td style="text-align:center; font-weight:800; font-size:13px; color:var(--text); font-family:var(--font-mono);">{{ $item->total_hari }}</td>
                   <td style="text-align:center; font-weight:800; font-size:13px; color:var(--text); font-family:var(--font-mono);">
                     {{ $pct }}%
                   </td>
@@ -865,7 +899,7 @@
                         <a href="/laporan?kategori=siswa&periode=individu&siswa_id={{ $item->id }}" class="btn-icon btn-icon-edit" data-tooltip="Buka Rekap Presensi Lengkap" title="Buka Rekap Presensi Lengkap">
                           <i class="bi bi-person-lines-fill"></i>
                         </a>
-                        <a href="/presensi-siswa/{{ $item->nis }}" target="_blank" class="btn-icon btn-icon-edit" data-tooltip="Lihat Portal Mandiri Siswa" title="Lihat Portal Mandiri Siswa">
+                        <a href="/portal-siswa/{{ $item->nisn ?: $item->id }}" target="_blank" class="btn-icon btn-icon-edit" data-tooltip="Lihat Portal Mandiri Siswa" title="Lihat Portal Mandiri Siswa">
                           <i class="bi bi-box-arrow-up-right"></i>
                         </a>
                       @else
@@ -914,16 +948,16 @@
             <div>
               <div style="font-size:16px; font-weight:800; color:var(--text);">{{ $selectedIndividu->nama }}</div>
               <div style="font-size:12px; color:var(--text-3); font-family:var(--font-mono); margin-top:2px;">
-                {{ $kategori === 'siswa' ? 'NIS: ' . $selectedIndividu->nis . ' · Kelas: ' . ($selectedIndividu->siswaRombels->first()?->rombel?->nama_rombel ?? '-') : 'NIP: ' . ($selectedIndividu->nip ?? '-') . ' · Jabatan: ' . ($selectedIndividu->jabatan ?? '-') }}
+                {{ $kategori === 'siswa' ? 'NISN: ' . ($selectedIndividu->nisn ?: '-') . ' · Kelas: ' . ($selectedIndividu->siswaRombels->first()?->rombel?->nama_rombel ?? '-') : 'NIP: ' . ($selectedIndividu->nip ?? '-') . ' · Jabatan: ' . ($selectedIndividu->jabatan ?? '-') }}
               </div>
             </div>
           </div>
           <div style="display:flex; gap:12px; font-family:var(--font-mono); font-size:12px; background:var(--surface); padding:8px 16px; border-radius:var(--r-sm); border:1px solid var(--border);">
-            <span style="color:var(--green); font-weight:800;">Hadir: {{ $totalHadir }}</span>
-            <span style="color:var(--amber); font-weight:800;">Telat: {{ $totalTerlambat }}</span>
-            <span style="color:var(--navy); font-weight:800;">Izin: {{ $totalIzin }}</span>
-            <span style="color:var(--red); font-weight:800;">Alpha: {{ $totalAlpha }}</span>
-            <span style="color:#991B1B; font-weight:800;">Bolos: {{ $totalBolos }}</span>
+            <span style="color:var(--text); font-weight:800;">Hadir: {{ $totalHadir }}</span>
+            <span style="color:var(--text); font-weight:800;">Telat: {{ $totalTerlambat }}</span>
+            <span style="color:var(--text); font-weight:800;">Izin: {{ $totalIzin }}</span>
+            <span style="color:var(--text); font-weight:800;">Alpha: {{ $totalAlpha }}</span>
+            <span style="color:var(--text); font-weight:800;">Bolos: {{ $totalBolos }}</span>
           </div>
         </div>
 
@@ -937,8 +971,8 @@
               <td style="border: none !important; width: 36%; padding: 2px 0;">: {{ $kategori === 'siswa' ? ($selectedIndividu->siswaRombels->first()?->rombel?->nama_rombel ?? '-') : ($selectedIndividu->jabatan ?? '-') }}</td>
             </tr>
             <tr style="border: none !important;">
-              <td style="border: none !important; font-weight: 700; padding: 2px 0;">{{ $kategori === 'siswa' ? 'NIS' : 'NIP' }}</td>
-              <td style="border: none !important; padding: 2px 0;">: {{ $kategori === 'siswa' ? $selectedIndividu->nis : ($selectedIndividu->nip ?? '-') }}</td>
+              <td style="border: none !important; font-weight: 700; padding: 2px 0;">{{ $kategori === 'siswa' ? 'NISN' : 'NIP' }}</td>
+              <td style="border: none !important; padding: 2px 0;">: {{ $kategori === 'siswa' ? ($selectedIndividu->nisn ?: '-') : ($selectedIndividu->nip ?? '-') }}</td>
               <td style="border: none !important; font-weight: 700; padding: 2px 0;">Total Kehadiran</td>
               <td style="border: none !important; padding: 2px 0;">: Hadir: {{ $totalHadir }}, Telat: {{ $totalTerlambat }}, Izin: {{ $totalIzin }}, Alpha: {{ $totalAlpha }}, Bolos: {{ $totalBolos }}</td>
             </tr>
@@ -948,21 +982,14 @@
 
       <div class="panel" style="padding:0; overflow:hidden;">
         <div class="panel-title no-print" style="padding:14px 18px; margin:0; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
-          <div>
-            <span><i class="bi bi-journal-text" style="color:var(--gold); margin-right:8px;"></i>Rincian Riwayat Presensi Individu</span>
-            <span class="badge" style="background:var(--bg-3); color:var(--text); font-size:11.5px; font-weight:700; margin-left:6px;">
-              Menampilkan {{ $laporans->firstItem() ?? 0 }} - {{ $laporans->lastItem() ?? 0 }} dari {{ $laporans->total() }} Hari Tercatat
+          <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+            <span style="font-weight:800; font-size:14px; color:var(--text); display:inline-flex; align-items:center; gap:8px;">
+              <i class="bi bi-journal-text" style="color:#000000;"></i> Rincian Riwayat Presensi Individu
             </span>
           </div>
-          <div style="display:flex; gap:8px; align-items:center;">
-            <button onclick="window.print()" class="btn btn-outline" style="height:36px; font-size:12px; font-weight:800; color:#000000; border:1.5px solid #000000; background:var(--bg-2); display:inline-flex; align-items:center; gap:6px;" title="Cetak Langsung Format A4">
-              <i class="bi bi-printer-fill" style="color:#000000;"></i> Cetak A4
-            </button>
-            <a href="{{ route('laporan.cetak-pdf', request()->query()) }}" target="_blank" class="btn btn-outline" style="height:36px; font-size:12px; font-weight:800; color:#000000; border:1.5px solid #000000; background:var(--bg-2); display:inline-flex; align-items:center; gap:6px;" title="Download File PDF Resmi">
-              <i class="bi bi-file-earmark-pdf-fill" style="color:#000000;"></i> PDF Resmi
-            </a>
-            <a href="{{ route('laporan.export-csv', request()->query()) }}" class="btn btn-outline" style="height:36px; font-size:12px; font-weight:800; color:#000000; border:1.5px solid #000000; background:var(--bg-2); display:inline-flex; align-items:center; gap:6px;" title="Export Data ke Excel/CSV">
-              <i class="bi bi-file-earmark-excel-fill" style="color:#000000;"></i> Export Excel/CSV
+          <div>
+            <a href="{{ route('laporan.cetak-pdf', request()->query()) }}" target="_blank" class="btn btn-outline" style="height:36px; font-size:12px; font-weight:800; color:#000000; border:1.5px solid #000000; background:var(--bg-2); display:inline-flex; align-items:center; gap:6px;" title="Buka Dokumen PDF Resmi">
+              <i class="bi bi-file-earmark-pdf-fill" style="color:#000000;"></i> Cetak PDF
             </a>
           </div>
         </div>
@@ -972,13 +999,13 @@
             <thead>
               <tr>
                 <th style="width:36px; text-align:center;">No</th>
-                <th style="width:85px; text-align:center;">Tanggal</th>
+                <th style="width:115px; min-width:115px; text-align:center; white-space:nowrap;">Tanggal</th>
                 <th style="width:75px; text-align:center;">Hari</th>
                 <th style="width:65px; text-align:center;">Masuk</th>
                 <th style="width:65px; text-align:center;">Pulang</th>
                 <th style="width:90px; text-align:center;">Status</th>
                 <th style="text-align:left;">Keterangan / Alasan</th>
-                <th style="width:110px; text-align:left;" class="no-print">Sumber Log</th>
+                <th style="width:120px; text-align:left;" class="no-print">Sumber Log</th>
                 <th style="width:80px; text-align:center;" class="no-print">Aksi</th>
               </tr>
             </thead>
@@ -993,32 +1020,18 @@
                   <td style="text-align:center; font-weight:700; color:var(--text-3); font-size:12px;">
                     {{ $laporans->firstItem() + $i }}
                   </td>
-                  <td style="text-align:center; font-family:var(--font-mono); font-size:12px; font-weight:700;">{{ $lap->tanggal }}</td>
+                  <td style="text-align:center; font-family:var(--font-mono); font-size:12px; font-weight:700; white-space:nowrap;">{{ $lap->tanggal }}</td>
                   <td style="text-align:center; font-size:12px; color:var(--text-2);">{{ $carbonTgl->translatedFormat('l') }}</td>
-                  <td style="text-align:center; font-family:var(--font-mono); font-size:12px; font-weight:700; color:{{ $lap->jam_masuk ? 'var(--green)' : 'var(--text-3)' }};">
+                  <td style="text-align:center; font-family:var(--font-mono); font-size:12px; font-weight:700; color:var(--text);">
                     {{ $lap->jam_masuk ?? '-' }}
                   </td>
-                  <td style="text-align:center; font-family:var(--font-mono); font-size:12px; font-weight:700; color:{{ $lap->jam_pulang ? 'var(--navy)' : 'var(--text-3)' }};">
+                  <td style="text-align:center; font-family:var(--font-mono); font-size:12px; font-weight:700; color:var(--text);">
                     {{ $lap->jam_pulang ?? '-' }}
                   </td>
-                  <td style="text-align:center;">
-                    @if($lap->status === 'hadir')
-                      <span class="badge" style="background:rgba(34,197,94,0.12); color:#16A34A; font-weight:800; font-size:10.5px;">HADIR</span>
-                    @elseif($lap->status === 'terlambat')
-                      <span class="badge" style="background:rgba(234,179,8,0.15); color:#CA8A04; font-weight:800; font-size:10.5px;">TERLAMBAT</span>
-                    @elseif($lap->status === 'izin')
-                      <span class="badge" style="background:rgba(59,130,246,0.12); color:#2563EB; font-weight:800; font-size:10.5px;">IZIN</span>
-                    @elseif($lap->status === 'sakit')
-                      <span class="badge" style="background:rgba(14,165,233,0.12); color:#0284C7; font-weight:800; font-size:10.5px;">SAKIT</span>
-                    @elseif($lap->status === 'dispen')
-                      <span class="badge" style="background:rgba(147,51,234,0.12); color:#9333EA; font-weight:800; font-size:10.5px;">DISPEN</span>
-                    @elseif($lap->status === 'alpha')
-                      <span class="badge" style="background:rgba(239,68,68,0.12); color:#DC2626; font-weight:800; font-size:10.5px;">ALPHA</span>
-                    @elseif($lap->status === 'bolos')
-                      <span class="badge" style="background:rgba(220,38,38,0.18); color:#991B1B; font-weight:800; font-size:10.5px;">BOLOS</span>
-                    @else
-                      <span class="badge" style="background:var(--bg-3); color:var(--text); font-size:10.5px;">{{ strtoupper($lap->status) }}</span>
-                    @endif
+                  <td style="text-align:center; white-space:nowrap;">
+                    <span style="font-weight:800; font-size:11.5px; text-transform:uppercase; color:{{ $lap->status === 'hadir' ? 'var(--text)' : ($lap->status === 'terlambat' ? '#CA8A04' : ($lap->status === 'alpha' || $lap->status === 'bolos' ? '#DC2626' : 'var(--text-2)')) }};">
+                      {{ strtoupper($lap->status) }}
+                    </span>
                   </td>
                   <td style="text-align:left; font-size:12px;">
                     @if($lap->keterangan)
@@ -1027,43 +1040,52 @@
                       <span>{{ $izin->keterangan }}</span>
                       @if($izin->disetujui_oleh)<small style="display:block; color:var(--text-3); font-size:10.5px;">(Disetujui: {{ $izin->disetujui_oleh }})</small>@endif
                     @elseif($lap->status === 'bolos')
-                      <span style="color:#991B1B; font-weight:600;">Scan masuk tanpa tap pulang &amp; tanpa izin piket</span>
-                    @elseif($lap->status === 'hadir' || $lap->status === 'terlambat')
-                      <span style="color:var(--text-3);">Kehadiran reguler</span>
+                      <span style="color:#991B1B; font-weight:600;">Scan masuk tanpa tap pulang</span>
                     @elseif($lap->status === 'alpha')
-                      <span style="color:#DC2626; font-weight:600;">Tidak hadir tanpa keterangan</span>
+                      <span style="color:#DC2626; font-weight:600;">Tanpa keterangan</span>
                     @else
-                      -
+                      <span style="color:var(--text-3);">-</span>
                     @endif
                   </td>
-                  <td class="no-print" style="text-align:left;">
-                    <span class="badge" style="background:var(--bg-3); color:var(--text-3); border:1px solid var(--border-2); font-size:10.5px; font-family:var(--font-mono);">
-                      {{ $lap->sumber_absen ?: 'Otomatis' }}
+                  <td class="no-print" style="text-align:left; white-space:nowrap;">
+                    @php
+                      $isManual = in_array($lap->sumber_absen, ['manual_piket', 'manual_izin_piket', 'koreksi_piket_manual']);
+                      $sumberLabel = $lap->sumber_absen_label ?? ($isManual ? 'Manual Piket' : 'Smart Gate');
+                    @endphp
+                    <span style="font-size:12px; font-weight:700; color:var(--text-2);">
+                      {{ $sumberLabel }}
                     </span>
                   </td>
                   <td class="no-print" style="text-align:center;">
-                    <div style="display:flex; gap:4px; justify-content:center;">
-                      <button type="button" 
-                        class="btn-icon btn-icon-edit btn-koreksi-modal" 
-                        data-id="{{ $lap->id }}"
-                        data-nama="{{ $nama }}"
-                        data-tanggal="{{ $lap->tanggal }}"
-                        data-status="{{ $lap->status }}"
-                        data-masuk="{{ $lap->jam_masuk ?? '' }}"
-                        data-pulang="{{ $lap->jam_pulang ?? '' }}"
-                        data-sumber="{{ $lap->sumber_absen }}"
-                        data-keterangan="{{ $lap->keterangan ?? ($izin->keterangan ?? '') }}"
-                        data-tooltip="Koreksi Presensi" 
-                        title="Koreksi Presensi">
-                        <i class="bi bi-pencil-square"></i>
-                      </button>
-                      <form action="/laporan/{{ $lap->id }}" method="POST" onsubmit="return confirm('Hapus catatan presensi tanggal {{ $lap->tanggal }}?')" style="display:inline;">
-                        @csrf @method('DELETE')
-                        <button type="submit" class="btn-icon btn-icon-danger" data-tooltip="Hapus Presensi" title="Hapus Presensi">
-                          <i class="bi bi-trash3-fill"></i>
+                    @php
+                      $canKoreksi = $isPiketBertugasHariIni && ($lap->tanggal === $todayDate);
+                    @endphp
+                    @if($canKoreksi)
+                      <div style="display:flex; gap:4px; justify-content:center;">
+                        <button type="button" 
+                          class="btn-icon btn-icon-edit btn-koreksi-modal" 
+                          data-id="{{ $lap->id }}"
+                          data-nama="{{ $nama }}"
+                          data-tanggal="{{ $lap->tanggal }}"
+                          data-status="{{ $lap->status }}"
+                          data-masuk="{{ $lap->jam_masuk ?? '' }}"
+                          data-pulang="{{ $lap->jam_pulang ?? '' }}"
+                          data-sumber="{{ $lap->sumber_absen }}"
+                          data-keterangan="{{ $lap->keterangan ?? ($izin->keterangan ?? '') }}"
+                          data-tooltip="Koreksi Presensi" 
+                          title="Koreksi Presensi">
+                          <i class="bi bi-pencil-square"></i>
                         </button>
-                      </form>
-                    </div>
+                        <form action="/laporan/{{ $lap->id }}" method="POST" onsubmit="return confirm('Hapus catatan presensi tanggal {{ $lap->tanggal }}?')" style="display:inline;">
+                          @csrf @method('DELETE')
+                          <button type="submit" class="btn-icon btn-icon-danger" data-tooltip="Hapus Presensi" title="Hapus Presensi">
+                            <i class="bi bi-trash3-fill"></i>
+                          </button>
+                        </form>
+                      </div>
+                    @else
+                      <span style="color:var(--text-3); font-size:11px;">-</span>
+                    @endif
                   </td>
                 </tr>
               @empty
@@ -1097,18 +1119,12 @@
       <div class="panel" style="padding:0; overflow:hidden; border:1px solid var(--border); border-radius:var(--r-md); box-shadow:var(--shadow-sm); background:var(--bg-2); margin-bottom:24px;">
         <div class="panel-title no-print" style="padding:14px 18px; margin:0; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
           <div style="font-weight:800; font-size:15px; color:var(--text); display:flex; align-items:center; gap:8px;">
-            <i class="bi bi-table" style="color:var(--gold);"></i>
+            <i class="bi bi-table" style="color:#000000;"></i>
             <span>Rincian Presensi Harian</span>
           </div>
-          <div style="display:flex; gap:8px;">
-            <button onclick="window.print()" class="btn btn-outline" style="height:36px; font-size:12px; font-weight:800; color:#000000; border:1.5px solid #000000; background:var(--bg-2); display:inline-flex; align-items:center; gap:6px;" title="Cetak Langsung Format A4">
-              <i class="bi bi-printer-fill" style="color:#000000;"></i> Cetak A4
-            </button>
-            <a href="{{ route('laporan.cetak-pdf', request()->query()) }}" target="_blank" class="btn btn-outline" style="height:36px; font-size:12px; font-weight:800; color:#000000; border:1.5px solid #000000; background:var(--bg-2); display:inline-flex; align-items:center; gap:6px;" title="Download File PDF Resmi">
-              <i class="bi bi-file-earmark-pdf-fill" style="color:#000000;"></i> PDF Resmi
-            </a>
-            <a href="{{ route('laporan.export-csv', request()->query()) }}" class="btn btn-outline" style="height:36px; font-size:12px; font-weight:800; color:#000000; border:1.5px solid #000000; background:var(--bg-2); display:inline-flex; align-items:center; gap:6px;" title="Export Data ke Excel/CSV">
-              <i class="bi bi-file-earmark-excel-fill" style="color:#000000;"></i> Export Excel/CSV
+          <div>
+            <a href="{{ route('laporan.cetak-pdf', request()->query()) }}" target="_blank" class="btn btn-outline" style="height:36px; font-size:12px; font-weight:800; color:#000000; border:1.5px solid #000000; background:var(--bg-2); display:inline-flex; align-items:center; gap:6px;" title="Buka Dokumen PDF Resmi">
+              <i class="bi bi-file-earmark-pdf-fill" style="color:#000000;"></i> Cetak PDF
             </a>
           </div>
         </div>
@@ -1138,8 +1154,8 @@
                   $nama = $lap->pemilik_type === 'siswa'
                     ? ($lap->siswa->nama ?? ($lap->siswaRombel->siswa->nama ?? 'Siswa'))
                     : ($lap->guru->nama ?? (($guruMap->get($lap->pemilik_id))->nama ?? 'Guru'));
-                  $nis = $lap->pemilik_type === 'siswa'
-                    ? ($lap->siswa->nis ?? ($lap->siswaRombel->siswa->nis ?? ''))
+                  $nisn = $lap->pemilik_type === 'siswa'
+                    ? ($lap->siswa->nisn ?? ($lap->siswaRombel->siswa->nisn ?? ''))
                     : '';
                   $rombelNama = $lap->pemilik_type === 'siswa'
                     ? ($lap->siswaRombel->rombel->nama_rombel ?? ($lap->siswa->siswaRombels->first()?->rombel?->nama_rombel ?? '-'))
@@ -1152,16 +1168,16 @@
                   <td style="text-align:center; font-weight:700; color:var(--text-3); font-size:12px;">
                     {{ $laporans->firstItem() + $i }}
                   </td>
-                  <td style="text-align:center; font-family:var(--font-mono); font-size:12px; font-weight:700; color:{{ $lap->jam_masuk ? 'var(--green)' : 'var(--text-3)' }};">
+                  <td style="text-align:center; font-family:var(--font-mono); font-size:12px; font-weight:700; color:var(--text);">
                     {{ $lap->jam_masuk ?? '-' }}
                   </td>
-                  <td style="text-align:center; font-family:var(--font-mono); font-size:12px; font-weight:700; color:{{ $lap->jam_pulang ? 'var(--navy)' : 'var(--text-3)' }};">
+                  <td style="text-align:center; font-family:var(--font-mono); font-size:12px; font-weight:700; color:var(--text);">
                     {{ $lap->jam_pulang ?? '-' }}
                   </td>
                   <td style="text-align:left;">
                     <strong style="color:var(--text); font-size:13.5px;">{{ $nama }}</strong>
-                    @if($nis)
-                      <div style="font-size:11px; color:var(--text-3); font-family:var(--font-mono);">NIS: {{ $nis }}</div>
+                    @if($nisn)
+                      <div style="font-size:11px; color:var(--text-3); font-family:var(--font-mono);">NISN: {{ $nisn }}</div>
                     @endif
                   </td>
                   <td style="{{ $lap->pemilik_type === 'siswa' ? 'text-align:center;' : 'text-align:left;' }}">
@@ -1173,78 +1189,73 @@
                       <span style="font-size:12px; color:var(--text-2);">{{ $rombelNama }}</span>
                     @endif
                   </td>
-                  <td style="text-align:center;">
-                    @if($lap->status === 'hadir')
-                      <span class="badge" style="background:rgba(34,197,94,0.12); color:#16A34A; font-weight:800; font-size:10.5px;">HADIR</span>
-                    @elseif($lap->status === 'terlambat')
-                      <span class="badge" style="background:rgba(234,179,8,0.15); color:#CA8A04; font-weight:800; font-size:10.5px;">TERLAMBAT</span>
-                    @elseif($lap->status === 'izin')
-                      <span class="badge" style="background:rgba(59,130,246,0.12); color:#2563EB; font-weight:800; font-size:10.5px;">IZIN</span>
-                    @elseif($lap->status === 'sakit')
-                      <span class="badge" style="background:rgba(14,165,233,0.12); color:#0284C7; font-weight:800; font-size:10.5px;">SAKIT</span>
-                    @elseif($lap->status === 'dispen')
-                      <span class="badge" style="background:rgba(147,51,234,0.12); color:#9333EA; font-weight:800; font-size:10.5px;">DISPEN</span>
-                    @elseif($lap->status === 'alpha')
-                      <span class="badge" style="background:rgba(239,68,68,0.12); color:#DC2626; font-weight:800; font-size:10.5px;">ALPHA</span>
-                    @elseif($lap->status === 'bolos')
-                      <span class="badge" style="background:rgba(220,38,38,0.18); color:#991B1B; font-weight:800; font-size:10.5px;">BOLOS</span>
-                    @else
-                      <span class="badge" style="background:var(--bg-3); color:var(--text); font-size:10.5px;">{{ strtoupper($lap->status) }}</span>
-                    @endif
+                  <td style="text-align:center; white-space:nowrap;">
+                    <span style="font-weight:800; font-size:11.5px; text-transform:uppercase; color:{{ $lap->status === 'hadir' ? 'var(--text)' : ($lap->status === 'terlambat' ? '#CA8A04' : ($lap->status === 'alpha' || $lap->status === 'bolos' ? '#DC2626' : 'var(--text-2)')) }};">
+                      {{ strtoupper($lap->status) }}
+                    </span>
                   </td>
                   <td style="text-align:left; font-size:12px;">
                     @if($keteranganText)
-                      <div style="font-weight:600; color:var(--text); display:flex; align-items:flex-start; gap:6px;">
-                        <i class="bi bi-chat-left-text-fill" style="color:var(--gold); font-size:11px; margin-top:2px; flex-shrink:0;"></i>
+                      <div style="font-weight:600; color:var(--text);">
                         <span>{{ $keteranganText }}</span>
                       </div>
                       @if($izin && $izin->disetujui_oleh)
                         <small style="display:block; color:var(--text-3); font-size:10.5px; margin-top:2px;">(Piket: {{ $izin->disetujui_oleh }})</small>
                       @endif
                     @elseif($lap->status === 'bolos')
-                      <span style="color:#991B1B; font-weight:600; font-size:11.5px;"><i class="bi bi-exclamation-triangle-fill"></i> Tidak tap pulang (tanpa izin)</span>
+                      <span style="color:#991B1B; font-weight:600; font-size:11.5px;">Tanpa tap pulang</span>
                     @elseif($lap->status === 'alpha')
-                      <span style="color:#DC2626; font-weight:600; font-size:11.5px;"><i class="bi bi-x-circle-fill"></i> Tanpa keterangan</span>
-                    @elseif($lap->status === 'terlambat')
-                      <span style="color:var(--amber); font-weight:600; font-size:11.5px;"><i class="bi bi-clock-history"></i> Terlambat masuk</span>
-                    @elseif($lap->status === 'hadir')
-                      <span style="color:var(--text-3); font-size:11.5px;">Hadir reguler</span>
+                      <span style="color:#DC2626; font-weight:600; font-size:11.5px;">Tanpa keterangan</span>
                     @else
                       <span style="color:var(--text-3); font-size:11.5px;">-</span>
                     @endif
                   </td>
-                  <td class="no-print" style="text-align:left;">
-                    <span class="badge" style="background:var(--bg-3); color:var(--text-3); border:1px solid var(--border-2); font-size:10.5px; font-family:var(--font-mono);">
-                      {{ $lap->sumber_absen ?: 'Otomatis' }}
+                  <td class="no-print" style="text-align:left; white-space:nowrap;">
+                    @php
+                      $isManual = in_array($lap->sumber_absen, ['manual_piket', 'manual_izin_piket', 'koreksi_piket_manual']);
+                      $sumberLabel = $lap->sumber_absen_label ?? ($isManual ? 'Manual Piket' : 'Smart Gate');
+                    @endphp
+                    <span style="font-size:12px; font-weight:700; color:var(--text-2);">
+                      {{ $sumberLabel }}
                     </span>
                   </td>
                   <td class="no-print" style="text-align:center;">
+                    @php
+                      $canKoreksi = $isPiketBertugasHariIni && ($lap->tanggal === $todayDate);
+                    @endphp
                     <div style="display:flex; gap:4px; justify-content:center;">
-                      <button type="button" 
-                        class="btn-icon btn-icon-edit btn-koreksi-modal" 
-                        data-id="{{ $lap->id }}"
-                        data-nama="{{ $nama }}"
-                        data-tanggal="{{ $lap->tanggal }}"
-                        data-status="{{ $lap->status }}"
-                        data-masuk="{{ $lap->jam_masuk ?? '' }}"
-                        data-pulang="{{ $lap->jam_pulang ?? '' }}"
-                        data-sumber="{{ $lap->sumber_absen }}"
-                        data-keterangan="{{ $keteranganText ?? '' }}"
-                        data-tooltip="Koreksi Presensi" 
-                        title="Koreksi Presensi">
-                        <i class="bi bi-pencil-square"></i>
-                      </button>
-                      @if($lap->pemilik_type === 'siswa' && $nis)
-                        <a href="/presensi-siswa/{{ $nis }}" target="_blank" class="btn-icon btn-icon-edit" data-tooltip="Portal Rekap Siswa" title="Portal Rekap Siswa">
+                      @if($canKoreksi)
+                        <button type="button" 
+                          class="btn-icon btn-icon-edit btn-koreksi-modal" 
+                          data-id="{{ $lap->id }}"
+                          data-nama="{{ $nama }}"
+                          data-tanggal="{{ $lap->tanggal }}"
+                          data-status="{{ $lap->status }}"
+                          data-masuk="{{ $lap->jam_masuk ?? '' }}"
+                          data-pulang="{{ $lap->jam_pulang ?? '' }}"
+                          data-sumber="{{ $lap->sumber_absen }}"
+                          data-keterangan="{{ $keteranganText ?? '' }}"
+                          data-tooltip="Koreksi Presensi" 
+                          title="Koreksi Presensi">
+                          <i class="bi bi-pencil-square"></i>
+                        </button>
+                      @endif
+                      @if($lap->pemilik_type === 'siswa')
+                        <a href="/portal-siswa/{{ $nisn ?: $lap->pemilik_id }}" target="_blank" class="btn-icon btn-icon-edit" data-tooltip="Portal Rekap Siswa" title="Portal Rekap Siswa">
                           <i class="bi bi-person-lines-fill"></i>
                         </a>
                       @endif
-                      <form action="/laporan/{{ $lap->id }}" method="POST" onsubmit="return confirm('Hapus catatan presensi {{ addslashes($nama) }}?')" style="display:inline;">
-                        @csrf @method('DELETE')
-                        <button type="submit" class="btn-icon btn-icon-danger" data-tooltip="Hapus Presensi" title="Hapus Presensi">
-                          <i class="bi bi-trash3-fill"></i>
-                        </button>
-                      </form>
+                      @if($canKoreksi)
+                        <form action="/laporan/{{ $lap->id }}" method="POST" onsubmit="return confirm('Hapus catatan presensi {{ addslashes($nama) }}?')" style="display:inline;">
+                          @csrf @method('DELETE')
+                          <button type="submit" class="btn-icon btn-icon-danger" data-tooltip="Hapus Presensi" title="Hapus Presensi">
+                            <i class="bi bi-trash3-fill"></i>
+                          </button>
+                        </form>
+                      @endif
+                      @if(!$canKoreksi && !($lap->pemilik_type === 'siswa'))
+                        <span style="color:var(--text-3); font-size:11px;">-</span>
+                      @endif
                     </div>
                   </td>
                 </tr>
@@ -1306,7 +1317,7 @@
   <div class="modal-card" style="max-width: 520px; padding: 0; overflow: hidden;" onclick="event.stopPropagation()">
     <div style="padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; background: var(--bg-2);">
       <div style="display: flex; align-items: center; gap: 8px;">
-        <i class="bi bi-pencil-square" style="color: var(--gold); font-size: 18px;"></i>
+        <i class="bi bi-pencil-square" style="color: #000000; font-size: 18px;"></i>
         <strong style="font-size: 15px; color: var(--text);">Koreksi Catatan Presensi</strong>
       </div>
       <button type="button" onclick="closeKoreksiModal()" class="btn-close" style="width: 32px; height: 32px; border-radius: var(--r-sm); border: 1px solid var(--border); background: var(--surface); color: var(--text-2); display: flex; align-items: center; justify-content: center; cursor: pointer;" data-tooltip="Tutup Modal" title="Tutup Modal">
@@ -1323,7 +1334,7 @@
         <div id="koreksi_nama" style="font-size: 15px; font-weight: 800; color: var(--text); margin-top: 3px;">-</div>
         <div style="display: flex; gap: 16px; font-size: 12px; color: var(--text-3); font-family: var(--font-mono); margin-top: 6px;">
           <span>Tanggal: <strong id="koreksi_tanggal" style="color: var(--text);">-</strong></span>
-          <span>Sumber: <strong id="koreksi_sumber" style="color: var(--gold);">-</strong></span>
+          <span>Sumber: <strong id="koreksi_sumber" style="color: #000000;">-</strong></span>
         </div>
       </div>
 
@@ -1464,9 +1475,9 @@
     let visibleCount = 0;
     items.forEach(item => {
       const nama = item.getAttribute('data-nama') || '';
-      const nis = item.getAttribute('data-nis') || '';
+      const nisn = item.getAttribute('data-nisn') || '';
       const rombel = item.getAttribute('data-rombel') || '';
-      if (!term || nama.includes(term) || nis.includes(term) || rombel.includes(term)) {
+      if (!term || nama.includes(term) || nisn.includes(term) || rombel.includes(term)) {
         item.style.display = 'flex';
         visibleCount++;
       } else {
@@ -1478,7 +1489,7 @@
     }
   }
 
-  function selectLpSiswa(id, nama, nis, rombel, fotoUrl) {
+  function selectLpSiswa(id, nama, nisn, rombel, fotoUrl) {
     const inputHidden = document.getElementById('inputLpSiswaId');
     if (inputHidden) inputHidden.value = id;
 
@@ -1489,7 +1500,7 @@
     const fotoEl = document.getElementById('lpSiswaFoto');
 
     if (namaEl) namaEl.innerText = nama;
-    if (metaEl) metaEl.innerText = 'NIS: ' + nis + (rombel ? ' · ' + rombel : '');
+    if (metaEl) metaEl.innerText = 'NISN: ' + nisn + (rombel ? ' · ' + rombel : '');
     if (fotoEl) fotoEl.src = fotoUrl || '/img/user-default.png';
 
     if (selectedView) selectedView.style.display = 'flex';
