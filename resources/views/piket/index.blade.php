@@ -65,6 +65,12 @@
       gap: 8px;
       flex-wrap: wrap;
     }
+    .piket-btn-divider {
+      width: 1px;
+      height: 26px;
+      background: var(--border-2);
+      margin: 0 4px;
+    }
     .piket-act-btn {
       height: 36px;
       padding: 0 14px;
@@ -463,17 +469,26 @@
         </div>
       </div>
 
-      {{-- Action Hub (Rapi di Kanan) --}}
+      {{-- Action Hub: Switcher Peserta Didik & Guru Sejajar dengan Aksi --}}
       <div class="piket-clean-actions">
-        @if(($canKoreksi ?? false) && ($siswaBelumHadirList->count() + $guruBelumHadirList->count() > 0))
-          <form action="{{ route('piket.flagging-wa') }}" method="POST" style="margin:0;"
-                onsubmit="return confirm('Kirim WA pengingat ke {{ $siswaBelumHadirList->count() }} wali murid & {{ $guruBelumHadirList->count() }} guru yang belum hadir?')">
-            @csrf
-            <button type="submit" class="piket-act-btn piket-act-btn--wa" title="Broadcast WhatsApp Otomatis ke Orang Tua">
-              <i class="bi bi-whatsapp"></i> Broadcast WA ({{ $siswaBelumHadirList->count() + $guruBelumHadirList->count() }})
-            </button>
-          </form>
-        @endif
+        {{-- Segmented View Switcher (Peserta Didik vs Guru) --}}
+        <div class="piket-segmented-tabs">
+          <button type="button" class="piket-segmented-btn piket-main-btn active" id="btnViewSiswa" onclick="switchMainView('siswa', this)">
+            <i class="bi bi-people-fill"></i> Peserta Didik
+            <span class="piket-segmented-count">{{ $totalSiswaAktif }}</span>
+          </button>
+          <button type="button" class="piket-segmented-btn piket-main-btn" id="btnViewGuru" onclick="switchMainView('guru', this)">
+            <i class="bi bi-person-badge-fill"></i> Guru &amp; Pegawai
+            <span class="piket-segmented-count">{{ $guruBelumHadirList->count() + $absensiGuruHariIni->count() }}</span>
+          </button>
+        </div>
+
+        <div class="piket-btn-divider"></div>
+
+        {{-- Akses Menuju Notifikasi WhatsApp --}}
+        <a href="{{ route('notifikasi.index') }}" class="piket-act-btn piket-act-btn--wa" title="Buka Meja Notifikasi WhatsApp">
+          <i class="bi bi-whatsapp"></i> Notifikasi
+        </a>
 
         <button type="button" class="piket-act-btn piket-act-btn--primary" onclick="openModal('modalPresensiManual')" title="Input presensi manual siswa / guru">
           <i class="bi bi-plus-circle-fill"></i> Presensi Manual
@@ -572,18 +587,78 @@
       </div>
     </div>
 
-    {{-- ══ 3. UNIFIED CONTROL TOOLBAR ══ --}}
+    {{-- ══ 4. UNIFIED CONTROL TOOLBAR ══ --}}
     <div class="piket-unified-toolbar no-print">
       <div class="piket-toolbar-top">
-        {{-- Segmented View Switcher --}}
-        <div class="piket-segmented-tabs">
-          <button type="button" class="piket-segmented-btn piket-main-btn active" id="btnViewSiswa" onclick="switchMainView('siswa', this)">
-            <i class="bi bi-people-fill"></i> Peserta Didik
-            <span class="piket-segmented-count">{{ $totalSiswaAktif }}</span>
+        {{-- Filter Chips Strip untuk Siswa --}}
+        <div id="filterChipsSiswa" class="piket-chips-strip filter-pills">
+          <button type="button" class="piket-chip filter-pill active" data-filter="all" onclick="filterSiswaTable('all', this)">
+            <span>Semua</span>
+            <span class="piket-chip-badge">{{ $totalSiswaAktif }}</span>
           </button>
-          <button type="button" class="piket-segmented-btn piket-main-btn" id="btnViewGuru" onclick="switchMainView('guru', this)">
-            <i class="bi bi-person-badge-fill"></i> Guru &amp; Pegawai
-            <span class="piket-segmented-count">{{ $guruBelumHadirList->count() + $absensiGuruHariIni->count() }}</span>
+          <button type="button" class="piket-chip filter-pill" data-filter="hadir" onclick="filterSiswaTable('hadir', this)">
+            <span>Hadir Tepat</span>
+            <span class="piket-chip-badge">{{ $hadirTepat }}</span>
+          </button>
+          <button type="button" class="piket-chip filter-pill" data-filter="terlambat" onclick="filterSiswaTable('terlambat', this)">
+            <span>Terlambat</span>
+            <span class="piket-chip-badge">{{ $terlambat }}</span>
+          </button>
+          <button type="button" class="piket-chip filter-pill" data-filter="belum_pulang" onclick="filterSiswaTable('belum_pulang', this)">
+            <span>Belum Pulang</span>
+            <span class="piket-chip-badge">{{ $siswaBelumScanPulang }}</span>
+          </button>
+          <button type="button" class="piket-chip filter-pill" data-filter="belum_hadir" onclick="filterSiswaTable('belum_hadir', this)">
+            <span>Belum Hadir</span>
+            <span class="piket-chip-badge" style="color:{{ $siswaBelumHadirList->count() > 0 ? '#DC2626' : 'inherit' }}; font-weight:800;">
+              {{ $siswaBelumHadirList->count() }}
+            </span>
+          </button>
+          <button type="button" class="piket-chip filter-pill" data-filter="izin" onclick="filterSiswaTable('izin', this)">
+            <span>Izin / Sakit</span>
+            <span class="piket-chip-badge">{{ $izinCount }}</span>
+          </button>
+          <button type="button" class="piket-chip filter-pill" data-filter="pkl" onclick="filterSiswaTable('pkl', this)">
+            <span>PKL</span>
+            <span class="piket-chip-badge">{{ $totalSiswaPkl ?? 0 }}</span>
+          </button>
+          <button type="button" class="piket-chip filter-pill" data-filter="bolos" onclick="filterSiswaTable('bolos', this)">
+            <span>Bolos</span>
+            <span class="piket-chip-badge">{{ $absensiHariIni->where('status', 'bolos')->count() }}</span>
+          </button>
+          <button type="button" class="piket-chip filter-pill" data-filter="pulang" onclick="filterSiswaTable('pulang', this)">
+            <span>Sudah Pulang</span>
+            <span class="piket-chip-badge">{{ $sudahPulang }}</span>
+          </button>
+        </div>
+
+        {{-- Filter Chips Strip untuk Guru (disembunyikan saat tab siswa aktif) --}}
+        <div id="filterChipsGuru" class="piket-chips-strip filter-pills" style="display:none;">
+          <button type="button" class="piket-chip filter-pill active" data-filter="all" onclick="filterGuruTable('all', this)">
+            <span>Semua Guru</span>
+            <span class="piket-chip-badge">{{ $absensiGuruHariIni->count() + $guruBelumHadirList->count() }}</span>
+          </button>
+          <button type="button" class="piket-chip filter-pill" data-filter="hadir" onclick="filterGuruTable('hadir', this)">
+            <span>Hadir Tepat</span>
+            <span class="piket-chip-badge">{{ $guruHadirTepat }}</span>
+          </button>
+          <button type="button" class="piket-chip filter-pill" data-filter="terlambat" onclick="filterGuruTable('terlambat', this)">
+            <span>Terlambat</span>
+            <span class="piket-chip-badge">{{ $guruTerlambat }}</span>
+          </button>
+          <button type="button" class="piket-chip filter-pill" data-filter="belum_hadir" onclick="filterGuruTable('belum_hadir', this)">
+            <span>Belum Hadir</span>
+            <span class="piket-chip-badge" style="color:{{ $guruBelumHadirList->count() > 0 ? '#DC2626' : 'inherit' }}; font-weight:800;">
+              {{ $guruBelumHadirList->count() }}
+            </span>
+          </button>
+          <button type="button" class="piket-chip filter-pill" data-filter="izin" onclick="filterGuruTable('izin', this)">
+            <span>Izin / Dinas</span>
+            <span class="piket-chip-badge">{{ $guruIzinSakit }}</span>
+          </button>
+          <button type="button" class="piket-chip filter-pill" data-filter="pulang" onclick="filterGuruTable('pulang', this)">
+            <span>Sudah Pulang</span>
+            <span class="piket-chip-badge">{{ $guruSudahPulang }}</span>
           </button>
         </div>
 
@@ -592,78 +667,6 @@
           <i class="bi bi-search piket-search-icon"></i>
           <input type="text" id="searchSiswaPiket" onkeyup="searchSiswaPiketTable()" class="piket-search-input" placeholder="Cari nama, NISN, rombel..." />
         </div>
-      </div>
-
-      {{-- Filter Chips Strip untuk Siswa --}}
-      <div id="filterChipsSiswa" class="piket-chips-strip filter-pills">
-        <button type="button" class="piket-chip filter-pill active" data-filter="all" onclick="filterSiswaTable('all', this)">
-          <span>Semua</span>
-          <span class="piket-chip-badge">{{ $totalSiswaAktif }}</span>
-        </button>
-        <button type="button" class="piket-chip filter-pill" data-filter="hadir" onclick="filterSiswaTable('hadir', this)">
-          <span>Hadir Tepat</span>
-          <span class="piket-chip-badge">{{ $hadirTepat }}</span>
-        </button>
-        <button type="button" class="piket-chip filter-pill" data-filter="terlambat" onclick="filterSiswaTable('terlambat', this)">
-          <span>Terlambat</span>
-          <span class="piket-chip-badge">{{ $terlambat }}</span>
-        </button>
-        <button type="button" class="piket-chip filter-pill" data-filter="belum_pulang" onclick="filterSiswaTable('belum_pulang', this)">
-          <span>Belum Pulang</span>
-          <span class="piket-chip-badge">{{ $siswaBelumScanPulang }}</span>
-        </button>
-        <button type="button" class="piket-chip filter-pill" data-filter="belum_hadir" onclick="filterSiswaTable('belum_hadir', this)">
-          <span>Belum Hadir</span>
-          <span class="piket-chip-badge" style="color:{{ $siswaBelumHadirList->count() > 0 ? '#DC2626' : 'inherit' }}; font-weight:800;">
-            {{ $siswaBelumHadirList->count() }}
-          </span>
-        </button>
-        <button type="button" class="piket-chip filter-pill" data-filter="izin" onclick="filterSiswaTable('izin', this)">
-          <span>Izin / Sakit</span>
-          <span class="piket-chip-badge">{{ $izinCount }}</span>
-        </button>
-        <button type="button" class="piket-chip filter-pill" data-filter="pkl" onclick="filterSiswaTable('pkl', this)">
-          <span>PKL</span>
-          <span class="piket-chip-badge">{{ $totalSiswaPkl ?? 0 }}</span>
-        </button>
-        <button type="button" class="piket-chip filter-pill" data-filter="bolos" onclick="filterSiswaTable('bolos', this)">
-          <span>Bolos</span>
-          <span class="piket-chip-badge">{{ $absensiHariIni->where('status', 'bolos')->count() }}</span>
-        </button>
-        <button type="button" class="piket-chip filter-pill" data-filter="pulang" onclick="filterSiswaTable('pulang', this)">
-          <span>Sudah Pulang</span>
-          <span class="piket-chip-badge">{{ $sudahPulang }}</span>
-        </button>
-      </div>
-
-      {{-- Filter Chips Strip untuk Guru (disembunyikan saat tab siswa aktif) --}}
-      <div id="filterChipsGuru" class="piket-chips-strip filter-pills" style="display:none;">
-        <button type="button" class="piket-chip filter-pill active" data-filter="all" onclick="filterGuruTable('all', this)">
-          <span>Semua Guru</span>
-          <span class="piket-chip-badge">{{ $absensiGuruHariIni->count() + $guruBelumHadirList->count() }}</span>
-        </button>
-        <button type="button" class="piket-chip filter-pill" data-filter="hadir" onclick="filterGuruTable('hadir', this)">
-          <span>Hadir Tepat</span>
-          <span class="piket-chip-badge">{{ $guruHadirTepat }}</span>
-        </button>
-        <button type="button" class="piket-chip filter-pill" data-filter="terlambat" onclick="filterGuruTable('terlambat', this)">
-          <span>Terlambat</span>
-          <span class="piket-chip-badge">{{ $guruTerlambat }}</span>
-        </button>
-        <button type="button" class="piket-chip filter-pill" data-filter="belum_hadir" onclick="filterGuruTable('belum_hadir', this)">
-          <span>Belum Hadir</span>
-          <span class="piket-chip-badge" style="color:{{ $guruBelumHadirList->count() > 0 ? '#DC2626' : 'inherit' }}; font-weight:800;">
-            {{ $guruBelumHadirList->count() }}
-          </span>
-        </button>
-        <button type="button" class="piket-chip filter-pill" data-filter="izin" onclick="filterGuruTable('izin', this)">
-          <span>Izin / Dinas</span>
-          <span class="piket-chip-badge">{{ $guruIzinSakit }}</span>
-        </button>
-        <button type="button" class="piket-chip filter-pill" data-filter="pulang" onclick="filterGuruTable('pulang', this)">
-          <span>Sudah Pulang</span>
-          <span class="piket-chip-badge">{{ $guruSudahPulang }}</span>
-        </button>
       </div>
     </div>
 
