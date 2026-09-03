@@ -361,6 +361,14 @@
       border-color: var(--cyan);
       box-shadow: 0 25px 60px -10px rgba(0,0,0,0.4), 0 0 35px var(--cyan-glow);
     }
+    .identity-result-card.status-selesai {
+      border-color: #64748B;
+      box-shadow: 0 25px 60px -10px rgba(0,0,0,0.4), 0 0 35px rgba(148, 163, 184, 0.2);
+    }
+    .identity-result-card.status-info {
+      border-color: #3B82F6;
+      box-shadow: 0 25px 60px -10px rgba(0,0,0,0.4), 0 0 35px rgba(59, 130, 246, 0.25);
+    }
     .identity-result-card.status-error {
       border-color: var(--rose);
       box-shadow: 0 25px 60px -10px rgba(0,0,0,0.4), 0 0 35px var(--rose-glow);
@@ -401,11 +409,22 @@
       color: var(--cyan);
       border: 1px solid var(--cyan);
     }
+    .result-badge-large.selesai {
+      background: rgba(148, 163, 184, 0.15);
+      color: #94A3B8;
+      border: 1px solid #64748B;
+    }
+    .result-badge-large.info {
+      background: rgba(59, 130, 246, 0.15);
+      color: #3B82F6;
+      border: 1px solid #3B82F6;
+    }
     .result-badge-large.error {
       background: var(--rose-glow);
       color: var(--rose);
       border: 1px solid var(--rose);
     }
+
 
     .identity-gate-label {
       font-size: 12px;
@@ -862,8 +881,38 @@
       const jam = d.jam || d.jam_masuk || d.jam_pulang || '';
       timeTxt.textContent = jam ? `Presensi Pukul ${jam} WIB` : 'Presensi Berhasil Dicatat';
 
+      const curHour = new Date().getHours();
+      let salam = 'Selamat pagi';
+      if (curHour >= 11 && curHour < 15) {
+        salam = 'Selamat siang';
+      } else if (curHour >= 15 && curHour < 18) {
+        salam = 'Selamat sore';
+      } else if (curHour >= 18 || curHour < 5) {
+        salam = 'Halo';
+      }
+
+      const speechNama = (d.nama || '').split(',')[0].trim();
+
       // Status variations
-      if (st === 'terlambat') {
+      if (st === 'selesai' || res.type === 'sudah_lengkap') {
+        card.className = 'identity-result-card status-selesai';
+        badge.className = 'result-badge-large selesai';
+        badgeTxt.textContent = 'PRESENSI SELESAI';
+        avatarWrap.style.borderColor = '#94A3B8';
+        avatarWrap.style.boxShadow = '0 0 25px rgba(148,163,184,0.3)';
+        countdownFill.style.background = '#94A3B8';
+        msgTxt.textContent = res.message || 'Presensi hari ini sudah lengkap.';
+        speak(`${salam}, ${speechNama}, presensi Anda hari ini sudah selesai.`);
+      } else if (st === 'sudah_masuk' || res.type === 'sudah_masuk' || res.type === 'belum_waktunya_pulang') {
+        card.className = 'identity-result-card status-info';
+        badge.className = 'result-badge-large info';
+        badgeTxt.textContent = (res.type === 'belum_waktunya_pulang') ? 'BELUM WAKTUNYA PULANG' : 'SUDAH PRESENSI MASUK';
+        avatarWrap.style.borderColor = '#3B82F6';
+        avatarWrap.style.boxShadow = '0 0 25px rgba(59,130,246,0.3)';
+        countdownFill.style.background = '#3B82F6';
+        msgTxt.textContent = res.message || 'Anda sudah melakukan presensi masuk.';
+        speak(`${salam}, ${speechNama}, Anda sudah tercatat presensi masuk.`);
+      } else if (st === 'terlambat') {
         card.className = 'identity-result-card status-terlambat';
         badge.className = 'result-badge-large terlambat';
         badgeTxt.textContent = 'TERLAMBAT';
@@ -871,6 +920,7 @@
         avatarWrap.style.boxShadow = '0 0 25px var(--amber-glow)';
         countdownFill.style.background = 'var(--amber)';
         msgTxt.textContent = res.message || 'Presensi terlambat dicatat.';
+        speak(`Perhatian, ${speechNama}, Anda tercatat terlambat.`);
       } else if (st === 'pulang') {
         card.className = 'identity-result-card status-pulang';
         badge.className = 'result-badge-large pulang';
@@ -879,6 +929,7 @@
         avatarWrap.style.boxShadow = '0 0 25px var(--cyan-glow)';
         countdownFill.style.background = 'var(--cyan)';
         msgTxt.textContent = res.message || 'Presensi pulang berhasil dicatat. Hati-hati di jalan!';
+        speak(`Terima kasih, ${speechNama}, presensi pulang berhasil. Hati-hati di jalan.`);
       } else {
         card.className = 'identity-result-card status-hadir';
         badge.className = 'result-badge-large hadir';
@@ -887,33 +938,23 @@
         avatarWrap.style.boxShadow = '0 0 25px var(--emerald-glow)';
         countdownFill.style.background = 'var(--emerald)';
         msgTxt.textContent = res.message || 'Presensi masuk berhasil dicatat.';
-      }
-
-      // Voice greeting
-      const speechNama = (d.nama || '').split(',')[0].trim();
-      if (st === 'terlambat') {
-        speak(`Perhatian, ${speechNama}, Anda tercatat terlambat.`);
-      } else if (st === 'pulang') {
-        speak(`Terima kasih, ${speechNama}, presensi pulang berhasil. Hati-hati di jalan.`);
-      } else {
-        speak(`Selamat pagi, ${speechNama}, presensi berhasil.`);
+        speak(`${salam}, ${speechNama}, presensi berhasil.`);
       }
 
     } else {
       playBeep('error');
       card.className = 'identity-result-card status-error';
       badge.className = 'result-badge-large error';
-      badgeTxt.textContent = 'DITOLAK';
-      photo.src = '/img/user-default.png';
+      badgeTxt.textContent = (res.type === 'di_luar_jam_operasional' || res.type === 'jam_tutup_terlewat') ? 'DITUTUP' : 'DITOLAK';
+      photo.src = (res.data && res.data.foto) ? res.data.foto : '/img/user-default.png';
       avatarWrap.style.borderColor = 'var(--rose)';
       avatarWrap.style.boxShadow = '0 0 25px var(--rose-glow)';
       countdownFill.style.background = 'var(--rose)';
-      nameEl.textContent = 'Pemindaian Gagal';
-      subTxt.textContent = 'Kartu atau Barcode Tidak Terdaftar';
-      timeTxt.textContent = 'Sistem Smart Gate';
+      nameEl.textContent = (res.data && res.data.nama) ? res.data.nama : 'Pemindaian Gagal';
+      subTxt.textContent = (res.data && (res.data.sub || res.data.rombel_atau_jabatan)) ? `${res.data.sub || res.data.rombel_atau_jabatan} • ${res.data.identitas || ''}` : 'Sistem Smart Gate';
+      timeTxt.textContent = (res.data && res.data.jam) ? `Presensi Pukul ${res.data.jam} WIB` : 'Di Luar Ketentuan';
       msgTxt.textContent = res.message || 'Kartu atau Barcode belum terdaftar di sistem.';
-      speak('Kartu tidak valid atau belum terdaftar.');
-
+      speak(res.message ? res.message.split('.')[0] : 'Presensi tidak dapat diproses.');
     }
 
     startCountdown(4);

@@ -211,6 +211,9 @@ class SiraniDeepTester
 
         DB::beginTransaction();
         try {
+            // Simulasi jam 07:10 WIB (pagi hari masuk sekolah)
+            Carbon::setTestNow(Carbon::today()->setTime(7, 10, 0));
+
             // A. Perekaman Masuk langsung aktif tanpa perlu buka manual
             Absensi::where('pemilik_type', 'siswa')->where('pemilik_id', $siswa->id)->where('tanggal', $today)->delete();
 
@@ -222,9 +225,11 @@ class SiraniDeepTester
             $this->assert("Fitur cooldown melindungi dari double-scan cepat", $resCooldown['success'] === true && $resCooldown['type'] === 'cooldown_double_scan');
 
         } finally {
+            Carbon::setTestNow();
             DB::rollBack();
         }
     }
+
 
     // ── 5. EVALUASI ALPHA & BOLOS ───────────────────────────────────────────
 

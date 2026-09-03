@@ -178,9 +178,9 @@ class RfidScanService
             // ── PARAMETER 5: Pengaturan Jam Operasional Sekolah ──
             $jadwal = JadwalHariIni::getJadwalAktif($today);
 
-            $jamMasukMaks = $jadwal?->jam_masuk_toleransi ?? $jadwal?->jam_masuk_selesai ?? '07:15:00';
-            $jamPulangMulai = $jadwal?->jam_pulang_mulai ?? '15:00:00';
-
+            $jamMasukMaks    = $jadwal?->jam_masuk_toleransi ?? $jadwal?->jam_masuk_selesai ?? '07:15:00';
+            $jamPulangMulai  = $jadwal?->jam_pulang_mulai ?? '14:30:00';
+            $jamTutupSekolah = $jadwal?->jam_tutup_gerbang ?? '17:00:00';
 
             // Catatan khusus guru honor
             $catatanHonor = '';
@@ -219,7 +219,7 @@ class RfidScanService
                 ];
             }
 
-            // ── PARAMETER 8: Anti-Double-Scan Cooldown (Mencegah scanner menembak 2x berturut-turut < 10 detik) ──
+            // ── PARAMETER 8: Anti-Double-Scan Cooldown (< 10 detik) ──
             if ($absensi && $absensi->updated_at && $absensi->updated_at->diffInSeconds($now) < 10) {
                 return [
                     'success' => true,
@@ -234,17 +234,125 @@ class RfidScanService
                         'rombel_atau_jabatan' => $rombelOrJabatan,
                         'foto'                => $person->foto_url,
                         'foto_url'            => $person->foto_url,
-                        'status'              => $absensi->status,
-                        'jam'                 => $absensi->jam_masuk ?: $timeNow,
+                        'status'              => !empty($absensi->jam_pulang) ? 'selesai' : $absensi->status,
+                        'jam'                 => !empty($absensi->jam_pulang) ? $absensi->jam_pulang : ($absensi->jam_masuk ?: $timeNow),
                         'jam_masuk'           => $absensi->jam_masuk,
                         'jam_pulang'          => $absensi->jam_pulang,
                     ]
                 ];
             }
 
+            // ── PARAMETER 9: KONDISI KARTU SUDAH LENGKAP (MASUK & PULANG TERCATAT) ──
+            if ($absensi && !empty($absensi->jam_masuk) && !empty($absensi->jam_pulang)) {
+                return [
+                    'success' => true,
+                    'status'  => 'info',
+                    'type'    => 'sudah_lengkap',
+                    'message' => "Presensi hari ini sudah lengkap (Masuk: {$absensi->jam_masuk} WIB · Pulang: {$absensi->jam_pulang} WIB).",
+                    'data'    => [
+                        'nama'                => $person->nama,
+                        'tipe'                => $type,
+                        'sub'                 => $rombelOrJabatan,
+                        'identitas'           => $identitas,
+                        'rombel_atau_jabatan' => $rombelOrJabatan,
+                        'foto'                => $person->foto_url,
+                        'foto_url'            => $person->foto_url,
+                        'status'              => 'selesai',
+                        'jam'                 => $absensi->jam_pulang,
+                        'jam_masuk'           => $absensi->jam_masuk,
+                        'jam_pulang'          => $absensi->jam_pulang,
+                    ]
+                ];
+            }
+
+            // ── PARAMETER 10: BATASAN WAKTU TUTUP SEKOLAH (> 17:00 WIB) ──
+            if ($timeNow >= $jamTutupSekolah) {
+                if (!$absensi) {
+                    return [
+                        'success' => false,
+                        'status'  => 'warning',
+                        'type'    => 'di_luar_jam_operasional',
+                        'message' => "Layanan presensi hari ini telah berakhir (Jam tutup sekolah: " . substr($jamTutupSekolah, 0, 5) . " WIB).",
+                        'data'    => [
+                            'nama'                => $person->nama,
+                            'tipe'                => $type,
+                            'sub'                 => $rombelOrJabatan,
+                            'identitas'           => $identitas,
+                            'rombel_atau_jabatan' => $rombelOrJabatan,
+                            'foto'                => $person->foto_url,
+                            'foto_url'            => $person->foto_url,
+                            'status'              => 'ditolak',
+                            'jam'                 => $timeNow,
+                        ]
+                    ];
+                }
+
+                // Jika sudah ada jam masuk tapi belum tap pulang sampai lewat jam tutup
+                return [
+                    'success' => false,
+                    'status'  => 'warning',
+                    'type'    => 'jam_tutup_terlewat',
+                    'message' => "Batas kepulangan sekolah telah berakhir pukul " . substr($jamTutupSekolah, 0, 5) . " WIB. Anda tercatat masuk pukul {$absensi->jam_masuk} WIB.",
+                    'data'    => [
+                        'nama'                => $person->nama,
+                        'tipe'                => $type,
+                        'sub'                 => $rombelOrJabatan,
+                        'identitas'           => $identitas,
+                        'rombel_atau_jabatan' => $rombelOrJabatan,
+                        'foto'                => $person->foto_url,
+                        'foto_url'            => $person->foto_url,
+                        'status'              => 'terlewat',
+                        'jam'                 => $absensi->jam_masuk,
+                        'jam_masuk'           => $absensi->jam_masuk,
+                        'jam_pulang'          => null,
+                    ]
+                ];
+            }
 
             // ── SCENARIO A: Perekaman Presensi Masuk (Pertama Kali di Hari Ini) ──
             if (!$absensi) {
+                // Jika scan pertama kali terjadi setelah jam 12:00 siang (tidak pernah absen pagi)
+                if ($timeNow >= '12:00:00') {
+                    if ($timeNow >= $jamPulangMulai) {
+                        return [
+                            'success' => false,
+                            'status'  => 'warning',
+                            'type'    => 'tanpa_jam_masuk',
+                            'message' => "Presensi pulang ditolak karena tidak ada rekaman presensi masuk pagi ini.",
+                            'data'    => [
+                                'nama'                => $person->nama,
+                                'tipe'                => $type,
+                                'sub'                 => $rombelOrJabatan,
+                                'identitas'           => $identitas,
+                                'rombel_atau_jabatan' => $rombelOrJabatan,
+                                'foto'                => $person->foto_url,
+                                'foto_url'            => $person->foto_url,
+                                'status'              => 'ditolak',
+                                'jam'                 => $timeNow,
+                            ]
+                        ];
+                    }
+
+                    // Jam 12:00 - jamPulangMulai:
+                    return [
+                        'success' => false,
+                        'status'  => 'warning',
+                        'type'    => 'verifikasi_piket',
+                        'message' => "Presensi pagi tidak terekam. Silakan melapor ke Petugas Piket untuk verifikasi kehadiran siang.",
+                        'data'    => [
+                            'nama'                => $person->nama,
+                            'tipe'                => $type,
+                            'sub'                 => $rombelOrJabatan,
+                            'identitas'           => $identitas,
+                            'rombel_atau_jabatan' => $rombelOrJabatan,
+                            'foto'                => $person->foto_url,
+                            'foto_url'            => $person->foto_url,
+                            'status'              => 'ditolak',
+                            'jam'                 => $timeNow,
+                        ]
+                    ];
+                }
+
                 $isTerlambat = ($timeNow > $jamMasukMaks);
                 $statusKehadiran = $isTerlambat ? 'terlambat' : 'hadir';
 
@@ -286,8 +394,8 @@ class RfidScanService
                 }
 
                 $message = $isTerlambat
-                    ? "Presensi Masuk (Terlambat) Berhasil! Pukul {$timeNow} WIB."
-                    : "Presensi Masuk Berhasil! Pukul {$timeNow} WIB.";
+                    ? "Presensi Masuk (TERLAMBAT) Berhasil Dicatat. Batas toleransi adalah {$jamMasukMaks} WIB."
+                    : "Presensi Masuk Berhasil! Tepat waktu pukul {$timeNow} WIB.";
 
                 return [
                     'success' => true,
@@ -310,18 +418,18 @@ class RfidScanService
                 ];
             }
 
-            // ── SCENARIO B: Sudah Ada Jam Masuk -> Perekaman Presensi Pulang ──
+            // ── SCENARIO B: Sudah Ada Jam Masuk -> Validasi Pulang ──
             if (empty($absensi->jam_pulang)) {
                 $jamPulangJadwal = Carbon::parse($jamPulangMulai);
 
-                // Validasi: Belum Waktunya Pulang
+                // Validasi: Belum Waktunya Pulang (< jamPulangMulai)
                 if ($now->lessThan($jamPulangJadwal)) {
                     $selisihMenit = $now->diffInMinutes($jamPulangJadwal);
                     return [
-                        'success' => false,
+                        'success' => true,
                         'status'  => 'info',
                         'type'    => 'belum_waktunya_pulang',
-                        'message' => "Anda sudah presensi masuk pukul {$absensi->jam_masuk} WIB. Belum waktunya absen pulang (Kurang {$selisihMenit} menit).",
+                        'message' => "Anda sudah presensi masuk pukul {$absensi->jam_masuk} WIB. Kepulangan dimulai pukul " . substr($jamPulangMulai, 0, 5) . " WIB (Kurang {$selisihMenit} menit).",
                         'data'    => [
                             'nama'                => $person->nama,
                             'tipe'                => $type,
@@ -330,8 +438,8 @@ class RfidScanService
                             'rombel_atau_jabatan' => $rombelOrJabatan,
                             'foto'                => $person->foto_url,
                             'foto_url'            => $person->foto_url,
-                            'status'              => $absensi->status,
-                            'jam'                 => $timeNow,
+                            'status'              => 'sudah_masuk',
+                            'jam'                 => $absensi->jam_masuk,
                             'jam_masuk'           => $absensi->jam_masuk,
                             'jam_pulang'          => null,
                         ]
@@ -378,7 +486,7 @@ class RfidScanService
                         'rombel_atau_jabatan' => $rombelOrJabatan,
                         'foto'                => $person->foto_url,
                         'foto_url'            => $person->foto_url,
-                        'status'              => 'pulang',
+                        'status'              => 'selesai',
                         'jam'                 => $timeNow,
                         'jam_masuk'           => $absensi->jam_masuk,
                         'jam_pulang'          => $timeNow,
@@ -386,7 +494,7 @@ class RfidScanService
                 ];
             }
 
-            // ── SCENARIO C: Presensi Lengkap (Masuk & Pulang Sudah Tercatat) ──
+            // Fallback (jika sudah lengkap)
             return [
                 'success' => true,
                 'status'  => 'info',
@@ -400,8 +508,8 @@ class RfidScanService
                     'rombel_atau_jabatan' => $rombelOrJabatan,
                     'foto'                => $person->foto_url,
                     'foto_url'            => $person->foto_url,
-                    'status'              => $absensi->status,
-                    'jam'                 => $timeNow,
+                    'status'              => 'selesai',
+                    'jam'                 => $absensi->jam_pulang,
                     'jam_masuk'           => $absensi->jam_masuk,
                     'jam_pulang'          => $absensi->jam_pulang,
                 ]
