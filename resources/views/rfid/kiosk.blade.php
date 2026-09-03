@@ -632,12 +632,6 @@
         Dekatkan Kartu Pelajar RFID / e-KTP ke sensor pembaca atau arahkan Barcode / QR Code NISN siswa ke scanner USB.
       </p>
 
-      <div class="scanner-protocols">
-        <span class="protocol-pill">RFID 13.56 MHz / 125 kHz</span>
-        <span class="protocol-pill">Barcode 1D / 2D</span>
-        <span class="protocol-pill">QR Code Siswa</span>
-      </div>
-
       <div class="scanner-status-indicator" id="scannerStatus">
         <span class="pulse-dot"></span>
         <span>PEMINDAI SIAP MENERIMA INPUT</span>
