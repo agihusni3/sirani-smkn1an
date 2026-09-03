@@ -569,16 +569,11 @@
       <div class="brand-sub">
         <span>Smart Gate System</span>
         <span>•</span>
-        @if($jadwal && $jadwal->is_sesi_buka)
-          <span class="header-status-badge open">
-            <span class="pulse-dot"></span> GERBANG DIBUKA
-          </span>
-        @else
-          <span class="header-status-badge closed">
-            <span class="pulse-dot"></span> GERBANG DITUTUP
-          </span>
-        @endif
+        <span class="header-status-badge open">
+          <span class="pulse-dot"></span> SMART GATE AKTIF
+        </span>
       </div>
+
     </div>
   </div>
 

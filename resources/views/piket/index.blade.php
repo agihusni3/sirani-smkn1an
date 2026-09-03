@@ -423,8 +423,6 @@
           <span>Batas Masuk: <strong>{{ substr($jadwal->jam_masuk_toleransi ?? '07:15', 0, 5) }}</strong></span>
           <span>·</span>
           <span>Tutup Gerbang: <strong>{{ substr($jadwal->jam_tutup_gerbang ?? '17:00', 0, 5) }}</strong></span>
-          <span>·</span>
-          <span>Smart Gate: <strong style="color:{{ $jadwal->is_sesi_buka ? '#16A34A' : '#DC2626' }};">{{ $jadwal->is_sesi_buka ? 'Terbuka' : 'Ditutup' }}</strong></span>
           @if($guruPiketHariIni->isNotEmpty())
             <span>·</span>
             <span>Petugas: <span style="color:var(--text); font-weight:600;">{{ $guruPiketHariIni->map(fn($g) => $g->guru->nama ?? 'Guru')->join(', ') }}</span></span>
@@ -435,24 +433,8 @@
 
       {{-- Action Buttons --}}
       <div class="piket-header-actions">
-        {{-- Gate Toggle --}}
-        @if($jadwal->is_sesi_buka)
-          <form action="{{ route('piket.toggle-gerbang') }}" method="POST" style="margin:0;">
-            @csrf
-            <button type="submit" name="status" value="tutup" class="piket-hdr-btn" title="Tutup sesi gerbang">
-              <i class="bi bi-door-closed"></i> Tutup Gerbang
-            </button>
-          </form>
-        @else
-          <form action="{{ route('piket.toggle-gerbang') }}" method="POST" style="margin:0;">
-            @csrf
-            <button type="submit" name="status" value="buka" class="piket-hdr-btn" title="Buka sesi gerbang">
-              <i class="bi bi-door-open"></i> Buka Gerbang
-            </button>
-          </form>
-        @endif
-
         {{-- WA Massal --}}
+
         @if(($canKoreksi ?? false) && ($siswaBelumHadirList->count() + $guruBelumHadirList->count() > 0))
           <form action="{{ route('piket.flagging-wa') }}" method="POST" style="margin:0;"
                 onsubmit="return confirm('Kirim WA pengingat ke {{ $siswaBelumHadirList->count() }} wali murid & {{ $guruBelumHadirList->count() }} guru yang belum hadir?')">

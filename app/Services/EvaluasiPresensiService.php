@@ -34,14 +34,14 @@ class EvaluasiPresensiService
             $jadwal = JadwalHariIni::getJadwalAktif($dateStr);
             $nowStr = Carbon::now()->format('H:i:s');
 
-            // Waktu evaluasi: jika dipaksa, atau sesi gerbang sudah ditutup sore hari,
-            // atau waktu sekarang sudah melewati jam tutup gerbang / jam 17:00
+            // Waktu evaluasi: jika dipaksa atau waktu sekarang sudah melewati jam tutup gerbang / jam 17:00
             $jamBatasEvaluasi = $jadwal->jam_tutup_gerbang ?: '17:00:00';
-            $sudahWaktuEvaluasi = $force || ($nowStr >= $jamBatasEvaluasi) || (!$jadwal->is_sesi_buka && $nowStr >= ($jadwal->jam_pulang_mulai ?: '15:30:00'));
+            $sudahWaktuEvaluasi = $force || ($nowStr >= $jamBatasEvaluasi);
 
             if (!$sudahWaktuEvaluasi) {
-                return ['status' => 'skipped', 'message' => 'Belum masuk waktu evaluasi sore'];
+                return ['status' => 'skipped', 'message' => 'Belum masuk waktu evaluasi sore (setelah jam tutup sekolah ' . substr($jamBatasEvaluasi, 0, 5) . ')'];
             }
+
         } elseif ($targetDate->isFuture()) {
             return ['status' => 'skipped', 'message' => 'Tanggal masa depan'];
         }

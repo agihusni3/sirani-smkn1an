@@ -42,18 +42,6 @@ class JadwalHariIni extends Model
 
         $jadwal = self::where('tanggal', $dateStr)->first();
         if ($jadwal) {
-            // Otomatis tutup sesi jika sudah melewati jam_tutup_gerbang pada hari ini
-            if ($jadwal->is_sesi_buka && $date->isToday() && $jadwal->jam_tutup_gerbang) {
-                $nowStr = Carbon::now()->format('H:i:s');
-                if ($nowStr >= $jadwal->jam_tutup_gerbang) {
-                    $jadwal->update([
-                        'is_sesi_buka' => false,
-                        'waktu_tutup_sesi' => now(),
-                        'diubah_oleh' => 'Sistem Otomatis (Batas Jam Tutup)',
-                    ]);
-                    $jadwal->is_sesi_buka = false;
-                }
-            }
             return $jadwal;
         }
 
@@ -90,19 +78,19 @@ class JadwalHariIni extends Model
             'jam_tutup_gerbang' => $jamTutup,
             'keterangan' => $ket,
             'diubah_oleh' => "Sistem Otomatis (Template {$namaHari})",
-            'is_sesi_buka' => false,
+            'is_sesi_buka' => true,
         ]);
     }
 
 
     /**
-     * Cek apakah sesi gerbang saat ini terbuka
+     * Cek apakah sesi gerbang saat ini terbuka (Smart Gate selalu aktif otomatis)
      */
     public static function isSesiAktif(?string $tanggal = null): bool
     {
-        $jadwal = self::getJadwalAktif($tanggal);
-        return (bool) $jadwal->is_sesi_buka;
+        return true;
     }
+
 
     /**
      * Buka sesi gerbang oleh Petugas Piket / Admin

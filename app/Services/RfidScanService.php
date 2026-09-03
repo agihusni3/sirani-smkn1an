@@ -175,31 +175,12 @@ class RfidScanService
                 ];
             }
 
-            // ── PARAMETER 5: Pengaturan Jam Operasional & Sesi Gerbang ──
+            // ── PARAMETER 5: Pengaturan Jam Operasional Sekolah ──
             $jadwal = JadwalHariIni::getJadwalAktif($today);
-
-            if ($jadwal && !$jadwal->is_sesi_buka) {
-                return [
-                    'success' => false,
-                    'status'  => 'warning',
-                    'type'    => 'gerbang_ditutup',
-                    'message' => "Gerbang Presensi sedang ditutup oleh Petugas Piket.",
-                    'error'   => "Gerbang belum dibuka.",
-                    'data'    => [
-                        'nama'                => $person->nama,
-                        'tipe'                => $type,
-                        'sub'                 => $rombelOrJabatan,
-                        'identitas'           => $identitas,
-                        'rombel_atau_jabatan' => $rombelOrJabatan,
-                        'foto'                => $person->foto_url,
-                        'foto_url'            => $person->foto_url,
-                        'jam'                 => $timeNow,
-                    ]
-                ];
-            }
 
             $jamMasukMaks = $jadwal?->jam_masuk_toleransi ?? $jadwal?->jam_masuk_selesai ?? '07:15:00';
             $jamPulangMulai = $jadwal?->jam_pulang_mulai ?? '15:00:00';
+
 
             // Catatan khusus guru honor
             $catatanHonor = '';

@@ -189,19 +189,9 @@ class SiraniDeepTester
         $this->assert("Format jam_pulang_mulai valid ({$jadwal->jam_pulang_mulai})", !empty($jadwal->jam_pulang_mulai));
         $this->assert("Format jam_tutup_gerbang valid ({$jadwal->jam_tutup_gerbang})", !empty($jadwal->jam_tutup_gerbang));
 
-        // Test buka/tutup sesi (gunakan batas tutup malam agar tidak terinterupsi saat dijalankan sore hari)
-        $originalStatus = $jadwal->is_sesi_buka;
-        $originalTutup = $jadwal->jam_tutup_gerbang;
-        $jadwal->update(['jam_tutup_gerbang' => '23:59:59', 'is_sesi_buka' => true]);
-        $this->assert("Status sesi gerbang dapat diaktifkan (true)", JadwalHariIni::isSesiAktif($today));
-
-        $jadwal->update(['is_sesi_buka' => false]);
-        $this->assert("Status sesi gerbang dapat dinonaktifkan (false)", !JadwalHariIni::isSesiAktif($today));
-
-        // Kembalikan ke status semula
-        $jadwal->update(['jam_tutup_gerbang' => $originalTutup, 'is_sesi_buka' => $originalStatus]);
+        // Smart Gate selalu aktif otomatis mengikuti jadwal operasional
+        $this->assert("Sistem Smart Gate selalu aktif otomatis (isSesiAktif = true)", JadwalHariIni::isSesiAktif($today));
     }
-
 
     // ── 4. SMART GATE RFID & BARCODE ────────────────────────────────────────
     private function testSmartGateRfidBarcode(): void
@@ -211,7 +201,6 @@ class SiraniDeepTester
         $service = new RfidScanService();
         $today = Carbon::today()->toDateString();
         $jadwal = JadwalHariIni::getJadwalAktif($today);
-        $originalSesi = $jadwal->is_sesi_buka;
 
         // Ambil 1 siswa aktif untuk simulasi transaksi
         $siswa = Siswa::where('status', 'aktif')->first();
@@ -222,31 +211,23 @@ class SiraniDeepTester
 
         DB::beginTransaction();
         try {
-            // A. Gerbang Ditutup -> Harus Ditolak
-            $jadwal->update(['is_sesi_buka' => false]);
-            $resTutup = $service->scanRfid($siswa->nisn ?: 'TEST_UID');
-            $this->assert("Scan ditolak dengan aman jika gerbang sedang ditutup", !$resTutup['success'] && $resTutup['status'] === 'warning');
-
-            // B. Gerbang Dibuka -> Perekaman Masuk (gunakan batas tutup malam selama pengujian)
-            $jadwal->update(['jam_tutup_gerbang' => '23:59:59', 'is_sesi_buka' => true]);
-            // Bersihkan absensi hari ini jika ada untuk testing murni
+            // A. Perekaman Masuk langsung aktif tanpa perlu buka manual
             Absensi::where('pemilik_type', 'siswa')->where('pemilik_id', $siswa->id)->where('tanggal', $today)->delete();
 
             $resMasuk = $service->scanRfid($siswa->nisn);
             $this->assert("Scan masuk siswa berhasil diproses via NISN/Barcode", $resMasuk['success'] === true && $resMasuk['type'] === 'jam_masuk');
 
-            // C. Anti-double scan cooldown (< 10 detik)
+            // B. Anti-double scan cooldown (< 10 detik)
             $resCooldown = $service->scanRfid($siswa->nisn);
             $this->assert("Fitur cooldown melindungi dari double-scan cepat", $resCooldown['success'] === true && $resCooldown['type'] === 'cooldown_double_scan');
 
         } finally {
             DB::rollBack();
-            $jadwal->update(['jam_tutup_gerbang' => '17:00:00', 'is_sesi_buka' => $originalSesi]);
         }
-
     }
 
     // ── 5. EVALUASI ALPHA & BOLOS ───────────────────────────────────────────
+
     private function testEvaluasiPresensiAlphaBolos(): void
     {
         $this->header("5. MESIN EVALUASI OTOMATIS ALPHA & BOLOS");
