@@ -6,167 +6,79 @@
   <title>Piket Harian — SMKN 1 Air Naningan</title>
   @include('partials.styles')
   <style>
-    /* ══ DUTY COMMAND CENTER DESIGN SYSTEM ══ */
-    .piket-hero-command {
-      background: var(--bg-2);
-      border: 1px solid var(--border);
-      border-radius: var(--r-xl);
-      padding: 22px 26px;
-      margin-bottom: 20px;
-      box-shadow: 0 10px 30px -10px rgba(0,0,0,0.05);
+    /* ══ CLEAN & TIDY PIKET LAYOUT SYSTEM ══ */
+    .piket-clean-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
       flex-wrap: wrap;
-      gap: 20px;
-      position: relative;
-      overflow: hidden;
+      gap: 16px;
+      margin-bottom: 14px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--border);
     }
-    .piket-hero-command::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 0; right: 0; height: 3.5px;
-      background: linear-gradient(90deg, #10B981, #06B6D4, #3B82F6, #6366F1);
-    }
-    .piket-duty-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      font-family: var(--font-mono);
-      font-size: 11px;
-      font-weight: 800;
-      letter-spacing: 0.6px;
-      text-transform: uppercase;
-      background: rgba(16, 185, 129, 0.12);
-      color: #059669;
-      border: 1px solid rgba(16, 185, 129, 0.3);
-      padding: 4px 12px;
-      border-radius: 100px;
-      margin-bottom: 8px;
-    }
-    .duty-pulsing-dot {
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      background: #10B981;
-      box-shadow: 0 0 8px #10B981;
-      animation: pulseDutyDot 1.8s infinite;
-    }
-    @keyframes pulseDutyDot {
-      0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
-      70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
-      100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
-    }
-    .piket-title {
-      font-size: 24px;
-      font-weight: 900;
-      color: var(--text);
-      letter-spacing: -0.5px;
-      margin-bottom: 8px;
-      line-height: 1.2;
-    }
-    .piket-meta-strip {
+    .piket-title-row {
       display: flex;
       align-items: center;
       gap: 10px;
       flex-wrap: wrap;
-      font-size: 12.5px;
-      color: var(--text-2);
     }
-    .piket-meta-chip {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      background: var(--bg-3);
-      border: 1px solid var(--border-2);
-      padding: 4px 10px;
-      border-radius: var(--r-sm);
-      font-weight: 600;
-    }
-    .piket-officers-chip {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      background: var(--surface);
-      border: 1px solid var(--border-2);
-      padding: 4px 12px;
-      border-radius: 100px;
-      font-size: 12px;
-    }
-    .piket-officers-avatar-group {
-      display: flex;
-      margin-left: 2px;
-    }
-    .piket-mini-avatar {
-      width: 22px;
-      height: 22px;
-      border-radius: 50%;
-      border: 1.5px solid var(--bg-2);
-      margin-left: -6px;
-      object-fit: cover;
-      background: #0F172A;
-      color: #FFF;
-      font-size: 9px;
-      font-weight: 800;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .piket-mini-avatar:first-child { margin-left: 0; }
-
-    /* Right Command Clock & Actions */
-    .piket-command-right {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-end;
-      gap: 10px;
-    }
-    @media (max-width: 768px) {
-      .piket-command-right { align-items: flex-start; width: 100%; }
-    }
-    .piket-live-clock-card {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      background: var(--bg-3);
-      border: 1px solid var(--border-2);
-      border-radius: var(--r-md);
-      padding: 6px 14px;
-      font-family: var(--font-mono);
-    }
-    .piket-clock-digits {
-      font-size: 20px;
+    .piket-page-title {
+      font-size: 22px;
       font-weight: 900;
       color: var(--text);
-      letter-spacing: 1px;
+      letter-spacing: -0.5px;
+      margin: 0;
+      line-height: 1.2;
     }
-    .piket-clock-badge {
-      font-size: 10px;
+    .piket-live-clock-pill {
+      font-family: var(--font-mono);
+      font-size: 13px;
       font-weight: 800;
-      background: var(--text);
-      color: var(--bg);
-      padding: 2px 6px;
-      border-radius: 4px;
+      color: var(--text);
+      background: var(--bg-3);
+      border: 1px solid var(--border-2);
+      padding: 3px 10px;
+      border-radius: 6px;
+      letter-spacing: 0.5px;
     }
-    .piket-action-group {
+    .piket-clean-subtitle {
+      font-size: 12px;
+      color: var(--text-3);
+      margin-top: 6px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .piket-clean-subtitle strong {
+      color: var(--text);
+      font-family: var(--font-mono);
+      font-weight: 700;
+    }
+    .piket-dot-sep {
+      color: var(--border-2);
+    }
+    .piket-clean-actions {
       display: flex;
       align-items: center;
       gap: 8px;
       flex-wrap: wrap;
     }
     .piket-act-btn {
-      height: 38px;
-      padding: 0 16px;
-      font-size: 12.5px;
+      height: 36px;
+      padding: 0 14px;
+      font-size: 12px;
       font-weight: 700;
-      border-radius: 8px;
+      border-radius: 6px;
       display: inline-flex;
       align-items: center;
-      gap: 7px;
+      gap: 6px;
       cursor: pointer;
-      transition: all .18s ease;
+      transition: all .15s ease;
       border: 1px solid transparent;
       text-decoration: none;
+      white-space: nowrap;
     }
     .piket-act-btn--primary {
       background: #000000;
@@ -174,18 +86,16 @@
       border-color: #000000;
     }
     .piket-act-btn--primary:hover {
-      background: #1E293B;
-      transform: translateY(-1px);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      background: #222222;
     }
     .piket-act-btn--wa {
-      background: linear-gradient(135deg, #10B981, #059669);
+      background: #16A34A;
       color: #FFFFFF;
-      border-color: #059669;
+      border-color: #16A34A;
     }
     .piket-act-btn--wa:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.35);
+      background: #15803D;
+      border-color: #15803D;
     }
     .piket-act-btn--outline {
       background: var(--bg-2);
@@ -193,84 +103,110 @@
       border-color: var(--border-2);
     }
     .piket-act-btn--outline:hover {
-      border-color: var(--text);
+      border-color: #000000;
       background: var(--surface);
-      transform: translateY(-1px);
     }
 
-    /* ══ KPI ANALYTICS GRID (5 MODERN CARDS) ══ */
+    /* ══ PETUGAS PIKET BANNER ══ */
+    .piket-officers-banner {
+      background: var(--bg-2);
+      border: 1px solid var(--border-2);
+      border-radius: var(--r-md);
+      padding: 9px 14px;
+      margin-bottom: 18px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .piket-officers-label {
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      color: var(--text-3);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .duty-pulsing-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #10B981;
+      box-shadow: 0 0 6px #10B981;
+    }
+    .piket-officers-tags {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .piket-officer-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--surface);
+      border: 1px solid var(--border-2);
+      padding: 3px 10px;
+      border-radius: 100px;
+      font-size: 11.5px;
+      font-weight: 700;
+      color: var(--text);
+    }
+    .officer-thumb {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      object-fit: cover;
+      background: #0F172A;
+    }
+
+    /* ══ KPI ANALYTICS GRID (6 CARDS BERSIH) ══ */
     .piket-kpi-grid {
       display: grid;
-      grid-template-columns: 1.35fr repeat(4, 1fr);
-      gap: 12px;
-      margin-bottom: 20px;
-    }
-    @media (max-width: 1100px) {
-      .piket-kpi-grid { grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); }
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 10px;
+      margin-bottom: 18px;
     }
     .piket-kpi-card {
       background: var(--bg-2);
       border: 1px solid var(--border-2);
-      border-radius: var(--r-md);
-      padding: 16px 18px;
+      border-radius: var(--r-sm);
+      padding: 12px 14px;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      position: relative;
+      gap: 4px;
       cursor: pointer;
-      transition: all .2s cubic-bezier(0.16, 1, 0.3, 1);
+      transition: all .15s ease;
       box-shadow: var(--shadow-sm);
-      overflow: hidden;
     }
     .piket-kpi-card:hover {
-      transform: translateY(-2px);
-      border-color: var(--text);
-      box-shadow: var(--shadow-md);
+      border-color: #000000;
+      transform: translateY(-1px);
     }
     .piket-kpi-top {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 10px;
-    }
-    .piket-kpi-label {
       font-size: 11px;
       font-weight: 800;
       text-transform: uppercase;
-      letter-spacing: 0.5px;
+      letter-spacing: 0.4px;
       color: var(--text-3);
-    }
-    .piket-kpi-icon {
-      width: 30px;
-      height: 30px;
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 15px;
     }
     .piket-kpi-value {
       font-family: var(--font-mono);
-      font-size: 26px;
+      font-size: 24px;
       font-weight: 900;
-      line-height: 1;
+      line-height: 1.1;
       color: var(--text);
-      margin-bottom: 8px;
-    }
-    .piket-kpi-bar {
-      height: 4px;
-      background: var(--border-2);
-      border-radius: 100px;
-      overflow: hidden;
-      margin-bottom: 6px;
-    }
-    .piket-kpi-bar-fill {
-      height: 100%;
-      border-radius: 100px;
-      transition: width .6s ease;
+      margin: 2px 0 2px;
     }
     .piket-kpi-sub {
-      font-size: 11.5px;
+      font-size: 11px;
       color: var(--text-3);
       font-weight: 600;
     }
@@ -279,53 +215,52 @@
     .piket-unified-toolbar {
       background: var(--bg-2);
       border: 1px solid var(--border);
-      border-radius: var(--r-xl) var(--r-xl) 0 0;
-      padding: 16px 20px;
+      border-radius: var(--r-md) var(--r-md) 0 0;
+      padding: 12px 16px;
       border-bottom: 1px solid var(--border);
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 10px;
     }
     .piket-toolbar-top {
       display: flex;
       justify-content: space-between;
       align-items: center;
       flex-wrap: wrap;
-      gap: 12px;
+      gap: 10px;
     }
     .piket-segmented-tabs {
       background: var(--bg-3);
       border: 1px solid var(--border-2);
-      padding: 4px;
-      border-radius: 10px;
+      padding: 3px;
+      border-radius: 8px;
       display: inline-flex;
       align-items: center;
-      gap: 4px;
+      gap: 3px;
     }
     .piket-segmented-btn {
       border: none;
       background: transparent;
-      padding: 8px 18px;
-      border-radius: 8px;
-      font-size: 12.5px;
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-size: 12px;
       font-weight: 700;
       color: var(--text-2);
       cursor: pointer;
-      transition: all .16s ease;
+      transition: all .15s ease;
       display: inline-flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
     }
     .piket-segmented-btn.active {
       background: #000000;
       color: #FFFFFF;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
     }
     .piket-segmented-count {
-      font-size: 11px;
+      font-size: 10.5px;
       font-family: var(--font-mono);
-      padding: 2px 7px;
-      border-radius: 100px;
+      padding: 1px 6px;
+      border-radius: 10px;
       background: rgba(255,255,255,0.2);
     }
     .piket-segmented-btn:not(.active) .piket-segmented-count {
@@ -335,16 +270,16 @@
     .piket-search-box {
       position: relative;
       width: 100%;
-      max-width: 280px;
+      max-width: 260px;
     }
     .piket-search-input {
       width: 100%;
-      height: 38px;
-      padding: 0 14px 0 36px;
-      background: var(--surface);
+      height: 34px;
+      padding: 0 12px 0 32px;
+      background: var(--bg-3);
       border: 1px solid var(--border-2);
-      border-radius: 8px;
-      font-size: 12px;
+      border-radius: 6px;
+      font-size: 11.5px;
       color: var(--text);
       transition: all .15s ease;
     }
@@ -352,44 +287,42 @@
       border-color: #000000;
       background: var(--bg-2);
       outline: none;
-      box-shadow: 0 0 0 3px rgba(0,0,0,0.06);
     }
     .piket-search-icon {
       position: absolute;
-      left: 12px;
+      left: 10px;
       top: 50%;
       transform: translateY(-50%);
       color: var(--text-3);
-      font-size: 13px;
+      font-size: 12px;
       pointer-events: none;
     }
 
-    /* Filter Chips Carousel / Strip */
+    /* Filter Chips */
     .piket-chips-strip {
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 5px;
       flex-wrap: wrap;
     }
     .piket-chip {
       background: var(--bg-3);
       border: 1px solid var(--border-2);
       color: var(--text-2);
-      padding: 5px 12px;
-      border-radius: 6px;
-      font-size: 11.5px;
+      padding: 4px 10px;
+      border-radius: 5px;
+      font-size: 11px;
       font-weight: 700;
       cursor: pointer;
       transition: all .15s;
       white-space: nowrap;
       display: inline-flex;
       align-items: center;
-      gap: 6px;
+      gap: 5px;
     }
     .piket-chip:hover {
       color: #000000;
       border-color: #000000;
-      background: var(--surface);
     }
     .piket-chip.active {
       background: #000000;
@@ -399,7 +332,7 @@
     .piket-chip-badge {
       font-family: var(--font-mono);
       font-size: 10px;
-      padding: 1px 6px;
+      padding: 1px 5px;
       border-radius: 4px;
       background: rgba(0,0,0,0.08);
     }
@@ -413,7 +346,7 @@
       background: var(--bg-2);
       border: 1px solid var(--border);
       border-top: none;
-      border-radius: 0 0 var(--r-xl) var(--r-xl);
+      border-radius: 0 0 var(--r-md) var(--r-md);
       overflow: hidden;
       box-shadow: var(--shadow-sm);
       margin-bottom: 24px;
@@ -426,7 +359,7 @@
       font-weight: 800;
       letter-spacing: 0.3px;
       text-transform: uppercase;
-      padding: 3px 10px;
+      padding: 2.5px 8px;
       border-radius: 100px;
       font-family: var(--font-mono);
     }
@@ -497,154 +430,144 @@
     
     {{-- FLASH MESSAGES --}}
     @if(session('success'))
-      <div class="alert-success" style="margin-bottom:16px;">
+      <div class="alert-success" style="margin-bottom:14px;">
         <i class="bi bi-check-circle-fill" style="margin-right:8px;"></i> {{ session('success') }}
       </div>
     @endif
     @if(session('error'))
-      <div class="alert-error" style="margin-bottom:16px;">
+      <div class="alert-error" style="margin-bottom:14px;">
         <i class="bi bi-exclamation-triangle-fill" style="margin-right:8px;"></i> {{ session('error') }}
       </div>
     @endif
 
-    {{-- ══ 1. HERO DUTY COMMAND BAR ══ --}}
-    <div class="piket-hero-command no-print">
+    {{-- ══ 1. CLEAN PAGE HEADER ══ --}}
+    <div class="piket-clean-header no-print">
       <div>
-        <div class="piket-duty-badge">
-          <span class="duty-pulsing-dot"></span> POS MEJA PIKET AKTIF
-        </div>
-        <div class="piket-title">Pusat Komando Kehadiran Harian</div>
-        <div class="piket-meta-strip">
-          <span class="piket-meta-chip">
-            <i class="bi bi-calendar3"></i> {{ now()->locale('id')->isoFormat('dddd, D MMMM Y') }}
+        <div class="piket-title-row">
+          <h1 class="piket-page-title">Meja Piket</h1>
+          <span class="piket-live-clock-pill" id="livePiketClock">
+            {{ now()->format('H:i:s') }} WIB
           </span>
-          <span class="piket-meta-chip">
-            <i class="bi bi-clock-history"></i> Masuk: <strong>{{ substr($jadwal->jam_masuk_toleransi ?? '07:15', 0, 5) }}</strong>
-          </span>
-          <span class="piket-meta-chip">
-            <i class="bi bi-door-closed"></i> Tutup: <strong>{{ substr($jadwal->jam_tutup_gerbang ?? '17:00', 0, 5) }}</strong>
-          </span>
-          @if($guruPiketHariIni->isNotEmpty())
-            <div class="piket-officers-chip">
-              <span style="color:var(--text-3); font-weight:700;">Petugas:</span>
-              <div class="piket-officers-avatar-group">
-                @foreach($guruPiketHariIni as $gp)
-                  <img src="{{ $gp->guru?->foto_url ?? '/img/user-default.png' }}" class="piket-mini-avatar" title="{{ $gp->guru?->nama ?? 'Guru' }}" />
-                @endforeach
-              </div>
-              <strong style="color:var(--text); font-size:12px;">{{ $guruPiketHariIni->map(fn($g) => $g->guru->nama ?? 'Guru')->join(', ') }}</strong>
-            </div>
-          @endif
           @if($isLibur)
-            <span class="badge" style="background:rgba(239,68,68,0.12); color:#DC2626; font-size:11px; font-weight:800; padding:4px 10px; border-radius:6px;">
+            <span class="badge" style="background:rgba(239,68,68,0.12); color:#DC2626; font-size:11px; font-weight:800; padding:3px 8px; border-radius:4px;">
               HARI LIBUR
             </span>
           @endif
         </div>
+        <div class="piket-clean-subtitle">
+          <span><i class="bi bi-calendar3"></i> {{ now()->locale('id')->isoFormat('dddd, D MMMM Y') }}</span>
+          <span class="piket-dot-sep">·</span>
+          <span>Batas Masuk: <strong>{{ substr($jadwal->jam_masuk_toleransi ?? '07:15', 0, 5) }}</strong></span>
+          <span class="piket-dot-sep">·</span>
+          <span>Tutup Gerbang: <strong>{{ substr($jadwal->jam_tutup_gerbang ?? '17:00', 0, 5) }}</strong></span>
+        </div>
       </div>
 
-      {{-- Action Hub & Live Clock --}}
-      <div class="piket-command-right">
-        <div class="piket-live-clock-card">
-          <span class="piket-clock-badge">WIB</span>
-          <span class="piket-clock-digits" id="livePiketClock">{{ now()->format('H:i:s') }}</span>
-        </div>
+      {{-- Action Hub (Rapi di Kanan) --}}
+      <div class="piket-clean-actions">
+        @if(($canKoreksi ?? false) && ($siswaBelumHadirList->count() + $guruBelumHadirList->count() > 0))
+          <form action="{{ route('piket.flagging-wa') }}" method="POST" style="margin:0;"
+                onsubmit="return confirm('Kirim WA pengingat ke {{ $siswaBelumHadirList->count() }} wali murid & {{ $guruBelumHadirList->count() }} guru yang belum hadir?')">
+            @csrf
+            <button type="submit" class="piket-act-btn piket-act-btn--wa" title="Broadcast WhatsApp Otomatis ke Orang Tua">
+              <i class="bi bi-whatsapp"></i> Broadcast WA ({{ $siswaBelumHadirList->count() + $guruBelumHadirList->count() }})
+            </button>
+          </form>
+        @endif
 
-        <div class="piket-action-group">
-          @if(($canKoreksi ?? false) && ($siswaBelumHadirList->count() + $guruBelumHadirList->count() > 0))
-            <form action="{{ route('piket.flagging-wa') }}" method="POST" style="margin:0;"
-                  onsubmit="return confirm('Kirim WA pengingat ke {{ $siswaBelumHadirList->count() }} wali murid & {{ $guruBelumHadirList->count() }} guru yang belum hadir?')">
-              @csrf
-              <button type="submit" class="piket-act-btn piket-act-btn--wa" title="Broadcast WhatsApp Otomatis ke Orang Tua">
-                <i class="bi bi-whatsapp"></i> Broadcast WA ({{ $siswaBelumHadirList->count() + $guruBelumHadirList->count() }})
-              </button>
-            </form>
-          @endif
-
-          <button type="button" class="piket-act-btn piket-act-btn--primary" onclick="openModal('modalPresensiManual')" title="Input presensi manual siswa / guru">
-            <i class="bi bi-plus-circle-fill"></i> Presensi Manual
-          </button>
-          <button type="button" class="piket-act-btn piket-act-btn--outline" onclick="openModal('modalCatatIzinPiket')" title="Catat perizinan atau surat sakit">
-            <i class="bi bi-envelope-paper-fill"></i> Catat Izin
-          </button>
-        </div>
+        <button type="button" class="piket-act-btn piket-act-btn--primary" onclick="openModal('modalPresensiManual')" title="Input presensi manual siswa / guru">
+          <i class="bi bi-plus-circle-fill"></i> Presensi Manual
+        </button>
+        <button type="button" class="piket-act-btn piket-act-btn--outline" onclick="openModal('modalCatatIzinPiket')" title="Catat perizinan atau surat sakit">
+          <i class="bi bi-envelope-paper-fill"></i> Catat Izin
+        </button>
       </div>
     </div>
 
-    {{-- ══ 2. KPI ANALYTICS GRID (5 MODERN CARDS) ══ --}}
+    {{-- ══ 2. STRIP PETUGAS PIKET HARI INI ══ --}}
+    @if($guruPiketHariIni->isNotEmpty())
+      <div class="piket-officers-banner no-print">
+        <div class="piket-officers-label">
+          <span class="duty-pulsing-dot"></span>
+          <span>GURU PIKET HARI INI:</span>
+        </div>
+        <div class="piket-officers-tags">
+          @foreach($guruPiketHariIni as $gp)
+            <span class="piket-officer-tag">
+              <img src="{{ $gp->guru?->foto_url ?? '/img/user-default.png' }}" class="officer-thumb" />
+              <span>{{ $gp->guru?->nama ?? 'Guru' }}</span>
+            </span>
+          @endforeach
+        </div>
+      </div>
+    @endif
+
+    {{-- ══ 3. KPI ANALYTICS GRID (6 KARTU RAPI) ══ --}}
     @php
       $isAfter1000 = now()->format('H:i') >= '10:00';
       $alphaCount = max(0, $totalSiswaAktif - ($hadirTepat + $terlambat + $izinCount + ($totalSiswaPkl ?? 0)));
-      $hadirPersen = $totalSiswaAktif > 0 ? round(($hadirTepat / $totalSiswaAktif) * 100) : 0;
-      $terlambatPersen = $totalSiswaAktif > 0 ? round(($terlambat / $totalSiswaAktif) * 100) : 0;
       $izinPklTotal = $izinCount + ($totalSiswaPkl ?? 0);
-      $izinPklPersen = $totalSiswaAktif > 0 ? round(($izinPklTotal / $totalSiswaAktif) * 100) : 0;
     @endphp
     <div class="piket-kpi-grid no-print">
-      <!-- 1. Tingkat Kehadiran (Hero Metric) -->
+      <!-- 1. Tingkat Kehadiran -->
       <div class="piket-kpi-card" onclick="selectSiswaFilter('all')">
         <div class="piket-kpi-top">
-          <span class="piket-kpi-label">Kehadiran Hari Ini</span>
-          <div class="piket-kpi-icon" style="background:rgba(16,185,129,0.12); color:#10B981;"><i class="bi bi-pie-chart-fill"></i></div>
+          <span>Tingkat Kehadiran</span>
+          <i class="bi bi-pie-chart-fill" style="color:#059669;"></i>
         </div>
         <div class="piket-kpi-value" style="color:#059669;">{{ $persenKehadiran }}%</div>
-        <div class="piket-kpi-bar">
-          <div class="piket-kpi-bar-fill" style="width:{{ min(100, $persenKehadiran) }}%; background:#10B981;"></div>
-        </div>
         <div class="piket-kpi-sub">{{ $hadirTepat + $terlambat }} dari {{ $totalSiswaAktif }} siswa</div>
       </div>
 
       <!-- 2. Hadir Tepat Waktu -->
       <div class="piket-kpi-card" onclick="selectSiswaFilter('hadir')">
         <div class="piket-kpi-top">
-          <span class="piket-kpi-label">Hadir Tepat</span>
-          <div class="piket-kpi-icon" style="background:rgba(16,185,129,0.12); color:#10B981;"><i class="bi bi-check2-circle"></i></div>
+          <span>Hadir Tepat</span>
+          <i class="bi bi-check2-circle" style="color:#10B981;"></i>
         </div>
         <div class="piket-kpi-value">{{ $hadirTepat }}</div>
-        <div class="piket-kpi-bar">
-          <div class="piket-kpi-bar-fill" style="width:{{ $hadirPersen }}%; background:#10B981;"></div>
-        </div>
         <div class="piket-kpi-sub">Batas {{ substr($jadwal->jam_masuk_toleransi ?? '07:15', 0, 5) }} WIB</div>
       </div>
 
       <!-- 3. Terlambat -->
       <div class="piket-kpi-card" onclick="selectSiswaFilter('terlambat')">
         <div class="piket-kpi-top">
-          <span class="piket-kpi-label">Terlambat</span>
-          <div class="piket-kpi-icon" style="background:rgba(245,158,11,0.12); color:#F59E0B;"><i class="bi bi-clock-history"></i></div>
+          <span>Terlambat</span>
+          <i class="bi bi-clock-history" style="color:#F59E0B;"></i>
         </div>
         <div class="piket-kpi-value" style="color:#D97706;">{{ $terlambat }}</div>
-        <div class="piket-kpi-bar">
-          <div class="piket-kpi-bar-fill" style="width:{{ $terlambatPersen }}%; background:#F59E0B;"></div>
-        </div>
-        <div class="piket-kpi-sub">Lewat toleransi pagi</div>
+        <div class="piket-kpi-sub">Lewat batas pagi</div>
       </div>
 
       <!-- 4. Izin / Sakit / PKL -->
       <div class="piket-kpi-card" onclick="selectSiswaFilter('izin')">
         <div class="piket-kpi-top">
-          <span class="piket-kpi-label">Izin &amp; PKL</span>
-          <div class="piket-kpi-icon" style="background:rgba(99,102,241,0.12); color:#6366F1;"><i class="bi bi-briefcase-fill"></i></div>
+          <span>Izin &amp; PKL</span>
+          <i class="bi bi-briefcase-fill" style="color:#6366F1;"></i>
         </div>
-        <div class="piket-kpi-value" style="color:#4F46E5;">{{ $izinPklTotal }}</div>
-        <div class="piket-kpi-bar">
-          <div class="piket-kpi-bar-fill" style="width:{{ $izinPklPersen }}%; background:#6366F1;"></div>
-        </div>
+        <div class="piket-kpi-value">{{ $izinPklTotal }}</div>
         <div class="piket-kpi-sub">{{ $izinCount }} Izin/Sakit · {{ $totalSiswaPkl ?? 0 }} PKL</div>
       </div>
 
-      <!-- 5. Belum Scan Pulang (Interactive) -->
+      <!-- 5. Alpha / Belum Scan -->
+      <div class="piket-kpi-card" onclick="selectSiswaFilter('belum_hadir')">
+        <div class="piket-kpi-top">
+          <span>Belum Scan</span>
+          <i class="bi bi-exclamation-octagon-fill" style="color:#DC2626;"></i>
+        </div>
+        <div class="piket-kpi-value" style="color:{{ $alphaCount > 0 ? '#DC2626' : 'inherit' }};">{{ $alphaCount }}</div>
+        <div class="piket-kpi-sub">{{ $isAfter1000 ? 'Status terkunci' : 'Otomatis Alpha 10:00' }}</div>
+      </div>
+
+      <!-- 6. Belum Scan Pulang -->
       <div class="piket-kpi-card" onclick="selectSiswaFilter('belum_pulang'); openModal('modalRekapPulangPiket');" style="border:{{ $sudahLewatJamTutup ? '1.5px solid #000000' : '1px solid var(--border-2)' }};">
         <div class="piket-kpi-top">
-          <span class="piket-kpi-label">Belum Pulang</span>
-          <div class="piket-kpi-icon" style="background:rgba(6,182,212,0.12); color:#06B6D4;"><i class="bi bi-door-open-fill"></i></div>
+          <span>Blm Scan Pulang</span>
+          <i class="bi bi-door-open-fill" style="color:#06B6D4;"></i>
         </div>
         <div class="piket-kpi-value" style="color:#0891B2;">{{ $siswaBelumScanPulang }}</div>
-        <div class="piket-kpi-bar">
-          <div class="piket-kpi-bar-fill" style="width:{{ $totalSiswaAktif > 0 ? round(($siswaBelumScanPulang / $totalSiswaAktif) * 100) : 0 }}%; background:#06B6D4;"></div>
-        </div>
         <div class="piket-kpi-sub" style="color:{{ $sudahLewatJamTutup ? '#000000' : 'var(--text-3)' }}; font-weight:{{ $sudahLewatJamTutup ? '800' : '600' }};">
-          {{ $sudahLewatJamTutup ? 'Lewat tutup 17:00 (Klik)' : 'Klik → rekap detail' }}
+          {{ $sudahLewatJamTutup ? 'Lewat 17:00 (Klik)' : 'Klik → lihat detail' }}
         </div>
       </div>
     </div>
