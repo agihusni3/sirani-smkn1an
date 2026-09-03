@@ -633,9 +633,9 @@
       </p>
 
       <div class="scanner-protocols">
-        <span class="protocol-pill"><i class="bi bi-credit-card-2-front"></i> RFID 13.56 MHz / 125 kHz</span>
-        <span class="protocol-pill"><i class="bi bi-upc"></i> Barcode 1D / 2D</span>
-        <span class="protocol-pill"><i class="bi bi-qr-code"></i> QR Code Siswa</span>
+        <span class="protocol-pill">RFID 13.56 MHz / 125 kHz</span>
+        <span class="protocol-pill">Barcode 1D / 2D</span>
+        <span class="protocol-pill">QR Code Siswa</span>
       </div>
 
       <div class="scanner-status-indicator" id="scannerStatus">
@@ -651,11 +651,9 @@
         {{-- Top Header Row --}}
         <div class="identity-top-bar">
           <div class="result-badge-large hadir" id="resBadge">
-            <i class="bi bi-check-circle-fill"></i>
             <span id="resBadgeText">BERHASIL HADIR</span>
           </div>
           <div class="identity-gate-label">
-            <i class="bi bi-shield-check" style="color:var(--emerald);"></i>
             <span>Smart Gate Presensi SMKN 1 Air Naningan</span>
           </div>
         </div>
@@ -669,11 +667,9 @@
           <div class="identity-details">
             <div class="identity-name-text" id="resName">-</div>
             <div class="identity-sub-text" id="resSub">
-              <i class="bi bi-mortarboard-fill"></i>
               <span id="resSubTxt">-</span>
             </div>
             <div class="identity-time-pill" id="resTimePill">
-              <i class="bi bi-clock-fill" style="color:var(--emerald);"></i>
               <span id="resTimeTxt">-</span>
             </div>
           </div>
@@ -681,7 +677,6 @@
 
         {{-- Pesan Notifikasi --}}
         <div class="identity-notification-box" id="resMessageBox">
-          <i class="bi bi-check-circle-fill" id="resMessageIcon" style="font-size:18px; color:var(--emerald);"></i>
           <span id="resMessageTxt">Presensi berhasil dicatat. Notifikasi otomatis dikirimkan ke orang tua.</span>
         </div>
 
@@ -691,7 +686,6 @@
             <div class="countdown-fill" id="countdownFill"></div>
           </div>
           <div class="countdown-caption">
-            <i class="bi bi-arrow-repeat"></i>
             <span>Kembali ke mode pemindaian dalam <strong id="countdownSec">4</strong> detik...</span>
           </div>
         </div>
@@ -857,7 +851,6 @@
     const subTxt = document.getElementById('resSubTxt');
     const timeTxt = document.getElementById('resTimeTxt');
     const msgBox = document.getElementById('resMessageBox');
-    const msgIcon = document.getElementById('resMessageIcon');
     const msgTxt = document.getElementById('resMessageTxt');
     const countdownFill = document.getElementById('countdownFill');
 
@@ -888,8 +881,6 @@
         avatarWrap.style.borderColor = 'var(--amber)';
         avatarWrap.style.boxShadow = '0 0 25px var(--amber-glow)';
         countdownFill.style.background = 'var(--amber)';
-        msgIcon.className = 'bi bi-exclamation-circle-fill';
-        msgIcon.style.color = 'var(--amber)';
         msgTxt.textContent = res.message || 'Presensi terlambat dicatat.';
       } else if (st === 'pulang') {
         card.className = 'identity-result-card status-pulang';
@@ -898,8 +889,6 @@
         avatarWrap.style.borderColor = 'var(--cyan)';
         avatarWrap.style.boxShadow = '0 0 25px var(--cyan-glow)';
         countdownFill.style.background = 'var(--cyan)';
-        msgIcon.className = 'bi bi-check-circle-fill';
-        msgIcon.style.color = 'var(--cyan)';
         msgTxt.textContent = res.message || 'Presensi pulang berhasil dicatat. Hati-hati di jalan!';
       } else {
         card.className = 'identity-result-card status-hadir';
@@ -908,8 +897,6 @@
         avatarWrap.style.borderColor = 'var(--emerald)';
         avatarWrap.style.boxShadow = '0 0 25px var(--emerald-glow)';
         countdownFill.style.background = 'var(--emerald)';
-        msgIcon.className = 'bi bi-check-circle-fill';
-        msgIcon.style.color = 'var(--emerald)';
         msgTxt.textContent = res.message || 'Presensi masuk berhasil dicatat.';
       }
 
@@ -935,8 +922,6 @@
       nameEl.textContent = 'Pemindaian Gagal';
       subTxt.textContent = 'Kartu atau Barcode Tidak Terdaftar';
       timeTxt.textContent = 'Sistem Smart Gate';
-      msgIcon.className = 'bi bi-x-circle-fill';
-      msgIcon.style.color = 'var(--rose)';
       msgTxt.textContent = res.message || 'Kartu belum terdaftar atau gerbang sedang ditutup.';
       speak('Kartu tidak valid atau belum terdaftar.');
     }
