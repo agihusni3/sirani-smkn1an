@@ -170,7 +170,8 @@ CRON_JOB="* * * * * cd ${APP_DIR} && php artisan schedule:run >> /dev/null 2>&1"
 echo -e "\n${GREEN}==============================================================${NC}"
 echo -e "${GREEN}  INSTALASI SELESAI DENGAN SUKSES!${NC}"
 echo -e "${GREEN}==============================================================${NC}"
-echo -e "Server SIRANI kini aktif dan dapat diakses melalui IP Publik VPS Anda."
-echo -e "Untuk memasang domain dan SSL gratis (HTTPS), jalankan:"
-echo -e "  sudo apt install -y certbot python3-certbot-nginx"
-echo -e "  sudo certbot --nginx -d domainsekolahanda.sch.id\n"
+echo -e ""
+
+# 9. Setup Cloudflare Tunnel Otomatis
+echo -e "${YELLOW}[BONUS] Mengaktifkan akses publik via Cloudflare Tunnel...${NC}"
+bash "$(dirname "$0")/setup_cloudflare_tunnel.sh"
