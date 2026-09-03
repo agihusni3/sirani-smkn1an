@@ -36,12 +36,14 @@ iptables -I INPUT 6 -m state --state NEW -p tcp --dport 443 -j ACCEPT 2>/dev/nul
 echo -e "\n${YELLOW}[2/7] Menambahkan repositori PHP 8.3 dan memasang paket...${NC}"
 apt install -y software-properties-common curl git unzip
 add-apt-repository -y ppa:ondrej/php
+apt --fix-broken install -y
 apt update
 
 DEBIAN_FRONTEND=noninteractive apt install -y nginx supervisor \
   php8.3-fpm php8.3-cli php8.3-common php8.3-sqlite3 \
   php8.3-curl php8.3-mbstring php8.3-xml php8.3-zip \
-  php8.3-bcmath php8.3-intl php8.3-gd
+  php8.3-bcmath php8.3-intl
+
 
 
 
