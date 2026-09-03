@@ -56,9 +56,22 @@ for i in {1..30}; do
     echo "Link SIRANI: ${URL}" > /etc/motd
     echo "" >> /etc/motd
     echo "Buka ${URL} dari HP/laptop mana saja!" >> /etc/motd
+    
+    # Tulis juga ke Desktop agar user tinggal buka file di Desktop
+    for USER_DESKTOP in /home/*/Desktop; do
+      if [ -d "$USER_DESKTOP" ]; then
+        echo "=== SIRANI SMKN 1 AIR NANINGAN ONLINE ===" > "${USER_DESKTOP}/LINK_SIRANI_ONLINE.txt"
+        echo "" >> "${USER_DESKTOP}/LINK_SIRANI_ONLINE.txt"
+        echo "Link Akses Guru & Orang Tua:" >> "${USER_DESKTOP}/LINK_SIRANI_ONLINE.txt"
+        echo "${URL}" >> "${USER_DESKTOP}/LINK_SIRANI_ONLINE.txt"
+        echo "" >> "${USER_DESKTOP}/LINK_SIRANI_ONLINE.txt"
+        echo "Status: AKTIF (Otomatis menyala setiap PC hidup)" >> "${USER_DESKTOP}/LINK_SIRANI_ONLINE.txt"
+      fi
+    done
     break
   fi
 done
+
 
 wait ${CF_PID}
 EOF
