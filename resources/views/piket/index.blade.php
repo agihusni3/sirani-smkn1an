@@ -6,97 +6,471 @@
   <title>Piket Harian — SMKN 1 Air Naningan</title>
   @include('partials.styles')
   <style>
-    /* ── Hero Meja Piket ── */
-    .piket-hero {
+    /* ══ DUTY COMMAND CENTER DESIGN SYSTEM ══ */
+    .piket-hero-command {
       background: var(--bg-2);
       border: 1px solid var(--border);
       border-radius: var(--r-xl);
-      padding: 22px 24px;
-      margin-bottom: 24px;
+      padding: 22px 26px;
+      margin-bottom: 20px;
+      box-shadow: 0 10px 30px -10px rgba(0,0,0,0.05);
       display: flex;
       justify-content: space-between;
       align-items: center;
       flex-wrap: wrap;
-      gap: 16px;
-      box-shadow: var(--shadow-sm);
+      gap: 20px;
+      position: relative;
+      overflow: hidden;
     }
-    .piket-clock-card {
+    .piket-hero-command::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; height: 3.5px;
+      background: linear-gradient(90deg, #10B981, #06B6D4, #3B82F6, #6366F1);
+    }
+    .piket-duty-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.6px;
+      text-transform: uppercase;
+      background: rgba(16, 185, 129, 0.12);
+      color: #059669;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      padding: 4px 12px;
+      border-radius: 100px;
+      margin-bottom: 8px;
+    }
+    .duty-pulsing-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #10B981;
+      box-shadow: 0 0 8px #10B981;
+      animation: pulseDutyDot 1.8s infinite;
+    }
+    @keyframes pulseDutyDot {
+      0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+      70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+      100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+    }
+    .piket-title {
+      font-size: 24px;
+      font-weight: 900;
+      color: var(--text);
+      letter-spacing: -0.5px;
+      margin-bottom: 8px;
+      line-height: 1.2;
+    }
+    .piket-meta-strip {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      font-size: 12.5px;
+      color: var(--text-2);
+    }
+    .piket-meta-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
       background: var(--bg-3);
       border: 1px solid var(--border-2);
-      border-radius: var(--r-md);
-      padding: 12px 18px;
+      padding: 4px 10px;
+      border-radius: var(--r-sm);
+      font-weight: 600;
+    }
+    .piket-officers-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--surface);
+      border: 1px solid var(--border-2);
+      padding: 4px 12px;
+      border-radius: 100px;
+      font-size: 12px;
+    }
+    .piket-officers-avatar-group {
+      display: flex;
+      margin-left: 2px;
+    }
+    .piket-mini-avatar {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      border: 1.5px solid var(--bg-2);
+      margin-left: -6px;
+      object-fit: cover;
+      background: #0F172A;
+      color: #FFF;
+      font-size: 9px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .piket-mini-avatar:first-child { margin-left: 0; }
+
+    /* Right Command Clock & Actions */
+    .piket-command-right {
       display: flex;
       flex-direction: column;
       align-items: flex-end;
-      gap: 4px;
-      min-width: 180px;
+      gap: 10px;
     }
-    .piket-clock-time {
+    @media (max-width: 768px) {
+      .piket-command-right { align-items: flex-start; width: 100%; }
+    }
+    .piket-live-clock-card {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--bg-3);
+      border: 1px solid var(--border-2);
+      border-radius: var(--r-md);
+      padding: 6px 14px;
       font-family: var(--font-mono);
-      font-size: 24px;
+    }
+    .piket-clock-digits {
+      font-size: 20px;
       font-weight: 900;
       color: var(--text);
       letter-spacing: 1px;
     }
-
-    /* ── KPI Stat Cards ── */
-    .piket-stats-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 10px;
-      margin-bottom: 8px;
+    .piket-clock-badge {
+      font-size: 10px;
+      font-weight: 800;
+      background: var(--text);
+      color: var(--bg);
+      padding: 2px 6px;
+      border-radius: 4px;
     }
-    .piket-stat-card {
+    .piket-action-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .piket-act-btn {
+      height: 38px;
+      padding: 0 16px;
+      font-size: 12.5px;
+      font-weight: 700;
+      border-radius: 8px;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      cursor: pointer;
+      transition: all .18s ease;
+      border: 1px solid transparent;
+      text-decoration: none;
+    }
+    .piket-act-btn--primary {
+      background: #000000;
+      color: #FFFFFF;
+      border-color: #000000;
+    }
+    .piket-act-btn--primary:hover {
+      background: #1E293B;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    .piket-act-btn--wa {
+      background: linear-gradient(135deg, #10B981, #059669);
+      color: #FFFFFF;
+      border-color: #059669;
+    }
+    .piket-act-btn--wa:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.35);
+    }
+    .piket-act-btn--outline {
+      background: var(--bg-2);
+      color: var(--text);
+      border-color: var(--border-2);
+    }
+    .piket-act-btn--outline:hover {
+      border-color: var(--text);
+      background: var(--surface);
+      transform: translateY(-1px);
+    }
+
+    /* ══ KPI ANALYTICS GRID (5 MODERN CARDS) ══ */
+    .piket-kpi-grid {
+      display: grid;
+      grid-template-columns: 1.35fr repeat(4, 1fr);
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    @media (max-width: 1100px) {
+      .piket-kpi-grid { grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); }
+    }
+    .piket-kpi-card {
       background: var(--bg-2);
       border: 1px solid var(--border-2);
-      border-radius: var(--r-sm);
-      padding: 10px 14px;
+      border-radius: var(--r-md);
+      padding: 16px 18px;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      gap: 3px;
-      transition: all .15s ease;
+      position: relative;
+      cursor: pointer;
+      transition: all .2s cubic-bezier(0.16, 1, 0.3, 1);
       box-shadow: var(--shadow-sm);
+      overflow: hidden;
     }
-    .piket-stat-card:hover {
-      border-color: #000000;
+    .piket-kpi-card:hover {
+      transform: translateY(-2px);
+      border-color: var(--text);
+      box-shadow: var(--shadow-md);
     }
-    .piket-stat-head {
+    .piket-kpi-top {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      font-size: 10.5px;
+      margin-bottom: 10px;
+    }
+    .piket-kpi-label {
+      font-size: 11px;
       font-weight: 800;
       text-transform: uppercase;
-      letter-spacing: 0.4px;
+      letter-spacing: 0.5px;
       color: var(--text-3);
     }
-    .piket-stat-val {
-      font-size: 22px;
-      font-weight: 900;
-      line-height: 1.1;
+    .piket-kpi-icon {
+      width: 30px;
+      height: 30px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+    }
+    .piket-kpi-value {
       font-family: var(--font-mono);
-      color: #000000;
-      margin: 2px 0 1px;
+      font-size: 26px;
+      font-weight: 900;
+      line-height: 1;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+    .piket-kpi-bar {
+      height: 4px;
+      background: var(--border-2);
+      border-radius: 100px;
+      overflow: hidden;
+      margin-bottom: 6px;
+    }
+    .piket-kpi-bar-fill {
+      height: 100%;
+      border-radius: 100px;
+      transition: width .6s ease;
+    }
+    .piket-kpi-sub {
+      font-size: 11.5px;
+      color: var(--text-3);
+      font-weight: 600;
     }
 
-    /* ── Presensi Manual Quick Bar ── */
-    .pm-panel {
+    /* ══ UNIFIED TOOLBAR & SEGMENTED TABS ══ */
+    .piket-unified-toolbar {
       background: var(--bg-2);
       border: 1px solid var(--border);
-      border-radius: var(--r-xl);
-      padding: 22px 24px;
-      margin-bottom: 24px;
+      border-radius: var(--r-xl) var(--r-xl) 0 0;
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .piket-toolbar-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .piket-segmented-tabs {
+      background: var(--bg-3);
+      border: 1px solid var(--border-2);
+      padding: 4px;
+      border-radius: 10px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .piket-segmented-btn {
+      border: none;
+      background: transparent;
+      padding: 8px 18px;
+      border-radius: 8px;
+      font-size: 12.5px;
+      font-weight: 700;
+      color: var(--text-2);
+      cursor: pointer;
+      transition: all .16s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .piket-segmented-btn.active {
+      background: #000000;
+      color: #FFFFFF;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+    .piket-segmented-count {
+      font-size: 11px;
+      font-family: var(--font-mono);
+      padding: 2px 7px;
+      border-radius: 100px;
+      background: rgba(255,255,255,0.2);
+    }
+    .piket-segmented-btn:not(.active) .piket-segmented-count {
+      background: var(--border-2);
+      color: var(--text);
+    }
+    .piket-search-box {
+      position: relative;
+      width: 100%;
+      max-width: 280px;
+    }
+    .piket-search-input {
+      width: 100%;
+      height: 38px;
+      padding: 0 14px 0 36px;
+      background: var(--surface);
+      border: 1px solid var(--border-2);
+      border-radius: 8px;
+      font-size: 12px;
+      color: var(--text);
+      transition: all .15s ease;
+    }
+    .piket-search-input:focus {
+      border-color: #000000;
+      background: var(--bg-2);
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(0,0,0,0.06);
+    }
+    .piket-search-icon {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-3);
+      font-size: 13px;
+      pointer-events: none;
+    }
+
+    /* Filter Chips Carousel / Strip */
+    .piket-chips-strip {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .piket-chip {
+      background: var(--bg-3);
+      border: 1px solid var(--border-2);
+      color: var(--text-2);
+      padding: 5px 12px;
+      border-radius: 6px;
+      font-size: 11.5px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all .15s;
+      white-space: nowrap;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .piket-chip:hover {
+      color: #000000;
+      border-color: #000000;
+      background: var(--surface);
+    }
+    .piket-chip.active {
+      background: #000000;
+      border-color: #000000;
+      color: #FFFFFF;
+    }
+    .piket-chip-badge {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      padding: 1px 6px;
+      border-radius: 4px;
+      background: rgba(0,0,0,0.08);
+    }
+    .piket-chip.active .piket-chip-badge {
+      background: rgba(255,255,255,0.22);
+      color: #FFFFFF;
+    }
+
+    /* ══ TABLE CONTAINER & STATUS PILLS ══ */
+    .piket-table-container {
+      background: var(--bg-2);
+      border: 1px solid var(--border);
+      border-top: none;
+      border-radius: 0 0 var(--r-xl) var(--r-xl);
+      overflow: hidden;
       box-shadow: var(--shadow-sm);
+      margin-bottom: 24px;
     }
-    .pm-panel:hover {
-      border-color: var(--text);
+    .piket-status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.3px;
+      text-transform: uppercase;
+      padding: 3px 10px;
+      border-radius: 100px;
+      font-family: var(--font-mono);
     }
+    .piket-status-pill.hadir {
+      background: rgba(16, 185, 129, 0.12);
+      color: #059669;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+    .piket-status-pill.terlambat {
+      background: rgba(245, 158, 11, 0.12);
+      color: #D97706;
+      border: 1px solid rgba(245, 158, 11, 0.3);
+    }
+    .piket-status-pill.pulang {
+      background: rgba(6, 182, 212, 0.12);
+      color: #0891B2;
+      border: 1px solid rgba(6, 182, 212, 0.3);
+    }
+    .piket-status-pill.izin {
+      background: rgba(59, 130, 246, 0.12);
+      color: #2563EB;
+      border: 1px solid rgba(59, 130, 246, 0.3);
+    }
+    .piket-status-pill.pkl {
+      background: rgba(139, 92, 246, 0.12);
+      color: #7C3AED;
+      border: 1px solid rgba(139, 92, 246, 0.3);
+    }
+    .piket-status-pill.belum {
+      background: rgba(239, 68, 68, 0.1);
+      color: #DC2626;
+      border: 1px dashed rgba(239, 68, 68, 0.4);
+    }
+    .piket-status-pill.bolos {
+      background: rgba(225, 29, 72, 0.12);
+      color: #E11D48;
+      border: 1px solid rgba(225, 29, 72, 0.3);
+    }
+
+    /* Modal Presensi Quick Bar (Keep intact for compatibility) */
     .pm-search-dropdown {
       position: absolute;
       top: calc(100% + 4px);
-      left: 0;
-      right: 0;
+      left: 0; right: 0;
       background: var(--bg-2);
       border: 1.5px solid var(--border-2);
       border-radius: var(--r-sm);
@@ -111,277 +485,8 @@
       transition: background .15s ease;
       text-align: left;
     }
-    .pm-item:last-child {
-      border-bottom: none;
-    }
-    .pm-item:hover, .pm-item.active {
-      background: var(--surface);
-    }
-
-    /* ── Tabs Styling ── */
-    .piket-nav-tabs {
-      display: flex;
-      gap: 4px;
-      border-bottom: 1.5px solid var(--border);
-      margin-bottom: 12px;
-      overflow-x: auto;
-      padding-bottom: 0px;
-      -webkit-overflow-scrolling: touch;
-      scrollbar-width: none;
-    }
-    .piket-nav-tabs::-webkit-scrollbar {
-      display: none;
-    }
-    .piket-tab-btn {
-      background: none;
-      border: none;
-      border-bottom: 2.5px solid transparent;
-      margin-bottom: -1.5px;
-      padding: 6px 12px;
-      font-size: 11.5px;
-      font-weight: 700;
-      color: var(--text-2);
-      cursor: pointer;
-      border-radius: var(--r-sm) var(--r-sm) 0 0;
-      white-space: nowrap;
-      flex-shrink: 0;
-      transition: all .15s ease;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .piket-tab-btn:hover {
-      color: #000000;
-      background: var(--surface);
-    }
-    .piket-tab-btn.active {
-      color: #000000;
-      font-weight: 900;
-      border-bottom-color: #000000;
-      background: none;
-    }
-    .piket-tab-pane { display: none; }
-    .piket-tab-pane.active { display: block; }
-
-    /* ── Filter Pills ── */
-    .filter-pills {
-      display: flex;
-      gap: 4px;
-      align-items: center;
-      flex-wrap: wrap;
-      margin-bottom: 0;
-    }
-    .filter-pill {
-      background: var(--bg-3);
-      border: 1px solid var(--border-2);
-      color: var(--text-2);
-      padding: 3px 8px;
-      border-radius: 5px;
-      font-size: 11px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: all .15s;
-      white-space: nowrap;
-    }
-    .filter-pill:hover {
-      color: #000000;
-      border-color: #000000;
-    }
-    .filter-pill.active {
-      background: #000000;
-      border-color: #000000;
-      color: #FFFFFF;
-      font-weight: 800;
-    }
-
-    @media (max-width: 768px) {
-      .filter-pills {
-        flex-wrap: nowrap !important;
-        overflow-x: auto !important;
-        -webkit-overflow-scrolling: touch;
-        scrollbar-width: none;
-        padding-bottom: 2px;
-        width: 100%;
-      }
-      .filter-pills::-webkit-scrollbar {
-        display: none;
-      }
-      .filter-pill {
-        flex-shrink: 0 !important;
-        padding: 4px 9px !important;
-        font-size: 10.5px !important;
-      }
-      .piket-search-wrap {
-        max-width: 100% !important;
-        margin-top: 2px;
-      }
-    }
-
-    /* ── Day Column Grid ── */
-    .piket-day-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
-      gap: 14px;
-    }
-    .piket-day-col {
-      background: var(--bg-2);
-      border: 1px solid var(--border-2);
-      border-radius: var(--r-md);
-      padding: 14px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-    .piket-day-col.today {
-      border-color: var(--text);
-      background: var(--surface);
-      box-shadow: var(--shadow-sm);
-    }
-    
-    /* ── MINIMALIST & ELEGANT PIKET DESIGN ── */
-    .piket-page-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      flex-wrap: wrap;
-      gap: 14px;
-      margin-bottom: 16px;
-      padding-bottom: 14px;
-      border-bottom: 1px solid var(--border);
-    }
-    .piket-header-title {
-      font-size: 19px;
-      font-weight: 800;
-      letter-spacing: -0.02em;
-      color: var(--text);
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .piket-header-subtitle {
-      font-size: 12px;
-      color: var(--text-2);
-      margin-top: 4px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-    .piket-header-subtitle strong {
-      color: var(--text);
-      font-family: var(--font-mono);
-    }
-    .piket-header-actions {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-    .piket-hdr-btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      height: 34px;
-      padding: 0 13px;
-      border-radius: 6px;
-      font-size: 12px;
-      font-weight: 600;
-      font-family: var(--font);
-      background: var(--bg-2);
-      color: var(--text);
-      border: 1px solid var(--border-2);
-      box-shadow: var(--shadow-sm);
-      cursor: pointer;
-      text-decoration: none;
-      white-space: nowrap;
-      transition: all .15s ease;
-      letter-spacing: -0.01em;
-    }
-    .piket-hdr-btn:hover {
-      background: var(--bg-3);
-      color: var(--text);
-      border-color: var(--border);
-      transform: translateY(-1px);
-      box-shadow: var(--shadow-md);
-    }
-    .piket-hdr-btn:active {
-      transform: translateY(0);
-    }
-    .piket-hdr-btn i {
-      font-size: 13.5px;
-      line-height: 1;
-    }
-    .piket-hdr-btn--wa {
-      color: #16A34A;
-      border-color: #86EFAC;
-    }
-    .piket-hdr-btn--wa:hover {
-      background: rgba(22, 163, 74, 0.08);
-      border-color: #16A34A;
-      color: #15803D;
-    }
-    .piket-hdr-btn--wa i {
-      color: #16A34A;
-    }
-    .piket-main-switcher {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 16px;
-      flex-wrap: wrap;
-    }
-    .piket-main-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 9px 18px;
-      border-radius: var(--r-sm);
-      font-size: 13px;
-      font-weight: 700;
-      background: var(--bg-2);
-      border: 1px solid var(--border-2);
-      color: var(--text-2);
-      cursor: pointer;
-      transition: all .18s ease;
-      text-decoration: none;
-      box-shadow: var(--shadow-sm);
-    }
-    .piket-main-btn:hover {
-      background: var(--bg-3);
-      color: var(--text);
-      border-color: var(--border);
-    }
-    .piket-main-btn.active {
-      background: #000000 !important;
-      color: #FFFFFF !important;
-      border-color: #000000 !important;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
-    }
-    .piket-main-btn.active i {
-      color: #FFFFFF !important;
-    }
-    .piket-main-btn.active .piket-main-badge {
-      background: rgba(255, 255, 255, 0.2);
-      color: #FFFFFF;
-      border-color: rgba(255, 255, 255, 0.3);
-    }
-    .piket-main-badge {
-      font-size: 11px;
-      font-weight: 800;
-      padding: 1px 7px;
-      border-radius: 10px;
-      background: var(--bg-3);
-      color: var(--text-2);
-      border: 1px solid var(--border);
-    }
-    .piket-tab-pane {
-      display: none;
-    }
-    .piket-tab-pane.active {
-      display: block;
-      animation: fadeIn .15s ease-in-out;
-    }
+    .pm-item:last-child { border-bottom: none; }
+    .pm-item:hover, .pm-item.active { background: var(--surface); }
   </style>
 </head>
 <body>
@@ -392,207 +497,270 @@
     
     {{-- FLASH MESSAGES --}}
     @if(session('success'))
-      <div class="alert-success" style="margin-bottom:12px;">
-        <i class="bi bi-check-circle-fill" style="margin-right:6px;"></i> {{ session('success') }}
+      <div class="alert-success" style="margin-bottom:16px;">
+        <i class="bi bi-check-circle-fill" style="margin-right:8px;"></i> {{ session('success') }}
       </div>
     @endif
     @if(session('error'))
-      <div class="alert-error" style="margin-bottom:12px;">
-        <i class="bi bi-exclamation-triangle-fill" style="margin-right:6px;"></i> {{ session('error') }}
+      <div class="alert-error" style="margin-bottom:16px;">
+        <i class="bi bi-exclamation-triangle-fill" style="margin-right:8px;"></i> {{ session('error') }}
       </div>
     @endif
 
-    {{-- ══ MINIMALIST & ELEGANT PAGE HEADER ══ --}}
-    <div class="piket-page-header no-print">
+    {{-- ══ 1. HERO DUTY COMMAND BAR ══ --}}
+    <div class="piket-hero-command no-print">
       <div>
-        <div class="piket-header-title">
-          <span>Meja Piket</span>
-          <span style="font-size:12px; font-weight:600; color:var(--text-3); font-family:var(--font-mono); background:var(--bg-3); padding:2px 8px; border-radius:5px; border:1px solid var(--border-2);" id="livePiketClock">
-            {{ now()->format('H:i:s') }} WIB
+        <div class="piket-duty-badge">
+          <span class="duty-pulsing-dot"></span> POS MEJA PIKET AKTIF
+        </div>
+        <div class="piket-title">Pusat Komando Kehadiran Harian</div>
+        <div class="piket-meta-strip">
+          <span class="piket-meta-chip">
+            <i class="bi bi-calendar3"></i> {{ now()->locale('id')->isoFormat('dddd, D MMMM Y') }}
           </span>
+          <span class="piket-meta-chip">
+            <i class="bi bi-clock-history"></i> Masuk: <strong>{{ substr($jadwal->jam_masuk_toleransi ?? '07:15', 0, 5) }}</strong>
+          </span>
+          <span class="piket-meta-chip">
+            <i class="bi bi-door-closed"></i> Tutup: <strong>{{ substr($jadwal->jam_tutup_gerbang ?? '17:00', 0, 5) }}</strong>
+          </span>
+          @if($guruPiketHariIni->isNotEmpty())
+            <div class="piket-officers-chip">
+              <span style="color:var(--text-3); font-weight:700;">Petugas:</span>
+              <div class="piket-officers-avatar-group">
+                @foreach($guruPiketHariIni as $gp)
+                  <img src="{{ $gp->guru?->foto_url ?? '/img/user-default.png' }}" class="piket-mini-avatar" title="{{ $gp->guru?->nama ?? 'Guru' }}" />
+                @endforeach
+              </div>
+              <strong style="color:var(--text); font-size:12px;">{{ $guruPiketHariIni->map(fn($g) => $g->guru->nama ?? 'Guru')->join(', ') }}</strong>
+            </div>
+          @endif
           @if($isLibur)
-            <span class="badge" style="background:rgba(239,68,68,0.12); color:#DC2626; font-size:10.5px; font-weight:700; padding:2px 8px; border-radius:4px;">
+            <span class="badge" style="background:rgba(239,68,68,0.12); color:#DC2626; font-size:11px; font-weight:800; padding:4px 10px; border-radius:6px;">
               HARI LIBUR
             </span>
           @endif
         </div>
-        
-        <div class="piket-header-subtitle">
-          <span>{{ now()->locale('id')->isoFormat('dddd, D MMMM Y') }}</span>
-          <span>·</span>
-          <span>Batas Masuk: <strong>{{ substr($jadwal->jam_masuk_toleransi ?? '07:15', 0, 5) }}</strong></span>
-          <span>·</span>
-          <span>Tutup Gerbang: <strong>{{ substr($jadwal->jam_tutup_gerbang ?? '17:00', 0, 5) }}</strong></span>
-          @if($guruPiketHariIni->isNotEmpty())
-            <span>·</span>
-            <span>Petugas: <span style="color:var(--text); font-weight:600;">{{ $guruPiketHariIni->map(fn($g) => $g->guru->nama ?? 'Guru')->join(', ') }}</span></span>
-          @endif
-        </div>
-
       </div>
 
-      {{-- Action Buttons --}}
-      <div class="piket-header-actions">
-        {{-- WA Massal --}}
+      {{-- Action Hub & Live Clock --}}
+      <div class="piket-command-right">
+        <div class="piket-live-clock-card">
+          <span class="piket-clock-badge">WIB</span>
+          <span class="piket-clock-digits" id="livePiketClock">{{ now()->format('H:i:s') }}</span>
+        </div>
 
-        @if(($canKoreksi ?? false) && ($siswaBelumHadirList->count() + $guruBelumHadirList->count() > 0))
-          <form action="{{ route('piket.flagging-wa') }}" method="POST" style="margin:0;"
-                onsubmit="return confirm('Kirim WA pengingat ke {{ $siswaBelumHadirList->count() }} wali murid & {{ $guruBelumHadirList->count() }} guru yang belum hadir?')">
-            @csrf
-            <button type="submit" class="piket-hdr-btn piket-hdr-btn--wa" title="Kirim WA Pengingat">
-              <i class="bi bi-whatsapp"></i> Broadcast WA ({{ $siswaBelumHadirList->count() + $guruBelumHadirList->count() }})
-            </button>
-          </form>
-        @endif
+        <div class="piket-action-group">
+          @if(($canKoreksi ?? false) && ($siswaBelumHadirList->count() + $guruBelumHadirList->count() > 0))
+            <form action="{{ route('piket.flagging-wa') }}" method="POST" style="margin:0;"
+                  onsubmit="return confirm('Kirim WA pengingat ke {{ $siswaBelumHadirList->count() }} wali murid & {{ $guruBelumHadirList->count() }} guru yang belum hadir?')">
+              @csrf
+              <button type="submit" class="piket-act-btn piket-act-btn--wa" title="Broadcast WhatsApp Otomatis ke Orang Tua">
+                <i class="bi bi-whatsapp"></i> Broadcast WA ({{ $siswaBelumHadirList->count() + $guruBelumHadirList->count() }})
+              </button>
+            </form>
+          @endif
 
-        {{-- Presensi Manual & Izin --}}
-        <button type="button" class="piket-hdr-btn" onclick="openModal('modalPresensiManual')" title="Input presensi manual siswa / guru">
-          <i class="bi bi-plus-lg"></i> Presensi Manual
-        </button>
-        <button type="button" class="piket-hdr-btn" onclick="openModal('modalCatatIzinPiket')" title="Catat perizinan atau sakit">
-          <i class="bi bi-envelope-paper"></i> Catat Izin
-        </button>
-      </div>{{-- /.piket-header-actions --}}
-    </div>{{-- /.piket-page-header --}}
+          <button type="button" class="piket-act-btn piket-act-btn--primary" onclick="openModal('modalPresensiManual')" title="Input presensi manual siswa / guru">
+            <i class="bi bi-plus-circle-fill"></i> Presensi Manual
+          </button>
+          <button type="button" class="piket-act-btn piket-act-btn--outline" onclick="openModal('modalCatatIzinPiket')" title="Catat perizinan atau surat sakit">
+            <i class="bi bi-envelope-paper-fill"></i> Catat Izin
+          </button>
+        </div>
+      </div>
+    </div>
 
-    {{-- ══ 6 KPI CARDS RINGKASAN MEJA PIKET ══ --}}
+    {{-- ══ 2. KPI ANALYTICS GRID (5 MODERN CARDS) ══ --}}
     @php
       $isAfter1000 = now()->format('H:i') >= '10:00';
       $alphaCount = max(0, $totalSiswaAktif - ($hadirTepat + $terlambat + $izinCount + ($totalSiswaPkl ?? 0)));
+      $hadirPersen = $totalSiswaAktif > 0 ? round(($hadirTepat / $totalSiswaAktif) * 100) : 0;
+      $terlambatPersen = $totalSiswaAktif > 0 ? round(($terlambat / $totalSiswaAktif) * 100) : 0;
+      $izinPklTotal = $izinCount + ($totalSiswaPkl ?? 0);
+      $izinPklPersen = $totalSiswaAktif > 0 ? round(($izinPklTotal / $totalSiswaAktif) * 100) : 0;
     @endphp
-    <div class="db-kpi-grid no-print" style="grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 18px;">
-      <!-- Tingkat Kehadiran -->
-      <div class="db-kpi-card" onclick="selectSiswaFilter('all')">
-        <div class="db-kpi-head">
-          <span class="db-kpi-title">Tingkat Kehadiran</span>
-          <div class="db-kpi-icon"><i class="bi bi-pie-chart-fill"></i></div>
+    <div class="piket-kpi-grid no-print">
+      <!-- 1. Tingkat Kehadiran (Hero Metric) -->
+      <div class="piket-kpi-card" onclick="selectSiswaFilter('all')">
+        <div class="piket-kpi-top">
+          <span class="piket-kpi-label">Kehadiran Hari Ini</span>
+          <div class="piket-kpi-icon" style="background:rgba(16,185,129,0.12); color:#10B981;"><i class="bi bi-pie-chart-fill"></i></div>
         </div>
-        <div class="db-kpi-val">{{ $persenKehadiran }}%</div>
-        <div class="db-kpi-sub">{{ $hadirTepat + $terlambat }} dari {{ $totalSiswaAktif }} siswa</div>
+        <div class="piket-kpi-value" style="color:#059669;">{{ $persenKehadiran }}%</div>
+        <div class="piket-kpi-bar">
+          <div class="piket-kpi-bar-fill" style="width:{{ min(100, $persenKehadiran) }}%; background:#10B981;"></div>
+        </div>
+        <div class="piket-kpi-sub">{{ $hadirTepat + $terlambat }} dari {{ $totalSiswaAktif }} siswa</div>
       </div>
 
-      <!-- Siswa Hadir Tepat -->
-      <div class="db-kpi-card" onclick="selectSiswaFilter('hadir')">
-        <div class="db-kpi-head">
-          <span class="db-kpi-title">Hadir Tepat Waktu</span>
-          <div class="db-kpi-icon"><i class="bi bi-check2-circle"></i></div>
+      <!-- 2. Hadir Tepat Waktu -->
+      <div class="piket-kpi-card" onclick="selectSiswaFilter('hadir')">
+        <div class="piket-kpi-top">
+          <span class="piket-kpi-label">Hadir Tepat</span>
+          <div class="piket-kpi-icon" style="background:rgba(16,185,129,0.12); color:#10B981;"><i class="bi bi-check2-circle"></i></div>
         </div>
-        <div class="db-kpi-val">{{ $hadirTepat }}</div>
-        <div class="db-kpi-sub">Scan sebelum batas</div>
+        <div class="piket-kpi-value">{{ $hadirTepat }}</div>
+        <div class="piket-kpi-bar">
+          <div class="piket-kpi-bar-fill" style="width:{{ $hadirPersen }}%; background:#10B981;"></div>
+        </div>
+        <div class="piket-kpi-sub">Batas {{ substr($jadwal->jam_masuk_toleransi ?? '07:15', 0, 5) }} WIB</div>
       </div>
 
-      <!-- Siswa Terlambat -->
-      <div class="db-kpi-card" onclick="selectSiswaFilter('terlambat')">
-        <div class="db-kpi-head">
-          <span class="db-kpi-title">Terlambat Gerbang</span>
-          <div class="db-kpi-icon"><i class="bi bi-clock-history"></i></div>
+      <!-- 3. Terlambat -->
+      <div class="piket-kpi-card" onclick="selectSiswaFilter('terlambat')">
+        <div class="piket-kpi-top">
+          <span class="piket-kpi-label">Terlambat</span>
+          <div class="piket-kpi-icon" style="background:rgba(245,158,11,0.12); color:#F59E0B;"><i class="bi bi-clock-history"></i></div>
         </div>
-        <div class="db-kpi-val">{{ $terlambat }}</div>
-        <div class="db-kpi-sub">Masuk pos piket</div>
+        <div class="piket-kpi-value" style="color:#D97706;">{{ $terlambat }}</div>
+        <div class="piket-kpi-bar">
+          <div class="piket-kpi-bar-fill" style="width:{{ $terlambatPersen }}%; background:#F59E0B;"></div>
+        </div>
+        <div class="piket-kpi-sub">Lewat toleransi pagi</div>
       </div>
 
-      <!-- Siswa Izin / Sakit -->
-      <div class="db-kpi-card" onclick="selectSiswaFilter('izin')">
-        <div class="db-kpi-head">
-          <span class="db-kpi-title">Izin / Sakit</span>
-          <div class="db-kpi-icon"><i class="bi bi-envelope-paper-fill"></i></div>
+      <!-- 4. Izin / Sakit / PKL -->
+      <div class="piket-kpi-card" onclick="selectSiswaFilter('izin')">
+        <div class="piket-kpi-top">
+          <span class="piket-kpi-label">Izin &amp; PKL</span>
+          <div class="piket-kpi-icon" style="background:rgba(99,102,241,0.12); color:#6366F1;"><i class="bi bi-briefcase-fill"></i></div>
         </div>
-        <div class="db-kpi-val">{{ $izinCount }}</div>
-        <div class="db-kpi-sub">Keterangan sah</div>
+        <div class="piket-kpi-value" style="color:#4F46E5;">{{ $izinPklTotal }}</div>
+        <div class="piket-kpi-bar">
+          <div class="piket-kpi-bar-fill" style="width:{{ $izinPklPersen }}%; background:#6366F1;"></div>
+        </div>
+        <div class="piket-kpi-sub">{{ $izinCount }} Izin/Sakit · {{ $totalSiswaPkl ?? 0 }} PKL</div>
       </div>
 
-      <!-- Siswa PKL -->
-      <div class="db-kpi-card" onclick="selectSiswaFilter('pkl')">
-        <div class="db-kpi-head">
-          <span class="db-kpi-title">Siswa PKL</span>
-          <div class="db-kpi-icon"><i class="bi bi-briefcase-fill"></i></div>
+      <!-- 5. Belum Scan Pulang (Interactive) -->
+      <div class="piket-kpi-card" onclick="selectSiswaFilter('belum_pulang'); openModal('modalRekapPulangPiket');" style="border:{{ $sudahLewatJamTutup ? '1.5px solid #000000' : '1px solid var(--border-2)' }};">
+        <div class="piket-kpi-top">
+          <span class="piket-kpi-label">Belum Pulang</span>
+          <div class="piket-kpi-icon" style="background:rgba(6,182,212,0.12); color:#06B6D4;"><i class="bi bi-door-open-fill"></i></div>
         </div>
-        <div class="db-kpi-val">{{ $totalSiswaPkl ?? 0 }}</div>
-        <div class="db-kpi-sub">Prakerin industri</div>
-      </div>
-
-      <!-- Siswa Alpha / Belum Scan -->
-      <div class="db-kpi-card" onclick="selectSiswaFilter('belum_hadir')">
-        <div class="db-kpi-head">
-          <span class="db-kpi-title">Alpha / Belum Scan</span>
-          <div class="db-kpi-icon"><i class="bi bi-exclamation-octagon-fill"></i></div>
+        <div class="piket-kpi-value" style="color:#0891B2;">{{ $siswaBelumScanPulang }}</div>
+        <div class="piket-kpi-bar">
+          <div class="piket-kpi-bar-fill" style="width:{{ $totalSiswaAktif > 0 ? round(($siswaBelumScanPulang / $totalSiswaAktif) * 100) : 0 }}%; background:#06B6D4;"></div>
         </div>
-        <div class="db-kpi-val">{{ $alphaCount }}</div>
-        <div class="db-kpi-sub">{{ $isAfter1000 ? 'Status terkunci' : 'Otomatis Alpha 10:00' }}</div>
-      </div>
-
-      <!-- Siswa Belum Scan Pulang → buka modal & filter tabel -->
-      <div class="db-kpi-card" onclick="selectSiswaFilter('belum_pulang'); openModal('modalRekapPulangPiket');" style="border:{{ $sudahLewatJamTutup ? '2px solid #000000' : '1px solid var(--border)' }}; cursor:pointer; transition:all .15s;">
-        <div class="db-kpi-head">
-          <span class="db-kpi-title">Blm Scan Pulang</span>
-          <div class="db-kpi-icon"><i class="bi bi-door-open-fill"></i></div>
-        </div>
-        <div class="db-kpi-val">{{ $siswaBelumScanPulang }}</div>
-        <div class="db-kpi-sub" style="font-weight:{{ $sudahLewatJamTutup ? '800' : '600' }}; color:{{ $sudahLewatJamTutup ? '#000000' : 'var(--text-3)' }};">
-          {{ $sudahLewatJamTutup ? 'Lewat tutup (17:00)' : 'Klik → lihat detail' }}
+        <div class="piket-kpi-sub" style="color:{{ $sudahLewatJamTutup ? '#000000' : 'var(--text-3)' }}; font-weight:{{ $sudahLewatJamTutup ? '800' : '600' }};">
+          {{ $sudahLewatJamTutup ? 'Lewat tutup 17:00 (Klik)' : 'Klik → rekap detail' }}
         </div>
       </div>
     </div>
 
-    {{-- ══ MAIN VIEW SWITCHER (PRESENSI SISWA vs GURU) ══ --}}
-    <div class="piket-main-switcher no-print">
-      <button type="button" class="piket-main-btn active" id="btnViewSiswa" onclick="switchMainView('siswa', this)">
-        <i class="bi bi-people-fill"></i> Presensi Siswa
-        <span class="piket-main-badge">{{ $totalSiswaAktif }}</span>
-      </button>
-      <button type="button" class="piket-main-btn" id="btnViewGuru" onclick="switchMainView('guru', this)">
-        <i class="bi bi-person-badge-fill"></i> Presensi Guru &amp; Pegawai
-        <span class="piket-main-badge">{{ $guruBelumHadirList->count() + $absensiGuruHariIni->count() }}</span>
-      </button>
+    {{-- ══ 3. UNIFIED CONTROL TOOLBAR ══ --}}
+    <div class="piket-unified-toolbar no-print">
+      <div class="piket-toolbar-top">
+        {{-- Segmented View Switcher --}}
+        <div class="piket-segmented-tabs">
+          <button type="button" class="piket-segmented-btn piket-main-btn active" id="btnViewSiswa" onclick="switchMainView('siswa', this)">
+            <i class="bi bi-people-fill"></i> Peserta Didik
+            <span class="piket-segmented-count">{{ $totalSiswaAktif }}</span>
+          </button>
+          <button type="button" class="piket-segmented-btn piket-main-btn" id="btnViewGuru" onclick="switchMainView('guru', this)">
+            <i class="bi bi-person-badge-fill"></i> Guru &amp; Pegawai
+            <span class="piket-segmented-count">{{ $guruBelumHadirList->count() + $absensiGuruHariIni->count() }}</span>
+          </button>
+        </div>
+
+        {{-- Search Bar --}}
+        <div class="piket-search-box">
+          <i class="bi bi-search piket-search-icon"></i>
+          <input type="text" id="searchSiswaPiket" onkeyup="searchSiswaPiketTable()" class="piket-search-input" placeholder="Cari nama, NISN, rombel..." />
+        </div>
+      </div>
+
+      {{-- Filter Chips Strip untuk Siswa --}}
+      <div id="filterChipsSiswa" class="piket-chips-strip filter-pills">
+        <button type="button" class="piket-chip filter-pill active" data-filter="all" onclick="filterSiswaTable('all', this)">
+          <span>Semua</span>
+          <span class="piket-chip-badge">{{ $totalSiswaAktif }}</span>
+        </button>
+        <button type="button" class="piket-chip filter-pill" data-filter="hadir" onclick="filterSiswaTable('hadir', this)">
+          <span>Hadir Tepat</span>
+          <span class="piket-chip-badge">{{ $hadirTepat }}</span>
+        </button>
+        <button type="button" class="piket-chip filter-pill" data-filter="terlambat" onclick="filterSiswaTable('terlambat', this)">
+          <span>Terlambat</span>
+          <span class="piket-chip-badge">{{ $terlambat }}</span>
+        </button>
+        <button type="button" class="piket-chip filter-pill" data-filter="belum_pulang" onclick="filterSiswaTable('belum_pulang', this)">
+          <span>Belum Pulang</span>
+          <span class="piket-chip-badge">{{ $siswaBelumScanPulang }}</span>
+        </button>
+        <button type="button" class="piket-chip filter-pill" data-filter="belum_hadir" onclick="filterSiswaTable('belum_hadir', this)">
+          <span>Belum Hadir</span>
+          <span class="piket-chip-badge" style="color:{{ $siswaBelumHadirList->count() > 0 ? '#DC2626' : 'inherit' }}; font-weight:800;">
+            {{ $siswaBelumHadirList->count() }}
+          </span>
+        </button>
+        <button type="button" class="piket-chip filter-pill" data-filter="izin" onclick="filterSiswaTable('izin', this)">
+          <span>Izin / Sakit</span>
+          <span class="piket-chip-badge">{{ $izinCount }}</span>
+        </button>
+        <button type="button" class="piket-chip filter-pill" data-filter="pkl" onclick="filterSiswaTable('pkl', this)">
+          <span>PKL</span>
+          <span class="piket-chip-badge">{{ $totalSiswaPkl ?? 0 }}</span>
+        </button>
+        <button type="button" class="piket-chip filter-pill" data-filter="bolos" onclick="filterSiswaTable('bolos', this)">
+          <span>Bolos</span>
+          <span class="piket-chip-badge">{{ $absensiHariIni->where('status', 'bolos')->count() }}</span>
+        </button>
+        <button type="button" class="piket-chip filter-pill" data-filter="pulang" onclick="filterSiswaTable('pulang', this)">
+          <span>Sudah Pulang</span>
+          <span class="piket-chip-badge">{{ $sudahPulang }}</span>
+        </button>
+      </div>
+
+      {{-- Filter Chips Strip untuk Guru (disembunyikan saat tab siswa aktif) --}}
+      <div id="filterChipsGuru" class="piket-chips-strip filter-pills" style="display:none;">
+        <button type="button" class="piket-chip filter-pill active" data-filter="all" onclick="filterGuruTable('all', this)">
+          <span>Semua Guru</span>
+          <span class="piket-chip-badge">{{ $absensiGuruHariIni->count() + $guruBelumHadirList->count() }}</span>
+        </button>
+        <button type="button" class="piket-chip filter-pill" data-filter="hadir" onclick="filterGuruTable('hadir', this)">
+          <span>Hadir Tepat</span>
+          <span class="piket-chip-badge">{{ $guruHadirTepat }}</span>
+        </button>
+        <button type="button" class="piket-chip filter-pill" data-filter="terlambat" onclick="filterGuruTable('terlambat', this)">
+          <span>Terlambat</span>
+          <span class="piket-chip-badge">{{ $guruTerlambat }}</span>
+        </button>
+        <button type="button" class="piket-chip filter-pill" data-filter="belum_hadir" onclick="filterGuruTable('belum_hadir', this)">
+          <span>Belum Hadir</span>
+          <span class="piket-chip-badge" style="color:{{ $guruBelumHadirList->count() > 0 ? '#DC2626' : 'inherit' }}; font-weight:800;">
+            {{ $guruBelumHadirList->count() }}
+          </span>
+        </button>
+        <button type="button" class="piket-chip filter-pill" data-filter="izin" onclick="filterGuruTable('izin', this)">
+          <span>Izin / Dinas</span>
+          <span class="piket-chip-badge">{{ $guruIzinSakit }}</span>
+        </button>
+        <button type="button" class="piket-chip filter-pill" data-filter="pulang" onclick="filterGuruTable('pulang', this)">
+          <span>Sudah Pulang</span>
+          <span class="piket-chip-badge">{{ $guruSudahPulang }}</span>
+        </button>
+      </div>
     </div>
 
-    {{-- ══ VIEW 1: TABEL PRESENSI SISWA (TERMASUK BELUM HADIR) ══ --}}
+    {{-- ══ 4. VIEW 1: TABEL PRESENSI SISWA ══ --}}
     <div id="view-siswa" class="piket-view-pane">
-      <div class="panel" style="padding:0; overflow:hidden;">
-        
-        {{-- Toolbar Filter & Search Siswa --}}
-        <div style="padding:10px 14px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; background:var(--surface);">
-          <div class="filter-pills" style="margin-bottom:0;">
-            <button type="button" class="filter-pill active" data-filter="all" onclick="filterSiswaTable('all', this)">Semua ({{ $totalSiswaAktif }})</button>
-            <button type="button" class="filter-pill" data-filter="hadir" onclick="filterSiswaTable('hadir', this)">Hadir Tepat ({{ $hadirTepat }})</button>
-            <button type="button" class="filter-pill" data-filter="terlambat" onclick="filterSiswaTable('terlambat', this)">Terlambat ({{ $terlambat }})</button>
-            <button type="button" class="filter-pill" data-filter="belum_pulang" onclick="filterSiswaTable('belum_pulang', this)">
-              Belum Pulang ({{ $siswaBelumScanPulang }})
-            </button>
-            <button type="button" class="filter-pill" data-filter="belum_hadir" onclick="filterSiswaTable('belum_hadir', this)">
-              Belum Hadir
-              @if($siswaBelumHadirList->count() > 0)
-                <span style="background:rgba(239,68,68,0.15); color:#DC2626; font-size:10px; font-weight:800; padding:1px 6px; border-radius:10px; margin-left:4px;">{{ $siswaBelumHadirList->count() }}</span>
-              @else
-                <span style="font-size:10px; font-weight:700; color:var(--text-3); margin-left:4px;">0</span>
-              @endif
-            </button>
-            <button type="button" class="filter-pill" data-filter="izin" onclick="filterSiswaTable('izin', this)">Izin / Sakit ({{ $izinCount }})</button>
-            <button type="button" class="filter-pill" data-filter="pkl" onclick="filterSiswaTable('pkl', this)">PKL ({{ $totalSiswaPkl ?? 0 }})</button>
-            <button type="button" class="filter-pill" data-filter="bolos" onclick="filterSiswaTable('bolos', this)">Bolos ({{ $absensiHariIni->where('status', 'bolos')->count() }})</button>
-            <button type="button" class="filter-pill" data-filter="pulang" onclick="filterSiswaTable('pulang', this)">Sudah Pulang ({{ $sudahPulang }})</button>
-          </div>
-
-          <div style="position:relative; width:100%; max-width:240px;" class="piket-search-wrap">
-            <i class="bi bi-search" style="position:absolute; left:10px; top:50%; transform:translateY(-50%); color:var(--text-3); font-size:11px;"></i>
-            <input type="text" id="searchSiswaPiket" onkeyup="searchSiswaPiketTable()" placeholder="Cari nama, NIS, kelas..." style="width:100%; height:32px; padding-left:28px; font-size:11.5px; background:var(--bg-3); border:1px solid var(--border-2); border-radius:var(--r-sm); color:var(--text);" />
-          </div>
-        </div>
-
+      <div class="piket-table-container">
         <div class="table-responsive">
           <table class="data-table" id="tableSiswaPiket">
             <thead>
               <tr>
                 <th style="width:40px; text-align:center;">No</th>
                 <th style="width:45px; text-align:center;">Foto</th>
-                <th style="width:110px;">NISN / NIS</th>
+                <th style="width:115px;">NISN / NIS</th>
                 <th>Nama Peserta Didik</th>
                 <th style="width:110px;">Kelas / Rombel</th>
-                <th style="width:90px; text-align:center;">Jam Masuk</th>
-                <th style="width:90px; text-align:center;">Jam Pulang</th>
-                <th style="width:110px; text-align:center;">Status</th>
-                <th style="width:150px;">Sumber Input</th>
-                <th style="text-align:right; width:115px;">Aksi</th>
+                <th style="width:95px; text-align:center;">Jam Masuk</th>
+                <th style="width:95px; text-align:center;">Jam Pulang</th>
+                <th style="width:125px; text-align:center;">Status</th>
+                <th style="width:140px;">Sumber Input</th>
+                <th style="text-align:right; width:110px;">Aksi</th>
               </tr>
             </thead>
             <tbody>
@@ -606,7 +774,6 @@
                   if (str_starts_with($hpClean, '0')) $hpClean = '62' . substr($hpClean, 1);
                 @endphp
                 <tr class="row-siswa-absen" data-status="{{ $ab->status }}" data-pulang="{{ $ab->jam_pulang ? 'pulang' : 'belum' }}" data-has-masuk="{{ $ab->jam_masuk ? '1' : '0' }}">
-
                   <td style="text-align:center; font-weight:700; color:var(--text-3); font-size:12px;">{{ $idx + 1 }}</td>
                   <td style="text-align:center; vertical-align:middle;">
                     <img src="{{ $ab->siswa?->foto_url }}" alt="{{ $ab->siswa?->nama }}" style="width:34px; height:34px; border-radius:50%; object-fit:cover; border:1.5px solid var(--border-2);" />
@@ -616,7 +783,7 @@
                     <strong style="color:var(--text); font-size:13px;">{{ $ab->siswa?->nama ?? '—' }}</strong>
                     @if($hpClean)
                       <div style="margin-top:2px;">
-                        <a href="https://wa.me/{{ $hpClean }}" target="_blank" style="font-size:11px; color:#16A34A; text-decoration:none; font-weight:600; display:inline-flex; align-items:center; gap:3px;">
+                        <a href="https://wa.me/{{ $hpClean }}" target="_blank" style="font-size:11px; color:#16A34A; text-decoration:none; font-weight:600; display:inline-flex; align-items:center; gap:4px;">
                           <i class="bi bi-whatsapp"></i> <span style="font-family:var(--font-mono);">{{ $hp }}</span>
                         </a>
                       </div>
@@ -626,49 +793,46 @@
                     <span style="font-weight:800; color:var(--text); font-size:12px;">{{ $rombel }}</span>
                   </td>
                   <td style="font-family:var(--font-mono); font-size:12px; font-weight:800; color:var(--text); text-align:center;">
-                    {{ $ab->jam_masuk ? substr($ab->jam_masuk, 0, 5) : '—' }}
+                    {{ $ab->jam_masuk ? substr($ab->jam_masuk,0,5) : '—' }}
                   </td>
                   <td style="font-family:var(--font-mono); font-size:12px; font-weight:700; color:var(--text); text-align:center;">
                     @if($ab->jam_pulang)
-                      {{ substr($ab->jam_pulang, 0, 5) }}
+                      {{ substr($ab->jam_pulang,0,5) }}
                     @else
                       <span style="color:var(--text-3); font-style:italic; font-size:11px;">Belum Pulang</span>
                     @endif
                   </td>
                   <td style="text-align:center;">
                     @if($ab->status === 'hadir')
-                      <span style="font-size:11.5px; font-weight:700; color:var(--text);">Hadir Tepat</span>
+                      <span class="piket-status-pill hadir"><i class="bi bi-check-circle-fill"></i> Hadir Tepat</span>
                     @elseif($ab->status === 'terlambat')
-                      <span style="font-size:11.5px; font-weight:700; color:var(--text);">Terlambat</span>
+                      <span class="piket-status-pill terlambat"><i class="bi bi-clock-fill"></i> Terlambat</span>
+                    @elseif($ab->status === 'pkl')
+                      <span class="piket-status-pill pkl"><i class="bi bi-briefcase-fill"></i> Siswa PKL</span>
+                    @elseif(in_array($ab->status, ['izin', 'sakit', 'dispensasi', 'cuti']))
+                      <span class="piket-status-pill izin"><i class="bi bi-file-earmark-text-fill"></i> {{ ucfirst($ab->status) }}</span>
                     @elseif($ab->status === 'bolos')
-                      <span style="font-size:11.5px; font-weight:700; color:var(--text);">Bolos</span>
-                    @elseif($ab->status === 'alpha')
-                      <span style="font-size:11.5px; font-weight:700; color:var(--text);">Alpha</span>
+                      <span class="piket-status-pill bolos"><i class="bi bi-exclamation-triangle-fill"></i> Bolos</span>
                     @else
-                      <span style="font-size:11.5px; font-weight:700; color:var(--text);">{{ ucfirst($ab->status) }}</span>
+                      <span class="piket-status-pill"><i class="bi bi-dot"></i> {{ ucfirst($ab->status) }}</span>
                     @endif
                   </td>
                   <td>
-                    @php
-                      $matchingIzin = $izinHariIni->firstWhere('siswa_id', $ab->pemilik_id ?: $ab->siswaRombel?->siswa_id);
-                    @endphp
-                    @if(in_array($ab->status, ['izin', 'sakit', 'dispen']) || $matchingIzin)
-                      <span style="font-size:11.5px; font-weight:700; color:var(--text);">Izin Resmi</span>
-                    @elseif(in_array($ab->sumber_absen, ['rfid', 'kios_rfid', 'barcode', 'scan_barcode', 'qr_code', 'kios_wajah', 'face_kiosk', 'kios_biometrik']) || empty($ab->sumber_absen))
+                    @if(in_array($ab->sumber_absen, ['rfid', 'kios_rfid', 'barcode', 'scan_barcode', 'qr_code', 'kios_wajah', 'face_kiosk', 'kios_biometrik']) || empty($ab->sumber_absen))
                       <span style="font-size:11.5px; font-weight:700; color:var(--text);">Smart Gate</span>
+                    @elseif($ab->sumber_absen === 'manual_izin_piket' || in_array($ab->status, ['izin', 'sakit', 'dispensasi', 'cuti']))
+                      <span style="font-size:11.5px; font-weight:700; color:var(--text);">Surat Izin / Sakit</span>
                     @elseif($ab->sumber_absen === 'koreksi_piket_manual')
                       <span style="font-size:11.5px; font-weight:700; color:var(--text);">Koreksi Piket</span>
-                    @elseif($ab->sumber_absen === 'manual_piket' || $ab->sumber_absen === 'manual_izin_piket')
+                    @elseif($ab->sumber_absen === 'manual_piket')
                       <span style="font-size:11.5px; font-weight:700; color:var(--text);">Manual Piket</span>
-                    @elseif($ab->sumber_absen === 'evaluasi_alpha')
-                      <span style="font-size:11.5px; font-weight:700; color:var(--text);">Sistem Otomatis</span>
                     @else
-                      <span style="font-size:11.5px; font-weight:700; color:var(--text);">{{ ucfirst(str_replace('_', ' ', $ab->sumber_absen)) }}</span>
+                      <span style="font-size:11.5px; color:var(--text-3);">{{ ucfirst(str_replace('_', ' ', $ab->sumber_absen)) }}</span>
                     @endif
                   </td>
                   <td style="text-align:right; white-space:nowrap;">
                     @if($canKoreksi ?? false)
-                      <button type="button" class="btn btn-sm btn-outline" style="padding:3px 8px; font-size:11px; font-weight:700; color:#000000; border-color:rgba(0,0,0,0.25);" onclick="openKoreksiPiketModal({{ $ab->id }}, '{{ addslashes($ab->siswa?->nama ?? 'Siswa') }}', '{{ $ab->status }}', '{{ $ab->jam_masuk ? substr($ab->jam_masuk,0,5) : '' }}', '{{ $ab->jam_pulang ? substr($ab->jam_pulang,0,5) : '' }}', '{{ addslashes($ab->keterangan ?? '') }}')">
+                      <button type="button" class="btn btn-sm btn-outline" style="padding:4px 10px; font-size:11px; font-weight:700; color:var(--text); border-color:var(--border-2); border-radius:6px;" onclick="openKoreksiModal({{ $ab->id }}, '{{ addslashes($ab->siswa?->nama ?? '-') }}', '{{ $ab->status }}', '{{ $ab->jam_masuk ? substr($ab->jam_masuk,0,5) : '' }}', '{{ $ab->jam_pulang ? substr($ab->jam_pulang,0,5) : '' }}', '{{ addslashes($ab->keterangan ?? '') }}')" title="Koreksi presensi siswa">
                         <i class="bi bi-pencil-square"></i> Koreksi
                       </button>
                     @else
@@ -678,25 +842,25 @@
                 </tr>
               @endforeach
 
-              {{-- 2. Siswa Belum Hadir / Scan --}}
-              @foreach($siswaBelumHadirList as $sb)
+              {{-- 2. Siswa yang belum hadir / belum scan hari ini --}}
+              @foreach($siswaBelumHadirList as $idx2 => $sb)
                 @php
-                  $rombel = $sb->siswaRombels->where('status_keanggotaan', 'aktif')->first()?->rombel?->nama_rombel ?? '—';
+                  $rombel = $sb->siswaRombel?->rombel?->nama_rombel ?? '—';
                   $hp = $sb->no_hp_siswa ?: $sb->no_hp_ortu;
                   $hpClean = preg_replace('/[^0-9]/', '', $hp ?? '');
                   if (str_starts_with($hpClean, '0')) $hpClean = '62' . substr($hpClean, 1);
                 @endphp
-                <tr class="row-siswa-absen" data-status="belum_hadir" data-pulang="belum">
-                  <td style="text-align:center; font-weight:700; color:var(--text-3); font-size:12px;">-</td>
+                <tr class="row-siswa-belum-hadir" data-status="belum_hadir" data-pulang="belum" data-has-masuk="0">
+                  <td style="text-align:center; font-weight:700; color:var(--text-3); font-size:12px;">{{ $absensiHariIni->count() + $idx2 + 1 }}</td>
                   <td style="text-align:center; vertical-align:middle;">
-                    <img src="{{ $sb->foto_url }}" alt="{{ $sb->nama }}" style="width:34px; height:34px; border-radius:50%; object-fit:cover; border:1.5px solid var(--border-2); opacity:0.85;" />
+                    <img src="{{ $sb->foto_url }}" alt="{{ $sb->nama }}" style="width:34px; height:34px; border-radius:50%; object-fit:cover; border:1.5px dashed var(--border-2); opacity:0.8;" />
                   </td>
-                  <td style="font-family:var(--font-mono); font-weight:700; color:var(--text); font-size:12px;">{{ $sb->nisn ?? ($sb->nis ?? '-') }}</td>
+                  <td style="font-family:var(--font-mono); font-weight:700; color:var(--text-3); font-size:12px;">{{ $sb->nisn ?? ($sb->nis ?? '-') }}</td>
                   <td>
-                    <strong style="color:var(--text); font-size:13px;">{{ $sb->nama }}</strong>
+                    <strong style="color:var(--text); font-size:13px;">{{ $sb->nama ?? '—' }}</strong>
                     @if($hpClean)
                       <div style="margin-top:2px;">
-                        <a href="https://wa.me/{{ $hpClean }}" target="_blank" style="font-size:11px; color:#16A34A; text-decoration:none; font-weight:600; display:inline-flex; align-items:center; gap:3px;">
+                        <a href="https://wa.me/{{ $hpClean }}" target="_blank" style="font-size:11px; color:#16A34A; text-decoration:none; font-weight:600; display:inline-flex; align-items:center; gap:4px;">
                           <i class="bi bi-whatsapp"></i> <span style="font-family:var(--font-mono);">{{ $hp }}</span>
                         </a>
                       </div>
@@ -708,16 +872,14 @@
                   <td style="font-family:var(--font-mono); font-size:12px; color:var(--text-3); text-align:center;">—</td>
                   <td style="font-family:var(--font-mono); font-size:12px; color:var(--text-3); text-align:center;">—</td>
                   <td style="text-align:center;">
-                    <span class="badge" style="background:rgba(239,68,68,0.1); color:#DC2626; font-weight:800; font-size:11px; display:inline-flex; align-items:center; gap:3px;">
-                      <i class="bi bi-exclamation-circle-fill"></i> Belum Scan
-                    </span>
+                    <span class="piket-status-pill belum"><i class="bi bi-exclamation-circle-fill"></i> Belum Scan</span>
                   </td>
                   <td>
                     <span style="color:var(--text-3); font-size:11.5px;">—</span>
                   </td>
                   <td style="text-align:right; white-space:nowrap;">
                     @if($canKoreksi ?? false)
-                      <button type="button" class="btn btn-sm btn-outline" style="padding:3px 8px; font-size:11px; font-weight:700; color:var(--text); border-color:var(--border-2);" onclick="openValidasiSiswaModal({{ $sb->id }}, '{{ addslashes($sb->nama) }}', 'NISN: {{ $sb->nisn ?? '-' }}', '{{ addslashes($rombel) }}')" title="Catat Status (Izin, Sakit, Hadir Manual, Dispen)">
+                      <button type="button" class="btn btn-sm btn-outline" style="padding:4px 10px; font-size:11px; font-weight:700; color:var(--text); border-color:var(--border-2); border-radius:6px;" onclick="openValidasiSiswaModal({{ $sb->id }}, '{{ addslashes($sb->nama) }}', 'NISN: {{ $sb->nisn ?? '-' }}', '{{ addslashes($rombel) }}')" title="Catat Status (Izin, Sakit, Hadir Manual, Dispen)">
                         <i class="bi bi-pencil-square"></i> Set Status
                       </button>
                     @else
@@ -726,21 +888,12 @@
                   </td>
                 </tr>
               @endforeach
-
-              @if($absensiHariIni->count() + $siswaBelumHadirList->count() === 0)
-                <tr class="empty-row">
-                  <td colspan="10" style="text-align:center; padding:36px; color:var(--text-3);">
-                    <i class="bi bi-inbox" style="font-size:32px; opacity:0.4; display:block; margin-bottom:6px;"></i>
-                    Belum ada rekaman data siswa aktif hari ini.
-                  </td>
-                </tr>
-              @endif
             </tbody>
           </table>
         </div>
 
         {{-- Pagination Bar Siswa --}}
-        <div class="piket-pagination-bar" id="paginationSiswaBar" style="padding:10px 14px; border-top:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; background:var(--surface);">
+        <div class="piket-pagination-bar" id="paginationSiswaBar" style="padding:12px 18px; border-top:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; background:var(--surface);">
           <div style="font-size:12px; color:var(--text-2); font-weight:600;" id="paginationSiswaInfo">
             Menampilkan 1 - 20 dari {{ $totalSiswaAktif }} data
           </div>
@@ -751,33 +904,9 @@
       </div>
     </div>
 
-    {{-- ══ VIEW 2: TABEL PRESENSI GURU & PEGAWAI (TERMASUK BELUM HADIR) ══ --}}
+    {{-- ══ 5. VIEW 2: TABEL PRESENSI GURU & PEGAWAI ══ --}}
     <div id="view-guru" class="piket-view-pane" style="display:none;">
-      <div class="panel" style="padding:0; overflow:hidden;">
-        
-        {{-- Toolbar Filter & Search Guru --}}
-        <div style="padding:10px 14px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; background:var(--surface);">
-          <div class="filter-pills" style="margin-bottom:0;">
-            <button type="button" class="filter-pill active" data-filter="all" onclick="filterGuruTable('all', this)">Semua ({{ $absensiGuruHariIni->count() + $guruBelumHadirList->count() }})</button>
-            <button type="button" class="filter-pill" data-filter="hadir" onclick="filterGuruTable('hadir', this)">Hadir Tepat ({{ $guruHadirTepat }})</button>
-            <button type="button" class="filter-pill" data-filter="terlambat" onclick="filterGuruTable('terlambat', this)">Terlambat ({{ $guruTerlambat }})</button>
-            <button type="button" class="filter-pill" data-filter="belum_hadir" onclick="filterGuruTable('belum_hadir', this)">
-              Belum Hadir
-              @if($guruBelumHadirList->count() > 0)
-                <span style="background:rgba(239,68,68,0.15); color:#DC2626; font-size:10px; font-weight:800; padding:1px 6px; border-radius:10px; margin-left:4px;">{{ $guruBelumHadirList->count() }}</span>
-              @else
-                <span style="font-size:10px; font-weight:700; color:var(--text-3); margin-left:4px;">0</span>
-              @endif
-            </button>
-            <button type="button" class="filter-pill" data-filter="izin" onclick="filterGuruTable('izin', this)">Izin / Dinas ({{ $guruIzinSakit }})</button>
-            <button type="button" class="filter-pill" data-filter="pulang" onclick="filterGuruTable('pulang', this)">Sudah Pulang ({{ $guruSudahPulang }})</button>
-          </div>
-          <div style="position:relative; width:100%; max-width:240px;" class="piket-search-wrap">
-            <i class="bi bi-search" style="position:absolute; left:10px; top:50%; transform:translateY(-50%); color:var(--text-3); font-size:11px;"></i>
-            <input type="text" id="searchGuruPiket" onkeyup="searchGuruPiketTable()" placeholder="Cari nama guru, NIP, jabatan..." style="width:100%; height:32px; padding-left:28px; font-size:11.5px; background:var(--bg-3); border:1px solid var(--border-2); border-radius:var(--r-sm); color:var(--text);" />
-          </div>
-        </div>
-
+      <div class="piket-table-container">
         <div class="table-responsive">
           <table class="data-table" id="tableGuruPiket">
             <thead>
@@ -787,11 +916,11 @@
                 <th style="width:120px;">NIP / ID</th>
                 <th>Nama Guru / Pegawai</th>
                 <th style="width:130px;">Jabatan</th>
-                <th style="width:90px; text-align:center;">Jam Masuk</th>
-                <th style="width:90px; text-align:center;">Jam Pulang</th>
-                <th style="width:110px; text-align:center;">Status</th>
-                <th style="width:150px;">Sumber Input</th>
-                <th style="text-align:right; width:115px;">Aksi</th>
+                <th style="width:95px; text-align:center;">Jam Masuk</th>
+                <th style="width:95px; text-align:center;">Jam Pulang</th>
+                <th style="width:125px; text-align:center;">Status</th>
+                <th style="width:140px;">Sumber Input</th>
+                <th style="text-align:right; width:110px;">Aksi</th>
               </tr>
             </thead>
             <tbody>
@@ -811,7 +940,7 @@
                     <strong style="color:var(--text); font-size:13px;">{{ $ag->guru?->nama ?? '—' }}</strong>
                     @if($hpGuru)
                       <div style="margin-top:2px;">
-                        <a href="https://wa.me/{{ $hpGuru }}" target="_blank" style="font-size:11px; color:#16A34A; text-decoration:none; font-weight:600; display:inline-flex; align-items:center; gap:3px;">
+                        <a href="https://wa.me/{{ $hpGuru }}" target="_blank" style="font-size:11px; color:#16A34A; text-decoration:none; font-weight:600; display:inline-flex; align-items:center; gap:4px;">
                           <i class="bi bi-whatsapp"></i> <span style="font-family:var(--font-mono);">{{ $ag->guru?->no_hp }}</span>
                         </a>
                       </div>
@@ -830,13 +959,13 @@
                   </td>
                   <td style="text-align:center;">
                     @if($ag->status === 'hadir')
-                      <span style="font-size:11.5px; font-weight:700; color:var(--text);">Hadir Tepat</span>
+                      <span class="piket-status-pill hadir"><i class="bi bi-check-circle-fill"></i> Hadir Tepat</span>
                     @elseif($ag->status === 'terlambat')
-                      <span style="font-size:11.5px; font-weight:700; color:var(--text);">Terlambat</span>
+                      <span class="piket-status-pill terlambat"><i class="bi bi-clock-fill"></i> Terlambat</span>
                     @elseif(in_array($ag->status, ['izin', 'sakit', 'cuti', 'dispen', 'dinas_luar']))
-                      <span style="font-size:11.5px; font-weight:700; color:var(--text);">{{ ucfirst(str_replace('_', ' ', $ag->status)) }}</span>
+                      <span class="piket-status-pill izin"><i class="bi bi-file-earmark-text-fill"></i> {{ ucfirst(str_replace('_', ' ', $ag->status)) }}</span>
                     @else
-                      <span style="font-size:11.5px; font-weight:700; color:var(--text);">{{ ucfirst($ag->status) }}</span>
+                      <span class="piket-status-pill"><i class="bi bi-dot"></i> {{ ucfirst($ag->status) }}</span>
                     @endif
                   </td>
                   <td>
@@ -849,12 +978,12 @@
                     @elseif($ag->sumber_absen === 'manual_piket')
                       <span style="font-size:11.5px; font-weight:700; color:var(--text);">Manual Piket</span>
                     @else
-                      <span style="font-size:11.5px; font-weight:700; color:var(--text);">{{ ucfirst(str_replace('_', ' ', $ag->sumber_absen)) }}</span>
+                      <span style="font-size:11.5px; color:var(--text-3);">{{ ucfirst(str_replace('_', ' ', $ag->sumber_absen)) }}</span>
                     @endif
                   </td>
                   <td style="text-align:right; white-space:nowrap;">
                     @if($canKoreksi ?? false)
-                      <button type="button" class="btn btn-sm btn-outline" style="padding:3px 8px; font-size:11px; font-weight:700; color:#000000; border-color:rgba(0,0,0,0.25);" onclick="openKoreksiPiketModal({{ $ag->id }}, '{{ addslashes($ag->guru?->nama ?? 'Guru') }}', '{{ $ag->status }}', '{{ $ag->jam_masuk ? substr($ag->jam_masuk,0,5) : '' }}', '{{ $ag->jam_pulang ? substr($ag->jam_pulang,0,5) : '' }}', '{{ addslashes($ag->keterangan ?? '') }}')">
+                      <button type="button" class="btn btn-sm btn-outline" style="padding:4px 10px; font-size:11px; font-weight:700; color:var(--text); border-color:var(--border-2); border-radius:6px;" onclick="openKoreksiModal({{ $ag->id }}, '{{ addslashes($ag->guru?->nama ?? '-') }}', '{{ $ag->status }}', '{{ $ag->jam_masuk ? substr($ag->jam_masuk,0,5) : '' }}', '{{ $ag->jam_pulang ? substr($ag->jam_pulang,0,5) : '' }}', '{{ addslashes($ag->keterangan ?? '') }}')" title="Koreksi presensi guru">
                         <i class="bi bi-pencil-square"></i> Koreksi
                       </button>
                     @else
@@ -864,42 +993,40 @@
                 </tr>
               @endforeach
 
-              {{-- 2. Guru Belum Hadir / Scan --}}
-              @foreach($guruBelumHadirList as $gb)
+              {{-- 2. Guru yang belum hadir hari ini --}}
+              @foreach($guruBelumHadirList as $idx2 => $gb)
                 @php
-                  $hpG = preg_replace('/[^0-9]/', '', $gb->no_hp ?? '');
-                  if (str_starts_with($hpG, '0')) $hpG = '62' . substr($hpG, 1);
+                  $hpGuru = preg_replace('/[^0-9]/', '', $gb->no_hp ?? '');
+                  if (str_starts_with($hpGuru, '0')) $hpGuru = '62' . substr($hpGuru, 1);
                 @endphp
-                <tr class="row-guru-absen" data-status="belum_hadir" data-pulang="belum">
-                  <td style="text-align:center; font-weight:700; color:var(--text-3); font-size:12px;">-</td>
+                <tr class="row-guru-belum-hadir" data-status="belum_hadir" data-pulang="belum">
+                  <td style="text-align:center; font-weight:700; color:var(--text-3); font-size:12px;">{{ $absensiGuruHariIni->count() + $idx2 + 1 }}</td>
                   <td style="text-align:center; vertical-align:middle;">
-                    <img src="{{ $gb->foto_url }}" alt="{{ $gb->nama }}" style="width:34px; height:34px; border-radius:50%; object-fit:cover; border:1.5px solid var(--border-2); opacity:0.85;" />
+                    <img src="{{ $gb->foto_url }}" alt="{{ $gb->nama }}" style="width:34px; height:34px; border-radius:50%; object-fit:cover; border:1.5px dashed var(--border-2); opacity:0.8;" />
                   </td>
-                  <td style="font-family:var(--font-mono); font-weight:700; color:var(--text); font-size:12px;">{{ $gb->nip ?: '-' }}</td>
+                  <td style="font-family:var(--font-mono); font-weight:700; color:var(--text-3); font-size:12px;">{{ $gb->nip ?: '-' }}</td>
                   <td>
-                    <strong style="color:var(--text); font-size:13px;">{{ $gb->nama }}</strong>
-                    @if($hpG)
+                    <strong style="color:var(--text); font-size:13px;">{{ $gb->nama ?? '—' }}</strong>
+                    @if($hpGuru)
                       <div style="margin-top:2px;">
-                        <a href="https://wa.me/{{ $hpG }}" target="_blank" style="font-size:11px; color:#16A34A; text-decoration:none; font-weight:600; display:inline-flex; align-items:center; gap:3px;">
+                        <a href="https://wa.me/{{ $hpGuru }}" target="_blank" style="font-size:11px; color:#16A34A; text-decoration:none; font-weight:600; display:inline-flex; align-items:center; gap:4px;">
                           <i class="bi bi-whatsapp"></i> <span style="font-family:var(--font-mono);">{{ $gb->no_hp }}</span>
                         </a>
                       </div>
                     @endif
                   </td>
-                  <td style="color:var(--text-2); font-size:12px;">{{ $gb->jabatan ?: 'Guru' }}</td>
+                  <td style="color:var(--text-2); font-size:12px;">{{ $gb->jabatan ?? 'Guru' }}</td>
                   <td style="font-family:var(--font-mono); font-size:12px; color:var(--text-3); text-align:center;">—</td>
                   <td style="font-family:var(--font-mono); font-size:12px; color:var(--text-3); text-align:center;">—</td>
                   <td style="text-align:center;">
-                    <span class="badge" style="background:rgba(239,68,68,0.1); color:#DC2626; font-weight:800; font-size:11px; display:inline-flex; align-items:center; gap:3px;">
-                      <i class="bi bi-exclamation-circle-fill"></i> Belum Scan
-                    </span>
+                    <span class="piket-status-pill belum"><i class="bi bi-exclamation-circle-fill"></i> Belum Hadir</span>
                   </td>
                   <td>
                     <span style="color:var(--text-3); font-size:11.5px;">—</span>
                   </td>
                   <td style="text-align:right; white-space:nowrap;">
                     @if($canKoreksi ?? false)
-                      <button type="button" class="btn btn-sm btn-outline" style="padding:3px 8px; font-size:11px; font-weight:700; color:var(--text); border-color:var(--border-2);" onclick="openSetStatusGuruModal({{ $gb->id }}, '{{ addslashes($gb->nama) }}', '{{ addslashes($gb->jabatan ?: 'Guru') }}')" title="Catat Hadir Manual / Izin / Sakit / Dinas Luar">
+                      <button type="button" class="btn btn-sm btn-outline" style="padding:4px 10px; font-size:11px; font-weight:700; color:var(--text); border-color:var(--border-2); border-radius:6px;" onclick="openSetStatusGuruModal({{ $gb->id }}, '{{ addslashes($gb->nama) }}', '{{ addslashes($gb->jabatan ?: 'Guru') }}')" title="Catat Hadir Manual / Izin / Sakit / Dinas Luar">
                         <i class="bi bi-pencil-square"></i> Set Status
                       </button>
                     @else
@@ -908,21 +1035,12 @@
                   </td>
                 </tr>
               @endforeach
-
-              @if($absensiGuruHariIni->count() + $guruBelumHadirList->count() === 0)
-                <tr class="empty-row">
-                  <td colspan="10" style="text-align:center; padding:36px; color:var(--text-3);">
-                    <i class="bi bi-person-badge" style="font-size:32px; opacity:0.4; display:block; margin-bottom:6px;"></i>
-                    Belum ada data dewan guru &amp; pegawai aktif hari ini.
-                  </td>
-                </tr>
-              @endif
             </tbody>
           </table>
         </div>
 
         {{-- Pagination Bar Guru --}}
-        <div class="piket-pagination-bar" id="paginationGuruBar" style="padding:10px 14px; border-top:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; background:var(--surface);">
+        <div class="piket-pagination-bar" id="paginationGuruBar" style="padding:12px 18px; border-top:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; background:var(--surface);">
           <div style="font-size:12px; color:var(--text-2); font-weight:600;" id="paginationGuruInfo">
             Menampilkan 1 - 20 dari {{ $guruBelumHadirList->count() + $absensiGuruHariIni->count() }} data
           </div>
@@ -954,16 +1072,33 @@
     // Toggle views
     const siswaPane = document.getElementById('view-siswa');
     const guruPane  = document.getElementById('view-guru');
+    const chipsSiswa = document.getElementById('filterChipsSiswa');
+    const chipsGuru  = document.getElementById('filterChipsGuru');
+    const searchInput = document.getElementById('searchSiswaPiket');
+
     if (siswaPane) siswaPane.style.display = view === 'siswa' ? '' : 'none';
     if (guruPane)  guruPane.style.display  = view === 'guru'  ? '' : 'none';
+    if (chipsSiswa) chipsSiswa.style.display = view === 'siswa' ? 'flex' : 'none';
+    if (chipsGuru)  chipsGuru.style.display  = view === 'guru'  ? 'flex' : 'none';
+
+    if (searchInput) {
+      searchInput.value = '';
+      searchInput.placeholder = view === 'siswa' ? 'Cari nama, NISN, rombel...' : 'Cari nama guru, NIP, jabatan...';
+    }
 
     // Update button active state
     document.querySelectorAll('.piket-main-btn').forEach(el => el.classList.remove('active'));
     if (btn) btn.classList.add('active');
 
     // Trigger paginator render for the shown table
-    if (view === 'siswa' && tableSiswaPiket_paginator) tableSiswaPiket_paginator.render();
-    if (view === 'guru'  && tableGuruPiket_paginator)  tableGuruPiket_paginator.render();
+    if (view === 'siswa' && tableSiswaPiket_paginator) {
+      tableSiswaPiket_paginator.setSearch('');
+      tableSiswaPiket_paginator.render();
+    }
+    if (view === 'guru'  && tableGuruPiket_paginator)  {
+      tableGuruPiket_paginator.setSearch('');
+      tableGuruPiket_paginator.render();
+    }
   }
 
   // ── KPI Card Quick Filter (activates Siswa view + sets filter pill) ──
@@ -972,7 +1107,7 @@
     switchMainView('siswa', document.getElementById('btnViewSiswa'));
 
     // Find and click the matching filter pill
-    const pills = document.querySelectorAll('#view-siswa .filter-pill');
+    const pills = document.querySelectorAll('#filterChipsSiswa .filter-pill');
     pills.forEach(pill => {
       pill.classList.remove('active');
       if (pill.getAttribute('data-filter') === status) {
@@ -1254,7 +1389,12 @@
 
   function searchSiswaPiketTable() {
     const q = document.getElementById('searchSiswaPiket')?.value || '';
-    if (tableSiswaPiket_paginator) tableSiswaPiket_paginator.setSearch(q);
+    const isGuruActive = document.getElementById('view-guru')?.style.display !== 'none';
+    if (isGuruActive) {
+      if (tableGuruPiket_paginator) tableGuruPiket_paginator.setSearch(q);
+    } else {
+      if (tableSiswaPiket_paginator) tableSiswaPiket_paginator.setSearch(q);
+    }
   }
 
   function filterGuruTable(status, btn) {
