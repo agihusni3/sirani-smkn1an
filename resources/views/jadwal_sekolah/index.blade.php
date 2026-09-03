@@ -350,18 +350,11 @@
             <thead>
               <tr style="background:var(--bg-3);">
                 <th style="padding:11px 16px; color:#000000; font-weight:800; width:140px;">Hari</th>
-                <th style="padding:11px 16px; color:#000000; font-weight:800; text-align:center; width:160px;">
-                  <i class="bi bi-sunrise"></i> Batas Masuk
-                </th>
-                <th style="padding:11px 16px; color:#000000; font-weight:800; text-align:center; width:160px;">
-                  <i class="bi bi-sunset"></i> Mulai Pulang
-                </th>
-                <th style="padding:11px 16px; color:#000000; font-weight:800; text-align:center; width:160px;">
-                  <i class="bi bi-moon-stars"></i> Tutup Gerbang
-                </th>
-                <th style="padding:11px 16px; color:#000000; font-weight:800;">
-                  <i class="bi bi-chat-left-text"></i> Keterangan
-                </th>
+                <th style="padding:11px 16px; color:#000000; font-weight:800; text-align:center; width:160px;">Batas Masuk</th>
+                <th style="padding:11px 16px; color:#000000; font-weight:800; text-align:center; width:160px;">Mulai Pulang</th>
+                <th style="padding:11px 16px; color:#000000; font-weight:800; text-align:center; width:160px;">Tutup Gerbang</th>
+                <th style="padding:11px 16px; color:#000000; font-weight:800;">Keterangan</th>
+
               </tr>
             </thead>
             <tbody>
