@@ -71,46 +71,16 @@
       background: var(--border-2);
       margin: 0 4px;
     }
-    .piket-act-btn {
-      height: 36px;
-      padding: 0 14px;
-      font-size: 12px;
-      font-weight: 700;
-      border-radius: 6px;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      cursor: pointer;
-      transition: all .15s ease;
-      border: 1px solid transparent;
-      text-decoration: none;
-      white-space: nowrap;
+    /* Standar SIRANI Button WhatsApp Extension */
+    .btn-wa {
+      color: #16A34A !important;
+      border-color: rgba(22, 163, 74, 0.35) !important;
+      background: var(--bg-2) !important;
     }
-    .piket-act-btn--primary {
-      background: #000000;
-      color: #FFFFFF;
-      border-color: #000000;
-    }
-    .piket-act-btn--primary:hover {
-      background: #222222;
-    }
-    .piket-act-btn--wa {
-      background: #16A34A;
-      color: #FFFFFF;
-      border-color: #16A34A;
-    }
-    .piket-act-btn--wa:hover {
-      background: #15803D;
-      border-color: #15803D;
-    }
-    .piket-act-btn--outline {
-      background: var(--bg-2);
-      color: var(--text);
-      border-color: var(--border-2);
-    }
-    .piket-act-btn--outline:hover {
-      border-color: #000000;
-      background: var(--surface);
+    .btn-wa:hover {
+      background: rgba(22, 163, 74, 0.08) !important;
+      border-color: #16A34A !important;
+      color: #15803D !important;
     }
 
     /* ══ PETUGAS PIKET BANNER ══ */
@@ -253,8 +223,8 @@
     .piket-segmented-tabs {
       background: var(--bg-3);
       border: 1px solid var(--border-2);
-      padding: 3px;
-      border-radius: 8px;
+      padding: 2.5px;
+      border-radius: var(--r-sm);
       display: inline-flex;
       align-items: center;
       gap: 3px;
@@ -262,10 +232,12 @@
     .piket-segmented-btn {
       border: none;
       background: transparent;
-      padding: 6px 14px;
-      border-radius: 6px;
+      padding: 0 12px;
+      height: 27px;
+      border-radius: calc(var(--r-sm) - 2px);
       font-size: 12px;
       font-weight: 700;
+      font-family: var(--font);
       color: var(--text-2);
       cursor: pointer;
       transition: all .15s ease;
@@ -276,6 +248,7 @@
     .piket-segmented-btn.active {
       background: #000000;
       color: #FFFFFF;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.12);
     }
     .piket-segmented-count {
       font-size: 10.5px;
@@ -591,14 +564,14 @@
 
         <div class="piket-toolbar-btns">
           {{-- Akses Menuju Notifikasi WhatsApp --}}
-          <a href="{{ route('notifikasi.index') }}" class="piket-act-btn piket-act-btn--wa" title="Buka Meja Notifikasi WhatsApp">
+          <a href="{{ route('notifikasi.index') }}" class="btn btn-outline btn-wa" style="height:32px; font-size:12px; font-weight:700; padding:0 12px; border-radius:var(--r-sm); text-decoration:none;" title="Buka Meja Notifikasi WhatsApp">
             <i class="bi bi-whatsapp"></i> Notifikasi
           </a>
-          <button type="button" class="piket-act-btn piket-act-btn--primary" onclick="openModal('modalPresensiManual')" title="Input presensi manual siswa / guru">
-            <i class="bi bi-plus-circle-fill"></i> Presensi Manual
+          <button type="button" class="btn btn-gold" style="height:32px; font-size:12px; font-weight:700; padding:0 12px; border-radius:var(--r-sm);" onclick="openModal('modalPresensiManual')" title="Input presensi manual siswa / guru">
+            <i class="bi bi-plus-lg"></i> Presensi Manual
           </button>
-          <button type="button" class="piket-act-btn piket-act-btn--outline" onclick="openModal('modalCatatIzinPiket')" title="Catat perizinan atau surat sakit">
-            <i class="bi bi-envelope-paper-fill"></i> Catat Izin
+          <button type="button" class="btn btn-outline" style="height:32px; font-size:12px; font-weight:700; padding:0 12px; border-radius:var(--r-sm);" onclick="openModal('modalCatatIzinPiket')" title="Catat perizinan atau surat sakit">
+            <i class="bi bi-envelope-paper"></i> Catat Izin
           </button>
         </div>
       </div>
@@ -786,7 +759,7 @@
               {{-- 2. Siswa yang belum hadir / belum scan hari ini --}}
               @foreach($siswaBelumHadirList as $idx2 => $sb)
                 @php
-                  $rombel = $sb->siswaRombel?->rombel?->nama_rombel ?? '—';
+                  $rombel = $sb->siswaRombels?->first()?->rombel?->nama_rombel ?? $sb->siswaRombel?->first()?->rombel?->nama_rombel ?? '—';
                   $hp = $sb->no_hp_siswa ?: $sb->no_hp_ortu;
                   $hpClean = preg_replace('/[^0-9]/', '', $hp ?? '');
                   if (str_starts_with($hpClean, '0')) $hpClean = '62' . substr($hpClean, 1);
