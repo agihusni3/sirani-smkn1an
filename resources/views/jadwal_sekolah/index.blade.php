@@ -299,11 +299,8 @@
           <h1 style="margin:0; font-size:16px; font-weight:900; color:var(--text); display:inline-flex; align-items:center; gap:6px;">
             <i class="bi bi-clock-history" style="color:#000000; font-size:16px;"></i> Jam Operasional Sekolah
           </h1>
-          <span style="color:var(--border-2); font-weight:300;">|</span>
-          <span style="font-size:11.5px; color:var(--text-3);">
-            {{ \Carbon\Carbon::parse($today)->translatedFormat('l, d F Y') }} · T.A. <strong style="color:#000000;">{{ $taAktif->nama ?? '2026/2027' }}</strong>
-          </span>
         </div>
+
 
         <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
           <span style="background:var(--bg-3); border:1px solid var(--border-2); color:#000000; font-family:var(--font-mono); font-size:12px; font-weight:800; padding:4px 10px; border-radius:6px; display:inline-flex; align-items:center; gap:5px;">
