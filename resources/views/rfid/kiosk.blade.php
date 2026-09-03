@@ -911,8 +911,9 @@
       nameEl.textContent = 'Pemindaian Gagal';
       subTxt.textContent = 'Kartu atau Barcode Tidak Terdaftar';
       timeTxt.textContent = 'Sistem Smart Gate';
-      msgTxt.textContent = res.message || 'Kartu belum terdaftar atau gerbang sedang ditutup.';
+      msgTxt.textContent = res.message || 'Kartu atau Barcode belum terdaftar di sistem.';
       speak('Kartu tidak valid atau belum terdaftar.');
+
     }
 
     startCountdown(4);

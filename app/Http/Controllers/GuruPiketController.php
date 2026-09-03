@@ -323,25 +323,9 @@ class GuruPiketController extends Controller
      */
     public function toggleSesiGerbang(Request $request)
     {
-        $today = Carbon::today()->toDateString();
-        $jadwal = JadwalHariIni::getJadwalAktif($today);
-        $user = auth()->user();
-        $petugasNama = $user->name ?? 'Petugas Piket';
-
-        $targetStatus = $request->input('status');
-
-        if ($targetStatus === 'buka' || ($targetStatus === null && !$jadwal->is_sesi_buka)) {
-            $jadwal->bukaSesi($petugasNama);
-            $msg = "Sesi Smart Gate BERHASIL DIBUKA oleh {$petugasNama}. Pemindaian Face ID di gerbang kini aktif.";
-            \App\Models\AuditLog::catat('buka_sesi_gerbang', 'jadwal_hari_ini', $msg);
-        } else {
-            $jadwal->tutupSesi($petugasNama);
-            $msg = "Sesi Smart Gate BERHASIL DITUTUP oleh {$petugasNama}. Pemindaian Face ID di gerbang dinonaktifkan sementara.";
-            \App\Models\AuditLog::catat('tutup_sesi_gerbang', 'jadwal_hari_ini', $msg);
-        }
-
-        return redirect()->back()->with('success', $msg);
+        return redirect()->back()->with('info', 'Smart Gate selalu aktif otomatis mengikuti jadwal operasional sekolah.');
     }
+
 
     /**
      * Validasi kehadiran siswa yang belum tap presensi langsung dari tabel tindak lanjut meja piket.

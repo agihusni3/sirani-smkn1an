@@ -393,10 +393,10 @@
         <div class="panel" style="margin-bottom:0; padding:0; overflow:hidden; border:1px solid var(--border); border-radius:var(--r-md); background:var(--bg-2);">
           <div style="padding:14px 18px; border-bottom:1px solid var(--border); background:var(--surface); display:flex; justify-content:space-between; align-items:center;">
             <span style="font-weight:800; font-size:13.5px; color:var(--text); display:flex; align-items:center; gap:8px;">
-              <i class="bi bi-clock-history"></i> Jam Belajar &amp; Sesi Smart Gate
+              <i class="bi bi-clock-history"></i> Jam Operasional Sekolah
             </span>
             <a href="/jadwal-sekolah" class="btn btn-outline" style="font-size:11px; padding:3px 10px; font-weight:800; text-decoration:none;">
-              <i class="bi bi-pencil"></i> Atur Sesi
+              <i class="bi bi-pencil"></i> Atur Jadwal
             </a>
           </div>
           <div style="padding:16px 18px;">
@@ -417,16 +417,10 @@
               </div>
             </div>
             <div style="display:flex; justify-content:space-between; align-items:center; background:var(--surface); padding:10px 14px; border-radius:var(--r-sm); border:1px solid var(--border);">
-              <span style="font-size:12px; font-weight:700; color:var(--text-2);">Status Gerbang Pagi:</span>
-              @if(isset($jadwalHarianSesi) && $jadwalHarianSesi && $jadwalHarianSesi->status_gerbang === 'buka')
-                <span class="badge" style="background:rgba(34,197,94,0.12); color:#16A34A; border:1px solid rgba(34,197,94,0.25); font-weight:800; font-size:11px;">
-                  <i class="bi bi-door-open-fill"></i> SESI TERBUKA
-                </span>
-              @else
-                <span class="badge" style="background:rgba(239,68,68,0.12); color:#DC2626; border:1px solid rgba(239,68,68,0.25); font-weight:800; font-size:11px;">
-                  <i class="bi bi-door-closed-fill"></i> SESI DITUTUP
-                </span>
-              @endif
+              <span style="font-size:12px; font-weight:700; color:var(--text-2);">Terminal Smart Gate:</span>
+              <span class="badge" style="background:rgba(34,197,94,0.12); color:#16A34A; border:1px solid rgba(34,197,94,0.25); font-weight:800; font-size:11px;">
+                ● AKTIF OTOMATIS
+              </span>
             </div>
           </div>
         </div>
@@ -626,23 +620,6 @@
                 </div>
               </div>
             </a>
-
-            <!-- Mini KPI 5: Sesi Smart Gate -->
-            <div style="background:var(--bg-3); border:1px solid var(--border-2); border-radius:var(--r-sm); padding:12px 14px;">
-              <div style="font-size:10.5px; font-weight:800; text-transform:uppercase; color:var(--text-3); letter-spacing:0.5px;">Sesi Smart Gate</div>
-              <div style="margin-top:4px;">
-                @if(isset($jadwalHarianSesi) && $jadwalHarianSesi && $jadwalHarianSesi->status_gerbang === 'buka')
-                  <span class="badge" style="background:var(--bg-2); color:#000000; border:1px solid #000000; font-weight:800; font-size:11.5px; padding:3px 8px; border-radius:6px;">
-                    SESI TERBUKA
-                  </span>
-                @else
-                  <span class="badge" style="background:var(--bg-2); color:#000000; border:1px solid var(--border-2); font-weight:800; font-size:11.5px; padding:3px 8px; border-radius:6px;">
-                    SESI DITUTUP
-                  </span>
-                @endif
-              </div>
-              <div style="font-size:11px; color:var(--text-3); margin-top:4px;">Gerbang Kiosk Depan</div>
-            </div>
           </div>
 
           {{-- Quick Table Siswa Terlambat Hari Ini --}}
