@@ -293,11 +293,11 @@
     @endphp
 
     {{-- ULTRA COMPACT SLIM HEADER BAR --}}
-    <div class="panel no-print" style="background:var(--bg-2); border:1px solid var(--border); padding:10px 16px; margin-bottom:12px; border-radius:var(--r-md); box-shadow:var(--shadow-sm);">
+    <div class="panel no-print" style="background:var(--bg-2); border:1px solid var(--border); padding:10px 16px; margin-bottom:14px; border-radius:var(--r-md); box-shadow:var(--shadow-sm);">
       <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
         <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
           <h1 style="margin:0; font-size:16px; font-weight:900; color:var(--text); display:inline-flex; align-items:center; gap:6px;">
-            <i class="bi bi-clock-history" style="color:#000000; font-size:16px;"></i> Jam Sekolah &amp; Sesi Operasional
+            <i class="bi bi-clock-history" style="color:#000000; font-size:16px;"></i> Jam Operasional Sekolah
           </h1>
           <span style="color:var(--border-2); font-weight:300;">|</span>
           <span style="font-size:11.5px; color:var(--text-3);">
@@ -309,11 +309,6 @@
           <span style="background:var(--bg-3); border:1px solid var(--border-2); color:#000000; font-family:var(--font-mono); font-size:12px; font-weight:800; padding:4px 10px; border-radius:6px; display:inline-flex; align-items:center; gap:5px;">
             <i class="bi bi-broadcast" style="color:#000000; font-size:11px;"></i>
             <span id="liveClockDisplay">{{ now()->format('H:i:s') }}</span> WIB
-          </span>
-
-          <span style="background:var(--bg-3); border:1px solid var(--border-2); color:#000000; font-size:11.5px; font-weight:800; padding:4px 10px; border-radius:6px; display:inline-flex; align-items:center; gap:5px;">
-            <span class="pulse-indicator" style="width:6px; height:6px;"></span>
-            {{ $jadwalHariIni->keterangan ?? 'Reguler' }}
           </span>
 
           @include('partials.header_actions')
@@ -337,23 +332,17 @@
       $canManageJadwal = $currentUser && ($currentUser->isAdmin() || $currentUser->isWakaKurikulum() || $currentUser->isWakaKesiswaan() || $currentUser->isKepalaSekolah() || $currentUser->isStafTu());
     @endphp
 
-    {{-- ══ JAM OPERASIONAL MINGGUAN RUTIN (SENIN - JUMAT) ══ --}}
+    {{-- ══ JAM OPERASIONAL MINGGUAN (SENIN - JUMAT) ══ --}}
     <div class="panel" style="padding:0; overflow:hidden; border:1px solid var(--border); border-radius:var(--r-md); box-shadow:var(--shadow-sm); background:var(--bg-2); margin-bottom:20px;">
 
-      <div style="padding:16px 20px; border-bottom:1px solid var(--border); background:var(--surface); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
-        <div>
-          <div style="font-size:15px; font-weight:900; color:var(--text); display:flex; align-items:center; gap:8px;">
-            <i class="bi bi-calendar-week-fill" style="color:#000000; font-size:16px;"></i>
-            <span>Jam Operasional Mingguan Rutin (Senin s/d Jumat)</span>
-          </div>
-          <div style="font-size:12px; color:var(--text-3); margin-top:2px;">
-            Konfigurasi standar jadwal per hari sekolah. Jadwal ini otomatis diterapkan berulang setiap pekannya oleh sistem Smart Gate SIRANI.
-          </div>
+      <div style="padding:14px 18px; border-bottom:1px solid var(--border); background:var(--surface); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+        <div style="font-size:14px; font-weight:900; color:var(--text); display:flex; align-items:center; gap:8px;">
+          <i class="bi bi-calendar-week-fill" style="color:#000000; font-size:15px;"></i>
+          <span>Pengaturan Jadwal Masuk &amp; Pulang (Senin – Jumat)</span>
         </div>
-        <div style="display:flex; align-items:center; gap:8px;">
-          <span style="background:rgba(0,0,0,0.06); color:#000000; font-size:11px; font-weight:800; padding:4px 10px; border-radius:100px; border:1px solid var(--border-2); display:inline-flex; align-items:center; gap:4px;">
-            <i class="bi bi-arrow-repeat"></i> Berlaku Berulang Otomatis
-          </span>
+        <div style="font-size:12px; color:var(--text-3); font-weight:600; display:flex; align-items:center; gap:6px;">
+          <i class="bi bi-arrow-repeat" style="color:#16A34A;"></i>
+          <span>Otomatis berulang setiap pekan</span>
         </div>
       </div>
 
@@ -363,21 +352,18 @@
           <table class="data-table" style="width:100%; border-collapse:collapse;">
             <thead>
               <tr style="background:var(--bg-3);">
-                <th style="padding:12px 16px; color:#000000; font-weight:800; width:130px;">Hari</th>
-                <th style="padding:12px 16px; color:#000000; font-weight:800; text-align:center; width:160px;">
-                  <i class="bi bi-sunrise"></i> Batas Masuk Pagi
+                <th style="padding:11px 16px; color:#000000; font-weight:800; width:140px;">Hari</th>
+                <th style="padding:11px 16px; color:#000000; font-weight:800; text-align:center; width:160px;">
+                  <i class="bi bi-sunrise"></i> Batas Masuk
                 </th>
-                <th style="padding:12px 16px; color:#000000; font-weight:800; text-align:center; width:160px;">
-                  <i class="bi bi-sunset"></i> Mulai Pulang Sore
+                <th style="padding:11px 16px; color:#000000; font-weight:800; text-align:center; width:160px;">
+                  <i class="bi bi-sunset"></i> Mulai Pulang
                 </th>
-                <th style="padding:12px 16px; color:#000000; font-weight:800; text-align:center; width:160px;">
+                <th style="padding:11px 16px; color:#000000; font-weight:800; text-align:center; width:160px;">
                   <i class="bi bi-moon-stars"></i> Tutup Gerbang
                 </th>
-                <th style="padding:12px 16px; color:#000000; font-weight:800;">
-                  <i class="bi bi-chat-left-text"></i> Keterangan Kegiatan
-                </th>
-                <th style="padding:12px 16px; color:#000000; font-weight:800; text-align:center; width:100px;">
-                  Status
+                <th style="padding:11px 16px; color:#000000; font-weight:800;">
+                  <i class="bi bi-chat-left-text"></i> Keterangan
                 </th>
               </tr>
             </thead>
@@ -394,30 +380,25 @@
                         <span style="background:#000000; color:#FFFFFF; font-size:9.5px; font-weight:800; padding:2px 6px; border-radius:4px;">HARI INI</span>
                       @endif
                     </div>
+                    <input type="hidden" name="mingguan[{{ $jm->hari }}][is_aktif]" value="1" />
                   </td>
-                  <td style="padding:10px 16px; text-align:center; vertical-align:middle;">
-                    <div class="time-input-wrap" style="max-width:140px; margin:0 auto;">
+                  <td style="padding:9px 16px; text-align:center; vertical-align:middle;">
+                    <div class="time-input-wrap" style="max-width:130px; margin:0 auto;">
                       <input type="time" name="mingguan[{{ $jm->hari }}][jam_masuk_toleransi]" value="{{ substr($jm->jam_masuk_toleransi, 0, 5) }}" required {{ !$canManageJadwal ? 'disabled' : '' }} style="text-align:center; font-weight:800; font-family:var(--font-mono); font-size:13px;" />
                     </div>
                   </td>
-                  <td style="padding:10px 16px; text-align:center; vertical-align:middle;">
-                    <div class="time-input-wrap" style="max-width:140px; margin:0 auto;">
+                  <td style="padding:9px 16px; text-align:center; vertical-align:middle;">
+                    <div class="time-input-wrap" style="max-width:130px; margin:0 auto;">
                       <input type="time" name="mingguan[{{ $jm->hari }}][jam_pulang_mulai]" value="{{ substr($jm->jam_pulang_mulai, 0, 5) }}" required {{ !$canManageJadwal ? 'disabled' : '' }} style="text-align:center; font-weight:800; font-family:var(--font-mono); font-size:13px;" />
                     </div>
                   </td>
-                  <td style="padding:10px 16px; text-align:center; vertical-align:middle;">
-                    <div class="time-input-wrap" style="max-width:140px; margin:0 auto;">
+                  <td style="padding:9px 16px; text-align:center; vertical-align:middle;">
+                    <div class="time-input-wrap" style="max-width:130px; margin:0 auto;">
                       <input type="time" name="mingguan[{{ $jm->hari }}][jam_tutup_gerbang]" value="{{ substr($jm->jam_tutup_gerbang ?? '17:00', 0, 5) }}" required {{ !$canManageJadwal ? 'disabled' : '' }} style="text-align:center; font-weight:800; font-family:var(--font-mono); font-size:13px;" />
                     </div>
                   </td>
-                  <td style="padding:10px 16px; vertical-align:middle;">
+                  <td style="padding:9px 16px; vertical-align:middle;">
                     <input type="text" name="mingguan[{{ $jm->hari }}][keterangan]" value="{{ $jm->keterangan }}" placeholder="Keterangan hari {{ $jm->hari }}" {{ !$canManageJadwal ? 'disabled' : '' }} style="width:100%; height:34px; font-size:12px; background:var(--bg-3); border:1px solid var(--border-2); border-radius:6px; padding:0 10px;" />
-                  </td>
-                  <td style="padding:10px 16px; text-align:center; vertical-align:middle;">
-                    <input type="hidden" name="mingguan[{{ $jm->hari }}][is_aktif]" value="1" />
-                    <span style="display:inline-flex; align-items:center; gap:4px; font-size:11px; font-weight:800; color:#16A34A; background:rgba(22,163,74,0.1); padding:3px 8px; border-radius:6px;">
-                      <i class="bi bi-check-circle-fill"></i> Aktif
-                    </span>
                   </td>
                 </tr>
               @endforeach
@@ -426,22 +407,23 @@
         </div>
 
         @if($canManageJadwal)
-          <div style="padding:14px 20px; border-top:1px solid var(--border); background:var(--surface); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+          <div style="padding:12px 18px; border-top:1px solid var(--border); background:var(--surface); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
             <label style="display:flex; align-items:center; gap:8px; cursor:pointer; margin:0; font-size:12.5px; font-weight:700; color:var(--text);">
               <input type="checkbox" name="terapkan_hari_ini" value="1" checked style="width:16px; height:16px; cursor:pointer;" />
-              <span>Terapkan juga ke jadwal hari ini ({{ \Carbon\Carbon::parse($today)->locale('id')->isoFormat('dddd') }}) secara langsung</span>
+              <span>Terapkan langsung ke jadwal hari ini ({{ \Carbon\Carbon::parse($today)->locale('id')->isoFormat('dddd') }})</span>
             </label>
             <button type="submit" class="btn btn-primary" style="background:#000000; color:#FFFFFF; height:38px; padding:0 22px; font-weight:800; font-size:12.5px; border-radius:8px; display:inline-flex; align-items:center; gap:6px;">
-              <i class="bi bi-floppy-fill"></i> Simpan Jam Operasional Mingguan
+              <i class="bi bi-floppy-fill"></i> Simpan Jam Operasional
             </button>
           </div>
         @else
-          <div style="padding:12px 20px; border-top:1px solid var(--border); background:var(--bg-3); font-size:12px; color:var(--text-3); font-weight:600;">
+          <div style="padding:12px 18px; border-top:1px solid var(--border); background:var(--bg-3); font-size:12px; color:var(--text-3); font-weight:600;">
             <i class="bi bi-lock-fill"></i> Pengubahan jam operasional mingguan dibatasi untuk Admin, Kepala Sekolah, Waka Kurikulum, dan Waka Kesiswaan.
           </div>
         @endif
       </form>
     </div>
+
 
     {{-- ══ 5. RIWAYAT PERUBAHAN JADWAL (TABEL TERPADU) ══ --}}
     <div class="panel" style="padding:0; overflow:hidden; border:1px solid var(--border); border-radius:var(--r-md); box-shadow:var(--shadow-sm); background:var(--bg-2); margin-bottom:24px;">
