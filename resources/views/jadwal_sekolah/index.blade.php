@@ -278,7 +278,8 @@
       $currentTime = now()->format('H:i');
       $jamMasuk = substr($jadwalHariIni->jam_masuk_toleransi ?? '07:15', 0, 5);
       $jamPulang = substr($jadwalHariIni->jam_pulang_mulai ?? '15:30', 0, 5);
-      $jamTutup = substr($jadwalHariIni->jam_tutup_gerbang ?? '18:00', 0, 5);
+      $jamTutup = substr($jadwalHariIni->jam_tutup_gerbang ?? '17:00', 0, 5);
+
 
       // Determine current active session phase
       $currentPhase = 'tutup';
@@ -427,39 +428,40 @@
           Preset Skenario Cepat (1-Klik Terapkan):
         </div>
         <div class="scenario-grid">
-          <button type="button" class="scenario-card" onclick="selectScenario('07:15', '15:30', '18:00', 'Jadwal Reguler (Senin - Kamis)', this)">
+          <button type="button" class="scenario-card" onclick="selectScenario('07:15', '15:30', '17:00', 'Jadwal Reguler (Senin - Kamis)', this)">
             <div class="scenario-icon">
               <i class="bi bi-calendar4-week"></i>
             </div>
             <div class="scenario-title">Reguler Senin–Kamis</div>
-            <div class="scenario-meta">07:15 &bull; 15:30 &bull; 18:00</div>
+            <div class="scenario-meta">07:15 &bull; 15:30 &bull; 17:00</div>
           </button>
 
-          <button type="button" class="scenario-card" onclick="selectScenario('07:15', '11:30', '18:00', 'Jadwal Khusus Hari Jumat', this)">
+          <button type="button" class="scenario-card" onclick="selectScenario('07:15', '11:30', '17:00', 'Jadwal Khusus Hari Jumat', this)">
             <div class="scenario-icon">
               <i class="bi bi-sun"></i>
             </div>
             <div class="scenario-title">Khusus Hari Jumat</div>
-            <div class="scenario-meta">07:15 &bull; 11:30 &bull; 18:00</div>
+            <div class="scenario-meta">07:15 &bull; 11:30 &bull; 17:00</div>
           </button>
 
-          <button type="button" class="scenario-card" onclick="selectScenario('07:15', '12:00', '18:00', 'Pekan Penilaian / Ujian Semester', this)">
+          <button type="button" class="scenario-card" onclick="selectScenario('07:15', '12:00', '17:00', 'Pekan Penilaian / Ujian Semester', this)">
             <div class="scenario-icon">
               <i class="bi bi-file-earmark-text"></i>
             </div>
             <div class="scenario-title">Pekan Ujian / PTS / PAS</div>
-            <div class="scenario-meta">07:15 &bull; 12:00 &bull; 18:00</div>
+            <div class="scenario-meta">07:15 &bull; 12:00 &bull; 17:00</div>
           </button>
 
-          <button type="button" class="scenario-card" onclick="selectScenario('07:15', '13:00', '18:00', 'Kegiatan Peringatan / Pulang Awal', this)">
+          <button type="button" class="scenario-card" onclick="selectScenario('07:15', '13:00', '17:00', 'Kegiatan Peringatan / Pulang Awal', this)">
             <div class="scenario-icon">
               <i class="bi bi-flag"></i>
             </div>
             <div class="scenario-title">Acara Khusus / Upacara</div>
-            <div class="scenario-meta">07:15 &bull; 13:00 &bull; 18:00</div>
+            <div class="scenario-meta">07:15 &bull; 13:00 &bull; 17:00</div>
           </button>
         </div>
         @endif
+
 
         {{-- Form Input --}}
         <form action="{{ route('admin.jadwal.update') }}" method="POST" id="form-jadwal" style="border-top:1px solid var(--border); padding-top:14px;">
@@ -488,7 +490,8 @@
                 <i class="bi bi-moon-stars"></i> Tutup Gerbang <span style="color:var(--red);">*</span>
               </label>
               <div class="time-input-wrap">
-                <input type="time" name="jam_tutup_gerbang" id="input_jam_tutup" value="{{ substr($jadwalHariIni->jam_tutup_gerbang ?? '18:00', 0, 5) }}" required {{ !$canManageJadwal ? 'disabled' : '' }} />
+                <input type="time" name="jam_tutup_gerbang" id="input_jam_tutup" value="{{ substr($jadwalHariIni->jam_tutup_gerbang ?? '17:00', 0, 5) }}" required {{ !$canManageJadwal ? 'disabled' : '' }} />
+
               </div>
             </div>
           </div>
@@ -615,7 +618,8 @@
                   </td>
                   <td style="padding:12px 14px; text-align:center;">
                     <span style="font-family:var(--font-mono); font-weight:800; font-size:13px; color:#000000;">
-                      {{ substr($rj->jam_tutup_gerbang ?? '18:00', 0, 5) }}
+                      {{ substr($rj->jam_tutup_gerbang ?? '17:00', 0, 5) }}
+
                     </span>
                   </td>
                   <td style="padding:12px 14px; color:#000000; font-size:12.5px; font-weight:600;">

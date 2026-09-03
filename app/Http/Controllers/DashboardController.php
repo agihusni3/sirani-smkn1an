@@ -635,17 +635,18 @@ class DashboardController extends Controller
             ->get();
         $piketBelumHadirCount = max(0, $totalSiswaActive - ($siswaHadir + $siswaTerlambat + $siswaIzin + $totalSiswaPkl));
 
-        // Siswa yang sudah absen masuk tapi belum scan pulang
+        // Siswa yang sudah absen masuk tapi belum scan pulang (hadir, terlambat, atau bolos)
         $siswaBelumPulangCount = Absensi::where('pemilik_type', 'siswa')
             ->where('tanggal', $today)
             ->whereNotNull('jam_masuk')
             ->whereNull('jam_pulang')
-            ->whereIn('status', ['hadir', 'terlambat'])
+            ->whereIn('status', ['hadir', 'terlambat', 'bolos'])
             ->count();
 
-        // Cek apakah sudah melewati jam tutup gerbang
-        $jamTutupGerbang = $jadwalHariIni->jam_tutup_gerbang ?? '18:00:00';
+        // Cek apakah sudah melewati jam tutup gerbang (17:00:00)
+        $jamTutupGerbang = $jadwalHariIni->jam_tutup_gerbang ?? '17:00:00';
         $sudahLewatJamTutup = now()->format('H:i:s') >= $jamTutupGerbang;
+
 
         $piketRecentLiveFeed = $absensiSiswaHariIni->sortByDesc(function ($item) {
             return $item->jam_pulang ?: $item->jam_masuk;
@@ -813,7 +814,8 @@ class DashboardController extends Controller
         $adminNama = auth()->user()->name ?? 'Administrator';
 
         $jadwal = JadwalHariIni::getJadwalAktif($today);
-        $jamTutup = $request->filled('jam_tutup_gerbang') ? ($request->input('jam_tutup_gerbang') . ':00') : ($jadwal->jam_tutup_gerbang ?? '18:00:00');
+        $jamTutup = $request->filled('jam_tutup_gerbang') ? ($request->input('jam_tutup_gerbang') . ':00') : ($jadwal->jam_tutup_gerbang ?? '17:00:00');
+
 
         $jadwal->update([
             'jam_masuk_toleransi' => $request->input('jam_masuk_toleransi') . ':00',

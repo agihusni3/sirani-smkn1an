@@ -460,7 +460,8 @@ class SimulasiTigaTahunSeeder extends Seeder
             'tanggal'             => $todayStr,
             'jam_masuk_toleransi' => '07:15:00',
             'jam_pulang_mulai'    => '15:30:00',
-            'jam_tutup_gerbang'   => '18:00:00',
+            'jam_tutup_gerbang'   => '17:00:00',
+
             'keterangan'          => 'Sesi Presensi Smart Gate Reguler',
             'is_sesi_buka'        => true,
             'dibuka_oleh'         => 'Drs. H. Ahmad Sudrajat, M.Pd.',

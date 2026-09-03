@@ -57,7 +57,7 @@ class JadwalHariIni extends Model
             return $jadwal;
         }
 
-        // Default: Hari Jumat jam pulang 11:30, Senin-Kamis 15:30, Tutup Gerbang 18:00
+        // Default: Hari Jumat jam pulang 11:30, Senin-Kamis 15:30, Tutup Gerbang 17:00
         $isJumat = ($date->dayOfWeek === Carbon::FRIDAY);
         $jamPulangDefault = $isJumat ? '11:30:00' : '15:30:00';
         $ketDefault = $isJumat ? 'Jadwal Hari Jumat (Pulang Cepat)' : 'Jadwal Reguler';
@@ -66,11 +66,12 @@ class JadwalHariIni extends Model
             'tanggal' => $dateStr,
             'jam_masuk_toleransi' => '07:15:00',
             'jam_pulang_mulai' => $jamPulangDefault,
-            'jam_tutup_gerbang' => '18:00:00',
+            'jam_tutup_gerbang' => '17:00:00',
             'keterangan' => $ketDefault,
             'diubah_oleh' => 'Sistem Otomatis',
             'is_sesi_buka' => false,
         ]);
+
     }
 
     /**

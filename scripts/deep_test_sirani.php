@@ -189,17 +189,19 @@ class SiraniDeepTester
         $this->assert("Format jam_pulang_mulai valid ({$jadwal->jam_pulang_mulai})", !empty($jadwal->jam_pulang_mulai));
         $this->assert("Format jam_tutup_gerbang valid ({$jadwal->jam_tutup_gerbang})", !empty($jadwal->jam_tutup_gerbang));
 
-        // Test buka/tutup sesi
+        // Test buka/tutup sesi (gunakan batas tutup malam agar tidak terinterupsi saat dijalankan sore hari)
         $originalStatus = $jadwal->is_sesi_buka;
-        $jadwal->update(['is_sesi_buka' => true]);
+        $originalTutup = $jadwal->jam_tutup_gerbang;
+        $jadwal->update(['jam_tutup_gerbang' => '23:59:59', 'is_sesi_buka' => true]);
         $this->assert("Status sesi gerbang dapat diaktifkan (true)", JadwalHariIni::isSesiAktif($today));
 
         $jadwal->update(['is_sesi_buka' => false]);
         $this->assert("Status sesi gerbang dapat dinonaktifkan (false)", !JadwalHariIni::isSesiAktif($today));
 
         // Kembalikan ke status semula
-        $jadwal->update(['is_sesi_buka' => $originalStatus]);
+        $jadwal->update(['jam_tutup_gerbang' => $originalTutup, 'is_sesi_buka' => $originalStatus]);
     }
+
 
     // ── 4. SMART GATE RFID & BARCODE ────────────────────────────────────────
     private function testSmartGateRfidBarcode(): void
@@ -225,8 +227,8 @@ class SiraniDeepTester
             $resTutup = $service->scanRfid($siswa->nisn ?: 'TEST_UID');
             $this->assert("Scan ditolak dengan aman jika gerbang sedang ditutup", !$resTutup['success'] && $resTutup['status'] === 'warning');
 
-            // B. Gerbang Dibuka -> Perekaman Masuk
-            $jadwal->update(['is_sesi_buka' => true]);
+            // B. Gerbang Dibuka -> Perekaman Masuk (gunakan batas tutup malam selama pengujian)
+            $jadwal->update(['jam_tutup_gerbang' => '23:59:59', 'is_sesi_buka' => true]);
             // Bersihkan absensi hari ini jika ada untuk testing murni
             Absensi::where('pemilik_type', 'siswa')->where('pemilik_id', $siswa->id)->where('tanggal', $today)->delete();
 
@@ -239,8 +241,9 @@ class SiraniDeepTester
 
         } finally {
             DB::rollBack();
-            $jadwal->update(['is_sesi_buka' => $originalSesi]);
+            $jadwal->update(['jam_tutup_gerbang' => '17:00:00', 'is_sesi_buka' => $originalSesi]);
         }
+
     }
 
     // ── 5. EVALUASI ALPHA & BOLOS ───────────────────────────────────────────
@@ -275,11 +278,15 @@ class SiraniDeepTester
 
         $tahapList = [
             'tahap_1_wali_kelas',
+            'tahap_2_bk',
             'tahap_2_guru_bk',
+            'tahap_3_wakasis',
             'tahap_3_waka_kesiswaan',
+            'tahap_4_kepsek',
             'tahap_4_kepala_sekolah',
             'selesai'
         ];
+
         $kasusValid = KasusDisiplin::whereIn('status_tahap', $tahapList)->count();
         $this->assert("Seluruh kasus disiplin memiliki status tahapan valid", $kasusValid === $totalKasus);
 

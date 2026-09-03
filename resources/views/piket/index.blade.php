@@ -422,12 +422,15 @@
           <span>·</span>
           <span>Batas Masuk: <strong>{{ substr($jadwal->jam_masuk_toleransi ?? '07:15', 0, 5) }}</strong></span>
           <span>·</span>
+          <span>Tutup Gerbang: <strong>{{ substr($jadwal->jam_tutup_gerbang ?? '17:00', 0, 5) }}</strong></span>
+          <span>·</span>
           <span>Smart Gate: <strong style="color:{{ $jadwal->is_sesi_buka ? '#16A34A' : '#DC2626' }};">{{ $jadwal->is_sesi_buka ? 'Terbuka' : 'Ditutup' }}</strong></span>
           @if($guruPiketHariIni->isNotEmpty())
             <span>·</span>
             <span>Petugas: <span style="color:var(--text); font-weight:600;">{{ $guruPiketHariIni->map(fn($g) => $g->guru->nama ?? 'Guru')->join(', ') }}</span></span>
           @endif
         </div>
+
       </div>
 
       {{-- Action Buttons --}}
@@ -536,15 +539,15 @@
         <div class="db-kpi-sub">{{ $isAfter1000 ? 'Status terkunci' : 'Otomatis Alpha 10:00' }}</div>
       </div>
 
-      <!-- Siswa Belum Scan Pulang → buka modal -->
-      <div class="db-kpi-card" onclick="openModal('modalRekapPulangPiket')" style="border:{{ $sudahLewatJamTutup ? '2px solid #000000' : '1px solid var(--border)' }}; cursor:pointer; transition:all .15s;">
+      <!-- Siswa Belum Scan Pulang → buka modal & filter tabel -->
+      <div class="db-kpi-card" onclick="selectSiswaFilter('belum_pulang'); openModal('modalRekapPulangPiket');" style="border:{{ $sudahLewatJamTutup ? '2px solid #000000' : '1px solid var(--border)' }}; cursor:pointer; transition:all .15s;">
         <div class="db-kpi-head">
-          <span class="db-kpi-title">{{ $sudahLewatJamTutup ? 'Dianggap Bolos' : 'Blm Scan Pulang' }}</span>
+          <span class="db-kpi-title">Blm Scan Pulang</span>
           <div class="db-kpi-icon"><i class="bi bi-door-open-fill"></i></div>
         </div>
         <div class="db-kpi-val">{{ $siswaBelumScanPulang }}</div>
         <div class="db-kpi-sub" style="font-weight:{{ $sudahLewatJamTutup ? '800' : '600' }}; color:{{ $sudahLewatJamTutup ? '#000000' : 'var(--text-3)' }};">
-          {{ $sudahLewatJamTutup ? 'Lewat jam tutup' : 'Klik → lihat detail' }}
+          {{ $sudahLewatJamTutup ? 'Lewat tutup (17:00)' : 'Klik → lihat detail' }}
         </div>
       </div>
     </div>
@@ -571,6 +574,9 @@
             <button type="button" class="filter-pill active" data-filter="all" onclick="filterSiswaTable('all', this)">Semua ({{ $totalSiswaAktif }})</button>
             <button type="button" class="filter-pill" data-filter="hadir" onclick="filterSiswaTable('hadir', this)">Hadir Tepat ({{ $hadirTepat }})</button>
             <button type="button" class="filter-pill" data-filter="terlambat" onclick="filterSiswaTable('terlambat', this)">Terlambat ({{ $terlambat }})</button>
+            <button type="button" class="filter-pill" data-filter="belum_pulang" onclick="filterSiswaTable('belum_pulang', this)">
+              Belum Pulang ({{ $siswaBelumScanPulang }})
+            </button>
             <button type="button" class="filter-pill" data-filter="belum_hadir" onclick="filterSiswaTable('belum_hadir', this)">
               Belum Hadir
               @if($siswaBelumHadirList->count() > 0)
@@ -584,6 +590,7 @@
             <button type="button" class="filter-pill" data-filter="bolos" onclick="filterSiswaTable('bolos', this)">Bolos ({{ $absensiHariIni->where('status', 'bolos')->count() }})</button>
             <button type="button" class="filter-pill" data-filter="pulang" onclick="filterSiswaTable('pulang', this)">Sudah Pulang ({{ $sudahPulang }})</button>
           </div>
+
           <div style="position:relative; width:100%; max-width:240px;" class="piket-search-wrap">
             <i class="bi bi-search" style="position:absolute; left:10px; top:50%; transform:translateY(-50%); color:var(--text-3); font-size:11px;"></i>
             <input type="text" id="searchSiswaPiket" onkeyup="searchSiswaPiketTable()" placeholder="Cari nama, NIS, kelas..." style="width:100%; height:32px; padding-left:28px; font-size:11.5px; background:var(--bg-3); border:1px solid var(--border-2); border-radius:var(--r-sm); color:var(--text);" />
@@ -616,7 +623,8 @@
                   $hpClean = preg_replace('/[^0-9]/', '', $hp ?? '');
                   if (str_starts_with($hpClean, '0')) $hpClean = '62' . substr($hpClean, 1);
                 @endphp
-                <tr class="row-siswa-absen" data-status="{{ $ab->status }}" data-pulang="{{ $ab->jam_pulang ? 'pulang' : 'belum' }}">
+                <tr class="row-siswa-absen" data-status="{{ $ab->status }}" data-pulang="{{ $ab->jam_pulang ? 'pulang' : 'belum' }}" data-has-masuk="{{ $ab->jam_masuk ? '1' : '0' }}">
+
                   <td style="text-align:center; font-weight:700; color:var(--text-3); font-size:12px;">{{ $idx + 1 }}</td>
                   <td style="text-align:center; vertical-align:middle;">
                     <img src="{{ $ab->siswa?->foto_url }}" alt="{{ $ab->siswa?->nama }}" style="width:34px; height:34px; border-radius:50%; object-fit:cover; border:1.5px solid var(--border-2);" />
@@ -1221,10 +1229,12 @@
         if (status === 'hadir') return rowStatus === 'hadir';
         if (status === 'terlambat') return rowStatus === 'terlambat';
         if (status === 'belum_hadir') return rowStatus === 'belum_hadir';
+        if (status === 'belum_pulang') return row.getAttribute('data-has-masuk') === '1' && rowPulang === 'belum';
         if (status === 'izin') return ['izin', 'sakit', 'dispen'].includes(rowStatus);
         if (status === 'pkl') return rowStatus === 'pkl';
         if (status === 'bolos') return rowStatus === 'bolos';
         if (status === 'pulang') return rowPulang === 'pulang';
+
         return true;
       }
     );
@@ -1833,7 +1843,8 @@
         </div>
         <div style="background:var(--bg-2); padding:8px 10px; border-radius:6px; border:1px solid var(--border-2);">
           <div style="font-size:10px; color:var(--text-3); font-weight:700; text-transform:uppercase;">Tutup Gerbang</div>
-          <div style="font-size:14px; font-weight:900; font-family:var(--font-mono); color:#000000;">{{ substr($jadwal->jam_tutup_gerbang ?? '18:00', 0, 5) }} WIB</div>
+          <div style="font-size:14px; font-weight:900; font-family:var(--font-mono); color:#000000;">{{ substr($jadwal->jam_tutup_gerbang ?? '17:00', 0, 5) }} WIB</div>
+
         </div>
       </div>
     </div>
@@ -2084,11 +2095,12 @@
           <i class="bi bi-door-open-fill"></i>
         </div>
         <div>
-          <div style="font-size:16px; font-weight:900; color:var(--text); line-height:1.2;">Rekap Siswa Belum Scan Pulang</div>
+          <div style="font-size:16px; font-weight:900; color:var(--text); line-height:1.2;">Rekap Siswa Hadir Pagi Belum Scan Pulang</div>
           <div style="font-size:12px; color:var(--text-3); margin-top:2px;">
-            Tanggal: <span style="font-family:var(--font-mono); font-weight:700; color:var(--text);">{{ now()->translatedFormat('d F Y') }}</span>
+            Siswa yang absen masuk pagi tapi belum scan pulang (Batas Tutup Gerbang: <span style="font-family:var(--font-mono); font-weight:800; color:var(--text);">{{ substr($jadwal->jam_tutup_gerbang ?? '17:00', 0, 5) }} WIB</span>)
           </div>
         </div>
+
       </div>
       <div style="display:flex; align-items:center; gap:10px;">
         @if($siswaBelumScanPulang > 0)
@@ -2213,12 +2225,18 @@
     <div style="padding:14px 24px; border-top:1px solid var(--border); background:#FFFFFF; display:flex; justify-content:space-between; align-items:center; flex-shrink:0;">
       <div style="font-size:12px; color:var(--text-3); font-weight:600; display:flex; align-items:center; gap:6px;">
         <i class="bi bi-info-circle-fill" style="color:var(--text-3);"></i>
-        Data sementara hingga batas jam tutup gerbang sekolah.
+        Data siswa yang tercatat hadir pagi dan belum melakukan scan kepulangan.
       </div>
-      <button type="button" onclick="closeModal('modalRekapPulangPiket')" class="btn btn-outline" style="height:38px; padding:0 22px; font-weight:800; font-size:13px; border-radius:8px;">
-        Tutup
-      </button>
+      <div style="display:flex; align-items:center; gap:10px;">
+        <button type="button" onclick="closeModal('modalRekapPulangPiket'); selectSiswaFilter('belum_pulang');" class="btn btn-primary" style="background:#000000; color:#FFFFFF; height:38px; padding:0 20px; font-weight:800; font-size:13px; border-radius:8px; display:inline-flex; align-items:center; gap:6px;">
+          <i class="bi bi-table"></i> Lihat di Tabel Presensi
+        </button>
+        <button type="button" onclick="closeModal('modalRekapPulangPiket')" class="btn btn-outline" style="height:38px; padding:0 22px; font-weight:800; font-size:13px; border-radius:8px;">
+          Tutup
+        </button>
+      </div>
     </div>
+
   </div>
 </div>
 
