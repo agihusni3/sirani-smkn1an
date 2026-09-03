@@ -16,17 +16,36 @@ echo -e "${BLUE}============================================================${NC
 echo -e "${GREEN}  MENYIAPKAN CLOUDFLARE TUNNEL OTOMATIS UNTUK SIRANI${NC}"
 echo -e "${BLUE}============================================================${NC}"
 
+# Pastikan DNS resolver lancar (Google 8.8.8.8 & Cloudflare 1.1.1.1)
+if ! grep -q "8.8.8.8" /etc/resolv.conf 2>/dev/null; then
+  echo "nameserver 8.8.8.8" >> /etc/resolv.conf 2>/dev/null || true
+  echo "nameserver 1.1.1.1" >> /etc/resolv.conf 2>/dev/null || true
+fi
+
 # 1. Download & Install cloudflared
 echo -e "\n${YELLOW}[1/3] Mengunduh dan memasang Cloudflare Tunnel...${NC}"
 if ! command -v cloudflared &> /dev/null; then
-  curl -L --output /tmp/cloudflared.deb \
-    https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64.deb
-  dpkg -i /tmp/cloudflared.deb
-  rm -f /tmp/cloudflared.deb
+  # Opsi 1: Coba unduh via curl dengan retry
+  curl -fsSL --retry 3 -L -o /tmp/cloudflared.deb \
+    https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64.deb 2>/dev/null || true
+
+  if [ -s /tmp/cloudflared.deb ]; then
+    dpkg -i /tmp/cloudflared.deb
+    rm -f /tmp/cloudflared.deb
+  else
+    # Opsi 2: Repositori resmi Cloudflare APT (kebal blokir)
+    echo -e "Menggunakan repositori resmi Cloudflare APT..."
+    mkdir -p --mode=0755 /etc/apt/keyrings
+    curl -fsSL https://pkg.cloudflare.com/cloudflare-main.gpg | tee /etc/apt/keyrings/cloudflare-main.gpg >/dev/null || true
+    echo 'deb [signed-by=/etc/apt/keyrings/cloudflare-main.gpg] https://pkg.cloudflare.com/cloudflared jammy main' | tee /etc/apt/sources.list.d/cloudflared.list
+    apt-get update
+    apt-get install -y cloudflared
+  fi
   echo -e "${GREEN}✔ cloudflared berhasil dipasang${NC}"
 else
   echo -e "${GREEN}✔ cloudflared sudah terpasang sebelumnya${NC}"
 fi
+
 
 # 2. Buat skrip wrapper yang menjalankan tunnel dan menyimpan URL
 echo -e "\n${YELLOW}[2/3] Membuat layanan otomatis tunnel SIRANI...${NC}"
