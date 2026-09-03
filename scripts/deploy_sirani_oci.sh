@@ -66,16 +66,14 @@ echo -e "\n${YELLOW}[4/7] Menyiapkan direktori aplikasi di ${APP_DIR}...${NC}"
 
 mkdir -p ${APP_DIR}
 
-if [ ! -f "${APP_DIR}/artisan" ]; then
-  echo -e "Menyalin file project ke ${APP_DIR}..."
-  # Jika dieksekusi dari dalam folder project lokal
-  if [ -f "./artisan" ]; then
-    cp -r ./* ${APP_DIR}/
-    cp -r ./.[!.]* ${APP_DIR}/ 2>/dev/null || true
-  fi
+echo -e "Menyinkronkan file project ke ${APP_DIR}..."
+if [ -f "./artisan" ]; then
+  cp -r ./* ${APP_DIR}/
+  cp -r ./.[!.]* ${APP_DIR}/ 2>/dev/null || true
 fi
 
 cd ${APP_DIR}
+
 
 # 6. Install Dependensi & Konfigurasi Lingkungan
 echo -e "\n${YELLOW}[5/7] Menginstal pustaka Composer dan migrasi database...${NC}"
