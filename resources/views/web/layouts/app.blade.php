@@ -98,31 +98,6 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Top Government Bar */
-        .gov-topbar {
-            background: #090d16;
-            color: #94a3b8;
-            font-size: 0.76rem;
-            padding: 7px 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-            position: relative;
-            z-index: 1001;
-        }
-
-        .topbar-flex {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .topbar-left, .topbar-right {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            white-space: nowrap;
-        }
-
         .live-status-dot {
             width: 7px;
             height: 7px;
@@ -130,24 +105,7 @@
             background: #10b981;
             animation: live-pulse 2s infinite ease-out;
             flex-shrink: 0;
-        }
-
-        .topbar-sep {
-            color: #334155;
-        }
-
-        .topbar-wa-link {
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-            color: #34d399 !important;
-            font-weight: 700;
-            transition: var(--transition);
-        }
-
-        .topbar-wa-link:hover {
-            color: #6ee7b7 !important;
-            text-shadow: 0 0 8px rgba(52, 211, 153, 0.5);
+            display: inline-block;
         }
 
         /* Main Navbar */
@@ -958,18 +916,8 @@
             .jurusan-hero-grid { grid-template-columns: 1fr !important; gap: 24px; }
         }
 
-        @media (max-width: 860px) {
-            .topbar-kbm, .topbar-kbm-sep { display: none !important; }
-        }
-
         @media (max-width: 640px) {
             .container { padding: 0 12px; }
-            .gov-topbar { font-size: 0.68rem; padding: 6px 0; }
-            .topbar-agency { display: none; }
-            .topbar-npsn { display: none; }
-            .topbar-sep { display: none; }
-            .topbar-left::after { content: 'SMKN 1 Air Naningan'; color: #cbd5e1; font-weight: 700; margin-left: 2px; }
-            .topbar-wa-link span { font-size: 0.7rem; }
             .navbar-inner { height: 60px; gap: 8px; }
             .brand-logo-area { gap: 8px; max-width: calc(100% - 46px); flex-shrink: 1 !important; }
             .brand-logo-img { width: 34px; height: 34px; }
@@ -990,30 +938,7 @@
 </head>
 <body>
 
-    <!-- 1. Government Official Topbar -->
-    <div class="gov-topbar">
-        <div class="container">
-            <div class="topbar-flex">
-                <div class="topbar-left">
-                    <span class="live-status-dot"></span>
-                    <span class="topbar-agency">Pemerintah Provinsi Lampung • Dinas Pendidikan dan Kebudayaan</span>
-                    <span class="topbar-sep">|</span>
-                    <span class="topbar-npsn">NPSN: {{ $sekolah->npsn ?? '69888999' }}</span>
-                </div>
-                <div class="topbar-right">
-                    <div class="topbar-kbm">
-                        <i class="fa-regular fa-clock" style="margin-right: 4px; color: #94a3b8;"></i> Jam Praktik &amp; KBM: <strong>07.15 – 15.30 WIB</strong>
-                    </div>
-                    <span class="topbar-sep topbar-kbm-sep">|</span>
-                    <a href="https://wa.me/6281234567890" target="_blank" class="topbar-wa-link">
-                        <i class="fa-brands fa-whatsapp"></i> <span>Helpdesk PPDB</span>
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- 2. Sticky Header Navbar -->
+    <!-- Sticky Header Navbar -->
     <header class="site-header">
         <div class="container">
             <div class="navbar-inner">
