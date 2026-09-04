@@ -677,18 +677,25 @@
 
 {{-- MODAL PRATINJAU PESAN WHATSAPP --}}
 <div class="modal-overlay" id="modalPreview">
-  <div class="modal-card" style="max-width:480px; padding:20px; background:#111B21; border-color:#2A3942;">
+  <div class="modal-card" style="max-width:500px; padding:20px; background:#111B21; border:1px solid #2A3942; border-radius:12px; box-shadow:0 12px 32px rgba(0,0,0,0.6);">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; border-bottom:1px solid #2A3942; padding-bottom:10px;">
-      <div style="display:flex; align-items:center; gap:8px;">
-        <div style="width:32px; height:32px; border-radius:50%; background:var(--text); display:flex; align-items:center; justify-content:center; color:var(--bg);"> 
+      <div style="display:flex; align-items:center; gap:10px;">
+        <div style="width:36px; height:36px; border-radius:50%; background:#25D366; display:flex; align-items:center; justify-content:center; color:#FFFFFF; font-size:18px;"> 
           <i class="bi bi-whatsapp"></i>
         </div>
         <div>
-          <div style="font-weight:800; font-size:13.5px; color:#E9EDEF;" id="modalPreviewNama">-</div>
-          <div style="font-size:11px; color:#8696A0;" id="modalPreviewTujuan">-</div>
+          <div style="font-weight:800; font-size:14px; color:#E9EDEF;" id="modalPreviewNama">-</div>
+          <div style="font-size:11px; color:#8696A0; font-weight:600;" id="modalPreviewTujuan">-</div>
         </div>
       </div>
-      <button type="button" class="btn btn-sm btn-outline" onclick="closeModal('modalPreview')" style="color:#8696A0; border-color:#2A3942;"><i class="bi bi-x-lg"></i></button>
+      <button type="button" class="btn btn-sm" onclick="closeModal('modalPreview')" style="background:transparent; color:#8696A0; border:none; font-size:18px; cursor:pointer;"><i class="bi bi-x-lg"></i></button>
+    </div>
+
+    {{-- Field Input No HP Tujuan jika belum terisi / ingin diubah --}}
+    <div style="margin-bottom:12px; background:#202C33; padding:8px 12px; border-radius:8px; border:1px solid #3B4A54; display:flex; align-items:center; gap:8px;">
+      <span style="font-size:11.5px; color:#8696A0; font-weight:700; white-space:nowrap;"><i class="bi bi-telephone"></i> No. WA:</span>
+      <input type="text" id="modalPreviewInputPhone" style="background:transparent; border:none; color:#25D366; font-size:12.5px; font-weight:800; font-family:monospace; width:100%; outline:none;" placeholder="Masukkan nomor WA (cth: 08123456789)" oninput="updateModalDirectWa()" />
+      <span id="phoneNoticeBadge" style="font-size:10px; padding:2px 6px; border-radius:4px; font-weight:700; display:none; white-space:nowrap;"></span>
     </div>
 
     <div style="margin-bottom:6px; display:flex; justify-content:space-between; align-items:center;">
@@ -696,13 +703,13 @@
       <span style="font-size:10.5px; color:#8696A0;" id="charCountPreview">0 karakter</span>
     </div>
 
-    <textarea id="modalPreviewPesan" class="input-field" rows="10" style="width:100%; background:#0B141A; border:1px solid #2A3942; border-radius:10px; padding:12px; font-size:12px; color:#E9EDEF; line-height:1.6; font-family:system-ui, -apple-system, sans-serif; resize:vertical; outline:none;" placeholder="Tulis isi pesan..."></textarea>
+    <textarea id="modalPreviewPesan" rows="9" style="width:100%; background:#202C33 !important; color:#FFFFFF !important; border:1px solid #3B4A54 !important; border-radius:10px; padding:12px; font-size:12.5px; line-height:1.6; font-family:system-ui, -apple-system, sans-serif; resize:vertical; outline:none;" placeholder="Tulis isi pesan..."></textarea>
 
     <div style="display:flex; justify-content:space-between; align-items:center; margin-top:16px; border-top:1px solid #2A3942; padding-top:12px;">
-      <button type="button" class="btn btn-outline" onclick="closeModal('modalPreview')" style="color:#8696A0; border-color:#2A3942;">Tutup</button>
+      <button type="button" class="btn btn-outline" onclick="closeModal('modalPreview')" style="color:#8696A0; border-color:#2A3942; background:transparent;">Tutup</button>
       
       <div style="display:flex; gap:8px;" id="modalActionButtons">
-        <a href="#" target="_blank" class="btn btn-gold" id="btnModalDirectWa" style="background:#25D366; color:#FFFFFF; border:none; font-weight:800; text-decoration:none; padding:7px 16px; border-radius:6px; display:inline-flex; align-items:center; gap:6px; font-size:12px; box-shadow:0 2px 8px rgba(37,211,102,0.3);">
+        <a href="#" target="_blank" class="btn" id="btnModalDirectWa" style="background:#25D366; color:#FFFFFF; border:none; font-weight:800; text-decoration:none; padding:7px 16px; border-radius:6px; display:inline-flex; align-items:center; gap:6px; font-size:12px; box-shadow:0 2px 8px rgba(37,211,102,0.3);">
           <i class="bi bi-whatsapp"></i> Chat WhatsApp (Kirim Pesan)
         </a>
       </div>
@@ -958,14 +965,23 @@
 
   function previewPesanModal(notif) {
     document.getElementById('modalPreviewNama').innerText = notif.nama_ortu || (notif.siswa ? notif.siswa.nama : 'Penerima');
-    document.getElementById('modalPreviewTujuan').innerText = (notif.no_tujuan ? notif.no_tujuan + ' · ' : '') + (notif.kategori || '').replace(/_/g, ' ').toUpperCase();
+    document.getElementById('modalPreviewTujuan').innerText = (notif.kategori || '').replace(/_/g, ' ').toUpperCase();
     
     const textarea = document.getElementById('modalPreviewPesan');
     if (textarea) textarea.value = notif.pesan || '';
 
-    let clean = (notif.no_tujuan || '').replace(/[^0-9]/g, '');
-    if (clean.startsWith('0')) clean = '62' + clean.substr(1);
-    currentTargetPhone = clean;
+    // Ambil nomor target: no_tujuan, atau jika kosong coba dari siswa->no_hp_ortu, lalu siswa->no_hp_siswa
+    let rawPhone = (notif.no_tujuan && notif.no_tujuan !== '-') ? notif.no_tujuan : '';
+    if (!rawPhone && notif.siswa) {
+      if (notif.siswa.no_hp_ortu && notif.siswa.no_hp_ortu !== '-') {
+        rawPhone = notif.siswa.no_hp_ortu;
+      } else if (notif.siswa.no_hp_siswa && notif.siswa.no_hp_siswa !== '-') {
+        rawPhone = notif.siswa.no_hp_siswa;
+      }
+    }
+
+    const inputPhone = document.getElementById('modalPreviewInputPhone');
+    if (inputPhone) inputPhone.value = rawPhone;
 
     updateModalDirectWa();
     openModal('modalPreview');
@@ -975,18 +991,35 @@
     const textarea = document.getElementById('modalPreviewPesan');
     const btn = document.getElementById('btnModalDirectWa');
     const counter = document.getElementById('charCountPreview');
+    const inputPhone = document.getElementById('modalPreviewInputPhone');
+    const badge = document.getElementById('phoneNoticeBadge');
     const msg = textarea ? textarea.value : '';
 
     if (counter) counter.innerText = msg.length + ' karakter';
 
-    if (currentTargetPhone) {
-      btn.href = 'https://wa.me/' + currentTargetPhone + '?text=' + encodeURIComponent(msg);
+    let rawVal = inputPhone ? inputPhone.value.trim() : '';
+    let clean = rawVal.replace(/[^0-9]/g, '');
+    if (clean.startsWith('0')) clean = '62' + clean.substr(1);
+
+    if (badge) {
+      if (!clean) {
+        badge.style.display = 'inline-block';
+        badge.style.background = '#EF4444';
+        badge.style.color = '#FFFFFF';
+        badge.innerText = 'No. HP Belum Ada';
+      } else {
+        badge.style.display = 'none';
+      }
+    }
+
+    if (clean) {
+      btn.href = 'https://wa.me/' + clean + '?text=' + encodeURIComponent(msg);
       btn.style.pointerEvents = 'auto';
       btn.style.opacity = '1';
     } else {
       btn.href = '#';
       btn.style.pointerEvents = 'none';
-      btn.style.opacity = '0.5';
+      btn.style.opacity = '0.4';
     }
   }
 
