@@ -1207,15 +1207,6 @@
         <img src="{{ $ppdbImgUrl }}" alt="{{ $ppdbJudul }}" class="ppdb-bg-media">
         <div class="ppdb-scrim-overlay"></div>
 
-        @if(auth()->check() && (auth()->user()->isAdmin() || auth()->user()->isSuperAdmin()) && $ppdbBanner)
-            <a href="{{ route('admin.banner.edit', $ppdbBanner->id) }}" 
-               style="position: absolute; top: 16px; right: 16px; z-index: 5; background: rgba(15, 23, 42, 0.78); backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.25); color: #ffffff; padding: 6px 14px; border-radius: 8px; font-size: 0.78rem; font-weight: 700; display: inline-flex; align-items: center; gap: 6px; text-decoration: none; transition: all 0.2s;"
-               title="Ubah Latar Foto & Tulisan di Admin CMS">
-                <i class="fa-solid fa-pen-to-square" style="color: #60a5fa;"></i>
-                <span>Edit Banner PPDB</span>
-            </a>
-        @endif
-
         <div class="ppdb-content-relative">
             <div style="display: inline-flex; align-items: center; gap: 8px; background: rgba(255, 255, 255, 0.14); backdrop-filter: blur(8px); padding: 6px 16px; border-radius: 9999px; font-size: 0.76rem; font-weight: 800; margin-bottom: 18px; border: 1px solid rgba(255,255,255,0.25);">
                 <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #34d399; box-shadow: 0 0 0 2px rgba(52,211,153,0.3);"></span>
