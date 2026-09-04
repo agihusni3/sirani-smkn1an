@@ -268,6 +268,10 @@
           dataTransfer.items.add(croppedFile);
           fileInput.files = dataTransfer.files;
 
+          try {
+            fileInput.dispatchEvent(new CustomEvent('crop:success', { detail: { file: croppedFile, name: fileName } }));
+          } catch(evErr) {}
+
           setTimeout(() => {
             if (fileInput) {
               fileInput._isCroppedNow = false;

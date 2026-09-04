@@ -320,8 +320,31 @@
               <input type="text" name="no_hp" placeholder="08xxxxxxxxxx" style="width:100%; height:38px;" />
             </div>
             <div class="form-group" style="margin-bottom:0;">
-              <label style="margin-bottom:5px; font-weight:700; font-size:12px; color:var(--text-2);">Foto Profil Guru</label>
-              <input type="file" name="foto" accept="image/*" style="width:100%; height:38px;" />
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
+                <label style="margin:0; font-weight:700; font-size:12px; color:var(--text-2);">Foto Profil Guru</label>
+                <span style="font-size:10.5px; font-weight:700; color:var(--gold, #ca8a04); display:inline-flex; align-items:center; gap:3px;">
+                  <i class="bi bi-crop"></i> Auto-Crop Aktif
+                </span>
+              </div>
+              <input type="file" id="tambah_guru_foto_input" name="foto" accept="image/*" style="display:none;" onchange="handleGuruPhotoSelect(this, 'tambah_guru_foto_img', 'tambah_guru_foto_text', 'Potong Foto Profil GTK')" />
+              
+              <div onclick="document.getElementById('tambah_guru_foto_input').click()" 
+                   style="display:flex; align-items:center; gap:10px; height:38px; padding:3px 10px; background:var(--bg-3); border:1px solid var(--border-2); border-radius:var(--r-sm); cursor:pointer; transition:all 0.15s ease;"
+                   onmouseover="this.style.borderColor='var(--text)'; this.style.background='var(--surface)';"
+                   onmouseout="this.style.borderColor='var(--border-2)'; this.style.background='var(--bg-3)';">
+                <div style="width:28px; height:28px; border-radius:50%; border:1.5px solid var(--border-2); background:var(--bg-1); display:flex; align-items:center; justify-content:center; overflow:hidden; flex-shrink:0;">
+                  <img id="tambah_guru_foto_img" src="/img/user-default.png" style="width:100%; height:100%; object-fit:cover;" />
+                </div>
+                <div style="display:flex; align-items:center; gap:6px; flex:1; min-width:0;">
+                  <span class="btn btn-sm btn-outline" style="height:26px; padding:0 8px; font-size:11px; font-weight:700; display:inline-flex; align-items:center; gap:4px; pointer-events:none; flex-shrink:0; background:var(--surface);">
+                    <i class="bi bi-camera-fill"></i> Pilih Foto
+                  </span>
+                  <span id="tambah_guru_foto_text" style="font-size:11px; color:var(--text-3); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; flex:1;">
+                    Upload &amp; potong foto
+                  </span>
+                </div>
+                <i class="bi bi-crop" style="font-size:13px; color:var(--text-3); flex-shrink:0;" title="Fitur crop foto otomatis"></i>
+              </div>
             </div>
             <div class="form-group" style="grid-column: 1 / -1; margin-bottom:0;">
               <label style="margin-bottom:5px; font-weight:700; font-size:12px; color:var(--text-2);">Alamat Domisili Tempat Tinggal</label>
@@ -966,12 +989,31 @@
               </select>
             </div>
             <div>
-              <label class="form-label" style="font-weight:700; font-size:11.5px; margin-bottom:3px;">Ganti Foto Profil</label>
-              <div style="display:flex; align-items:center; gap:8px;">
-                <div style="width:34px; height:34px; border-radius:50%; border:1.5px solid var(--border-2); background:var(--bg-3); display:flex; align-items:center; justify-content:center; overflow:hidden; flex-shrink:0;">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:3px;">
+                <label class="form-label" style="font-weight:700; font-size:11.5px; margin:0;">Ganti Foto Profil</label>
+                <span style="font-size:10px; font-weight:700; color:var(--gold, #ca8a04); display:inline-flex; align-items:center; gap:3px;">
+                  <i class="bi bi-crop"></i> Auto-Crop Aktif
+                </span>
+              </div>
+              <input type="file" id="edit_guru_foto_input" name="foto" accept="image/*" style="display:none;" 
+                onchange="handleGuruPhotoSelect(this, 'edit_guru_foto_img', 'edit_guru_foto_text', 'Potong Foto Profil Guru')" />
+              
+              <div onclick="document.getElementById('edit_guru_foto_input').click()" 
+                   style="display:flex; align-items:center; gap:8px; height:34px; padding:3px 10px; background:var(--bg-3); border:1px solid var(--border-2); border-radius:var(--r-sm); cursor:pointer; transition:all 0.15s ease;"
+                   onmouseover="this.style.borderColor='var(--text)'; this.style.background='var(--surface)';"
+                   onmouseout="this.style.borderColor='var(--border-2)'; this.style.background='var(--bg-3)';">
+                <div style="position:relative; width:26px; height:26px; border-radius:50%; border:1.5px solid var(--border-2); background:var(--bg-1); display:flex; align-items:center; justify-content:center; overflow:hidden; flex-shrink:0;">
                   <img id="edit_guru_foto_img" src="/img/user-default.png" style="width:100%; height:100%; object-fit:cover;" />
                 </div>
-                <input type="file" name="foto" accept="image/*" class="input-field" style="flex:1; height:34px; font-size:11px; padding:3px 6px;" />
+                <div style="display:flex; align-items:center; gap:6px; flex:1; min-width:0;">
+                  <span class="btn btn-sm btn-outline" style="height:24px; padding:0 8px; font-size:11px; font-weight:700; display:inline-flex; align-items:center; gap:4px; pointer-events:none; flex-shrink:0; background:var(--surface);">
+                    <i class="bi bi-camera-fill"></i> Pilih Foto
+                  </span>
+                  <span id="edit_guru_foto_text" style="font-size:11px; color:var(--text-3); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; flex:1;">
+                    Ganti &amp; potong foto
+                  </span>
+                </div>
+                <i class="bi bi-crop" style="font-size:12px; color:var(--text-3); flex-shrink:0;" title="Fitur crop foto otomatis"></i>
               </div>
             </div>
           </div>
@@ -1317,6 +1359,14 @@
     if (imgPreview) {
       imgPreview.src = guru.foto_url || '/img/user-default.png';
     }
+    const editFotoInput = document.getElementById('edit_guru_foto_input');
+    if (editFotoInput) editFotoInput.value = '';
+    const editFotoText = document.getElementById('edit_guru_foto_text');
+    if (editFotoText) {
+      editFotoText.innerText = 'Ganti & potong foto';
+      editFotoText.style.color = 'var(--text-3)';
+      editFotoText.style.fontWeight = 'normal';
+    }
 
     // Set hari mengajar checkboxes
     const hariList = (guru.hari_mengajar && Array.isArray(guru.hari_mengajar)) ? guru.hari_mengajar : ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat'];
@@ -1433,7 +1483,49 @@
 
   function openModal(id) { document.getElementById(id).classList.add('active'); }
   function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+
+  function handleGuruPhotoSelect(input, previewId, labelId, title) {
+    if (!input.files || !input.files[0]) return;
+    const file = input.files[0];
+    const label = document.getElementById(labelId);
+    if (label) {
+      label.innerText = file.name;
+      label.style.color = 'var(--text)';
+      label.style.fontWeight = '600';
+    }
+    if (typeof initPhotoCrop === 'function') {
+      initPhotoCrop(input, previewId, '1:1', title);
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', function() {
+    const editInput = document.getElementById('edit_guru_foto_input');
+    if (editInput) {
+      editInput.addEventListener('crop:success', function(e) {
+        const label = document.getElementById('edit_guru_foto_text');
+        if (label) {
+          label.innerText = '✓ Foto dicrop (' + (e.detail?.name || 'siap simpan') + ')';
+          label.style.color = '#10b981';
+          label.style.fontWeight = '700';
+        }
+      });
+    }
+
+    const tambahInput = document.getElementById('tambah_guru_foto_input');
+    if (tambahInput) {
+      tambahInput.addEventListener('crop:success', function(e) {
+        const label = document.getElementById('tambah_guru_foto_text');
+        if (label) {
+          label.innerText = '✓ Foto dicrop (' + (e.detail?.name || 'siap simpan') + ')';
+          label.style.color = '#10b981';
+          label.style.fontWeight = '700';
+        }
+      });
+    }
+  });
 </script>
+
+@include('partials.crop_modal')
 
 @if($isAdmin || $isStafTu)
   @include('partials.rfid_pair_modal')
