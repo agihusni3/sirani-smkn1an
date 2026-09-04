@@ -280,9 +280,15 @@
                     <td>: {{ $pendaftar->nama_ibu ?: '-' }} {{ $pendaftar->pekerjaan_ibu ? '(' . $pendaftar->pekerjaan_ibu . ')' : '' }}</td>
                 </tr>
                 <tr>
-                    <td>Nomor Kontak / WhatsApp</td>
+                    <td>WhatsApp Siswa (Notifikasi)</td>
+                    <td>: <strong>{{ $pendaftar->no_hp_siswa ?: ($pendaftar->no_hp_ortu ?: '-') }}</strong></td>
+                </tr>
+                @if($pendaftar->no_hp_ortu && $pendaftar->no_hp_ortu !== $pendaftar->no_hp_siswa)
+                <tr>
+                    <td>WhatsApp Orang Tua</td>
                     <td>: {{ $pendaftar->no_hp_ortu }}</td>
                 </tr>
+                @endif
             </table>
         </div>
 

@@ -95,7 +95,7 @@
               <td style="padding:6px 0;"><span class="badge" style="background:#e0e7ff; color:#3730a3; padding:3px 8px; border-radius:4px;">{{ $pendaftar->organisasi_minat ?: '-' }}</span></td>
             </tr>
             <tr>
-              <td style="padding:6px 0; color:var(--text-3);">No. WhatsApp Siswa</td>
+              <td style="padding:6px 0; color:var(--text-3);">No. WhatsApp Siswa (Notifikasi Seleksi)</td>
               <td style="padding:6px 0;">
                 @if($pendaftar->no_hp_siswa)
                   {{ $pendaftar->no_hp_siswa }}
@@ -186,15 +186,18 @@
             </div>
           </div>
 
-          {{-- Kontak Notifikasi Utama --}}
-          <div style="background:rgba(245, 158, 11, 0.08); border:1px solid rgba(245, 158, 11, 0.25); border-radius:6px; padding:10px 14px; display:flex; justify-content:space-between; align-items:center; font-size:12px;">
+          {{-- Kontak Notifikasi Siswa --}}
+          <div style="background:rgba(37, 99, 235, 0.06); border:1px solid rgba(37, 99, 235, 0.2); border-radius:6px; padding:10px 14px; display:flex; justify-content:space-between; align-items:center; font-size:12px;">
             <div>
-              <span style="color:var(--text-3);">Kontak Utama Notifikasi PPDB:</span>
-              <strong style="margin-left:6px;">{{ $pendaftar->no_hp_ortu }}</strong>
+              <span style="color:var(--text-3);">No. WhatsApp Siswa (Tujuan Notifikasi Seleksi / Kelulusan):</span>
+              <strong style="margin-left:6px; color:#2563eb;">{{ $pendaftar->no_hp_siswa ?: ($pendaftar->no_hp_ortu ?: '-') }}</strong>
             </div>
-            @if($pendaftar->no_hp_ortu)
-              <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $pendaftar->no_hp_ortu) }}" target="_blank" class="btn btn-sm" style="background:#16a34a; color:#fff; font-size:11px; padding:4px 10px; border-radius:4px; text-decoration:none;">
-                <i class="bi bi-whatsapp"></i> Hubungi WhatsApp Utama
+            @php
+              $targetWa = $pendaftar->no_hp_siswa ?: $pendaftar->no_hp_ortu;
+            @endphp
+            @if($targetWa)
+              <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $targetWa) }}" target="_blank" class="btn btn-sm" style="background:#16a34a; color:#fff; font-size:11px; padding:4px 10px; border-radius:4px; text-decoration:none;">
+                <i class="bi bi-whatsapp"></i> Chat WhatsApp Siswa
               </a>
             @endif
           </div>

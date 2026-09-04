@@ -9,9 +9,9 @@
     <!-- Breadcrumb -->
     <div style="margin-bottom: 24px; display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: var(--text-muted);">
         <a href="{{ route('web.beranda') }}" style="color: var(--brand-blue); font-weight: 600;">Beranda</a>
-        <i class="fa-solid fa-chevron-right" style="font-size: 0.7rem;"></i>
+        <span style="font-size: 0.85rem;">/</span>
         <a href="{{ route('ppdb.index') }}" style="color: var(--brand-blue); font-weight: 600;">PPDB 2026</a>
-        <i class="fa-solid fa-chevron-right" style="font-size: 0.7rem;"></i>
+        <span style="font-size: 0.85rem;">/</span>
         <span style="color: var(--text-dark); font-weight: 700;">Formulir Pendaftaran</span>
     </div>
 
@@ -28,8 +28,8 @@
 
         @if($errors->any())
             <div style="background: #fef2f2; border: 1px solid #fecaca; border-radius: var(--radius-sm); padding: 18px 20px; margin-bottom: 28px;">
-                <div style="font-size: 0.92rem; font-weight: 700; color: #b91c1c; display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
-                    <i class="fa-solid fa-circle-exclamation"></i> Terdapat kendala pada data formulir Anda:
+                <div style="font-size: 0.92rem; font-weight: 700; color: #b91c1c; margin-bottom: 8px;">
+                    Terdapat kendala pada data formulir Anda:
                 </div>
                 <ul style="color: #991b1b; font-size: 0.88rem; padding-left: 20px; line-height: 1.6;">
                     @foreach($errors->all() as $error)
@@ -174,6 +174,13 @@
                         </label>
                         <input type="number" name="tahun_lulus" value="{{ old('tahun_lulus', date('Y')) }}" required min="2020" max="{{ date('Y') + 1 }}" style="width: 100%; padding: 11px 14px; font-size: 0.9rem;">
                     </div>
+
+                    <div style="grid-column: 1 / -1;">
+                        <label style="display: block; font-size: 0.85rem; font-weight: 700; color: var(--text-dark); margin-bottom: 8px;">
+                            Nomor WhatsApp Siswa (Penerima Notifikasi Hasil Seleksi / Kelulusan) <span style="color: #ef4444;">*</span>
+                        </label>
+                        <input type="text" name="no_hp_siswa" value="{{ old('no_hp_siswa') }}" required placeholder="08xxxxxxxxxx (Pengumuman diterima / tidak akan dikirim langsung ke nomor WhatsApp ini)" style="width: 100%; padding: 11px 14px; font-size: 0.9rem;">
+                    </div>
                 </div>
 
                 <div style="margin-top: 18px;">
@@ -187,38 +194,35 @@
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 18px; margin-top: 18px; padding-top: 18px; border-top: 1px dashed var(--border-main);">
                     <div>
                         <label style="display: block; font-size: 0.85rem; font-weight: 700; color: var(--text-dark); margin-bottom: 8px;">
-                            <i class="fa-solid fa-heart" style="color: #ef4444; margin-right: 6px;"></i> Hobi Calon Siswa
+                            Hobi Calon Siswa
                         </label>
                         <input type="text" name="hobi" value="{{ old('hobi') }}" placeholder="Contoh: Membaca, Sepak Bola, Komputer, Musik, dll." style="width: 100%; padding: 11px 14px; font-size: 0.9rem;">
                     </div>
 
                     <div>
                         <label style="display: block; font-size: 0.85rem; font-weight: 700; color: var(--text-dark); margin-bottom: 8px;">
-                            <i class="fa-solid fa-users-gear" style="color: var(--brand-blue); margin-right: 6px;"></i> Organisasi yang Diminati
+                            Organisasi yang Diminati
                         </label>
                         <input type="text" name="organisasi_minat" value="{{ old('organisasi_minat') }}" placeholder="Contoh: OSIS, Pramuka, PMR, Paskibra, Rohis, Seni, Olahraga" style="width: 100%; padding: 11px 14px; font-size: 0.9rem;">
                     </div>
                 </div>
             </div>
 
-            <!-- 3. DATA ORANG TUA & KONTAK -->
+            <!-- 3. DATA ORANG TUA -->
             <div style="margin-bottom: 36px; padding-top: 24px; border-top: 1px solid var(--border-main);">
                 <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 18px;">
                     <span style="width: 28px; height: 28px; border-radius: 50%; background: var(--brand-amber); color: white; display: inline-flex; align-items: center; justify-content: center; font-size: 0.85rem; font-weight: 800;">3</span>
                     <h3 style="font-size: 1.15rem; font-weight: 800; color: var(--text-dark);">
-                        Data Orang Tua (Ayah & Ibu) & WhatsApp
+                        Data Orang Tua (Ayah & Ibu)
                     </h3>
                 </div>
 
                 {{-- DUA KARTU: DATA AYAH & DATA IBU --}}
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; margin-bottom: 20px;">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px;">
                     
                     {{-- KARTU DATA AYAH KANDUNG --}}
                     <div style="background: var(--bg-surface-alt, #f8fafc); border: 1px solid var(--border-main); border-radius: var(--radius-sm); padding: 18px;">
-                        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 14px; padding-bottom: 10px; border-bottom: 1px solid var(--border-main);">
-                            <span style="width: 24px; height: 24px; border-radius: 6px; background: rgba(37, 99, 235, 0.12); color: #2563eb; display: inline-flex; align-items: center; justify-content: center; font-size: 0.85rem;">
-                                <i class="fa-solid fa-user-tie"></i>
-                            </span>
+                        <div style="margin-bottom: 14px; padding-bottom: 10px; border-bottom: 1px solid var(--border-main);">
                             <h4 style="font-size: 0.95rem; font-weight: 800; color: var(--text-dark); margin: 0;">Data Ayah Kandung</h4>
                         </div>
 
@@ -265,7 +269,7 @@
 
                             <div>
                                 <label style="display: block; font-size: 0.82rem; font-weight: 700; color: var(--text-dark); margin-bottom: 6px;">
-                                    Nomor WhatsApp / HP Ayah
+                                    Nomor WhatsApp / HP Ayah (Opsional)
                                 </label>
                                 <input type="text" name="no_hp_ayah" value="{{ old('no_hp_ayah') }}" placeholder="08xxxxxxxxxx" style="width: 100%; padding: 10px 12px; font-size: 0.88rem;">
                             </div>
@@ -274,10 +278,7 @@
 
                     {{-- KARTU DATA IBU KANDUNG --}}
                     <div style="background: var(--bg-surface-alt, #f8fafc); border: 1px solid var(--border-main); border-radius: var(--radius-sm); padding: 18px;">
-                        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 14px; padding-bottom: 10px; border-bottom: 1px solid var(--border-main);">
-                            <span style="width: 24px; height: 24px; border-radius: 6px; background: rgba(236, 72, 153, 0.12); color: #ec4899; display: inline-flex; align-items: center; justify-content: center; font-size: 0.85rem;">
-                                <i class="fa-solid fa-person-dress"></i>
-                            </span>
+                        <div style="margin-bottom: 14px; padding-bottom: 10px; border-bottom: 1px solid var(--border-main);">
                             <h4 style="font-size: 0.95rem; font-weight: 800; color: var(--text-dark); margin: 0;">Data Ibu Kandung</h4>
                         </div>
 
@@ -324,29 +325,11 @@
 
                             <div>
                                 <label style="display: block; font-size: 0.82rem; font-weight: 700; color: var(--text-dark); margin-bottom: 6px;">
-                                    Nomor WhatsApp / HP Ibu
+                                    Nomor WhatsApp / HP Ibu (Opsional)
                                 </label>
                                 <input type="text" name="no_hp_ibu" value="{{ old('no_hp_ibu') }}" placeholder="08xxxxxxxxxx" style="width: 100%; padding: 10px 12px; font-size: 0.88rem;">
                             </div>
                         </div>
-                    </div>
-                </div>
-
-                {{-- KONTAK UTAMA NOTIFIKASI & SISWA --}}
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 18px; background: rgba(245, 158, 11, 0.06); border: 1px solid rgba(245, 158, 11, 0.2); border-radius: var(--radius-sm); padding: 16px;">
-                    <div>
-                        <label style="display: block; font-size: 0.85rem; font-weight: 700; color: var(--text-dark); margin-bottom: 6px;">
-                            <i class="fa-brands fa-whatsapp" style="color: #10b981; margin-right: 6px;"></i> Nomor WhatsApp Utama Notifikasi Kelulusan <span style="color: #ef4444;">*</span>
-                        </label>
-                        <input type="text" name="no_hp_ortu" value="{{ old('no_hp_ortu') }}" required placeholder="08xxxxxxxxxx (Nomor aktif untuk info PPDB)" style="width: 100%; padding: 11px 14px; font-size: 0.9rem; background: #fff;">
-                        <span style="display: block; font-size: 0.74rem; color: var(--text-muted); margin-top: 4px;">Dapat diisi nomor HP/WA Ayah, Ibu, atau Wali yang paling sering aktif.</span>
-                    </div>
-
-                    <div>
-                        <label style="display: block; font-size: 0.85rem; font-weight: 700; color: var(--text-dark); margin-bottom: 6px;">
-                            <i class="fa-solid fa-mobile-screen-button" style="color: var(--brand-blue); margin-right: 6px;"></i> Nomor WhatsApp Calon Siswa (Pribadi)
-                        </label>
-                        <input type="text" name="no_hp_siswa" value="{{ old('no_hp_siswa') }}" placeholder="08xxxxxxxxxx (Opsional jika siswa memiliki HP)" style="width: 100%; padding: 11px 14px; font-size: 0.9rem; background: #fff;">
                     </div>
                 </div>
             </div>
@@ -363,7 +346,7 @@
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 18px;">
                     <div style="background: var(--bg-surface-alt); border: 1.5px dashed var(--border-main); border-radius: var(--radius-sm); padding: 18px;">
                         <label style="display: block; font-size: 0.88rem; font-weight: 700; color: var(--text-dark); margin-bottom: 4px;">
-                            <i class="fa-regular fa-image" style="color: var(--brand-blue); margin-right: 6px;"></i> Pas Foto 3x4
+                            Pas Foto 3x4
                         </label>
                         <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 12px;">Format JPG/PNG, Maksimal 2MB</p>
                         <input type="file" name="pas_foto" accept="image/*" style="font-size: 0.82rem; color: var(--text-body);">
@@ -371,7 +354,7 @@
 
                     <div style="background: var(--bg-surface-alt); border: 1.5px dashed var(--border-main); border-radius: var(--radius-sm); padding: 18px;">
                         <label style="display: block; font-size: 0.88rem; font-weight: 700; color: var(--text-dark); margin-bottom: 4px;">
-                            <i class="fa-regular fa-file" style="color: var(--brand-emerald); margin-right: 6px;"></i> Scan Kartu Keluarga (KK)
+                            Scan Kartu Keluarga (KK)
                         </label>
                         <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 12px;">Format PDF/JPG, Maksimal 3MB</p>
                         <input type="file" name="scan_kk" accept="image/*,application/pdf" style="font-size: 0.82rem; color: var(--text-body);">
@@ -379,7 +362,7 @@
 
                     <div style="background: var(--bg-surface-alt); border: 1.5px dashed var(--border-main); border-radius: var(--radius-sm); padding: 18px;">
                         <label style="display: block; font-size: 0.88rem; font-weight: 700; color: var(--text-dark); margin-bottom: 4px;">
-                            <i class="fa-solid fa-graduation-cap" style="color: var(--brand-amber); margin-right: 6px;"></i> Scan SKL / Ijazah SMP
+                            Scan SKL / Ijazah SMP
                         </label>
                         <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 12px;">Format PDF/JPG, Maksimal 3MB</p>
                         <input type="file" name="scan_ijazah_skl" accept="image/*,application/pdf" style="font-size: 0.82rem; color: var(--text-body);">
@@ -387,7 +370,7 @@
 
                     <div style="background: var(--bg-surface-alt); border: 1.5px dashed var(--border-main); border-radius: var(--radius-sm); padding: 18px;">
                         <label style="display: block; font-size: 0.88rem; font-weight: 700; color: var(--text-dark); margin-bottom: 4px;">
-                            <i class="fa-regular fa-id-card" style="color: #6366f1; margin-right: 6px;"></i> Scan KTP Orang Tua (1 Saja)
+                            Scan KTP Orang Tua (1 Saja)
                         </label>
                         <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 12px;">KTP Ayah / Ibu / Wali (JPG/PDF, Maks 3MB)</p>
                         <input type="file" name="scan_ktp_ortu" accept="image/*,application/pdf" style="font-size: 0.82rem; color: var(--text-body);">
@@ -395,7 +378,7 @@
 
                     <div style="background: var(--bg-surface-alt); border: 1.5px dashed var(--border-main); border-radius: var(--radius-sm); padding: 18px;">
                         <label style="display: block; font-size: 0.88rem; font-weight: 700; color: var(--text-dark); margin-bottom: 4px;">
-                            <i class="fa-regular fa-file-lines" style="color: #0d9488; margin-right: 6px;"></i> Scan Akta Kelahiran
+                            Scan Akta Kelahiran
                         </label>
                         <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 12px;">Format PDF/JPG, Maksimal 3MB</p>
                         <input type="file" name="scan_akta" accept="image/*,application/pdf" style="font-size: 0.82rem; color: var(--text-body);">
@@ -403,7 +386,7 @@
 
                     <div style="background: var(--bg-surface-alt); border: 1.5px dashed var(--border-main); border-radius: var(--radius-sm); padding: 18px;">
                         <label style="display: block; font-size: 0.88rem; font-weight: 700; color: var(--text-dark); margin-bottom: 4px;">
-                            <i class="fa-solid fa-id-card-clip" style="color: #ea580c; margin-right: 6px;"></i> Scan Kartu Indonesia Pintar (KIP)
+                            Scan Kartu Indonesia Pintar (KIP)
                         </label>
                         <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 12px;">KIP / PIP (Opsional / Jalur Afirmasi, Maks 3MB)</p>
                         <input type="file" name="scan_kip" accept="image/*,application/pdf" style="font-size: 0.82rem; color: var(--text-body);">
@@ -411,7 +394,7 @@
 
                     <div style="background: var(--bg-surface-alt); border: 1.5px dashed var(--border-main); border-radius: var(--radius-sm); padding: 18px;">
                         <label style="display: block; font-size: 0.88rem; font-weight: 700; color: var(--text-dark); margin-bottom: 4px;">
-                            <i class="fa-solid fa-file-shield" style="color: #dc2626; margin-right: 6px;"></i> Scan Surat Ket. Tidak Mampu (SKTM)
+                            Scan Surat Ket. Tidak Mampu (SKTM)
                         </label>
                         <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 12px;">Dari Kelurahan / Pekon (Opsional / Afirmasi, Maks 3MB)</p>
                         <input type="file" name="scan_sktm" accept="image/*,application/pdf" style="font-size: 0.82rem; color: var(--text-body);">
@@ -422,10 +405,10 @@
             <!-- Tombol Kirim -->
             <div style="padding-top: 24px; border-top: 1px solid var(--border-main); display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 16px;">
                 <div style="font-size: 0.85rem; color: var(--text-muted);">
-                    <i class="fa-solid fa-shield-halved" style="color: var(--brand-emerald);"></i> Seluruh data terenkripsi dan disimpan di server mandiri sekolah.
+                    Seluruh data terenkripsi dan disimpan di server mandiri sekolah.
                 </div>
                 <button type="submit" class="btn-industrial btn-industrial-primary" style="padding: 13px 36px; font-size: 0.95rem;">
-                    <i class="fa-solid fa-paper-plane"></i> Kirim Formulir Pendaftaran
+                    Kirim Formulir Pendaftaran
                 </button>
             </div>
         </form>
