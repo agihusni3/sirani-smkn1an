@@ -365,10 +365,11 @@
               <input type="text" name="nuptk" maxlength="16" placeholder="Nomor Unik Pendidik 16 Digit" style="width:100%; height:38px;" />
             </div>
             <div class="form-group" style="margin-bottom:0;">
-              <label style="margin-bottom:5px; font-weight:700; font-size:12px; color:var(--text-2);">Jenis PTK <span style="color:var(--red);">*</span></label>
+              <label style="margin-bottom:5px; font-weight:700; font-size:12px; color:var(--text-2);">Jenis PTK (Opsional)</label>
               <select name="jenis_ptk" style="width:100%; height:38px;" class="input-field">
+                <option value="">-- Pilih Jenis PTK (Opsional) --</option>
                 <option value="Guru Kejuruan / Produktif">Guru Kejuruan / Produktif</option>
-                <option value="Guru Normatif / Adaptif">Guru Normatif / Adaptif</option>
+                <option value="Guru Normatif / Adaptif">Guru Normatif / Adaptif (Umum)</option>
                 <option value="Guru BK">Guru BK (Bimbingan Konseling)</option>
                 <option value="Kepala Sekolah">Kepala Sekolah</option>
                 <option value="Tenaga Administrasi Sekolah (TU)">Tenaga Administrasi Sekolah (TU)</option>
@@ -671,11 +672,6 @@
                   @elseif($g->mapel_diampu)
                     <div style="font-size:11px; color:var(--text-2); margin-top:2px;">
                       Mapel: <strong>{{ $g->mapel_diampu }}</strong> {{ $g->jjm ? '(' . $g->jjm . ' JP)' : '' }}
-                    </div>
-                  @endif
-                  @if($g->jenis_ptk)
-                    <div style="font-size:10.5px; color:var(--text-3); margin-top:3px;">
-                      {{ $g->jenis_ptk }}
                     </div>
                   @endif
                 </td>
@@ -1028,10 +1024,11 @@
               <input type="text" id="edit_guru_nuptk" name="nuptk" maxlength="16" class="input-field" style="width:100%; height:34px; font-size:12px;" />
             </div>
             <div>
-              <label class="form-label" style="font-weight:700; font-size:11.5px; margin-bottom:3px;">Jenis PTK <span style="color:var(--red);">*</span></label>
+              <label class="form-label" style="font-weight:700; font-size:11.5px; margin-bottom:3px;">Jenis PTK (Opsional)</label>
               <select id="edit_guru_jenis_ptk" name="jenis_ptk" class="input-field" style="width:100%; height:34px; font-size:12px;">
+                <option value="">-- Pilih Jenis PTK (Opsional) --</option>
                 <option value="Guru Kejuruan / Produktif">Guru Kejuruan / Produktif</option>
-                <option value="Guru Normatif / Adaptif">Guru Normatif / Adaptif</option>
+                <option value="Guru Normatif / Adaptif">Guru Normatif / Adaptif (Umum)</option>
                 <option value="Guru BK">Guru BK (Bimbingan Konseling)</option>
                 <option value="Kepala Sekolah">Kepala Sekolah</option>
                 <option value="Tenaga Administrasi Sekolah (TU)">Tenaga Administrasi Sekolah (TU)</option>
@@ -1327,7 +1324,7 @@
 
     document.getElementById('edit_guru_jabatan').value = guru.jabatan || '';
     document.getElementById('edit_guru_jenis_kepegawaian').value = guru.jenis_kepegawaian || 'pns';
-    document.getElementById('edit_guru_jenis_ptk').value = guru.jenis_ptk || 'Guru Kejuruan / Produktif';
+    document.getElementById('edit_guru_jenis_ptk').value = guru.jenis_ptk || '';
     document.getElementById('edit_guru_golongan_pangkat').value = guru.golongan_pangkat || '';
     document.getElementById('edit_guru_nomor_sk_pengangkatan').value = guru.nomor_sk_pengangkatan || '';
     document.getElementById('edit_guru_tmt_kerja').value = guru.tmt_kerja ? guru.tmt_kerja.substring(0, 10) : '';
