@@ -846,57 +846,255 @@
             }
         }
 
-        /* Footer */
+        /* ── Clean Light Minimalist Footer ── */
         .site-footer {
             margin-top: 100px;
-            background: #090d16;
-            color: #94a3b8;
-            border-top: 1px solid rgba(255, 255, 255, 0.08);
-            padding: 70px 0 30px 0;
+            background: #ffffff;
+            color: #475569;
+            border-top: 1px solid #e2e8f0;
+            box-shadow: 0 -4px 20px -5px rgba(15, 23, 42, 0.03);
+            padding: 70px 0 32px 0;
+            position: relative;
+        }
+
+        .site-footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #1e3a8a 0%, #2563eb 50%, #38bdf8 100%);
         }
 
         .footer-grid {
             display: grid;
-            grid-template-columns: 2fr 1fr 1fr 1.2fr;
-            gap: 40px;
+            grid-template-columns: 2fr 1fr 1fr 1.3fr;
+            gap: 48px;
             margin-bottom: 50px;
         }
 
-        .footer-col h3 {
+        .footer-brand-title {
+            font-size: 1.12rem;
+            font-weight: 800;
+            color: #0f172a;
+            letter-spacing: -0.01em;
+            line-height: 1.25;
+        }
+
+        .footer-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #f1f5f9;
+            color: #334155;
+            padding: 3px 10px;
+            border-radius: 9999px;
+            font-size: 0.72rem;
+            font-weight: 600;
+            border: 1px solid #e2e8f0;
+            margin-top: 4px;
+        }
+
+        .footer-badge .status-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #10b981;
+            box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
+        }
+
+        .footer-desc {
             font-size: 0.88rem;
-            font-weight: 700;
+            color: #64748b;
+            line-height: 1.65;
+            margin-top: 14px;
+            margin-bottom: 22px;
+        }
+
+        .footer-social-links {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .footer-social-btn {
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            color: #64748b;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.95rem;
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            text-decoration: none;
+        }
+
+        .footer-social-btn:hover {
+            transform: translateY(-3px);
+        }
+
+        .footer-social-btn.fb:hover {
+            background: #1877f2;
             color: #ffffff;
+            border-color: #1877f2;
+            box-shadow: 0 8px 16px -3px rgba(24, 119, 242, 0.35);
+        }
+
+        .footer-social-btn.ig:hover {
+            background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
+            color: #ffffff;
+            border-color: transparent;
+            box-shadow: 0 8px 16px -3px rgba(220, 39, 67, 0.35);
+        }
+
+        .footer-social-btn.yt:hover {
+            background: #ef4444;
+            color: #ffffff;
+            border-color: #ef4444;
+            box-shadow: 0 8px 16px -3px rgba(239, 68, 68, 0.35);
+        }
+
+        .footer-col h3 {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #0f172a;
             text-transform: uppercase;
             letter-spacing: 0.06em;
             margin-bottom: 18px;
+            position: relative;
+            padding-bottom: 8px;
+        }
+
+        .footer-col h3::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 24px;
+            height: 2px;
+            background: var(--brand-blue);
+            border-radius: 2px;
         }
 
         .footer-col ul {
             list-style: none;
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 12px;
             font-size: 0.88rem;
+            padding: 0;
+            margin: 0;
         }
 
         .footer-col ul li a {
+            color: #64748b;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+
+        .footer-col ul li a::before {
+            content: '›';
+            font-size: 1.1rem;
+            line-height: 1;
             color: #94a3b8;
-            transition: var(--transition);
+            transition: transform 0.2s ease, color 0.2s ease;
         }
 
         .footer-col ul li a:hover {
+            color: var(--brand-blue);
+            transform: translateX(4px);
+        }
+
+        .footer-col ul li a:hover::before {
+            color: var(--brand-blue);
+        }
+
+        .footer-contact-list {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .footer-contact-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            font-size: 0.86rem;
+            color: #475569;
+            line-height: 1.55;
+        }
+
+        .footer-contact-icon {
+            width: 32px;
+            height: 32px;
+            flex-shrink: 0;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+        }
+
+        .footer-contact-icon.geo { background: #fef2f2; color: #ef4444; }
+        .footer-contact-icon.tel { background: #eff6ff; color: #2563eb; }
+        .footer-contact-icon.mail { background: #fffbeb; color: #d97706; }
+
+        .footer-helpdesk-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            background: #ecfdf5;
+            border: 1px solid #a7f3d0;
+            color: #047857;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            text-decoration: none;
+            margin-top: 6px;
+            transition: all 0.2s ease;
+        }
+
+        .footer-helpdesk-btn:hover {
+            background: #059669;
             color: #ffffff;
-            padding-left: 4px;
+            border-color: #059669;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px -2px rgba(5, 150, 105, 0.25);
         }
 
         .footer-bottom-bar {
-            border-top: 1px solid rgba(255, 255, 255, 0.06);
+            border-top: 1px solid #f1f5f9;
             padding-top: 24px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-size: 0.8rem;
+            font-size: 0.82rem;
             color: #64748b;
+        }
+
+        .footer-bottom-bar strong {
+            color: #1e293b;
+            font-weight: 600;
+        }
+
+        .footer-badge-sys {
+            background: #f1f5f9;
+            border: 1px solid #e2e8f0;
+            color: #475569;
+            font-size: 0.72rem;
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: 4px;
+            margin-left: 6px;
         }
 
         /* ── Responsive Media Queries ── */
@@ -1368,35 +1566,38 @@
         @yield('content')
     </main>
 
-    <!-- 3. Clean Architectural Footer -->
+    <!-- 3. Clean Light Minimalist Footer -->
     <footer class="site-footer">
         <div class="container">
             <div class="footer-grid">
                 <div>
-                    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 14px;">
-                        <img src="{{ asset('logo.png') }}" alt="Logo" style="width: 44px; height: 44px; object-fit: contain;">
+                    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+                        <img src="{{ asset('logo.png') }}" alt="Logo SMK" style="width: 44px; height: 44px; object-fit: contain;">
                         <div>
-                            <h2 style="font-size: 1.15rem; font-weight: 800; color: #ffffff;">SMK NEGERI 1 AIR NANINGAN</h2>
-                            <p style="font-size: 0.75rem; color: #64748b; margin: 0;">NPSN: {{ $sekolah->npsn ?? '69888999' }} • Akreditasi B</p>
+                            <div class="footer-brand-title">SMK NEGERI 1 AIR NANINGAN</div>
+                            <div class="footer-badge">
+                                <span class="status-dot"></span>
+                                <span>Akreditasi B • NPSN: {{ $sekolah->npsn ?? '69888999' }}</span>
+                            </div>
                         </div>
                     </div>
-                    <p style="font-size: 0.88rem; color: #94a3b8; line-height: 1.6; margin-bottom: 20px;">
-                        Lembaga pendidikan kejuruan negeri terakreditasi di Kabupaten Tanggamus, berdedikasi melatih tenaga kerja terampil siap kerja berstandar industri dan mencetak wirausahawan mandiri.
+                    <p class="footer-desc">
+                        Lembaga pendidikan kejuruan vokasi negeri unggulan di Kabupaten Tanggamus, berdedikasi melatih tenaga kerja terampil siap kerja berstandar industri dan mencetak wirausahawan mandiri.
                     </p>
-                    <div style="display: flex; gap: 10px;">
-                        <a href="#" style="width: 36px; height: 36px; border-radius: 8px; background: rgba(255,255,255,0.06); display: flex; align-items: center; justify-content: center; color: #cbd5e1;"><i class="fa-brands fa-facebook-f"></i></a>
-                        <a href="#" style="width: 36px; height: 36px; border-radius: 8px; background: rgba(255,255,255,0.06); display: flex; align-items: center; justify-content: center; color: #cbd5e1;"><i class="fa-brands fa-instagram"></i></a>
-                        <a href="#" style="width: 36px; height: 36px; border-radius: 8px; background: rgba(255,255,255,0.06); display: flex; align-items: center; justify-content: center; color: #cbd5e1;"><i class="fa-brands fa-youtube"></i></a>
+                    <div class="footer-social-links">
+                        <a href="https://facebook.com" target="_blank" rel="noopener" class="footer-social-btn fb" title="Facebook SMKN 1 Air Naningan"><i class="fa-brands fa-facebook-f"></i></a>
+                        <a href="https://instagram.com" target="_blank" rel="noopener" class="footer-social-btn ig" title="Instagram SMKN 1 Air Naningan"><i class="fa-brands fa-instagram"></i></a>
+                        <a href="https://youtube.com" target="_blank" rel="noopener" class="footer-social-btn yt" title="YouTube SMKN 1 Air Naningan"><i class="fa-brands fa-youtube"></i></a>
                     </div>
                 </div>
 
                 <div class="footer-col">
-                    <h3>Program Rekayasa</h3>
+                    <h3>Program Kejuruan</h3>
                     <ul>
                         <li><a href="{{ route('web.jurusan.show', 'rpl') }}">Rekayasa Perangkat Lunak (RPL)</a></li>
-                        <li><a href="{{ route('web.jurusan.show', 'aphp') }}">Agribisnis Pengolahan Hasil Pertanian (APHP)</a></li>
-                        <li><a href="{{ route('web.jurusan.show', 'tsm') }}">Teknik &amp; Bisnis Sepeda Motor (TSM)</a></li>
-                        <li><a href="{{ route('web.jurusan.index') }}">Standar Sertifikasi LSP BNSP</a></li>
+                        <li><a href="{{ route('web.jurusan.show', 'aphp') }}">Agribisnis Pengolahan Hasil (APHP)</a></li>
+                        <li><a href="{{ route('web.jurusan.show', 'tsm') }}">Teknik Sepeda Motor (TSM)</a></li>
+                        <li><a href="{{ route('web.jurusan.index') }}">Standar Kompetensi LSP BNSP</a></li>
                     </ul>
                 </div>
 
@@ -1404,36 +1605,42 @@
                     <h3>Layanan Mandiri</h3>
                     <ul>
                         <li><a href="{{ route('ppdb.index') }}">PPDB Online 2026/2027</a></li>
-                        <li><a href="{{ route('ppdb.status') }}">Cek Status Hasil Seleksi</a></li>
-                        <li><a href="{{ route('portal.ortu.index') }}">Portal Kehadiran Orang Tua</a></li>
+                        <li><a href="{{ route('ppdb.status') }}">Cek Status Seleksi</a></li>
+                        <li><a href="{{ route('portal.ortu.index') }}">Portal Presensi Siswa</a></li>
                         <li><a href="{{ route('web.berita.index') }}">Warta &amp; Agenda Sekolah</a></li>
                         <li><a href="{{ route('login') }}">Masuk Dasbor SIRANI</a></li>
                     </ul>
                 </div>
 
                 <div class="footer-col">
-                    <h3>Kampus &amp; Pelayanan</h3>
-                    <p style="font-size: 0.85rem; color: #94a3b8; line-height: 1.6; margin-bottom: 12px;">
-                        <i class="fa-solid fa-location-dot" style="color: #ef4444; margin-right: 6px;"></i>
-                        {{ $sekolah->alamat ?? 'Jl. Raya Air Naningan, Kec. Air Naningan, Kab. Tanggamus, Lampung 35379' }}
-                    </p>
-                    <p style="font-size: 0.85rem; color: #94a3b8; margin-bottom: 8px;">
-                        <i class="fa-solid fa-phone" style="color: #60a5fa; margin-right: 6px;"></i>
-                        {{ $sekolah->telepon ?? '0812-3456-7890' }}
-                    </p>
-                    <p style="font-size: 0.85rem; color: #94a3b8;">
-                        <i class="fa-solid fa-envelope" style="color: #fbbf24; margin-right: 6px;"></i>
-                        {{ $sekolah->email ?? 'info@smkn1airnaningan.sch.id' }}
-                    </p>
+                    <h3>Kampus &amp; Kontak</h3>
+                    <div class="footer-contact-list">
+                        <div class="footer-contact-item">
+                            <span class="footer-contact-icon geo"><i class="fa-solid fa-location-dot"></i></span>
+                            <span>{{ $sekolah->alamat ?? 'Jl. Raya Air Naningan, Kec. Air Naningan, Kab. Tanggamus, Lampung 35379' }}</span>
+                        </div>
+                        <div class="footer-contact-item">
+                            <span class="footer-contact-icon tel"><i class="fa-solid fa-phone"></i></span>
+                            <span>{{ $sekolah->telepon ?? '0812-3456-7890' }}</span>
+                        </div>
+                        <div class="footer-contact-item">
+                            <span class="footer-contact-icon mail"><i class="fa-solid fa-envelope"></i></span>
+                            <span>{{ $sekolah->email ?? 'info@smkn1airnaningan.sch.id' }}</span>
+                        </div>
+                        <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $sekolah->telepon ?? '6281234567890') }}?text=Halo%20Admin%20SMKN%201%20Air%20Naningan" target="_blank" rel="noopener" class="footer-helpdesk-btn">
+                            <i class="fa-brands fa-whatsapp" style="font-size: 1.05rem;"></i> Helpdesk Layanan Cepat
+                        </a>
+                    </div>
                 </div>
             </div>
 
             <div class="footer-bottom-bar">
                 <div>
-                    &copy; {{ date('Y') }} SMKN 1 Air Naningan. Hak Cipta Dilindungi. Terintegrasi SIRANI System.
+                    &copy; {{ date('Y') }} <strong>SMKN 1 Air Naningan</strong>. Hak Cipta Dilindungi.
+                    <span class="footer-badge-sys">SIRANI Integrated System</span>
                 </div>
                 <div>
-                    Kepala Sekolah: <strong>{{ $sekolah->nama_kepala_sekolah ?? 'Drs. H. Ahmad Sudrajat, M.Pd.' }}</strong>
+                    Kepala Sekolah: <strong>{{ $sekolah->nama_kepala_sekolah ?? 'Drs. H. Ahmad Sudrajat, M.Pd.' }}</strong> • Tanggamus, Lampung
                 </div>
             </div>
         </div>
