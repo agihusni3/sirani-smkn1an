@@ -257,6 +257,38 @@
                         <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 12px;">Format PDF/JPG, Maksimal 3MB</p>
                         <input type="file" name="scan_ijazah_skl" accept="image/*,application/pdf" style="font-size: 0.82rem; color: var(--text-body);">
                     </div>
+
+                    <div style="background: var(--bg-surface-alt); border: 1.5px dashed var(--border-main); border-radius: var(--radius-sm); padding: 18px;">
+                        <label style="display: block; font-size: 0.88rem; font-weight: 700; color: var(--text-dark); margin-bottom: 4px;">
+                            <i class="fa-regular fa-id-card" style="color: #6366f1; margin-right: 6px;"></i> Scan KTP Orang Tua (1 Saja)
+                        </label>
+                        <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 12px;">KTP Ayah / Ibu / Wali (JPG/PDF, Maks 3MB)</p>
+                        <input type="file" name="scan_ktp_ortu" accept="image/*,application/pdf" style="font-size: 0.82rem; color: var(--text-body);">
+                    </div>
+
+                    <div style="background: var(--bg-surface-alt); border: 1.5px dashed var(--border-main); border-radius: var(--radius-sm); padding: 18px;">
+                        <label style="display: block; font-size: 0.88rem; font-weight: 700; color: var(--text-dark); margin-bottom: 4px;">
+                            <i class="fa-regular fa-file-lines" style="color: #0d9488; margin-right: 6px;"></i> Scan Akta Kelahiran
+                        </label>
+                        <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 12px;">Format PDF/JPG, Maksimal 3MB</p>
+                        <input type="file" name="scan_akta" accept="image/*,application/pdf" style="font-size: 0.82rem; color: var(--text-body);">
+                    </div>
+
+                    <div style="background: var(--bg-surface-alt); border: 1.5px dashed var(--border-main); border-radius: var(--radius-sm); padding: 18px;">
+                        <label style="display: block; font-size: 0.88rem; font-weight: 700; color: var(--text-dark); margin-bottom: 4px;">
+                            <i class="fa-solid fa-id-card-clip" style="color: #ea580c; margin-right: 6px;"></i> Scan Kartu Indonesia Pintar (KIP)
+                        </label>
+                        <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 12px;">KIP / PIP (Opsional / Jalur Afirmasi, Maks 3MB)</p>
+                        <input type="file" name="scan_kip" accept="image/*,application/pdf" style="font-size: 0.82rem; color: var(--text-body);">
+                    </div>
+
+                    <div style="background: var(--bg-surface-alt); border: 1.5px dashed var(--border-main); border-radius: var(--radius-sm); padding: 18px;">
+                        <label style="display: block; font-size: 0.88rem; font-weight: 700; color: var(--text-dark); margin-bottom: 4px;">
+                            <i class="fa-solid fa-file-shield" style="color: #dc2626; margin-right: 6px;"></i> Scan Surat Ket. Tidak Mampu (SKTM)
+                        </label>
+                        <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 12px;">Dari Kelurahan / Pekon (Opsional / Afirmasi, Maks 3MB)</p>
+                        <input type="file" name="scan_sktm" accept="image/*,application/pdf" style="font-size: 0.82rem; color: var(--text-body);">
+                    </div>
                 </div>
             </div>
 

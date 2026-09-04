@@ -36,6 +36,10 @@ class PpdbPendaftar extends Model
         'berkas_foto',
         'berkas_kk',
         'berkas_ijazah_skl',
+        'berkas_ktp_ortu',
+        'berkas_akta',
+        'berkas_kip',
+        'berkas_sktm',
         'status',
         'jurusan_diterima_id',
         'catatan_panitia',
@@ -124,6 +128,18 @@ class PpdbPendaftar extends Model
 
     public function getScanIjazahSklAttribute() { return $this->attributes['berkas_ijazah_skl'] ?? null; }
     public function setScanIjazahSklAttribute($value) { $this->attributes['berkas_ijazah_skl'] = $value; }
+
+    public function getScanKtpOrtuAttribute() { return $this->attributes['berkas_ktp_ortu'] ?? null; }
+    public function setScanKtpOrtuAttribute($value) { $this->attributes['berkas_ktp_ortu'] = $value; }
+
+    public function getScanAktaAttribute() { return $this->attributes['berkas_akta'] ?? null; }
+    public function setScanAktaAttribute($value) { $this->attributes['berkas_akta'] = $value; }
+
+    public function getScanKipAttribute() { return $this->attributes['berkas_kip'] ?? null; }
+    public function setScanKipAttribute($value) { $this->attributes['berkas_kip'] = $value; }
+
+    public function getScanSktmAttribute() { return $this->attributes['berkas_sktm'] ?? null; }
+    public function setScanSktmAttribute($value) { $this->attributes['berkas_sktm'] = $value; }
 
     public function getJurusanPilihan1IdAttribute() { return $this->attributes['jurusan_id_1'] ?? null; }
     public function setJurusanPilihan1IdAttribute($value) { $this->attributes['jurusan_id_1'] = $value; }

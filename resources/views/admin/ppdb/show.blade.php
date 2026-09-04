@@ -145,6 +145,58 @@
                 <div style="height:120px; background:var(--surface); display:flex; align-items:center; justify-content:center; color:var(--text-3); font-size:11px;">Belum Diunggah</div>
               @endif
             </div>
+
+            {{-- KTP Orang Tua --}}
+            <div style="border:1px solid var(--border); border-radius:8px; padding:10px; text-align:center;">
+              <div style="font-size:11px; font-weight:700; color:var(--text-3); margin-bottom:6px;">Scan KTP Ortu (1 Saja)</div>
+              @if($pendaftar->scan_ktp_ortu)
+                <div style="height:120px; background:var(--surface); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px;">
+                  <i class="bi bi-person-vcard-fill" style="font-size:32px; color:#6366f1;"></i>
+                  <a href="{{ asset('storage/' . $pendaftar->scan_ktp_ortu) }}" target="_blank" class="btn btn-sm" style="background:#0284c7; color:#fff; font-size:11px; padding:4px 8px;">Buka Dokumen KTP</a>
+                </div>
+              @else
+                <div style="height:120px; background:var(--surface); display:flex; align-items:center; justify-content:center; color:var(--text-3); font-size:11px;">Belum Diunggah</div>
+              @endif
+            </div>
+
+            {{-- Akta Kelahiran --}}
+            <div style="border:1px solid var(--border); border-radius:8px; padding:10px; text-align:center;">
+              <div style="font-size:11px; font-weight:700; color:var(--text-3); margin-bottom:6px;">Scan Akta Kelahiran</div>
+              @if($pendaftar->scan_akta)
+                <div style="height:120px; background:var(--surface); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px;">
+                  <i class="bi bi-file-earmark-text-fill" style="font-size:32px; color:#f59e0b;"></i>
+                  <a href="{{ asset('storage/' . $pendaftar->scan_akta) }}" target="_blank" class="btn btn-sm" style="background:#0284c7; color:#fff; font-size:11px; padding:4px 8px;">Buka Akta Lahir</a>
+                </div>
+              @else
+                <div style="height:120px; background:var(--surface); display:flex; align-items:center; justify-content:center; color:var(--text-3); font-size:11px;">Belum Diunggah</div>
+              @endif
+            </div>
+
+            {{-- KIP / PIP --}}
+            <div style="border:1px solid var(--border); border-radius:8px; padding:10px; text-align:center;">
+              <div style="font-size:11px; font-weight:700; color:var(--text-3); margin-bottom:6px;">Kartu KIP / PIP</div>
+              @if($pendaftar->scan_kip)
+                <div style="height:120px; background:var(--surface); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px;">
+                  <i class="bi bi-credit-card-2-front-fill" style="font-size:32px; color:#10b981;"></i>
+                  <a href="{{ asset('storage/' . $pendaftar->scan_kip) }}" target="_blank" class="btn btn-sm" style="background:#0284c7; color:#fff; font-size:11px; padding:4px 8px;">Buka Kartu KIP</a>
+                </div>
+              @else
+                <div style="height:120px; background:var(--surface); display:flex; align-items:center; justify-content:center; color:var(--text-3); font-size:11px;">Tidak Ada / Opsional</div>
+              @endif
+            </div>
+
+            {{-- SKTM --}}
+            <div style="border:1px solid var(--border); border-radius:8px; padding:10px; text-align:center;">
+              <div style="font-size:11px; font-weight:700; color:var(--text-3); margin-bottom:6px;">Surat SKTM</div>
+              @if($pendaftar->scan_sktm)
+                <div style="height:120px; background:var(--surface); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px;">
+                  <i class="bi bi-file-earmark-medical-fill" style="font-size:32px; color:#ec4899;"></i>
+                  <a href="{{ asset('storage/' . $pendaftar->scan_sktm) }}" target="_blank" class="btn btn-sm" style="background:#0284c7; color:#fff; font-size:11px; padding:4px 8px;">Buka Berkas SKTM</a>
+                </div>
+              @else
+                <div style="height:120px; background:var(--surface); display:flex; align-items:center; justify-content:center; color:var(--text-3); font-size:11px;">Tidak Ada / Opsional</div>
+              @endif
+            </div>
           </div>
         </div>
 

@@ -62,6 +62,10 @@ class PpdbDaftarController extends Controller
             'pas_foto' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
             'scan_kk' => 'nullable|file|mimes:jpeg,png,jpg,pdf|max:3072',
             'scan_ijazah_skl' => 'nullable|file|mimes:jpeg,png,jpg,pdf|max:3072',
+            'scan_ktp_ortu' => 'nullable|file|mimes:jpeg,png,jpg,pdf|max:3072',
+            'scan_akta' => 'nullable|file|mimes:jpeg,png,jpg,pdf|max:3072',
+            'scan_kip' => 'nullable|file|mimes:jpeg,png,jpg,pdf|max:3072',
+            'scan_sktm' => 'nullable|file|mimes:jpeg,png,jpg,pdf|max:3072',
         ], [
             'nisn.required' => 'NISN wajib diisi (10 digit).',
             'nisn.size' => 'NISN harus tepat 10 digit angka.',
@@ -101,6 +105,18 @@ class PpdbDaftarController extends Controller
         }
         if ($request->hasFile('scan_ijazah_skl')) {
             $p->berkas_ijazah_skl = $request->file('scan_ijazah_skl')->store('ppdb/berkas', 'public');
+        }
+        if ($request->hasFile('scan_ktp_ortu')) {
+            $p->berkas_ktp_ortu = $request->file('scan_ktp_ortu')->store('ppdb/berkas', 'public');
+        }
+        if ($request->hasFile('scan_akta')) {
+            $p->berkas_akta = $request->file('scan_akta')->store('ppdb/berkas', 'public');
+        }
+        if ($request->hasFile('scan_kip')) {
+            $p->berkas_kip = $request->file('scan_kip')->store('ppdb/berkas', 'public');
+        }
+        if ($request->hasFile('scan_sktm')) {
+            $p->berkas_sktm = $request->file('scan_sktm')->store('ppdb/berkas', 'public');
         }
 
         $p->save();
