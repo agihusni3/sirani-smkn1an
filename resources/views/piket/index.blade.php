@@ -899,8 +899,8 @@
           </button>
           <button type="button" class="piket-chip filter-pill" data-filter="belum_hadir" onclick="filterSiswaTable('belum_hadir', this)">
             <span>Belum Hadir</span>
-            <span class="piket-chip-badge" style="color:{{ $siswaBelumHadirList->count() > 0 ? '#DC2626' : 'inherit' }}; font-weight:800;">
-              {{ $siswaBelumHadirList->count() }}
+            <span class="piket-chip-badge" style="color:{{ $alphaCount > 0 ? '#DC2626' : 'inherit' }}; font-weight:800;">
+              {{ $alphaCount }}
             </span>
           </button>
           <button type="button" class="piket-chip filter-pill" data-filter="belum_pulang" onclick="filterSiswaTable('belum_pulang', this)">
@@ -925,8 +925,8 @@
           </button>
           <button type="button" class="piket-chip filter-pill" data-filter="belum_hadir" onclick="filterGuruTable('belum_hadir', this)">
             <span>Belum Hadir</span>
-            <span class="piket-chip-badge" style="color:{{ $guruBelumHadirList->count() > 0 ? '#DC2626' : 'inherit' }}; font-weight:800;">
-              {{ $guruBelumHadirList->count() }}
+            <span class="piket-chip-badge" style="color:{{ $guruBelumHadirCount > 0 ? '#DC2626' : 'inherit' }}; font-weight:800;">
+              {{ $guruBelumHadirCount }}
             </span>
           </button>
           <button type="button" class="piket-chip filter-pill" data-filter="izin" onclick="filterGuruTable('izin', this)">
@@ -1025,6 +1025,8 @@
                       <span class="piket-status-pill terlambat"><i class="bi bi-clock-fill"></i> Terlambat</span>
                     @elseif(in_array($ab->status, ['izin', 'sakit', 'dispensasi', 'cuti']))
                       <span class="piket-status-pill izin"><i class="bi bi-file-earmark-text-fill"></i> {{ ucfirst($ab->status) }}</span>
+                    @elseif(in_array($ab->status, ['alpha', 'alfa']))
+                      <span class="piket-status-pill belum"><i class="bi bi-exclamation-octagon-fill"></i> Alpha (Belum Scan)</span>
                     @elseif($ab->status === 'bolos')
                       <span class="piket-status-pill bolos"><i class="bi bi-exclamation-triangle-fill"></i> Bolos</span>
                     @else
@@ -1182,6 +1184,8 @@
                       <span class="piket-status-pill terlambat"><i class="bi bi-clock-fill"></i> Terlambat</span>
                     @elseif(in_array($ag->status, ['izin', 'sakit', 'cuti', 'dispen', 'dinas_luar']))
                       <span class="piket-status-pill izin"><i class="bi bi-file-earmark-text-fill"></i> {{ ucfirst(str_replace('_', ' ', $ag->status)) }}</span>
+                    @elseif(in_array($ag->status, ['alpha', 'alfa']))
+                      <span class="piket-status-pill belum"><i class="bi bi-exclamation-octagon-fill"></i> Alpha (Belum Scan)</span>
                     @else
                       <span class="piket-status-pill"><i class="bi bi-dot"></i> {{ ucfirst($ag->status) }}</span>
                     @endif
@@ -1574,7 +1578,7 @@
         if (status === 'all') return true;
         if (status === 'hadir') return rowStatus === 'hadir';
         if (status === 'terlambat') return rowStatus === 'terlambat';
-        if (status === 'belum_hadir') return rowStatus === 'belum_hadir';
+        if (status === 'belum_hadir') return rowStatus === 'belum_hadir' || rowStatus === 'alpha' || rowStatus === 'alfa';
         if (status === 'belum_pulang') return row.getAttribute('data-has-masuk') === '1' && rowPulang === 'belum';
         if (status === 'izin') return ['izin', 'sakit', 'dispen', 'dispensasi', 'cuti'].includes(rowStatus);
         if (status === 'bolos') return rowStatus === 'bolos';
@@ -1597,7 +1601,7 @@
         if (status === 'all') return true;
         if (status === 'hadir') return rowStatus === 'hadir';
         if (status === 'terlambat') return rowStatus === 'terlambat';
-        if (status === 'belum_hadir') return rowStatus === 'belum_hadir';
+        if (status === 'belum_hadir') return rowStatus === 'belum_hadir' || rowStatus === 'alpha' || rowStatus === 'alfa';
         if (status === 'izin') return ['izin', 'sakit', 'cuti', 'dispen', 'dinas_luar'].includes(rowStatus);
         if (status === 'pulang') return rowPulang === 'pulang';
         return true;
