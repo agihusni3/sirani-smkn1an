@@ -1,154 +1,238 @@
 @extends('web.layouts.app')
 
 @section('title', 'Hubungi Kami & Lokasi Kampus — SMKN 1 Air Naningan')
-@section('meta_description', 'Layanan komunikasi resmi, alamat kampus, jam operasional, dan helpdesk pendaftaran SMKN 1 Air Naningan Kabupaten Tanggamus.')
+@section('meta_description', 'Pusat layanan komunikasi resmi, alamat kampus, jam operasional, dan helpdesk pendaftaran SMKN 1 Air Naningan Kabupaten Tanggamus.')
+
+@push('styles')
+<link rel="stylesheet" href="{{ asset('css/web-kontak.css') }}?v={{ filemtime(public_path('css/web-kontak.css')) }}">
+@endpush
 
 @section('content')
-<div class="container" style="padding-top: 40px; padding-bottom: 60px;">
+<div class="container" style="padding-top: 40px; padding-bottom: 70px;">
 
-    <!-- Section Title -->
-    <div style="max-width: 760px; margin-bottom: 36px;">
-        <span class="section-tag">Pusat Informasi & Komunikasi</span>
-        <h1 class="section-title-large">Hubungi Kampus SMKN 1 Air Naningan</h1>
-        <p style="color: var(--text-body); font-size: 1.05rem; margin-top: 12px; line-height: 1.65;">
+    <!-- Section Title & Status -->
+    <div class="kontak-hero-wrap">
+        <span class="kontak-tag">
+            <i class="fa-solid fa-headset"></i> Pusat Informasi &amp; Komunikasi
+        </span>
+        <h1 class="kontak-title">Hubungi Kampus SMKN 1 Air Naningan</h1>
+        <p class="kontak-desc">
             Kami membuka pintu kemitraan industri, layanan informasi kurikulum kejuruan, konsultasi pendaftaran peserta didik baru (PPDB), serta verifikasi administrasi alumni.
         </p>
     </div>
 
-    <div class="contact-layout-grid">
+    <!-- Top Row: 3 Modern Quick-Connect Channel Cards -->
+    <div class="kontak-channels-grid">
         
-        <!-- Left: Industrial Contact Cards -->
-        <div style="display: flex; flex-direction: column; gap: 20px;">
-            
-            <div style="background: var(--bg-surface); border: 1px solid var(--border-main); border-radius: var(--radius-lg); padding: 32px; box-shadow: var(--shadow-card);">
-                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid var(--border-main);">
-                    <div>
-                        <h3 style="font-size: 1.2rem; font-weight: 800; color: var(--text-dark);">Sekretariat & Tata Usaha</h3>
-                        <p style="font-size: 0.8rem; color: var(--text-muted);">Gedung Administrasi Utama Kampus</p>
+        <!-- WhatsApp Helpdesk -->
+        <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $sekolah->telepon ?? '6281234567890') }}?text=Halo%20Admin%20SMKN%201%20Air%20Naningan,%20saya%20ingin%20berkonsultasi" 
+           target="_blank" rel="noopener" class="channel-card wa">
+            <div>
+                <div class="channel-card-top">
+                    <div class="channel-icon-box wa">
+                        <i class="fa-brands fa-whatsapp"></i>
                     </div>
-                    <span style="font-family: var(--font-tech); font-size: 0.72rem; font-weight: 700; background: var(--brand-emerald-subtle); color: var(--brand-emerald); padding: 4px 10px; border-radius: 20px; border: 1px solid rgba(4,120,87,0.2);">
-                        <i class="fa-solid fa-circle-dot" style="font-size: 0.6rem; margin-right: 4px;"></i> Jam Kerja Aktif
+                    <span class="channel-badge-status" style="background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0;">
+                        <span class="status-dot-pulse"></span> Respon Cepat
                     </span>
                 </div>
+                <div class="channel-label">Konsultasi &amp; Helpdesk</div>
+                <div class="channel-value">WhatsApp Resmi</div>
+                <div class="channel-subtext">Layanan informasi PPDB &amp; administrasi siswa</div>
+            </div>
+            <div class="channel-action-arrow wa">
+                <span>Buka Percakapan Chat</span>
+                <i class="fa-solid fa-arrow-right"></i>
+            </div>
+        </a>
 
-                <div style="display: flex; flex-direction: column; gap: 22px;">
-                    <!-- Alamat -->
-                    <div style="display: flex; align-items: flex-start; gap: 16px;">
-                        <div style="width: 44px; height: 44px; border-radius: 10px; background: var(--brand-blue-subtle); display: flex; align-items: center; justify-content: center; color: var(--brand-blue); flex-shrink: 0; font-size: 1.15rem; border: 1px solid rgba(37,99,235,0.2);">
-                            <i class="fa-solid fa-location-dot"></i>
-                        </div>
+        <!-- Telephone / Voice -->
+        <a href="tel:{{ preg_replace('/[^0-9]/', '', $sekolah->telepon ?? '081234567890') }}" class="channel-card tel">
+            <div>
+                <div class="channel-card-top">
+                    <div class="channel-icon-box tel">
+                        <i class="fa-solid fa-phone-volume"></i>
+                    </div>
+                    <span class="channel-badge-status" style="background: #eff6ff; color: #2563eb; border: 1px solid #bfdbfe;">
+                        Telepon Kampus
+                    </span>
+                </div>
+                <div class="channel-label">Panggilan Kantor</div>
+                <div class="channel-value">{{ $sekolah->telepon ?? '(0721) 892110' }}</div>
+                <div class="channel-subtext">Aktif pada hari &amp; jam operasional kerja</div>
+            </div>
+            <div class="channel-action-arrow tel">
+                <span>Hubungi Langsung</span>
+                <i class="fa-solid fa-arrow-right"></i>
+            </div>
+        </a>
+
+        <!-- Email Official -->
+        <a href="mailto:{{ $sekolah->email ?? 'smkn1airnaningan@gmail.com' }}" class="channel-card mail">
+            <div>
+                <div class="channel-card-top">
+                    <div class="channel-icon-box mail">
+                        <i class="fa-solid fa-envelope-open-text"></i>
+                    </div>
+                    <span class="channel-badge-status" style="background: #fffbeb; color: #d97706; border: 1px solid #fde68a;">
+                        Korespondensi
+                    </span>
+                </div>
+                <div class="channel-label">Surat Elektronik</div>
+                <div class="channel-value" style="font-size: 0.95rem; word-break: break-all;">
+                    {{ $sekolah->email ?? 'smkn1airnaningan@gmail.com' }}
+                </div>
+                <div class="channel-subtext">Kerjasama kemitraan industri &amp; instansi resmi</div>
+            </div>
+            <div class="channel-action-arrow mail">
+                <span>Kirim Pesan Email</span>
+                <i class="fa-solid fa-arrow-right"></i>
+            </div>
+        </a>
+
+    </div>
+
+    <!-- Main Bento Grid: Office Details & Cinematic Map -->
+    <div class="kontak-bento-grid">
+        
+        <!-- Left: Office & Operational Hours -->
+        <div style="display: flex; flex-direction: column; gap: 20px;">
+            
+            <div class="kontak-details-card">
+                <div>
+                    <div class="kontak-card-header">
                         <div>
-                            <div style="font-family: var(--font-tech); font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">Alamat Kampus</div>
-                            <div style="font-size: 0.95rem; font-weight: 600; color: var(--text-dark); line-height: 1.5; margin-top: 2px;">
-                                {{ $sekolah->alamat ?? 'Jl. Raya Air Naningan, Pekon Air Naningan, Kec. Air Naningan, Kab. Tanggamus, Lampung 35379' }}
-                            </div>
+                            <div class="kontak-card-title">Sekretariat &amp; Tata Usaha</div>
+                            <div class="kontak-card-subtitle">Gedung Pelayanan Administrasi Terpadu</div>
                         </div>
+                        <span class="channel-badge-status" style="background: var(--brand-emerald-subtle); color: var(--brand-emerald); border: 1px solid rgba(4,120,87,0.2);">
+                            <span class="status-dot-pulse"></span> Buka Pelayanan
+                        </span>
                     </div>
 
-                    <!-- Jam KBM -->
-                    <div style="display: flex; align-items: flex-start; gap: 16px;">
-                        <div style="width: 44px; height: 44px; border-radius: 10px; background: var(--bg-surface-alt); display: flex; align-items: center; justify-content: center; color: var(--text-dark); flex-shrink: 0; font-size: 1.15rem; border: 1px solid var(--border-main);">
-                            <i class="fa-solid fa-clock"></i>
-                        </div>
-                        <div>
-                            <div style="font-family: var(--font-tech); font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">Jam Operasional & KBM</div>
-                            <div style="font-size: 0.95rem; font-weight: 700; color: var(--text-dark); margin-top: 2px;">
-                                Senin – Jumat : 07.15 – 15.30 WIB
+                    <div class="kontak-items-list" style="margin-top: 18px;">
+                        <!-- Alamat Kampus -->
+                        <div class="kontak-item-row">
+                            <div class="kontak-item-icon loc">
+                                <i class="fa-solid fa-location-dot"></i>
                             </div>
-                            <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 2px;">Sabtu & Minggu : Agenda Ekstrakurikuler / Libur</div>
-                        </div>
-                    </div>
-
-                    <!-- Telepon / Helpdesk -->
-                    <div style="display: flex; align-items: flex-start; gap: 16px;">
-                        <div style="width: 44px; height: 44px; border-radius: 10px; background: var(--brand-emerald-subtle); display: flex; align-items: center; justify-content: center; color: var(--brand-emerald); flex-shrink: 0; font-size: 1.15rem; border: 1px solid rgba(4,120,87,0.2);">
-                            <i class="fa-solid fa-phone"></i>
-                        </div>
-                        <div>
-                            <div style="font-family: var(--font-tech); font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">Telepon / Helpdesk PPDB</div>
-                            <div style="font-size: 0.95rem; font-weight: 700; color: var(--text-dark); margin-top: 2px;">
-                                {{ $sekolah->telepon ?? '0812-3456-7890' }}
+                            <div>
+                                <div class="kontak-item-title">Alamat Lengkap Kampus</div>
+                                <div class="kontak-item-val">
+                                    {{ $sekolah->alamat ?? 'Jl. Makam Baturuguk, Pekon Karang Sari, Kec. Air Naningan, Kab. Tanggamus, Lampung' }}
+                                </div>
+                                <div class="kontak-item-sub">Kawasan Pendidikan Terpadu Air Naningan</div>
                             </div>
-                            <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 2px;">Layanan WhatsApp & Panggilan Suara</div>
                         </div>
-                    </div>
 
-                    <!-- Email -->
-                    <div style="display: flex; align-items: flex-start; gap: 16px;">
-                        <div style="width: 44px; height: 44px; border-radius: 10px; background: var(--brand-amber-subtle); display: flex; align-items: center; justify-content: center; color: var(--brand-amber); flex-shrink: 0; font-size: 1.15rem; border: 1px solid rgba(180,83,9,0.2);">
-                            <i class="fa-solid fa-envelope"></i>
+                        <!-- Jam Operasional -->
+                        <div class="kontak-item-row">
+                            <div class="kontak-item-icon clock">
+                                <i class="fa-solid fa-business-time"></i>
+                            </div>
+                            <div>
+                                <div class="kontak-item-title">Waktu Operasional &amp; KBM</div>
+                                <div class="kontak-item-val">
+                                    Senin – Jumat : 07.15 – 15.30 WIB
+                                </div>
+                                <div class="kontak-item-sub">Sabtu &amp; Minggu : Pembinaan Ekstrakurikuler / Libur</div>
+                            </div>
                         </div>
-                        <div>
-                            <div style="font-family: var(--font-tech); font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">Email Korespondensi Resmi</div>
-                            <div style="font-size: 0.95rem; font-weight: 700; color: var(--brand-blue); margin-top: 2px;">
-                                <a href="mailto:{{ $sekolah->email ?? 'info@smkn1airnaningan.sch.id' }}">{{ $sekolah->email ?? 'info@smkn1airnaningan.sch.id' }}</a>
+
+                        <!-- NPSN & Akreditasi -->
+                        <div class="kontak-item-row">
+                            <div class="kontak-item-icon npsn">
+                                <i class="fa-solid fa-award"></i>
+                            </div>
+                            <div>
+                                <div class="kontak-item-title">Legalitas Lembaga Vokasi</div>
+                                <div class="kontak-item-val">
+                                    Akreditasi B • NPSN: {{ $sekolah->npsn ?? '69888999' }}
+                                </div>
+                                <div class="kontak-item-sub">Sekolah Menengah Kejuruan Negeri Tanggamus</div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div style="margin-top: 28px; padding-top: 20px; border-top: 1px solid var(--border-main);">
-                    <a href="https://wa.me/6281234567890?text=Halo%20Admin%20SMKN%201%20Air%20Naningan,%20saya%20ingin%20bertanya%20seputar%20sekolah" target="_blank" class="btn-industrial" style="width: 100%; justify-content: center; background: #059669; color: #ffffff; padding: 12px 20px;">
-                        <i class="fa-brands fa-whatsapp" style="font-size: 1.2rem;"></i> Buka Chat WhatsApp Helpdesk
+                <div>
+                    <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $sekolah->telepon ?? '6281234567890') }}?text=Halo%20Admin%20SMKN%201%20Air%20Naningan" 
+                       target="_blank" rel="noopener" class="footer-wa-pill" style="width: 100%; justify-content: center; padding: 12px 20px; font-size: 0.88rem; border-radius: var(--radius-md);">
+                        <i class="fa-brands fa-whatsapp" style="font-size: 1.15rem;"></i> Buka Percakapan WhatsApp Helpdesk
                     </a>
                 </div>
             </div>
 
-            <!-- Kartu Layanan Cepat -->
-            <div style="background: var(--bg-surface-alt); border: 1px solid var(--border-main); border-radius: var(--radius-lg); padding: 22px 26px; display: flex; align-items: center; justify-content: space-between;">
+            <!-- PPDB Quick Gateway Callout -->
+            <div class="kontak-ppdb-callout">
                 <div>
-                    <div style="font-weight: 700; font-size: 0.95rem; color: var(--text-dark);">Pendaftaran Siswa Baru (PPDB)</div>
-                    <div style="font-size: 0.82rem; color: var(--text-muted); margin-top: 2px;">Informasi kuota & pendaftaran online 2026/2027</div>
+                    <div class="kontak-ppdb-title">
+                        <i class="fa-solid fa-graduation-cap" style="color: #38bdf8;"></i>
+                        Pendaftaran Siswa Baru (PPDB)
+                    </div>
+                    <div class="kontak-ppdb-sub">
+                        Pendaftaran siswa baru TP 2026/2027 telah dibuka bebas biaya untuk seluruh jurusan.
+                    </div>
                 </div>
-                <a href="{{ route('ppdb.index') }}" class="btn-industrial btn-industrial-dark" style="font-size: 0.8rem; padding: 8px 16px;">
-                    Portal PPDB <i class="fa-solid fa-arrow-right" style="font-size: 0.75rem;"></i>
+                <a href="{{ route('ppdb.index') }}" class="kontak-ppdb-btn">
+                    Portal PPDB <i class="fa-solid fa-arrow-right"></i>
                 </a>
             </div>
 
         </div>
 
-        <!-- Right: Map Location & Directions -->
-        <div style="background: var(--bg-surface); border: 1px solid var(--border-main); border-radius: var(--radius-lg); padding: 32px; box-shadow: var(--shadow-card); display: flex; flex-direction: column;">
-            
-            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px;">
-                <div>
-                    <h3 style="font-size: 1.2rem; font-weight: 800; color: var(--text-dark);">Peta & Navigasi Kampus</h3>
-                    <p style="font-size: 0.82rem; color: var(--text-muted); margin-top: 2px;">Akses lokasi melalui Google Maps atau GPS</p>
+        <!-- Right: Cinematic Interactive Map -->
+        <div class="kontak-map-card">
+            <div>
+                <div class="kontak-map-header">
+                    <div>
+                        <div class="kontak-card-title">Peta Navigasi &amp; Penunjuk Arah</div>
+                        <div class="kontak-card-subtitle">Petunjuk rute Google Maps GPS interaktif</div>
+                    </div>
+                    <a href="https://maps.google.com/maps?q=SMK+Negeri+1+Air+Naningan+Tanggamus" 
+                       target="_blank" rel="noopener" class="kontak-map-btn">
+                        <i class="fa-solid fa-diamond-turn-right" style="color: var(--brand-blue);"></i>
+                        <span>Buka di Google Maps</span>
+                    </a>
                 </div>
-                <a href="https://maps.google.com/maps?q=SMK+Negeri+1+Air+Naningan+Tanggamus" target="_blank" class="btn-industrial btn-industrial-outline" style="font-size: 0.78rem; padding: 6px 14px;">
-                    <i class="fa-solid fa-diamond-turn-right" style="color: var(--brand-blue);"></i> Rute Google Maps
-                </a>
-            </div>
 
-            <div style="flex: 1; min-height: 420px; border-radius: var(--radius-md); overflow: hidden; border: 1px solid var(--border-main); position: relative; background: #e2e8f0;">
-                <iframe 
-                    width="100%" 
-                    height="100%" 
-                    frameborder="0" 
-                    scrolling="no" 
-                    marginheight="0" 
-                    marginwidth="0" 
-                    src="https://maps.google.com/maps?q=SMK+Negeri+1+Air+Naningan+Tanggamus&t=&z=14&ie=UTF8&iwloc=&output=embed"
-                    style="border: 0; min-height: 420px; width: 100%; display: block;"
-                    loading="lazy">
-                </iframe>
-            </div>
-
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; margin-top: 20px;">
-                <div style="padding: 12px 16px; background: var(--bg-surface-alt); border-radius: var(--radius-sm); border: 1px solid var(--border-main);">
-                    <div style="font-family: var(--font-tech); font-size: 0.7rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Akses Transportasi</div>
-                    <div style="font-size: 0.85rem; font-weight: 600; color: var(--text-dark); margin-top: 2px;">Dapat dilalui kendaraan roda dua & empat</div>
-                </div>
-                <div style="padding: 12px 16px; background: var(--bg-surface-alt); border-radius: var(--radius-sm); border: 1px solid var(--border-main);">
-                    <div style="font-family: var(--font-tech); font-size: 0.7rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Area Parkir</div>
-                    <div style="font-size: 0.85rem; font-weight: 600; color: var(--text-dark); margin-top: 2px;">Tersedia lapangan parkir tamu & siswa luas</div>
+                <div class="kontak-map-frame-box">
+                    <iframe 
+                        class="kontak-map-frame"
+                        frameborder="0" 
+                        scrolling="no" 
+                        marginheight="0" 
+                        marginwidth="0" 
+                        src="https://maps.google.com/maps?q=SMK+Negeri+1+Air+Naningan+Tanggamus&t=&z=14&ie=UTF8&iwloc=&output=embed"
+                        loading="lazy">
+                    </iframe>
                 </div>
             </div>
 
+            <!-- Facility Chips -->
+            <div class="kontak-fac-grid">
+                <div class="kontak-fac-pill">
+                    <div class="kontak-fac-icon">
+                        <i class="fa-solid fa-road"></i>
+                    </div>
+                    <div>
+                        <div class="kontak-fac-title">Akses Jalan Raya</div>
+                        <div class="kontak-fac-text">Jalur aspal mulus untuk motor &amp; mobil</div>
+                    </div>
+                </div>
+                <div class="kontak-fac-pill">
+                    <div class="kontak-fac-icon" style="color: #059669;">
+                        <i class="fa-solid fa-square-parking"></i>
+                    </div>
+                    <div>
+                        <div class="kontak-fac-title">Fasilitas Area Parkir</div>
+                        <div class="kontak-fac-text">Halaman parkir tamu, guru &amp; siswa aman</div>
+                    </div>
+                </div>
+            </div>
         </div>
 
     </div>
 
 </div>
 @endsection
-
