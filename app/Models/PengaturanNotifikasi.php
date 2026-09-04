@@ -19,6 +19,13 @@ class PengaturanNotifikasi extends Model
         'ambang_batas_alpha',
         'hitung_bolos_bersama_alpha',
         'auto_notif_wali_kelas',
+        'notif_terlambat_aktif',
+        'notif_alpha_aktif',
+        'notif_bolos_aktif',
+        'notif_izin_aktif',
+        'notif_panggilan_aktif',
+        'notif_masuk_aktif',
+        'notif_pulang_aktif',
         'template_terlambat',
         'template_alpha',
         'template_izin',
@@ -32,7 +39,31 @@ class PengaturanNotifikasi extends Model
         'ambang_batas_alpha'         => 'integer',
         'hitung_bolos_bersama_alpha' => 'boolean',
         'auto_notif_wali_kelas'      => 'boolean',
+        'notif_terlambat_aktif'      => 'boolean',
+        'notif_alpha_aktif'          => 'boolean',
+        'notif_bolos_aktif'          => 'boolean',
+        'notif_izin_aktif'           => 'boolean',
+        'notif_panggilan_aktif'      => 'boolean',
+        'notif_masuk_aktif'          => 'boolean',
+        'notif_pulang_aktif'         => 'boolean',
     ];
+
+    /**
+     * Cek apakah notifikasi untuk kategori tertentu diizinkan dibuat drafnya.
+     */
+    public function isKategoriAktif(string $kategori): bool
+    {
+        return match (strtolower($kategori)) {
+            'terlambat'      => (bool) ($this->notif_terlambat_aktif ?? true),
+            'alpha'          => (bool) ($this->notif_alpha_aktif ?? true),
+            'bolos'          => (bool) ($this->notif_bolos_aktif ?? true),
+            'izin', 'sakit'  => (bool) ($this->notif_izin_aktif ?? true),
+            'panggilan_ortu' => (bool) ($this->notif_panggilan_aktif ?? true),
+            'masuk'          => (bool) ($this->notif_masuk_aktif ?? false),
+            'pulang'         => (bool) ($this->notif_pulang_aktif ?? false),
+            default          => true,
+        };
+    }
 
     /**
      * Dapatkan instance pengaturan singleton atau buat dengan template default.

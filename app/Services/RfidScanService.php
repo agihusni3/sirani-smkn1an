@@ -367,29 +367,21 @@ class RfidScanService
                     'keterangan'      => $isTerlambat ? "Terlambat (Scan Barcode/RFID {$timeNow}){$catatanHonor}" : "Tepat Waktu (Scan Barcode/RFID {$timeNow}){$catatanHonor}",
                 ]);
 
-                // Notifikasi WhatsApp Orang Tua untuk Siswa
+                // Notifikasi WhatsApp Orang Tua untuk Siswa (Hanya jika kategori aktif & lewat NotifikasiDraftService)
                 if ($type === 'siswa') {
-                    $noTujuan = $person->no_hp_ortu ?: ($person->no_hp_siswa ?: null);
-                    if ($noTujuan) {
-                        try {
-                            $pesanWa = $isTerlambat
-                                ? "Pemberitahuan SMKN 1 Air Naningan: Ananda {$person->nama} ({$rombelOrJabatan}) telah melakukan presensi masuk (TERLAMBAT) pada pukul {$timeNow} WIB via Scan Barcode/RFID."
-                                : "Pemberitahuan SMKN 1 Air Naningan: Ananda {$person->nama} ({$rombelOrJabatan}) telah hadir di sekolah pada pukul {$timeNow} WIB via Scan Barcode/RFID.";
-
-                            NotifikasiOrtu::create([
-                                'siswa_id'    => $id,
-                                'kategori'    => $isTerlambat ? 'terlambat' : 'masuk',
-                                'no_tujuan'   => $noTujuan,
-                                'nama_ortu'   => $person->nama_ortu,
-                                'judul'       => $isTerlambat ? "Presensi Terlambat: {$person->nama}" : "Presensi Masuk: {$person->nama}",
-                                'pesan'       => $pesanWa,
-                                'status'      => 'pending',
-                                'tanggal'     => $today,
-                                'dibuat_oleh' => 'sistem_rfid',
-                            ]);
-                        } catch (\Throwable $e) {
-                            \Illuminate\Support\Facades\Log::warning("Gagal membuat draf notifikasi ortu masuk RFID: " . $e->getMessage());
+                    try {
+                        $kategori = $isTerlambat ? 'terlambat' : 'masuk';
+                        $settingNotif = \App\Models\PengaturanNotifikasi::getPengaturan();
+                        if ($settingNotif->isKategoriAktif($kategori)) {
+                            \App\Services\NotifikasiDraftService::buatDraft($person, $kategori, [
+                                'tanggal'    => $today,
+                                'jam'        => $timeNow,
+                                'batas_jam'  => $jamMasukMaks,
+                                'keterangan' => $absensi->keterangan,
+                            ], 'sistem_rfid');
                         }
+                    } catch (\Throwable $e) {
+                        \Illuminate\Support\Facades\Log::warning("Gagal memproses draf notifikasi ortu masuk RFID: " . $e->getMessage());
                     }
                 }
 
@@ -451,25 +443,19 @@ class RfidScanService
                     'jam_pulang' => $timeNow,
                 ]);
 
-                // Notifikasi WhatsApp Pulang
+                // Notifikasi WhatsApp Pulang (Hanya jika kategori pulang diaktifkan)
                 if ($type === 'siswa') {
-                    $noTujuan = $person->no_hp_ortu ?: ($person->no_hp_siswa ?: null);
-                    if ($noTujuan) {
-                        try {
-                            NotifikasiOrtu::create([
-                                'siswa_id'    => $id,
-                                'kategori'    => 'pulang',
-                                'no_tujuan'   => $noTujuan,
-                                'nama_ortu'   => $person->nama_ortu,
-                                'judul'       => "Presensi Pulang: {$person->nama}",
-                                'pesan'       => "Pemberitahuan SMKN 1 Air Naningan: Ananda {$person->nama} ({$rombelOrJabatan}) telah melakukan presensi PULANG pada pukul {$timeNow} WIB via Scan Barcode/RFID.",
-                                'status'      => 'pending',
-                                'tanggal'     => $today,
-                                'dibuat_oleh' => 'sistem_rfid',
-                            ]);
-                        } catch (\Throwable $e) {
-                            \Illuminate\Support\Facades\Log::warning("Gagal membuat draf notifikasi ortu pulang RFID: " . $e->getMessage());
+                    try {
+                        $settingNotif = \App\Models\PengaturanNotifikasi::getPengaturan();
+                        if ($settingNotif->isKategoriAktif('pulang')) {
+                            \App\Services\NotifikasiDraftService::buatDraft($person, 'pulang', [
+                                'tanggal'    => $today,
+                                'jam'        => $timeNow,
+                                'keterangan' => 'Presensi Pulang Resmi via RFID/Barcode',
+                            ], 'sistem_rfid');
                         }
+                    } catch (\Throwable $e) {
+                        \Illuminate\Support\Facades\Log::warning("Gagal memproses draf notifikasi ortu pulang RFID: " . $e->getMessage());
                     }
                 }
 

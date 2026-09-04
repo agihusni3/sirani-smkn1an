@@ -15,6 +15,13 @@ class NotifikasiDraftService
      */
     public static function buatDraft(Siswa $siswa, string $kategori, array $params = [], string $dibuatOleh = 'sistem'): ?NotifikasiOrtu
     {
+        $setting = PengaturanNotifikasi::getPengaturan();
+
+        // 0. Cek apakah kategori ini diaktifkan di Pengaturan (cegah spam masuk/pulang normal)
+        if (!$setting->isKategoriAktif($kategori)) {
+            return null;
+        }
+
         $tanggal = $params['tanggal'] ?? Carbon::today()->toDateString();
 
         // 1. Anti-Duplikasi: Cek apakah sudah ada notifikasi kategori yang sama untuk siswa hari ini

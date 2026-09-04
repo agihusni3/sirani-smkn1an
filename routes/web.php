@@ -144,6 +144,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/notifikasi/batch-approve', [NotifikasiController::class, 'batchApprove'])->name('notifikasi.batch-approve');
         Route::post('/notifikasi/{id}/reject', [NotifikasiController::class, 'reject'])->name('notifikasi.reject');
         Route::post('/notifikasi/batch-reject', [NotifikasiController::class, 'batchReject'])->name('notifikasi.batch-reject');
+        Route::post('/notifikasi/bersihkan-kadaluarsa', [NotifikasiController::class, 'bersihkanKadaluarsa'])->name('notifikasi.bersihkan-kadaluarsa');
         Route::post('/notifikasi/pengaturan', [NotifikasiController::class, 'updatePengaturan'])->name('notifikasi.pengaturan.update')->middleware('role:admin,guru_piket');
         Route::post('/notifikasi/test-kirim', [NotifikasiController::class, 'testKirim'])->name('notifikasi.test-kirim')->middleware('role:admin,guru_piket');
     });

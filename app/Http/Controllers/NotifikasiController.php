@@ -171,6 +171,11 @@ class NotifikasiController extends Controller
             return back()->with('error', 'Pilih minimal satu notifikasi untuk diverifikasi.');
         }
 
+        // Proteksi Anti-Spam: Cegah pemblokiran nomor WhatsApp oleh provider
+        if (count($ids) > 50) {
+            return back()->with('error', 'Demi keselamatan nomor WhatsApp sekolah dari risiko pemblokiran (anti-spam), batas maksimal verifikasi sekaligus adalah 50 nomor per sesi.');
+        }
+
         $petugas = $this->getPetugasNama();
         $successCount = 0;
         $failCount = 0;
@@ -234,6 +239,31 @@ class NotifikasiController extends Controller
     }
 
     /**
+     * Bersihkan antrean notifikasi usang/kadaluarsa (draf hari kemarin atau anomali kehadiran masuk/pulang normal).
+     */
+    public function bersihkanKadaluarsa(Request $request)
+    {
+        $today = Carbon::today()->toDateString();
+        $petugas = $this->getPetugasNama();
+
+        // 1. Batalkan semua draf pending yang kategorinya 'masuk' atau 'pulang' normal
+        // 2. Batalkan semua draf pending yang tanggalnya sudah lewat (< today)
+        $affected = NotifikasiOrtu::where('status', 'pending')
+            ->where(function ($q) use ($today) {
+                $q->whereIn('kategori', ['masuk', 'pulang'])
+                  ->orWhereDate('tanggal', '<', $today);
+            })
+            ->update([
+                'status'            => 'dibatalkan',
+                'diverifikasi_oleh' => $petugas,
+                'waktu_verifikasi'  => now(),
+                'catatan_error'     => 'Dibersihkan otomatis: draf kadaluarsa / kategori kehadiran rutin',
+            ]);
+
+        return back()->with('success', "Berhasil membersihkan {$affected} draf notifikasi usang/kadaluarsa dari antrean!");
+    }
+
+    /**
      * Simpan pengaturan gateway WhatsApp & kustomisasi template pesan.
      */
     public function updatePengaturan(Request $request)
@@ -264,6 +294,13 @@ class NotifikasiController extends Controller
             'ambang_batas_alpha'         => (int) $request->input('ambang_batas_alpha', 3),
             'hitung_bolos_bersama_alpha' => $request->boolean('hitung_bolos_bersama_alpha'),
             'auto_notif_wali_kelas'      => $request->boolean('auto_notif_wali_kelas'),
+            'notif_terlambat_aktif'      => $request->boolean('notif_terlambat_aktif'),
+            'notif_alpha_aktif'          => $request->boolean('notif_alpha_aktif'),
+            'notif_bolos_aktif'          => $request->boolean('notif_bolos_aktif'),
+            'notif_izin_aktif'           => $request->boolean('notif_izin_aktif'),
+            'notif_panggilan_aktif'      => $request->boolean('notif_panggilan_aktif'),
+            'notif_masuk_aktif'          => $request->boolean('notif_masuk_aktif'),
+            'notif_pulang_aktif'         => $request->boolean('notif_pulang_aktif'),
             'template_terlambat'         => $request->input('template_terlambat'),
             'template_alpha'             => $request->input('template_alpha'),
             'template_izin'              => $request->input('template_izin'),

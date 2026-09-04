@@ -354,6 +354,12 @@
 
         <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
           @if(auth()->check() && (auth()->user()->isAdmin() || auth()->user()->isGuruPiket() || auth()->user()->isPiketHariIni()))
+            <form action="{{ route('notifikasi.bersihkan-kadaluarsa') }}" method="POST" onsubmit="return confirm('Bersihkan semua draf notifikasi yang sudah lewat hari atau kehadiran normal (masuk/pulang) dari antrean?');" style="display:inline; margin:0;">
+              @csrf
+              <button type="submit" class="btn btn-sm btn-outline" style="height:32px; padding:0 10px; font-size:11px; font-weight:700; color:var(--text-2); border:1px solid var(--border-2); background:var(--bg-2); display:inline-flex; align-items:center; gap:4px; border-radius:6px; cursor:pointer;" title="Batalkan otomatis draf usang atau rutin masuk/pulang agar antrean tetap bersih">
+                <i class="bi bi-stars"></i> Bersihkan Draf Usang
+              </button>
+            </form>
             <button type="button" class="btn btn-sm btn-outline" onclick="openModal('modalPengaturan')" style="height:32px; padding:0 12px; font-size:11.5px; font-weight:800; color:#000000; border:1px solid var(--border-2); background:var(--bg-2); display:inline-flex; align-items:center; gap:4px; border-radius:6px; cursor:pointer;">
               <i class="bi bi-gear-fill"></i> Pengaturan Gateway
             </button>
@@ -765,7 +771,63 @@
         </div>
       </div>
 
-      {{-- SEKSI 2: ATURAN AMBANG BATAS PELANGGARAN --}}
+      {{-- SEKSI 2: FILTER KATEGORI NOTIFIKASI (ANTI-ANTREAN MEMBENGKAK) --}}
+      <div style="background:var(--surface); border:1px solid var(--border); border-radius:var(--r-sm); padding:14px; margin-bottom:14px;">
+        <div style="font-weight:800; font-size:12.5px; color:var(--text); margin-bottom:6px; display:flex; align-items:center; gap:6px;">
+          <i class="bi bi-funnel-fill" style="color:#000000;"></i>
+          <span>Kategori Notifikasi yang Diizinkan (Anti-Spam Antrean)</span>
+        </div>
+        <p style="font-size:11px; color:var(--text-3); margin-top:0; margin-bottom:12px;">
+          Pilih hanya kejadian yang membutuhkan perhatian orang tua. Nonaktifkan kehadiran normal agar tidak membanjiri antrean harian.
+        </p>
+
+        <div style="display:grid; grid-template-columns:1fr; gap:8px;">
+          <label style="display:flex; align-items:center; gap:8px; font-size:12px; font-weight:700; color:var(--text); cursor:pointer;">
+            <input type="checkbox" name="notif_alpha_aktif" value="1" {{ ($setting->notif_alpha_aktif ?? true) ? 'checked' : '' }} style="width:16px; height:16px;" />
+            <span>❌ Siswa Alpha (Tanpa Keterangan) <span style="font-size:10.5px; color:#DC2626; font-weight:600;">(Prioritas Utama)</span></span>
+          </label>
+
+          <label style="display:flex; align-items:center; gap:8px; font-size:12px; font-weight:700; color:var(--text); cursor:pointer;">
+            <input type="checkbox" name="notif_bolos_aktif" value="1" {{ ($setting->notif_bolos_aktif ?? true) ? 'checked' : '' }} style="width:16px; height:16px;" />
+            <span>🚫 Siswa Bolos / Pulang Sebelum Waktu <span style="font-size:10.5px; color:#DC2626; font-weight:600;">(Prioritas Utama)</span></span>
+          </label>
+
+          <label style="display:flex; align-items:center; gap:8px; font-size:12px; font-weight:700; color:var(--text); cursor:pointer;">
+            <input type="checkbox" name="notif_terlambat_aktif" value="1" {{ ($setting->notif_terlambat_aktif ?? true) ? 'checked' : '' }} style="width:16px; height:16px;" />
+            <span>⚠️ Siswa Terlambat Datang Sekolah</span>
+          </label>
+
+          <label style="display:flex; align-items:center; gap:8px; font-size:12px; font-weight:700; color:var(--text); cursor:pointer;">
+            <input type="checkbox" name="notif_panggilan_aktif" value="1" {{ ($setting->notif_panggilan_aktif ?? true) ? 'checked' : '' }} style="width:16px; height:16px;" />
+            <span>🚨 Surat Panggilan Orang Tua (Akumulasi Alpha)</span>
+          </label>
+
+          <label style="display:flex; align-items:center; gap:8px; font-size:12px; font-weight:700; color:var(--text); cursor:pointer;">
+            <input type="checkbox" name="notif_izin_aktif" value="1" {{ ($setting->notif_izin_aktif ?? true) ? 'checked' : '' }} style="width:16px; height:16px;" />
+            <span>📋 Konfirmasi Surat Izin &amp; Sakit Resmi</span>
+          </label>
+
+          <div style="border-top:1px dashed var(--border); margin:4px 0;"></div>
+
+          <label style="display:flex; align-items:flex-start; gap:8px; font-size:12px; font-weight:600; color:var(--text-2); cursor:pointer;">
+            <input type="checkbox" name="notif_masuk_aktif" value="1" {{ ($setting->notif_masuk_aktif ?? false) ? 'checked' : '' }} style="width:16px; height:16px; margin-top:2px;" />
+            <div>
+              <span>🟢 Siswa Masuk Tepat Waktu (Kehadiran Normal)</span>
+              <div style="font-size:10.5px; color:var(--text-3); font-weight:400;">Nonaktifkan agar tidak menumpuk ratusan antrean harian saat siswa scan pagi.</div>
+            </div>
+          </label>
+
+          <label style="display:flex; align-items:flex-start; gap:8px; font-size:12px; font-weight:600; color:var(--text-2); cursor:pointer;">
+            <input type="checkbox" name="notif_pulang_aktif" value="1" {{ ($setting->notif_pulang_aktif ?? false) ? 'checked' : '' }} style="width:16px; height:16px; margin-top:2px;" />
+            <div>
+              <span>🔵 Siswa Pulang Sekolah Normal</span>
+              <div style="font-size:10.5px; color:var(--text-3); font-weight:400;">Nonaktifkan agar tidak menumpuk ratusan antrean harian saat siswa scan jam pulang.</div>
+            </div>
+          </label>
+        </div>
+      </div>
+
+      {{-- SEKSI 3: ATURAN AMBANG BATAS PELANGGARAN --}}
       <div style="background:var(--surface); border:1px solid var(--border); border-radius:var(--r-sm); padding:14px; margin-bottom:14px;">
         <div style="font-weight:800; font-size:12.5px; color:var(--text); margin-bottom:10px; display:flex; align-items:center; gap:6px;">
           <i class="bi bi-shield-exclamation" style="color:#000000;"></i>
