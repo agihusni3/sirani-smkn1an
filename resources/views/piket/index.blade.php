@@ -536,49 +536,61 @@
     .piket-status-pill {
       display: inline-flex;
       align-items: center;
-      gap: 5px;
-      font-size: 11px;
-      font-weight: 800;
-      letter-spacing: 0.3px;
-      text-transform: uppercase;
-      padding: 2.5px 8px;
-      border-radius: 100px;
-      font-family: var(--font-mono);
+      gap: 5.5px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.1px;
+      padding: 0;
+      background: transparent !important;
+      border: none !important;
+      box-shadow: none !important;
+      white-space: nowrap;
+    }
+    .piket-status-pill i {
+      font-size: 12.5px;
+      flex-shrink: 0;
     }
     .piket-status-pill.hadir {
-      background: rgba(16, 185, 129, 0.12);
-      color: #059669;
-      border: 1px solid rgba(16, 185, 129, 0.3);
+      color: #16A34A;
+    }
+    [data-theme="dark"] .piket-status-pill.hadir {
+      color: #22C55E;
     }
     .piket-status-pill.terlambat {
-      background: rgba(245, 158, 11, 0.12);
       color: #D97706;
-      border: 1px solid rgba(245, 158, 11, 0.3);
+    }
+    [data-theme="dark"] .piket-status-pill.terlambat {
+      color: #F59E0B;
     }
     .piket-status-pill.pulang {
-      background: rgba(6, 182, 212, 0.12);
-      color: #0891B2;
-      border: 1px solid rgba(6, 182, 212, 0.3);
+      color: #0284C7;
+    }
+    [data-theme="dark"] .piket-status-pill.pulang {
+      color: #38BDF8;
     }
     .piket-status-pill.izin {
-      background: rgba(59, 130, 246, 0.12);
       color: #2563EB;
-      border: 1px solid rgba(59, 130, 246, 0.3);
+    }
+    [data-theme="dark"] .piket-status-pill.izin {
+      color: #60A5FA;
     }
     .piket-status-pill.pkl {
-      background: rgba(139, 92, 246, 0.12);
       color: #7C3AED;
-      border: 1px solid rgba(139, 92, 246, 0.3);
+    }
+    [data-theme="dark"] .piket-status-pill.pkl {
+      color: #A78BFA;
     }
     .piket-status-pill.belum {
-      background: rgba(239, 68, 68, 0.1);
       color: #DC2626;
-      border: 1px dashed rgba(239, 68, 68, 0.4);
+    }
+    [data-theme="dark"] .piket-status-pill.belum {
+      color: #EF4444;
     }
     .piket-status-pill.bolos {
-      background: rgba(225, 29, 72, 0.12);
       color: #E11D48;
-      border: 1px solid rgba(225, 29, 72, 0.3);
+    }
+    [data-theme="dark"] .piket-status-pill.bolos {
+      color: #F43F5E;
     }
 
     /* Modal Presensi Quick Bar (Keep intact for compatibility) */
