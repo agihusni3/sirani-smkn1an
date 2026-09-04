@@ -36,12 +36,12 @@ class BeritaWebController extends Controller
         $berita = BeritaSekolah::published()->where('slug', $slug)->firstOrFail();
         
         // Naikkan view count
-        $berita->increment('views');
+        $berita->increment('dilihat');
 
         $beritaTerkait = BeritaSekolah::published()
             ->where('id', '!=', $berita->id)
             ->where('kategori', $berita->kategori)
-            ->latest('tanggal_publikasi')
+            ->latest('published_at')
             ->take(3)
             ->get();
 
