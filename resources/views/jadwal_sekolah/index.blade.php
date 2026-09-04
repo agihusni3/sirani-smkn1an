@@ -5,268 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Jam Sekolah &amp; Sesi Operasional — SIRANI SMKN 1 Air Naningan</title>
   @include('partials.styles')
-  <style>
-    /* ── Pusat Kendali Timeline & Sesi Styling ── */
-    .hero-sesi-banner {
-      background: var(--bg-2);
-      border: 1px solid var(--border);
-      border-radius: var(--r-md);
-      padding: 12px 16px;
-      margin-bottom: 12px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 12px;
-      position: relative;
-      overflow: hidden;
-      box-shadow: var(--shadow-sm);
-    }
-    .hero-sesi-banner::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 2.5px;
-      background: #000000;
-    }
-
-    /* Live Digital Clock Card */
-    .digital-clock-box {
-      background: var(--bg-3);
-      border: 1px solid var(--border-2);
-      border-radius: var(--r-sm);
-      padding: 6px 14px;
-      text-align: center;
-      min-width: 160px;
-    }
-    .digital-clock-time {
-      font-size: 20px;
-      font-weight: 900;
-      font-family: var(--font-mono);
-      color: #000000;
-      letter-spacing: 1px;
-      line-height: 1.1;
-    }
-    .pulse-indicator {
-      display: inline-block;
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      background: #000000;
-      animation: pulseAnim 1.8s infinite;
-      margin-right: 4px;
-    }
-    @keyframes pulseAnim {
-      0% { transform: scale(0.9); box-shadow: 0 0 0 0 rgba(0,0,0,0.4); }
-      70% { transform: scale(1.1); box-shadow: 0 0 0 6px rgba(0,0,0,0); }
-      100% { transform: scale(0.9); box-shadow: 0 0 0 0 rgba(0,0,0,0); }
-    }
-
-    /* ── Visual Day Timeline ── */
-    .timeline-container {
-      background: var(--bg-2);
-      border: 1px solid var(--border);
-      border-radius: var(--r-md);
-      padding: 12px 14px;
-      margin-bottom: 12px;
-      box-shadow: var(--shadow-sm);
-    }
-    .timeline-track {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 8px;
-      margin-top: 10px;
-      position: relative;
-    }
-    .timeline-phase {
-      background: var(--bg-3);
-      border: 1px solid var(--border-2);
-      border-radius: var(--r-sm);
-      padding: 8px 10px;
-      position: relative;
-      transition: all .15s ease;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      gap: 3px;
-    }
-    .timeline-phase.active {
-      border-color: #000000;
-      background: var(--bg-2);
-      box-shadow: 0 0 0 1px #000000;
-    }
-    .phase-badge {
-      font-size: 9.5px;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: 0.4px;
-      padding: 2px 6px;
-      border-radius: 4px;
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      width: fit-content;
-      margin-bottom: 2px;
-      background: var(--bg-2);
-      border: 1px solid var(--border);
-      color: var(--text-2);
-    }
-    .timeline-phase.active .phase-badge {
-      border-color: #000000;
-      color: #FFFFFF;
-      background: #000000;
-    }
-    .phase-time {
-      font-size: 14px;
-      font-weight: 900;
-      font-family: var(--font-mono);
-      margin: 2px 0 1px 0;
-      color: #000000;
-    }
-    .phase-desc {
-      font-size: 10.5px;
-      color: var(--text-3);
-      line-height: 1.25;
-    }
-
-    /* ── Preset Scenario Cards Grid ── */
-    .scenario-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 8px;
-      margin-bottom: 14px;
-    }
-    .scenario-card {
-      background: var(--bg-3);
-      border: 1px solid var(--border-2);
-      border-radius: var(--r-sm);
-      padding: 10px 12px;
-      cursor: pointer;
-      transition: all .15s ease;
-      text-align: left;
-      position: relative;
-    }
-    .scenario-card:hover {
-      border-color: #000000;
-      background: var(--bg-2);
-    }
-    .scenario-card.selected {
-      border-color: #000000;
-      background: #000000;
-      color: #FFFFFF !important;
-    }
-    .scenario-card.selected .scenario-title,
-    .scenario-card.selected .scenario-meta,
-    .scenario-card.selected i {
-      color: #FFFFFF !important;
-    }
-    .scenario-icon {
-      width: 24px;
-      height: 24px;
-      border-radius: 4px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 12px;
-      margin-bottom: 6px;
-      background: var(--bg-2);
-      color: #000000;
-      border: 1px solid var(--border);
-    }
-    .scenario-title {
-      font-size: 12px;
-      font-weight: 800;
-      color: var(--text);
-      margin-bottom: 2px;
-    }
-    .scenario-meta {
-      font-size: 10px;
-      font-family: var(--font-mono);
-      color: var(--text-3);
-      font-weight: 700;
-    }
-
-    /* Form Styles */
-    .studio-layout {
-      display: grid;
-      grid-template-columns: 1.3fr 1fr;
-      gap: 14px;
-    }
-    .time-inputs-row {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
-      margin-bottom: 12px;
-    }
-    .time-input-wrap {
-      position: relative;
-    }
-    .time-input-wrap input {
-      width: 100%;
-      height: 38px;
-      font-size: 14px;
-      font-weight: 800;
-      font-family: var(--font-mono);
-      padding: 0 12px;
-      background: var(--bg-3);
-      border: 1px solid var(--border-2);
-      border-radius: var(--r-sm);
-      color: #000000;
-      transition: border-color .15s ease;
-    }
-    .time-input-wrap input:focus {
-      outline: none;
-      border-color: #000000;
-    }
-
-    /* Mobile Responsive */
-    @media (max-width: 900px) {
-      .studio-layout {
-        grid-template-columns: 1fr;
-      }
-    }
-    @media (max-width: 768px) {
-      .hero-sesi-banner {
-        flex-direction: column !important;
-        align-items: stretch !important;
-        padding: 10px 12px !important;
-      }
-      .digital-clock-box {
-        width: 100% !important;
-        padding: 6px 10px !important;
-      }
-      .timeline-track {
-        grid-template-columns: repeat(2, 1fr) !important;
-        gap: 6px !important;
-      }
-      .timeline-phase {
-        padding: 6px 8px !important;
-      }
-      .phase-time {
-        font-size: 12.5px !important;
-      }
-      .phase-desc {
-        display: none !important;
-      }
-      .scenario-grid {
-        grid-template-columns: repeat(2, 1fr) !important;
-        gap: 6px !important;
-      }
-      .scenario-card {
-        padding: 8px 10px !important;
-      }
-      .time-inputs-row {
-        grid-template-columns: 1fr !important;
-        gap: 8px !important;
-      }
-      .time-input-wrap input {
-        height: 34px !important;
-        font-size: 13px !important;
-      }
-    }
-  </style>
+  <link rel="stylesheet" href="{{ asset('css/jadwal-sekolah.css') }}?v={{ filemtime(public_path('css/jadwal-sekolah.css')) }}">
 </head>
 <body>
 
@@ -279,7 +18,6 @@
       $jamMasuk = substr($jadwalHariIni->jam_masuk_toleransi ?? '07:15', 0, 5);
       $jamPulang = substr($jadwalHariIni->jam_pulang_mulai ?? '15:30', 0, 5);
       $jamTutup = substr($jadwalHariIni->jam_tutup_gerbang ?? '17:00', 0, 5);
-
 
       // Determine current active session phase
       $currentPhase = 'tutup';
@@ -300,7 +38,6 @@
             <i class="bi bi-clock-history" style="color:#000000; font-size:16px;"></i> Jam Operasional Sekolah
           </h1>
         </div>
-
 
         <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
           <span style="background:var(--bg-3); border:1px solid var(--border-2); color:#000000; font-family:var(--font-mono); font-size:12px; font-weight:800; padding:4px 10px; border-radius:6px; display:inline-flex; align-items:center; gap:5px;">
@@ -414,7 +151,6 @@
       </form>
     </div>
 
-
     {{-- ══ 5. RIWAYAT PERUBAHAN JADWAL (TABEL TERPADU) ══ --}}
     <div class="panel" style="padding:0; overflow:hidden; border:1px solid var(--border); border-radius:var(--r-md); box-shadow:var(--shadow-sm); background:var(--bg-2); margin-bottom:24px;">
       <div style="padding:14px 18px; border-bottom:1px solid var(--border); background:var(--surface); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
@@ -423,7 +159,6 @@
           <span>Riwayat Jadwal Operasional (10 Hari Terakhir)</span>
         </div>
       </div>
-
 
       @if($riwayatJadwal->isEmpty())
         <div style="text-align:center; padding:32px; color:var(--text-3); font-size:13px;">

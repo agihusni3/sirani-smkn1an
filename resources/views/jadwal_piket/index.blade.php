@@ -5,84 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Jadwal Guru Piket — SMKN 1 Air Naningan</title>
   @include('partials.styles')
-  <style>
-    .day-column {
-      background: var(--bg-2);
-      border: 1.5px solid var(--border-2);
-      border-radius: var(--r-md);
-      padding: 16px;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      transition: all .2s;
-    }
-    .day-column.today-column {
-      border-color: var(--text);
-      box-shadow: var(--shadow-sm);
-      background: var(--bg-2);
-    }
-    .day-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding-bottom: 10px;
-      border-bottom: 1px solid var(--border);
-    }
-    .day-name {
-      font-size: 15px;
-      font-weight: 800;
-      color: var(--text);
-    }
-    .piket-card-item {
-      background: var(--bg-3);
-      border: 1px solid var(--border-2);
-      border-radius: var(--r-sm);
-      padding: 10px 12px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      transition: transform .15s;
-    }
-    .piket-card-item:hover {
-      transform: translateY(-1px);
-      border-color: var(--text);
-    }
-    .kpi-mini-card {
-      background: var(--bg-2);
-      border: 1px solid var(--border-2);
-      border-radius: var(--r-sm);
-      padding: 14px 16px;
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    }
-    .kpi-mini-val {
-      font-size: 24px;
-      font-weight: 800;
-      font-family: var(--font-mono);
-      color: var(--text);
-      line-height: 1;
-    }
-    .kpi-mini-lbl {
-      font-size: 11.5px;
-      font-weight: 700;
-      color: var(--text-3);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-    @media (max-width: 768px) {
-      .day-column {
-        padding: 10px 12px !important;
-      }
-      .kpi-mini-card {
-        padding: 8px 10px !important;
-      }
-      .kpi-mini-val {
-        font-size: 18px !important;
-      }
-    }
-  </style>
+  <link rel="stylesheet" href="{{ asset('css/jadwal-piket.css') }}?v={{ filemtime(public_path('css/jadwal-piket.css')) }}">
 </head>
 <body>
 
@@ -238,7 +161,6 @@
 
   </main>
 </div>
-
 
 <script>
   function toggleFormPiket(forceState) {

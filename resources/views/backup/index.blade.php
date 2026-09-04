@@ -5,55 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Pencadangan &amp; Auto-Backup Database — SMKN 1 Air Naningan</title>
   @include('partials.styles')
-  <style>
-    .backup-stat-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
-      gap: 14px;
-      margin-bottom: 24px;
-    }
-    .backup-stat-card {
-      background: var(--bg-2);
-      border: 1px solid var(--border-2);
-      border-radius: var(--r-md);
-      padding: 16px 18px;
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      box-shadow: var(--shadow-sm);
-    }
-    .backup-stat-icon {
-      width: 42px;
-      height: 42px;
-      border-radius: 10px;
-      background: var(--bg-3);
-      border: 1px solid var(--border-2);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 19px;
-      color: #000000;
-      flex-shrink: 0;
-    }
-    .backup-stat-val {
-      font-family: var(--font-mono);
-      font-size: 20px;
-      font-weight: 900;
-      color: var(--text);
-      line-height: 1.1;
-    }
-    .backup-stat-lbl {
-      font-size: 11px;
-      font-weight: 800;
-      color: var(--text-3);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      margin-top: 3px;
-    }
-    .backup-table-row:hover td {
-      background: var(--bg-2);
-    }
-  </style>
+  <link rel="stylesheet" href="{{ asset('css/backup.css') }}?v={{ filemtime(public_path('css/backup.css')) }}">
 </head>
 <body>
 <div class="app-container">

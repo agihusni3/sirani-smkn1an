@@ -5,13 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Tambah Hero &amp; Banner — SIRANI SMKN 1 Air Naningan</title>
   @include('partials.styles')
-  <style>
-    .posisi-teks-radio:checked + .posisi-card {
-      border-color: var(--brand) !important;
-      background: rgba(37, 99, 235, 0.08) !important;
-      box-shadow: 0 0 0 1px var(--brand);
-    }
-  </style>
+  <link rel="stylesheet" href="{{ asset('css/admin-banner.css') }}?v={{ filemtime(public_path('css/admin-banner.css')) }}">
 </head>
 <body>
 <div class="app-container">

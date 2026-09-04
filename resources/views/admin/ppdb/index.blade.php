@@ -5,44 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Panitia PPDB Online 2026 — SIRANI SMKN 1 Air Naningan</title>
   @include('partials.styles')
-  <style>
-    .ppdb-stat-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 10px;
-      margin-bottom: 16px;
-    }
-    .ppdb-stat-card {
-      background: var(--bg-2);
-      border: 1px solid var(--border-2);
-      border-radius: var(--r-sm);
-      padding: 12px 16px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      box-shadow: var(--shadow-sm);
-    }
-    .ppdb-stat-val {
-      font-size: 22px;
-      font-weight: 900;
-      font-family: var(--font-mono);
-      line-height: 1.1;
-    }
-    .badge-status {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      padding: 4px 8px;
-      border-radius: 6px;
-      font-size: 11px;
-      font-weight: 800;
-      text-transform: uppercase;
-    }
-    .badge-menunggu { background: #fef3c7; color: #b45309; border: 1px solid #fde68a; }
-    .badge-berkas_valid { background: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd; }
-    .badge-diterima { background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; }
-    .badge-ditolak { background: #fee2e2; color: #b91c1c; border: 1px solid #fecaca; }
-  </style>
+  <link rel="stylesheet" href="{{ asset('css/admin-ppdb.css') }}?v={{ filemtime(public_path('css/admin-ppdb.css')) }}">
 </head>
 <body>
 <div class="app-container">

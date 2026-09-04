@@ -1,0 +1,15 @@
+/* ─── Source: admin/banner/create.blade.php ─── */
+    .posisi-teks-radio:checked + .posisi-card {
+      border-color: var(--brand) !important;
+      background: rgba(37, 99, 235, 0.08) !important;
+      box-shadow: 0 0 0 1px var(--brand);
+    }
+  
+
+/* ─── Source: admin/banner/edit.blade.php ─── */
+    .posisi-teks-radio:checked + .posisi-card {
+      border-color: var(--brand) !important;
+      background: rgba(37, 99, 235, 0.08) !important;
+      box-shadow: 0 0 0 1px var(--brand);
+    }
+  

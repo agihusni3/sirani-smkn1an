@@ -1,0 +1,194 @@
+/* ─── Source: dashboard.blade.php ─── */
+    .clickable-card {
+      cursor: pointer;
+      position: relative;
+      user-select: none;
+      transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+    }
+    .clickable-card:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-md);
+      border-color: #000000;
+    }
+
+    .section-divider {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 28px 0 16px 0;
+    }
+    .section-divider h2 {
+      font-size: 16px;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .section-divider-line {
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    /* Tab Switcher */
+    .tab-pills {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+    .tab-pill-btn {
+      background: var(--bg-2);
+      border: 1px solid var(--border-2);
+      color: var(--text-2);
+      padding: 8px 18px;
+      border-radius: var(--r-sm);
+      font-family: var(--font);
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all .2s;
+    }
+    .tab-pill-btn.active {
+      background: #000000 !important;
+      color: #FFFFFF !important;
+      border-color: #000000 !important;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25);
+    }
+    .tab-pill-btn.active i {
+      color: #FFFFFF !important;
+    }
+
+    /* Modules Grid Hub */
+    .modules-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+    .module-card {
+      background: var(--bg-2);
+      border: 1px solid var(--border-2);
+      border-radius: var(--r-md);
+      padding: 14px 16px;
+      text-decoration: none;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease, background .2s ease;
+      box-shadow: var(--shadow-sm);
+    }
+    .module-card:hover {
+      transform: translateY(-3px);
+      border-color: #000000;
+      box-shadow: var(--shadow-md);
+      background: var(--bg-3);
+    }
+    .module-icon-wrap {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+    .module-title {
+      font-size: 13.5px;
+      font-weight: 800;
+      line-height: 1.3;
+      color: var(--text);
+    }
+    .module-desc {
+      font-size: 11px;
+      color: var(--text-2);
+      margin-top: 2px;
+    }
+
+    /* Mobile Responsive Dashboard Layout */
+    @media (max-width: 768px) {
+      .header {
+        margin-bottom: 12px !important;
+        padding-bottom: 8px !important;
+      }
+      .header-title h1 {
+        font-size: 18px !important;
+      }
+      .header-title p {
+        font-size: 11.5px !important;
+      }
+      .exec-hero {
+        padding: 14px 16px !important;
+        gap: 12px !important;
+        margin-bottom: 14px !important;
+      }
+      .exec-date-card {
+        padding: 10px 12px !important;
+      }
+      .db-kpi-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 8px !important;
+        margin-bottom: 14px !important;
+      }
+      .db-kpi-card {
+        padding: 10px 12px !important;
+      }
+      .db-kpi-val {
+        font-size: 20px !important;
+      }
+      .db-kpi-title {
+        font-size: 10px !important;
+      }
+      .db-kpi-icon {
+        width: 28px !important;
+        height: 28px !important;
+        font-size: 14px !important;
+      }
+      .tab-pills {
+        overflow-x: auto !important;
+        flex-wrap: nowrap !important;
+        -webkit-overflow-scrolling: touch !important;
+        scrollbar-width: none !important;
+        gap: 6px !important;
+        margin-bottom: 12px !important;
+      }
+      .tab-pill-btn {
+        padding: 6px 12px !important;
+        font-size: 11.5px !important;
+        white-space: nowrap !important;
+        flex-shrink: 0 !important;
+      }
+      .modules-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 8px !important;
+        margin-bottom: 16px !important;
+      }
+      .module-card {
+        padding: 10px 12px !important;
+        gap: 8px !important;
+      }
+      .module-icon-wrap {
+        width: 34px !important;
+        height: 34px !important;
+        font-size: 16px !important;
+        border-radius: 8px !important;
+      }
+      .module-title {
+        font-size: 12px !important;
+      }
+      .module-desc {
+        display: none !important;
+      }
+      .section-divider {
+        margin: 18px 0 10px 0 !important;
+      }
+      .section-divider h2 {
+        font-size: 14px !important;
+      }
+    }
+  

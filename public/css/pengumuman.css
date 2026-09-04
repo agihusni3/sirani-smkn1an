@@ -1,0 +1,109 @@
+/* ─── Source: pengumuman/index.blade.php ─── */
+    .ann-stat-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+    .ann-stat-card {
+      background: var(--bg-2);
+      border: 1px solid var(--border-2);
+      border-radius: var(--r-sm);
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      transition: all .15s ease;
+      box-shadow: var(--shadow-sm);
+    }
+    .ann-stat-card:hover {
+      border-color: #000000;
+    }
+    .ann-stat-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+      flex-shrink: 0;
+    }
+    .ann-stat-val {
+      font-size: 20px;
+      font-weight: 900;
+      font-family: var(--font-mono);
+      line-height: 1.1;
+      color: #000000;
+    }
+    .ann-stat-lbl {
+      font-size: 11.5px;
+      color: var(--text-3);
+      font-weight: 600;
+      margin-top: 2px;
+    }
+    @media (max-width: 768px) {
+      .ann-stat-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 8px !important;
+      }
+      .ann-stat-card {
+        padding: 8px 10px !important;
+        gap: 10px !important;
+      }
+      .ann-stat-val {
+        font-size: 18px !important;
+      }
+      .ann-stat-icon {
+        width: 32px !important;
+        height: 32px !important;
+        font-size: 15px !important;
+      }
+    }
+
+    /* Modern Hover Tooltip */
+    [data-tooltip] {
+      position: relative;
+    }
+    [data-tooltip]::before {
+      content: attr(data-tooltip);
+      position: absolute;
+      bottom: calc(100% + 8px);
+      left: 50%;
+      transform: translateX(-50%) translateY(4px);
+      background: #0f172a;
+      color: #f8fafc;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 5px 9px;
+      border-radius: 6px;
+      white-space: nowrap;
+      pointer-events: none;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity .15s ease, transform .15s ease;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45);
+      border: 1px solid rgba(255,255,255,0.15);
+      z-index: 1000;
+    }
+    [data-tooltip]::after {
+      content: '';
+      position: absolute;
+      bottom: calc(100% + 2px);
+      left: 50%;
+      transform: translateX(-50%) translateY(4px);
+      border: 4px solid transparent;
+      border-top-color: #0f172a;
+      pointer-events: none;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity .15s ease, transform .15s ease;
+      z-index: 1000;
+    }
+    [data-tooltip]:hover::before,
+    [data-tooltip]:hover::after {
+      opacity: 1;
+      visibility: visible;
+      transform: translateX(-50%) translateY(0);
+    }
+  

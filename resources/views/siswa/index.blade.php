@@ -5,193 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Master Data Siswa — SMKN 1 Air Naningan</title>
   @include('partials.styles')
-  <style>
-    .siswa-stat-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 10px;
-      margin-bottom: 12px;
-    }
-    .siswa-stat-card {
-      background: var(--bg-2);
-      border: 1px solid var(--border-2);
-      border-radius: var(--r-sm);
-      padding: 10px 14px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      transition: all .15s ease;
-      box-shadow: var(--shadow-sm);
-    }
-    .siswa-stat-card:hover {
-      border-color: #000000;
-    }
-    .siswa-stat-icon {
-      width: 32px;
-      height: 32px;
-      border-radius: 6px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 15px;
-      flex-shrink: 0;
-    }
-    .siswa-stat-val {
-      font-size: 20px;
-      font-weight: 900;
-      font-family: var(--font-mono);
-      line-height: 1.1;
-      color: #000000;
-    }
-    .siswa-stat-lbl {
-      font-size: 11.5px;
-      color: var(--text-3);
-      font-weight: 600;
-      margin-top: 2px;
-    }
-
-    .siswa-form-grid {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 18px 24px;
-      margin-bottom: 22px;
-    }
-    @media (max-width: 992px) {
-      .siswa-form-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    }
-    @media (max-width: 768px) {
-      .siswa-stat-grid {
-        grid-template-columns: repeat(2, 1fr) !important;
-        gap: 8px !important;
-      }
-      .siswa-stat-card {
-        padding: 8px 10px !important;
-        gap: 10px !important;
-      }
-      .siswa-stat-val {
-        font-size: 18px !important;
-      }
-      .siswa-stat-icon {
-        width: 32px !important;
-        height: 32px !important;
-        font-size: 15px !important;
-      }
-
-      /* Toolbar Mobile Responsive */
-      .siswa-table-toolbar {
-        flex-direction: column !important;
-        align-items: stretch !important;
-        gap: 6px !important;
-      }
-      .siswa-table-title {
-        width: 100% !important;
-      }
-      .siswa-table-form {
-        width: 100% !important;
-        max-width: 100% !important;
-        flex-direction: column !important;
-        align-items: stretch !important;
-        gap: 6px !important;
-      }
-      .siswa-search-box {
-        width: 100% !important;
-      }
-      .siswa-filter-group {
-        width: 100% !important;
-        display: flex !important;
-        gap: 4px !important;
-      }
-      .siswa-filter-group select {
-        font-size: 10.5px !important;
-      }
-    }
-    @media (max-width: 640px) {
-      .siswa-form-grid { grid-template-columns: 1fr; }
-    }
-
-    /* Tab Navigation */
-    .tab-nav {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 16px;
-      border-bottom: 1px solid var(--border);
-      padding-bottom: 2px;
-      overflow-x: auto;
-    }
-    .tab-btn {
-      padding: 9px 16px;
-      border-radius: 8px 8px 0 0;
-      font-size: 13px;
-      font-weight: 700;
-      text-decoration: none;
-      color: var(--text-2);
-      background: transparent;
-      border: 1px solid transparent;
-      border-bottom: none;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      transition: all .2s ease;
-      white-space: nowrap;
-    }
-    .tab-btn:hover {
-      color: var(--text);
-      background: rgba(255,255,255,0.03);
-    }
-    .tab-btn.active {
-      color: #000000;
-      background: var(--bg-2);
-      border-color: var(--border);
-      border-bottom: 2px solid #000000;
-      font-weight: 800;
-    }
-
-    /* Modern Hover Tooltip */
-    [data-tooltip] {
-      position: relative;
-    }
-    [data-tooltip]::before {
-      content: attr(data-tooltip);
-      position: absolute;
-      bottom: calc(100% + 8px);
-      left: 50%;
-      transform: translateX(-50%) translateY(4px);
-      background: #0f172a;
-      color: #f8fafc;
-      font-size: 11px;
-      font-weight: 700;
-      padding: 5px 9px;
-      border-radius: 6px;
-      white-space: nowrap;
-      pointer-events: none;
-      opacity: 0;
-      visibility: hidden;
-      transition: opacity .15s ease, transform .15s ease;
-      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45);
-      border: 1px solid rgba(255,255,255,0.15);
-      z-index: 1000;
-    }
-    [data-tooltip]::after {
-      content: '';
-      position: absolute;
-      bottom: calc(100% + 2px);
-      left: 50%;
-      transform: translateX(-50%) translateY(4px);
-      border: 4px solid transparent;
-      border-top-color: #0f172a;
-      pointer-events: none;
-      opacity: 0;
-      visibility: hidden;
-      transition: opacity .15s ease, transform .15s ease;
-      z-index: 1000;
-    }
-    [data-tooltip]:hover::before,
-    [data-tooltip]:hover::after {
-      opacity: 1;
-      visibility: visible;
-      transform: translateX(-50%) translateY(0);
-    }
-  </style>
+  <link rel="stylesheet" href="{{ asset('css/siswa.css') }}?v={{ filemtime(public_path('css/siswa.css')) }}">
 </head>
 <body>
 <div class="app-container">
@@ -268,7 +82,6 @@
           <div class="siswa-stat-lbl">Direktori Alumni / Lulus</div>
         </div>
       </div>
-
 
       <div class="siswa-stat-card">
         <div class="siswa-stat-icon" style="background:var(--bg-3); border:1px solid var(--border-2); color:#000000;">
@@ -564,7 +377,6 @@
                     <span style="color:var(--text-3); font-size:11.5px;">-</span>
                   @endif
                 </td>
-
 
                 {{-- Kartu RFID --}}
                 <td style="vertical-align:middle; text-align:center; padding:12px 8px; white-space:nowrap;">

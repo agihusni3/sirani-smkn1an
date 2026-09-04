@@ -5,21 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Master Rombel &amp; Jurusan — SMKN 1 Air Naningan</title>
   @include('partials.styles')
-  <style>
-    .btn-badge-action {
-      height: 36px;
-      padding: 0 14px;
-      font-size: 13px;
-      font-weight: 700;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      border-radius: var(--r-sm);
-      text-decoration: none;
-      cursor: pointer;
-      transition: all .2s;
-    }
-  </style>
+  <link rel="stylesheet" href="{{ asset('css/rombel.css') }}?v={{ filemtime(public_path('css/rombel.css')) }}">
 </head>
 <body>
 <div class="app-container">

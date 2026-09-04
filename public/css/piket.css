@@ -1,0 +1,877 @@
+/* ─── Source: piket/index.blade.php ─── */
+    /* ══ CLEAN & TIDY PIKET LAYOUT SYSTEM ══ */
+    .piket-clean-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-bottom: 16px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--border);
+    }
+    .piket-header-left {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .piket-title-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .piket-page-title {
+      font-size: 24px;
+      font-weight: 900;
+      color: var(--text);
+      letter-spacing: -0.5px;
+      margin: 0;
+      line-height: 1.2;
+    }
+    .piket-date-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--text-2);
+      background: var(--bg-2);
+      border: 1px solid var(--border-2);
+      padding: 4px 10px;
+      border-radius: var(--r-sm);
+    }
+    .piket-holiday-badge {
+      background: rgba(239, 68, 68, 0.12);
+      color: #DC2626;
+      font-size: 11px;
+      font-weight: 800;
+      padding: 4px 10px;
+      border-radius: var(--r-sm);
+      border: 1px solid rgba(239, 68, 68, 0.25);
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    /* ══ GRADIENT ACTION BUTTONS & BEAUTIFIED HOVER TOOLTIPS ══ */
+    .btn-gradient-koreksi {
+      background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%) !important;
+      color: #ffffff !important;
+      border: none !important;
+      border-radius: 6px !important;
+      font-size: 11px !important;
+      font-weight: 800 !important;
+      letter-spacing: 0.02em !important;
+      padding: 5px 12px !important;
+      cursor: pointer !important;
+      box-shadow: 0 2px 6px rgba(37, 99, 235, 0.28) !important;
+      transition: all .2s cubic-bezier(.4, 0, .2, 1) !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      text-decoration: none !important;
+      position: relative !important;
+      outline: none !important;
+    }
+    .btn-gradient-koreksi:hover {
+      background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%) !important;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.45) !important;
+      transform: translateY(-1.5px) !important;
+      color: #ffffff !important;
+    }
+    .btn-gradient-koreksi:active {
+      transform: translateY(0) !important;
+      box-shadow: 0 1px 3px rgba(37, 99, 235, 0.3) !important;
+    }
+
+    .btn-gradient-status {
+      background: linear-gradient(135deg, #059669 0%, #047857 100%) !important;
+      color: #ffffff !important;
+      border: none !important;
+      border-radius: 6px !important;
+      font-size: 11px !important;
+      font-weight: 800 !important;
+      letter-spacing: 0.02em !important;
+      padding: 5px 12px !important;
+      cursor: pointer !important;
+      box-shadow: 0 2px 6px rgba(5, 150, 105, 0.28) !important;
+      transition: all .2s cubic-bezier(.4, 0, .2, 1) !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      text-decoration: none !important;
+      position: relative !important;
+      outline: none !important;
+    }
+    .btn-gradient-status:hover {
+      background: linear-gradient(135deg, #047857 0%, #065f46 100%) !important;
+      box-shadow: 0 4px 12px rgba(5, 150, 105, 0.45) !important;
+      transform: translateY(-1.5px) !important;
+      color: #ffffff !important;
+    }
+    .btn-gradient-status:active {
+      transform: translateY(0) !important;
+      box-shadow: 0 1px 3px rgba(5, 150, 105, 0.3) !important;
+    }
+
+    /* Toolbar Gradient Action Buttons */
+    .btn-gradient-notif {
+      background: linear-gradient(135deg, #16a34a 0%, #15803d 100%) !important;
+      color: #ffffff !important;
+      border: none !important;
+      border-radius: var(--r-sm) !important;
+      height: 32px !important;
+      font-size: 12px !important;
+      font-weight: 800 !important;
+      padding: 0 14px !important;
+      cursor: pointer !important;
+      box-shadow: 0 2px 6px rgba(22, 163, 74, 0.25) !important;
+      transition: all .2s cubic-bezier(.4, 0, .2, 1) !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      text-decoration: none !important;
+      position: relative !important;
+    }
+    .btn-gradient-notif:hover {
+      background: linear-gradient(135deg, #15803d 0%, #166534 100%) !important;
+      box-shadow: 0 4px 12px rgba(22, 163, 74, 0.4) !important;
+      transform: translateY(-1.5px) !important;
+      color: #ffffff !important;
+    }
+
+    .btn-gradient-manual {
+      background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%) !important;
+      color: #ffffff !important;
+      border: 1px solid rgba(255, 255, 255, 0.15) !important;
+      border-radius: var(--r-sm) !important;
+      height: 32px !important;
+      font-size: 12px !important;
+      font-weight: 800 !important;
+      padding: 0 14px !important;
+      cursor: pointer !important;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25) !important;
+      transition: all .2s cubic-bezier(.4, 0, .2, 1) !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      text-decoration: none !important;
+      position: relative !important;
+    }
+    .btn-gradient-manual:hover {
+      background: linear-gradient(135deg, #334155 0%, #1e293b 100%) !important;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4) !important;
+      transform: translateY(-1.5px) !important;
+      color: #ffffff !important;
+    }
+
+    .btn-gradient-izin {
+      background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%) !important;
+      color: #ffffff !important;
+      border: none !important;
+      border-radius: var(--r-sm) !important;
+      height: 32px !important;
+      font-size: 12px !important;
+      font-weight: 800 !important;
+      padding: 0 14px !important;
+      cursor: pointer !important;
+      box-shadow: 0 2px 6px rgba(2, 132, 199, 0.25) !important;
+      transition: all .2s cubic-bezier(.4, 0, .2, 1) !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      text-decoration: none !important;
+      position: relative !important;
+    }
+    .btn-gradient-izin:hover {
+      background: linear-gradient(135deg, #0369a1 0%, #075985 100%) !important;
+      box-shadow: 0 4px 12px rgba(2, 132, 199, 0.4) !important;
+      transform: translateY(-1.5px) !important;
+      color: #ffffff !important;
+    }
+
+    /* Modal Submit Gradient Button */
+    .btn-gradient-simpan {
+      background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%) !important;
+      color: #ffffff !important;
+      border: none !important;
+      border-radius: 8px !important;
+      font-weight: 800 !important;
+      font-size: 13px !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      padding: 0 20px !important;
+      height: 40px !important;
+      cursor: pointer !important;
+      box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3) !important;
+      transition: all .2s cubic-bezier(.4, 0, .2, 1) !important;
+      position: relative !important;
+    }
+    .btn-gradient-simpan:hover {
+      background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%) !important;
+      box-shadow: 0 4px 14px rgba(37, 99, 235, 0.45) !important;
+      transform: translateY(-1.5px) !important;
+    }
+
+    /* Preset Chips in Modal */
+    .btn-chip-titip {
+      background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%) !important;
+      color: #ffffff !important;
+      border: none !important;
+      border-radius: 6px !important;
+      padding: 6px 13px !important;
+      font-size: 11px !important;
+      font-weight: 800 !important;
+      box-shadow: 0 2px 5px rgba(239, 68, 68, 0.25) !important;
+      cursor: pointer !important;
+      transition: all .18s ease !important;
+      position: relative !important;
+    }
+    .btn-chip-titip:hover {
+      background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%) !important;
+      box-shadow: 0 4px 10px rgba(239, 68, 68, 0.4) !important;
+      transform: translateY(-1px) !important;
+    }
+
+    .btn-chip-alpha {
+      background: linear-gradient(135deg, #64748b 0%, #475569 100%) !important;
+      color: #ffffff !important;
+      border: none !important;
+      border-radius: 6px !important;
+      padding: 6px 13px !important;
+      font-size: 11px !important;
+      font-weight: 800 !important;
+      box-shadow: 0 2px 5px rgba(100, 116, 139, 0.25) !important;
+      cursor: pointer !important;
+      transition: all .18s ease !important;
+      position: relative !important;
+    }
+    .btn-chip-alpha:hover {
+      background: linear-gradient(135deg, #475569 0%, #334155 100%) !important;
+      box-shadow: 0 4px 10px rgba(100, 116, 139, 0.4) !important;
+      transform: translateY(-1px) !important;
+    }
+
+    .btn-chip-bolos {
+      background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%) !important;
+      color: #ffffff !important;
+      border: none !important;
+      border-radius: 6px !important;
+      padding: 6px 13px !important;
+      font-size: 11px !important;
+      font-weight: 800 !important;
+      box-shadow: 0 2px 5px rgba(245, 158, 11, 0.25) !important;
+      cursor: pointer !important;
+      transition: all .18s ease !important;
+      position: relative !important;
+    }
+    .btn-chip-bolos:hover {
+      background: linear-gradient(135deg, #d97706 0%, #b45309 100%) !important;
+      box-shadow: 0 4px 10px rgba(245, 158, 11, 0.4) !important;
+      transform: translateY(-1px) !important;
+    }
+
+    /* Custom Floating Tooltip specifically for Table Action Buttons */
+    .btn-gradient-koreksi[data-tooltip]::before,
+    .btn-gradient-status[data-tooltip]::before {
+      right: 0 !important;
+      left: auto !important;
+      transform: translateY(4px) !important;
+    }
+    .btn-gradient-koreksi[data-tooltip]::after,
+    .btn-gradient-status[data-tooltip]::after {
+      right: 18px !important;
+      left: auto !important;
+      transform: translateY(4px) !important;
+    }
+    .btn-gradient-koreksi[data-tooltip]:hover::before,
+    .btn-gradient-status[data-tooltip]:hover::before {
+      transform: translateY(0) !important;
+    }
+    .btn-gradient-koreksi[data-tooltip]:hover::after,
+    .btn-gradient-status[data-tooltip]:hover::after {
+      transform: translateY(0) !important;
+    }
+
+    /* Right Header with Theme/Account Actions & Time Cards Underneath */
+    .piket-header-right {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 10px;
+    }
+    .piket-actions-row {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 8px;
+    }
+
+    /* Modern Time Cards */
+    .piket-time-strip {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .piket-time-card {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      background: var(--bg-2);
+      border: 1px solid var(--border-2);
+      padding: 6px 14px;
+      border-radius: var(--r-sm);
+      box-shadow: var(--shadow-sm);
+      transition: all 0.15s ease;
+    }
+    .piket-time-card:hover {
+      border-color: var(--border);
+      background: var(--surface);
+    }
+    .piket-time-card--live {
+      background: var(--bg-3);
+      border-color: rgba(22, 163, 74, 0.3);
+    }
+    [data-theme="dark"] .piket-time-card--live {
+      border-color: rgba(34, 197, 94, 0.35);
+      background: rgba(34, 197, 94, 0.05);
+    }
+    .piket-live-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #16A34A;
+      box-shadow: 0 0 0 0 rgba(22, 163, 74, 0.7);
+      animation: piketPulse 1.8s infinite;
+      flex-shrink: 0;
+    }
+    @keyframes piketPulse {
+      0% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(22, 163, 74, 0.7);
+      }
+      70% {
+        transform: scale(1);
+        box-shadow: 0 0 0 6px rgba(22, 163, 74, 0);
+      }
+      100% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(22, 163, 74, 0);
+      }
+    }
+    .piket-time-meta {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.15;
+    }
+    .piket-time-label {
+      font-size: 9.5px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-3);
+    }
+    .piket-time-val-wrap {
+      display: flex;
+      align-items: baseline;
+      gap: 4px;
+    }
+    .piket-time-val {
+      font-family: var(--font-mono);
+      font-size: 13.5px;
+      font-weight: 800;
+      color: var(--text);
+      letter-spacing: 0.3px;
+    }
+    .piket-time-card--live .piket-time-val {
+      font-size: 14.5px;
+      font-weight: 900;
+      color: var(--text);
+    }
+    .piket-time-unit {
+      font-size: 9.5px;
+      font-weight: 800;
+      color: var(--text-3);
+      font-family: var(--font-mono);
+    }
+    .piket-time-icon {
+      font-size: 15px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .piket-clean-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .piket-btn-divider {
+      width: 1px;
+      height: 26px;
+      background: var(--border-2);
+      margin: 0 4px;
+    }
+    /* Standar SIRANI Button WhatsApp Extension */
+    .btn-wa {
+      color: #16A34A !important;
+      border-color: rgba(22, 163, 74, 0.35) !important;
+      background: var(--bg-2) !important;
+    }
+    .btn-wa:hover {
+      background: rgba(22, 163, 74, 0.08) !important;
+      border-color: #16A34A !important;
+      color: #15803D !important;
+    }
+
+    /* ══ PETUGAS PIKET BANNER ══ */
+    .piket-officers-banner {
+      background: var(--bg-2);
+      border: 1px solid var(--border-2);
+      border-radius: var(--r-md);
+      padding: 9px 14px;
+      margin-bottom: 18px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .piket-officers-label {
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      color: var(--text-3);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .duty-pulsing-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #10B981;
+      box-shadow: 0 0 6px #10B981;
+    }
+    .piket-officers-tags {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .piket-officer-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--surface);
+      border: 1px solid var(--border-2);
+      padding: 3px 10px;
+      border-radius: 100px;
+      font-size: 11.5px;
+      font-weight: 700;
+      color: var(--text);
+    }
+    .officer-thumb {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      object-fit: cover;
+      background: #0F172A;
+    }
+
+    /* ══ KPI ANALYTICS GRID (6 CARDS BERSIH) ══ */
+    .piket-kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+    .piket-kpi-card {
+      background: var(--bg-2);
+      border: 1px solid var(--border-2);
+      border-radius: var(--r-sm);
+      padding: 12px 14px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 4px;
+      cursor: pointer;
+      transition: all .15s ease;
+      box-shadow: var(--shadow-sm);
+    }
+    .piket-kpi-card:hover {
+      border-color: #000000;
+      transform: translateY(-1px);
+    }
+    .piket-kpi-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      color: var(--text-3);
+    }
+    .piket-kpi-value {
+      font-family: var(--font-mono);
+      font-size: 24px;
+      font-weight: 900;
+      line-height: 1.1;
+      color: var(--text);
+      margin: 2px 0 2px;
+    }
+    .piket-kpi-sub {
+      font-size: 11px;
+      color: var(--text-3);
+      font-weight: 600;
+    }
+
+    /* ══ UNIFIED TOOLBAR & SEGMENTED TABS ══ */
+    .piket-unified-toolbar {
+      background: var(--bg-2);
+      border: 1px solid var(--border);
+      border-radius: var(--r-md) var(--r-md) 0 0;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .piket-toolbar-actions-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border);
+    }
+    .piket-toolbar-btns {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .piket-toolbar-filters-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+    .piket-segmented-tabs {
+      background: var(--bg-3);
+      border: 1px solid var(--border-2);
+      padding: 2.5px;
+      border-radius: var(--r-sm);
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+    }
+    .piket-segmented-btn {
+      border: none;
+      background: transparent;
+      padding: 0 12px;
+      height: 28px;
+      border-radius: calc(var(--r-sm) - 2px);
+      font-size: 12px;
+      font-weight: 700;
+      font-family: var(--font);
+      color: var(--text-2);
+      cursor: pointer;
+      transition: all .15s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .piket-segmented-btn.active {
+      background: #000000;
+      color: #FFFFFF;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+    }
+    .piket-segmented-count {
+      font-size: 10.5px;
+      font-family: var(--font-mono);
+      padding: 1px 6px;
+      border-radius: 10px;
+      background: rgba(255,255,255,0.2);
+    }
+    .piket-segmented-btn:not(.active) .piket-segmented-count {
+      background: var(--border-2);
+      color: var(--text);
+    }
+    .piket-search-box {
+      position: relative;
+      width: 100%;
+      max-width: 320px;
+      flex-shrink: 0;
+    }
+    .piket-search-input {
+      width: 100%;
+      height: 36px;
+      padding: 0 36px 0 36px;
+      background: var(--bg-2, #fff);
+      border: 1.5px solid var(--border-2);
+      border-radius: 8px;
+      font-size: 12px;
+      color: var(--text);
+      transition: border-color .2s ease, box-shadow .2s ease;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    }
+    .piket-search-input::placeholder {
+      color: var(--text-3);
+      font-style: italic;
+    }
+    .piket-search-input:focus {
+      border-color: #4f46e5;
+      background: #fff;
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(79,70,229,0.10);
+    }
+    .piket-search-icon {
+      position: absolute;
+      left: 11px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #9ca3af;
+      font-size: 13px;
+      pointer-events: none;
+      transition: color .2s;
+    }
+    .piket-search-box:focus-within .piket-search-icon {
+      color: #4f46e5;
+    }
+    .piket-search-clear {
+      position: absolute;
+      right: 9px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #9ca3af;
+      font-size: 13px;
+      padding: 2px;
+      display: none;
+      line-height: 1;
+    }
+    .piket-search-clear:hover { color: #ef4444; }
+    .piket-search-input:not(:placeholder-shown) ~ .piket-search-clear { display: block; }
+
+    /* Filter Chips Horizontal Strip */
+    .piket-chips-strip {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      overflow-x: auto;
+      white-space: nowrap;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+      padding: 2px 0;
+      flex: 1;
+      min-width: 0;
+    }
+    .piket-chips-strip::-webkit-scrollbar {
+      display: none;
+    }
+    .piket-chip {
+      background: var(--bg-3);
+      border: 1px solid var(--border-2);
+      color: var(--text-2);
+      padding: 4px 10px;
+      border-radius: 5px;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all .15s;
+      white-space: nowrap;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      flex-shrink: 0;
+    }
+    .piket-chip:hover {
+      color: #000000;
+      border-color: #000000;
+    }
+    .piket-chip.active {
+      background: #000000;
+      border-color: #000000;
+      color: #FFFFFF;
+    }
+    .piket-chip-badge {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      padding: 1px 5px;
+      border-radius: 4px;
+      background: rgba(0,0,0,0.08);
+    }
+    .piket-chip.active .piket-chip-badge {
+      background: rgba(255,255,255,0.22);
+      color: #FFFFFF;
+    }
+
+    /* ══ RESPONSIVE MOBILE MODE (< 768px) ══ */
+    @media (max-width: 768px) {
+      .piket-clean-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 14px;
+      }
+      .piket-header-right {
+        align-items: flex-start;
+        width: 100%;
+      }
+      .piket-actions-row {
+        width: 100%;
+        justify-content: flex-start;
+      }
+      .piket-time-strip {
+        justify-content: flex-start;
+        width: 100%;
+      }
+      .piket-toolbar-actions-row {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+      }
+      /* Posisi tombol aksi (Notifikasi, Presensi Manual, Catat Izin) DI ATAS */
+      .piket-toolbar-btns {
+        order: 1;
+        width: 100%;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 6px;
+      }
+      .piket-toolbar-btns .btn {
+        width: 100%;
+        padding: 0 4px !important;
+        font-size: 11px !important;
+        justify-content: center;
+        text-align: center;
+      }
+      /* Posisi Peserta Didik & Guru DI BAWAH tombol aksi */
+      .piket-segmented-tabs {
+        order: 2;
+        width: 100%;
+        display: flex;
+      }
+      .piket-segmented-btn {
+        flex: 1;
+        justify-content: center;
+        height: 32px;
+      }
+      .piket-toolbar-filters-row {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+      }
+      .piket-search-box {
+        max-width: 100%;
+        order: 1;
+      }
+      .piket-chips-strip {
+        order: 2;
+        width: 100%;
+      }
+    }
+
+    /* ══ TABLE CONTAINER & STATUS PILLS ══ */
+    .piket-table-container {
+      background: var(--bg-2);
+      border: 1px solid var(--border);
+      border-top: none;
+      border-radius: 0 0 var(--r-md) var(--r-md);
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+      margin-bottom: 24px;
+    }
+    .piket-status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5.5px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.1px;
+      padding: 0;
+      background: transparent !important;
+      border: none !important;
+      box-shadow: none !important;
+      white-space: nowrap;
+    }
+    .piket-status-pill i {
+      font-size: 12.5px;
+      flex-shrink: 0;
+    }
+    .piket-status-pill.hadir {
+      color: #16A34A;
+    }
+    [data-theme="dark"] .piket-status-pill.hadir {
+      color: #22C55E;
+    }
+    .piket-status-pill.terlambat {
+      color: #D97706;
+    }
+    [data-theme="dark"] .piket-status-pill.terlambat {
+      color: #F59E0B;
+    }
+    .piket-status-pill.pulang {
+      color: #0284C7;
+    }
+    [data-theme="dark"] .piket-status-pill.pulang {
+      color: #38BDF8;
+    }
+    .piket-status-pill.izin {
+      color: #2563EB;
+    }
+    [data-theme="dark"] .piket-status-pill.izin {
+      color: #60A5FA;
+    }
+    .piket-status-pill.pkl {
+      color: #7C3AED;
+    }
+    [data-theme="dark"] .piket-status-pill.pkl {
+      color: #A78BFA;
+    }
+    .piket-status-pill.belum {
+      color: #DC2626;
+    }
+    [data-theme="dark"] .piket-status-pill.belum {
+      color: #EF4444;
+    }
+    .piket-status-pill.bolos {
+      color: #E11D48;
+    }
+    [data-theme="dark"] .piket-status-pill.bolos {
+      color: #F43F5E;
+    }
+
+    /* Modal Presensi Quick Bar (Keep intact for compatibility) */
+    .pm-search-dropdown {
+      position: absolute;
+      top: calc(100% + 4px);
+      left: 0; right: 0;
+      background: var(--bg-2);
+      border: 1.5px solid var(--border-2);
+      border-radius: var(--r-sm);
+      box-shadow: var(--shadow-lg);
+      z-index: 1050;
+      overflow: hidden;
+    }
+    .pm-item {
+      padding: 8px 12px;
+      border-bottom: 1px solid var(--border);
+      cursor: pointer;
+      transition: background .15s ease;
+      text-align: left;
+    }
+    .pm-item:last-child { border-bottom: none; }
+    .pm-item:hover, .pm-item.active { background: var(--surface); }
+  
