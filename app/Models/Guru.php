@@ -81,28 +81,42 @@ class Guru extends Model
     }
 
     /**
+     * Cek apakah guru wajib hadir pada hari tertentu (nama hari bahasa Indonesia atau string tanggal).
+     */
+    public function isWajibHadirHari(?string $hari = null): bool
+    {
+        if (empty($hari)) {
+            $hari = \Carbon\Carbon::today()->locale('id')->isoFormat('dddd');
+        }
+
+        // Jika parameter berupa format tanggal (misal 2026-09-04), konversi ke nama hari bahasa Indonesia
+        if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $hari)) {
+            $hari = \Carbon\Carbon::parse($hari)->locale('id')->isoFormat('dddd');
+        }
+
+        $hariFormatted = ucfirst(strtolower(trim($hari)));
+
+        // Hari libur akhir pekan
+        if (in_array($hariFormatted, ['Sabtu', 'Minggu'])) {
+            return false;
+        }
+
+        // Pegawai / Guru tetap (PNS, PPPK, Tendik) wajib hadir setiap hari kerja (Senin-Jumat)
+        if (!$this->isHonor()) {
+            return true;
+        }
+
+        // Guru honorer / GTT wajib hadir jika hari tersebut ada di jadwal mengajarnya
+        $hariList = array_map(fn($h) => ucfirst(strtolower(trim($h))), $this->getHariMengajarList());
+        return in_array($hariFormatted, $hariList);
+    }
+
+    /**
      * Cek apakah hari tertentu (atau hari ini) termasuk hari mengajar bagi guru ini.
      */
     public function isHariMengajar($tanggal = null): bool
     {
-        $date = $tanggal ? \Carbon\Carbon::parse($tanggal) : \Carbon\Carbon::today();
-        $namaHariIndo = match ($date->dayOfWeek) {
-            1 => 'Senin',
-            2 => 'Selasa',
-            3 => 'Rabu',
-            4 => 'Kamis',
-            5 => 'Jumat',
-            6 => 'Sabtu',
-            0 => 'Minggu',
-        };
-
-        // Jika bukan honorer, hari kerja normal adalah Senin-Jumat
-        if (!$this->isHonor()) {
-            return !in_array($namaHariIndo, ['Sabtu', 'Minggu']);
-        }
-
-        // Untuk guru honorer, cek apakah hari ada di daftar hari mengajarnya
-        return in_array($namaHariIndo, $this->getHariMengajarList());
+        return $this->isWajibHadirHari($tanggal ? \Carbon\Carbon::parse($tanggal)->toDateString() : null);
     }
 
     public function getFotoUrlAttribute(): string
