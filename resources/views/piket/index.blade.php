@@ -721,7 +721,8 @@
       $isAfter1000 = now()->format('H:i') >= '10:00';
       $alphaCount = max(0, $totalSiswaAktif - ($hadirTepat + $terlambat + $izinCount));
     @endphp
-    <div class="piket-kpi-grid no-print">
+    {{-- KPI Grid Peserta Didik --}}
+    <div class="piket-kpi-grid no-print" id="kpiGridSiswa">
       <!-- 1. Tingkat Kehadiran -->
       <div class="piket-kpi-card" onclick="selectSiswaFilter('all')">
         <div class="piket-kpi-top">
@@ -782,6 +783,69 @@
         <div class="piket-kpi-sub" style="color:{{ $sudahLewatJamTutup ? '#000000' : 'var(--text-3)' }}; font-weight:{{ $sudahLewatJamTutup ? '800' : '600' }};">
           {{ $sudahLewatJamTutup ? 'Lewat 17:00 (Klik)' : 'Klik → lihat detail' }}
         </div>
+      </div>
+    </div>
+
+    {{-- KPI Grid Guru & Pegawai --}}
+    <div class="piket-kpi-grid no-print" id="kpiGridGuru" style="display:none;">
+      <!-- 1. Tingkat Kehadiran Guru -->
+      <div class="piket-kpi-card" onclick="selectGuruFilter('all')">
+        <div class="piket-kpi-top">
+          <span>Tingkat Kehadiran</span>
+          <i class="bi bi-pie-chart-fill" style="color:#059669;"></i>
+        </div>
+        <div class="piket-kpi-value" style="color:#059669;">{{ $guruPersenKehadiran }}%</div>
+        <div class="piket-kpi-sub">{{ $guruHadirTotal }} dari {{ $totalGuruAktif }} guru</div>
+      </div>
+
+      <!-- 2. Hadir Tepat Waktu Guru -->
+      <div class="piket-kpi-card" onclick="selectGuruFilter('hadir')">
+        <div class="piket-kpi-top">
+          <span>Hadir Tepat</span>
+          <i class="bi bi-check2-circle" style="color:#10B981;"></i>
+        </div>
+        <div class="piket-kpi-value">{{ $guruHadirTepat }}</div>
+        <div class="piket-kpi-sub">Batas {{ substr($jadwal->jam_masuk_toleransi ?? '07:15', 0, 5) }} WIB</div>
+      </div>
+
+      <!-- 3. Terlambat Guru -->
+      <div class="piket-kpi-card" onclick="selectGuruFilter('terlambat')">
+        <div class="piket-kpi-top">
+          <span>Terlambat</span>
+          <i class="bi bi-clock-history" style="color:#F59E0B;"></i>
+        </div>
+        <div class="piket-kpi-value" style="color:#D97706;">{{ $guruTerlambat }}</div>
+        <div class="piket-kpi-sub">Lewat batas pagi</div>
+      </div>
+
+      <!-- 4. Izin, Sakit & Dinas Luar Guru -->
+      <div class="piket-kpi-card" onclick="selectGuruFilter('izin')">
+        <div class="piket-kpi-top">
+          <span>Izin &amp; Dinas</span>
+          <i class="bi bi-file-earmark-medical-fill" style="color:#2563EB;"></i>
+        </div>
+        <div class="piket-kpi-value" style="color:#2563EB;">{{ $guruIzinSakit }}</div>
+        <div class="piket-kpi-sub">{{ $guruIzinSakit > 0 ? $guruIzinSakit . ' izin / sakit / dinas' : 'Tidak ada izin' }}</div>
+      </div>
+
+      <!-- 5. Belum Hadir / Alpha Guru -->
+      <div class="piket-kpi-card" onclick="selectGuruFilter('belum_hadir')">
+        <div class="piket-kpi-top">
+          <span>Belum Hadir</span>
+          <i class="bi bi-exclamation-octagon-fill" style="color:#DC2626;"></i>
+        </div>
+        <div class="piket-kpi-value" style="color:{{ $guruBelumHadirCount > 0 ? '#DC2626' : 'inherit' }};">{{ $guruBelumHadirCount }}</div>
+        <div class="piket-kpi-sub">{{ $isAfter1000 ? 'Status terkunci' : 'Otomatis Alpha 10:00' }}</div>
+      </div>
+
+      <!-- 6. Sudah Scan Pulang Guru -->
+      <div class="piket-kpi-card" onclick="selectGuruFilter('pulang')">
+        <div class="piket-kpi-top">
+          <span>Sudah Pulang</span>
+          <i class="bi bi-door-closed-fill" style="color:#06B6D4;"></i>
+        </div>
+        <div class="piket-kpi-value" style="color:#0891B2;">{{ $guruSudahPulang }}</div>
+        <div class="piket-kpi-sub">Telah scan pulang</div>
       </div>
     </div>
 
@@ -849,7 +913,7 @@
         <div id="filterChipsGuru" class="piket-chips-strip filter-pills" style="display:none;">
           <button type="button" class="piket-chip filter-pill active" data-filter="all" onclick="filterGuruTable('all', this)">
             <span>Semua Guru</span>
-            <span class="piket-chip-badge">{{ $absensiGuruHariIni->count() + $guruBelumHadirList->count() }}</span>
+            <span class="piket-chip-badge">{{ $totalGuruAktif }}</span>
           </button>
           <button type="button" class="piket-chip filter-pill" data-filter="hadir" onclick="filterGuruTable('hadir', this)">
             <span>Hadir Tepat</span>
@@ -1219,12 +1283,16 @@
     const guruPane  = document.getElementById('view-guru');
     const chipsSiswa = document.getElementById('filterChipsSiswa');
     const chipsGuru  = document.getElementById('filterChipsGuru');
+    const kpiSiswa = document.getElementById('kpiGridSiswa');
+    const kpiGuru  = document.getElementById('kpiGridGuru');
     const searchInput = document.getElementById('searchSiswaPiket');
 
     if (siswaPane) siswaPane.style.display = view === 'siswa' ? '' : 'none';
     if (guruPane)  guruPane.style.display  = view === 'guru'  ? '' : 'none';
     if (chipsSiswa) chipsSiswa.style.display = view === 'siswa' ? 'flex' : 'none';
     if (chipsGuru)  chipsGuru.style.display  = view === 'guru'  ? 'flex' : 'none';
+    if (kpiSiswa) kpiSiswa.style.display = view === 'siswa' ? 'grid' : 'none';
+    if (kpiGuru)  kpiGuru.style.display  = view === 'guru'  ? 'grid' : 'none';
 
     if (searchInput) {
       searchInput.value = '';
@@ -1260,6 +1328,22 @@
       }
     });
     if (tableSiswaPiket_paginator) tableSiswaPiket_paginator.setFilter(status);
+  }
+
+  // ── KPI Card Quick Filter Guru (activates Guru view + sets filter pill) ──
+  function selectGuruFilter(status) {
+    // Switch to guru view
+    switchMainView('guru', document.getElementById('btnViewGuru'));
+
+    // Find and click the matching filter pill
+    const pills = document.querySelectorAll('#filterChipsGuru .filter-pill');
+    pills.forEach(pill => {
+      pill.classList.remove('active');
+      if (pill.getAttribute('data-filter') === status) {
+        pill.classList.add('active');
+      }
+    });
+    if (tableGuruPiket_paginator) tableGuruPiket_paginator.setFilter(status);
   }
 
   // ── Presensi Manual Live Search Logic ──
