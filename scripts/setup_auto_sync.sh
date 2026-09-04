@@ -45,16 +45,9 @@ LOCAL=$(git rev-parse HEAD)
 REMOTE=$(git rev-parse origin/main)
 
 if [ "$LOCAL" != "$REMOTE" ]; then
-    echo "[$(date)] Deteksi commit baru: $LOCAL -> $REMOTE. Memulai update..." >> /var/log/sirani-autoupdate.log
-    git reset --hard origin/main >> /var/log/sirani-autoupdate.log 2>&1
-    php artisan optimize:clear >> /var/log/sirani-autoupdate.log 2>&1
-    php artisan config:cache >> /var/log/sirani-autoupdate.log 2>&1
-    php artisan route:cache >> /var/log/sirani-autoupdate.log 2>&1
-    php artisan view:cache >> /var/log/sirani-autoupdate.log 2>&1
-    chown -R www-data:www-data "$APP_DIR" 2>/dev/null || true
-    systemctl reload nginx 2>/dev/null || true
-    systemctl reload php8.3-fpm 2>/dev/null || true
-    echo "[$(date)] Update otomatis selesai!" >> /var/log/sirani-autoupdate.log
+    echo "[$(date)] Deteksi commit baru: $LOCAL -> $REMOTE. Menjalankan update_ubuntu.sh..." >> /var/log/sirani-autoupdate.log
+    bash "$APP_DIR/scripts/update_ubuntu.sh" >> /var/log/sirani-autoupdate.log 2>&1
+    echo "[$(date)] Auto-update SIRANI selesai!" >> /var/log/sirani-autoupdate.log
 fi
 EOF
 
