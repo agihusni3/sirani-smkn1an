@@ -1075,8 +1075,9 @@
             border-top: 1px solid #f1f5f9;
             padding-top: 24px;
             display: flex;
-            justify-content: space-between;
+            justify-content: center;
             align-items: center;
+            text-align: center;
             font-size: 0.82rem;
             color: #64748b;
         }
@@ -1638,9 +1639,6 @@
                 <div>
                     &copy; {{ date('Y') }} <strong>SMKN 1 Air Naningan</strong>. Hak Cipta Dilindungi.
                     <span class="footer-badge-sys">SIRANI Integrated System</span>
-                </div>
-                <div>
-                    Kepala Sekolah: <strong>{{ $sekolah->nama_kepala_sekolah ?? 'Drs. H. Ahmad Sudrajat, M.Pd.' }}</strong> • Tanggamus, Lampung
                 </div>
             </div>
         </div>
