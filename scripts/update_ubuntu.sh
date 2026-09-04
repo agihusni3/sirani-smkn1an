@@ -33,9 +33,10 @@ echo -e "\n${YELLOW}[1/4] Menarik pembaruan terbaru dari GitHub (main)...${NC}"
 git fetch origin main
 git pull origin main
 
-# 2. Jalankan migrasi database jika ada
-echo -e "\n${YELLOW}[2/4] Memeriksa migrasi database...${NC}"
+# 2. Jalankan migrasi database jika ada & sinkronisasi data siswa
+echo -e "\n${YELLOW}[2/5] Memeriksa migrasi database & sinkronisasi data siswa...${NC}"
 php artisan migrate --force
+php artisan sirani:sync-siswa
 
 # 3. Bersihkan & Optimasi Cache Laravel
 echo -e "\n${YELLOW}[3/4] Mengosongkan cache lama & mengoptimasi cache Blade/Route...${NC}"
