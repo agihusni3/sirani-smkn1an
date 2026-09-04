@@ -719,8 +719,7 @@
     {{-- ══ 3. KPI ANALYTICS GRID (6 KARTU RAPI) ══ --}}
     @php
       $isAfter1000 = now()->format('H:i') >= '10:00';
-      $alphaCount = max(0, $totalSiswaAktif - ($hadirTepat + $terlambat + $izinCount + ($totalSiswaPkl ?? 0)));
-      $izinPklTotal = $izinCount + ($totalSiswaPkl ?? 0);
+      $alphaCount = max(0, $totalSiswaAktif - ($hadirTepat + $terlambat + $izinCount));
     @endphp
     <div class="piket-kpi-grid no-print">
       <!-- 1. Tingkat Kehadiran -->
@@ -753,14 +752,14 @@
         <div class="piket-kpi-sub">Lewat batas pagi</div>
       </div>
 
-      <!-- 4. Izin / Sakit / PKL -->
+      <!-- 4. Izin & Sakit -->
       <div class="piket-kpi-card" onclick="selectSiswaFilter('izin')">
         <div class="piket-kpi-top">
-          <span>Izin &amp; PKL</span>
-          <i class="bi bi-briefcase-fill" style="color:#6366F1;"></i>
+          <span>Izin &amp; Sakit</span>
+          <i class="bi bi-file-earmark-medical-fill" style="color:#2563EB;"></i>
         </div>
-        <div class="piket-kpi-value">{{ $izinPklTotal }}</div>
-        <div class="piket-kpi-sub">{{ $izinCount }} Izin/Sakit · {{ $totalSiswaPkl ?? 0 }} PKL</div>
+        <div class="piket-kpi-value" style="color:#2563EB;">{{ $izinCount }}</div>
+        <div class="piket-kpi-sub">{{ $izinCount > 0 ? $izinCount . ' surat izin / sakit' : 'Tidak ada izin' }}</div>
       </div>
 
       <!-- 5. Alpha / Belum Scan -->
@@ -831,8 +830,8 @@
             <span class="piket-chip-badge">{{ $terlambat }}</span>
           </button>
           <button type="button" class="piket-chip filter-pill" data-filter="izin" onclick="filterSiswaTable('izin', this)">
-            <span>Izin &amp; PKL</span>
-            <span class="piket-chip-badge">{{ $izinPklTotal }}</span>
+            <span>Izin &amp; Sakit</span>
+            <span class="piket-chip-badge">{{ $izinCount }}</span>
           </button>
           <button type="button" class="piket-chip filter-pill" data-filter="belum_hadir" onclick="filterSiswaTable('belum_hadir', this)">
             <span>Belum Hadir</span>
@@ -960,8 +959,6 @@
                       <span class="piket-status-pill hadir"><i class="bi bi-check-circle-fill"></i> Hadir Tepat</span>
                     @elseif($ab->status === 'terlambat')
                       <span class="piket-status-pill terlambat"><i class="bi bi-clock-fill"></i> Terlambat</span>
-                    @elseif($ab->status === 'pkl')
-                      <span class="piket-status-pill pkl"><i class="bi bi-briefcase-fill"></i> Siswa PKL</span>
                     @elseif(in_array($ab->status, ['izin', 'sakit', 'dispensasi', 'cuti']))
                       <span class="piket-status-pill izin"><i class="bi bi-file-earmark-text-fill"></i> {{ ucfirst($ab->status) }}</span>
                     @elseif($ab->status === 'bolos')
@@ -1495,8 +1492,7 @@
         if (status === 'terlambat') return rowStatus === 'terlambat';
         if (status === 'belum_hadir') return rowStatus === 'belum_hadir';
         if (status === 'belum_pulang') return row.getAttribute('data-has-masuk') === '1' && rowPulang === 'belum';
-        if (status === 'izin') return ['izin', 'sakit', 'dispen', 'dispensasi', 'cuti', 'pkl'].includes(rowStatus);
-        if (status === 'pkl') return rowStatus === 'pkl';
+        if (status === 'izin') return ['izin', 'sakit', 'dispen', 'dispensasi', 'cuti'].includes(rowStatus);
         if (status === 'bolos') return rowStatus === 'bolos';
         if (status === 'pulang') return rowPulang === 'pulang';
 

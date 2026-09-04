@@ -52,7 +52,6 @@ class GuruPiketController extends Controller
             ->get();
 
         $totalSiswaAktif = Siswa::where('status', 'aktif')->count();
-        $totalSiswaPkl   = Siswa::where('status', 'aktif')->where('status_pkl', 'aktif_pkl')->count();
         $totalGuruAktif  = Guru::where('status', 'aktif')->count();
         $hadirTepat      = $absensiHariIni->where('status', 'hadir')->count();
         $terlambat       = $absensiHariIni->where('status', 'terlambat')->count();
@@ -157,7 +156,6 @@ class GuruPiketController extends Controller
             'absensiHariIni',
             'absensiGuruHariIni',
             'totalSiswaAktif',
-            'totalSiswaPkl',
             'totalGuruAktif',
             'hadirTepat',
             'hadirTotal',
