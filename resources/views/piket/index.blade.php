@@ -10,7 +10,7 @@
     .piket-clean-header {
       display: flex;
       justify-content: space-between;
-      align-items: center;
+      align-items: flex-start;
       flex-wrap: wrap;
       gap: 16px;
       margin-bottom: 16px;
@@ -20,7 +20,7 @@
     .piket-header-left {
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 8px;
     }
     .piket-title-row {
       display: flex;
@@ -29,7 +29,7 @@
       flex-wrap: wrap;
     }
     .piket-page-title {
-      font-size: 22px;
+      font-size: 24px;
       font-weight: 900;
       color: var(--text);
       letter-spacing: -0.5px;
@@ -40,7 +40,7 @@
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      font-size: 12px;
+      font-size: 12.5px;
       font-weight: 600;
       color: var(--text-2);
       background: var(--bg-2);
@@ -61,10 +61,25 @@
       gap: 5px;
     }
 
-    /* Modern Left-Aligned Time Cards */
+    /* Right Header with Theme/Account Actions & Time Cards Underneath */
+    .piket-header-right {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 10px;
+    }
+    .piket-actions-row {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 8px;
+    }
+
+    /* Modern Time Cards */
     .piket-time-strip {
       display: flex;
       align-items: center;
+      justify-content: flex-end;
       gap: 10px;
       flex-wrap: wrap;
     }
@@ -155,11 +170,6 @@
       align-items: center;
       justify-content: center;
       flex-shrink: 0;
-    }
-    .piket-header-right {
-      display: flex;
-      align-items: center;
-      gap: 8px;
     }
     .piket-clean-actions {
       display: flex;
@@ -450,6 +460,23 @@
 
     /* ══ RESPONSIVE MOBILE MODE (< 768px) ══ */
     @media (max-width: 768px) {
+      .piket-clean-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 14px;
+      }
+      .piket-header-right {
+        align-items: flex-start;
+        width: 100%;
+      }
+      .piket-actions-row {
+        width: 100%;
+        justify-content: flex-start;
+      }
+      .piket-time-strip {
+        justify-content: flex-start;
+        width: 100%;
+      }
       .piket-toolbar-actions-row {
         flex-direction: column;
         align-items: stretch;
@@ -600,17 +627,25 @@
       <div class="piket-header-left">
         <div class="piket-title-row">
           <h1 class="piket-page-title">Meja Piket</h1>
-          <span class="piket-date-badge">
-            <i class="bi bi-calendar3"></i> {{ now()->locale('id')->isoFormat('dddd, D MMMM Y') }}
-          </span>
           @if($isLibur)
             <span class="piket-holiday-badge">
               <i class="bi bi-calendar-x-fill"></i> HARI LIBUR
             </span>
           @endif
         </div>
+        <div>
+          <span class="piket-date-badge">
+            <i class="bi bi-calendar3"></i> {{ now()->locale('id')->isoFormat('dddd, D MMMM Y') }}
+          </span>
+        </div>
+      </div>
 
-        {{-- TIME & GATE STATUS PILLS (GESER SEBELAH KIRI & DESAIN LEBIH BAGUS) --}}
+      <div class="piket-header-right">
+        <div class="piket-actions-row">
+          @include('partials.header_actions')
+        </div>
+
+        {{-- TIME & GATE STATUS PILLS (DI SEBELAH KANAN DI BAWAH ICON AKUN & DARKMODE) --}}
         <div class="piket-time-strip">
           <!-- 1. Jam Server Realtime -->
           <div class="piket-time-card piket-time-card--live" title="Waktu server realtime (WIB)">
@@ -648,10 +683,6 @@
             </div>
           </div>
         </div>
-      </div>
-
-      <div class="piket-header-right">
-        @include('partials.header_actions')
       </div>
     </div>
 
