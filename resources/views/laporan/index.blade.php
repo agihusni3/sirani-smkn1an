@@ -96,9 +96,19 @@
       gap: 2px;
       transition: all .15s ease;
       box-shadow: var(--shadow-sm);
+      text-decoration: none;
+      color: inherit;
     }
     .lp-kpi-card:hover {
       border-color: #000000;
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+    .lp-kpi-card.active {
+      border: 2px solid #000000;
+      background: rgba(0, 0, 0, 0.04);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+      transform: translateY(-2px);
     }
     .lp-kpi-head {
       display: flex;
@@ -495,7 +505,7 @@
     <!-- ═══════════════════════════════════════════════════════════════════ -->
     <div class="lp-kpi-grid no-print">
       {{-- Total Rekap --}}
-      <div class="lp-kpi-card">
+      <a href="{{ request()->fullUrlWithQuery(['status' => null, 'page' => 1]) }}" class="lp-kpi-card {{ empty(request('status')) ? 'active' : '' }}" title="Tampilkan Semua Status" data-tooltip="Tampilkan Semua Status">
         <div class="lp-kpi-head">
           <span class="lp-kpi-title">Total Rekap</span>
           <div class="lp-kpi-icon" style="background:var(--bg-3); color:#000000; border:1px solid var(--border-2);">
@@ -503,10 +513,10 @@
           </div>
         </div>
         <div class="lp-kpi-val" style="color:#000000;">{{ $totalRecord }}</div>
-      </div>
+      </a>
 
       {{-- Hadir Tepat --}}
-      <div class="lp-kpi-card">
+      <a href="{{ request()->fullUrlWithQuery(['status' => 'hadir', 'page' => 1]) }}" class="lp-kpi-card {{ request('status') === 'hadir' ? 'active' : '' }}" title="Filter Khusus Hadir Tepat" data-tooltip="Filter Khusus Hadir Tepat">
         <div class="lp-kpi-head">
           <span class="lp-kpi-title">Hadir Tepat</span>
           <div class="lp-kpi-icon" style="background:var(--bg-3); color:#000000; border:1px solid var(--border-2);">
@@ -514,10 +524,10 @@
           </div>
         </div>
         <div class="lp-kpi-val" style="color:#000000;">{{ $totalHadir }}</div>
-      </div>
+      </a>
 
       {{-- Terlambat --}}
-      <div class="lp-kpi-card">
+      <a href="{{ request()->fullUrlWithQuery(['status' => 'terlambat', 'page' => 1]) }}" class="lp-kpi-card {{ request('status') === 'terlambat' ? 'active' : '' }}" title="Filter Khusus Terlambat" data-tooltip="Filter Khusus Terlambat">
         <div class="lp-kpi-head">
           <span class="lp-kpi-title">Terlambat</span>
           <div class="lp-kpi-icon" style="background:var(--bg-3); color:#000000; border:1px solid var(--border-2);">
@@ -525,10 +535,10 @@
           </div>
         </div>
         <div class="lp-kpi-val" style="color:#000000;">{{ $totalTerlambat }}</div>
-      </div>
+      </a>
 
       {{-- Izin / Sakit --}}
-      <div class="lp-kpi-card">
+      <a href="{{ request()->fullUrlWithQuery(['status' => 'izin', 'page' => 1]) }}" class="lp-kpi-card {{ request('status') === 'izin' ? 'active' : '' }}" title="Filter Khusus Izin / Sakit / Dispen" data-tooltip="Filter Khusus Izin & Sakit">
         <div class="lp-kpi-head">
           <span class="lp-kpi-title">Izin / Sakit</span>
           <div class="lp-kpi-icon" style="background:var(--bg-3); color:#000000; border:1px solid var(--border-2);">
@@ -536,10 +546,10 @@
           </div>
         </div>
         <div class="lp-kpi-val" style="color:#000000;">{{ $totalIzin }}</div>
-      </div>
+      </a>
 
       {{-- Alpha --}}
-      <div class="lp-kpi-card">
+      <a href="{{ request()->fullUrlWithQuery(['status' => 'alpha', 'page' => 1]) }}" class="lp-kpi-card {{ request('status') === 'alpha' ? 'active' : '' }}" title="Filter Khusus Alpha" data-tooltip="Filter Khusus Alpha">
         <div class="lp-kpi-head">
           <span class="lp-kpi-title">Alpha</span>
           <div class="lp-kpi-icon" style="background:var(--bg-3); color:#000000; border:1px solid var(--border-2);">
@@ -547,10 +557,10 @@
           </div>
         </div>
         <div class="lp-kpi-val" style="color:#000000;">{{ $totalAlpha }}</div>
-      </div>
+      </a>
 
       {{-- Bolos --}}
-      <div class="lp-kpi-card">
+      <a href="{{ request()->fullUrlWithQuery(['status' => 'bolos', 'page' => 1]) }}" class="lp-kpi-card {{ request('status') === 'bolos' ? 'active' : '' }}" title="Filter Khusus Bolos" data-tooltip="Filter Khusus Bolos">
         <div class="lp-kpi-head">
           <span class="lp-kpi-title">Bolos</span>
           <div class="lp-kpi-icon" style="background:var(--bg-3); color:#000000; border:1px solid var(--border-2);">
@@ -558,10 +568,10 @@
           </div>
         </div>
         <div class="lp-kpi-val" style="color:#000000;">{{ $totalBolos }}</div>
-      </div>
+      </a>
 
       {{-- Kehadiran % --}}
-      <div class="lp-kpi-card">
+      <div class="lp-kpi-card" style="cursor:default;">
         <div class="lp-kpi-head">
           <span class="lp-kpi-title">Kehadiran</span>
           <div class="lp-kpi-icon" style="background:var(--bg-3); color:#000000; border:1px solid var(--border-2);">
@@ -793,6 +803,19 @@
             @endif
           @endif
 
+          <!-- Filter Status Presensi -->
+          <div class="form-group" style="flex:1; min-width:180px; margin-bottom:0;">
+            <label style="font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:0.5px; color:var(--text-2); margin-bottom:6px; display:block;">Status Presensi</label>
+            <select name="status" style="width:100%; height:42px; background:var(--bg-3); border:1px solid var(--border-2); border-radius:var(--r-sm); padding:0 12px; color:var(--text); font-size:13px; font-weight:700;">
+              <option value="">-- Semua Status --</option>
+              <option value="hadir" {{ request('status') === 'hadir' ? 'selected' : '' }}>🟢 Hadir Tepat</option>
+              <option value="terlambat" {{ request('status') === 'terlambat' ? 'selected' : '' }}>⏰ Terlambat</option>
+              <option value="izin" {{ request('status') === 'izin' ? 'selected' : '' }}>📄 Izin / Sakit / Dispen</option>
+              <option value="alpha" {{ request('status') === 'alpha' ? 'selected' : '' }}>❌ Alpha</option>
+              <option value="bolos" {{ request('status') === 'bolos' ? 'selected' : '' }}>🚪 Bolos</option>
+            </select>
+          </div>
+
           <div style="display:flex; gap:8px; align-items:flex-end;">
             <button type="submit" class="btn btn-gold" style="height:42px; padding:0 20px; font-weight:800; display:inline-flex; align-items:center; justify-content:center; gap:8px;">
               <i class="bi bi-funnel-fill"></i> Tampilkan Data
@@ -814,6 +837,12 @@
           <div style="font-weight:800; font-size:15px; color:var(--text); display:flex; align-items:center; gap:8px;">
             <i class="bi bi-file-earmark-spreadsheet-fill" style="color:#000000;"></i>
             <span>Rekapitulasi {{ ucfirst($kategori) }} ({{ ucfirst($periode) }})</span>
+            @if(request('status'))
+              <span class="badge" style="background:#000000; color:#FFFFFF; font-size:11px; padding:3px 8px; border-radius:4px; font-weight:700; display:inline-flex; align-items:center; gap:5px;">
+                Filter: {{ ucfirst(request('status')) }}
+                <a href="{{ request()->fullUrlWithQuery(['status' => null, 'page' => 1]) }}" style="color:#FFFFFF; text-decoration:none; margin-left:2px;" title="Hapus Filter Status"><i class="bi bi-x-circle-fill"></i></a>
+              </span>
+            @endif
           </div>
           <div>
             <a href="{{ route('laporan.cetak-pdf', request()->query()) }}" target="_blank" class="btn btn-outline" style="height:36px; font-size:12px; font-weight:800; color:#000000; border:1.5px solid #000000; background:var(--bg-2); display:inline-flex; align-items:center; gap:6px;" title="Buka Dokumen PDF Resmi">
@@ -986,6 +1015,12 @@
             <span style="font-weight:800; font-size:14px; color:var(--text); display:inline-flex; align-items:center; gap:8px;">
               <i class="bi bi-journal-text" style="color:#000000;"></i> Rincian Riwayat Presensi Individu
             </span>
+            @if(request('status'))
+              <span class="badge" style="background:#000000; color:#FFFFFF; font-size:11px; padding:3px 8px; border-radius:4px; font-weight:700; display:inline-flex; align-items:center; gap:5px;">
+                Filter: {{ ucfirst(request('status')) }}
+                <a href="{{ request()->fullUrlWithQuery(['status' => null, 'page' => 1]) }}" style="color:#FFFFFF; text-decoration:none; margin-left:2px;" title="Hapus Filter Status"><i class="bi bi-x-circle-fill"></i></a>
+              </span>
+            @endif
           </div>
           <div>
             <a href="{{ route('laporan.cetak-pdf', request()->query()) }}" target="_blank" class="btn btn-outline" style="height:36px; font-size:12px; font-weight:800; color:#000000; border:1.5px solid #000000; background:var(--bg-2); display:inline-flex; align-items:center; gap:6px;" title="Buka Dokumen PDF Resmi">
@@ -1146,6 +1181,12 @@
           <div style="font-weight:800; font-size:15px; color:var(--text); display:flex; align-items:center; gap:8px;">
             <i class="bi bi-table" style="color:#000000;"></i>
             <span>Rincian Presensi Harian</span>
+            @if(request('status'))
+              <span class="badge" style="background:#000000; color:#FFFFFF; font-size:11px; padding:3px 8px; border-radius:4px; font-weight:700; display:inline-flex; align-items:center; gap:5px;">
+                Filter: {{ ucfirst(request('status')) }}
+                <a href="{{ request()->fullUrlWithQuery(['status' => null, 'page' => 1]) }}" style="color:#FFFFFF; text-decoration:none; margin-left:2px;" title="Hapus Filter Status"><i class="bi bi-x-circle-fill"></i></a>
+              </span>
+            @endif
           </div>
           <div>
             <a href="{{ route('laporan.cetak-pdf', request()->query()) }}" target="_blank" class="btn btn-outline" style="height:36px; font-size:12px; font-weight:800; color:#000000; border:1.5px solid #000000; background:var(--bg-2); display:inline-flex; align-items:center; gap:6px;" title="Buka Dokumen PDF Resmi">

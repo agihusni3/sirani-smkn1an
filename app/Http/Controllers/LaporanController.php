@@ -111,6 +111,8 @@ class LaporanController extends Controller
             }
         }
 
+        $status = $request->input('status');
+
         // ── QUERY UTAMA ────────────────────────────────────────────────────────
         $baseQuery = Absensi::where('pemilik_type', $kategori)
             ->whereBetween('tanggal', [$startDate, $endDate]);
@@ -129,15 +131,7 @@ class LaporanController extends Controller
             if ($guruId) $baseQuery->where('pemilik_id', $guruId);
         }
 
-        // Paginasi 20 per halaman untuk tabel rincian harian & individu
-        $laporans = (clone $baseQuery)
-            ->with($kategori === 'siswa'
-                ? ['siswa:id,nis,nama', 'siswaRombel.rombel:id,nama_rombel']
-                : ['guru:id,nip,nama,jabatan'])
-            ->orderBy('tanggal', 'desc')->orderBy('jam_masuk', 'asc')
-            ->paginate(20)->withQueryString();
-
-        // Statistik ringkas (tanpa load semua baris)
+        // Statistik ringkas (tanpa load semua baris) - Dihitung SEBELUM filter status tabel agar KPI Card tetap utuh
         $statsRaw = (clone $baseQuery)->selectRaw("
             COUNT(*) as total_record,
             SUM(CASE WHEN status = 'hadir' THEN 1 ELSE 0 END) as total_hadir,
@@ -147,6 +141,26 @@ class LaporanController extends Controller
             SUM(CASE WHEN status IN ('alpha','alfa') THEN 1 ELSE 0 END) as total_alpha,
             SUM(CASE WHEN status = 'bolos' THEN 1 ELSE 0 END) as total_bolos
         ")->first();
+
+        // Query khusus tabel rincian harian & individu (menerapkan filter status jika dipilih)
+        $tableQuery = clone $baseQuery;
+        if (!empty($status)) {
+            if ($status === 'izin') {
+                $tableQuery->whereIn('status', ['sakit', 'izin', 'dispen', 'dispensasi', 'cuti', 'dinas_luar']);
+            } elseif ($status === 'alpha') {
+                $tableQuery->whereIn('status', ['alpha', 'alfa']);
+            } else {
+                $tableQuery->where('status', $status);
+            }
+        }
+
+        // Paginasi 20 per halaman untuk tabel rincian harian & individu
+        $laporans = $tableQuery
+            ->with($kategori === 'siswa'
+                ? ['siswa:id,nis,nama', 'siswaRombel.rombel:id,nama_rombel']
+                : ['guru:id,nip,nama,jabatan'])
+            ->orderBy('tanggal', 'desc')->orderBy('jam_masuk', 'asc')
+            ->paginate(20)->withQueryString();
 
         // Preload data guru (untuk tabel rincian harian)
         $guruMap = collect();
@@ -236,6 +250,20 @@ class LaporanController extends Controller
                         'total_hari'        => (int)($a->total_hari ?? 0),
                     ];
                 });
+            }
+
+            if (!empty($status)) {
+                if ($status === 'hadir') {
+                    $rekapCollection = $rekapCollection->filter(fn($item) => $item->total_hadir > 0);
+                } elseif ($status === 'terlambat') {
+                    $rekapCollection = $rekapCollection->filter(fn($item) => $item->total_telat > 0);
+                } elseif ($status === 'izin') {
+                    $rekapCollection = $rekapCollection->filter(fn($item) => ($item->total_izin + ($item->total_sakit ?? 0)) > 0);
+                } elseif ($status === 'alpha') {
+                    $rekapCollection = $rekapCollection->filter(fn($item) => $item->total_alpha > 0);
+                } elseif ($status === 'bolos') {
+                    $rekapCollection = $rekapCollection->filter(fn($item) => $item->total_bolos > 0);
+                }
             }
 
             // Paginasi 20 item per halaman untuk Rekap Agregat
@@ -349,7 +377,8 @@ class LaporanController extends Controller
             'canAccessGuru',
             'isWaliKelas',
             'waliRombelId',
-            'waliRombelNama'
+            'waliRombelNama',
+            'status'
         ));
     }
 
@@ -409,7 +438,19 @@ class LaporanController extends Controller
         elseif ($periode === 'tahunan')   { $startDate = "{$tahun}-01-01"; $endDate = "{$tahun}-12-31"; }
         else                              { $startDate = $tanggalMulai; $endDate = $tanggalSelesai; }
 
+        $status = $request->input('status');
+
         $query = Absensi::where('pemilik_type', $kategori)->whereBetween('tanggal', [$startDate, $endDate]);
+
+        if (!empty($status)) {
+            if ($status === 'izin') {
+                $query->whereIn('status', ['sakit', 'izin', 'dispen', 'dispensasi', 'cuti', 'dinas_luar']);
+            } elseif ($status === 'alpha') {
+                $query->whereIn('status', ['alpha', 'alfa']);
+            } else {
+                $query->where('status', $status);
+            }
+        }
 
         if ($kategori === 'siswa') {
             $query->whereHas('siswa', fn($q) => $q->where('status', 'aktif'));
@@ -620,7 +661,19 @@ class LaporanController extends Controller
             $periodeText = "Individu : " . Carbon::parse($startDate)->translatedFormat('d M Y') . " s/d " . Carbon::parse($endDate)->translatedFormat('d M Y');
         }
 
+        $status = $request->input('status');
+
         $query = Absensi::where('pemilik_type', $kategori)->whereBetween('tanggal', [$startDate, $endDate]);
+
+        if (!empty($status)) {
+            if ($status === 'izin') {
+                $query->whereIn('status', ['sakit', 'izin', 'dispen', 'dispensasi', 'cuti', 'dinas_luar']);
+            } elseif ($status === 'alpha') {
+                $query->whereIn('status', ['alpha', 'alfa']);
+            } else {
+                $query->where('status', $status);
+            }
+        }
 
         $rombel = null;
         if ($rombelId) {
@@ -739,7 +792,8 @@ class LaporanController extends Controller
             'rombel',
             'laporans',
             'rekapData',
-            'sekolah'
+            'sekolah',
+            'status'
         ));
     }
 
