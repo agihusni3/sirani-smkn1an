@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\DB;
 class KunciStatusAlphaCommand extends Command
 {
     protected $signature = 'piket:kunci-alpha {tanggal?}';
-    protected $description = 'Pukul 10:00 — kunci status siswa & guru yang belum hadir menjadi Alpha';
+    protected $description = 'Pukul 09:00 — kunci status siswa & guru yang belum hadir menjadi Alpha';
 
     public function handle()
     {
@@ -70,7 +70,7 @@ class KunciStatusAlphaCommand extends Command
                     'tanggal'         => $tanggal,
                     'status'          => 'alpha',
                     'sumber_absen'    => 'auto_kunci_piket',
-                    'keterangan'      => 'Dikunci otomatis sistem pukul 10:00 — tanpa keterangan dari Guru Piket',
+                    'keterangan'      => 'Dikunci otomatis sistem pukul 09:00 — tanpa keterangan dari Guru Piket',
                 ]);
                 $countSiswaAlpha++;
 
@@ -79,7 +79,7 @@ class KunciStatusAlphaCommand extends Command
                     if ($membership->siswa) {
                         \App\Services\NotifikasiDraftService::buatDraft($membership->siswa, 'alpha', [
                             'tanggal' => $tanggal,
-                            'jam'     => '10:00',
+                            'jam'     => '09:00',
                         ], 'sistem_cron');
 
                         \App\Services\NotifikasiDraftService::cekAkumulasiAlphaDanBuatPanggilan($membership->siswa, 'sistem_cron');
@@ -117,7 +117,7 @@ class KunciStatusAlphaCommand extends Command
                 'tanggal'      => $tanggal,
                 'status'       => 'alpha',
                 'sumber_absen' => 'auto_kunci_piket',
-                'keterangan'   => 'Dikunci otomatis sistem pukul 10:00 — tanpa keterangan dari Guru Piket',
+                'keterangan'   => 'Dikunci otomatis sistem pukul 09:00 — tanpa keterangan dari Guru Piket',
             ]);
             $countGuruAlpha++;
         }

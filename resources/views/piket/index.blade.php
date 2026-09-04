@@ -718,7 +718,7 @@
 
     {{-- ══ 3. KPI ANALYTICS GRID (6 KARTU RAPI) ══ --}}
     @php
-      $isAfter1000 = now()->format('H:i') >= '10:00';
+      $isAfter0900 = now()->format('H:i') >= '09:00';
       $alphaCount = max(0, $totalSiswaAktif - ($hadirTepat + $terlambat + $izinCount));
     @endphp
     {{-- KPI Grid Peserta Didik --}}
@@ -770,7 +770,7 @@
           <i class="bi bi-exclamation-octagon-fill" style="color:#DC2626;"></i>
         </div>
         <div class="piket-kpi-value" style="color:{{ $alphaCount > 0 ? '#DC2626' : 'inherit' }};">{{ $alphaCount }}</div>
-        <div class="piket-kpi-sub">{{ $isAfter1000 ? 'Status terkunci' : 'Otomatis Alpha 10:00' }}</div>
+        <div class="piket-kpi-sub">{{ $isAfter0900 ? 'Status terkunci' : 'Otomatis Alpha 09:00' }}</div>
       </div>
 
       <!-- 6. Belum Scan Pulang -->
@@ -835,7 +835,7 @@
           <i class="bi bi-exclamation-octagon-fill" style="color:#DC2626;"></i>
         </div>
         <div class="piket-kpi-value" style="color:{{ $guruBelumHadirCount > 0 ? '#DC2626' : 'inherit' }};">{{ $guruBelumHadirCount }}</div>
-        <div class="piket-kpi-sub">{{ $isAfter1000 ? 'Status terkunci' : 'Otomatis Alpha 10:00' }}</div>
+        <div class="piket-kpi-sub">{{ $isAfter0900 ? 'Status terkunci' : 'Otomatis Alpha 09:00' }}</div>
       </div>
 
       <!-- 6. Sudah Scan Pulang Guru -->

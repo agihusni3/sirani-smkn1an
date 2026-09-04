@@ -13,8 +13,8 @@ Artisan::command('inspire', function () {
 // 07:30 — Flagging belum hadir: kirim WA pengingat ke orang tua siswa & guru yang belum scan
 Schedule::command('piket:flagging-belum-hadir')->dailyAt('07:30')->weekdays();
 
-// 10:00 — Kunci Status Alpha: siswa/guru yang masih belum hadir & tanpa keterangan → Alpha
-Schedule::command('piket:kunci-alpha')->dailyAt('10:00')->weekdays();
+// 09:00 — Kunci Status Alpha: siswa/guru yang masih belum hadir & tanpa keterangan → Alpha
+Schedule::command('piket:kunci-alpha')->dailyAt('09:00')->weekdays();
 
 // ── Evaluasi Sore (Deteksi Bolos & Alpha Siswa Tidak Pulang) ──────────────
 
