@@ -424,260 +424,280 @@
         letter-spacing: 0.05em;
     }
 
-    /* ── Interactive Department Showcase Stage (Tabbed Product Tour) ── */
-    .dept-showcase-section {
+    /* ── 3. Interactive Expanding Panoramic Deck ── */
+    .expanding-deck-section {
         margin-bottom: 75px;
     }
 
-    .dept-tabs-bar {
-        display: inline-flex;
-        background: #ffffff;
-        padding: 6px;
-        border-radius: 18px;
-        border: 1px solid var(--border-main);
-        box-shadow: 0 4px 20px -4px rgba(15, 23, 42, 0.06);
-        margin-bottom: 28px;
-        gap: 6px;
-        flex-wrap: wrap;
-        max-width: 100%;
+    .expanding-deck {
+        display: flex;
+        gap: 18px;
+        height: 530px;
+        width: 100%;
+        margin-top: 24px;
+        perspective: 1000px;
     }
 
-    .dept-tab-btn {
-        display: inline-flex;
-        align-items: center;
-        gap: 10px;
-        padding: 10px 22px;
-        border-radius: 12px;
-        font-size: 0.88rem;
-        font-weight: 700;
-        color: var(--text-muted);
-        border: 1px solid transparent;
-        background: transparent;
+    .deck-card {
+        position: relative;
+        border-radius: 24px;
+        overflow: hidden;
         cursor: pointer;
-        transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1);
-        font-family: inherit;
-        user-select: none;
-    }
-
-    .dept-tab-btn:hover {
-        color: var(--text-dark);
-        background: #f8fafc;
-    }
-
-    .dept-tab-btn.active {
+        flex: 1; /* Default collapsed width */
+        transition: flex 0.65s cubic-bezier(0.16, 1, 0.3, 1), transform 0.4s ease, box-shadow 0.4s ease;
+        box-shadow: 0 10px 30px -10px rgba(15, 23, 42, 0.15);
         background: #0f172a;
-        color: #ffffff;
-        box-shadow: 0 6px 16px -2px rgba(15, 23, 42, 0.28);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        outline: none;
     }
 
-    .dept-tab-icon {
-        width: 24px;
-        height: 24px;
-        border-radius: 6px;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 0.82rem;
-    }
-    .dept-tab-icon.blue { color: #3b82f6; }
-    .dept-tab-icon.green { color: #10b981; }
-    .dept-tab-icon.amber { color: #f59e0b; }
-    .dept-tab-btn.active .dept-tab-icon { color: #38bdf8; }
-
-    .dept-stage-box {
-        background: #ffffff;
-        border: 1px solid var(--border-main);
-        border-radius: var(--radius-xl);
-        padding: clamp(28px, 4vw, 42px);
-        box-shadow: var(--shadow-card);
-        position: relative;
-        overflow: hidden;
+    .deck-card.active {
+        flex: 3.5; /* Expanded (~60-65% width) */
+        box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.38);
+        border-color: rgba(255, 255, 255, 0.25);
     }
 
-    .dept-panel {
-        display: none;
-        grid-template-columns: 1.15fr 1fr;
-        gap: clamp(24px, 4vw, 44px);
-        align-items: center;
-        opacity: 0;
-        transform: translateY(12px);
-    }
-
-    .dept-panel.active {
-        display: grid;
-        opacity: 1;
-        transform: translateY(0);
-        animation: deptCrossfade 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-    }
-
-    @keyframes deptCrossfade {
-        0% {
-            opacity: 0;
-            transform: translateY(12px);
-            filter: blur(4px);
-        }
-        100% {
-            opacity: 1;
-            transform: translateY(0);
-            filter: blur(0);
-        }
-    }
-
-    .dept-category-tag {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        font-size: 0.74rem;
-        font-weight: 800;
-        padding: 5px 12px;
-        border-radius: 9999px;
-        text-transform: uppercase;
-        letter-spacing: 0.04em;
-        margin-bottom: 14px;
-    }
-    .dept-category-tag.blue { background: #eff6ff; color: #2563eb; border: 1px solid #bfdbfe; }
-    .dept-category-tag.green { background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0; }
-    .dept-category-tag.amber { background: #fffbeb; color: #d97706; border: 1px solid #fde68a; }
-
-    .dept-stage-title {
-        font-size: clamp(1.6rem, 2.5vw, 2.1rem);
-        font-weight: 900;
-        letter-spacing: -0.025em;
-        color: var(--text-dark);
-        line-height: 1.22;
-        margin-bottom: 12px;
-    }
-
-    .dept-stage-desc {
-        font-size: 0.94rem;
-        color: var(--text-body);
-        line-height: 1.65;
-        margin-bottom: 24px;
-    }
-
-    .dept-spec-bento {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 12px;
-        margin-bottom: 28px;
-    }
-
-    .dept-spec-item {
-        background: #f8fafc;
-        border: 1px solid var(--border-main);
-        padding: 12px 14px;
-        border-radius: 12px;
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        transition: transform 0.2s ease, border-color 0.2s ease;
-    }
-    .dept-spec-item:hover {
-        border-color: #cbd5e1;
-        transform: translateY(-1px);
-    }
-
-    .dept-spec-icon {
-        width: 36px;
-        height: 36px;
-        border-radius: 10px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 0.95rem;
-        flex-shrink: 0;
-    }
-    .dept-spec-icon.blue { background: #dbeafe; color: #1d4ed8; }
-    .dept-spec-icon.green { background: #d1fae5; color: #047857; }
-    .dept-spec-icon.amber { background: #fef3c7; color: #b45309; }
-
-    .dept-spec-label {
-        font-size: 0.7rem;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 0.04em;
-        color: var(--text-muted);
-    }
-
-    .dept-spec-value {
-        font-size: 0.83rem;
-        font-weight: 800;
-        color: var(--text-dark);
-        margin-top: 1px;
-    }
-
-    .dept-stage-visual {
-        position: relative;
-        height: 440px;
-        border-radius: 20px;
-        overflow: hidden;
-        box-shadow: 0 15px 35px -10px rgba(15, 23, 42, 0.2);
-    }
-
-    .dept-stage-img {
+    .deck-bg-img {
+        position: absolute;
+        inset: 0;
         width: 100%;
         height: 100%;
         object-fit: cover;
-        transition: transform 0.6s ease;
+        transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
-    .dept-stage-visual:hover .dept-stage-img {
-        transform: scale(1.04);
+    .deck-card:hover .deck-bg-img {
+        transform: scale(1.05);
     }
 
-    .dept-floating-stat {
+    /* Scrim overlay */
+    .deck-overlay {
         position: absolute;
-        bottom: 18px;
-        left: 18px;
-        right: 18px;
-        background: rgba(15, 23, 42, 0.86);
-        backdrop-filter: blur(12px);
-        border: 1px solid rgba(255, 255, 255, 0.18);
+        inset: 0;
+        background: linear-gradient(180deg, rgba(15, 23, 42, 0.25) 0%, rgba(15, 23, 42, 0.6) 45%, rgba(15, 23, 42, 0.95) 100%);
+        transition: background 0.5s ease;
+    }
+
+    .deck-card.active .deck-overlay {
+        background: linear-gradient(180deg, rgba(15, 23, 42, 0.15) 0%, rgba(15, 23, 42, 0.65) 45%, rgba(15, 23, 42, 0.96) 100%);
+    }
+
+    /* Collapsed Header (Vertical text on desktop) */
+    .deck-collapsed-content {
+        position: absolute;
+        inset: 0;
+        padding: 28px 20px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        align-items: center;
+        z-index: 3;
+        transition: opacity 0.35s ease;
+        pointer-events: none;
+    }
+
+    .deck-card.active .deck-collapsed-content {
+        opacity: 0;
+        pointer-events: none;
+    }
+
+    .deck-card:not(.active) .deck-collapsed-content {
+        opacity: 1;
+    }
+
+    .deck-collapsed-badge {
+        width: 44px;
+        height: 44px;
         border-radius: 14px;
-        padding: 14px 20px;
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 16px;
+        background: rgba(255, 255, 255, 0.18);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.25);
+        display: flex;
+        align-items: center;
+        justify-content: center;
         color: #ffffff;
-    }
-
-    .dept-floating-stat .stat-label {
-        font-size: 0.7rem;
-        color: #94a3b8;
-        text-transform: uppercase;
-        font-weight: 700;
-    }
-
-    .dept-floating-stat .stat-val {
         font-size: 1.1rem;
-        font-weight: 900;
-        color: #38bdf8;
-        margin-top: 2px;
     }
 
-    @media (max-width: 960px) {
-        .dept-panel {
-            grid-template-columns: 1fr;
-            gap: 28px;
+    .deck-collapsed-title {
+        writing-mode: vertical-rl;
+        transform: rotate(180deg);
+        color: #ffffff;
+        font-size: 1.1rem;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        text-shadow: 0 2px 8px rgba(0,0,0,0.6);
+        white-space: nowrap;
+    }
+
+    .deck-collapsed-index {
+        color: rgba(255, 255, 255, 0.6);
+        font-weight: 900;
+        font-size: 1.15rem;
+        font-family: var(--font-tech);
+    }
+
+    /* Expanded Full Content */
+    .deck-expanded-content {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        padding: clamp(24px, 3.5vw, 40px);
+        z-index: 3;
+        opacity: 0;
+        transform: translateY(20px);
+        transition: opacity 0.45s cubic-bezier(0.16, 1, 0.3, 1) 0.15s, transform 0.45s cubic-bezier(0.16, 1, 0.3, 1) 0.15s;
+        pointer-events: none;
+    }
+
+    .deck-card.active .deck-expanded-content {
+        opacity: 1;
+        transform: translateY(0);
+        pointer-events: auto;
+    }
+
+    .deck-top-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 14px;
+        border-radius: 9999px;
+        font-size: 0.74rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-bottom: 12px;
+        backdrop-filter: blur(8px);
+    }
+    .deck-top-badge.blue { background: rgba(59, 130, 246, 0.28); color: #93c5fd; border: 1px solid rgba(147, 197, 253, 0.4); }
+    .deck-top-badge.green { background: rgba(16, 185, 129, 0.28); color: #6ee7b7; border: 1px solid rgba(110, 231, 183, 0.4); }
+    .deck-top-badge.amber { background: rgba(245, 158, 11, 0.28); color: #fde68a; border: 1px solid rgba(253, 230, 138, 0.4); }
+
+    .deck-title {
+        font-size: clamp(1.6rem, 2.5vw, 2.2rem);
+        font-weight: 900;
+        color: #ffffff;
+        line-height: 1.2;
+        margin-bottom: 10px;
+        letter-spacing: -0.02em;
+        text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+    }
+
+    .deck-desc {
+        font-size: 0.94rem;
+        color: #e2e8f0;
+        line-height: 1.6;
+        max-width: 620px;
+        margin-bottom: 20px;
+        text-shadow: 0 1px 4px rgba(0,0,0,0.4);
+    }
+
+    /* Skill Chips / Bento Pills */
+    .deck-chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 24px;
+    }
+
+    .deck-chip {
+        background: rgba(255, 255, 255, 0.12);
+        border: 1px solid rgba(255, 255, 255, 0.22);
+        backdrop-filter: blur(8px);
+        color: #ffffff;
+        font-size: 0.78rem;
+        font-weight: 700;
+        padding: 6px 13px;
+        border-radius: 9999px;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .deck-btn-cta {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        background: #ffffff;
+        color: #0f172a;
+        font-weight: 800;
+        font-size: 0.88rem;
+        padding: 12px 24px;
+        border-radius: 12px;
+        text-decoration: none;
+        box-shadow: 0 10px 20px -5px rgba(0,0,0,0.3);
+        transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+    }
+
+    .deck-btn-cta:hover {
+        transform: translateY(-2px);
+        background: #f8fafc;
+        box-shadow: 0 15px 25px -5px rgba(0,0,0,0.45);
+        color: #0f172a;
+    }
+
+    /* Mobile Accordion Stack */
+    @media (max-width: 900px) {
+        .expanding-deck {
+            flex-direction: column;
+            height: auto;
+            gap: 14px;
         }
-        .dept-stage-visual {
-            height: 280px;
-            order: -1;
+
+        .deck-card {
+            flex: none;
+            height: 100px;
+            border-radius: 18px;
+            transition: height 0.5s cubic-bezier(0.16, 1, 0.3, 1), transform 0.3s ease;
         }
-        .dept-spec-bento {
-            grid-template-columns: 1fr;
+
+        .deck-card.active {
+            flex: none;
+            height: auto;
+            min-height: 480px;
         }
-        .dept-tabs-bar {
-            width: 100%;
-            overflow-x: auto;
-            flex-wrap: nowrap;
-            -webkit-overflow-scrolling: touch;
-            padding: 4px;
+
+        .deck-collapsed-content {
+            flex-direction: row;
+            padding: 18px 22px;
         }
-        .dept-tab-btn {
-            white-space: nowrap;
-            padding: 8px 16px;
-            font-size: 0.82rem;
+
+        .deck-collapsed-title {
+            writing-mode: horizontal-tb;
+            transform: none;
+            font-size: 0.95rem;
+            letter-spacing: 0.03em;
+        }
+
+        .deck-collapsed-badge {
+            width: 38px;
+            height: 38px;
+            font-size: 0.95rem;
+            border-radius: 10px;
+        }
+
+        .deck-expanded-content {
+            padding: 24px 20px;
+        }
+
+        .deck-title {
+            font-size: 1.5rem;
+        }
+
+        .deck-desc {
+            font-size: 0.88rem;
+        }
+
+        .deck-chips {
+            gap: 6px;
+            margin-bottom: 18px;
+        }
+
+        .deck-chip {
+            font-size: 0.74rem;
+            padding: 5px 10px;
         }
     }
 
@@ -1097,223 +1117,118 @@
         </div>
     </div>
 
-    <!-- ═══ 3. INTERACTIVE VOCATIONAL SHOWCASE STAGE (KONSEP 2) ═══ -->
-    <section class="dept-showcase-section" id="program-keahlian">
-        <div class="section-header-clean" style="margin-bottom: 24px;">
+    <!-- ═══ 3. INTERACTIVE EXPANDING PANORAMIC DECK ═══ -->
+    <section class="expanding-deck-section" id="program-keahlian">
+        <div class="section-header-clean" style="margin-bottom: 20px;">
             <span class="section-tag">PROGRAM KEAHLIAN UNGGULAN</span>
-            <h2 class="section-title-large">Spesifikasi Kompetensi &amp; Ekosistem Vokasi</h2>
+            <h2 class="section-title-large">Program Keahlian Berstandar Industri</h2>
             <p style="color: var(--text-muted); font-size: 0.95rem; max-width: 680px; margin-top: 6px;">
-                Eksplorasi kurikulum berbasis industri, fasilitas workshop modern, dan sertifikasi lisensi BNSP yang membentuk talenta siap kerja SMKN 1 Air Naningan.
+                Arahkan kursor atau sentuh kartu kejuruan untuk melihat profil kurikulum, spesifikasi laboratorium, dan lisensi BNSP berstandar nasional.
             </p>
         </div>
 
-        <!-- Interactive Department Switcher Tabs -->
-        <div style="display: flex; justify-content: center;">
-            <div class="dept-tabs-bar" role="tablist" aria-label="Pilihan Program Keahlian">
-                <button type="button" class="dept-tab-btn active" role="tab" aria-selected="true" aria-controls="dept-panel-rpl" data-dept="rpl" onclick="switchDeptTab('rpl')">
-                    <span class="dept-tab-icon blue">💻</span>
-                    <span>Rekayasa Perangkat Lunak</span>
-                </button>
-                <button type="button" class="dept-tab-btn" role="tab" aria-selected="false" aria-controls="dept-panel-aphp" data-dept="aphp" onclick="switchDeptTab('aphp')">
-                    <span class="dept-tab-icon green">🌿</span>
-                    <span>Agribisnis Pengolahan Hasil Pertanian</span>
-                </button>
-                <button type="button" class="dept-tab-btn" role="tab" aria-selected="false" aria-controls="dept-panel-tsm" data-dept="tsm" onclick="switchDeptTab('tsm')">
-                    <span class="dept-tab-icon amber">⚙️</span>
-                    <span>Teknik Sepeda Motor</span>
-                </button>
-            </div>
-        </div>
-
-        <!-- Interactive Stage Box -->
-        <div class="dept-stage-box">
+        <!-- The 3 Interactive Expanding Cards -->
+        <div class="expanding-deck" role="region" aria-label="Program Keahlian SMK">
             
-            <!-- Panel 01: RPL -->
-            <div class="dept-panel active" id="dept-panel-rpl" role="tabpanel" aria-labelledby="tab-rpl">
-                <div>
-                    <span class="dept-category-tag blue">01 / SOFTWARE ENGINEERING &amp; IOT</span>
-                    <h3 class="dept-stage-title">Rekayasa Perangkat Lunak (RPL)</h3>
-                    <p class="dept-stage-desc">
-                        Fokus pada perancangan perangkat lunak modern, aplikasi web enterprise, komputasi awan (cloud database), serta integrasi mikrokontroler dan sistem Internet of Things (IoT) berskala industri.
-                    </p>
+            <!-- CARD 1: RPL (ACTIVE DEFAULT) -->
+            <div class="deck-card active" tabindex="0" role="button" aria-expanded="true" aria-label="Rekayasa Perangkat Lunak">
+                <img src="{{ asset('images/web/jurusan_rpl.jpg') }}" alt="Laboratorium Rekayasa Perangkat Lunak" class="deck-bg-img">
+                <div class="deck-overlay"></div>
 
-                    <div class="dept-spec-bento">
-                        <div class="dept-spec-item">
-                            <div class="dept-spec-icon blue">🚀</div>
-                            <div>
-                                <div class="dept-spec-label">Core Tech Stack</div>
-                                <div class="dept-spec-value">Fullstack Web &amp; Mobile App</div>
-                            </div>
-                        </div>
-                        <div class="dept-spec-item">
-                            <div class="dept-spec-icon blue">🏢</div>
-                            <div>
-                                <div class="dept-spec-label">Fasilitas Praktik</div>
-                                <div class="dept-spec-value">High-Spec Lab &amp; Cloud Server</div>
-                            </div>
-                        </div>
-                        <div class="dept-spec-item">
-                            <div class="dept-spec-icon blue">🎖️</div>
-                            <div>
-                                <div class="dept-spec-label">Standar Lisensi</div>
-                                <div class="dept-spec-value">Junior Developer LSP-P1 BNSP</div>
-                            </div>
-                        </div>
-                        <div class="dept-spec-item">
-                            <div class="dept-spec-icon blue">💼</div>
-                            <div>
-                                <div class="dept-spec-label">Prospek Karir</div>
-                                <div class="dept-spec-value">Programmer, Web Dev, QA Engineer</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div style="display: flex; gap: 14px; align-items: center; flex-wrap: wrap;">
-                        <a href="{{ route('web.jurusan.show', 'rpl') }}" class="btn-industrial btn-industrial-primary">
-                            Eksplorasi Kurikulum RPL →
-                        </a>
-                        <span style="font-size: 0.82rem; color: var(--text-muted);">Akreditasi B • Standar Industri</span>
-                    </div>
+                <!-- Collapsed State (Visible when shrunk) -->
+                <div class="deck-collapsed-content">
+                    <div class="deck-collapsed-badge">💻</div>
+                    <div class="deck-collapsed-title">01 / Rekayasa Perangkat Lunak</div>
+                    <div class="deck-collapsed-index">01</div>
                 </div>
 
-                <div class="dept-stage-visual">
-                    <img src="{{ asset('images/web/jurusan_rpl.jpg') }}" alt="Laboratorium Rekayasa Perangkat Lunak SMKN 1 Air Naningan" class="dept-stage-img">
-                    <div class="dept-floating-stat">
-                        <div>
-                            <div class="stat-label">Tingkat Kelulusan</div>
-                            <div class="stat-val">100% BNSP</div>
-                        </div>
-                        <div>
-                            <div class="stat-label">Koneksi Industri</div>
-                            <div class="stat-val" style="color: #38bdf8;">10+ Mitra IT</div>
-                        </div>
+                <!-- Expanded State (Visible when wide) -->
+                <div class="deck-expanded-content">
+                    <div class="deck-top-badge blue">
+                        💻 01 / SOFTWARE ENGINEERING &amp; IOT
                     </div>
+                    <h3 class="deck-title">Rekayasa Perangkat Lunak (RPL)</h3>
+                    <p class="deck-desc">
+                        Fokus pada perancangan arsitektur web enterprise fullstack, aplikasi mobile modern, komputasi awan (*cloud database*), serta integrasi mikrokontroler IoT presisi.
+                    </p>
+                    <div class="deck-chips">
+                        <span class="deck-chip">✓ Fullstack Web &amp; Mobile</span>
+                        <span class="deck-chip">✓ IoT Microcontroller SIRANI</span>
+                        <span class="deck-chip">✓ Dedicated PC Lab Core i7</span>
+                        <span class="deck-chip">✓ Lisensi LSP-P1 BNSP</span>
+                    </div>
+                    <a href="{{ route('web.jurusan.show', 'rpl') }}" class="deck-btn-cta">
+                        <span>Eksplorasi Kurikulum &amp; Lab RPL</span>
+                        <span>→</span>
+                    </a>
                 </div>
             </div>
 
-            <!-- Panel 02: APHP -->
-            <div class="dept-panel" id="dept-panel-aphp" role="tabpanel" aria-labelledby="tab-aphp">
-                <div>
-                    <span class="dept-category-tag green">02 / AGRO-TECHNOLOGY &amp; FOOD SCIENCE</span>
-                    <h3 class="dept-stage-title">Agribisnis Pengolahan Hasil Pertanian (APHP)</h3>
-                    <p class="dept-stage-desc">
-                        Penguasaan teknologi pascapanen komoditas unggulan lokal Tanggamus (Kopi Robusta &amp; Hortikultura), pengolahan pangan higienis modern, serta tata kelola keamanan mutu berstandar HACCP.
-                    </p>
+            <!-- CARD 2: APHP -->
+            <div class="deck-card" tabindex="0" role="button" aria-expanded="false" aria-label="Agribisnis Pengolahan Hasil Pertanian">
+                <img src="{{ asset('images/web/jurusan_aphp.jpg') }}" alt="Laboratorium Agribisnis Hasil Pertanian" class="deck-bg-img">
+                <div class="deck-overlay"></div>
 
-                    <div class="dept-spec-bento">
-                        <div class="dept-spec-item">
-                            <div class="dept-spec-icon green">☕</div>
-                            <div>
-                                <div class="dept-spec-label">Core Focus</div>
-                                <div class="dept-spec-value">Hilirisasi Kopi &amp; Pangan Organik</div>
-                            </div>
-                        </div>
-                        <div class="dept-spec-item">
-                            <div class="dept-spec-icon green">🔬</div>
-                            <div>
-                                <div class="dept-spec-label">Fasilitas Praktik</div>
-                                <div class="dept-spec-value">Digital Roaster &amp; Lab Higienis</div>
-                            </div>
-                        </div>
-                        <div class="dept-spec-item">
-                            <div class="dept-spec-icon green">🛡️</div>
-                            <div>
-                                <div class="dept-spec-label">Standar Lisensi</div>
-                                <div class="dept-spec-value">Quality Control LSP-P1 BNSP</div>
-                            </div>
-                        </div>
-                        <div class="dept-spec-item">
-                            <div class="dept-spec-icon green">🌱</div>
-                            <div>
-                                <div class="dept-spec-label">Prospek Karir</div>
-                                <div class="dept-spec-value">Food QC, Barista &amp; Agripreneur</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div style="display: flex; gap: 14px; align-items: center; flex-wrap: wrap;">
-                        <a href="{{ route('web.jurusan.show', 'aphp') }}" class="btn-industrial btn-industrial-primary" style="background: #059669; border-color: #059669;">
-                            Eksplorasi Kurikulum APHP →
-                        </a>
-                        <span style="font-size: 0.82rem; color: var(--text-muted);">Teaching Factory Kopi Robusta</span>
-                    </div>
+                <!-- Collapsed State -->
+                <div class="deck-collapsed-content">
+                    <div class="deck-collapsed-badge">🌿</div>
+                    <div class="deck-collapsed-title">02 / Agribisnis Hasil Pertanian</div>
+                    <div class="deck-collapsed-index">02</div>
                 </div>
 
-                <div class="dept-stage-visual">
-                    <img src="{{ asset('images/web/jurusan_aphp.jpg') }}" alt="Laboratorium Pengolahan Pertanian SMKN 1 Air Naningan" class="dept-stage-img">
-                    <div class="dept-floating-stat">
-                        <div>
-                            <div class="stat-label">Produksi Unggulan</div>
-                            <div class="stat-val" style="color: #34d399;">Kopi Robusta TEFA</div>
-                        </div>
-                        <div>
-                            <div class="stat-label">Standar Mutu</div>
-                            <div class="stat-val" style="color: #6ee7b7;">HACCP Certified</div>
-                        </div>
+                <!-- Expanded State -->
+                <div class="deck-expanded-content">
+                    <div class="deck-top-badge green">
+                        🌿 02 / AGRO-TECHNOLOGY &amp; FOOD SCIENCE
                     </div>
+                    <h3 class="deck-title">Agribisnis Pengolahan Hasil Pertanian</h3>
+                    <p class="deck-desc">
+                        Hilirisasi komoditas unggulan kopi robusta Tanggamus petik merah lereng Air Naningan, mesin roasting digital, tata kelola mutu higienis HACCP, dan wirausaha pangan.
+                    </p>
+                    <div class="deck-chips">
+                        <span class="deck-chip">✓ Roasting Kopi Robusta TEFA</span>
+                        <span class="deck-chip">✓ Pengolahan Pangan HACCP</span>
+                        <span class="deck-chip">✓ Stainless Steel Processing Lab</span>
+                        <span class="deck-chip">✓ Lisensi QC Pangan BNSP</span>
+                    </div>
+                    <a href="{{ route('web.jurusan.show', 'aphp') }}" class="deck-btn-cta">
+                        <span>Eksplorasi Kurikulum &amp; Lab APHP</span>
+                        <span>→</span>
+                    </a>
                 </div>
             </div>
 
-            <!-- Panel 03: TSM -->
-            <div class="dept-panel" id="dept-panel-tsm" role="tabpanel" aria-labelledby="tab-tsm">
-                <div>
-                    <span class="dept-category-tag amber">03 / AUTOMOTIVE ENGINEERING</span>
-                    <h3 class="dept-stage-title">Teknik &amp; Bisnis Sepeda Motor (TSM)</h3>
-                    <p class="dept-stage-desc">
-                        Pemeliharaan dan perbaikan sepeda motor modern dengan sistem injeksi elektronik (EFI), diagnosis kelistrikan komputerisasi, overhaul mesin presisi, serta manajemen operasional bengkel resmi.
-                    </p>
+            <!-- CARD 3: TSM -->
+            <div class="deck-card" tabindex="0" role="button" aria-expanded="false" aria-label="Teknik & Bisnis Sepeda Motor">
+                <img src="{{ asset('images/web/jurusan_tsm.jpg') }}" alt="Bengkel Teknik Sepeda Motor" class="deck-bg-img">
+                <div class="deck-overlay"></div>
 
-                    <div class="dept-spec-bento">
-                        <div class="dept-spec-item">
-                            <div class="dept-spec-icon amber">⚡</div>
-                            <div>
-                                <div class="dept-spec-label">Core Focus</div>
-                                <div class="dept-spec-value">Electronic Fuel Injection &amp; Engine</div>
-                            </div>
-                        </div>
-                        <div class="dept-spec-item">
-                            <div class="dept-spec-icon amber">🔧</div>
-                            <div>
-                                <div class="dept-spec-label">Fasilitas Praktik</div>
-                                <div class="dept-spec-value">Hydraulic Lift &amp; OBD Diagnostic</div>
-                            </div>
-                        </div>
-                        <div class="dept-spec-item">
-                            <div class="dept-spec-icon amber">📜</div>
-                            <div>
-                                <div class="dept-spec-label">Standar Lisensi</div>
-                                <div class="dept-spec-value">Teknisi Motor Injeksi LSP BNSP</div>
-                            </div>
-                        </div>
-                        <div class="dept-spec-item">
-                            <div class="dept-spec-icon amber">🏁</div>
-                            <div>
-                                <div class="dept-spec-label">Prospek Karir</div>
-                                <div class="dept-spec-value">Service Advisor, Mekanik, Wirausaha</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div style="display: flex; gap: 14px; align-items: center; flex-wrap: wrap;">
-                        <a href="{{ route('web.jurusan.show', 'tsm') }}" class="btn-industrial btn-industrial-primary" style="background: #d97706; border-color: #d97706;">
-                            Eksplorasi Kurikulum TSM →
-                        </a>
-                        <span style="font-size: 0.82rem; color: var(--text-muted);">Bengkel Praktik Berlisensi APM</span>
-                    </div>
+                <!-- Collapsed State -->
+                <div class="deck-collapsed-content">
+                    <div class="deck-collapsed-badge">⚙️</div>
+                    <div class="deck-collapsed-title">03 / Teknik Sepeda Motor</div>
+                    <div class="deck-collapsed-index">03</div>
                 </div>
 
-                <div class="dept-stage-visual">
-                    <img src="{{ asset('images/web/jurusan_tsm.jpg') }}" alt="Bengkel Teknik Sepeda Motor SMKN 1 Air Naningan" class="dept-stage-img">
-                    <div class="dept-floating-stat">
-                        <div>
-                            <div class="stat-label">Sertifikasi Praktik</div>
-                            <div class="stat-val" style="color: #fbbf24;">Teknisi Ahli BNSP</div>
-                        </div>
-                        <div>
-                            <div class="stat-label">Fasilitas Bengkel</div>
-                            <div class="stat-val" style="color: #fde68a;">Standar Dealer Resmi</div>
-                        </div>
+                <!-- Expanded State -->
+                <div class="deck-expanded-content">
+                    <div class="deck-top-badge amber">
+                        ⚙️ 03 / AUTOMOTIVE ENGINEERING
                     </div>
+                    <h3 class="deck-title">Teknik &amp; Bisnis Sepeda Motor (TSM)</h3>
+                    <p class="deck-desc">
+                        Teknologi injeksi bahan bakar elektronik (EFI), diagnostik kelistrikan komputerisasi, overhaul mesin presisi, dan tata kelola manajemen bengkel resmi berlisensi.
+                    </p>
+                    <div class="deck-chips">
+                        <span class="deck-chip">✓ Diagnostic Scanner EFI</span>
+                        <span class="deck-chip">✓ Hydraulic Bike-Lift Workshop</span>
+                        <span class="deck-chip">✓ Overhaul Engine &amp; CVT</span>
+                        <span class="deck-chip">✓ Lisensi Teknisi Motor BNSP</span>
+                    </div>
+                    <a href="{{ route('web.jurusan.show', 'tsm') }}" class="deck-btn-cta">
+                        <span>Eksplorasi Kurikulum &amp; Bengkel TSM</span>
+                        <span>→</span>
+                    </a>
                 </div>
             </div>
 
@@ -1663,21 +1578,37 @@
         resetHeroTimer();
     }
 
-    // Vocational Department Tab Switcher (Konsep 2)
-    function switchDeptTab(deptId) {
-        const buttons = document.querySelectorAll('.dept-tab-btn');
-        const panels = document.querySelectorAll('.dept-panel');
-
-        buttons.forEach(btn => {
-            const isActive = btn.getAttribute('data-dept') === deptId;
-            btn.classList.toggle('active', isActive);
-            btn.setAttribute('aria-selected', isActive ? 'true' : 'false');
+    // Interactive Expanding Panoramic Deck (Konsep 1: Otomatis Melebar Mulus saat Mouse Digeser)
+    function setActiveDeckCard(card) {
+        if (!card || card.classList.contains('active')) return;
+        const allCards = document.querySelectorAll('.deck-card');
+        allCards.forEach(c => {
+            c.classList.remove('active');
+            c.setAttribute('aria-expanded', 'false');
         });
-
-        panels.forEach(panel => {
-            const isMatch = panel.id === `dept-panel-${deptId}`;
-            panel.classList.toggle('active', isMatch);
-        });
+        card.classList.add('active');
+        card.setAttribute('aria-expanded', 'true');
     }
+
+    const deckCards = document.querySelectorAll('.deck-card');
+    deckCards.forEach(card => {
+        // Otomatis melebar mulus saat mouse digeser ke kartu (hover)
+        card.addEventListener('mouseenter', () => {
+            setActiveDeckCard(card);
+        });
+
+        // Dukungan klik / sentuhan mobile
+        card.addEventListener('click', () => {
+            setActiveDeckCard(card);
+        });
+
+        // Aksesibilitas keyboard (Enter / Spasi)
+        card.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                setActiveDeckCard(card);
+            }
+        });
+    });
 </script>
 @endpush
