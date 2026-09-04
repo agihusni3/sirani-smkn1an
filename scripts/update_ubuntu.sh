@@ -37,6 +37,7 @@ git pull origin main
 echo -e "\n${YELLOW}[2/5] Memeriksa migrasi database & sinkronisasi data siswa...${NC}"
 php artisan migrate --force
 php artisan sirani:sync-siswa
+php artisan sirani:bersihkan-notif
 
 # 3. Bersihkan & Optimasi Cache Laravel
 echo -e "\n${YELLOW}[3/4] Mengosongkan cache lama & mengoptimasi cache Blade/Route...${NC}"
