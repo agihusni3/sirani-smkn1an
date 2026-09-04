@@ -572,12 +572,10 @@
             <tr>
               <th style="width:36px; text-align:center;">No</th>
               <th>Pendidik &amp; Legalitas</th>
-              <th>Tugas &amp; Mapel</th>
-              <th>Status &amp; Kualifikasi</th>
+              <th>Penugasan &amp; Mapel</th>
+              <th>Kepegawaian &amp; Kualifikasi</th>
               <th style="text-align:center;">Sertifikat Pelatihan</th>
-              <th>Kontak WA</th>
-              <th style="text-align:center;">Kartu RFID</th>
-              <th>Akun Login</th>
+              <th>Akun Akses</th>
               <th style="text-align:center;">Status</th>
               <th style="width:80px; text-align:center;">Aksi</th>
             </tr>
@@ -587,17 +585,18 @@
               @php
                 $cleanHp = preg_replace('/[^0-9]/', '', $g->no_hp ?? '');
                 if (str_starts_with($cleanHp, '0')) { $cleanHp = '62' . substr($cleanHp, 1); }
+                $kartu = $g->kartuRfid;
               @endphp
               <tr>
                 <td style="text-align:center; font-weight:700; color:var(--text); font-family:var(--font-mono); font-size:12px; vertical-align:middle;">
                   {{ $gurus->firstItem() + $idx }}
                 </td>
                 <td style="vertical-align:middle; padding:12px 12px;">
-                  <div style="display:flex; align-items:center; gap:10px;">
-                    <div class="avatar-circle avatar-md">
+                  <div style="display:flex; align-items:flex-start; gap:11px;">
+                    <div class="avatar-circle avatar-md" style="margin-top:2px; flex-shrink:0;">
                       <img src="{{ $g->foto_url }}" alt="{{ $g->nama }}" class="avatar-img" />
                     </div>
-                    <div style="min-width:0;">
+                    <div style="min-width:0; flex:1;">
                       <div style="font-weight:800; font-size:13.5px; color:var(--text); line-height:1.3;">
                         {{ $g->nama_lengkap_gelar }}
                       </div>
@@ -607,19 +606,53 @@
                           <span style="color:var(--border-2);">|</span> NUPTK: {{ $g->nuptk }}
                         @endif
                       </div>
-                      @if(!empty($g->list_tugas_tambahan))
-                        <div style="display:flex; flex-wrap:wrap; gap:3px; margin-top:3px;">
+
+                      {{-- Badges Meta: WhatsApp, Kartu RFID, & Tugas Tambahan --}}
+                      <div style="display:flex; flex-wrap:wrap; align-items:center; gap:5px; margin-top:5px;">
+                        @if($g->no_hp)
+                          <a href="https://wa.me/{{ $cleanHp }}" target="_blank" 
+                             style="font-size:10.5px; font-weight:700; font-family:var(--font-mono); text-decoration:none; display:inline-flex; align-items:center; gap:3px; color:#15803d; background:#dcfce7; border:1px solid rgba(22,163,74,0.3); border-radius:4px; padding:1px 6px; transition:all .15s ease;"
+                             title="Kirim Pesan WhatsApp: {{ $g->no_hp }}">
+                            <i class="bi bi-whatsapp"></i> {{ $g->no_hp }}
+                          </a>
+                        @endif
+
+                        @if($kartu)
+                          @if($isAdmin || $isStafTu)
+                            <button type="button"
+                              onclick="openRfidPairModal('guru', {{ $g->id }}, '{{ addslashes($g->nama) }}', '{{ $g->nip ? 'NIP: ' . $g->nip : $g->label_kepegawaian }}', '{{ $g->foto_url }}', '{{ $kartu->uid }}')"
+                              style="background:rgba(16,185,129,0.08); border:1px solid rgba(16,185,129,0.3); border-radius:4px; padding:1px 6px; font-size:10.5px; font-weight:700; color:#065f46; cursor:pointer; font-family:var(--font-mono); display:inline-flex; align-items:center; gap:3px; transition:all .15s ease;"
+                              title="Kartu RFID: {{ $kartu->uid }} (Klik untuk ubah / lepas)">
+                              <i class="bi bi-broadcast" style="color:#10b981;"></i> {{ $kartu->uid }}
+                            </button>
+                          @else
+                            <span style="background:rgba(16,185,129,0.08); border:1px solid rgba(16,185,129,0.3); border-radius:4px; padding:1px 6px; font-size:10.5px; font-weight:700; color:#065f46; font-family:var(--font-mono); display:inline-flex; align-items:center; gap:3px;">
+                              <i class="bi bi-broadcast" style="color:#10b981;"></i> {{ $kartu->uid }}
+                            </span>
+                          @endif
+                        @else
+                          @if($isAdmin || $isStafTu)
+                            <button type="button"
+                              onclick="openRfidPairModal('guru', {{ $g->id }}, '{{ addslashes($g->nama) }}', '{{ $g->nip ? 'NIP: ' . $g->nip : $g->label_kepegawaian }}', '{{ $g->foto_url }}', '')"
+                              style="background:var(--bg-3); border:1px dashed var(--border-2); border-radius:4px; padding:1px 6px; font-size:10px; font-weight:700; color:var(--text-3); cursor:pointer; display:inline-flex; align-items:center; gap:3px; transition:all .15s ease;"
+                              title="Daftarkan Kartu RFID Guru">
+                              <i class="bi bi-plus-circle"></i> Pasang RFID
+                            </button>
+                          @endif
+                        @endif
+
+                        @if(!empty($g->list_tugas_tambahan))
                           @foreach($g->list_tugas_tambahan as $tgs)
                             <span style="font-size:10px; font-weight:700; color:#b45309; background:#fef3c7; border:1px solid rgba(217,119,6,0.25); border-radius:4px; padding:1px 5px; display:inline-flex; align-items:center; gap:3px;" title="{{ $g->sk_tugas_tambahan ? 'SK: ' . $g->sk_tugas_tambahan : 'Tugas Tambahan' }}">
                               <i class="bi bi-star-fill" style="font-size:8px;"></i> {{ $tgs }}
                             </span>
                           @endforeach
-                        </div>
-                      @elseif($g->rombelWali)
-                        <div style="font-size:10.5px; font-weight:700; color:var(--text-2); margin-top:2px; display:inline-flex; align-items:center; gap:4px;">
-                          <i class="bi bi-mortarboard-fill" style="color:var(--text-3); font-size:10px;"></i> Wali: {{ $g->rombelWali->nama_rombel }}
-                        </div>
-                      @endif
+                        @elseif($g->rombelWali)
+                          <span style="font-size:10px; font-weight:700; color:var(--text-2); background:var(--bg-3); border:1px solid var(--border); border-radius:4px; padding:1px 5px; display:inline-flex; align-items:center; gap:3px;">
+                            <i class="bi bi-mortarboard-fill" style="font-size:9px;"></i> Wali: {{ $g->rombelWali->nama_rombel }}
+                          </span>
+                        @endif
+                      </div>
                     </div>
                   </div>
                 </td>
@@ -686,47 +719,7 @@
                   </button>
                 </td>
 
-                <td style="vertical-align:middle; padding:10px 12px; white-space:nowrap;">
-                  @if($g->no_hp)
-                    <a href="https://wa.me/{{ $cleanHp }}" target="_blank" style="font-size:12px; font-weight:700; font-family:var(--font-mono); text-decoration:none; display:inline-block; color:var(--text); white-space:nowrap; transition:color .15s ease;" onmouseover="this.style.color='#25D366'" onmouseout="this.style.color='var(--text)'" title="Chat WhatsApp Guru">
-                      {{ $g->no_hp }}
-                    </a>
-                  @else
-                    <span style="color:var(--text-3); font-size:12px;">-</span>
-                  @endif
-                </td>
-
-                {{-- Kartu RFID --}}
-                <td style="vertical-align:middle; text-align:center; padding:10px 12px; white-space:nowrap;">
-                  @php $kartu = $g->kartuRfid; @endphp
-                  @if($kartu)
-                    @if($isAdmin || $isStafTu)
-                      <button type="button"
-                        onclick="openRfidPairModal('guru', {{ $g->id }}, '{{ addslashes($g->nama) }}', '{{ $g->nip ? 'NIP: ' . $g->nip : $g->label_kepegawaian }}', '{{ $g->foto_url }}', '{{ $kartu->uid }}')"
-                        style="background:transparent; border:none; padding:4px 0; font-size:12px; font-weight:700; color:var(--text); cursor:pointer; font-family:var(--font-mono); white-space:nowrap;"
-                        title="Klik untuk Ubah / Lepas Kartu RFID">
-                        {{ $kartu->uid }}
-                      </button>
-                    @else
-                      <span style="font-size:11.5px; font-weight:700; color:var(--text); font-family:var(--font-mono);">
-                        {{ $kartu->uid }}
-                      </span>
-                    @endif
-                  @else
-                    @if($isAdmin || $isStafTu)
-                      <button type="button"
-                        onclick="openRfidPairModal('guru', {{ $g->id }}, '{{ addslashes($g->nama) }}', '{{ $g->nip ? 'NIP: ' . $g->nip : $g->label_kepegawaian }}', '{{ $g->foto_url }}', '')"
-                        style="background:transparent; border:none; padding:4px 0; font-size:11.5px; font-weight:800; color:var(--text-2); cursor:pointer; white-space:nowrap;"
-                        onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--text-2)'"
-                        title="Daftarkan Kartu RFID">
-                        + RFID
-                      </button>
-                    @else
-                      <span style="font-size:11px; font-weight:600; color:var(--text-3);">-</span>
-                    @endif
-                  @endif
-                </td>
-
+                {{-- Kolom Akun Akses SIRANI --}}
                 <td style="vertical-align:middle; padding:10px 12px; white-space:nowrap;">
                   @if($g->user)
                     @if($isAdmin || $isStafTu)
@@ -755,6 +748,7 @@
                   @endif
                 </td>
 
+                {{-- Status Keaktifan --}}
                 <td style="vertical-align:middle; text-align:center; padding:10px 8px; white-space:nowrap;">
                   @if($g->status === 'aktif')
                     <span class="table-status-pill aktif"><i class="bi bi-check-circle-fill"></i> Aktif</span>
@@ -765,6 +759,7 @@
                   @endif
                 </td>
 
+                {{-- Aksi --}}
                 <td style="vertical-align:middle; text-align:center; padding:10px 8px; white-space:nowrap;">
                   <div style="display:flex; gap:4px; justify-content:center; align-items:center;">
                     <a href="{{ route('kartu.digital.guru', ['id' => $g->id]) }}" target="_blank"
@@ -787,7 +782,7 @@
               </tr>
             @empty
               <tr>
-                <td colspan="10" style="text-align:center; padding:36px; color:var(--text-3);">
+                <td colspan="8" style="text-align:center; padding:36px; color:var(--text-3);">
                   <i class="bi bi-person-x" style="font-size:32px; opacity:0.4;"></i>
                   <div style="font-weight:700; margin-top:8px; font-size:14px; color:var(--text);">Tidak ada data GTK yang cocok</div>
                   <p style="font-size:12px; margin-top:4px;">Coba gunakan kata kunci pencarian lain atau klik Reset.</p>

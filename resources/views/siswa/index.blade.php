@@ -460,7 +460,6 @@
               <th>Siswa</th>
               <th>Rombel &amp; Jurusan</th>
               <th>Kontak Orang Tua &amp; Siswa</th>
-              <th style="text-align:center;">Kartu RFID</th>
               <th style="text-align:center;">Status</th>
               <th style="width:100px; text-align:center;">Aksi</th>
             </tr>
@@ -471,6 +470,7 @@
                 $rombelNama = ($s->siswaRombels && $s->siswaRombels->first() && $s->siswaRombels->first()->rombel)
                   ? $s->siswaRombels->first()->rombel->nama_rombel
                   : 'Tanpa Rombel';
+                $kartu = $s->kartuRfid;
               @endphp
               <tr id="row-siswa-{{ $s->id }}">
                 <td style="text-align:center; vertical-align:middle; padding:8px 6px; white-space:nowrap;">
@@ -480,24 +480,48 @@
                   {{ $siswas->firstItem() + $idx }}
                 </td>
                 
-                {{-- Siswa (Avatar + Nama + NISN) --}}
+                {{-- Siswa (Avatar + Nama + NISN + RFID Chip) --}}
                 <td>
-                  <div style="display:flex; align-items:center; gap:10px;">
-                    <div class="avatar-circle avatar-md">
+                  <div style="display:flex; align-items:flex-start; gap:10px;">
+                    <div class="avatar-circle avatar-md" style="margin-top:2px; flex-shrink:0;">
                       <img src="{{ $s->foto_url }}" alt="{{ $s->nama }}" class="avatar-img" />
                     </div>
-                    <div>
+                    <div style="min-width:0;">
                       <div style="display:flex; align-items:center; gap:6px;">
                         <strong style="color:var(--text); font-size:13.5px;">{{ $s->nama }}</strong>
                         @if($s->jenis_kelamin)
                           <span style="font-size:10px; font-weight:800; padding:1px 5px; border-radius:4px; {{ $s->jenis_kelamin === 'L' ? 'background:#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe;' : 'background:#fdf2f8; color:#db2777; border:1px solid #fbcfe8;' }}" title="{{ $s->jenis_kelamin === 'L' ? 'Laki-laki' : 'Perempuan' }}">{{ $s->jenis_kelamin }}</span>
                         @endif
                       </div>
-                      <div style="font-size:11.5px; color:var(--text-3); font-family:var(--font-mono); margin-top:2px; display:flex; align-items:center; gap:6px;">
+                      <div style="font-size:11.5px; color:var(--text-3); font-family:var(--font-mono); margin-top:2px; display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
                         <span>NISN: <strong style="color:var(--text);">{{ $s->nisn ?: '-' }}</strong></span>
                         @if($s->nik)
                           <span style="color:var(--border-2);">•</span>
                           <span title="NIK Kependudukan">NIK: {{ $s->nik }}</span>
+                        @endif
+
+                        @if($kartu)
+                          @if($canManageSiswa)
+                            <button type="button"
+                              onclick="openRfidPairModal('siswa', {{ $s->id }}, '{{ addslashes($s->nama) }}', 'NISN: {{ $s->nisn ?: '-' }}', '{{ $s->foto_url }}', '{{ $kartu->uid }}')"
+                              style="background:rgba(16,185,129,0.08); border:1px solid rgba(16,185,129,0.3); border-radius:4px; padding:1px 6px; font-size:10px; font-weight:700; color:#065f46; cursor:pointer; font-family:var(--font-mono); display:inline-flex; align-items:center; gap:3px; transition:all .15s ease;"
+                              title="Kartu RFID: {{ $kartu->uid }} (Klik untuk ubah / lepas)">
+                              <i class="bi bi-broadcast" style="color:#10b981; font-size:9px;"></i> {{ $kartu->uid }}
+                            </button>
+                          @else
+                            <span style="background:rgba(16,185,129,0.08); border:1px solid rgba(16,185,129,0.3); border-radius:4px; padding:1px 6px; font-size:10px; font-weight:700; color:#065f46; font-family:var(--font-mono); display:inline-flex; align-items:center; gap:3px;">
+                              <i class="bi bi-broadcast" style="color:#10b981; font-size:9px;"></i> {{ $kartu->uid }}
+                            </span>
+                          @endif
+                        @else
+                          @if($canManageSiswa)
+                            <button type="button"
+                              onclick="openRfidPairModal('siswa', {{ $s->id }}, '{{ addslashes($s->nama) }}', 'NISN: {{ $s->nisn ?: '-' }}', '{{ $s->foto_url }}', '')"
+                              style="background:var(--bg-3); border:1px dashed var(--border-2); border-radius:4px; padding:1px 6px; font-size:9.5px; font-weight:700; color:var(--text-3); cursor:pointer; display:inline-flex; align-items:center; gap:2px; transition:all .15s ease;"
+                              title="Daftarkan Kartu RFID Siswa">
+                              <i class="bi bi-plus"></i> RFID
+                            </button>
+                          @endif
                         @endif
                       </div>
                     </div>
@@ -521,8 +545,8 @@
                     </div>
                     @if($s->no_hp_ortu)
                       <div style="font-size:11.5px; font-family:var(--font-mono); color:var(--text-2); margin-top:2px;">
-                        <a href="https://wa.me/{{ preg_replace('/^0/', '62', preg_replace('/[^0-9]/', '', $s->no_hp_ortu)) }}" target="_blank" style="color:var(--text); text-decoration:none; display:inline-flex; align-items:center; gap:4px; transition:color .15s ease;" onmouseover="this.style.color='#25D366'" onmouseout="this.style.color='var(--text)'" title="Chat WhatsApp Wali Murid">
-                          <i class="bi bi-whatsapp" style="font-size:10.5px; color:#25D366;"></i> {{ $s->no_hp_ortu }}
+                        <a href="https://wa.me/{{ preg_replace('/^0/', '62', preg_replace('/[^0-9]/', '', $s->no_hp_ortu)) }}" target="_blank" style="color:var(--text); text-decoration:none; display:inline-flex; align-items:center; gap:4px; transition:color .15s ease;" onmouseover="this.style.color='#25D366'" onmouseout="this.style.color='var(--text)'" title="Chat WhatsApp Orang Tua">
+                          <i class="bi bi-whatsapp" style="color:#25D366; font-size:11px;"></i> {{ $s->no_hp_ortu }}
                         </a>
                       </div>
                     @endif
@@ -537,37 +561,6 @@
                     </div>
                   @elseif(!$s->nama_ortu && !$s->no_hp_ortu)
                     <span style="color:var(--text-3); font-size:11.5px;">-</span>
-                  @endif
-                </td>
-
-                {{-- Kartu RFID --}}
-                <td style="vertical-align:middle; text-align:center; padding:12px 8px; white-space:nowrap;">
-                  @php $kartu = $s->kartuRfid; @endphp
-                  @if($kartu)
-                    @if($canManageSiswa)
-                      <button type="button"
-                        onclick="openRfidPairModal('siswa', {{ $s->id }}, '{{ addslashes($s->nama) }}', 'NISN: {{ $s->nisn ?: '-' }}', '{{ $s->foto_url }}', '{{ $kartu->uid }}')"
-                        style="background:transparent; border:none; padding:4px 0; font-size:12px; font-weight:700; color:var(--text); cursor:pointer; font-family:var(--font-mono); white-space:nowrap;"
-                        title="Klik untuk Ubah / Lepas Kartu RFID">
-                        {{ $kartu->uid }}
-                      </button>
-                    @else
-                      <span style="font-size:11.5px; font-weight:700; color:var(--text); font-family:var(--font-mono);">
-                        {{ $kartu->uid }}
-                      </span>
-                    @endif
-                  @else
-                    @if($canManageSiswa)
-                      <button type="button"
-                        onclick="openRfidPairModal('siswa', {{ $s->id }}, '{{ addslashes($s->nama) }}', 'NISN: {{ $s->nisn ?: '-' }}', '{{ $s->foto_url }}', '')"
-                        style="background:transparent; border:none; padding:4px 0; font-size:11.5px; font-weight:800; color:var(--text-2); cursor:pointer; white-space:nowrap;"
-                        onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--text-2)'"
-                        title="Daftarkan Kartu RFID">
-                        + RFID
-                      </button>
-                    @else
-                      <span style="font-size:11px; font-weight:600; color:var(--text-3);">-</span>
-                    @endif
                   @endif
                 </td>
 
@@ -612,7 +605,7 @@
               </tr>
             @empty
               <tr>
-                <td colspan="9" style="text-align:center; padding:48px; color:var(--text-3);">
+                <td colspan="7" style="text-align:center; padding:48px; color:var(--text-3);">
                   <i class="bi bi-person-x" style="font-size:36px; opacity:0.35;"></i>
                   <div style="font-weight:700; margin-top:10px; font-size:14px; color:var(--text);">Tidak ada data siswa yang cocok</div>
                   <p style="font-size:12px; margin-top:4px;">Coba gunakan kata kunci pencarian lain atau klik Reset.</p>
