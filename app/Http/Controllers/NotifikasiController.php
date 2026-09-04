@@ -43,6 +43,10 @@ class NotifikasiController extends Controller
                 'catatan_error'     => 'Dibersihkan otomatis oleh sistem (draf kadaluarsa / anomali kehadiran rutin)',
             ]);
 
+        // 0.1. SINKRONISASI TEMPLATE:
+        // Otomatis ubah pesan draf pending lama yang masih memakai teks hardcoded RFID ke template resmi terkini
+        \App\Services\NotifikasiDraftService::sinkronkanDraftPending();
+
         // Restriksi jika login sebagai Wali Kelas (hanya melihat kelas binaannya)
         $isWaliKelas   = $user && $user->isWaliKelas() && !$user->isAdmin() && $user->guru;
         $waliRombelIds = $isWaliKelas ? $user->guru->rombels()->pluck('id')->toArray() : [];

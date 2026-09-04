@@ -157,6 +157,95 @@ class NotifikasiDraftService
     }
 
     /**
+     * Parse template pesan untuk notifikasi tertentu sesuai template PengaturanNotifikasi.
+     */
+    public static function parsePesan(Siswa $siswa, string $kategori, array $params = []): string
+    {
+        $setting = PengaturanNotifikasi::getPengaturan();
+        $template = match ($kategori) {
+            'terlambat'      => $setting->template_terlambat,
+            'alpha'          => $setting->template_alpha,
+            'izin'           => $setting->template_izin,
+            'sakit'          => $setting->template_sakit,
+            'bolos'          => $setting->template_bolos,
+            'panggilan_ortu' => "🚨 *SURAT PANGGILAN ORANG TUA / WALI SISWA*\n*SMK NEGERI 1 AIR NANINGAN*\n\nYth. Bapak/Ibu Orang Tua / Wali dari *{nama_siswa}* ({kelas}),\n\nBerdasarkan catatan evaluasi sistem presensi, ananda telah mencapai akumulasi ketidakhadiran tanpa keterangan.\nMohon kehadirannya ke sekolah guna koordinasi dan bimbingan bersama Wali Kelas dan Guru BK.",
+            default          => "Pemberitahuan kehadiran siswa {nama_siswa} ({kelas}): Status {kategori} pada {tanggal}.",
+        };
+
+        $rombelAktif = $siswa->siswaRombels()->where('status_keanggotaan', 'aktif')->with(['rombel.waliKelas', 'rombel.jurusan'])->first();
+        $rombel = $rombelAktif?->rombel;
+        $namaRombel = $rombel?->nama_rombel ?? '-';
+        $namaJurusan = $rombel?->jurusan?->nama_jurusan ?? '-';
+        $namaWali = $rombel?->waliKelas?->nama ?? '-';
+
+        $tanggal = $params['tanggal'] ?? Carbon::today()->toDateString();
+        $tglIndo = Carbon::parse($tanggal)->translatedFormat('d F Y');
+        $jam = $params['jam'] ?? Carbon::now()->format('H:i:s');
+        $batasJam = $params['batas_jam'] ?? '07:15';
+        $keterangan = $params['keterangan'] ?? '-';
+        $linkPortal = url('/portal-siswa/' . ($siswa->nisn ?: $siswa->id));
+
+        $replacements = [
+            '{nama_siswa}'           => $siswa->nama,
+            '{nis}'                  => $siswa->nisn ?: '-',
+            '{nisn}'                 => $siswa->nisn ?: '-',
+            '{kelas}'                => $namaRombel,
+            '{rombel}'               => $namaRombel,
+            '{jurusan}'              => $namaJurusan,
+            '{nama_wali_kelas}'      => $namaWali,
+            '{tanggal}'              => $tglIndo,
+            '{jam}'                  => $jam,
+            '{waktu}'                => $jam,
+            '{batas_jam}'            => $batasJam,
+            '{keterangan}'           => $keterangan,
+            '{total_alpha}'          => '0',
+            '{total_bolos}'          => '0',
+            '{total_terlambat}'      => '0',
+            '{total_pelanggaran}'    => '0',
+            '{rincian_pelanggaran}'  => '-',
+            '{tingkat_urgensi}'      => 'Pemberitahuan',
+            '{rekomendasi_tindakan}' => 'Mohon pendampingan siswa di rumah',
+            '{link_portal}'          => $linkPortal,
+            '{link_portal_ortu}'     => $linkPortal,
+            '{kategori}'             => strtoupper(str_replace('_', ' ', $kategori)),
+            '{nama_ortu}'            => $siswa->nama_ortu ?: 'Bapak/Ibu Orang Tua/Wali',
+            '{no_hp_ortu}'           => $siswa->no_hp_ortu ?: 'Belum ada kontak',
+        ];
+
+        return str_replace(array_keys($replacements), array_values($replacements), $template);
+    }
+
+    /**
+     * Sinkronkan otomatis draf pending yang masih memakai pesan hardcoded lama ke template resmi.
+     */
+    public static function sinkronkanDraftPending(): int
+    {
+        $drafts = NotifikasiOrtu::where('status', 'pending')
+            ->where(function ($q) {
+                $q->where('pesan', 'like', '%telah melakukan presensi%')
+                  ->orWhere('pesan', 'like', '%Scan Barcode/RFID%');
+            })
+            ->with('siswa')
+            ->get();
+
+        $count = 0;
+        foreach ($drafts as $d) {
+            if ($d->siswa) {
+                preg_match('/pukul\s+([0-9:]+)/i', $d->pesan, $m);
+                $jam = $m[1] ?? Carbon::now()->format('H:i:s');
+                $pesanBaru = self::parsePesan($d->siswa, $d->kategori, [
+                    'tanggal'   => $d->tanggal,
+                    'jam'       => $jam,
+                    'batas_jam' => '07:15',
+                ]);
+                $d->update(['pesan' => $pesanBaru]);
+                $count++;
+            }
+        }
+        return $count;
+    }
+
+    /**
      * Evaluasi jika siswa telah mencapai akumulasi batas ketentuan pelanggaran
      * dan otomatis kirim notifikasi dinamis langsung ke Wali Kelas tanpa butuh verifikasi manual.
      */
