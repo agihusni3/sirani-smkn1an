@@ -61,6 +61,247 @@
       gap: 5px;
     }
 
+    /* ══ GRADIENT ACTION BUTTONS & BEAUTIFIED HOVER TOOLTIPS ══ */
+    .btn-gradient-koreksi {
+      background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%) !important;
+      color: #ffffff !important;
+      border: none !important;
+      border-radius: 6px !important;
+      font-size: 11px !important;
+      font-weight: 800 !important;
+      letter-spacing: 0.02em !important;
+      padding: 5px 12px !important;
+      cursor: pointer !important;
+      box-shadow: 0 2px 6px rgba(37, 99, 235, 0.28) !important;
+      transition: all .2s cubic-bezier(.4, 0, .2, 1) !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      text-decoration: none !important;
+      position: relative !important;
+      outline: none !important;
+    }
+    .btn-gradient-koreksi:hover {
+      background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%) !important;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.45) !important;
+      transform: translateY(-1.5px) !important;
+      color: #ffffff !important;
+    }
+    .btn-gradient-koreksi:active {
+      transform: translateY(0) !important;
+      box-shadow: 0 1px 3px rgba(37, 99, 235, 0.3) !important;
+    }
+
+    .btn-gradient-status {
+      background: linear-gradient(135deg, #059669 0%, #047857 100%) !important;
+      color: #ffffff !important;
+      border: none !important;
+      border-radius: 6px !important;
+      font-size: 11px !important;
+      font-weight: 800 !important;
+      letter-spacing: 0.02em !important;
+      padding: 5px 12px !important;
+      cursor: pointer !important;
+      box-shadow: 0 2px 6px rgba(5, 150, 105, 0.28) !important;
+      transition: all .2s cubic-bezier(.4, 0, .2, 1) !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      text-decoration: none !important;
+      position: relative !important;
+      outline: none !important;
+    }
+    .btn-gradient-status:hover {
+      background: linear-gradient(135deg, #047857 0%, #065f46 100%) !important;
+      box-shadow: 0 4px 12px rgba(5, 150, 105, 0.45) !important;
+      transform: translateY(-1.5px) !important;
+      color: #ffffff !important;
+    }
+    .btn-gradient-status:active {
+      transform: translateY(0) !important;
+      box-shadow: 0 1px 3px rgba(5, 150, 105, 0.3) !important;
+    }
+
+    /* Toolbar Gradient Action Buttons */
+    .btn-gradient-notif {
+      background: linear-gradient(135deg, #16a34a 0%, #15803d 100%) !important;
+      color: #ffffff !important;
+      border: none !important;
+      border-radius: var(--r-sm) !important;
+      height: 32px !important;
+      font-size: 12px !important;
+      font-weight: 800 !important;
+      padding: 0 14px !important;
+      cursor: pointer !important;
+      box-shadow: 0 2px 6px rgba(22, 163, 74, 0.25) !important;
+      transition: all .2s cubic-bezier(.4, 0, .2, 1) !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      text-decoration: none !important;
+      position: relative !important;
+    }
+    .btn-gradient-notif:hover {
+      background: linear-gradient(135deg, #15803d 0%, #166534 100%) !important;
+      box-shadow: 0 4px 12px rgba(22, 163, 74, 0.4) !important;
+      transform: translateY(-1.5px) !important;
+      color: #ffffff !important;
+    }
+
+    .btn-gradient-manual {
+      background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%) !important;
+      color: #ffffff !important;
+      border: 1px solid rgba(255, 255, 255, 0.15) !important;
+      border-radius: var(--r-sm) !important;
+      height: 32px !important;
+      font-size: 12px !important;
+      font-weight: 800 !important;
+      padding: 0 14px !important;
+      cursor: pointer !important;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25) !important;
+      transition: all .2s cubic-bezier(.4, 0, .2, 1) !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      text-decoration: none !important;
+      position: relative !important;
+    }
+    .btn-gradient-manual:hover {
+      background: linear-gradient(135deg, #334155 0%, #1e293b 100%) !important;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4) !important;
+      transform: translateY(-1.5px) !important;
+      color: #ffffff !important;
+    }
+
+    .btn-gradient-izin {
+      background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%) !important;
+      color: #ffffff !important;
+      border: none !important;
+      border-radius: var(--r-sm) !important;
+      height: 32px !important;
+      font-size: 12px !important;
+      font-weight: 800 !important;
+      padding: 0 14px !important;
+      cursor: pointer !important;
+      box-shadow: 0 2px 6px rgba(2, 132, 199, 0.25) !important;
+      transition: all .2s cubic-bezier(.4, 0, .2, 1) !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      text-decoration: none !important;
+      position: relative !important;
+    }
+    .btn-gradient-izin:hover {
+      background: linear-gradient(135deg, #0369a1 0%, #075985 100%) !important;
+      box-shadow: 0 4px 12px rgba(2, 132, 199, 0.4) !important;
+      transform: translateY(-1.5px) !important;
+      color: #ffffff !important;
+    }
+
+    /* Modal Submit Gradient Button */
+    .btn-gradient-simpan {
+      background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%) !important;
+      color: #ffffff !important;
+      border: none !important;
+      border-radius: 8px !important;
+      font-weight: 800 !important;
+      font-size: 13px !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      padding: 0 20px !important;
+      height: 40px !important;
+      cursor: pointer !important;
+      box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3) !important;
+      transition: all .2s cubic-bezier(.4, 0, .2, 1) !important;
+      position: relative !important;
+    }
+    .btn-gradient-simpan:hover {
+      background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%) !important;
+      box-shadow: 0 4px 14px rgba(37, 99, 235, 0.45) !important;
+      transform: translateY(-1.5px) !important;
+    }
+
+    /* Preset Chips in Modal */
+    .btn-chip-titip {
+      background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%) !important;
+      color: #ffffff !important;
+      border: none !important;
+      border-radius: 6px !important;
+      padding: 6px 13px !important;
+      font-size: 11px !important;
+      font-weight: 800 !important;
+      box-shadow: 0 2px 5px rgba(239, 68, 68, 0.25) !important;
+      cursor: pointer !important;
+      transition: all .18s ease !important;
+      position: relative !important;
+    }
+    .btn-chip-titip:hover {
+      background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%) !important;
+      box-shadow: 0 4px 10px rgba(239, 68, 68, 0.4) !important;
+      transform: translateY(-1px) !important;
+    }
+
+    .btn-chip-alpha {
+      background: linear-gradient(135deg, #64748b 0%, #475569 100%) !important;
+      color: #ffffff !important;
+      border: none !important;
+      border-radius: 6px !important;
+      padding: 6px 13px !important;
+      font-size: 11px !important;
+      font-weight: 800 !important;
+      box-shadow: 0 2px 5px rgba(100, 116, 139, 0.25) !important;
+      cursor: pointer !important;
+      transition: all .18s ease !important;
+      position: relative !important;
+    }
+    .btn-chip-alpha:hover {
+      background: linear-gradient(135deg, #475569 0%, #334155 100%) !important;
+      box-shadow: 0 4px 10px rgba(100, 116, 139, 0.4) !important;
+      transform: translateY(-1px) !important;
+    }
+
+    .btn-chip-bolos {
+      background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%) !important;
+      color: #ffffff !important;
+      border: none !important;
+      border-radius: 6px !important;
+      padding: 6px 13px !important;
+      font-size: 11px !important;
+      font-weight: 800 !important;
+      box-shadow: 0 2px 5px rgba(245, 158, 11, 0.25) !important;
+      cursor: pointer !important;
+      transition: all .18s ease !important;
+      position: relative !important;
+    }
+    .btn-chip-bolos:hover {
+      background: linear-gradient(135deg, #d97706 0%, #b45309 100%) !important;
+      box-shadow: 0 4px 10px rgba(245, 158, 11, 0.4) !important;
+      transform: translateY(-1px) !important;
+    }
+
+    /* Custom Floating Tooltip specifically for Table Action Buttons */
+    .btn-gradient-koreksi[data-tooltip]::before,
+    .btn-gradient-status[data-tooltip]::before {
+      right: 0 !important;
+      left: auto !important;
+      transform: translateY(4px) !important;
+    }
+    .btn-gradient-koreksi[data-tooltip]::after,
+    .btn-gradient-status[data-tooltip]::after {
+      right: 18px !important;
+      left: auto !important;
+      transform: translateY(4px) !important;
+    }
+    .btn-gradient-koreksi[data-tooltip]:hover::before,
+    .btn-gradient-status[data-tooltip]:hover::before {
+      transform: translateY(0) !important;
+    }
+    .btn-gradient-koreksi[data-tooltip]:hover::after,
+    .btn-gradient-status[data-tooltip]:hover::after {
+      transform: translateY(0) !important;
+    }
+
     /* Right Header with Theme/Account Actions & Time Cards Underneath */
     .piket-header-right {
       display: flex;
@@ -866,14 +1107,14 @@
 
         <div class="piket-toolbar-btns">
           {{-- Akses Menuju Notifikasi WhatsApp --}}
-          <a href="{{ route('notifikasi.index') }}" class="btn btn-outline btn-wa" style="height:32px; font-size:12px; font-weight:700; padding:0 12px; border-radius:var(--r-sm); text-decoration:none;" title="Buka Meja Notifikasi WhatsApp">
-            <i class="bi bi-whatsapp"></i> Notifikasi
+          <a href="{{ route('notifikasi.index') }}" class="btn-gradient-notif" data-tooltip="Buka panel notifikasi WhatsApp & kirim pesan pengingat" title="Buka panel notifikasi WhatsApp & kirim pesan pengingat">
+            Notifikasi
           </a>
-          <button type="button" class="btn btn-gold" style="height:32px; font-size:12px; font-weight:700; padding:0 12px; border-radius:var(--r-sm);" onclick="openModal('modalPresensiManual')" title="Input presensi manual siswa / guru">
-            <i class="bi bi-plus-lg"></i> Presensi Manual
+          <button type="button" class="btn-gradient-manual" onclick="openModal('modalPresensiManual')" data-tooltip="Input presensi kehadiran manual siswa atau guru" title="Input presensi kehadiran manual siswa atau guru">
+            Presensi Manual
           </button>
-          <button type="button" class="btn btn-outline" style="height:32px; font-size:12px; font-weight:700; padding:0 12px; border-radius:var(--r-sm);" onclick="openModal('modalCatatIzinPiket')" title="Catat perizinan atau surat sakit">
-            <i class="bi bi-envelope-paper"></i> Catat Izin
+          <button type="button" class="btn-gradient-izin" onclick="openModal('modalCatatIzinPiket')" data-tooltip="Catat surat keterangan perizinan atau sakit harian" title="Catat surat keterangan perizinan atau sakit harian">
+            Catat Izin
           </button>
         </div>
       </div>
@@ -1032,7 +1273,7 @@
                         </span>
                       @elseif(in_array($ab->sumber_absen, ['koreksi_piket_manual', 'manual_piket', 'piket']))
                         <span class="piket-status-pill belum" style="background:#fef2f2; color:#b91c1c; border:1px solid #f87171;" title="Divalidasi langsung oleh Petugas Guru Piket">
-                          <i class="bi bi-pencil-square"></i> Alpha (Validasi Piket)
+                          Alpha (Validasi Piket)
                         </span>
                       @else
                         <span class="piket-status-pill belum"><i class="bi bi-exclamation-octagon-fill"></i> Alpha</span>
@@ -1045,8 +1286,8 @@
                   </td>
                   <td style="text-align:right; white-space:nowrap;">
                     @if($canKoreksi ?? false)
-                      <button type="button" class="btn btn-sm btn-outline" style="padding:4px 10px; font-size:11px; font-weight:700; color:var(--text); border-color:var(--border-2); border-radius:6px;" onclick="openKoreksiModal({{ $ab->id }}, '{{ addslashes($ab->siswa?->nama ?? '-') }}', '{{ $ab->status }}', '{{ $ab->jam_masuk ? substr($ab->jam_masuk,0,5) : '' }}', '{{ $ab->jam_pulang ? substr($ab->jam_pulang,0,5) : '' }}', '{{ addslashes($ab->keterangan ?? '') }}')" title="Koreksi presensi siswa">
-                        <i class="bi bi-pencil-square"></i> Koreksi
+                      <button type="button" class="btn-gradient-koreksi" onclick="openKoreksiModal({{ $ab->id }}, '{{ addslashes($ab->siswa?->nama ?? '-') }}', '{{ $ab->status }}', '{{ $ab->jam_masuk ? substr($ab->jam_masuk,0,5) : '' }}', '{{ $ab->jam_pulang ? substr($ab->jam_pulang,0,5) : '' }}', '{{ addslashes($ab->keterangan ?? '') }}')" data-tooltip="Koreksi presensi & jam kehadiran siswa ini" title="Koreksi presensi & jam kehadiran siswa ini">
+                        Koreksi
                       </button>
                     @else
                       <span style="display:inline-flex; align-items:center; gap:4px; font-size:10.5px; color:var(--text-3); font-weight:600; padding:3px 8px; background:var(--bg-3); border-radius:4px;" title="Akses koreksi hanya untuk Guru Piket hari ini">
@@ -1102,8 +1343,8 @@
                   </td>
                   <td style="text-align:right; white-space:nowrap;">
                     @if($canKoreksi ?? false)
-                      <button type="button" class="btn btn-sm btn-outline" style="padding:4px 10px; font-size:11px; font-weight:700; color:var(--text); border-color:var(--border-2); border-radius:6px;" onclick="openValidasiSiswaModal({{ $sb->id }}, '{{ addslashes($sb->nama) }}', 'NISN: {{ $sb->nisn ?? '-' }}', '{{ addslashes($rombel) }}')" title="Catat Status (Izin, Sakit, Hadir Manual, Dispen)">
-                        <i class="bi bi-pencil-square"></i> Set Status
+                      <button type="button" class="btn-gradient-status" onclick="openValidasiSiswaModal({{ $sb->id }}, '{{ addslashes($sb->nama) }}', 'NISN: {{ $sb->nisn ?? '-' }}', '{{ addslashes($rombel) }}')" data-tooltip="Catat kehadiran manual, izin, sakit, atau dispensasi" title="Catat kehadiran manual, izin, sakit, atau dispensasi">
+                        Set Status
                       </button>
                     @else
                       <span style="display:inline-flex; align-items:center; gap:4px; font-size:10.5px; color:var(--text-3); font-weight:600; padding:3px 8px; background:var(--bg-3); border-radius:4px;" title="Akses koreksi hanya untuk Guru Piket hari ini">
@@ -1209,7 +1450,7 @@
                         </span>
                       @elseif(in_array($ag->sumber_absen, ['koreksi_piket_manual', 'manual_piket', 'piket']))
                         <span class="piket-status-pill belum" style="background:#fef2f2; color:#b91c1c; border:1px solid #f87171;" title="Divalidasi langsung oleh Petugas Guru Piket">
-                          <i class="bi bi-pencil-square"></i> Alpha (Validasi Piket)
+                          Alpha (Validasi Piket)
                         </span>
                       @else
                         <span class="piket-status-pill belum"><i class="bi bi-exclamation-octagon-fill"></i> Alpha</span>
@@ -1220,8 +1461,8 @@
                   </td>
                   <td style="text-align:right; white-space:nowrap;">
                     @if($canKoreksi ?? false)
-                      <button type="button" class="btn btn-sm btn-outline" style="padding:4px 10px; font-size:11px; font-weight:700; color:var(--text); border-color:var(--border-2); border-radius:6px;" onclick="openKoreksiModal({{ $ag->id }}, '{{ addslashes($ag->guru?->nama ?? '-') }}', '{{ $ag->status }}', '{{ $ag->jam_masuk ? substr($ag->jam_masuk,0,5) : '' }}', '{{ $ag->jam_pulang ? substr($ag->jam_pulang,0,5) : '' }}', '{{ addslashes($ag->keterangan ?? '') }}')" title="Koreksi presensi guru">
-                        <i class="bi bi-pencil-square"></i> Koreksi
+                      <button type="button" class="btn-gradient-koreksi" onclick="openKoreksiModal({{ $ag->id }}, '{{ addslashes($ag->guru?->nama ?? '-') }}', '{{ $ag->status }}', '{{ $ag->jam_masuk ? substr($ag->jam_masuk,0,5) : '' }}', '{{ $ag->jam_pulang ? substr($ag->jam_pulang,0,5) : '' }}', '{{ addslashes($ag->keterangan ?? '') }}')" data-tooltip="Koreksi presensi & jam kehadiran guru ini" title="Koreksi presensi & jam kehadiran guru ini">
+                        Koreksi
                       </button>
                     @else
                       <span style="display:inline-flex; align-items:center; gap:4px; font-size:10.5px; color:var(--text-3); font-weight:600; padding:3px 8px; background:var(--bg-3); border-radius:4px;" title="Akses koreksi hanya untuk Guru Piket hari ini">
@@ -1273,8 +1514,8 @@
                   </td>
                   <td style="text-align:right; white-space:nowrap;">
                     @if($canKoreksi ?? false)
-                      <button type="button" class="btn btn-sm btn-outline" style="padding:4px 10px; font-size:11px; font-weight:700; color:var(--text); border-color:var(--border-2); border-radius:6px;" onclick="openSetStatusGuruModal({{ $gb->id }}, '{{ addslashes($gb->nama) }}', '{{ addslashes($gb->jabatan ?: 'Guru') }}')" title="Catat Hadir Manual / Izin / Sakit / Dinas Luar">
-                        <i class="bi bi-pencil-square"></i> Set Status
+                      <button type="button" class="btn-gradient-status" onclick="openSetStatusGuruModal({{ $gb->id }}, '{{ addslashes($gb->nama) }}', '{{ addslashes($gb->jabatan ?: 'Guru') }}')" data-tooltip="Catat status hadir manual, izin, sakit, atau dinas luar guru ini" title="Catat status hadir manual, izin, sakit, atau dinas luar guru ini">
+                        Set Status
                       </button>
                     @else
                       <span style="display:inline-flex; align-items:center; gap:4px; font-size:10.5px; color:var(--text-3); font-weight:600; padding:3px 8px; background:var(--bg-3); border-radius:4px;" title="Akses koreksi hanya untuk Guru Piket hari ini">
@@ -1930,8 +2171,8 @@
         {{-- Action Buttons --}}
         <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:8px;">
           <button type="button" class="btn btn-outline" onclick="closeModal('modalPresensiManual')">Batal</button>
-          <button type="submit" class="btn btn-gold" style="font-weight:800; display:inline-flex; align-items:center; gap:6px;">
-            <i class="bi bi-check2-circle"></i> Catat Presensi
+          <button type="submit" class="btn-gradient-simpan" data-tooltip="Simpan data presensi manual" title="Simpan data presensi manual">
+            Catat Presensi
           </button>
         </div>
 
@@ -1944,8 +2185,8 @@
 <div class="modal-overlay" id="modalKoreksiPiket">
   <div class="modal-card" style="max-width:500px; padding:24px; border-radius:14px; background:var(--bg-2); border:1px solid var(--border); box-shadow:var(--shadow-lg);">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px; border-bottom:1px solid var(--border); padding-bottom:12px;">
-      <h3 style="font-size:16.5px; font-weight:900; color:var(--text); margin:0; display:flex; align-items:center; gap:8px;">
-        <i class="bi bi-pencil-square" style="color:var(--text); font-size:18px;"></i> Koreksi Presensi Piket
+      <h3 style="font-size:16.5px; font-weight:900; color:var(--text); margin:0;">
+        Koreksi Presensi Piket
       </h3>
       <button type="button" class="btn btn-sm btn-outline" onclick="closeModal('modalKoreksiPiket')" style="width:34px; height:34px; padding:0; display:flex; align-items:center; justify-content:center; border-radius:8px; border:1px solid var(--border-2); color:var(--text);"><i class="bi bi-x-lg" style="font-size:14px;"></i></button>
     </div>
@@ -1967,7 +2208,7 @@
           <option value="hadir">Hadir Tepat Waktu</option>
           <option value="terlambat">Datang Terlambat</option>
           <option value="alpha">Alpha / Belum Scan (Kembalikan Status)</option>
-          <option value="titip_kartu">🚫 Dibatalkan — Terindikasi Titip Kartu (Alpha)</option>
+          <option value="titip_kartu">Dibatalkan — Terindikasi Titip Kartu (Alpha)</option>
           <option value="bolos">Bolos Kelas</option>
           <option value="izin">Izin</option>
           <option value="sakit">Sakit</option>
@@ -1977,14 +2218,14 @@
 
       {{-- Quick Action Intervensi Chips --}}
       <div style="margin-bottom:14px; display:flex; flex-wrap:wrap; gap:6px;">
-        <button type="button" onclick="setPresetKoreksi('titip_kartu')" class="btn btn-sm btn-outline" style="font-size:11px; font-weight:800; border-radius:6px; padding:4px 10px; color:#dc2626; border-color:rgba(220,38,38,0.3); background:rgba(220,38,38,0.06);">
-          <i class="bi bi-slash-circle"></i> 🚫 Intervensi Titip Kartu
+        <button type="button" onclick="setPresetKoreksi('titip_kartu')" class="btn-chip-titip" data-tooltip="Tandai kehadiran dibatalkan akibat titip kartu" title="Tandai kehadiran dibatalkan akibat titip kartu">
+          Intervensi Titip Kartu
         </button>
-        <button type="button" onclick="setPresetKoreksi('alpha')" class="btn btn-sm btn-outline" style="font-size:11px; font-weight:800; border-radius:6px; padding:4px 10px; color:var(--text-2); border-color:var(--border-2);">
-          <i class="bi bi-arrow-counterclockwise"></i> Reset ke Alpha
+        <button type="button" onclick="setPresetKoreksi('alpha')" class="btn-chip-alpha" data-tooltip="Reset catatan presensi kembali ke status Alpha" title="Reset catatan presensi kembali ke status Alpha">
+          Reset ke Alpha
         </button>
-        <button type="button" onclick="setPresetKoreksi('bolos')" class="btn btn-sm btn-outline" style="font-size:11px; font-weight:800; border-radius:6px; padding:4px 10px; color:#d97706; border-color:rgba(217,119,6,0.3); background:rgba(217,119,6,0.06);">
-          <i class="bi bi-exclamation-triangle"></i> Bolos Kelas
+        <button type="button" onclick="setPresetKoreksi('bolos')" class="btn-chip-bolos" data-tooltip="Tandai siswa bolos / tidak masuk kelas" title="Tandai siswa bolos / tidak masuk kelas">
+          Bolos Kelas
         </button>
       </div>
 
@@ -2008,8 +2249,8 @@
 
       <div style="display:flex; justify-content:flex-end; gap:10px; border-top:1px solid var(--border); padding-top:14px;">
         <button type="button" class="btn btn-outline" onclick="closeModal('modalKoreksiPiket')" style="height:40px; padding:0 18px; font-weight:800; border-radius:8px;">Batal</button>
-        <button type="submit" class="btn" style="background:#000000; color:#FFFFFF; border:1px solid #000000; font-weight:800; display:inline-flex; align-items:center; gap:6px; padding:0 20px; height:40px; border-radius:8px; cursor:pointer;">
-          <i class="bi bi-check2"></i> Simpan Koreksi
+        <button type="submit" class="btn-gradient-simpan" data-tooltip="Simpan perubahan koreksi presensi ke database" title="Simpan perubahan koreksi presensi ke database">
+          Simpan Koreksi
         </button>
       </div>
     </form>
@@ -2076,8 +2317,8 @@
 
         <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:6px;">
           <button type="button" class="btn btn-outline" onclick="closeModal('modalValidasiSiswa')">Batal</button>
-          <button type="submit" class="btn" style="background:#000000; color:#FFFFFF; border:1px solid #000000; font-weight:800; display:inline-flex; align-items:center; gap:6px; padding:0 16px; height:38px; border-radius:var(--r-sm); cursor:pointer;">
-            <i class="bi bi-check2-circle"></i> Simpan Status
+          <button type="submit" class="btn-gradient-simpan" data-tooltip="Simpan status kehadiran peserta didik ke sistem" title="Simpan status kehadiran peserta didik ke sistem">
+            Simpan Status
           </button>
         </div>
       </div>
@@ -2135,8 +2376,8 @@
 
         <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:6px;">
           <button type="button" class="btn btn-outline" onclick="closeModal('modalSetStatusGuru')">Batal</button>
-          <button type="submit" class="btn" style="background:#000000; color:#FFFFFF; border:1px solid #000000; font-weight:800; display:inline-flex; align-items:center; gap:6px; padding:0 16px; height:38px; border-radius:var(--r-sm); cursor:pointer;">
-            <i class="bi bi-check2-circle"></i> Simpan Status Guru
+          <button type="submit" class="btn-gradient-simpan" data-tooltip="Simpan status kehadiran guru ke sistem" title="Simpan status kehadiran guru ke sistem">
+            Simpan Status Guru
           </button>
         </div>
       </div>
@@ -2149,8 +2390,8 @@
   <div class="modal-card" style="max-width:540px; padding:24px;">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; border-bottom:1px solid var(--border); padding-bottom:10px;">
       <div>
-        <h3 style="font-size:16px; font-weight:900; color:var(--text); margin:0; display:flex; align-items:center; gap:8px;">
-          <i class="bi bi-envelope-paper-fill" style="color:#000000;"></i> Catat Surat Izin / Keterangan Tidak Hadir
+        <h3 style="font-size:16px; font-weight:900; color:var(--text); margin:0;">
+          Catat Surat Izin / Keterangan Tidak Hadir
         </h3>
         <div style="font-size:11px; color:var(--text-3); margin-top:2px;">Perekaman izin langsung di meja piket harian</div>
       </div>
@@ -2289,7 +2530,7 @@
 
       <div style="display:flex; justify-content:flex-end; gap:8px;">
         <button type="button" class="btn btn-outline" onclick="closeModal('modalCatatIzinPiket')">Batal</button>
-        <button type="submit" class="btn btn-gold" style="background:#000000; color:#FFFFFF; border:none; font-weight:800; height:38px; padding:0 16px;">
+        <button type="submit" class="btn-gradient-simpan" data-tooltip="Simpan perekaman izin ke sistem presensi" title="Simpan perekaman izin ke sistem presensi">
           Simpan Izin ke Presensi
         </button>
       </div>
