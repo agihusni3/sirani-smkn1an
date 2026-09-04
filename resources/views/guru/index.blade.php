@@ -439,20 +439,24 @@
         <div id="tab_tambah_tugas" class="gtk-tab-content" style="display:none;">
           <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap:14px; margin-bottom:14px;">
             <div class="form-group" style="margin-bottom:0;">
-              <label style="margin-bottom:5px; font-weight:700; font-size:12px; color:var(--text-2);">Mata Pelajaran yang Diampu</label>
-              <input type="text" name="mapel_diampu" placeholder="Contoh: Pemrograman Web, Matematika, PKn" style="width:100%; height:38px;" />
+              <label style="margin-bottom:2px; font-weight:700; font-size:12px; color:var(--text-2);">Mata Pelajaran yang Diampu</label>
+              <span style="font-size:10.5px; color:var(--text-3); display:block; margin-bottom:5px;">Pisahkan dengan koma jika &gt; 1 mapel (Contoh: <em>Pemrograman Web, Basis Data, PBO</em>)</span>
+              <input type="text" name="mapel_diampu" placeholder="Contoh: Pemrograman Web, Basis Data, PBO" style="width:100%; height:38px;" />
             </div>
             <div class="form-group" style="margin-bottom:0;">
-              <label style="margin-bottom:5px; font-weight:700; font-size:12px; color:var(--text-2);">Jumlah Jam Mengajar (JJM) / Minggu</label>
+              <label style="margin-bottom:2px; font-weight:700; font-size:12px; color:var(--text-2);">Jumlah Jam Mengajar (JJM) / Minggu</label>
+              <span style="font-size:10.5px; color:var(--text-3); display:block; margin-bottom:5px;">Total jam tatap muka mingguan seluruh mapel</span>
               <input type="number" name="jjm" min="0" max="60" placeholder="Contoh: 24 (Jam)" style="width:100%; height:38px;" />
             </div>
             <div class="form-group" style="margin-bottom:0;">
-              <label style="margin-bottom:5px; font-weight:700; font-size:12px; color:var(--text-2);">Tugas Tambahan di Sekolah</label>
-              <input type="text" name="tugas_tambahan" placeholder="Contoh: Kepala Bengkel RPL / Waka Kesiswaan / Wali Kelas" style="width:100%; height:38px;" />
+              <label style="margin-bottom:2px; font-weight:700; font-size:12px; color:var(--text-2);">Tugas Tambahan di Sekolah</label>
+              <span style="font-size:10.5px; color:var(--text-3); display:block; margin-bottom:5px;">Pisahkan dengan koma jika &gt; 1 (Contoh: <em>Kepala Bengkel RPL (12 Jam), Wali Kelas (2 Jam)</em>)</span>
+              <input type="text" name="tugas_tambahan" placeholder="Contoh: Kepala Bengkel RPL, Wali Kelas XII RPL 1" style="width:100%; height:38px;" />
             </div>
             <div class="form-group" style="margin-bottom:0;">
-              <label style="margin-bottom:5px; font-weight:700; font-size:12px; color:var(--text-2);">SK Tugas Tambahan</label>
-              <input type="text" name="sk_tugas_tambahan" placeholder="Nomor SK Pembagian Tugas Semester Ini" style="width:100%; height:38px;" />
+              <label style="margin-bottom:2px; font-weight:700; font-size:12px; color:var(--text-2);">SK Tugas Tambahan</label>
+              <span style="font-size:10.5px; color:var(--text-3); display:block; margin-bottom:5px;">Nomor SK Pembagian Tugas Pokok &amp; Tambahan Semester ini</span>
+              <input type="text" name="sk_tugas_tambahan" placeholder="Contoh: 800/012/SMK.01/2026" style="width:100%; height:38px;" />
             </div>
 
             {{-- Jadwal Hari Mengajar (Centang Hari Aktif) --}}
@@ -589,9 +593,13 @@
                           <span style="color:var(--border-2);">|</span> NUPTK: {{ $g->nuptk }}
                         @endif
                       </div>
-                      @if($g->tugas_tambahan)
-                        <div style="font-size:10.5px; font-weight:700; color:#2563eb; margin-top:2px; display:inline-flex; align-items:center; gap:4px;">
-                          <i class="bi bi-star-fill" style="font-size:9px;"></i> {{ $g->tugas_tambahan }}
+                      @if(!empty($g->list_tugas_tambahan))
+                        <div style="display:flex; flex-wrap:wrap; gap:3px; margin-top:3px;">
+                          @foreach($g->list_tugas_tambahan as $tgs)
+                            <span style="font-size:10px; font-weight:700; color:#b45309; background:#fef3c7; border:1px solid rgba(217,119,6,0.25); border-radius:4px; padding:1px 5px; display:inline-flex; align-items:center; gap:3px;" title="{{ $g->sk_tugas_tambahan ? 'SK: ' . $g->sk_tugas_tambahan : 'Tugas Tambahan' }}">
+                              <i class="bi bi-star-fill" style="font-size:8px;"></i> {{ $tgs }}
+                            </span>
+                          @endforeach
                         </div>
                       @elseif($g->rombelWali)
                         <div style="font-size:10.5px; font-weight:700; color:var(--text-2); margin-top:2px; display:inline-flex; align-items:center; gap:4px;">
@@ -603,13 +611,26 @@
                 </td>
                 <td style="vertical-align:middle; padding:12px 12px;">
                   <div style="font-size:12.5px; font-weight:700; color:var(--text);">{{ $g->jabatan }}</div>
-                  @if($g->mapel_diampu)
+                  @if(!empty($g->list_mapel))
+                    <div style="display:flex; flex-wrap:wrap; gap:3px; margin-top:4px; align-items:center;">
+                      @foreach($g->list_mapel as $mpl)
+                        <span style="font-size:10px; font-weight:700; background:rgba(37,99,235,0.08); color:#2563eb; border:1px solid rgba(37,99,235,0.2); padding:1px 5px; border-radius:4px; display:inline-flex; align-items:center; gap:3px;">
+                          <i class="bi bi-book-half" style="font-size:8.5px;"></i> {{ $mpl }}
+                        </span>
+                      @endforeach
+                      @if($g->jjm)
+                        <span style="font-size:9.5px; font-weight:800; color:var(--text-3); background:var(--bg-3); padding:1px 5px; border-radius:4px; border:1px solid var(--border);" title="Total Jam Mengajar per Minggu">
+                          {{ $g->jjm }} JP
+                        </span>
+                      @endif
+                    </div>
+                  @elseif($g->mapel_diampu)
                     <div style="font-size:11px; color:var(--text-2); margin-top:2px;">
                       Mapel: <strong>{{ $g->mapel_diampu }}</strong> {{ $g->jjm ? '(' . $g->jjm . ' JP)' : '' }}
                     </div>
                   @endif
                   @if($g->jenis_ptk)
-                    <div style="font-size:10.5px; color:var(--text-3); margin-top:2px;">
+                    <div style="font-size:10.5px; color:var(--text-3); margin-top:3px;">
                       {{ $g->jenis_ptk }}
                     </div>
                   @endif
@@ -1065,20 +1086,24 @@
       <div id="tab_edit_tugas" class="gtk-tab-content" style="display:none;">
         <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:12px;">
           <div>
-            <label class="form-label" style="font-weight:700; font-size:12px; margin-bottom:4px;">Mata Pelajaran Diampu</label>
-            <input type="text" id="edit_guru_mapel_diampu" name="mapel_diampu" class="input-field" style="width:100%; height:36px;" />
+            <label class="form-label" style="font-weight:700; font-size:12px; margin-bottom:2px;">Mata Pelajaran Diampu</label>
+            <span style="font-size:10px; color:var(--text-3); display:block; margin-bottom:4px;">Pisahkan dengan koma jika &gt; 1 mapel</span>
+            <input type="text" id="edit_guru_mapel_diampu" name="mapel_diampu" placeholder="Contoh: Pemrograman Web, Basis Data, PBO" class="input-field" style="width:100%; height:36px;" />
           </div>
           <div>
-            <label class="form-label" style="font-weight:700; font-size:12px; margin-bottom:4px;">JJM (Jam Mengajar / Minggu)</label>
-            <input type="number" id="edit_guru_jjm" name="jjm" min="0" max="60" class="input-field" style="width:100%; height:36px;" />
+            <label class="form-label" style="font-weight:700; font-size:12px; margin-bottom:2px;">JJM (Jam Mengajar / Minggu)</label>
+            <span style="font-size:10px; color:var(--text-3); display:block; margin-bottom:4px;">Total jam mengajar mingguan</span>
+            <input type="number" id="edit_guru_jjm" name="jjm" min="0" max="60" placeholder="Contoh: 24" class="input-field" style="width:100%; height:36px;" />
           </div>
           <div>
-            <label class="form-label" style="font-weight:700; font-size:12px; margin-bottom:4px;">Tugas Tambahan</label>
-            <input type="text" id="edit_guru_tugas_tambahan" name="tugas_tambahan" class="input-field" style="width:100%; height:36px;" />
+            <label class="form-label" style="font-weight:700; font-size:12px; margin-bottom:2px;">Tugas Tambahan</label>
+            <span style="font-size:10px; color:var(--text-3); display:block; margin-bottom:4px;">Pisahkan dengan koma jika &gt; 1 tugas</span>
+            <input type="text" id="edit_guru_tugas_tambahan" name="tugas_tambahan" placeholder="Contoh: Kepala Bengkel RPL, Wali Kelas" class="input-field" style="width:100%; height:36px;" />
           </div>
           <div>
-            <label class="form-label" style="font-weight:700; font-size:12px; margin-bottom:4px;">SK Tugas Tambahan</label>
-            <input type="text" id="edit_guru_sk_tugas_tambahan" name="sk_tugas_tambahan" class="input-field" style="width:100%; height:36px;" />
+            <label class="form-label" style="font-weight:700; font-size:12px; margin-bottom:2px;">SK Tugas Tambahan</label>
+            <span style="font-size:10px; color:var(--text-3); display:block; margin-bottom:4px;">Nomor SK Pembagian Tugas Semester ini</span>
+            <input type="text" id="edit_guru_sk_tugas_tambahan" name="sk_tugas_tambahan" placeholder="Contoh: 800/012/SMK.01/2026" class="input-field" style="width:100%; height:36px;" />
           </div>
 
           <div id="edit_hari_mengajar_box" style="grid-column: 1 / -1; background:var(--bg-3); border:1px solid var(--border-2); border-radius:var(--r-md); padding:10px 12px;">

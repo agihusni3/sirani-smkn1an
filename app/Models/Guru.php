@@ -71,7 +71,29 @@ class Guru extends Model
         'tmt_kerja'     => 'date',
     ];
 
-    protected $appends = ['foto_url', 'label_kepegawaian', 'nama_lengkap_gelar'];
+    protected $appends = ['foto_url', 'label_kepegawaian', 'nama_lengkap_gelar', 'list_mapel', 'list_tugas_tambahan'];
+
+    /**
+     * Dapatkan daftar mata pelajaran yang diampu dalam bentuk array.
+     */
+    public function getListMapelAttribute(): array
+    {
+        if (empty($this->mapel_diampu)) {
+            return [];
+        }
+        return array_values(array_filter(array_map('trim', explode(',', $this->mapel_diampu))));
+    }
+
+    /**
+     * Dapatkan daftar tugas tambahan dalam bentuk array.
+     */
+    public function getListTugasTambahanAttribute(): array
+    {
+        if (empty($this->tugas_tambahan)) {
+            return [];
+        }
+        return array_values(array_filter(array_map('trim', explode(',', $this->tugas_tambahan))));
+    }
 
     /**
      * Dapatkan nama lengkap resmi beserta gelar depan dan belakang.
