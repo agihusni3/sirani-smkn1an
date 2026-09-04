@@ -451,79 +451,55 @@
         @yield('content')
     </main>
 
-    <!-- 3. Clean Light Minimalist Footer -->
+    <!-- 3. Clean Streamlined Minimalist Footer -->
     <footer class="site-footer">
         <div class="container">
-            <div class="footer-grid">
-                <div>
-                    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
-                        <img src="{{ asset('logo.png') }}" alt="Logo SMK" style="width: 44px; height: 44px; object-fit: contain;">
-                        <div>
-                            <div class="footer-brand-title">SMK NEGERI 1 AIR NANINGAN</div>
-                            <div class="footer-badge">
-                                <span class="status-dot"></span>
-                                <span>Akreditasi B • NPSN: {{ $sekolah->npsn ?? '69888999' }}</span>
-                            </div>
+            <div class="footer-main-row">
+                <!-- Brand & Akreditasi -->
+                <div class="footer-brand-box">
+                    <img src="{{ asset('logo.png') }}" alt="Logo SMK" class="footer-logo" onerror="this.src='{{ asset('img/logo.png') }}'">
+                    <div>
+                        <div class="footer-brand-title">SMK NEGERI 1 AIR NANINGAN</div>
+                        <div class="footer-meta-line">
+                            <span class="footer-badge">
+                                <span class="status-dot"></span> Akreditasi B • NPSN: {{ $sekolah->npsn ?? '69888999' }}
+                            </span>
+                            <span class="footer-loc-text">
+                                <i class="fa-solid fa-location-dot"></i> Air Naningan, Tanggamus, Lampung
+                            </span>
                         </div>
                     </div>
-                    <p class="footer-desc">
-                        Lembaga pendidikan kejuruan vokasi negeri unggulan di Kabupaten Tanggamus, berdedikasi melatih tenaga kerja terampil siap kerja berstandar industri dan mencetak wirausahawan mandiri.
-                    </p>
-                    <div class="footer-social-links">
-                        <a href="https://facebook.com" target="_blank" rel="noopener" class="footer-social-btn fb" title="Facebook SMKN 1 Air Naningan"><i class="fa-brands fa-facebook-f"></i></a>
-                        <a href="https://instagram.com" target="_blank" rel="noopener" class="footer-social-btn ig" title="Instagram SMKN 1 Air Naningan"><i class="fa-brands fa-instagram"></i></a>
-                        <a href="https://youtube.com" target="_blank" rel="noopener" class="footer-social-btn yt" title="YouTube SMKN 1 Air Naningan"><i class="fa-brands fa-youtube"></i></a>
-                    </div>
                 </div>
 
-                <div class="footer-col">
-                    <h3>Program Kejuruan</h3>
-                    <ul>
-                        <li><a href="{{ route('web.jurusan.show', 'rpl') }}">Rekayasa Perangkat Lunak (RPL)</a></li>
-                        <li><a href="{{ route('web.jurusan.show', 'aphp') }}">Agribisnis Pengolahan Hasil (APHP)</a></li>
-                        <li><a href="{{ route('web.jurusan.show', 'tsm') }}">Teknik Sepeda Motor (TSM)</a></li>
-                        <li><a href="{{ route('web.jurusan.index') }}">Standar Kompetensi LSP BNSP</a></li>
-                    </ul>
-                </div>
+                <!-- Quick Inline Links -->
+                <nav class="footer-nav-inline" aria-label="Navigasi Footer">
+                    <a href="{{ route('web.beranda') }}">Beranda</a>
+                    <a href="{{ route('web.jurusan.index') }}">Kejuruan</a>
+                    <a href="{{ route('ppdb.index') }}">PPDB Online</a>
+                    <a href="{{ route('web.berita.index') }}">Warta</a>
+                    <a href="{{ route('portal.ortu.index') }}">Presensi</a>
+                    <a href="{{ route('web.kontak') }}">Kontak</a>
+                </nav>
 
-                <div class="footer-col">
-                    <h3>Layanan Mandiri</h3>
-                    <ul>
-                        <li><a href="{{ route('ppdb.index') }}">PPDB Online 2026/2027</a></li>
-                        <li><a href="{{ route('ppdb.status') }}">Cek Status Seleksi</a></li>
-                        <li><a href="{{ route('portal.ortu.index') }}">Portal Presensi Siswa</a></li>
-                        <li><a href="{{ route('web.berita.index') }}">Warta &amp; Agenda Sekolah</a></li>
-                        <li><a href="{{ route('login') }}">Masuk Dasbor SIRANI</a></li>
-                    </ul>
-                </div>
-
-                <div class="footer-col">
-                    <h3>Kampus &amp; Kontak</h3>
-                    <div class="footer-contact-list">
-                        <div class="footer-contact-item">
-                            <span class="footer-contact-icon geo"><i class="fa-solid fa-location-dot"></i></span>
-                            <span>{{ $sekolah->alamat ?? 'Jl. Raya Air Naningan, Kec. Air Naningan, Kab. Tanggamus, Lampung 35379' }}</span>
-                        </div>
-                        <div class="footer-contact-item">
-                            <span class="footer-contact-icon tel"><i class="fa-solid fa-phone"></i></span>
-                            <span>{{ $sekolah->telepon ?? '0812-3456-7890' }}</span>
-                        </div>
-                        <div class="footer-contact-item">
-                            <span class="footer-contact-icon mail"><i class="fa-solid fa-envelope"></i></span>
-                            <span>{{ $sekolah->email ?? 'info@smkn1airnaningan.sch.id' }}</span>
-                        </div>
-                        <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $sekolah->telepon ?? '6281234567890') }}?text=Halo%20Admin%20SMKN%201%20Air%20Naningan" target="_blank" rel="noopener" class="footer-helpdesk-btn">
-                            <i class="fa-brands fa-whatsapp" style="font-size: 1.05rem;"></i> Helpdesk Layanan Cepat
-                        </a>
+                <!-- Action & Socials -->
+                <div class="footer-actions-cluster">
+                    <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $sekolah->telepon ?? '6281234567890') }}?text=Halo%20Admin%20SMKN%201%20Air%20Naningan"
+                       target="_blank" rel="noopener" class="footer-wa-pill" title="Konsultasi WhatsApp">
+                        <i class="fa-brands fa-whatsapp"></i>
+                        <span>Helpdesk</span>
+                    </a>
+                    <div class="footer-social-icons">
+                        <a href="https://facebook.com" target="_blank" rel="noopener" class="footer-social-circle fb" title="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
+                        <a href="https://instagram.com" target="_blank" rel="noopener" class="footer-social-circle ig" title="Instagram"><i class="fa-brands fa-instagram"></i></a>
+                        <a href="https://youtube.com" target="_blank" rel="noopener" class="footer-social-circle yt" title="YouTube"><i class="fa-brands fa-youtube"></i></a>
                     </div>
                 </div>
             </div>
 
+            <!-- Bottom Copyright -->
             <div class="footer-bottom-bar">
-                <div>
-                    &copy; {{ date('Y') }} <strong>SMKN 1 Air Naningan</strong>. Hak Cipta Dilindungi.
-                    <span class="footer-badge-sys">SIRANI Integrated System</span>
-                </div>
+                <div>&copy; {{ date('Y') }} <strong>SMKN 1 Air Naningan</strong>. Hak Cipta Dilindungi.</div>
+                <div class="footer-badge-sys">SIRANI Integrated System</div>
             </div>
         </div>
     </footer>
