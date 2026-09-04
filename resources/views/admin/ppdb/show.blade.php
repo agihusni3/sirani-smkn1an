@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Verifikasi Pendaftar {{ $pendaftar->nomor_pendaftaran }} — PPDB SIRANI</title>
+  @include('partials.styles')
+</head>
+<body>
+<div class="app-container">
+  @include('partials.sidebar')
+  <main class="main-content">
+    
+    {{-- HEADER BAR --}}
+    <div class="panel no-print" style="background:var(--bg-2); border:1px solid var(--border); padding:12px 18px; margin-bottom:14px; border-radius:var(--r-md); box-shadow:var(--shadow-sm);">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+        <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+          <a href="{{ route('admin.ppdb.index') }}" class="btn btn-sm" style="background:var(--surface); border:1px solid var(--border); color:var(--text); padding:5px 10px; border-radius:6px; font-size:12px;">
+            <i class="bi bi-arrow-left"></i> Kembali
+          </a>
+          <h1 style="margin:0; font-size:16px; font-weight:900; color:var(--text); display:inline-flex; align-items:center; gap:8px;">
+            Verifikasi Calon Siswa: {{ $pendaftar->nama_lengkap }} ({{ $pendaftar->nomor_pendaftaran }})
+          </h1>
+        </div>
+
+        <div style="display:flex; align-items:center; gap:8px;">
+          <a href="{{ route('ppdb.cetak', $pendaftar->nomor_pendaftaran) }}" target="_blank" class="btn btn-sm" style="background:#0284c7; color:#fff; font-weight:700; border-radius:6px; font-size:12px; padding:6px 14px;">
+            <i class="bi bi-printer-fill"></i> Cetak Kartu Pendaftaran
+          </a>
+        </div>
+      </div>
+    </div>
+
+    @if(session('success'))
+      <div class="panel" style="background:#ecfdf5; border:1px solid #a7f3d0; color:#065f46; padding:12px 16px; margin-bottom:14px; border-radius:var(--r-sm); font-size:13px; font-weight:700;">
+        <i class="bi bi-check-circle-fill" style="margin-right:6px;"></i> {{ session('success') }}
+      </div>
+    @endif
+    @if(session('error'))
+      <div class="panel" style="background:#fef2f2; border:1px solid #fecaca; color:#991b1b; padding:12px 16px; margin-bottom:14px; border-radius:var(--r-sm); font-size:13px; font-weight:700;">
+        <i class="bi bi-exclamation-triangle-fill" style="margin-right:6px;"></i> {{ session('error') }}
+      </div>
+    @endif
+
+    <div style="display:grid; grid-template-columns: 2fr 1fr; gap:16px;">
+      
+      {{-- KOLOM KIRI: BIODATA & BERKAS --}}
+      <div style="display:flex; flex-direction:column; gap:16px;">
+        
+        {{-- BIODATA DETAIL --}}
+        <div class="panel" style="background:var(--bg-2); border:1px solid var(--border); border-radius:var(--r-sm); padding:16px;">
+          <h3 style="font-size:14px; font-weight:800; margin-bottom:14px; color:var(--text); border-bottom:1px solid var(--border); padding-bottom:8px;">
+            <i class="bi bi-person-lines-fill" style="color:#6366f1;"></i> Data Diri Calon Siswa
+          </h3>
+
+          <table style="width:100%; font-size:12.5px; border-collapse:collapse;">
+            <tr>
+              <td style="width:160px; padding:6px 0; color:var(--text-3);">Nomor Pendaftaran</td>
+              <td style="padding:6px 0; font-family:var(--font-mono); font-weight:800; color:#4338ca;">{{ $pendaftar->nomor_pendaftaran }}</td>
+            </tr>
+            <tr>
+              <td style="padding:6px 0; color:var(--text-3);">NISN</td>
+              <td style="padding:6px 0; font-weight:700;">{{ $pendaftar->nisn }}</td>
+            </tr>
+            <tr>
+              <td style="padding:6px 0; color:var(--text-3);">NIK</td>
+              <td style="padding:6px 0;">{{ $pendaftar->nik ?? '-' }}</td>
+            </tr>
+            <tr>
+              <td style="padding:6px 0; color:var(--text-3);">Nama Lengkap</td>
+              <td style="padding:6px 0; font-weight:800; font-size:13.5px;">{{ $pendaftar->nama_lengkap }}</td>
+            </tr>
+            <tr>
+              <td style="padding:6px 0; color:var(--text-3);">Jenis Kelamin</td>
+              <td style="padding:6px 0;">{{ $pendaftar->jenis_kelamin == 'L' ? 'Laki-laki' : 'Perempuan' }}</td>
+            </tr>
+            <tr>
+              <td style="padding:6px 0; color:var(--text-3);">Tempat, Tanggal Lahir</td>
+              <td style="padding:6px 0;">{{ $pendaftar->tempat_lahir }}, {{ \Carbon\Carbon::parse($pendaftar->tanggal_lahir)->translatedFormat('d F Y') }}</td>
+            </tr>
+            <tr>
+              <td style="padding:6px 0; color:var(--text-3);">Asal Sekolah (SMP)</td>
+              <td style="padding:6px 0;">{{ $pendaftar->asal_sekolah }} (Lulus: {{ $pendaftar->tahun_lulus }})</td>
+            </tr>
+            <tr>
+              <td style="padding:6px 0; color:var(--text-3);">Alamat Lengkap</td>
+              <td style="padding:6px 0;">{{ $pendaftar->alamat_lengkap }}</td>
+            </tr>
+            <tr>
+              <td style="padding:6px 0; color:var(--text-3);">Nama Ibu / Ayah</td>
+              <td style="padding:6px 0;">{{ $pendaftar->nama_ibu }} / {{ $pendaftar->nama_ayah ?? '-' }}</td>
+            </tr>
+            <tr>
+              <td style="padding:6px 0; color:var(--text-3);">Kontak HP Orang Tua</td>
+              <td style="padding:6px 0;">
+                <strong>{{ $pendaftar->no_hp_ortu }}</strong>
+                <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $pendaftar->no_hp_ortu) }}" target="_blank" style="margin-left:8px; color:#16a34a; font-size:11.5px; text-decoration:none;">
+                  <i class="bi bi-whatsapp"></i> Chat WA
+                </a>
+              </td>
+            </tr>
+          </table>
+        </div>
+
+        {{-- BERKAS LAMPIRAN --}}
+        <div class="panel" style="background:var(--bg-2); border:1px solid var(--border); border-radius:var(--r-sm); padding:16px;">
+          <h3 style="font-size:14px; font-weight:800; margin-bottom:14px; color:var(--text); border-bottom:1px solid var(--border); padding-bottom:8px;">
+            <i class="bi bi-paperclip" style="color:#0ea5e9;"></i> Lampiran Berkas Persyaratan
+          </h3>
+
+          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:14px;">
+            {{-- Pas Foto --}}
+            <div style="border:1px solid var(--border); border-radius:8px; padding:10px; text-align:center;">
+              <div style="font-size:11px; font-weight:700; color:var(--text-3); margin-bottom:6px;">Pas Foto 3x4</div>
+              @if($pendaftar->pas_foto)
+                <img src="{{ asset('storage/' . $pendaftar->pas_foto) }}" alt="Pas Foto" style="width:100px; height:130px; object-fit:cover; border-radius:4px; border:1px solid var(--border); margin-bottom:6px;">
+                <div><a href="{{ asset('storage/' . $pendaftar->pas_foto) }}" target="_blank" style="font-size:11px; color:#0284c7;">Lihat Foto Penuh</a></div>
+              @else
+                <div style="height:120px; background:var(--surface); display:flex; align-items:center; justify-content:center; color:var(--text-3); font-size:11px;">Belum Diunggah</div>
+              @endif
+            </div>
+
+            {{-- Kartu Keluarga --}}
+            <div style="border:1px solid var(--border); border-radius:8px; padding:10px; text-align:center;">
+              <div style="font-size:11px; font-weight:700; color:var(--text-3); margin-bottom:6px;">Scan Kartu Keluarga</div>
+              @if($pendaftar->scan_kk)
+                <div style="height:120px; background:var(--surface); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px;">
+                  <i class="bi bi-file-earmark-pdf-fill" style="font-size:32px; color:#ef4444;"></i>
+                  <a href="{{ asset('storage/' . $pendaftar->scan_kk) }}" target="_blank" class="btn btn-sm" style="background:#0284c7; color:#fff; font-size:11px; padding:4px 8px;">Buka Dokumen KK</a>
+                </div>
+              @else
+                <div style="height:120px; background:var(--surface); display:flex; align-items:center; justify-content:center; color:var(--text-3); font-size:11px;">Belum Diunggah</div>
+              @endif
+            </div>
+
+            {{-- Ijazah / SKL --}}
+            <div style="border:1px solid var(--border); border-radius:8px; padding:10px; text-align:center;">
+              <div style="font-size:11px; font-weight:700; color:var(--text-3); margin-bottom:6px;">Scan Ijazah / SKL</div>
+              @if($pendaftar->scan_ijazah_skl)
+                <div style="height:120px; background:var(--surface); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px;">
+                  <i class="bi bi-file-earmark-check-fill" style="font-size:32px; color:#10b981;"></i>
+                  <a href="{{ asset('storage/' . $pendaftar->scan_ijazah_skl) }}" target="_blank" class="btn btn-sm" style="background:#0284c7; color:#fff; font-size:11px; padding:4px 8px;">Buka Dokumen SKL</a>
+                </div>
+              @else
+                <div style="height:120px; background:var(--surface); display:flex; align-items:center; justify-content:center; color:var(--text-3); font-size:11px;">Belum Diunggah</div>
+              @endif
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      {{-- KOLOM KANAN: FORM KEPUTUSAN & MUTASI --}}
+      <div style="display:flex; flex-direction:column; gap:16px;">
+        
+        {{-- FORM UPDATE STATUS --}}
+        <div class="panel" style="background:var(--bg-2); border:1px solid var(--border); border-radius:var(--r-sm); padding:16px;">
+          <h3 style="font-size:14px; font-weight:800; margin-bottom:14px; color:var(--text); border-bottom:1px solid var(--border); padding-bottom:8px;">
+            <i class="bi bi-shield-check" style="color:#10b981;"></i> Keputusan Tim Verifikator
+          </h3>
+
+          <form action="{{ route('admin.ppdb.update_status', $pendaftar->id) }}" method="POST">
+            @csrf
+            @method('PUT')
+
+            <div style="margin-bottom:12px;">
+              <label style="display:block; font-size:11.5px; font-weight:700; color:var(--text-2); margin-bottom:4px;">Status Pendaftaran</label>
+              <select name="status_pendaftaran" required style="width:100%; padding:8px 10px; font-size:12.5px; border-radius:6px; border:1px solid var(--border); background:var(--surface); color:var(--text);">
+                <option value="menunggu" {{ $pendaftar->status_pendaftaran == 'menunggu' ? 'selected' : '' }}>Menunggu Verifikasi</option>
+                <option value="berkas_valid" {{ $pendaftar->status_pendaftaran == 'berkas_valid' ? 'selected' : '' }}>Berkas Valid (Lolos Administrasi)</option>
+                <option value="diterima" {{ $pendaftar->status_pendaftaran == 'diterima' ? 'selected' : '' }}>DITERIMA (Lolos Seleksi)</option>
+                <option value="ditolak" {{ $pendaftar->status_pendaftaran == 'ditolak' ? 'selected' : '' }}>DITOLAK (Tidak Lolos)</option>
+              </select>
+            </div>
+
+            <div style="margin-bottom:12px;">
+              <label style="display:block; font-size:11.5px; font-weight:700; color:var(--text-2); margin-bottom:4px;">Jurusan Diterima (Jika Diterima)</label>
+              <select name="jurusan_diterima_id" style="width:100%; padding:8px 10px; font-size:12.5px; border-radius:6px; border:1px solid var(--border); background:var(--surface); color:var(--text);">
+                <option value="">-- Tetapkan Jurusan --</option>
+                @foreach($jurusans as $j)
+                  <option value="{{ $j->id }}" {{ $pendaftar->jurusan_diterima_id == $j->id || ($pendaftar->jurusan_pilihan_1_id == $j->id && !$pendaftar->jurusan_diterima_id) ? 'selected' : '' }}>
+                    {{ $j->kode }} - {{ $j->nama_jurusan }}
+                  </option>
+                @endforeach
+              </select>
+            </div>
+
+            <div style="margin-bottom:14px;">
+              <label style="display:block; font-size:11.5px; font-weight:700; color:var(--text-2); margin-bottom:4px;">Catatan untuk Calon Siswa</label>
+              <textarea name="catatan" rows="3" placeholder="Misal: Berkas lengkap, silakan daftar ulang..." style="width:100%; padding:8px 10px; font-size:12px; border-radius:6px; border:1px solid var(--border); background:var(--surface); color:var(--text);">{{ $pendaftar->catatan }}</textarea>
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="width:100%; padding:9px; font-size:12.5px; font-weight:800; border-radius:6px;">
+              Simpan Keputusan Verifikasi
+            </button>
+          </form>
+        </div>
+
+        {{-- MUTASI KE SIRANI --}}
+        @if($pendaftar->status_pendaftaran == 'diterima')
+          <div class="panel" style="background:#f0fdf4; border:1px solid #86efac; border-radius:var(--r-sm); padding:16px;">
+            <h3 style="font-size:14px; font-weight:800; margin-bottom:8px; color:#15803d;">
+              <i class="bi bi-box-arrow-in-right"></i> Mutasi Otomatis ke Siswa SIRANI
+            </h3>
+            
+            @if($pendaftar->siswa_id)
+              <div style="font-size:12px; color:#166534; margin-bottom:10px;">
+                Calon siswa ini sudah resmi tercatat sebagai <strong>Siswa Aktif SIRANI</strong>.
+              </div>
+              <a href="/siswa" class="btn btn-sm" style="background:#16a34a; color:#fff; font-weight:700; font-size:11.5px; padding:6px 12px; border-radius:6px; display:inline-block;">
+                Lihat di Master Siswa →
+              </a>
+            @else
+              <p style="font-size:12px; color:#166534; margin-bottom:12px;">
+                Pendaftar berstatus <strong>Diterima</strong>. Anda dapat langsung memasukkannya ke rombel kelas X SIRANI dengan 1 klik:
+              </p>
+
+              <form action="{{ route('admin.ppdb.mutasi', $pendaftar->id) }}" method="POST">
+                @csrf
+                <div style="margin-bottom:10px;">
+                  <label style="display:block; font-size:11.5px; font-weight:700; color:#166534; margin-bottom:4px;">Pilih Rombel Kelas X Tujuan</label>
+                  <select name="rombel_id" required style="width:100%; padding:8px 10px; font-size:12px; border-radius:6px; border:1px solid #86efac; background:#fff;">
+                    <option value="">-- Pilih Kelas X --</option>
+                    @foreach($rombels as $r)
+                      <option value="{{ $r->id }}">{{ $r->nama_rombel }}</option>
+                    @endforeach
+                  </select>
+                </div>
+
+                <button type="submit" class="btn" style="width:100%; background:#16a34a; color:#fff; font-weight:800; font-size:12.5px; padding:9px; border-radius:6px;">
+                  <i class="bi bi-person-check-fill"></i> Mutasikan Calon Siswa Ini
+                </button>
+              </form>
+            @endif
+          </div>
+        @endif
+
+      </div>
+
+    </div>
+
+  </main>
+</div>
+</body>
+</html>

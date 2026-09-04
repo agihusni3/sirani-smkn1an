@@ -64,7 +64,19 @@ class User extends Authenticatable
             && !$this->isGuruBk() 
             && !$this->isWaliKelas() 
             && !$this->isStafTu()
+            && !$this->isHumas()
+            && !$this->isPanitiaPpdb()
             && ($this->guru_id === null || $this->role === 'admin');
+    }
+
+    public function isHumas(): bool
+    {
+        return $this->role === 'humas' || $this->role === 'operator_web';
+    }
+
+    public function isPanitiaPpdb(): bool
+    {
+        return $this->role === 'panitia_ppdb' || $this->role === 'ppdb';
     }
 
     public function isKepalaSekolah(): bool
@@ -209,6 +221,8 @@ class User extends Authenticatable
         if ($this->isWaliKelas()) return 'Wali Kelas';
         if ($this->isGuruPiket()) return 'Guru Piket';
         if ($this->isStafTu()) return 'Staf Tata Usaha (TU)';
+        if ($this->isHumas()) return 'Tim Humas & Web';
+        if ($this->isPanitiaPpdb()) return 'Panitia PPDB 2026';
         return 'Guru / Tenaga Pendidik';
     }
 }

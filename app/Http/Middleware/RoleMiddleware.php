@@ -39,6 +39,8 @@ class RoleMiddleware
                 'guru_piket'     => $user->isGuruPiket(),
                 'staf_tu'        => $user->isStafTu(),
                 'guru'           => $user->isGuru(),
+                'humas'          => $user->isHumas(),
+                'panitia_ppdb'   => $user->isPanitiaPpdb(),
                 default          => false,
             };
 

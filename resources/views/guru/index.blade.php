@@ -706,6 +706,8 @@
             <option value="wali_kelas">Wali Kelas (Monitoring Kelas Binaan &amp; Pembinaan Tahap 1)</option>
             <option value="guru_piket">Guru Piket (Operasional Meja Piket &amp; Perizinan Siswa)</option>
             <option value="staf_tu">Staf Tata Usaha / Kepegawaian (Data Master Siswa/Guru)</option>
+            <option value="humas">Tim Humas &amp; Web (Pengelola Banner &amp; Publikasi Berita)</option>
+            <option value="panitia_ppdb">Panitia PPDB 2026 (Verifikasi Dokumen Pendaftar Baru)</option>
             <option value="guru">Guru Mata Pelajaran (Presensi &amp; Jadwal Mengajar)</option>
           </select>
         </div>

@@ -547,7 +547,7 @@ class GuruController extends Controller
             'username' => 'required|string|max:100|unique:users,username,' . ($userId ?? 'NULL') . ',id',
             'email'    => 'nullable|email|max:255|unique:users,email,' . ($userId ?? 'NULL') . ',id',
             'password' => $userId ? 'nullable|min:4' : 'required|min:4',
-            'role'     => 'nullable|in:admin,kepala_sekolah,waka_kesiswaan,waka_kurikulum,guru_bk,wali_kelas,guru_piket,staf_tu,guru',
+            'role'     => 'nullable|in:admin,kepala_sekolah,waka_kesiswaan,waka_kurikulum,guru_bk,wali_kelas,guru_piket,staf_tu,guru,humas,panitia_ppdb',
         ], [
             'username.required' => 'Nickname / Username login wajib diisi.',
             'username.unique'   => 'Nickname / Username ini sudah digunakan oleh akun lain.',
