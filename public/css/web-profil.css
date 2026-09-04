@@ -44,36 +44,7 @@
   color: #475569;
   font-size: 1.05rem;
   line-height: 1.65;
-  margin: 0 0 20px 0;
-}
-
-/* ─── Identitas Ringkas (Badges Row) ─── */
-.profil-identity-badges {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-}
-
-.identity-badge {
-  font-size: 0.78rem;
-  font-weight: 700;
-  color: #1e293b;
-  background: #f1f5f9;
-  padding: 6px 14px;
-  border-radius: 8px;
-  border: 1px solid #e2e8f0;
-}
-
-.identity-badge.negeri {
-  background: #ecfdf5;
-  color: #047857;
-  border-color: #a7f3d0;
-}
-
-.identity-badge.akreditasi {
-  background: #fffbeb;
-  color: #b45309;
-  border-color: #fde68a;
+  margin: 0;
 }
 
 /* ─── Visual Banner Kampus (Cinematic Card) ─── */
