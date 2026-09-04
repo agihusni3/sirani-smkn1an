@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('nama_instansi_atas')->default('PEMERINTAH PROVINSI LAMPUNG');
             $table->string('nama_dinas')->default('DINAS PENDIDIKAN DAN KEBUDAYAAN');
             $table->string('nama_sekolah')->default('SMK NEGERI 1 AIR NANINGAN');
-            $table->string('npsn')->default('69888999');
+            $table->string('npsn')->default('70011825');
             $table->text('alamat')->nullable();
             $table->string('desa_kelurahan')->default('Air Naningan');
             $table->string('kecamatan')->default('Air Naningan');

@@ -199,7 +199,7 @@
                 <h2>Dinas Pendidikan dan Kebudayaan</h2>
                 <h1>SMK NEGERI 1 AIR NANINGAN</h1>
                 <p>{{ $sekolah->alamat ?? 'Jl. Raya Air Naningan, Kec. Air Naningan, Kab. Tanggamus, Lampung 35379' }}</p>
-                <p>NPSN: {{ $sekolah->npsn ?? '69888999' }} | Email: {{ $sekolah->email ?? 'info@smkn1airnaningan.sch.id' }}</p>
+                <p>NPSN: {{ $sekolah->npsn ?? '70011825' }} | Email: {{ $sekolah->email ?? 'info@smkn1airnaningan.sch.id' }}</p>
             </div>
             <img src="{{ asset('logo.png') }}" class="kop-logo" alt="Logo SMKN 1" onerror="this.src='{{ asset('img/logo.png') }}'">
         </div>

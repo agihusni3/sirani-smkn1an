@@ -24,7 +24,7 @@
         <div class="profil-identity-badges">
             <span class="identity-badge negeri">SMK NEGERI (Pemprov Lampung)</span>
             <span class="identity-badge akreditasi">Terakreditasi B (BAN-SM)</span>
-            <span class="identity-badge">NPSN: {{ $sekolah->npsn ?? '69888999' }}</span>
+            <span class="identity-badge">NPSN: {{ $sekolah->npsn ?? '70011825' }}</span>
             <span class="identity-badge">Kecamatan Air Naningan, Tanggamus</span>
         </div>
     </div>

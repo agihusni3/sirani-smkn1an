@@ -69,7 +69,7 @@ class SuratDanBackupTest extends TestCase
             'nama_instansi_atas' => 'PEMERINTAH PROVINSI LAMPUNG',
             'nama_dinas'         => 'DINAS PENDIDIKAN DAN KEBUDAYAAN',
             'nama_sekolah'       => 'SMK NEGERI 1 AIR NANINGAN HEBAT',
-            'npsn'               => '69888999',
+            'npsn'               => '70011825',
             'alamat'             => 'Jl. Raya Air Naningan No. 10',
             'kecamatan'          => 'Air Naningan',
             'kabupaten'          => 'Kab. Tanggamus',

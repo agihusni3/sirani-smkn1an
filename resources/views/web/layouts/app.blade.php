@@ -462,7 +462,7 @@
                         <div class="footer-brand-title">SMK NEGERI 1 AIR NANINGAN</div>
                         <div class="footer-meta-line">
                             <span class="footer-badge">
-                                <span class="status-dot"></span> Akreditasi B • NPSN: {{ $sekolah->npsn ?? '69888999' }}
+                                <span class="status-dot"></span> Akreditasi B • NPSN: {{ $sekolah->npsn ?? '70011825' }}
                             </span>
                             <span class="footer-loc-text">
                                 <i class="fa-solid fa-location-dot"></i> Air Naningan, Tanggamus, Lampung

@@ -35,7 +35,7 @@
                         <span>Layanan Aktif • Buka Hari Ini</span>
                     </span>
                     <span class="kontak-legal-badge">
-                        Akreditasi B • NPSN: {{ $sekolah->npsn ?? '69888999' }}
+                        Akreditasi B • NPSN: {{ $sekolah->npsn ?? '70011825' }}
                     </span>
                 </div>
 

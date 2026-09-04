@@ -43,7 +43,7 @@ class PengaturanSekolah extends Model
                 'nama_instansi_atas' => 'PEMERINTAH PROVINSI LAMPUNG',
                 'nama_dinas'          => 'DINAS PENDIDIKAN DAN KEBUDAYAAN',
                 'nama_sekolah'        => 'SMK NEGERI 1 AIR NANINGAN',
-                'npsn'                => '69888999',
+                'npsn'                => '70011825',
                 'alamat'              => 'Jl. Raya Air Naningan, Kec. Air Naningan',
                 'desa_kelurahan'      => 'Air Naningan',
                 'kecamatan'           => 'Air Naningan',
