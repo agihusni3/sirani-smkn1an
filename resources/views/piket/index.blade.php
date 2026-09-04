@@ -805,7 +805,6 @@
 
       {{-- Baris 2: Filter Chips di Kiri, Search Bar di Kanan --}}
       <div class="piket-toolbar-filters-row">
-        {{-- Filter Chips Strip untuk Siswa --}}
         <div id="filterChipsSiswa" class="piket-chips-strip filter-pills">
           <button type="button" class="piket-chip filter-pill active" data-filter="all" onclick="filterSiswaTable('all', this)">
             <span>Semua</span>
@@ -819,9 +818,9 @@
             <span>Terlambat</span>
             <span class="piket-chip-badge">{{ $terlambat }}</span>
           </button>
-          <button type="button" class="piket-chip filter-pill" data-filter="belum_pulang" onclick="filterSiswaTable('belum_pulang', this)">
-            <span>Belum Pulang</span>
-            <span class="piket-chip-badge">{{ $siswaBelumScanPulang }}</span>
+          <button type="button" class="piket-chip filter-pill" data-filter="izin" onclick="filterSiswaTable('izin', this)">
+            <span>Izin &amp; PKL</span>
+            <span class="piket-chip-badge">{{ $izinPklTotal }}</span>
           </button>
           <button type="button" class="piket-chip filter-pill" data-filter="belum_hadir" onclick="filterSiswaTable('belum_hadir', this)">
             <span>Belum Hadir</span>
@@ -829,21 +828,9 @@
               {{ $siswaBelumHadirList->count() }}
             </span>
           </button>
-          <button type="button" class="piket-chip filter-pill" data-filter="izin" onclick="filterSiswaTable('izin', this)">
-            <span>Izin / Sakit</span>
-            <span class="piket-chip-badge">{{ $izinCount }}</span>
-          </button>
-          <button type="button" class="piket-chip filter-pill" data-filter="pkl" onclick="filterSiswaTable('pkl', this)">
-            <span>PKL</span>
-            <span class="piket-chip-badge">{{ $totalSiswaPkl ?? 0 }}</span>
-          </button>
-          <button type="button" class="piket-chip filter-pill" data-filter="bolos" onclick="filterSiswaTable('bolos', this)">
-            <span>Bolos</span>
-            <span class="piket-chip-badge">{{ $absensiHariIni->where('status', 'bolos')->count() }}</span>
-          </button>
-          <button type="button" class="piket-chip filter-pill" data-filter="pulang" onclick="filterSiswaTable('pulang', this)">
-            <span>Sudah Pulang</span>
-            <span class="piket-chip-badge">{{ $sudahPulang }}</span>
+          <button type="button" class="piket-chip filter-pill" data-filter="belum_pulang" onclick="filterSiswaTable('belum_pulang', this)">
+            <span>Blm Scan Pulang</span>
+            <span class="piket-chip-badge">{{ $siswaBelumScanPulang }}</span>
           </button>
         </div>
 
@@ -893,14 +880,11 @@
             <thead>
               <tr>
                 <th style="width:40px; text-align:center;">No</th>
-                <th style="width:45px; text-align:center;">Foto</th>
-                <th style="width:115px;">NISN / NIS</th>
-                <th>Nama Peserta Didik</th>
-                <th style="width:110px;">Kelas / Rombel</th>
-                <th style="width:95px; text-align:center;">Jam Masuk</th>
-                <th style="width:95px; text-align:center;">Jam Pulang</th>
+                <th>Peserta Didik</th>
+                <th style="width:120px;">Kelas / Rombel</th>
+                <th style="width:105px; text-align:center;">Jam Masuk</th>
+                <th style="width:105px; text-align:center;">Jam Pulang</th>
                 <th style="width:125px; text-align:center;">Status</th>
-                <th style="width:140px;">Sumber Input</th>
                 <th style="text-align:right; width:110px;">Aksi</th>
               </tr>
             </thead>
@@ -916,29 +900,45 @@
                 @endphp
                 <tr class="row-siswa-absen" data-status="{{ $ab->status }}" data-pulang="{{ $ab->jam_pulang ? 'pulang' : 'belum' }}" data-has-masuk="{{ $ab->jam_masuk ? '1' : '0' }}">
                   <td style="text-align:center; font-weight:700; color:var(--text-3); font-size:12px;">{{ $idx + 1 }}</td>
-                  <td style="text-align:center; vertical-align:middle;">
-                    <img src="{{ $ab->siswa?->foto_url }}" alt="{{ $ab->siswa?->nama }}" style="width:34px; height:34px; border-radius:50%; object-fit:cover; border:1.5px solid var(--border-2);" />
-                  </td>
-                  <td style="font-family:var(--font-mono); font-weight:700; color:var(--text); font-size:12px;">{{ $ab->siswa?->nisn ?? ($ab->siswa?->nis ?? '-') }}</td>
                   <td>
-                    <strong style="color:var(--text); font-size:13px;">{{ $ab->siswa?->nama ?? '—' }}</strong>
-                    @if($hpClean)
-                      <div style="margin-top:2px;">
-                        <a href="https://wa.me/{{ $hpClean }}" target="_blank" style="font-size:11px; color:#16A34A; text-decoration:none; font-weight:600; display:inline-flex; align-items:center; gap:4px;">
-                          <i class="bi bi-whatsapp"></i> <span style="font-family:var(--font-mono);">{{ $hp }}</span>
-                        </a>
+                    <div style="display:flex; align-items:center; gap:10px;">
+                      <img src="{{ $ab->siswa?->foto_url }}" alt="{{ $ab->siswa?->nama }}" style="width:34px; height:34px; border-radius:50%; object-fit:cover; border:1.5px solid var(--border-2); flex-shrink:0;" />
+                      <div style="min-width:0;">
+                        <strong style="color:var(--text); font-size:13px; display:block; line-height:1.2;">{{ $ab->siswa?->nama ?? '—' }}</strong>
+                        <div style="font-size:11px; color:var(--text-3); margin-top:3px; display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+                          <span style="font-family:var(--font-mono);">NISN: {{ $ab->siswa?->nisn ?? ($ab->siswa?->nis ?? '-') }}</span>
+                          @if($hpClean)
+                            <span style="color:var(--border-2);">·</span>
+                            <a href="https://wa.me/{{ $hpClean }}" target="_blank" style="color:#16A34A; text-decoration:none; font-weight:600; display:inline-flex; align-items:center; gap:3px;">
+                              <i class="bi bi-whatsapp"></i> <span style="font-family:var(--font-mono);">{{ $hp }}</span>
+                            </a>
+                          @endif
+                        </div>
                       </div>
-                    @endif
+                    </div>
                   </td>
                   <td>
                     <span style="font-weight:800; color:var(--text); font-size:12px;">{{ $rombel }}</span>
                   </td>
-                  <td style="font-family:var(--font-mono); font-size:12px; font-weight:800; color:var(--text); text-align:center;">
-                    {{ $ab->jam_masuk ? substr($ab->jam_masuk,0,5) : '—' }}
+                  <td style="text-align:center;">
+                    @if($ab->jam_masuk)
+                      <span style="font-family:var(--font-mono); font-size:12px; font-weight:800; color:var(--text);">
+                        {{ substr($ab->jam_masuk,0,5) }}
+                      </span>
+                      @if(!empty($ab->sumber_absen) && !in_array($ab->sumber_absen, ['rfid', 'kios_rfid', 'barcode', 'scan_barcode', 'qr_code', 'kios_wajah', 'face_kiosk', 'kios_biometrik']))
+                        <div style="font-size:9.5px; font-weight:700; color:var(--text-3); text-transform:uppercase; margin-top:2px;">
+                          {{ $ab->sumber_absen === 'koreksi_piket_manual' ? 'Koreksi' : ($ab->sumber_absen === 'manual_piket' ? 'Manual' : 'Izin') }}
+                        </div>
+                      @endif
+                    @else
+                      <span style="color:var(--text-3); font-family:var(--font-mono);">—</span>
+                    @endif
                   </td>
-                  <td style="font-family:var(--font-mono); font-size:12px; font-weight:700; color:var(--text); text-align:center;">
+                  <td style="text-align:center;">
                     @if($ab->jam_pulang)
-                      {{ substr($ab->jam_pulang,0,5) }}
+                      <span style="font-family:var(--font-mono); font-size:12px; font-weight:700; color:var(--text);">
+                        {{ substr($ab->jam_pulang,0,5) }}
+                      </span>
                     @else
                       <span style="color:var(--text-3); font-style:italic; font-size:11px;">Belum Pulang</span>
                     @endif
@@ -958,26 +958,15 @@
                       <span class="piket-status-pill"><i class="bi bi-dot"></i> {{ ucfirst($ab->status) }}</span>
                     @endif
                   </td>
-                  <td>
-                    @if(in_array($ab->sumber_absen, ['rfid', 'kios_rfid', 'barcode', 'scan_barcode', 'qr_code', 'kios_wajah', 'face_kiosk', 'kios_biometrik']) || empty($ab->sumber_absen))
-                      <span style="font-size:11.5px; font-weight:700; color:var(--text);">Smart Gate</span>
-                    @elseif($ab->sumber_absen === 'manual_izin_piket' || in_array($ab->status, ['izin', 'sakit', 'dispensasi', 'cuti']))
-                      <span style="font-size:11.5px; font-weight:700; color:var(--text);">Surat Izin / Sakit</span>
-                    @elseif($ab->sumber_absen === 'koreksi_piket_manual')
-                      <span style="font-size:11.5px; font-weight:700; color:var(--text);">Koreksi Piket</span>
-                    @elseif($ab->sumber_absen === 'manual_piket')
-                      <span style="font-size:11.5px; font-weight:700; color:var(--text);">Manual Piket</span>
-                    @else
-                      <span style="font-size:11.5px; color:var(--text-3);">{{ ucfirst(str_replace('_', ' ', $ab->sumber_absen)) }}</span>
-                    @endif
-                  </td>
                   <td style="text-align:right; white-space:nowrap;">
                     @if($canKoreksi ?? false)
                       <button type="button" class="btn btn-sm btn-outline" style="padding:4px 10px; font-size:11px; font-weight:700; color:var(--text); border-color:var(--border-2); border-radius:6px;" onclick="openKoreksiModal({{ $ab->id }}, '{{ addslashes($ab->siswa?->nama ?? '-') }}', '{{ $ab->status }}', '{{ $ab->jam_masuk ? substr($ab->jam_masuk,0,5) : '' }}', '{{ $ab->jam_pulang ? substr($ab->jam_pulang,0,5) : '' }}', '{{ addslashes($ab->keterangan ?? '') }}')" title="Koreksi presensi siswa">
                         <i class="bi bi-pencil-square"></i> Koreksi
                       </button>
                     @else
-                      <span style="color:var(--text-3); font-size:11px;">-</span>
+                      <span style="display:inline-flex; align-items:center; gap:4px; font-size:10.5px; color:var(--text-3); font-weight:600; padding:3px 8px; background:var(--bg-3); border-radius:4px;" title="Akses koreksi hanya untuk Guru Piket hari ini">
+                        <i class="bi bi-lock-fill"></i> Terkunci
+                      </span>
                     @endif
                   </td>
                 </tr>
@@ -993,19 +982,22 @@
                 @endphp
                 <tr class="row-siswa-belum-hadir" data-status="belum_hadir" data-pulang="belum" data-has-masuk="0">
                   <td style="text-align:center; font-weight:700; color:var(--text-3); font-size:12px;">{{ $absensiHariIni->count() + $idx2 + 1 }}</td>
-                  <td style="text-align:center; vertical-align:middle;">
-                    <img src="{{ $sb->foto_url }}" alt="{{ $sb->nama }}" style="width:34px; height:34px; border-radius:50%; object-fit:cover; border:1.5px dashed var(--border-2); opacity:0.8;" />
-                  </td>
-                  <td style="font-family:var(--font-mono); font-weight:700; color:var(--text-3); font-size:12px;">{{ $sb->nisn ?? ($sb->nis ?? '-') }}</td>
                   <td>
-                    <strong style="color:var(--text); font-size:13px;">{{ $sb->nama ?? '—' }}</strong>
-                    @if($hpClean)
-                      <div style="margin-top:2px;">
-                        <a href="https://wa.me/{{ $hpClean }}" target="_blank" style="font-size:11px; color:#16A34A; text-decoration:none; font-weight:600; display:inline-flex; align-items:center; gap:4px;">
-                          <i class="bi bi-whatsapp"></i> <span style="font-family:var(--font-mono);">{{ $hp }}</span>
-                        </a>
+                    <div style="display:flex; align-items:center; gap:10px;">
+                      <img src="{{ $sb->foto_url }}" alt="{{ $sb->nama }}" style="width:34px; height:34px; border-radius:50%; object-fit:cover; border:1.5px dashed var(--border-2); opacity:0.8; flex-shrink:0;" />
+                      <div style="min-width:0;">
+                        <strong style="color:var(--text); font-size:13px; display:block; line-height:1.2;">{{ $sb->nama ?? '—' }}</strong>
+                        <div style="font-size:11px; color:var(--text-3); margin-top:3px; display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+                          <span style="font-family:var(--font-mono);">NISN: {{ $sb->nisn ?? ($sb->nis ?? '-') }}</span>
+                          @if($hpClean)
+                            <span style="color:var(--border-2);">·</span>
+                            <a href="https://wa.me/{{ $hpClean }}" target="_blank" style="color:#16A34A; text-decoration:none; font-weight:600; display:inline-flex; align-items:center; gap:3px;">
+                              <i class="bi bi-whatsapp"></i> <span style="font-family:var(--font-mono);">{{ $hp }}</span>
+                            </a>
+                          @endif
+                        </div>
                       </div>
-                    @endif
+                    </div>
                   </td>
                   <td>
                     <span style="font-weight:800; color:var(--text); font-size:12px;">{{ $rombel }}</span>
@@ -1013,10 +1005,7 @@
                   <td style="font-family:var(--font-mono); font-size:12px; color:var(--text-3); text-align:center;">—</td>
                   <td style="font-family:var(--font-mono); font-size:12px; color:var(--text-3); text-align:center;">—</td>
                   <td style="text-align:center;">
-                    <span class="piket-status-pill belum"><i class="bi bi-exclamation-circle-fill"></i> Belum Scan</span>
-                  </td>
-                  <td>
-                    <span style="color:var(--text-3); font-size:11.5px;">—</span>
+                    <span class="piket-status-pill belum"><i class="bi bi-exclamation-circle-fill"></i> Belum Hadir</span>
                   </td>
                   <td style="text-align:right; white-space:nowrap;">
                     @if($canKoreksi ?? false)
@@ -1024,7 +1013,9 @@
                         <i class="bi bi-pencil-square"></i> Set Status
                       </button>
                     @else
-                      <span style="color:var(--text-3); font-size:11px;">-</span>
+                      <span style="display:inline-flex; align-items:center; gap:4px; font-size:10.5px; color:var(--text-3); font-weight:600; padding:3px 8px; background:var(--bg-3); border-radius:4px;" title="Akses koreksi hanya untuk Guru Piket hari ini">
+                        <i class="bi bi-lock-fill"></i> Terkunci
+                      </span>
                     @endif
                   </td>
                 </tr>
@@ -1053,14 +1044,11 @@
             <thead>
               <tr>
                 <th style="width:40px; text-align:center;">No</th>
-                <th style="width:45px; text-align:center;">Foto</th>
-                <th style="width:120px;">NIP / ID</th>
-                <th>Nama Guru / Pegawai</th>
-                <th style="width:130px;">Jabatan</th>
-                <th style="width:95px; text-align:center;">Jam Masuk</th>
-                <th style="width:95px; text-align:center;">Jam Pulang</th>
+                <th>Guru / Pegawai</th>
+                <th style="width:140px;">Jabatan</th>
+                <th style="width:105px; text-align:center;">Jam Masuk</th>
+                <th style="width:105px; text-align:center;">Jam Pulang</th>
                 <th style="width:125px; text-align:center;">Status</th>
-                <th style="width:140px;">Sumber Input</th>
                 <th style="text-align:right; width:110px;">Aksi</th>
               </tr>
             </thead>
@@ -1073,27 +1061,43 @@
                 @endphp
                 <tr class="row-guru-absen" data-status="{{ $ag->status }}" data-pulang="{{ $ag->jam_pulang ? 'pulang' : 'belum' }}">
                   <td style="text-align:center; font-weight:700; color:var(--text-3); font-size:12px;">{{ $idx + 1 }}</td>
-                  <td style="text-align:center; vertical-align:middle;">
-                    <img src="{{ $ag->guru?->foto_url }}" alt="{{ $ag->guru?->nama }}" style="width:34px; height:34px; border-radius:50%; object-fit:cover; border:1.5px solid var(--border-2);" />
-                  </td>
-                  <td style="font-family:var(--font-mono); font-weight:700; color:var(--text); font-size:12px;">{{ $ag->guru?->nip ?: '-' }}</td>
                   <td>
-                    <strong style="color:var(--text); font-size:13px;">{{ $ag->guru?->nama ?? '—' }}</strong>
-                    @if($hpGuru)
-                      <div style="margin-top:2px;">
-                        <a href="https://wa.me/{{ $hpGuru }}" target="_blank" style="font-size:11px; color:#16A34A; text-decoration:none; font-weight:600; display:inline-flex; align-items:center; gap:4px;">
-                          <i class="bi bi-whatsapp"></i> <span style="font-family:var(--font-mono);">{{ $ag->guru?->no_hp }}</span>
-                        </a>
+                    <div style="display:flex; align-items:center; gap:10px;">
+                      <img src="{{ $ag->guru?->foto_url }}" alt="{{ $ag->guru?->nama }}" style="width:34px; height:34px; border-radius:50%; object-fit:cover; border:1.5px solid var(--border-2); flex-shrink:0;" />
+                      <div style="min-width:0;">
+                        <strong style="color:var(--text); font-size:13px; display:block; line-height:1.2;">{{ $ag->guru?->nama ?? '—' }}</strong>
+                        <div style="font-size:11px; color:var(--text-3); margin-top:3px; display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+                          <span style="font-family:var(--font-mono);">NIP: {{ $ag->guru?->nip ?: '-' }}</span>
+                          @if($hpGuru)
+                            <span style="color:var(--border-2);">·</span>
+                            <a href="https://wa.me/{{ $hpGuru }}" target="_blank" style="color:#16A34A; text-decoration:none; font-weight:600; display:inline-flex; align-items:center; gap:3px;">
+                              <i class="bi bi-whatsapp"></i> <span style="font-family:var(--font-mono);">{{ $ag->guru?->no_hp }}</span>
+                            </a>
+                          @endif
+                        </div>
                       </div>
-                    @endif
+                    </div>
                   </td>
                   <td style="color:var(--text-2); font-size:12px;">{{ $ag->guru?->jabatan ?? 'Guru' }}</td>
-                  <td style="font-family:var(--font-mono); font-size:12px; font-weight:800; color:var(--text); text-align:center;">
-                    {{ $ag->jam_masuk ? substr($ag->jam_masuk,0,5) : '—' }}
+                  <td style="text-align:center;">
+                    @if($ag->jam_masuk)
+                      <span style="font-family:var(--font-mono); font-size:12px; font-weight:800; color:var(--text);">
+                        {{ substr($ag->jam_masuk,0,5) }}
+                      </span>
+                      @if(!empty($ag->sumber_absen) && !in_array($ag->sumber_absen, ['rfid', 'kios_rfid', 'barcode', 'scan_barcode', 'qr_code', 'kios_wajah', 'face_kiosk', 'kios_biometrik']))
+                        <div style="font-size:9.5px; font-weight:700; color:var(--text-3); text-transform:uppercase; margin-top:2px;">
+                          {{ $ag->sumber_absen === 'koreksi_piket_manual' ? 'Koreksi' : ($ag->sumber_absen === 'manual_piket' ? 'Manual' : 'Dinas') }}
+                        </div>
+                      @endif
+                    @else
+                      <span style="color:var(--text-3); font-family:var(--font-mono);">—</span>
+                    @endif
                   </td>
-                  <td style="font-family:var(--font-mono); font-size:12px; font-weight:700; color:var(--text); text-align:center;">
+                  <td style="text-align:center;">
                     @if($ag->jam_pulang)
-                      {{ substr($ag->jam_pulang,0,5) }}
+                      <span style="font-family:var(--font-mono); font-size:12px; font-weight:700; color:var(--text);">
+                        {{ substr($ag->jam_pulang,0,5) }}
+                      </span>
                     @else
                       <span style="color:var(--text-3); font-style:italic; font-size:11px;">Belum Pulang</span>
                     @endif
@@ -1109,26 +1113,15 @@
                       <span class="piket-status-pill"><i class="bi bi-dot"></i> {{ ucfirst($ag->status) }}</span>
                     @endif
                   </td>
-                  <td>
-                    @if(in_array($ag->sumber_absen, ['rfid', 'kios_rfid', 'barcode', 'scan_barcode', 'qr_code', 'kios_wajah', 'face_kiosk', 'kios_biometrik']) || empty($ag->sumber_absen))
-                      <span style="font-size:11.5px; font-weight:700; color:var(--text);">Smart Gate</span>
-                    @elseif($ag->sumber_absen === 'manual_izin_piket' || in_array($ag->status, ['izin', 'sakit', 'cuti', 'dispen', 'dinas_luar']))
-                      <span style="font-size:11.5px; font-weight:700; color:var(--text);">Izin Dinas / Sakit</span>
-                    @elseif($ag->sumber_absen === 'koreksi_piket_manual')
-                      <span style="font-size:11.5px; font-weight:700; color:var(--text);">Koreksi Piket</span>
-                    @elseif($ag->sumber_absen === 'manual_piket')
-                      <span style="font-size:11.5px; font-weight:700; color:var(--text);">Manual Piket</span>
-                    @else
-                      <span style="font-size:11.5px; color:var(--text-3);">{{ ucfirst(str_replace('_', ' ', $ag->sumber_absen)) }}</span>
-                    @endif
-                  </td>
                   <td style="text-align:right; white-space:nowrap;">
                     @if($canKoreksi ?? false)
                       <button type="button" class="btn btn-sm btn-outline" style="padding:4px 10px; font-size:11px; font-weight:700; color:var(--text); border-color:var(--border-2); border-radius:6px;" onclick="openKoreksiModal({{ $ag->id }}, '{{ addslashes($ag->guru?->nama ?? '-') }}', '{{ $ag->status }}', '{{ $ag->jam_masuk ? substr($ag->jam_masuk,0,5) : '' }}', '{{ $ag->jam_pulang ? substr($ag->jam_pulang,0,5) : '' }}', '{{ addslashes($ag->keterangan ?? '') }}')" title="Koreksi presensi guru">
                         <i class="bi bi-pencil-square"></i> Koreksi
                       </button>
                     @else
-                      <span style="color:var(--text-3); font-size:11px;">-</span>
+                      <span style="display:inline-flex; align-items:center; gap:4px; font-size:10.5px; color:var(--text-3); font-weight:600; padding:3px 8px; background:var(--bg-3); border-radius:4px;" title="Akses koreksi hanya untuk Guru Piket hari ini">
+                        <i class="bi bi-lock-fill"></i> Terkunci
+                      </span>
                     @endif
                   </td>
                 </tr>
@@ -1142,19 +1135,22 @@
                 @endphp
                 <tr class="row-guru-belum-hadir" data-status="belum_hadir" data-pulang="belum">
                   <td style="text-align:center; font-weight:700; color:var(--text-3); font-size:12px;">{{ $absensiGuruHariIni->count() + $idx2 + 1 }}</td>
-                  <td style="text-align:center; vertical-align:middle;">
-                    <img src="{{ $gb->foto_url }}" alt="{{ $gb->nama }}" style="width:34px; height:34px; border-radius:50%; object-fit:cover; border:1.5px dashed var(--border-2); opacity:0.8;" />
-                  </td>
-                  <td style="font-family:var(--font-mono); font-weight:700; color:var(--text-3); font-size:12px;">{{ $gb->nip ?: '-' }}</td>
                   <td>
-                    <strong style="color:var(--text); font-size:13px;">{{ $gb->nama ?? '—' }}</strong>
-                    @if($hpGuru)
-                      <div style="margin-top:2px;">
-                        <a href="https://wa.me/{{ $hpGuru }}" target="_blank" style="font-size:11px; color:#16A34A; text-decoration:none; font-weight:600; display:inline-flex; align-items:center; gap:4px;">
-                          <i class="bi bi-whatsapp"></i> <span style="font-family:var(--font-mono);">{{ $gb->no_hp }}</span>
-                        </a>
+                    <div style="display:flex; align-items:center; gap:10px;">
+                      <img src="{{ $gb->foto_url }}" alt="{{ $gb->nama }}" style="width:34px; height:34px; border-radius:50%; object-fit:cover; border:1.5px dashed var(--border-2); opacity:0.8; flex-shrink:0;" />
+                      <div style="min-width:0;">
+                        <strong style="color:var(--text); font-size:13px; display:block; line-height:1.2;">{{ $gb->nama ?? '—' }}</strong>
+                        <div style="font-size:11px; color:var(--text-3); margin-top:3px; display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+                          <span style="font-family:var(--font-mono);">NIP: {{ $gb->nip ?: '-' }}</span>
+                          @if($hpGuru)
+                            <span style="color:var(--border-2);">·</span>
+                            <a href="https://wa.me/{{ $hpGuru }}" target="_blank" style="color:#16A34A; text-decoration:none; font-weight:600; display:inline-flex; align-items:center; gap:3px;">
+                              <i class="bi bi-whatsapp"></i> <span style="font-family:var(--font-mono);">{{ $gb->no_hp }}</span>
+                            </a>
+                          @endif
+                        </div>
                       </div>
-                    @endif
+                    </div>
                   </td>
                   <td style="color:var(--text-2); font-size:12px;">{{ $gb->jabatan ?? 'Guru' }}</td>
                   <td style="font-family:var(--font-mono); font-size:12px; color:var(--text-3); text-align:center;">—</td>
@@ -1162,16 +1158,15 @@
                   <td style="text-align:center;">
                     <span class="piket-status-pill belum"><i class="bi bi-exclamation-circle-fill"></i> Belum Hadir</span>
                   </td>
-                  <td>
-                    <span style="color:var(--text-3); font-size:11.5px;">—</span>
-                  </td>
                   <td style="text-align:right; white-space:nowrap;">
                     @if($canKoreksi ?? false)
                       <button type="button" class="btn btn-sm btn-outline" style="padding:4px 10px; font-size:11px; font-weight:700; color:var(--text); border-color:var(--border-2); border-radius:6px;" onclick="openSetStatusGuruModal({{ $gb->id }}, '{{ addslashes($gb->nama) }}', '{{ addslashes($gb->jabatan ?: 'Guru') }}')" title="Catat Hadir Manual / Izin / Sakit / Dinas Luar">
                         <i class="bi bi-pencil-square"></i> Set Status
                       </button>
                     @else
-                      <span style="color:var(--text-3); font-size:11px;">-</span>
+                      <span style="display:inline-flex; align-items:center; gap:4px; font-size:10.5px; color:var(--text-3); font-weight:600; padding:3px 8px; background:var(--bg-3); border-radius:4px;" title="Akses koreksi hanya untuk Guru Piket hari ini">
+                        <i class="bi bi-lock-fill"></i> Terkunci
+                      </span>
                     @endif
                   </td>
                 </tr>
@@ -1488,7 +1483,7 @@
         if (status === 'terlambat') return rowStatus === 'terlambat';
         if (status === 'belum_hadir') return rowStatus === 'belum_hadir';
         if (status === 'belum_pulang') return row.getAttribute('data-has-masuk') === '1' && rowPulang === 'belum';
-        if (status === 'izin') return ['izin', 'sakit', 'dispen'].includes(rowStatus);
+        if (status === 'izin') return ['izin', 'sakit', 'dispen', 'dispensasi', 'cuti', 'pkl'].includes(rowStatus);
         if (status === 'pkl') return rowStatus === 'pkl';
         if (status === 'bolos') return rowStatus === 'bolos';
         if (status === 'pulang') return rowPulang === 'pulang';
