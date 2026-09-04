@@ -102,6 +102,10 @@ class LaporanController extends Controller
         if ($kategori === 'siswa') {
             if ($periode === 'harian') {
                 \App\Services\EvaluasiPresensiService::evaluasiOtomatisJikaWaktunya($tanggal);
+                // Sinkronkan status Alpha otomatis setelah pukul 10:00 jika hari aktif sekolah
+                if ($tanggal === Carbon::today()->toDateString() && now()->format('H:i') >= '10:00' && !\App\Models\HariLibur::isLibur($tanggal)) {
+                    \Illuminate\Support\Facades\Artisan::call('piket:kunci-alpha', ['tanggal' => $tanggal]);
+                }
             } else {
                 \App\Services\EvaluasiPresensiService::evaluasiOtomatisJikaWaktunya(Carbon::today()->toDateString());
             }
@@ -112,6 +116,7 @@ class LaporanController extends Controller
             ->whereBetween('tanggal', [$startDate, $endDate]);
 
         if ($kategori === 'siswa') {
+            $baseQuery->whereHas('siswa', fn($q) => $q->where('status', 'aktif'));
             if ($rombelId) {
                 $baseQuery->where(function ($q) use ($rombelId) {
                     $q->whereHas('siswaRombel', fn($sq) => $sq->where('rombel_id', $rombelId))
@@ -120,6 +125,7 @@ class LaporanController extends Controller
             }
             if ($siswaId) $baseQuery->where('pemilik_id', $siswaId);
         } else {
+            $baseQuery->whereHas('guru', fn($q) => $q->where('status', 'aktif'));
             if ($guruId) $baseQuery->where('pemilik_id', $guruId);
         }
 
@@ -136,7 +142,8 @@ class LaporanController extends Controller
             COUNT(*) as total_record,
             SUM(CASE WHEN status = 'hadir' THEN 1 ELSE 0 END) as total_hadir,
             SUM(CASE WHEN status = 'terlambat' THEN 1 ELSE 0 END) as total_terlambat,
-            SUM(CASE WHEN status IN ('sakit','izin','dispen') THEN 1 ELSE 0 END) as total_izin,
+            SUM(CASE WHEN status = 'sakit' THEN 1 ELSE 0 END) as total_sakit,
+            SUM(CASE WHEN status IN ('sakit','izin','dispen','dispensasi','cuti','dinas_luar') THEN 1 ELSE 0 END) as total_izin,
             SUM(CASE WHEN status IN ('alpha','alfa') THEN 1 ELSE 0 END) as total_alpha,
             SUM(CASE WHEN status = 'bolos' THEN 1 ELSE 0 END) as total_bolos
         ")->first();
@@ -251,6 +258,30 @@ class LaporanController extends Controller
         $totalIzin      = (int)($statsRaw->total_izin ?? 0);
         $totalAlpha     = (int)($statsRaw->total_alpha ?? 0);
         $totalBolos     = (int)($statsRaw->total_bolos ?? 0);
+
+        // Harmonisasikan perhitungan Harian Hari Ini dengan Meja Piket
+        if ($periode === 'harian' && $tanggal === Carbon::today()->toDateString()) {
+            if ($kategori === 'siswa') {
+                if ($rombelId) {
+                    $totalTarget = Siswa::where('status', 'aktif')
+                        ->whereHas('siswaRombels', fn($q) => $q->where('rombel_id', $rombelId)->where('status_keanggotaan', 'aktif'))
+                        ->count();
+                } elseif ($siswaId) {
+                    $totalTarget = 1;
+                } else {
+                    $totalTarget = Siswa::where('status', 'aktif')->count();
+                }
+            } else {
+                $totalTarget = $guruId ? 1 : Guru::where('status', 'aktif')->count();
+            }
+
+            if ($totalRecord < $totalTarget) {
+                $unscanned = max(0, $totalTarget - ($totalHadir + $totalTerlambat + $totalIzin + $totalBolos));
+                $totalAlpha = max($totalAlpha, $unscanned);
+                $totalRecord = $totalTarget;
+            }
+        }
+
         $persentase     = $totalRecord > 0 ? round((($totalHadir + $totalTerlambat) / $totalRecord) * 100, 1) : 0;
 
         // Data Master untuk Pilihan Dropdown
@@ -381,6 +412,7 @@ class LaporanController extends Controller
         $query = Absensi::where('pemilik_type', $kategori)->whereBetween('tanggal', [$startDate, $endDate]);
 
         if ($kategori === 'siswa') {
+            $query->whereHas('siswa', fn($q) => $q->where('status', 'aktif'));
             $query->with(['siswa.siswaRombels.rombel', 'siswaRombel.siswa', 'siswaRombel.rombel']);
             if ($rombelId) {
                 $query->where(function ($q) use ($rombelId) {
@@ -393,6 +425,7 @@ class LaporanController extends Controller
             }
             if ($siswaId)  $query->where('pemilik_id', $siswaId);
         } else {
+            $query->whereHas('guru', fn($q) => $q->where('status', 'aktif'));
             $query->with('guru');
             if ($guruId) $query->where('pemilik_id', $guruId);
         }
@@ -438,7 +471,7 @@ class LaporanController extends Controller
                             $absenSiswa->where('status', 'hadir')->count(),
                             $absenSiswa->where('status', 'terlambat')->count(),
                             $absenSiswa->where('status', 'sakit')->count(),
-                            $absenSiswa->whereIn('status', ['izin', 'dispen', 'dispensasi'])->count(),
+                            $absenSiswa->whereIn('status', ['izin', 'dispen', 'dispensasi', 'cuti', 'dinas_luar'])->count(),
                             $absenSiswa->whereIn('status', ['alpha', 'alfa'])->count(),
                             $absenSiswa->where('status', 'bolos')->count(),
                             $absenSiswa->count(),
@@ -595,6 +628,7 @@ class LaporanController extends Controller
         }
 
         if ($kategori === 'siswa') {
+            $query->whereHas('siswa', fn($q) => $q->where('status', 'aktif'));
             $query->with(['siswa.siswaRombels.rombel', 'siswaRombel.siswa', 'siswaRombel.rombel']);
             if ($rombelId) {
                 $query->where(function ($q) use ($rombelId) {
@@ -607,6 +641,7 @@ class LaporanController extends Controller
             }
             if ($siswaId)  $query->where('pemilik_id', $siswaId);
         } else {
+            $query->whereHas('guru', fn($q) => $q->where('status', 'aktif'));
             $query->with('guru');
             if ($guruId) $query->where('pemilik_id', $guruId);
         }
@@ -633,8 +668,8 @@ class LaporanController extends Controller
                     $h = $absenSiswa->where('status', 'hadir')->count();
                     $t = $absenSiswa->where('status', 'terlambat')->count();
                     $sakit = $absenSiswa->where('status', 'sakit')->count();
-                    $i = $absenSiswa->where('status', 'izin')->count();
-                    $a = $absenSiswa->where('status', 'alpha')->count();
+                    $i = $absenSiswa->whereIn('status', ['izin', 'dispen', 'dispensasi', 'cuti', 'dinas_luar'])->count();
+                    $a = $absenSiswa->whereIn('status', ['alpha', 'alfa'])->count();
                     $b = $absenSiswa->where('status', 'bolos')->count();
                     $totMasuk = $h + $t;
                     $totPertemuan = $totMasuk + $sakit + $i + $a + $b;
@@ -666,8 +701,8 @@ class LaporanController extends Controller
                     $h = $absenGuru->where('status', 'hadir')->count();
                     $t = $absenGuru->where('status', 'terlambat')->count();
                     $sakit = $absenGuru->where('status', 'sakit')->count();
-                    $i = $absenGuru->where('status', 'izin')->count();
-                    $a = $absenGuru->where('status', 'alpha')->count();
+                    $i = $absenGuru->whereIn('status', ['izin', 'dispen', 'dispensasi', 'cuti', 'dinas_luar'])->count();
+                    $a = $absenGuru->whereIn('status', ['alpha', 'alfa'])->count();
                     $b = $absenGuru->where('status', 'bolos')->count();
                     $totMasuk = $h + $t;
                     $totPertemuan = $totMasuk + $sakit + $i + $a + $b;

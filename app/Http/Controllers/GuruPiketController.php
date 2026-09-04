@@ -8,6 +8,8 @@ use App\Models\IzinGuru;
 use App\Models\IzinSiswa;
 use App\Models\JadwalHariIni;
 use App\Models\JadwalPiket;
+use App\Models\KasusDisiplin;
+use App\Models\NotifikasiOrtu;
 use App\Models\PengaturanNotifikasi;
 use App\Models\Siswa;
 use App\Models\SiswaRombel;
@@ -41,6 +43,7 @@ class GuruPiketController extends Controller
         $absensiHariIni = Absensi::with(['siswa', 'siswaRombel.rombel'])
             ->where('pemilik_type', 'siswa')
             ->where('tanggal', $today)
+            ->whereHas('siswa', fn($q) => $q->where('status', 'aktif'))
             ->orderBy('jam_masuk', 'desc')
             ->get();
 
@@ -48,6 +51,7 @@ class GuruPiketController extends Controller
         $absensiGuruHariIni = Absensi::with('guru')
             ->where('pemilik_type', 'guru')
             ->where('tanggal', $today)
+            ->whereHas('guru', fn($q) => $q->where('status', 'aktif'))
             ->orderBy('jam_masuk', 'desc')
             ->get();
 
@@ -66,15 +70,18 @@ class GuruPiketController extends Controller
                 }
             }])
             ->where('tanggal', $today)
+            ->whereHas('siswa', fn($q) => $q->where('status', 'aktif'))
             ->orderBy('created_at', 'desc')
             ->get();
 
-        $izinCount = $izinHariIni->count();
-        $belumAbsen = max(0, $totalSiswaAktif - $absensiHariIni->count());
-
-        // Siswa yang sudah hadir / memiliki record absensi
+        // Siswa yang sudah hadir / memiliki record absensi dan izin
         $hadirSiswaIds = $absensiHariIni->pluck('pemilik_id')->toArray();
-        $izinSiswaIds  = $izinHariIni->pluck('siswa_id')->toArray();
+        $izinSiswaIds  = array_values(array_unique(array_merge(
+            $izinHariIni->pluck('siswa_id')->toArray(),
+            $absensiHariIni->whereIn('status', ['sakit', 'izin', 'dispen', 'dispensasi', 'cuti', 'dinas_luar'])->pluck('pemilik_id')->toArray()
+        )));
+        $izinCount = count($izinSiswaIds);
+        $belumAbsen = max(0, $totalSiswaAktif - $absensiHariIni->count());
 
         // Data untuk form presensi manual
         $semuaSiswa = Siswa::where('status', 'aktif')
@@ -306,6 +313,16 @@ class GuruPiketController extends Controller
                 } else {
                     IzinSiswa::where('siswa_id', $siswaId)->where('tanggal', $absensi->tanggal)->delete();
                 }
+
+                // Sinkronisasi Buku Kasus Disiplin & Hapus Notifikasi Pending jika Hadir/Izin
+                KasusDisiplin::syncFromPresensi($siswaId);
+                if (!in_array($status, ['alpha', 'terlambat', 'bolos'])) {
+                    NotifikasiOrtu::where('siswa_id', $siswaId)
+                        ->where('tanggal', $absensi->tanggal)
+                        ->where('status', 'pending')
+                        ->whereIn('kategori', ['alpha', 'terlambat', 'bolos', 'panggilan_ortu'])
+                        ->delete();
+                }
             }
         }
 
@@ -414,6 +431,16 @@ class GuruPiketController extends Controller
         } else {
             // Hapus izin jika sebelumnya tercatat izin lalu divalidasi hadir/alpha
             IzinSiswa::where('siswa_id', $siswa->id)->where('tanggal', $today)->delete();
+        }
+
+        // Sinkronisasi Buku Kasus Disiplin & Hapus Notifikasi Pending jika Hadir/Izin
+        KasusDisiplin::syncFromPresensi($siswa->id);
+        if (!in_array($status, ['alpha', 'terlambat', 'bolos'])) {
+            NotifikasiOrtu::where('siswa_id', $siswa->id)
+                ->where('tanggal', $today)
+                ->where('status', 'pending')
+                ->whereIn('kategori', ['alpha', 'terlambat', 'bolos', 'panggilan_ortu'])
+                ->delete();
         }
 
         return redirect()->back()->with('success', "Presensi ananda {$siswa->nama} berhasil divalidasi sebagai: " . strtoupper($status));

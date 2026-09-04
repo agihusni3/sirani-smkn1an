@@ -127,6 +127,15 @@ class PresensiManualController extends Controller
                 ? (Siswa::find($pemilikId)?->nama ?? '-')
                 : (Guru::find($pemilikId)?->nama ?? '-');
 
+            if ($kategori === 'siswa') {
+                \App\Models\KasusDisiplin::syncFromPresensi($pemilikId);
+                \App\Models\NotifikasiOrtu::where('siswa_id', $pemilikId)
+                    ->where('tanggal', $today)
+                    ->where('status', 'pending')
+                    ->whereIn('kategori', ['alpha', 'terlambat', 'bolos', 'panggilan_ortu'])
+                    ->delete();
+            }
+
             return [
                 'success' => true,
                 'message' => "Presensi masuk berhasil dicatat untuk {$nama} (Status: " . strtoupper($status) . "). Sumber: Manual (Lupa Kartu). Dicatat oleh: {$pencatat}.",
