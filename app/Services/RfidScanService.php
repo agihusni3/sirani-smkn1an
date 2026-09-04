@@ -219,6 +219,29 @@ class RfidScanService
                 ];
             }
 
+            // ── PARAMETER 7B: Proteksi Status Alpha (Terkunci Alpha Tanpa Jam Masuk) ──
+            if ($absensi && in_array($absensi->status, ['alpha', 'alfa']) && empty($absensi->jam_masuk)) {
+                return [
+                    'success' => false,
+                    'status'  => 'warning',
+                    'type'    => 'tercatat_alpha',
+                    'message' => "Presensi ditolak. {$person->nama} tercatat Alpha (tidak ada rekaman jam masuk pagi). Silakan melapor ke Petugas Piket.",
+                    'data'    => [
+                        'nama'                => $person->nama,
+                        'tipe'                => $type,
+                        'sub'                 => $rombelOrJabatan,
+                        'identitas'           => $identitas,
+                        'rombel_atau_jabatan' => $rombelOrJabatan,
+                        'foto'                => $person->foto_url,
+                        'foto_url'            => $person->foto_url,
+                        'status'              => 'alpha',
+                        'jam'                 => $timeNow,
+                        'jam_masuk'           => null,
+                        'jam_pulang'          => null,
+                    ]
+                ];
+            }
+
             // ── PARAMETER 8: Anti-Double-Scan Cooldown (< 10 detik) ──
             if ($absensi && $absensi->updated_at && $absensi->updated_at->diffInSeconds($now) < 10) {
                 return [
@@ -411,7 +434,7 @@ class RfidScanService
             }
 
             // ── SCENARIO B: Sudah Ada Jam Masuk -> Validasi Pulang ──
-            if (empty($absensi->jam_pulang)) {
+            if (!empty($absensi->jam_masuk) && empty($absensi->jam_pulang)) {
                 $jamPulangJadwal = Carbon::parse($jamPulangMulai);
 
                 // Validasi: Belum Waktunya Pulang (< jamPulangMulai)
@@ -476,6 +499,29 @@ class RfidScanService
                         'jam'                 => $timeNow,
                         'jam_masuk'           => $absensi->jam_masuk,
                         'jam_pulang'          => $timeNow,
+                    ]
+                ];
+            }
+
+            // ── SCENARIO C: Record Ada Namun Tanpa Jam Masuk (Terkunci Alpha / Belum Scan Pagi) ──
+            if (empty($absensi->jam_masuk)) {
+                return [
+                    'success' => false,
+                    'status'  => 'warning',
+                    'type'    => 'tanpa_jam_masuk',
+                    'message' => "Presensi ditolak. Tidak ada rekaman jam masuk pagi ini untuk {$person->nama}. Silakan melapor ke Petugas Piket.",
+                    'data'    => [
+                        'nama'                => $person->nama,
+                        'tipe'                => $type,
+                        'sub'                 => $rombelOrJabatan,
+                        'identitas'           => $identitas,
+                        'rombel_atau_jabatan' => $rombelOrJabatan,
+                        'foto'                => $person->foto_url,
+                        'foto_url'            => $person->foto_url,
+                        'status'              => $absensi->status ?: 'ditolak',
+                        'jam'                 => $timeNow,
+                        'jam_masuk'           => null,
+                        'jam_pulang'          => null,
                     ]
                 ];
             }
