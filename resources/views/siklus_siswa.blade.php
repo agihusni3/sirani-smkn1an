@@ -502,57 +502,63 @@
     <div class="panel" style="padding:0; overflow:hidden; border:1px solid var(--border); border-radius:var(--r-md); box-shadow:var(--shadow-sm); background:var(--bg-2); margin-bottom:24px;">
       
       {{-- Header & Toolbar Terpadu --}}
-      <div class="siklus-table-toolbar" style="padding:8px 12px; border-bottom:1px solid var(--border); background:var(--surface); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
-        <div class="siklus-table-title" style="font-weight:800; font-size:13px; color:var(--text); display:flex; align-items:center; gap:6px;">
+      <div class="siklus-table-toolbar" style="padding:10px 14px; border-bottom:1px solid var(--border); background:var(--surface); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+        
+        {{-- Judul --}}
+        <div class="siklus-table-title" style="font-weight:800; font-size:13px; color:var(--text); display:flex; align-items:center; gap:6px; flex-shrink:0;">
           <i class="bi bi-people-fill" style="color:#000000;"></i>
           <span>Histori Siswa</span>
-          <span style="background:var(--bg-3); border:1px solid var(--border-2); color:var(--text-2); font-size:10.5px; font-weight:700; padding:1px 6px; border-radius:4px;" class="font-mono">
+          <span style="background:var(--bg-3); border:1px solid var(--border-2); color:var(--text-2); font-size:10.5px; font-weight:700; padding:1px 7px; border-radius:4px; font-family:var(--font-mono);">
             {{ $siswas->total() }}
           </span>
         </div>
 
-        <form method="GET" action="{{ route('siklus-siswa.index') }}" class="siklus-table-form" style="display:flex; flex-wrap:wrap; gap:6px; align-items:center; flex:1; justify-content:flex-end; max-width:640px;">
-          <div class="siklus-search-box" style="position:relative; flex:1.5; min-width:130px;">
-            <i class="bi bi-search" style="position:absolute; left:10px; top:50%; transform:translateY(-50%); color:var(--text-3); font-size:11px;"></i>
-            <input type="text" name="q" value="{{ $search }}" placeholder="Cari nama, NIS..." class="input-field" style="width:100%; height:32px; font-size:11.5px; padding-left:28px; padding-right:8px;" />
+        {{-- Form Filter & Search --}}
+        <form method="GET" action="{{ route('siklus-siswa.index') }}" style="display:flex; flex-wrap:wrap; gap:6px; align-items:center;">
+          
+          {{-- Search Box --}}
+          <div style="position:relative; min-width:180px; flex:1;">
+            <i class="bi bi-search" style="position:absolute; left:10px; top:50%; transform:translateY(-50%); color:var(--text-3); font-size:11px; pointer-events:none;"></i>
+            <input type="text" name="q" value="{{ $search }}" placeholder="Cari nama, NIS..." class="input-field"
+              style="width:100%; height:33px; font-size:11.5px; padding-left:30px; padding-right:8px; border-radius:6px;" />
           </div>
 
-          <div class="siklus-filter-group" style="display:flex; gap:6px; align-items:center; flex-wrap:wrap; flex:2;">
-            <div style="min-width:105px; flex:1;">
-              <select name="rombel_id" class="input-field" style="width:100%; height:32px; font-size:11.5px; padding:0 6px;" onchange="this.form.submit()">
-                <option value="">Semua Kelas</option>
-                @foreach($rombels as $r)
-                  <option value="{{ $r->id }}" {{ $rombelId == $r->id ? 'selected' : '' }}>{{ $r->nama_rombel }}</option>
-                @endforeach
-              </select>
-            </div>
+          {{-- Filter Kelas --}}
+          <select name="rombel_id" class="input-field" style="height:33px; font-size:11.5px; padding:0 8px; border-radius:6px; min-width:105px;" onchange="this.form.submit()">
+            <option value="">Semua Kelas</option>
+            @foreach($rombels as $r)
+              <option value="{{ $r->id }}" {{ $rombelId == $r->id ? 'selected' : '' }}>{{ $r->nama_rombel }}</option>
+            @endforeach
+          </select>
 
-            <div style="min-width:85px; flex:1;">
-              <select name="status" class="input-field" style="width:100%; height:32px; font-size:11.5px; padding:0 6px;" onchange="this.form.submit()">
-                <option value="">Status</option>
-                <option value="aktif" {{ $status === 'aktif' ? 'selected' : '' }}>Aktif</option>
-                <option value="pkl" {{ $status === 'pkl' ? 'selected' : '' }}>PKL</option>
-                <option value="lulus" {{ $status === 'lulus' ? 'selected' : '' }}>Lulus</option>
-                <option value="pindah" {{ $status === 'pindah' ? 'selected' : '' }}>Pindah</option>
-                <option value="keluar" {{ $status === 'keluar' ? 'selected' : '' }}>Keluar</option>
-              </select>
-            </div>
+          {{-- Filter Status --}}
+          <select name="status" class="input-field" style="height:33px; font-size:11.5px; padding:0 8px; border-radius:6px; min-width:90px;" onchange="this.form.submit()">
+            <option value="">Status</option>
+            <option value="aktif"  {{ $status === 'aktif'  ? 'selected' : '' }}>Aktif</option>
+            <option value="pkl"    {{ $status === 'pkl'    ? 'selected' : '' }}>PKL</option>
+            <option value="lulus"  {{ $status === 'lulus'  ? 'selected' : '' }}>Lulus</option>
+            <option value="pindah" {{ $status === 'pindah' ? 'selected' : '' }}>Pindah</option>
+            <option value="keluar" {{ $status === 'keluar' ? 'selected' : '' }}>Keluar</option>
+          </select>
 
-            <div style="min-width:95px; flex:1;">
-              <select name="sort" class="input-field" style="width:100%; height:32px; font-size:11.5px; padding:0 6px;" onchange="this.form.submit()">
-                <option value="nama_asc" {{ $sort === 'nama_asc' ? 'selected' : '' }}>Nama (A-Z)</option>
-                <option value="nama_desc" {{ $sort === 'nama_desc' ? 'selected' : '' }}>Nama (Z-A)</option>
-                <option value="nis_asc" {{ $sort === 'nis_asc' ? 'selected' : '' }}>NIS (Kecil)</option>
-                <option value="terbaru" {{ $sort === 'terbaru' ? 'selected' : '' }}>Terbaru</option>
-              </select>
-            </div>
+          {{-- Filter Urutan --}}
+          <select name="sort" class="input-field" style="height:33px; font-size:11.5px; padding:0 8px; border-radius:6px; min-width:105px;" onchange="this.form.submit()">
+            <option value="nama_asc"  {{ $sort === 'nama_asc'  ? 'selected' : '' }}>Nama (A-Z)</option>
+            <option value="nama_desc" {{ $sort === 'nama_desc' ? 'selected' : '' }}>Nama (Z-A)</option>
+            <option value="nis_asc"   {{ $sort === 'nis_asc'   ? 'selected' : '' }}>NIS (Kecil)</option>
+            <option value="terbaru"   {{ $sort === 'terbaru'   ? 'selected' : '' }}>Terbaru</option>
+          </select>
 
-            <button type="submit" class="btn btn-sm btn-black" style="height:32px; padding:0 10px; font-size:11.5px; font-weight:800; border-radius:var(--r-sm); flex-shrink:0;">
+          {{-- Tombol Aksi --}}
+          <div style="display:flex; gap:5px; align-items:center; flex-shrink:0;">
+            <button type="submit" class="btn btn-sm btn-black"
+              style="height:33px; padding:0 14px; font-size:11.5px; font-weight:800; border-radius:6px; white-space:nowrap;">
               Filter
             </button>
-
             @if($search || $rombelId || $status || ($sort && $sort !== 'nama_asc'))
-              <a href="{{ route('siklus-siswa.index') }}" class="btn btn-sm btn-outline" style="height:32px; padding:0 8px; font-size:11px; font-weight:800; color:var(--red); border-color:rgba(239,68,68,0.4); border-radius:var(--r-sm); flex-shrink:0;" title="Reset Filter">
+              <a href="{{ route('siklus-siswa.index') }}"
+                style="height:33px; padding:0 12px; font-size:11.5px; font-weight:800; border-radius:6px; border:1.5px solid rgba(239,68,68,0.5); color:#ef4444; background:transparent; display:inline-flex; align-items:center; white-space:nowrap; text-decoration:none;"
+                title="Reset Filter">
                 Reset
               </a>
             @endif
