@@ -1696,7 +1696,7 @@
   }
 
   // ── Modal Koreksi Presensi Meja Piket ──
-  function openKoreksiPiketModal(id, nama, status, jamMasuk, jamPulang, keterangan) {
+  function openKoreksiModal(id, nama, status, jamMasuk, jamPulang, keterangan) {
     const form = document.getElementById('formKoreksiPiket');
     if (form) form.action = '/piket/absensi/' + id;
     
@@ -1716,6 +1716,44 @@
     if (elKet) elKet.value = keterangan || '';
 
     openModal('modalKoreksiPiket');
+  }
+  const openKoreksiPiketModal = openKoreksiModal;
+
+  // ── Modal Set Status Guru Belum Hadir Meja Piket ──
+  function openSetStatusGuruModal(id, nama, jabatan) {
+    const elId = document.getElementById('setStatusGuruId');
+    if (elId) elId.value = id;
+
+    const elNama = document.getElementById('setStatusGuruNama');
+    if (elNama) elNama.value = nama;
+
+    const elSub = document.getElementById('setStatusGuruSub');
+    if (elSub) elSub.textContent = jabatan || 'Guru / Tenaga Pendidik';
+
+    const elStatus = document.getElementById('setStatusGuruStatus');
+    if (elStatus) elStatus.value = 'hadir';
+
+    const elKet = document.getElementById('setStatusGuruKeterangan');
+    if (elKet) elKet.value = '';
+
+    onSetStatusGuruChange('hadir');
+    openModal('modalSetStatusGuru');
+  }
+
+  function onSetStatusGuruChange(val) {
+    const wrapJam = document.getElementById('setStatusGuruWrapJamMasuk');
+    const jamInput = document.getElementById('setStatusGuruJamMasuk');
+
+    if (val === 'hadir' || val === 'terlambat') {
+      if (wrapJam) wrapJam.style.display = 'block';
+      if (jamInput && !jamInput.value) {
+        const now = new Date();
+        jamInput.value = String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
+      }
+    } else {
+      if (wrapJam) wrapJam.style.display = 'none';
+      if (jamInput) jamInput.value = '';
+    }
   }
 
   // ── Modal Validasi Siswa Belum Hadir Meja Piket ──
@@ -2040,6 +2078,65 @@
           <button type="button" class="btn btn-outline" onclick="closeModal('modalValidasiSiswa')">Batal</button>
           <button type="submit" class="btn" style="background:#000000; color:#FFFFFF; border:1px solid #000000; font-weight:800; display:inline-flex; align-items:center; gap:6px; padding:0 16px; height:38px; border-radius:var(--r-sm); cursor:pointer;">
             <i class="bi bi-check2-circle"></i> Simpan Status
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+{{-- MODAL SET STATUS GURU BELUM HADIR --}}
+<div class="modal-overlay" id="modalSetStatusGuru">
+  <div class="modal-card" style="max-width:480px; padding:24px;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+      <div>
+        <h3 style="font-size:16px; font-weight:900; color:var(--text); margin:0;">Catat Kehadiran / Status Guru</h3>
+        <div style="font-size:11.5px; color:var(--text-3); margin-top:2px;">Simpan konfirmasi hadir manual, izin, sakit, atau dinas luar</div>
+      </div>
+      <button type="button" class="btn btn-sm btn-outline" onclick="closeModal('modalSetStatusGuru')"><i class="bi bi-x-lg"></i></button>
+    </div>
+
+    <form method="POST" action="{{ route('piket.set-status-guru') }}">
+      @csrf
+      <input type="hidden" name="guru_id" id="setStatusGuruId" required />
+
+      <div style="display:flex; flex-direction:column; gap:14px;">
+        {{-- Guru Info --}}
+        <div>
+          <label style="font-size:11.5px; font-weight:700; color:var(--text-2); margin-bottom:4px; display:block;">GURU / TENAGA PENDIDIK</label>
+          <input type="text" id="setStatusGuruNama" readonly style="width:100%; height:38px; background:var(--bg-2); border:1px solid var(--border); border-radius:var(--r-sm); padding:0 12px; font-weight:800; color:var(--text); font-size:13px;" />
+          <div id="setStatusGuruSub" style="font-size:11.5px; color:var(--text-3); margin-top:3px;"></div>
+        </div>
+
+        {{-- Status Kehadiran --}}
+        <div>
+          <label style="font-size:11.5px; font-weight:700; color:var(--text-2); margin-bottom:4px; display:block;">STATUS KEHADIRAN <span style="color:var(--red);">*</span></label>
+          <select name="status" id="setStatusGuruStatus" required onchange="onSetStatusGuruChange(this.value)" style="width:100%; height:40px; background:var(--bg-3); border:1px solid var(--border-2); border-radius:var(--r-sm); padding:0 12px; font-weight:700; color:var(--text); font-size:13px;">
+            <option value="hadir">Hadir Tepat Waktu (Hadir Manual)</option>
+            <option value="terlambat">Terlambat Datang</option>
+            <option value="izin">Izin Pribadi / Keperluan Lain</option>
+            <option value="sakit">Sakit</option>
+            <option value="dispen">Tugas Dinas Luar / Dispensasi</option>
+            <option value="alpha">Alpha (Tanpa Keterangan)</option>
+          </select>
+        </div>
+
+        {{-- Jam Masuk --}}
+        <div id="setStatusGuruWrapJamMasuk" style="display:block;">
+          <label style="font-size:11.5px; font-weight:700; color:var(--text-2); margin-bottom:4px; display:block;">JAM MASUK</label>
+          <input type="time" name="jam_masuk" id="setStatusGuruJamMasuk" style="width:100%; height:38px; background:var(--bg-3); border:1px solid var(--border-2); border-radius:var(--r-sm); padding:0 10px; color:var(--text); font-size:13px;" />
+        </div>
+
+        {{-- Catatan / Keterangan --}}
+        <div>
+          <label style="font-size:11.5px; font-weight:700; color:var(--text-2); margin-bottom:4px; display:block;">ALASAN / CATATAN GURU PIKET</label>
+          <input type="text" name="keterangan" id="setStatusGuruKeterangan" placeholder="Contoh: Konfirmasi langsung / Surat Tugas" style="width:100%; height:38px; background:var(--bg-3); border:1px solid var(--border-2); border-radius:var(--r-sm); padding:0 12px; color:var(--text); font-size:13px;" />
+        </div>
+
+        <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:6px;">
+          <button type="button" class="btn btn-outline" onclick="closeModal('modalSetStatusGuru')">Batal</button>
+          <button type="submit" class="btn" style="background:#000000; color:#FFFFFF; border:1px solid #000000; font-weight:800; display:inline-flex; align-items:center; gap:6px; padding:0 16px; height:38px; border-radius:var(--r-sm); cursor:pointer;">
+            <i class="bi bi-check2-circle"></i> Simpan Status Guru
           </button>
         </div>
       </div>
