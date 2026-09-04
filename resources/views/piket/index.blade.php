@@ -1028,7 +1028,7 @@
                     @elseif(in_array($ab->status, ['alpha', 'alfa']))
                       @if($ab->sumber_absen === 'auto_kunci_piket')
                         <span class="piket-status-pill belum" style="background:#fee2e2; color:#991b1b; border:1px solid #fca5a5;" title="Dikunci otomatis oleh sistem pukul 09:00">
-                          <i class="bi bi-robot"></i> Alpha (Auto 09:00)
+                          <i class="bi bi-exclamation-octagon-fill"></i> Alpha
                         </span>
                       @elseif(in_array($ab->sumber_absen, ['koreksi_piket_manual', 'manual_piket', 'piket']))
                         <span class="piket-status-pill belum" style="background:#fef2f2; color:#b91c1c; border:1px solid #f87171;" title="Divalidasi langsung oleh Petugas Guru Piket">
@@ -1205,7 +1205,7 @@
                     @elseif(in_array($ag->status, ['alpha', 'alfa']))
                       @if($ag->sumber_absen === 'auto_kunci_piket')
                         <span class="piket-status-pill belum" style="background:#fee2e2; color:#991b1b; border:1px solid #fca5a5;" title="Dikunci otomatis oleh sistem pukul 09:00">
-                          <i class="bi bi-robot"></i> Alpha (Auto 09:00)
+                          <i class="bi bi-exclamation-octagon-fill"></i> Alpha
                         </span>
                       @elseif(in_array($ag->sumber_absen, ['koreksi_piket_manual', 'manual_piket', 'piket']))
                         <span class="piket-status-pill belum" style="background:#fef2f2; color:#b91c1c; border:1px solid #f87171;" title="Divalidasi langsung oleh Petugas Guru Piket">
