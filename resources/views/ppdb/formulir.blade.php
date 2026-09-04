@@ -180,7 +180,24 @@
                     <label style="display: block; font-size: 0.85rem; font-weight: 700; color: var(--text-dark); margin-bottom: 8px;">
                         Alamat Tempat Tinggal Lengkap <span style="color: #ef4444;">*</span>
                     </label>
-                    <textarea name="alamat_lengkap" required rows="2" placeholder="Nama Jalan, RT/RW, Dusun, Pekon / Desa..." style="width: 100%; padding: 11px 14px; font-size: 0.9rem;">{{ old('alamat_lengkap') }}</textarea>
+                    <textarea name="alamat_lengkap" required rows="2" placeholder="Nama Jalan, RT/RW, Dusun, Pekon / Desa, Kecamatan, Kabupaten..." style="width: 100%; padding: 11px 14px; font-size: 0.9rem;">{{ old('alamat_lengkap') }}</textarea>
+                </div>
+
+                {{-- Hobi & Minat Organisasi --}}
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 18px; margin-top: 18px; padding-top: 18px; border-top: 1px dashed var(--border-main);">
+                    <div>
+                        <label style="display: block; font-size: 0.85rem; font-weight: 700; color: var(--text-dark); margin-bottom: 8px;">
+                            <i class="fa-solid fa-heart" style="color: #ef4444; margin-right: 6px;"></i> Hobi Calon Siswa
+                        </label>
+                        <input type="text" name="hobi" value="{{ old('hobi') }}" placeholder="Contoh: Membaca, Sepak Bola, Komputer, Musik, dll." style="width: 100%; padding: 11px 14px; font-size: 0.9rem;">
+                    </div>
+
+                    <div>
+                        <label style="display: block; font-size: 0.85rem; font-weight: 700; color: var(--text-dark); margin-bottom: 8px;">
+                            <i class="fa-solid fa-users-gear" style="color: var(--brand-blue); margin-right: 6px;"></i> Organisasi yang Diminati
+                        </label>
+                        <input type="text" name="organisasi_minat" value="{{ old('organisasi_minat') }}" placeholder="Contoh: OSIS, Pramuka, PMR, Paskibra, Rohis, Seni, Olahraga" style="width: 100%; padding: 11px 14px; font-size: 0.9rem;">
+                    </div>
                 </div>
             </div>
 
@@ -189,37 +206,147 @@
                 <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 18px;">
                     <span style="width: 28px; height: 28px; border-radius: 50%; background: var(--brand-amber); color: white; display: inline-flex; align-items: center; justify-content: center; font-size: 0.85rem; font-weight: 800;">3</span>
                     <h3 style="font-size: 1.15rem; font-weight: 800; color: var(--text-dark);">
-                        Data Orang Tua / Wali & WhatsApp
+                        Data Orang Tua (Ayah & Ibu) & WhatsApp
                     </h3>
                 </div>
 
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 18px;">
+                {{-- DUA KARTU: DATA AYAH & DATA IBU --}}
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; margin-bottom: 20px;">
+                    
+                    {{-- KARTU DATA AYAH KANDUNG --}}
+                    <div style="background: var(--bg-surface-alt, #f8fafc); border: 1px solid var(--border-main); border-radius: var(--radius-sm); padding: 18px;">
+                        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 14px; padding-bottom: 10px; border-bottom: 1px solid var(--border-main);">
+                            <span style="width: 24px; height: 24px; border-radius: 6px; background: rgba(37, 99, 235, 0.12); color: #2563eb; display: inline-flex; align-items: center; justify-content: center; font-size: 0.85rem;">
+                                <i class="fa-solid fa-user-tie"></i>
+                            </span>
+                            <h4 style="font-size: 0.95rem; font-weight: 800; color: var(--text-dark); margin: 0;">Data Ayah Kandung</h4>
+                        </div>
+
+                        <div style="display: flex; flex-direction: column; gap: 12px;">
+                            <div>
+                                <label style="display: block; font-size: 0.82rem; font-weight: 700; color: var(--text-dark); margin-bottom: 6px;">
+                                    Nama Lengkap Ayah
+                                </label>
+                                <input type="text" name="nama_ayah" value="{{ old('nama_ayah') }}" placeholder="Nama lengkap sesuai KTP" style="width: 100%; padding: 10px 12px; font-size: 0.88rem;">
+                            </div>
+
+                            <div>
+                                <label style="display: block; font-size: 0.82rem; font-weight: 700; color: var(--text-dark); margin-bottom: 6px;">
+                                    Pekerjaan Ayah
+                                </label>
+                                <select name="pekerjaan_ayah" style="width: 100%; padding: 10px 12px; font-size: 0.88rem;">
+                                    <option value="">-- Pilih Pekerjaan Ayah --</option>
+                                    <option value="Petani / Pekebun" {{ old('pekerjaan_ayah') == 'Petani / Pekebun' ? 'selected' : '' }}>Petani / Pekebun</option>
+                                    <option value="Wiraswasta / Pedagang" {{ old('pekerjaan_ayah') == 'Wiraswasta / Pedagang' ? 'selected' : '' }}>Wiraswasta / Pedagang</option>
+                                    <option value="Karyawan Swasta" {{ old('pekerjaan_ayah') == 'Karyawan Swasta' ? 'selected' : '' }}>Karyawan Swasta</option>
+                                    <option value="PNS / TNI / Polri" {{ old('pekerjaan_ayah') == 'PNS / TNI / Polri' ? 'selected' : '' }}>PNS / TNI / Polri</option>
+                                    <option value="Buruh Harian / Tukang" {{ old('pekerjaan_ayah') == 'Buruh Harian / Tukang' ? 'selected' : '' }}>Buruh Harian / Tukang</option>
+                                    <option value="Pensiunan" {{ old('pekerjaan_ayah') == 'Pensiunan' ? 'selected' : '' }}>Pensiunan</option>
+                                    <option value="Tidak Bekerja / Meninggal" {{ old('pekerjaan_ayah') == 'Tidak Bekerja / Meninggal' ? 'selected' : '' }}>Tidak Bekerja / Meninggal</option>
+                                    <option value="Lainnya" {{ old('pekerjaan_ayah') == 'Lainnya' ? 'selected' : '' }}>Lainnya</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label style="display: block; font-size: 0.82rem; font-weight: 700; color: var(--text-dark); margin-bottom: 6px;">
+                                    Pendidikan Terakhir Ayah
+                                </label>
+                                <select name="pendidikan_ayah" style="width: 100%; padding: 10px 12px; font-size: 0.88rem;">
+                                    <option value="">-- Pilih Pendidikan Terakhir --</option>
+                                    <option value="SD / Sederajat" {{ old('pendidikan_ayah') == 'SD / Sederajat' ? 'selected' : '' }}>SD / Sederajat</option>
+                                    <option value="SMP / Sederajat" {{ old('pendidikan_ayah') == 'SMP / Sederajat' ? 'selected' : '' }}>SMP / Sederajat</option>
+                                    <option value="SMA / SMK / Sederajat" {{ old('pendidikan_ayah') == 'SMA / SMK / Sederajat' ? 'selected' : '' }}>SMA / SMK / Sederajat</option>
+                                    <option value="D1 / D2 / D3" {{ old('pendidikan_ayah') == 'D1 / D2 / D3' ? 'selected' : '' }}>D1 / D2 / D3</option>
+                                    <option value="S1 / D4" {{ old('pendidikan_ayah') == 'S1 / D4' ? 'selected' : '' }}>S1 / D4</option>
+                                    <option value="S2 / S3" {{ old('pendidikan_ayah') == 'S2 / S3' ? 'selected' : '' }}>S2 / S3</option>
+                                    <option value="Tidak Sekolah" {{ old('pendidikan_ayah') == 'Tidak Sekolah' ? 'selected' : '' }}>Tidak Sekolah</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label style="display: block; font-size: 0.82rem; font-weight: 700; color: var(--text-dark); margin-bottom: 6px;">
+                                    Nomor WhatsApp / HP Ayah
+                                </label>
+                                <input type="text" name="no_hp_ayah" value="{{ old('no_hp_ayah') }}" placeholder="08xxxxxxxxxx" style="width: 100%; padding: 10px 12px; font-size: 0.88rem;">
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- KARTU DATA IBU KANDUNG --}}
+                    <div style="background: var(--bg-surface-alt, #f8fafc); border: 1px solid var(--border-main); border-radius: var(--radius-sm); padding: 18px;">
+                        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 14px; padding-bottom: 10px; border-bottom: 1px solid var(--border-main);">
+                            <span style="width: 24px; height: 24px; border-radius: 6px; background: rgba(236, 72, 153, 0.12); color: #ec4899; display: inline-flex; align-items: center; justify-content: center; font-size: 0.85rem;">
+                                <i class="fa-solid fa-person-dress"></i>
+                            </span>
+                            <h4 style="font-size: 0.95rem; font-weight: 800; color: var(--text-dark); margin: 0;">Data Ibu Kandung</h4>
+                        </div>
+
+                        <div style="display: flex; flex-direction: column; gap: 12px;">
+                            <div>
+                                <label style="display: block; font-size: 0.82rem; font-weight: 700; color: var(--text-dark); margin-bottom: 6px;">
+                                    Nama Lengkap Ibu <span style="color: #ef4444;">*</span>
+                                </label>
+                                <input type="text" name="nama_ibu" value="{{ old('nama_ibu') }}" required placeholder="Nama lengkap sesuai KTP / KK" style="width: 100%; padding: 10px 12px; font-size: 0.88rem;">
+                            </div>
+
+                            <div>
+                                <label style="display: block; font-size: 0.82rem; font-weight: 700; color: var(--text-dark); margin-bottom: 6px;">
+                                    Pekerjaan Ibu
+                                </label>
+                                <select name="pekerjaan_ibu" style="width: 100%; padding: 10px 12px; font-size: 0.88rem;">
+                                    <option value="">-- Pilih Pekerjaan Ibu --</option>
+                                    <option value="Ibu Rumah Tangga (IRT)" {{ old('pekerjaan_ibu') == 'Ibu Rumah Tangga (IRT)' ? 'selected' : '' }}>Ibu Rumah Tangga (IRT)</option>
+                                    <option value="Petani / Pekebun" {{ old('pekerjaan_ibu') == 'Petani / Pekebun' ? 'selected' : '' }}>Petani / Pekebun</option>
+                                    <option value="Wiraswasta / Pedagang" {{ old('pekerjaan_ibu') == 'Wiraswasta / Pedagang' ? 'selected' : '' }}>Wiraswasta / Pedagang</option>
+                                    <option value="Karyawan Swasta" {{ old('pekerjaan_ibu') == 'Karyawan Swasta' ? 'selected' : '' }}>Karyawan Swasta</option>
+                                    <option value="PNS / TNI / Polri" {{ old('pekerjaan_ibu') == 'PNS / TNI / Polri' ? 'selected' : '' }}>PNS / TNI / Polri</option>
+                                    <option value="Buruh Harian" {{ old('pekerjaan_ibu') == 'Buruh Harian' ? 'selected' : '' }}>Buruh Harian</option>
+                                    <option value="Tidak Bekerja / Meninggal" {{ old('pekerjaan_ibu') == 'Tidak Bekerja / Meninggal' ? 'selected' : '' }}>Tidak Bekerja / Meninggal</option>
+                                    <option value="Lainnya" {{ old('pekerjaan_ibu') == 'Lainnya' ? 'selected' : '' }}>Lainnya</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label style="display: block; font-size: 0.82rem; font-weight: 700; color: var(--text-dark); margin-bottom: 6px;">
+                                    Pendidikan Terakhir Ibu
+                                </label>
+                                <select name="pendidikan_ibu" style="width: 100%; padding: 10px 12px; font-size: 0.88rem;">
+                                    <option value="">-- Pilih Pendidikan Terakhir --</option>
+                                    <option value="SD / Sederajat" {{ old('pendidikan_ibu') == 'SD / Sederajat' ? 'selected' : '' }}>SD / Sederajat</option>
+                                    <option value="SMP / Sederajat" {{ old('pendidikan_ibu') == 'SMP / Sederajat' ? 'selected' : '' }}>SMP / Sederajat</option>
+                                    <option value="SMA / SMK / Sederajat" {{ old('pendidikan_ibu') == 'SMA / SMK / Sederajat' ? 'selected' : '' }}>SMA / SMK / Sederajat</option>
+                                    <option value="D1 / D2 / D3" {{ old('pendidikan_ibu') == 'D1 / D2 / D3' ? 'selected' : '' }}>D1 / D2 / D3</option>
+                                    <option value="S1 / D4" {{ old('pendidikan_ibu') == 'S1 / D4' ? 'selected' : '' }}>S1 / D4</option>
+                                    <option value="S2 / S3" {{ old('pendidikan_ibu') == 'S2 / S3' ? 'selected' : '' }}>S2 / S3</option>
+                                    <option value="Tidak Sekolah" {{ old('pendidikan_ibu') == 'Tidak Sekolah' ? 'selected' : '' }}>Tidak Sekolah</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label style="display: block; font-size: 0.82rem; font-weight: 700; color: var(--text-dark); margin-bottom: 6px;">
+                                    Nomor WhatsApp / HP Ibu
+                                </label>
+                                <input type="text" name="no_hp_ibu" value="{{ old('no_hp_ibu') }}" placeholder="08xxxxxxxxxx" style="width: 100%; padding: 10px 12px; font-size: 0.88rem;">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- KONTAK UTAMA NOTIFIKASI & SISWA --}}
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 18px; background: rgba(245, 158, 11, 0.06); border: 1px solid rgba(245, 158, 11, 0.2); border-radius: var(--radius-sm); padding: 16px;">
                     <div>
-                        <label style="display: block; font-size: 0.85rem; font-weight: 700; color: var(--text-dark); margin-bottom: 8px;">
-                            Nama Ibu Kandung <span style="color: #ef4444;">*</span>
+                        <label style="display: block; font-size: 0.85rem; font-weight: 700; color: var(--text-dark); margin-bottom: 6px;">
+                            <i class="fa-brands fa-whatsapp" style="color: #10b981; margin-right: 6px;"></i> Nomor WhatsApp Utama Notifikasi Kelulusan <span style="color: #ef4444;">*</span>
                         </label>
-                        <input type="text" name="nama_ibu" value="{{ old('nama_ibu') }}" required placeholder="Nama Lengkap Ibu" style="width: 100%; padding: 11px 14px; font-size: 0.9rem;">
+                        <input type="text" name="no_hp_ortu" value="{{ old('no_hp_ortu') }}" required placeholder="08xxxxxxxxxx (Nomor aktif untuk info PPDB)" style="width: 100%; padding: 11px 14px; font-size: 0.9rem; background: #fff;">
+                        <span style="display: block; font-size: 0.74rem; color: var(--text-muted); margin-top: 4px;">Dapat diisi nomor HP/WA Ayah, Ibu, atau Wali yang paling sering aktif.</span>
                     </div>
 
                     <div>
-                        <label style="display: block; font-size: 0.85rem; font-weight: 700; color: var(--text-dark); margin-bottom: 8px;">
-                            Nama Ayah
+                        <label style="display: block; font-size: 0.85rem; font-weight: 700; color: var(--text-dark); margin-bottom: 6px;">
+                            <i class="fa-solid fa-mobile-screen-button" style="color: var(--brand-blue); margin-right: 6px;"></i> Nomor WhatsApp Calon Siswa (Pribadi)
                         </label>
-                        <input type="text" name="nama_ayah" value="{{ old('nama_ayah') }}" placeholder="Nama Lengkap Ayah" style="width: 100%; padding: 11px 14px; font-size: 0.9rem;">
-                    </div>
-
-                    <div>
-                        <label style="display: block; font-size: 0.85rem; font-weight: 700; color: var(--text-dark); margin-bottom: 8px;">
-                            Nomor WhatsApp / HP Orang Tua <span style="color: #ef4444;">*</span>
-                        </label>
-                        <input type="text" name="no_hp_ortu" value="{{ old('no_hp_ortu') }}" required placeholder="08xxxxxxxxxx (Untuk notifikasi kelulusan)" style="width: 100%; padding: 11px 14px; font-size: 0.9rem;">
-                    </div>
-
-                    <div>
-                        <label style="display: block; font-size: 0.85rem; font-weight: 700; color: var(--text-dark); margin-bottom: 8px;">
-                            Nomor WhatsApp Calon Siswa
-                        </label>
-                        <input type="text" name="no_hp_siswa" value="{{ old('no_hp_siswa') }}" placeholder="08xxxxxxxxxx (Opsional)" style="width: 100%; padding: 11px 14px; font-size: 0.9rem;">
+                        <input type="text" name="no_hp_siswa" value="{{ old('no_hp_siswa') }}" placeholder="08xxxxxxxxxx (Opsional jika siswa memiliki HP)" style="width: 100%; padding: 11px 14px; font-size: 0.9rem; background: #fff;">
                     </div>
                 </div>
             </div>

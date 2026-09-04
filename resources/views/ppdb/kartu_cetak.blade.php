@@ -268,8 +268,16 @@
                     <td>: {{ $pendaftar->jurusanPilihan2->nama_jurusan ?? '-' }}</td>
                 </tr>
                 <tr>
-                    <td>Nama Orang Tua / Wali</td>
-                    <td>: {{ $pendaftar->nama_ibu ?? $pendaftar->nama_ayah }}</td>
+                    <td>Hobi & Minat Organisasi</td>
+                    <td>: {{ $pendaftar->hobi ?: '-' }} {{ $pendaftar->organisasi_minat ? ' | Minat: ' . $pendaftar->organisasi_minat : '' }}</td>
+                </tr>
+                <tr>
+                    <td>Data Ayah Kandung</td>
+                    <td>: {{ $pendaftar->nama_ayah ?: '-' }} {{ $pendaftar->pekerjaan_ayah ? '(' . $pendaftar->pekerjaan_ayah . ')' : '' }}</td>
+                </tr>
+                <tr>
+                    <td>Data Ibu Kandung</td>
+                    <td>: {{ $pendaftar->nama_ibu ?: '-' }} {{ $pendaftar->pekerjaan_ibu ? '(' . $pendaftar->pekerjaan_ibu . ')' : '' }}</td>
                 </tr>
                 <tr>
                     <td>Nomor Kontak / WhatsApp</td>

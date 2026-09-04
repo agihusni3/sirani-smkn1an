@@ -27,12 +27,20 @@ class PpdbMutasiService
             $siswa->tempat_lahir = $pendaftar->tempat_lahir;
             $siswa->tanggal_lahir = $pendaftar->tanggal_lahir;
             $siswa->agama = $pendaftar->agama;
+            $siswa->hobi = $pendaftar->hobi;
+            $siswa->organisasi_minat = $pendaftar->organisasi_minat;
             $siswa->alamat = $pendaftar->alamat;
             $siswa->nama_ayah = $pendaftar->nama_ayah;
+            $siswa->pekerjaan_ayah = $pendaftar->pekerjaan_ayah;
+            $siswa->pendidikan_ayah = $pendaftar->pendidikan_ayah;
+            $siswa->no_hp_ayah = $pendaftar->no_hp_ayah;
             $siswa->nama_ibu = $pendaftar->nama_ibu;
+            $siswa->pekerjaan_ibu = $pendaftar->pekerjaan_ibu;
+            $siswa->pendidikan_ibu = $pendaftar->pendidikan_ibu;
+            $siswa->no_hp_ibu = $pendaftar->no_hp_ibu;
             $siswa->nama_ortu = $pendaftar->nama_ibu ?? $pendaftar->nama_ayah;
             $siswa->asal_sekolah = $pendaftar->asal_sekolah;
-            $siswa->no_hp_ortu = $pendaftar->no_hp_ortu;
+            $siswa->no_hp_ortu = $pendaftar->no_hp_ortu ?: ($pendaftar->no_hp_ibu ?: $pendaftar->no_hp_ayah);
             $siswa->no_hp_siswa = $pendaftar->no_hp_siswa;
             $siswa->status = 'aktif';
             if ($pendaftar->berkas_foto && empty($siswa->foto)) {

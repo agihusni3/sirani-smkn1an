@@ -51,9 +51,17 @@ class PpdbDaftarController extends Controller
             'agama' => 'required|string|max:50',
             'asal_sekolah' => 'required|string|max:150',
             'tahun_lulus' => 'required|integer|min:2020|max:' . (date('Y') + 1),
+            'hobi' => 'nullable|string|max:100',
+            'organisasi_minat' => 'nullable|string|max:100',
             'alamat_lengkap' => 'required|string',
             'nama_ayah' => 'nullable|string|max:150',
+            'pekerjaan_ayah' => 'nullable|string|max:100',
+            'pendidikan_ayah' => 'nullable|string|max:50',
+            'no_hp_ayah' => 'nullable|string|max:25',
             'nama_ibu' => 'required|string|max:150',
+            'pekerjaan_ibu' => 'nullable|string|max:100',
+            'pendidikan_ibu' => 'nullable|string|max:50',
+            'no_hp_ibu' => 'nullable|string|max:25',
             'no_hp_siswa' => 'nullable|string|max:20',
             'no_hp_ortu' => 'required|string|max:20',
             'jurusan_pilihan_1_id' => 'required|exists:jurusans,id',
@@ -71,6 +79,7 @@ class PpdbDaftarController extends Controller
             'nisn.size' => 'NISN harus tepat 10 digit angka.',
             'nisn.unique' => 'NISN ini sudah terdaftar dalam sistem PPDB. Silakan cek status pendaftaran Anda.',
             'nama_lengkap.required' => 'Nama lengkap calon siswa wajib diisi.',
+            'nama_ibu.required' => 'Nama lengkap Ibu kandung wajib diisi.',
             'jurusan_pilihan_1_id.required' => 'Pilihan keahlian utama wajib dipilih.',
             'no_hp_ortu.required' => 'Nomor WhatsApp / HP Orang Tua wajib diisi untuk konfirmasi.',
         ]);
@@ -86,10 +95,19 @@ class PpdbDaftarController extends Controller
         $p->agama = $validated['agama'] ?? 'Islam';
         $p->asal_sekolah = $validated['asal_sekolah'];
         $p->tahun_lulus = (string) $validated['tahun_lulus'];
+        $p->hobi = $validated['hobi'] ?? null;
+        $p->organisasi_minat = $validated['organisasi_minat'] ?? null;
         $p->alamat = $validated['alamat_lengkap'];
         $p->nama_ayah = $validated['nama_ayah'] ?? null;
+        $p->pekerjaan_ayah = $validated['pekerjaan_ayah'] ?? null;
+        $p->pendidikan_ayah = $validated['pendidikan_ayah'] ?? null;
+        $p->no_hp_ayah = $validated['no_hp_ayah'] ?? null;
         $p->nama_ibu = $validated['nama_ibu'];
-        $p->no_hp_ortu = $validated['no_hp_ortu'];
+        $p->pekerjaan_ibu = $validated['pekerjaan_ibu'] ?? null;
+        $p->pendidikan_ibu = $validated['pendidikan_ibu'] ?? null;
+        $p->no_hp_ibu = $validated['no_hp_ibu'] ?? null;
+        $p->pekerjaan_ortu = $validated['pekerjaan_ayah'] ?: ($validated['pekerjaan_ibu'] ?: null);
+        $p->no_hp_ortu = $validated['no_hp_ortu'] ?: ($validated['no_hp_ibu'] ?: ($validated['no_hp_ayah'] ?: null));
         $p->no_hp_siswa = $validated['no_hp_siswa'] ?? null;
         $p->jurusan_id_1 = $validated['jurusan_pilihan_1_id'];
         $p->jurusan_id_2 = $validated['jurusan_pilihan_2_id'] ?? null;

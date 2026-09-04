@@ -87,19 +87,117 @@
               <td style="padding:6px 0;">{{ $pendaftar->alamat_lengkap }}</td>
             </tr>
             <tr>
-              <td style="padding:6px 0; color:var(--text-3);">Nama Ibu / Ayah</td>
-              <td style="padding:6px 0;">{{ $pendaftar->nama_ibu }} / {{ $pendaftar->nama_ayah ?? '-' }}</td>
+              <td style="padding:6px 0; color:var(--text-3);">Hobi Calon Siswa</td>
+              <td style="padding:6px 0;"><strong>{{ $pendaftar->hobi ?: '-' }}</strong></td>
             </tr>
             <tr>
-              <td style="padding:6px 0; color:var(--text-3);">Kontak HP Orang Tua</td>
+              <td style="padding:6px 0; color:var(--text-3);">Organisasi Diminati</td>
+              <td style="padding:6px 0;"><span class="badge" style="background:#e0e7ff; color:#3730a3; padding:3px 8px; border-radius:4px;">{{ $pendaftar->organisasi_minat ?: '-' }}</span></td>
+            </tr>
+            <tr>
+              <td style="padding:6px 0; color:var(--text-3);">No. WhatsApp Siswa</td>
               <td style="padding:6px 0;">
-                <strong>{{ $pendaftar->no_hp_ortu }}</strong>
-                <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $pendaftar->no_hp_ortu) }}" target="_blank" style="margin-left:8px; color:#16a34a; font-size:11.5px; text-decoration:none;">
-                  <i class="bi bi-whatsapp"></i> Chat WA
-                </a>
+                @if($pendaftar->no_hp_siswa)
+                  {{ $pendaftar->no_hp_siswa }}
+                  <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $pendaftar->no_hp_siswa) }}" target="_blank" style="margin-left:6px; color:#16a34a; font-size:11px; text-decoration:none;">
+                    <i class="bi bi-whatsapp"></i> Chat
+                  </a>
+                @else
+                  -
+                @endif
               </td>
             </tr>
           </table>
+        </div>
+
+        {{-- DATA ORANG TUA (AYAH & IBU TERPISAH) --}}
+        <div class="panel" style="background:var(--bg-2); border:1px solid var(--border); border-radius:var(--r-sm); padding:16px;">
+          <h3 style="font-size:14px; font-weight:800; margin-bottom:14px; color:var(--text); border-bottom:1px solid var(--border); padding-bottom:8px;">
+            <i class="bi bi-people-fill" style="color:#f59e0b;"></i> Data Orang Tua Calon Siswa (Ayah & Ibu)
+          </h3>
+
+          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:14px; margin-bottom:14px;">
+            {{-- Kartu Ayah --}}
+            <div style="border:1px solid var(--border); border-radius:8px; padding:12px; background:var(--surface);">
+              <div style="font-size:12px; font-weight:800; color:#2563eb; margin-bottom:8px; display:flex; align-items:center; gap:6px;">
+                <i class="bi bi-person-badge"></i> Data Ayah Kandung
+              </div>
+              <table style="width:100%; font-size:11.5px; border-collapse:collapse;">
+                <tr>
+                  <td style="width:110px; padding:4px 0; color:var(--text-3);">Nama Lengkap</td>
+                  <td style="padding:4px 0; font-weight:700;">{{ $pendaftar->nama_ayah ?: '-' }}</td>
+                </tr>
+                <tr>
+                  <td style="padding:4px 0; color:var(--text-3);">Pekerjaan</td>
+                  <td style="padding:4px 0;">{{ $pendaftar->pekerjaan_ayah ?: '-' }}</td>
+                </tr>
+                <tr>
+                  <td style="padding:4px 0; color:var(--text-3);">Pendidikan</td>
+                  <td style="padding:4px 0;">{{ $pendaftar->pendidikan_ayah ?: '-' }}</td>
+                </tr>
+                <tr>
+                  <td style="padding:4px 0; color:var(--text-3);">No HP / WhatsApp</td>
+                  <td style="padding:4px 0;">
+                    @if($pendaftar->no_hp_ayah)
+                      <strong>{{ $pendaftar->no_hp_ayah }}</strong>
+                      <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $pendaftar->no_hp_ayah) }}" target="_blank" style="margin-left:6px; color:#16a34a; font-size:11px; text-decoration:none;">
+                        <i class="bi bi-whatsapp"></i> Chat
+                      </a>
+                    @else
+                      -
+                    @endif
+                  </td>
+                </tr>
+              </table>
+            </div>
+
+            {{-- Kartu Ibu --}}
+            <div style="border:1px solid var(--border); border-radius:8px; padding:12px; background:var(--surface);">
+              <div style="font-size:12px; font-weight:800; color:#db2777; margin-bottom:8px; display:flex; align-items:center; gap:6px;">
+                <i class="bi bi-person-heart"></i> Data Ibu Kandung
+              </div>
+              <table style="width:100%; font-size:11.5px; border-collapse:collapse;">
+                <tr>
+                  <td style="width:110px; padding:4px 0; color:var(--text-3);">Nama Lengkap</td>
+                  <td style="padding:4px 0; font-weight:700;">{{ $pendaftar->nama_ibu ?: '-' }}</td>
+                </tr>
+                <tr>
+                  <td style="padding:4px 0; color:var(--text-3);">Pekerjaan</td>
+                  <td style="padding:4px 0;">{{ $pendaftar->pekerjaan_ibu ?: '-' }}</td>
+                </tr>
+                <tr>
+                  <td style="padding:4px 0; color:var(--text-3);">Pendidikan</td>
+                  <td style="padding:4px 0;">{{ $pendaftar->pendidikan_ibu ?: '-' }}</td>
+                </tr>
+                <tr>
+                  <td style="padding:4px 0; color:var(--text-3);">No HP / WhatsApp</td>
+                  <td style="padding:4px 0;">
+                    @if($pendaftar->no_hp_ibu)
+                      <strong>{{ $pendaftar->no_hp_ibu }}</strong>
+                      <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $pendaftar->no_hp_ibu) }}" target="_blank" style="margin-left:6px; color:#16a34a; font-size:11px; text-decoration:none;">
+                        <i class="bi bi-whatsapp"></i> Chat
+                      </a>
+                    @else
+                      -
+                    @endif
+                  </td>
+                </tr>
+              </table>
+            </div>
+          </div>
+
+          {{-- Kontak Notifikasi Utama --}}
+          <div style="background:rgba(245, 158, 11, 0.08); border:1px solid rgba(245, 158, 11, 0.25); border-radius:6px; padding:10px 14px; display:flex; justify-content:space-between; align-items:center; font-size:12px;">
+            <div>
+              <span style="color:var(--text-3);">Kontak Utama Notifikasi PPDB:</span>
+              <strong style="margin-left:6px;">{{ $pendaftar->no_hp_ortu }}</strong>
+            </div>
+            @if($pendaftar->no_hp_ortu)
+              <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $pendaftar->no_hp_ortu) }}" target="_blank" class="btn btn-sm" style="background:#16a34a; color:#fff; font-size:11px; padding:4px 10px; border-radius:4px; text-decoration:none;">
+                <i class="bi bi-whatsapp"></i> Hubungi WhatsApp Utama
+              </a>
+            @endif
+          </div>
         </div>
 
         {{-- BERKAS LAMPIRAN --}}

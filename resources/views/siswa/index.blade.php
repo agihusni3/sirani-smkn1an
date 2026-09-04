@@ -205,48 +205,102 @@
                 <option value="Khonghucu">Khonghucu</option>
               </select>
             </div>
+
+            <div class="form-group" style="margin-bottom:0;">
+              <label style="margin-bottom:4px; font-weight:700; font-size:11.5px; text-transform:uppercase; letter-spacing:0.3px; color:var(--text-2);">
+                Hobi Siswa
+              </label>
+              <input type="text" name="hobi" placeholder="Contoh: Membaca, Olahraga, Musik..." style="width:100%; height:38px;" />
+            </div>
+
+            <div class="form-group" style="margin-bottom:0;">
+              <label style="margin-bottom:4px; font-weight:700; font-size:11.5px; text-transform:uppercase; letter-spacing:0.3px; color:var(--text-2);">
+                Organisasi Diminati
+              </label>
+              <input type="text" name="organisasi_minat" placeholder="Contoh: OSIS, Pramuka, PMR, Rohis..." style="width:100%; height:38px;" />
+            </div>
           </div>
         </div>
 
-        {{-- Seksi 3: Orang Tua / Wali & Kontak --}}
+        {{-- Seksi 3: Orang Tua (Ayah & Ibu) & Kontak WhatsApp --}}
         <div style="margin-bottom:16px; padding-top:12px; border-top:1px dashed var(--border);">
           <div style="font-size:12px; font-weight:800; color:var(--text); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:10px; display:flex; align-items:center; gap:6px;">
-            <span style="width:6px; height:6px; border-radius:50%; background:var(--brand-amber, #d97706);"></span> Orang Tua / Wali & Kontak WhatsApp
+            <span style="width:6px; height:6px; border-radius:50%; background:var(--brand-amber, #d97706);"></span> Orang Tua (Ayah & Ibu) & Kontak WhatsApp
           </div>
-          <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap:12px;">
+          
+          <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap:14px; margin-bottom:12px;">
+            {{-- Data Ayah --}}
+            <div style="background:var(--surface); border:1px solid var(--border); border-radius:6px; padding:12px;">
+              <div style="font-size:11.5px; font-weight:800; color:#2563eb; margin-bottom:8px;">
+                <i class="bi bi-person-badge"></i> Data Ayah Kandung
+              </div>
+              <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+                <div style="grid-column:1 / -1;">
+                  <label style="margin-bottom:2px; font-weight:600; font-size:10.5px; color:var(--text-2);">Nama Ayah</label>
+                  <input type="text" name="nama_ayah" placeholder="Nama ayah..." style="width:100%; height:34px; font-size:12px;" />
+                </div>
+                <div>
+                  <label style="margin-bottom:2px; font-weight:600; font-size:10.5px; color:var(--text-2);">Pekerjaan</label>
+                  <input type="text" name="pekerjaan_ayah" placeholder="Petani, Wiraswasta, PNS..." style="width:100%; height:34px; font-size:12px;" />
+                </div>
+                <div>
+                  <label style="margin-bottom:2px; font-weight:600; font-size:10.5px; color:var(--text-2);">Pendidikan</label>
+                  <input type="text" name="pendidikan_ayah" placeholder="SD, SMP, SMA, S1..." style="width:100%; height:34px; font-size:12px;" />
+                </div>
+                <div style="grid-column:1 / -1;">
+                  <label style="margin-bottom:2px; font-weight:600; font-size:10.5px; color:var(--text-2);">No HP / WA Ayah</label>
+                  <input type="text" name="no_hp_ayah" placeholder="08xxxxxxxxxx" style="width:100%; height:34px; font-size:12px;" />
+                </div>
+              </div>
+            </div>
+
+            {{-- Data Ibu --}}
+            <div style="background:var(--surface); border:1px solid var(--border); border-radius:6px; padding:12px;">
+              <div style="font-size:11.5px; font-weight:800; color:#db2777; margin-bottom:8px;">
+                <i class="bi bi-person-heart"></i> Data Ibu Kandung
+              </div>
+              <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+                <div style="grid-column:1 / -1;">
+                  <label style="margin-bottom:2px; font-weight:600; font-size:10.5px; color:var(--text-2);">Nama Ibu</label>
+                  <input type="text" name="nama_ibu" placeholder="Nama ibu..." style="width:100%; height:34px; font-size:12px;" />
+                </div>
+                <div>
+                  <label style="margin-bottom:2px; font-weight:600; font-size:10.5px; color:var(--text-2);">Pekerjaan</label>
+                  <input type="text" name="pekerjaan_ibu" placeholder="IRT, Petani, Pedagang..." style="width:100%; height:34px; font-size:12px;" />
+                </div>
+                <div>
+                  <label style="margin-bottom:2px; font-weight:600; font-size:10.5px; color:var(--text-2);">Pendidikan</label>
+                  <input type="text" name="pendidikan_ibu" placeholder="SD, SMP, SMA, S1..." style="width:100%; height:34px; font-size:12px;" />
+                </div>
+                <div style="grid-column:1 / -1;">
+                  <label style="margin-bottom:2px; font-weight:600; font-size:10.5px; color:var(--text-2);">No HP / WA Ibu</label>
+                  <input type="text" name="no_hp_ibu" placeholder="08xxxxxxxxxx" style="width:100%; height:34px; font-size:12px;" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {{-- Kontak Notifikasi & Siswa --}}
+          <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:10px;">
             <div class="form-group" style="margin-bottom:0;">
-              <label style="margin-bottom:4px; font-weight:700; font-size:11.5px; text-transform:uppercase; letter-spacing:0.3px; color:var(--text-2);">
-                Nama Ayah Kandung
+              <label style="margin-bottom:4px; font-weight:700; font-size:11px; text-transform:uppercase; color:var(--text-2);">
+                Nama Wali / Kontak Tambahan
               </label>
-              <input type="text" name="nama_ayah" placeholder="Nama ayah..." style="width:100%; height:38px;" />
+              <input type="text" name="nama_ortu" placeholder="Opsional jika diasuh wali..." style="width:100%; height:36px;" />
             </div>
 
             <div class="form-group" style="margin-bottom:0;">
-              <label style="margin-bottom:4px; font-weight:700; font-size:11.5px; text-transform:uppercase; letter-spacing:0.3px; color:var(--text-2);">
-                Nama Ibu Kandung
+              <label style="margin-bottom:4px; font-weight:700; font-size:11px; text-transform:uppercase; color:var(--text-2);">
+                No. WA Utama Presensi <span style="color:#059669; font-size:10px;">(Notif Sekolah)</span>
               </label>
-              <input type="text" name="nama_ibu" placeholder="Nama ibu..." style="width:100%; height:38px;" />
+              <input type="text" name="no_hp_ortu" placeholder="08xxxxxxxxxx" style="width:100%; height:36px;" />
             </div>
 
             <div class="form-group" style="margin-bottom:0;">
-              <label style="margin-bottom:4px; font-weight:700; font-size:11.5px; text-transform:uppercase; letter-spacing:0.3px; color:var(--text-2);">
-                Nama Wali / Ortu Tambahan
-              </label>
-              <input type="text" name="nama_ortu" placeholder="Opsional jika diasuh wali..." style="width:100%; height:38px;" />
-            </div>
-
-            <div class="form-group" style="margin-bottom:0;">
-              <label style="margin-bottom:4px; font-weight:700; font-size:11.5px; text-transform:uppercase; letter-spacing:0.3px; color:var(--text-2);">
-                No. WhatsApp Orang Tua <span style="color:#059669; font-size:10px;">(Notif WA)</span>
-              </label>
-              <input type="text" name="no_hp_ortu" placeholder="08xxxxxxxxxx" style="width:100%; height:38px;" />
-            </div>
-
-            <div class="form-group" style="margin-bottom:0;">
-              <label style="margin-bottom:4px; font-weight:700; font-size:11.5px; text-transform:uppercase; letter-spacing:0.3px; color:var(--text-2);">
+              <label style="margin-bottom:4px; font-weight:700; font-size:11px; text-transform:uppercase; color:var(--text-2);">
                 No. WhatsApp Siswa (Pribadi)
               </label>
-              <input type="text" name="no_hp_siswa" placeholder="08xxxxxxxxxx (Opsional)" style="width:100%; height:38px;" />
+              <input type="text" name="no_hp_siswa" placeholder="08xxxxxxxxxx (Opsional)" style="width:100%; height:36px;" />
             </div>
           </div>
         </div>
@@ -658,34 +712,59 @@
                 <option value="Khonghucu">Khonghucu</option>
               </select>
             </div>
+            <div>
+              <label class="form-label" style="font-weight:700; font-size:11.5px; display:block; margin-bottom:4px;">Hobi Siswa</label>
+              <input type="text" id="edit_hobi" name="hobi" placeholder="Membaca, Olahraga, Musik..." class="input-field" style="width:100%; height:38px;" />
+            </div>
+            <div>
+              <label class="form-label" style="font-weight:700; font-size:11.5px; display:block; margin-bottom:4px;">Organisasi Diminati</label>
+              <input type="text" id="edit_organisasi_minat" name="organisasi_minat" placeholder="OSIS, Pramuka, PMR..." class="input-field" style="width:100%; height:38px;" />
+            </div>
           </div>
         </div>
 
-        {{-- Seksi 3: Orang Tua / Wali & Kontak --}}
+        {{-- Seksi 3: Orang Tua (Ayah & Ibu) & Kontak --}}
         <div style="padding-top:10px; border-top:1px dashed var(--border);">
           <div style="font-size:11.5px; font-weight:800; color:var(--text); text-transform:uppercase; letter-spacing:0.4px; margin-bottom:8px; display:flex; align-items:center; gap:6px;">
-            <span style="width:6px; height:6px; border-radius:50%; background:var(--brand-amber, #d97706);"></span> Orang Tua / Wali & Kontak WhatsApp
+            <span style="width:6px; height:6px; border-radius:50%; background:var(--brand-amber, #d97706);"></span> Orang Tua (Ayah & Ibu) & Kontak WhatsApp
           </div>
-          <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap:10px;">
+
+          <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap:12px; margin-bottom:10px;">
+            {{-- Ayah --}}
+            <div style="background:var(--bg-2); border:1px solid var(--border); border-radius:6px; padding:10px;">
+              <div style="font-size:11px; font-weight:800; color:#2563eb; margin-bottom:6px;"><i class="bi bi-person-badge"></i> Ayah Kandung</div>
+              <div style="display:flex; flex-direction:column; gap:6px;">
+                <input type="text" id="edit_nama_ayah" name="nama_ayah" placeholder="Nama ayah..." class="input-field" style="width:100%; height:32px; font-size:12px;" />
+                <input type="text" id="edit_pekerjaan_ayah" name="pekerjaan_ayah" placeholder="Pekerjaan ayah..." class="input-field" style="width:100%; height:32px; font-size:12px;" />
+                <input type="text" id="edit_pendidikan_ayah" name="pendidikan_ayah" placeholder="Pendidikan ayah..." class="input-field" style="width:100%; height:32px; font-size:12px;" />
+                <input type="text" id="edit_no_hp_ayah" name="no_hp_ayah" placeholder="No HP/WA ayah..." class="input-field" style="width:100%; height:32px; font-size:12px;" />
+              </div>
+            </div>
+
+            {{-- Ibu --}}
+            <div style="background:var(--bg-2); border:1px solid var(--border); border-radius:6px; padding:10px;">
+              <div style="font-size:11px; font-weight:800; color:#db2777; margin-bottom:6px;"><i class="bi bi-person-heart"></i> Ibu Kandung</div>
+              <div style="display:flex; flex-direction:column; gap:6px;">
+                <input type="text" id="edit_nama_ibu" name="nama_ibu" placeholder="Nama ibu..." class="input-field" style="width:100%; height:32px; font-size:12px;" />
+                <input type="text" id="edit_pekerjaan_ibu" name="pekerjaan_ibu" placeholder="Pekerjaan ibu..." class="input-field" style="width:100%; height:32px; font-size:12px;" />
+                <input type="text" id="edit_pendidikan_ibu" name="pendidikan_ibu" placeholder="Pendidikan ibu..." class="input-field" style="width:100%; height:32px; font-size:12px;" />
+                <input type="text" id="edit_no_hp_ibu" name="no_hp_ibu" placeholder="No HP/WA ibu..." class="input-field" style="width:100%; height:32px; font-size:12px;" />
+              </div>
+            </div>
+          </div>
+
+          <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap:10px;">
             <div>
-              <label class="form-label" style="font-weight:700; font-size:11.5px; display:block; margin-bottom:4px;">Nama Ayah Kandung</label>
-              <input type="text" id="edit_nama_ayah" name="nama_ayah" class="input-field" style="width:100%; height:38px;" />
+              <label class="form-label" style="font-weight:700; font-size:11px; display:block; margin-bottom:4px;">Nama Wali / Kontak</label>
+              <input type="text" id="edit_nama_ortu" name="nama_ortu" class="input-field" style="width:100%; height:36px;" />
             </div>
             <div>
-              <label class="form-label" style="font-weight:700; font-size:11.5px; display:block; margin-bottom:4px;">Nama Ibu Kandung</label>
-              <input type="text" id="edit_nama_ibu" name="nama_ibu" class="input-field" style="width:100%; height:38px;" />
+              <label class="form-label" style="font-weight:700; font-size:11px; display:block; margin-bottom:4px;">No. WA Utama Sekolah</label>
+              <input type="text" id="edit_no_hp_ortu" name="no_hp_ortu" class="input-field" style="width:100%; height:36px;" />
             </div>
             <div>
-              <label class="form-label" style="font-weight:700; font-size:11.5px; display:block; margin-bottom:4px;">Nama Wali / Ortu</label>
-              <input type="text" id="edit_nama_ortu" name="nama_ortu" class="input-field" style="width:100%; height:38px;" />
-            </div>
-            <div>
-              <label class="form-label" style="font-weight:700; font-size:11.5px; display:block; margin-bottom:4px;">No. WA Orang Tua <span style="color:#059669; font-size:10px;">(Notif WA)</span></label>
-              <input type="text" id="edit_no_hp_ortu" name="no_hp_ortu" class="input-field" style="width:100%; height:38px;" />
-            </div>
-            <div>
-              <label class="form-label" style="font-weight:700; font-size:11.5px; display:block; margin-bottom:4px;">No. WA Siswa (Pribadi)</label>
-              <input type="text" id="edit_no_hp_siswa" name="no_hp_siswa" placeholder="08xxxxxxxxxx" class="input-field" style="width:100%; height:38px;" />
+              <label class="form-label" style="font-weight:700; font-size:11px; display:block; margin-bottom:4px;">No. WA Siswa Pribadi</label>
+              <input type="text" id="edit_no_hp_siswa" name="no_hp_siswa" placeholder="08xxxxxxxxxx" class="input-field" style="width:100%; height:36px;" />
             </div>
           </div>
         </div>
@@ -806,8 +885,16 @@
     document.getElementById('edit_tempat_lahir').value = siswa.tempat_lahir || '';
     document.getElementById('edit_tanggal_lahir').value = siswa.tanggal_lahir ? siswa.tanggal_lahir.substring(0, 10) : '';
     document.getElementById('edit_agama').value = siswa.agama || '';
+    document.getElementById('edit_hobi').value = siswa.hobi || '';
+    document.getElementById('edit_organisasi_minat').value = siswa.organisasi_minat || '';
     document.getElementById('edit_nama_ayah').value = siswa.nama_ayah || '';
+    document.getElementById('edit_pekerjaan_ayah').value = siswa.pekerjaan_ayah || '';
+    document.getElementById('edit_pendidikan_ayah').value = siswa.pendidikan_ayah || '';
+    document.getElementById('edit_no_hp_ayah').value = siswa.no_hp_ayah || '';
     document.getElementById('edit_nama_ibu').value = siswa.nama_ibu || '';
+    document.getElementById('edit_pekerjaan_ibu').value = siswa.pekerjaan_ibu || '';
+    document.getElementById('edit_pendidikan_ibu').value = siswa.pendidikan_ibu || '';
+    document.getElementById('edit_no_hp_ibu').value = siswa.no_hp_ibu || '';
     document.getElementById('edit_nama_ortu').value = siswa.nama_ortu || '';
     document.getElementById('edit_no_hp_ortu').value = siswa.no_hp_ortu || '';
     document.getElementById('edit_no_hp_siswa').value = siswa.no_hp_siswa || '';
