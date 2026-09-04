@@ -14,6 +14,7 @@ class WebsiteBanner extends Model
 
     protected $fillable = [
         'posisi',
+        'posisi_teks',
         'judul',
         'subjudul',
         'badge_text',
@@ -55,6 +56,9 @@ class WebsiteBanner extends Model
     {
         if ($this->gambar && Storage::disk('public')->exists($this->gambar)) {
             return Storage::disk('public')->url($this->gambar);
+        }
+        if ($this->urutan % 2 === 0 && file_exists(public_path('images/web/jurusan_rpl.jpg'))) {
+            return asset('images/web/jurusan_rpl.jpg');
         }
         return asset('images/web/hero_kampus.jpg');
     }

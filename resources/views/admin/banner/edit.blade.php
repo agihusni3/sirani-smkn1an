@@ -5,6 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Edit Hero &amp; Banner — SIRANI SMKN 1 Air Naningan</title>
   @include('partials.styles')
+  <style>
+    .posisi-teks-radio:checked + .posisi-card {
+      border-color: var(--brand) !important;
+      background: rgba(37, 99, 235, 0.08) !important;
+      box-shadow: 0 0 0 1px var(--brand);
+    }
+  </style>
 </head>
 <body>
 <div class="app-container">
@@ -44,7 +51,7 @@
               Posisi Penempatan <span style="color:#ef4444;">*</span>
             </label>
             <select name="posisi" required style="width:100%; padding:9px 12px; font-size:13px; border-radius:6px; border:1px solid var(--border); background:var(--surface); color:var(--text);">
-              <option value="hero_home" {{ old('posisi', $banner->posisi) == 'hero_home' ? 'selected' : '' }}>Hero Utama Beranda Web (Workshop Stage)</option>
+              <option value="hero_home" {{ old('posisi', $banner->posisi) == 'hero_home' ? 'selected' : '' }}>Hero Utama Beranda Web (Full Photo Slider)</option>
               <option value="top_bar" {{ old('posisi', $banner->posisi) == 'top_bar' ? 'selected' : '' }}>Top Bar Pengumuman</option>
               <option value="popup_modal" {{ old('posisi', $banner->posisi) == 'popup_modal' ? 'selected' : '' }}>Modal Pengumuman Penting</option>
             </select>
@@ -55,6 +62,44 @@
               Urutan Tampil <span style="color:#ef4444;">*</span>
             </label>
             <input type="number" name="urutan" value="{{ old('urutan', $banner->urutan) }}" min="1" required style="width:100%; padding:9px 12px; font-size:13px; border-radius:6px; border:1px solid var(--border); background:var(--surface); color:var(--text);">
+          </div>
+        </div>
+
+        {{-- Tata Letak Tulisan (Posisi Teks di Hero) --}}
+        <div style="margin-bottom:18px; padding:16px; background:var(--surface); border:1px solid var(--border); border-radius:8px;">
+          <label style="display:block; font-size:12px; font-weight:800; color:var(--text); margin-bottom:6px;">
+            <i class="bi bi-text-paragraph"></i> Tata Letak Tulisan di Dalam Hero Banner <span style="color:#ef4444;">*</span>
+          </label>
+          <div style="font-size:11.5px; color:var(--text-3); margin-bottom:12px;">
+            Atur letak tulisan dan tombol di atas foto agar tidak menutupi objek utama pada foto banner.
+          </div>
+          <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:12px;">
+            <label style="display:block; cursor:pointer;">
+              <input type="radio" name="posisi_teks" value="left" {{ old('posisi_teks', $banner->posisi_teks ?: 'left') === 'left' ? 'checked' : '' }} style="display:none;" class="posisi-teks-radio">
+              <div class="posisi-card" style="border:2px solid var(--border); border-radius:8px; padding:12px; text-align:center; transition:all 0.2s;">
+                <div style="font-size:22px; color:var(--brand); margin-bottom:4px;"><i class="bi bi-text-left"></i></div>
+                <div style="font-weight:700; font-size:12.5px; color:var(--text);">Rata Kiri (Left)</div>
+                <div style="font-size:11px; color:var(--text-3); margin-top:2px;">Teks di kiri, foto dominan di kanan</div>
+              </div>
+            </label>
+
+            <label style="display:block; cursor:pointer;">
+              <input type="radio" name="posisi_teks" value="center" {{ old('posisi_teks', $banner->posisi_teks) === 'center' ? 'checked' : '' }} style="display:none;" class="posisi-teks-radio">
+              <div class="posisi-card" style="border:2px solid var(--border); border-radius:8px; padding:12px; text-align:center; transition:all 0.2s;">
+                <div style="font-size:22px; color:var(--brand); margin-bottom:4px;"><i class="bi bi-text-center"></i></div>
+                <div style="font-weight:700; font-size:12.5px; color:var(--text);">Rata Tengah (Center)</div>
+                <div style="font-size:11px; color:var(--text-3); margin-top:2px;">Teks terpusat simetris di tengah</div>
+              </div>
+            </label>
+
+            <label style="display:block; cursor:pointer;">
+              <input type="radio" name="posisi_teks" value="right" {{ old('posisi_teks', $banner->posisi_teks) === 'right' ? 'checked' : '' }} style="display:none;" class="posisi-teks-radio">
+              <div class="posisi-card" style="border:2px solid var(--border); border-radius:8px; padding:12px; text-align:center; transition:all 0.2s;">
+                <div style="font-size:22px; color:var(--brand); margin-bottom:4px;"><i class="bi bi-text-right"></i></div>
+                <div style="font-weight:700; font-size:12.5px; color:var(--text);">Rata Kanan (Right)</div>
+                <div style="font-size:11px; color:var(--text-3); margin-top:2px;">Teks di kanan, foto dominan di kiri</div>
+              </div>
+            </label>
           </div>
         </div>
 

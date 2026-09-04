@@ -36,6 +36,7 @@ class WebsiteBannerController extends Controller
     {
         $validated = $request->validate([
             'posisi'         => 'required|string|in:hero_home,top_bar,popup_modal',
+            'posisi_teks'    => 'nullable|string|in:left,center,right',
             'judul'          => 'required|string|max:255',
             'subjudul'       => 'nullable|string|max:600',
             'badge_text'     => 'nullable|string|max:100',
@@ -47,6 +48,7 @@ class WebsiteBannerController extends Controller
             'urutan'         => 'required|integer|min:1',
             'gambar'         => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120',
         ]);
+        $validated['posisi_teks'] = $request->input('posisi_teks', 'left');
 
         if ($request->hasFile('gambar')) {
             $validated['gambar'] = $request->file('gambar')->store('banners', 'public');
@@ -75,6 +77,7 @@ class WebsiteBannerController extends Controller
     {
         $validated = $request->validate([
             'posisi'         => 'required|string|in:hero_home,top_bar,popup_modal',
+            'posisi_teks'    => 'nullable|string|in:left,center,right',
             'judul'          => 'required|string|max:255',
             'subjudul'       => 'nullable|string|max:600',
             'badge_text'     => 'nullable|string|max:100',
@@ -86,6 +89,7 @@ class WebsiteBannerController extends Controller
             'urutan'         => 'required|integer|min:1',
             'gambar'         => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120',
         ]);
+        $validated['posisi_teks'] = $request->input('posisi_teks', 'left');
 
         if ($request->hasFile('gambar')) {
             // Hapus gambar lama jika ada di disk

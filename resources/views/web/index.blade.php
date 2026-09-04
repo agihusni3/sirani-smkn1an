@@ -5,93 +5,383 @@
 
 @push('styles')
 <style>
-    /* ── Precision Workshop Styling ── */
-    .hero-stage {
-        background: #ffffff;
-        border: 1px solid var(--border-main);
-        border-radius: var(--radius-xl);
-        overflow: hidden;
-        margin-top: 28px;
-        margin-bottom: 40px;
-        box-shadow: var(--shadow-card);
-    }
-
-    .hero-stage-grid {
-        display: grid;
-        grid-template-columns: 1.25fr 1fr;
-        min-height: 520px;
-    }
-
-    .hero-stage-left {
-        padding: clamp(36px, 5vw, 64px);
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-    }
-
-    .hero-badge-industrial {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        padding: 6px 14px;
-        background: var(--bg-surface-alt);
-        border: 1px solid var(--border-main);
-        border-radius: 30px;
-        font-family: var(--font-tech);
-        font-size: 0.78rem;
-        font-weight: 700;
-        color: var(--text-dark);
-        letter-spacing: 0.04em;
-        margin-bottom: 24px;
-        width: fit-content;
-    }
-
-    .hero-main-title {
-        font-size: clamp(2.2rem, 4vw, 3.4rem);
-        font-weight: 800;
-        color: var(--text-dark);
-        line-height: 1.1;
-        letter-spacing: -0.035em;
-        margin-bottom: 20px;
-    }
-
-    .hero-lead-text {
-        font-size: 1.05rem;
-        color: var(--text-body);
-        line-height: 1.65;
-        max-width: 580px;
-        margin-bottom: 32px;
-    }
-
-    .hero-stage-right {
+    /* ═══ FULL PHOTO HERO BANNER SLIDER ═══ */
+    .hero-full-wrapper {
         position: relative;
-        background: #0f172a;
+        margin-top: 24px;
+        margin-bottom: 40px;
+        border-radius: 24px;
+        overflow: hidden;
+        box-shadow: 0 20px 40px -15px rgba(15, 23, 42, 0.18);
+        background: #090d16;
+        border: 1px solid rgba(226, 232, 240, 0.8);
+    }
+
+    .hero-full-slider {
+        position: relative;
+        width: 100%;
+        min-height: 560px;
+        height: 580px;
+        max-height: 82vh;
         overflow: hidden;
     }
 
-    .hero-stage-right img {
+    .hero-full-slide {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        transform: scale(1.02);
+        display: flex;
+        align-items: center;
+        z-index: 1;
+    }
+
+    .hero-full-slide.active {
+        opacity: 1;
+        visibility: visible;
+        transform: scale(1);
+        z-index: 2;
+    }
+
+    /* Background Full Photo */
+    .hero-full-photo {
+        position: absolute;
+        inset: 0;
         width: 100%;
         height: 100%;
         object-fit: cover;
-        opacity: 0.92;
-        transition: transform 0.6s ease;
+        object-position: center 35%;
+        z-index: 1;
+        transition: transform 8s ease;
     }
 
-    .hero-stage-right:hover img {
-        transform: scale(1.03);
+    .hero-full-slide.active .hero-full-photo {
+        transform: scale(1.04);
     }
 
-    .hero-stage-overlay-tag {
+    /* Dynamic Scrim Overlays based on Text Alignment */
+    .hero-scrim-overlay {
+        position: absolute;
+        inset: 0;
+        z-index: 2;
+        pointer-events: none;
+    }
+
+    /* Tata Letak 1: Kiri (Left Alignment) */
+    .hero-scrim-left {
+        background: 
+            linear-gradient(90deg, rgba(15, 23, 42, 0.94) 0%, rgba(15, 23, 42, 0.78) 42%, rgba(15, 23, 42, 0.3) 75%, rgba(15, 23, 42, 0.1) 100%),
+            linear-gradient(0deg, rgba(15, 23, 42, 0.7) 0%, transparent 40%);
+    }
+
+    /* Tata Letak 2: Tengah (Center Alignment) */
+    .hero-scrim-center {
+        background: 
+            radial-gradient(ellipse at center, rgba(15, 23, 42, 0.62) 0%, rgba(15, 23, 42, 0.88) 100%),
+            linear-gradient(180deg, rgba(15, 23, 42, 0.4) 0%, rgba(15, 23, 42, 0.8) 100%);
+    }
+
+    /* Tata Letak 3: Kanan (Right Alignment) */
+    .hero-scrim-right {
+        background: 
+            linear-gradient(270deg, rgba(15, 23, 42, 0.94) 0%, rgba(15, 23, 42, 0.78) 42%, rgba(15, 23, 42, 0.3) 75%, rgba(15, 23, 42, 0.1) 100%),
+            linear-gradient(0deg, rgba(15, 23, 42, 0.7) 0%, transparent 40%);
+    }
+
+    /* Inner Narrative Container */
+    .hero-full-content-box {
+        position: relative;
+        z-index: 3;
+        width: 100%;
+        padding: 55px 76px;
+    }
+
+    /* Text Alignments */
+    .hero-text-align-left {
+        max-width: 680px;
+        margin-right: auto;
+        text-align: left;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .hero-text-align-center {
+        max-width: 820px;
+        margin: 0 auto;
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .hero-text-align-right {
+        max-width: 680px;
+        margin-left: auto;
+        text-align: right;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+    }
+
+    /* Badge */
+    .hero-pill-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 16px;
+        background: rgba(255, 255, 255, 0.14);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        border-radius: 9999px;
+        font-family: var(--font-tech);
+        font-size: 0.78rem;
+        font-weight: 700;
+        color: #ffffff;
+        letter-spacing: 0.05em;
+        margin-bottom: 20px;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+    }
+
+    .hero-pill-badge i {
+        color: #38bdf8;
+    }
+
+    /* Headline Title */
+    .hero-banner-title {
+        font-size: clamp(2.2rem, 4.2vw, 3.4rem);
+        font-weight: 800;
+        color: #ffffff;
+        line-height: 1.15;
+        letter-spacing: -0.025em;
+        margin-bottom: 18px;
+        text-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    }
+
+    /* Subtitle */
+    .hero-banner-sub {
+        font-size: clamp(0.98rem, 1.6vw, 1.15rem);
+        color: rgba(241, 245, 249, 0.94);
+        line-height: 1.65;
+        margin-bottom: 32px;
+        text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+        max-width: 640px;
+    }
+
+    /* Button Group */
+    .hero-btn-group {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 14px;
+        align-items: center;
+    }
+
+    .hero-text-align-center .hero-btn-group {
+        justify-content: center;
+    }
+
+    .hero-text-align-right .hero-btn-group {
+        justify-content: flex-end;
+    }
+
+    .btn-hero-solid {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        background: #2563eb;
+        color: #ffffff;
+        font-size: 0.95rem;
+        font-weight: 700;
+        padding: 13px 26px;
+        border-radius: 12px;
+        text-decoration: none;
+        box-shadow: 0 10px 25px -4px rgba(37, 99, 235, 0.55);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .btn-hero-solid:hover {
+        background: #1d4ed8;
+        transform: translateY(-2px);
+        box-shadow: 0 14px 30px -4px rgba(37, 99, 235, 0.7);
+        color: #ffffff;
+    }
+
+    .btn-hero-glass {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        background: rgba(255, 255, 255, 0.16);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        color: #ffffff;
+        font-size: 0.95rem;
+        font-weight: 700;
+        padding: 13px 26px;
+        border-radius: 12px;
+        text-decoration: none;
+        border: 1px solid rgba(255, 255, 255, 0.35);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .btn-hero-glass:hover {
+        background: rgba(255, 255, 255, 0.28);
+        border-color: rgba(255, 255, 255, 0.6);
+        transform: translateY(-2px);
+        color: #ffffff;
+    }
+
+    /* Prev & Next Floating Navigation Arrows */
+    .hero-slider-nav-btn {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        background: rgba(15, 23, 42, 0.5);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.25);
+        color: #ffffff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.1rem;
+        cursor: pointer;
+        z-index: 10;
+        transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .hero-slider-nav-btn:hover {
+        background: #2563eb;
+        border-color: #3b82f6;
+        transform: translateY(-50%) scale(1.1);
+        box-shadow: 0 8px 24px rgba(37, 99, 235, 0.4);
+    }
+
+    .hero-slider-nav-btn.prev {
+        left: 24px;
+    }
+
+    .hero-slider-nav-btn.next {
+        right: 24px;
+    }
+
+    /* Bottom Slider Indicator Bar */
+    .hero-slider-indicator-bar {
         position: absolute;
         bottom: 24px;
-        left: 24px;
-        right: 24px;
-        background: rgba(15, 23, 42, 0.85);
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 10;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        background: rgba(15, 23, 42, 0.6);
         backdrop-filter: blur(12px);
-        border: 1px solid rgba(255, 255, 255, 0.15);
-        border-radius: 12px;
-        padding: 14px 18px;
-        color: #ffffff;
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        padding: 6px 18px;
+        border-radius: 9999px;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+    }
+
+    .hero-indicator-dots {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .hero-indicator-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 9999px;
+        background: rgba(255, 255, 255, 0.35);
+        border: none;
+        padding: 0;
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .hero-indicator-dot.active {
+        width: 26px;
+        background: #38bdf8;
+    }
+
+    .hero-slide-num {
+        font-family: var(--font-tech);
+        font-size: 0.76rem;
+        font-weight: 700;
+        color: #e2e8f0;
+        letter-spacing: 0.05em;
+    }
+
+    /* Mobile Responsive for Full Slider */
+    @media (max-width: 900px) {
+        .hero-full-slider {
+            height: auto;
+            min-height: 520px;
+        }
+        .hero-full-content-box {
+            padding: 44px 32px;
+        }
+        .hero-slider-nav-btn {
+            display: none;
+        }
+    }
+
+    @media (max-width: 640px) {
+        .hero-full-wrapper {
+            margin-top: 14px;
+            margin-bottom: 28px;
+            border-radius: 18px;
+        }
+        .hero-full-slider {
+            min-height: 500px;
+        }
+        .hero-full-content-box {
+            padding: 46px 20px 76px 20px !important;
+        }
+        .hero-scrim-left,
+        .hero-scrim-center,
+        .hero-scrim-right {
+            background: 
+                linear-gradient(180deg, rgba(15, 23, 42, 0.88) 0%, rgba(15, 23, 42, 0.65) 50%, rgba(15, 23, 42, 0.94) 100%) !important;
+        }
+        .hero-banner-title {
+            font-size: 1.85rem !important;
+        }
+        .hero-banner-sub {
+            font-size: 0.92rem !important;
+        }
+        .hero-text-align-left,
+        .hero-text-align-center,
+        .hero-text-align-right {
+            max-width: 100% !important;
+            text-align: left !important;
+            align-items: flex-start !important;
+            margin-left: 0 !important;
+            margin-right: 0 !important;
+        }
+        .hero-btn-group {
+            width: 100%;
+            flex-direction: column;
+            align-items: stretch !important;
+        }
+        .btn-hero-solid, .btn-hero-glass {
+            justify-content: center;
+            width: 100%;
+        }
+        .hero-slider-indicator-bar {
+            bottom: 16px;
+        }
     }
 
     /* Workshop Telemetry Bar */
@@ -294,207 +584,116 @@
         .ppdb-banner-box { padding: 28px 18px !important; }
     }
 
-    /* Hero Multi-Slide & Carousel Controls */
-    .hero-slider-track {
-        position: relative;
-    }
-    .hero-slide {
-        display: none;
-        opacity: 0;
-        transition: opacity 0.4s ease;
-    }
-    .hero-slide.active {
-        display: block;
-        opacity: 1;
-        animation: heroFadeIn 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-    }
-    @keyframes heroFadeIn {
-        from { opacity: 0; transform: translateY(3px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
-    .hero-slider-controls {
-        display: inline-flex;
-        align-items: center;
-        gap: 10px;
-        background: var(--bg-surface-alt);
-        border: 1px solid var(--border-main);
-        padding: 4px 10px;
-        border-radius: 20px;
-    }
-    .hero-slider-dots {
-        display: flex;
-        align-items: center;
-        gap: 5px;
-    }
-    .hero-dot {
-        width: 7px;
-        height: 7px;
-        border-radius: 10px;
-        background: var(--border-main);
-        border: none;
-        cursor: pointer;
-        padding: 0;
-        transition: all 0.25s ease;
-    }
-    .hero-dot.active {
-        width: 20px;
-        background: var(--brand-blue);
-    }
-    .hero-slider-counter {
-        font-family: var(--font-tech);
-        font-size: 0.72rem;
-        font-weight: 700;
-        color: var(--text-muted);
-        letter-spacing: 0.04em;
-    }
-    .hero-arrow-btn {
-        width: 24px;
-        height: 24px;
-        border-radius: 50%;
-        border: 1px solid var(--border-main);
-        background: #ffffff;
-        color: var(--text-dark);
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 0.68rem;
-        cursor: pointer;
-        transition: all 0.2s ease;
-    }
-    .hero-arrow-btn:hover {
-        background: var(--brand-blue);
-        color: #ffffff;
-        border-color: var(--brand-blue);
-    }
 </style>
 @endpush
 
 @section('content')
 <div class="container">
 
-    <!-- ═══ 1. HERO: THE PRECISION WORKSHOP STAGE ═══ -->
-    <div class="hero-stage" id="heroStageSlider">
-        <div class="hero-slider-track">
+    <!-- ═══ 1. HERO: FULL PHOTO DYNAMIC SLIDER ═══ -->
+    <div class="hero-full-wrapper" id="heroFullSliderWrapper">
+        <div class="hero-full-slider">
             @forelse($heroBanners as $index => $banner)
-                <div class="hero-slide {{ $index === 0 ? 'active' : '' }}" data-slide-index="{{ $index }}">
-                    <div class="hero-stage-grid">
-                        <!-- Left Narrative -->
-                        <div class="hero-stage-left">
-                            <div>
-                                @if($banner->badge_text)
-                                    <div class="hero-badge-industrial">
-                                        <span style="color: var(--brand-amber);"><i class="fa-solid fa-microchip"></i></span>
-                                        {{ $banner->badge_text }}
-                                    </div>
-                                @endif
+                @php
+                    $posisiTeks = $banner->posisi_teks ?: 'left';
+                    $scrimClass = 'hero-scrim-' . $posisiTeks;
+                    $alignClass = 'hero-text-align-' . $posisiTeks;
+                @endphp
+                <div class="hero-full-slide {{ $index === 0 ? 'active' : '' }}" data-slide-index="{{ $index }}">
+                    <!-- Full Background Photo -->
+                    <img src="{{ $banner->gambar_url }}" class="hero-full-photo" alt="{{ $banner->judul }}">
 
-                                <h1 class="hero-main-title">
-                                    {{ $banner->judul }}
-                                </h1>
+                    <!-- Dynamic Scrim Gradient Overlay based on text placement -->
+                    <div class="hero-scrim-overlay {{ $scrimClass }}"></div>
 
-                                @if($banner->subjudul)
-                                    <p class="hero-lead-text">
-                                        {{ $banner->subjudul }}
-                                    </p>
-                                @endif
-                            </div>
-
-                            <div class="hero-actions-and-controls" style="display: flex; flex-wrap: wrap; gap: 14px; align-items: center; justify-content: space-between; margin-top: 24px;">
-                                <div style="display: flex; flex-wrap: wrap; gap: 12px; align-items: center;">
-                                    @if($banner->tombol_teks_1)
-                                        <a href="{{ $banner->tombol_url_1 ?: route('web.jurusan.index') }}" class="btn-industrial btn-industrial-dark">
-                                            <i class="fa-solid fa-compass"></i>
-                                            {{ $banner->tombol_teks_1 }}
-                                        </a>
-                                    @endif
-                                    @if($banner->tombol_teks_2)
-                                        <a href="{{ $banner->tombol_url_2 ?: route('ppdb.index') }}" class="btn-industrial btn-industrial-primary">
-                                            <i class="fa-solid fa-graduation-cap"></i>
-                                            {{ $banner->tombol_teks_2 }}
-                                        </a>
-                                    @endif
-                                </div>
-
-                                @if($heroBanners->count() > 1)
-                                    <div class="hero-slider-controls">
-                                        <div class="hero-slider-dots">
-                                            @foreach($heroBanners as $dIndex => $bDot)
-                                                <button type="button" class="hero-dot {{ $dIndex === $index ? 'active' : '' }}" onclick="goToHeroSlide({{ $dIndex }})" aria-label="Slide {{ $dIndex + 1 }}"></button>
-                                            @endforeach
-                                        </div>
-                                        <div style="display: flex; align-items: center; gap: 6px;">
-                                            <button type="button" class="hero-arrow-btn" onclick="prevHeroSlide()" aria-label="Slide Sebelumnya">
-                                                <i class="fa-solid fa-chevron-left"></i>
-                                            </button>
-                                            <span class="hero-slider-counter">{{ sprintf('%02d', $index + 1) }} / {{ sprintf('%02d', $heroBanners->count()) }}</span>
-                                            <button type="button" class="hero-arrow-btn" onclick="nextHeroSlide()" aria-label="Slide Berikutnya">
-                                                <i class="fa-solid fa-chevron-right"></i>
-                                            </button>
-                                        </div>
-                                    </div>
-                                @endif
-                            </div>
-                        </div>
-
-                        <!-- Right Visual Stage -->
-                        <div class="hero-stage-right">
-                            <img src="{{ $banner->gambar_url }}" alt="{{ $banner->judul }}">
-                            @if($banner->tag_overlay)
-                                <div class="hero-stage-overlay-tag">
-                                    <div style="font-size: 0.72rem; font-weight: 700; color: #38bdf8; text-transform: uppercase; font-family: var(--font-tech);">
-                                        KAMPUS PENDIDIKAN VOKASI NEGERI
-                                    </div>
-                                    <div style="font-size: 0.95rem; font-weight: 800;">
-                                        {{ $banner->tag_overlay }}
-                                    </div>
+                    <!-- Slide Narrative Content -->
+                    <div class="container hero-full-content-box">
+                        <div class="{{ $alignClass }}">
+                            @if($banner->badge_text)
+                                <div class="hero-pill-badge">
+                                    <i class="fa-solid fa-sparkles"></i>
+                                    <span>{{ $banner->badge_text }}</span>
                                 </div>
                             @endif
+
+                            <h1 class="hero-banner-title">
+                                {{ $banner->judul }}
+                            </h1>
+
+                            @if($banner->subjudul)
+                                <p class="hero-banner-sub">
+                                    {{ $banner->subjudul }}
+                                </p>
+                            @endif
+
+                            <div class="hero-btn-group">
+                                @if($banner->tombol_teks_1)
+                                    <a href="{{ $banner->tombol_url_1 ?: route('web.jurusan.index') }}" class="btn-hero-solid">
+                                        <span>{{ $banner->tombol_teks_1 }}</span>
+                                        <i class="fa-solid fa-arrow-right"></i>
+                                    </a>
+                                @endif
+                                @if($banner->tombol_teks_2)
+                                    <a href="{{ $banner->tombol_url_2 ?: route('ppdb.index') }}" class="btn-hero-glass">
+                                        <i class="fa-solid fa-graduation-cap"></i>
+                                        <span>{{ $banner->tombol_teks_2 }}</span>
+                                    </a>
+                                @endif
+                            </div>
                         </div>
                     </div>
                 </div>
             @empty
-                <!-- Fallback Default -->
-                <div class="hero-slide active">
-                    <div class="hero-stage-grid">
-                        <div class="hero-stage-left">
-                            <div>
-                                <div class="hero-badge-industrial">
-                                    <span style="color: var(--brand-amber);"><i class="fa-solid fa-microchip"></i></span>
-                                    PRECISION VOCATIONAL WORKSHOP • TANGGAMUS
-                                </div>
-                                <h1 class="hero-main-title">
-                                    Menempa Keahlian Teknik, Rekayasa, &amp; Agro-Industri.
-                                </h1>
-                                <p class="hero-lead-text">
-                                    SMKN 1 Air Naningan mempersiapkan lulusan berkompetensi tinggi yang siap terserap langsung di dunia industri, menguasai pengujian sertifikasi profesi resmi BNSP, serta memiliki mentalitas mandiri wirausaha.
-                                </p>
+                <div class="hero-full-slide active" data-slide-index="0">
+                    <img src="{{ asset('images/web/hero_kampus.jpg') }}" class="hero-full-photo" alt="SMKN 1 Air Naningan">
+                    <div class="hero-scrim-overlay hero-scrim-left"></div>
+                    <div class="container hero-full-content-box">
+                        <div class="hero-text-align-left">
+                            <div class="hero-pill-badge">
+                                <i class="fa-solid fa-microchip"></i>
+                                <span>PRECISION VOCATIONAL ACADEMY</span>
                             </div>
-                            <div style="display: flex; flex-wrap: wrap; gap: 12px; align-items: center;">
-                                <a href="{{ route('web.jurusan.index') }}" class="btn-industrial btn-industrial-dark">
-                                    <i class="fa-solid fa-compass"></i>
-                                    Eksplorasi 3 Kejuruan
+                            <h1 class="hero-banner-title">
+                                Menempa Keahlian Teknik, Rekayasa, &amp; Agro-Industri.
+                            </h1>
+                            <p class="hero-banner-sub">
+                                SMKN 1 Air Naningan mempersiapkan lulusan berkompetensi tinggi yang siap terserap langsung di dunia industri.
+                            </p>
+                            <div class="hero-btn-group">
+                                <a href="{{ route('web.jurusan.index') }}" class="btn-hero-solid">
+                                    <span>Eksplorasi 3 Kejuruan</span>
+                                    <i class="fa-solid fa-arrow-right"></i>
                                 </a>
-                                <a href="{{ route('ppdb.index') }}" class="btn-industrial btn-industrial-primary">
+                                <a href="{{ route('ppdb.index') }}" class="btn-hero-glass">
                                     <i class="fa-solid fa-graduation-cap"></i>
-                                    Pendaftaran PPDB 2026/2027
+                                    <span>Pendaftaran PPDB</span>
                                 </a>
-                            </div>
-                        </div>
-                        <div class="hero-stage-right">
-                            <img src="{{ asset('images/web/hero_kampus.jpg') }}" alt="Kampus SMKN 1 Air Naningan Tanggamus">
-                            <div class="hero-stage-overlay-tag">
-                                <div style="font-size: 0.72rem; font-weight: 700; color: #38bdf8; text-transform: uppercase; font-family: var(--font-tech);">
-                                    KAMPUS PENDIDIKAN VOKASI NEGERI
-                                </div>
-                                <div style="font-size: 0.95rem; font-weight: 800;">
-                                    SMKN 1 Air Naningan • Tanggamus, Lampung
-                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             @endforelse
         </div>
+
+        @if($heroBanners->count() > 1)
+            <!-- Floating Navigation Arrows -->
+            <button type="button" class="hero-slider-nav-btn prev" onclick="prevHeroSlide()" aria-label="Slide Sebelumnya">
+                <i class="fa-solid fa-chevron-left"></i>
+            </button>
+            <button type="button" class="hero-slider-nav-btn next" onclick="nextHeroSlide()" aria-label="Slide Berikutnya">
+                <i class="fa-solid fa-chevron-right"></i>
+            </button>
+
+            <!-- Bottom Pagination Pill Bar -->
+            <div class="hero-slider-indicator-bar">
+                <div class="hero-indicator-dots">
+                    @foreach($heroBanners as $dIndex => $bDot)
+                        <button type="button" class="hero-indicator-dot {{ $dIndex === 0 ? 'active' : '' }}" onclick="goToHeroSlide({{ $dIndex }})" aria-label="Slide {{ $dIndex + 1 }}"></button>
+                    @endforeach
+                </div>
+                <span class="hero-slide-num" id="heroSlideCounter">01 / {{ sprintf('%02d', $heroBanners->count()) }}</span>
+            </div>
+        @endif
     </div>
 
     <!-- ═══ 2. WORKSHOP TELEMETRY STRIP ═══ -->
@@ -782,7 +981,9 @@
 @push('scripts')
 <script>
     let currentHeroIndex = 0;
-    const heroSlides = document.querySelectorAll('.hero-slide');
+    const heroSlides = document.querySelectorAll('.hero-full-slide');
+    const heroDots = document.querySelectorAll('.hero-indicator-dot');
+    const heroCounter = document.getElementById('heroSlideCounter');
     const totalHeroSlides = heroSlides.length;
     let heroAutoTimer = null;
 
@@ -799,6 +1000,20 @@
                 slide.classList.remove('active');
             }
         });
+
+        heroDots.forEach((dot, i) => {
+            if (i === currentHeroIndex) {
+                dot.classList.add('active');
+            } else {
+                dot.classList.remove('active');
+            }
+        });
+
+        if (heroCounter) {
+            const currentStr = String(currentHeroIndex + 1).padStart(2, '0');
+            const totalStr = String(totalHeroSlides).padStart(2, '0');
+            heroCounter.textContent = `${currentStr} / ${totalStr}`;
+        }
     }
 
     function nextHeroSlide() {
@@ -819,15 +1034,37 @@
     function resetHeroTimer() {
         if (heroAutoTimer) clearInterval(heroAutoTimer);
         if (totalHeroSlides > 1) {
-            heroAutoTimer = setInterval(nextHeroSlide, 7000);
+            heroAutoTimer = setInterval(nextHeroSlide, 6000);
         }
     }
 
     if (totalHeroSlides > 1) {
-        const sliderEl = document.getElementById('heroStageSlider');
-        if (sliderEl) {
-            sliderEl.addEventListener('mouseenter', () => clearInterval(heroAutoTimer));
-            sliderEl.addEventListener('mouseleave', resetHeroTimer);
+        const sliderWrapper = document.getElementById('heroFullSliderWrapper');
+        if (sliderWrapper) {
+            sliderWrapper.addEventListener('mouseenter', () => clearInterval(heroAutoTimer));
+            sliderWrapper.addEventListener('mouseleave', resetHeroTimer);
+
+            // Touch Swipe Support for Mobile
+            let touchStartX = 0;
+            let touchEndX = 0;
+            sliderWrapper.addEventListener('touchstart', (e) => {
+                touchStartX = e.changedTouches[0].screenX;
+                clearInterval(heroAutoTimer);
+            }, { passive: true });
+
+            sliderWrapper.addEventListener('touchend', (e) => {
+                touchEndX = e.changedTouches[0].screenX;
+                const diff = touchStartX - touchEndX;
+                if (Math.abs(diff) > 40) {
+                    if (diff > 0) {
+                        nextHeroSlide();
+                    } else {
+                        prevHeroSlide();
+                    }
+                } else {
+                    resetHeroTimer();
+                }
+            }, { passive: true });
         }
         resetHeroTimer();
     }

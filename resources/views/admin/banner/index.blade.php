@@ -101,11 +101,17 @@
 
                 {{-- Headline & Narasi --}}
                 <td style="padding:12px 14px;">
-                  @if($banner->badge_text)
-                    <div style="display:inline-block; font-size:10px; font-weight:800; color:#b45309; background:#fef3c7; border:1px solid #fde68a; padding:2px 8px; border-radius:4px; margin-bottom:4px; text-transform:uppercase;">
-                      {{ $banner->badge_text }}
-                    </div>
-                  @endif
+                  <div style="display:flex; align-items:center; gap:6px; margin-bottom:4px; flex-wrap:wrap;">
+                    @if($banner->badge_text)
+                      <span style="font-size:10px; font-weight:800; color:#b45309; background:#fef3c7; border:1px solid #fde68a; padding:2px 8px; border-radius:4px; text-transform:uppercase;">
+                        {{ $banner->badge_text }}
+                      </span>
+                    @endif
+                    <span style="font-size:10px; font-weight:700; color:#475569; background:#f1f5f9; border:1px solid #cbd5e1; padding:2px 8px; border-radius:4px;">
+                      <i class="bi bi-text-{{ $banner->posisi_teks ?: 'left' }}"></i> 
+                      {{ $banner->posisi_teks === 'center' ? 'Teks Tengah' : ($banner->posisi_teks === 'right' ? 'Teks Kanan' : 'Teks Kiri') }}
+                    </span>
+                  </div>
                   <div style="font-weight:800; color:var(--text); font-size:13.5px; line-height:1.3; margin-bottom:4px;">
                     {{ $banner->judul }}
                   </div>
