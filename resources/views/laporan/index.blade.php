@@ -1052,19 +1052,34 @@
                     @elseif($lap->status === 'bolos')
                       <span style="color:#991B1B; font-weight:600;">Scan masuk tanpa tap pulang</span>
                     @elseif($lap->status === 'alpha')
-                      <span style="color:#DC2626; font-weight:600;">Tanpa keterangan</span>
+                      @if($lap->sumber_absen === 'auto_kunci_piket')
+                        <span style="color:#DC2626; font-weight:600;">Otomatis Sistem (09:00)</span>
+                      @elseif(!empty($lap->keterangan))
+                        <span style="color:#DC2626; font-weight:600;">{{ $lap->keterangan }}</span>
+                      @else
+                        <span style="color:#DC2626; font-weight:600;">Tanpa keterangan</span>
+                      @endif
                     @else
                       <span style="color:var(--text-3);">-</span>
                     @endif
                   </td>
                   <td class="no-print" style="text-align:left; white-space:nowrap;">
                     @php
-                      $isManual = in_array($lap->sumber_absen, ['manual_piket', 'manual_izin_piket', 'koreksi_piket_manual']);
-                      $sumberLabel = $lap->sumber_absen_label ?? ($isManual ? 'Manual Piket' : 'Smart Gate');
+                      $sumberLabel = $lap->sumber_absen_label;
                     @endphp
-                    <span style="font-size:12px; font-weight:700; color:var(--text-2);">
-                      {{ $sumberLabel }}
-                    </span>
+                    @if($lap->sumber_absen === 'auto_kunci_piket')
+                      <span class="badge" style="font-size:11px; font-weight:700; background:#fee2e2; color:#991b1b; border:1px solid #fca5a5; padding:2px 7px; border-radius:4px; display:inline-flex; align-items:center; gap:4px;">
+                        <i class="bi bi-robot"></i> {{ $sumberLabel }}
+                      </span>
+                    @elseif(in_array($lap->sumber_absen, ['manual_piket', 'manual_izin_piket', 'koreksi_piket_manual']))
+                      <span class="badge" style="font-size:11px; font-weight:700; background:#f0fdf4; color:#166534; border:1px solid #86efac; padding:2px 7px; border-radius:4px; display:inline-flex; align-items:center; gap:4px;">
+                        <i class="bi bi-pencil-square"></i> {{ $sumberLabel }}
+                      </span>
+                    @else
+                      <span style="font-size:12px; font-weight:700; color:var(--text-2);">
+                        {{ $sumberLabel }}
+                      </span>
+                    @endif
                   </td>
                   <td class="no-print" style="text-align:center;">
                     @php
@@ -1225,19 +1240,34 @@
                     @elseif($lap->status === 'bolos')
                       <span style="color:#991B1B; font-weight:600; font-size:11.5px;">Tanpa tap pulang</span>
                     @elseif($lap->status === 'alpha')
-                      <span style="color:#DC2626; font-weight:600; font-size:11.5px;">Tanpa keterangan</span>
+                      @if($lap->sumber_absen === 'auto_kunci_piket')
+                        <span style="color:#DC2626; font-weight:600; font-size:11.5px;">Otomatis Sistem (09:00)</span>
+                      @elseif(!empty($lap->keterangan))
+                        <span style="color:#DC2626; font-weight:600; font-size:11.5px;">{{ $lap->keterangan }}</span>
+                      @else
+                        <span style="color:#DC2626; font-weight:600; font-size:11.5px;">Tanpa keterangan</span>
+                      @endif
                     @else
                       <span style="color:var(--text-3); font-size:11.5px;">-</span>
                     @endif
                   </td>
                   <td class="no-print" style="text-align:left; white-space:nowrap;">
                     @php
-                      $isManual = in_array($lap->sumber_absen, ['manual_piket', 'manual_izin_piket', 'koreksi_piket_manual']);
-                      $sumberLabel = $lap->sumber_absen_label ?? ($isManual ? 'Manual Piket' : 'Smart Gate');
+                      $sumberLabel = $lap->sumber_absen_label;
                     @endphp
-                    <span style="font-size:12px; font-weight:700; color:var(--text-2);">
-                      {{ $sumberLabel }}
-                    </span>
+                    @if($lap->sumber_absen === 'auto_kunci_piket')
+                      <span class="badge" style="font-size:11px; font-weight:700; background:#fee2e2; color:#991b1b; border:1px solid #fca5a5; padding:2px 7px; border-radius:4px; display:inline-flex; align-items:center; gap:4px;">
+                        <i class="bi bi-robot"></i> {{ $sumberLabel }}
+                      </span>
+                    @elseif(in_array($lap->sumber_absen, ['manual_piket', 'manual_izin_piket', 'koreksi_piket_manual']))
+                      <span class="badge" style="font-size:11px; font-weight:700; background:#f0fdf4; color:#166534; border:1px solid #86efac; padding:2px 7px; border-radius:4px; display:inline-flex; align-items:center; gap:4px;">
+                        <i class="bi bi-pencil-square"></i> {{ $sumberLabel }}
+                      </span>
+                    @else
+                      <span style="font-size:12px; font-weight:700; color:var(--text-2);">
+                        {{ $sumberLabel }}
+                      </span>
+                    @endif
                   </td>
                   <td class="no-print" style="text-align:center;">
                     @php

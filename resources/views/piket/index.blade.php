@@ -766,11 +766,11 @@
       <!-- 5. Alpha / Belum Scan -->
       <div class="piket-kpi-card" onclick="selectSiswaFilter('belum_hadir')">
         <div class="piket-kpi-top">
-          <span>Belum Scan</span>
+          <span>{{ $isAfter0900 ? 'Alpha / Belum Hadir' : 'Belum Scan' }}</span>
           <i class="bi bi-exclamation-octagon-fill" style="color:#DC2626;"></i>
         </div>
         <div class="piket-kpi-value" style="color:{{ $alphaCount > 0 ? '#DC2626' : 'inherit' }};">{{ $alphaCount }}</div>
-        <div class="piket-kpi-sub">{{ $isAfter0900 ? 'Status terkunci' : 'Otomatis Alpha 09:00' }}</div>
+        <div class="piket-kpi-sub">{{ $isAfter0900 ? 'Status terkunci (09:00)' : 'Otomatis Alpha 09:00' }}</div>
       </div>
 
       <!-- 6. Belum Scan Pulang -->
@@ -831,11 +831,11 @@
       <!-- 5. Belum Hadir / Alpha Guru -->
       <div class="piket-kpi-card" onclick="selectGuruFilter('belum_hadir')">
         <div class="piket-kpi-top">
-          <span>Belum Hadir</span>
+          <span>{{ $isAfter0900 ? 'Alpha / Belum Hadir' : 'Belum Hadir' }}</span>
           <i class="bi bi-exclamation-octagon-fill" style="color:#DC2626;"></i>
         </div>
         <div class="piket-kpi-value" style="color:{{ $guruBelumHadirCount > 0 ? '#DC2626' : 'inherit' }};">{{ $guruBelumHadirCount }}</div>
-        <div class="piket-kpi-sub">{{ $isAfter0900 ? 'Status terkunci' : 'Otomatis Alpha 09:00' }}</div>
+        <div class="piket-kpi-sub">{{ $isAfter0900 ? 'Status terkunci (09:00)' : 'Otomatis Alpha 09:00' }}</div>
       </div>
 
       <!-- 6. Sudah Scan Pulang Guru -->
@@ -898,7 +898,7 @@
             <span class="piket-chip-badge">{{ $izinCount }}</span>
           </button>
           <button type="button" class="piket-chip filter-pill" data-filter="belum_hadir" onclick="filterSiswaTable('belum_hadir', this)">
-            <span>Belum Hadir</span>
+            <span>{{ $isAfter0900 ? 'Alpha / Belum Hadir' : 'Belum Scan' }}</span>
             <span class="piket-chip-badge" style="color:{{ $alphaCount > 0 ? '#DC2626' : 'inherit' }}; font-weight:800;">
               {{ $alphaCount }}
             </span>
@@ -924,7 +924,7 @@
             <span class="piket-chip-badge">{{ $guruTerlambat }}</span>
           </button>
           <button type="button" class="piket-chip filter-pill" data-filter="belum_hadir" onclick="filterGuruTable('belum_hadir', this)">
-            <span>Belum Hadir</span>
+            <span>{{ $isAfter0900 ? 'Alpha / Belum Hadir' : 'Belum Hadir' }}</span>
             <span class="piket-chip-badge" style="color:{{ $guruBelumHadirCount > 0 ? '#DC2626' : 'inherit' }}; font-weight:800;">
               {{ $guruBelumHadirCount }}
             </span>
@@ -1026,7 +1026,17 @@
                     @elseif(in_array($ab->status, ['izin', 'sakit', 'dispensasi', 'cuti']))
                       <span class="piket-status-pill izin"><i class="bi bi-file-earmark-text-fill"></i> {{ ucfirst($ab->status) }}</span>
                     @elseif(in_array($ab->status, ['alpha', 'alfa']))
-                      <span class="piket-status-pill belum"><i class="bi bi-exclamation-octagon-fill"></i> Alpha (Belum Scan)</span>
+                      @if($ab->sumber_absen === 'auto_kunci_piket')
+                        <span class="piket-status-pill belum" style="background:#fee2e2; color:#991b1b; border:1px solid #fca5a5;" title="Dikunci otomatis oleh sistem pukul 09:00">
+                          <i class="bi bi-robot"></i> Alpha (Auto 09:00)
+                        </span>
+                      @elseif(in_array($ab->sumber_absen, ['koreksi_piket_manual', 'manual_piket', 'piket']))
+                        <span class="piket-status-pill belum" style="background:#fef2f2; color:#b91c1c; border:1px solid #f87171;" title="Divalidasi langsung oleh Petugas Guru Piket">
+                          <i class="bi bi-pencil-square"></i> Alpha (Validasi Piket)
+                        </span>
+                      @else
+                        <span class="piket-status-pill belum"><i class="bi bi-exclamation-octagon-fill"></i> Alpha</span>
+                      @endif
                     @elseif($ab->status === 'bolos')
                       <span class="piket-status-pill bolos"><i class="bi bi-exclamation-triangle-fill"></i> Bolos</span>
                     @else
@@ -1080,7 +1090,15 @@
                   <td style="font-family:var(--font-mono); font-size:12px; color:var(--text-3); text-align:center;">—</td>
                   <td style="font-family:var(--font-mono); font-size:12px; color:var(--text-3); text-align:center;">—</td>
                   <td style="text-align:center;">
-                    <span class="piket-status-pill belum"><i class="bi bi-exclamation-circle-fill"></i> Belum Hadir</span>
+                    @if(!$isAfter0900)
+                      <span class="piket-status-pill" style="background:#fef3c7; color:#92400e; border:1px solid #fcd34d;" title="Sesi kedatangan pagi masih berjalan, menunggu scan hingga 09:00">
+                        <i class="bi bi-hourglass-split"></i> Menunggu Scan
+                      </span>
+                    @else
+                      <span class="piket-status-pill belum" style="background:#fee2e2; color:#991b1b; border:1px solid #fca5a5;" title="Belum hadir & belum diproses piket">
+                        <i class="bi bi-exclamation-circle-fill"></i> Belum Hadir
+                      </span>
+                    @endif
                   </td>
                   <td style="text-align:right; white-space:nowrap;">
                     @if($canKoreksi ?? false)
@@ -1185,7 +1203,17 @@
                     @elseif(in_array($ag->status, ['izin', 'sakit', 'cuti', 'dispen', 'dinas_luar']))
                       <span class="piket-status-pill izin"><i class="bi bi-file-earmark-text-fill"></i> {{ ucfirst(str_replace('_', ' ', $ag->status)) }}</span>
                     @elseif(in_array($ag->status, ['alpha', 'alfa']))
-                      <span class="piket-status-pill belum"><i class="bi bi-exclamation-octagon-fill"></i> Alpha (Belum Scan)</span>
+                      @if($ag->sumber_absen === 'auto_kunci_piket')
+                        <span class="piket-status-pill belum" style="background:#fee2e2; color:#991b1b; border:1px solid #fca5a5;" title="Dikunci otomatis oleh sistem pukul 09:00">
+                          <i class="bi bi-robot"></i> Alpha (Auto 09:00)
+                        </span>
+                      @elseif(in_array($ag->sumber_absen, ['koreksi_piket_manual', 'manual_piket', 'piket']))
+                        <span class="piket-status-pill belum" style="background:#fef2f2; color:#b91c1c; border:1px solid #f87171;" title="Divalidasi langsung oleh Petugas Guru Piket">
+                          <i class="bi bi-pencil-square"></i> Alpha (Validasi Piket)
+                        </span>
+                      @else
+                        <span class="piket-status-pill belum"><i class="bi bi-exclamation-octagon-fill"></i> Alpha</span>
+                      @endif
                     @else
                       <span class="piket-status-pill"><i class="bi bi-dot"></i> {{ ucfirst($ag->status) }}</span>
                     @endif
@@ -1233,7 +1261,15 @@
                   <td style="font-family:var(--font-mono); font-size:12px; color:var(--text-3); text-align:center;">—</td>
                   <td style="font-family:var(--font-mono); font-size:12px; color:var(--text-3); text-align:center;">—</td>
                   <td style="text-align:center;">
-                    <span class="piket-status-pill belum"><i class="bi bi-exclamation-circle-fill"></i> Belum Hadir</span>
+                    @if(!$isAfter0900)
+                      <span class="piket-status-pill" style="background:#fef3c7; color:#92400e; border:1px solid #fcd34d;" title="Sesi kedatangan pagi masih berjalan, menunggu scan hingga 09:00">
+                        <i class="bi bi-hourglass-split"></i> Menunggu Scan
+                      </span>
+                    @else
+                      <span class="piket-status-pill belum" style="background:#fee2e2; color:#991b1b; border:1px solid #fca5a5;" title="Belum hadir & belum diproses piket">
+                        <i class="bi bi-exclamation-circle-fill"></i> Belum Hadir
+                      </span>
+                    @endif
                   </td>
                   <td style="text-align:right; white-space:nowrap;">
                     @if($canKoreksi ?? false)
