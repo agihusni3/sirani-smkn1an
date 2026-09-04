@@ -339,27 +339,39 @@
 
     @media (max-width: 640px) {
         .hero-full-wrapper {
-            margin-top: 14px;
-            margin-bottom: 28px;
+            margin-top: 10px;
+            margin-bottom: 24px;
             border-radius: 18px;
         }
         .hero-full-slider {
-            min-height: 500px;
+            min-height: 410px;
         }
         .hero-full-content-box {
-            padding: 46px 20px 76px 20px !important;
+            padding: 28px 18px 48px 18px !important;
         }
         .hero-scrim-left,
         .hero-scrim-center,
         .hero-scrim-right {
             background: 
-                linear-gradient(180deg, rgba(15, 23, 42, 0.88) 0%, rgba(15, 23, 42, 0.65) 50%, rgba(15, 23, 42, 0.94) 100%) !important;
+                linear-gradient(180deg, rgba(15, 23, 42, 0.90) 0%, rgba(15, 23, 42, 0.68) 45%, rgba(15, 23, 42, 0.95) 100%) !important;
+        }
+        .hero-pill-badge {
+            font-size: 0.66rem !important;
+            padding: 3px 10px !important;
+            margin-bottom: 10px !important;
         }
         .hero-banner-title {
-            font-size: 1.85rem !important;
+            font-size: 1.35rem !important;
+            line-height: 1.25 !important;
+            letter-spacing: -0.02em !important;
+            margin-bottom: 8px !important;
         }
         .hero-banner-sub {
-            font-size: 0.92rem !important;
+            font-size: 0.82rem !important;
+            line-height: 1.5 !important;
+            margin-bottom: 16px !important;
+            color: rgba(241, 245, 249, 0.9) !important;
+            max-width: 100% !important;
         }
         .hero-text-align-left,
         .hero-text-align-center,
@@ -372,15 +384,45 @@
         }
         .hero-btn-group {
             width: 100%;
+            display: flex;
             flex-direction: column;
-            align-items: stretch !important;
+            align-items: flex-start !important;
+            gap: 8px !important;
+        }
+        .hero-text-align-center .hero-btn-group {
+            align-items: center !important;
+        }
+        .hero-text-align-right .hero-btn-group {
+            align-items: flex-end !important;
         }
         .btn-hero-solid, .btn-hero-glass {
+            display: inline-flex !important;
+            width: auto !important;
+            max-width: 100% !important;
+            align-items: center;
             justify-content: center;
-            width: 100%;
+            gap: 7px;
+            height: 38px;
+            padding: 0 18px !important;
+            font-size: 0.82rem !important;
+            font-weight: 700 !important;
+            border-radius: 9px !important;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2) !important;
         }
         .hero-slider-indicator-bar {
-            bottom: 16px;
+            bottom: 12px !important;
+            padding: 3px 12px !important;
+            gap: 8px !important;
+        }
+        .hero-indicator-dot {
+            width: 6px !important;
+            height: 6px !important;
+        }
+        .hero-indicator-dot.active {
+            width: 18px !important;
+        }
+        .hero-slide-num {
+            font-size: 0.68rem !important;
         }
     }
 
@@ -643,61 +685,89 @@
         .expanding-deck {
             flex-direction: column;
             height: auto;
-            gap: 14px;
+            gap: 12px;
+            margin-top: 16px;
         }
 
         .deck-card {
             flex: none;
-            height: 100px;
-            border-radius: 18px;
-            transition: height 0.5s cubic-bezier(0.16, 1, 0.3, 1), transform 0.3s ease;
+            height: 68px;
+            border-radius: 14px;
+            transition: height 0.45s cubic-bezier(0.16, 1, 0.3, 1), transform 0.3s ease;
+            box-shadow: 0 4px 14px -2px rgba(15, 23, 42, 0.18);
         }
 
         .deck-card.active {
             flex: none;
             height: auto;
-            min-height: 480px;
+            min-height: 400px;
+            border-radius: 16px;
         }
 
         .deck-collapsed-content {
             flex-direction: row;
-            padding: 18px 22px;
+            padding: 14px 18px;
         }
 
         .deck-collapsed-title {
             writing-mode: horizontal-tb;
             transform: none;
-            font-size: 0.95rem;
-            letter-spacing: 0.03em;
+            font-size: 0.85rem;
+            letter-spacing: 0.02em;
+            font-weight: 700;
         }
 
         .deck-collapsed-badge {
-            width: 38px;
-            height: 38px;
+            width: 34px;
+            height: 34px;
+            font-size: 0.88rem;
+            border-radius: 9px;
+        }
+
+        .deck-collapsed-index {
             font-size: 0.95rem;
-            border-radius: 10px;
         }
 
         .deck-expanded-content {
-            padding: 24px 20px;
+            padding: 20px 16px;
+        }
+
+        .deck-top-badge {
+            font-size: 0.66rem;
+            padding: 3px 9px;
+            margin-bottom: 8px;
         }
 
         .deck-title {
-            font-size: 1.5rem;
+            font-size: 1.25rem;
+            line-height: 1.25;
+            margin-bottom: 6px;
         }
 
         .deck-desc {
-            font-size: 0.88rem;
+            font-size: 0.8rem;
+            line-height: 1.45;
+            margin-bottom: 12px;
         }
 
         .deck-chips {
-            gap: 6px;
-            margin-bottom: 18px;
+            gap: 5px;
+            margin-bottom: 14px;
         }
 
         .deck-chip {
-            font-size: 0.74rem;
-            padding: 5px 10px;
+            font-size: 0.7rem;
+            padding: 4px 9px;
+            border-radius: 6px;
+        }
+
+        .deck-btn-cta {
+            height: 38px;
+            padding: 0 16px;
+            font-size: 0.82rem;
+            border-radius: 9px;
+            width: 100%;
+            justify-content: center;
         }
     }
 
@@ -969,20 +1039,121 @@
     }
 
     @media (max-width: 900px) {
-        .hero-stage-grid { grid-template-columns: 1fr; }
-        .hero-stage-right { min-height: 280px; }
         .telemetry-strip { grid-template-columns: 1fr 1fr; }
-        .spec-sheet-card, .spec-sheet-card.reverse { grid-template-columns: 1fr; }
     }
 
     @media (max-width: 640px) {
-        .hero-stage { margin-top: 14px; margin-bottom: 24px; border-radius: var(--radius-lg); }
-        .hero-stage-left { padding: 24px 16px !important; }
-        .hero-main-title { font-size: 1.85rem !important; }
-        .hero-lead-text { font-size: 0.92rem !important; }
-        .hero-badge-industrial { font-size: 0.68rem; padding: 4px 10px; margin-bottom: 16px; max-width: 100%; }
-        .tefa-banner { padding: 28px 18px !important; }
-        .ppdb-banner-box { padding: 28px 18px !important; }
+        /* Telemetry Mobile */
+        .telemetry-strip {
+            grid-template-columns: 1fr 1fr !important;
+            gap: 12px !important;
+            padding: 14px 16px !important;
+            margin-bottom: 36px !important;
+            border-radius: 14px !important;
+        }
+        .telemetry-item {
+            border-right: none !important;
+            padding-right: 0 !important;
+        }
+        .telemetry-value {
+            font-size: 1.25rem !important;
+            margin-bottom: 2px !important;
+        }
+        .telemetry-desc {
+            font-size: 0.68rem !important;
+        }
+
+        /* Section Headers Clean Mobile */
+        .section-header-clean {
+            margin-bottom: 16px !important;
+        }
+        .section-tag {
+            font-size: 0.68rem !important;
+            padding: 3px 10px !important;
+            margin-bottom: 8px !important;
+        }
+        .section-title-large {
+            font-size: 1.35rem !important;
+            line-height: 1.25 !important;
+        }
+        .section-header-clean p {
+            font-size: 0.82rem !important;
+            line-height: 1.45 !important;
+            margin-top: 4px !important;
+        }
+
+        /* TEFA Industrial Showcase Mobile */
+        .tefa-strip {
+            padding: 24px 16px !important;
+            border-radius: 16px !important;
+            margin-bottom: 40px !important;
+        }
+        .btn-tefa-cta {
+            height: 36px !important;
+            padding: 0 14px !important;
+            font-size: 0.78rem !important;
+            border-radius: 8px !important;
+        }
+
+        /* PPDB Fast Banner Mobile */
+        .ppdb-banner-box {
+            padding: 24px 16px !important;
+            border-radius: 16px !important;
+            margin-bottom: 40px !important;
+        }
+        .ppdb-benefit-pills {
+            gap: 6px !important;
+            margin-bottom: 16px !important;
+        }
+        .ppdb-benefit-pill {
+            font-size: 0.72rem !important;
+            padding: 3px 10px !important;
+        }
+        .ppdb-content-relative h2 {
+            font-size: 1.3rem !important;
+            line-height: 1.25 !important;
+        }
+        .ppdb-content-relative p {
+            font-size: 0.82rem !important;
+            line-height: 1.45 !important;
+            margin-bottom: 16px !important;
+        }
+        .ppdb-btn-group {
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: flex-start !important;
+            gap: 8px !important;
+            width: 100% !important;
+        }
+        .ppdb-banner-center .ppdb-btn-group {
+            align-items: center !important;
+        }
+        .ppdb-banner-right .ppdb-btn-group {
+            align-items: flex-end !important;
+        }
+        .ppdb-btn-group .btn-hero-solid,
+        .ppdb-btn-group .btn-hero-glass,
+        .btn-ppdb-wa {
+            width: auto !important;
+            max-width: 100% !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            height: 38px !important;
+            padding: 0 16px !important;
+            font-size: 0.82rem !important;
+            border-radius: 9px !important;
+        }
+
+        /* General Industrial Buttons Mobile */
+        .btn-industrial {
+            height: 36px !important;
+            padding: 0 14px !important;
+            font-size: 0.8rem !important;
+            border-radius: 8px !important;
+            display: inline-flex !important;
+            align-items: center !important;
+        }
     }
 
 </style>
