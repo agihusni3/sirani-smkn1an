@@ -24,6 +24,8 @@ class WebsiteBanner extends Model
         'tombol_url_1',
         'tombol_teks_2',
         'tombol_url_2',
+        'tombol_teks_3',
+        'tombol_url_3',
         'urutan',
         'is_active',
     ];

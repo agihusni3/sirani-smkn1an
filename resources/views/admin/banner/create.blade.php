@@ -158,11 +158,11 @@
           </div>
         </div>
 
-        {{-- Tombol Aksi (CTA 1 & CTA 2) --}}
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:18px;">
+        {{-- Tombol Aksi (CTA 1, CTA 2, CTA 3) --}}
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr)); gap:16px; margin-bottom:18px;">
           <div style="padding:14px; background:var(--surface); border:1px solid var(--border); border-radius:8px;">
             <div style="font-size:12px; font-weight:800; color:var(--text); margin-bottom:8px;">
-              <i class="bi bi-box-arrow-in-up-right"></i> Tombol Aksi 1 (Primer / Gelap)
+              <i class="bi bi-box-arrow-in-up-right"></i> Tombol Aksi 1 (Putih / Primer)
             </div>
             <div style="margin-bottom:8px;">
               <label style="font-size:11px; font-weight:700; color:var(--text-3);">Teks Tombol 1</label>
@@ -176,7 +176,7 @@
 
           <div style="padding:14px; background:var(--surface); border:1px solid var(--border); border-radius:8px;">
             <div style="font-size:12px; font-weight:800; color:var(--text); margin-bottom:8px;">
-              <i class="bi bi-box-arrow-in-up-right"></i> Tombol Aksi 2 (Aksen Biru)
+              <i class="bi bi-box-arrow-in-up-right"></i> Tombol Aksi 2 (Kaca / Sekunder)
             </div>
             <div style="margin-bottom:8px;">
               <label style="font-size:11px; font-weight:700; color:var(--text-3);">Teks Tombol 2</label>
@@ -185,6 +185,20 @@
             <div>
               <label style="font-size:11px; font-weight:700; color:var(--text-3);">Tujuan URL / Link</label>
               <input type="text" name="tombol_url_2" value="{{ old('tombol_url_2', '/ppdb') }}" placeholder="Contoh: /ppdb atau https://..." style="width:100%; padding:7px 10px; font-size:12px; border-radius:6px; border:1px solid var(--border); background:var(--bg-2); color:var(--text);">
+            </div>
+          </div>
+
+          <div style="padding:14px; background:var(--surface); border:1px solid var(--border); border-radius:8px;">
+            <div style="font-size:12px; font-weight:800; color:#10b981; margin-bottom:8px;">
+              <i class="bi bi-whatsapp"></i> Tombol Aksi 3 (WhatsApp / Bantuan)
+            </div>
+            <div style="margin-bottom:8px;">
+              <label style="font-size:11px; font-weight:700; color:var(--text-3);">Teks Tombol 3</label>
+              <input type="text" name="tombol_teks_3" value="{{ old('tombol_teks_3', 'Tanya Panitia PPDB') }}" placeholder="Contoh: Tanya Panitia PPDB" style="width:100%; padding:7px 10px; font-size:12px; border-radius:6px; border:1px solid var(--border); background:var(--bg-2); color:var(--text);">
+            </div>
+            <div>
+              <label style="font-size:11px; font-weight:700; color:var(--text-3);">Tujuan Link WA / URL</label>
+              <input type="text" name="tombol_url_3" value="{{ old('tombol_url_3') }}" placeholder="Contoh: https://wa.me/62812... atau link lain" style="width:100%; padding:7px 10px; font-size:12px; border-radius:6px; border:1px solid var(--border); background:var(--bg-2); color:var(--text);">
             </div>
           </div>
         </div>

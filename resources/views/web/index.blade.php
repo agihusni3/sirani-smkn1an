@@ -1170,13 +1170,13 @@
     </div>
 
     <!-- ═══ 5. PPDB CALLOUT BANNER (ADMIN CUSTOMIZABLE) ═══ -->
+    @if(!$ppdbBanner || $ppdbBanner->is_active)
     @php
+        $ppdbPosisiTeks = ($ppdbBanner && $ppdbBanner->posisi_teks) ? $ppdbBanner->posisi_teks : 'left';
         $ppdbImgUrl = ($ppdbBanner && $ppdbBanner->gambar) 
             ? $ppdbBanner->gambar_url 
             : asset('images/web/ppdb_banner_bg.jpg');
-        $ppdbBadge = ($ppdbBanner && $ppdbBanner->badge_text) 
-            ? $ppdbBanner->badge_text 
-            : ('GELOMBANG 1 TP ' . date('Y') . '/' . (date('Y') + 1) . ' • BEBAS BIAYA PENDAFTARAN (100% GRATIS)');
+        $ppdbBadge = $ppdbBanner ? $ppdbBanner->badge_text : ('GELOMBANG 1 TP ' . date('Y') . '/' . (date('Y') + 1) . ' • BEBAS BIAYA PENDAFTARAN (100% GRATIS)');
         $ppdbJudul = ($ppdbBanner && $ppdbBanner->judul) 
             ? $ppdbBanner->judul 
             : 'Daftar Online Mudah dari Rumah, Siap Cetak Generasi Vokasi Berkarakter';
@@ -1184,68 +1184,90 @@
             ? $ppdbBanner->subjudul 
             : 'Membuka 3 Jalur: Reguler (Nilai Rapor), Prestasi (Piagam Lomba & Tahfidz), dan Afirmasi (KIP / PKH). Bebas uang gedung (SPI), didukung laboratorium bengkel presisi modern, serta terhubung sertifikasi kerja resmi BNSP.';
         
-        $rawPills = ($ppdbBanner && $ppdbBanner->tag_overlay) 
-            ? $ppdbBanner->tag_overlay 
+        $rawPills = $ppdbBanner 
+            ? ($ppdbBanner->tag_overlay ?? '') 
             : 'Bebas Biaya Pendaftaran | Tanpa Uang Gedung (SPI) | Lisensi Sertifikasi BNSP | Penyaluran Kerja & Industri';
         $pills = array_filter(array_map('trim', preg_split('/[|,]/', $rawPills)));
-        if (empty($pills)) {
-            $pills = [
-                'Bebas Biaya Pendaftaran',
-                'Tanpa Uang Gedung (SPI)',
-                'Lisensi Sertifikasi BNSP',
-                'Penyaluran Kerja & Industri'
-            ];
-        }
 
-        $btn1Text = ($ppdbBanner && $ppdbBanner->tombol_teks_1) ? $ppdbBanner->tombol_teks_1 : 'Isi Formulir PPDB Sekarang';
+        $btn1Text = $ppdbBanner ? $ppdbBanner->tombol_teks_1 : 'Isi Formulir PPDB Sekarang';
         $btn1Url  = ($ppdbBanner && $ppdbBanner->tombol_url_1) ? $ppdbBanner->tombol_url_1 : route('ppdb.formulir');
-        $btn2Text = ($ppdbBanner && $ppdbBanner->tombol_teks_2) ? $ppdbBanner->tombol_teks_2 : 'Cek Status Seleksi';
+        
+        $btn2Text = $ppdbBanner ? $ppdbBanner->tombol_teks_2 : 'Cek Status Seleksi';
         $btn2Url  = ($ppdbBanner && $ppdbBanner->tombol_url_2) ? $ppdbBanner->tombol_url_2 : route('ppdb.status');
+
+        $btn3Text = ($ppdbBanner && $ppdbBanner->tombol_teks_3 !== null) ? $ppdbBanner->tombol_teks_3 : 'Tanya Panitia PPDB';
+        $btn3Url  = ($ppdbBanner && $ppdbBanner->tombol_url_3) 
+            ? $ppdbBanner->tombol_url_3 
+            : ('https://wa.me/' . preg_replace('/[^0-9]/', '', $sekolah->telepon ?? '6281234567890') . '?text=' . urlencode('Halo Panitia PPDB ' . ($sekolah->nama_sekolah ?? 'SMKN 1 Air Naningan') . ', saya ingin bertanya seputar pendaftaran'));
+        
+        // Dynamic alignment styles
+        $alignStyle = 'text-align: left; margin-right: auto; margin-left: 0;';
+        $flexJustify = 'justify-content: flex-start;';
+        $scrimStyle = 'background: linear-gradient(90deg, rgba(8, 14, 30, 0.96) 0%, rgba(11, 20, 45, 0.92) 45%, rgba(15, 23, 42, 0.75) 72%, rgba(15, 23, 42, 0.48) 100%);';
+
+        if ($ppdbPosisiTeks === 'center') {
+            $alignStyle = 'text-align: center; margin-left: auto; margin-right: auto;';
+            $flexJustify = 'justify-content: center;';
+            $scrimStyle = 'background: radial-gradient(circle at center, rgba(8, 14, 30, 0.88) 0%, rgba(11, 20, 45, 0.94) 100%);';
+        } elseif ($ppdbPosisiTeks === 'right') {
+            $alignStyle = 'text-align: right; margin-left: auto; margin-right: 0;';
+            $flexJustify = 'justify-content: flex-end;';
+            $scrimStyle = 'background: linear-gradient(270deg, rgba(8, 14, 30, 0.96) 0%, rgba(11, 20, 45, 0.92) 45%, rgba(15, 23, 42, 0.75) 72%, rgba(15, 23, 42, 0.48) 100%);';
+        }
     @endphp
 
     <div class="ppdb-banner-box">
         <img src="{{ $ppdbImgUrl }}" alt="{{ $ppdbJudul }}" class="ppdb-bg-media">
-        <div class="ppdb-scrim-overlay"></div>
+        <div class="ppdb-scrim-overlay" style="{{ $scrimStyle }}"></div>
 
-        <div class="ppdb-content-relative">
-            <div style="display: inline-flex; align-items: center; gap: 8px; background: rgba(255, 255, 255, 0.14); backdrop-filter: blur(8px); padding: 6px 16px; border-radius: 9999px; font-size: 0.76rem; font-weight: 800; margin-bottom: 18px; border: 1px solid rgba(255,255,255,0.25);">
-                <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #34d399; box-shadow: 0 0 0 2px rgba(52,211,153,0.3);"></span>
-                <span>{{ $ppdbBadge }}</span>
-            </div>
+        <div class="ppdb-content-relative" style="{{ $alignStyle }}">
+            @if(!empty($ppdbBadge))
+                <div style="display: inline-flex; align-items: center; gap: 8px; background: rgba(255, 255, 255, 0.14); backdrop-filter: blur(8px); padding: 6px 16px; border-radius: 9999px; font-size: 0.76rem; font-weight: 800; margin-bottom: 18px; border: 1px solid rgba(255,255,255,0.25);">
+                    <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #34d399; box-shadow: 0 0 0 2px rgba(52,211,153,0.3);"></span>
+                    <span>{{ $ppdbBadge }}</span>
+                </div>
+            @endif
             
             <h2 style="font-size: clamp(1.8rem, 3.4vw, 2.5rem); font-weight: 800; line-height: 1.18; margin-bottom: 16px; text-shadow: 0 2px 8px rgba(0,0,0,0.4);">
                 {{ $ppdbJudul }}
             </h2>
             
-            <p style="font-size: 0.98rem; color: #cbd5e1; line-height: 1.65; margin-bottom: 22px; text-shadow: 0 1px 4px rgba(0,0,0,0.3);">
-                {!! nl2br(e($ppdbSubjudul)) !!}
-            </p>
+            @if(!empty($ppdbSubjudul))
+                <p style="font-size: 0.98rem; color: #cbd5e1; line-height: 1.65; margin-bottom: 22px; text-shadow: 0 1px 4px rgba(0,0,0,0.3);">
+                    {!! nl2br(e($ppdbSubjudul)) !!}
+                </p>
+            @endif
 
-            <div class="ppdb-benefit-pills">
-                @foreach($pills as $pill)
-                    <span class="ppdb-benefit-pill"><i class="fa-solid fa-check"></i> {{ $pill }}</span>
-                @endforeach
-            </div>
+            @if(count($pills) > 0)
+                <div class="ppdb-benefit-pills" style="{{ $flexJustify }}">
+                    @foreach($pills as $pill)
+                        <span class="ppdb-benefit-pill"><i class="fa-solid fa-check"></i> {{ $pill }}</span>
+                    @endforeach
+                </div>
+            @endif
 
-            <div style="display: flex; flex-wrap: wrap; gap: 12px; align-items: center;">
-                @if($btn1Text && $btn1Url)
+            <div style="display: flex; flex-wrap: wrap; gap: 12px; align-items: center; {{ $flexJustify }}">
+                @if(!empty($btn1Text) && !empty($btn1Url))
                     <a href="{{ $btn1Url }}" class="btn-industrial" style="background: #ffffff; color: #0f172a; font-weight: 800; padding: 13px 28px; border-radius: 12px; box-shadow: 0 10px 25px -4px rgba(0,0,0,0.3);">
                         <i class="fa-solid fa-file-signature"></i> {{ $btn1Text }}
                     </a>
                 @endif
 
-                @if($btn2Text && $btn2Url)
+                @if(!empty($btn2Text) && !empty($btn2Url))
                     <a href="{{ $btn2Url }}" class="btn-industrial" style="background: rgba(255, 255, 255, 0.14); border: 1px solid rgba(255,255,255,0.3); color: #ffffff; padding: 13px 22px; border-radius: 12px;">
                         <i class="fa-solid fa-id-badge"></i> {{ $btn2Text }}
                     </a>
                 @endif
 
-                <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $sekolah->telepon ?? '6281234567890') }}?text=Halo%20Panitia%20PPDB%20SMKN%201%20Air%20Naningan,%20saya%20ingin%20bertanya%20seputar%20pendaftaran" target="_blank" rel="noopener" class="btn-ppdb-wa">
-                    <i class="fa-brands fa-whatsapp"></i> Tanya Panitia PPDB
-                </a>
+                @if(!empty($btn3Text) && !empty($btn3Url))
+                    <a href="{{ $btn3Url }}" target="_blank" rel="noopener" class="btn-ppdb-wa">
+                        <i class="fa-brands fa-whatsapp"></i> {{ $btn3Text }}
+                    </a>
+                @endif
             </div>
         </div>
     </div>
+    @endif
 
     <!-- ═══ 6. WARTA & ARTIKEL RESMI SEKOLAH ═══ -->
     <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 24px;">

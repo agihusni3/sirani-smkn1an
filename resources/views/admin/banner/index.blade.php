@@ -154,6 +154,11 @@
                         <i class="bi bi-link-45deg"></i> {{ $banner->tombol_teks_2 }} &rarr; <span style="color:var(--text-3);">{{ $banner->tombol_url_2 }}</span>
                       </span>
                     @endif
+                    @if($banner->tombol_teks_3)
+                      <span style="background:#ecfdf5; border:1px solid #a7f3d0; padding:3px 8px; border-radius:4px; color:#065f46; display:inline-flex; align-items:center; gap:4px;">
+                        <i class="bi bi-whatsapp"></i> {{ $banner->tombol_teks_3 }}
+                      </span>
+                    @endif
                   </div>
                 </td>
 

@@ -45,6 +45,8 @@ class WebsiteBannerController extends Controller
             'tombol_url_1'   => 'nullable|string|max:255',
             'tombol_teks_2'  => 'nullable|string|max:60',
             'tombol_url_2'   => 'nullable|string|max:255',
+            'tombol_teks_3'  => 'nullable|string|max:60',
+            'tombol_url_3'   => 'nullable|string|max:255',
             'urutan'         => 'required|integer|min:1',
             'gambar'         => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120',
         ]);
@@ -86,6 +88,8 @@ class WebsiteBannerController extends Controller
             'tombol_url_1'   => 'nullable|string|max:255',
             'tombol_teks_2'  => 'nullable|string|max:60',
             'tombol_url_2'   => 'nullable|string|max:255',
+            'tombol_teks_3'  => 'nullable|string|max:60',
+            'tombol_url_3'   => 'nullable|string|max:255',
             'urutan'         => 'required|integer|min:1',
             'gambar'         => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120',
         ]);
