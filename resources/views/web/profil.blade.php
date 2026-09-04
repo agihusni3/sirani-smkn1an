@@ -46,8 +46,8 @@
     <!-- Pimpinan Lembaga & Sambutan Kepala Sekolah -->
     <div class="profil-leader-card">
         <div class="leader-meta-col">
-            <div class="leader-avatar-badge">
-                AS
+            <div class="leader-photo-box">
+                <img src="{{ asset('images/web/kepala_sekolah.jpg') }}" alt="Kepala SMK Negeri 1 Air Naningan" class="leader-photo-img">
             </div>
             <span class="leader-role-tag">Kepala Sekolah</span>
             <h3 class="leader-name">{{ $sekolah->nama_kepala_sekolah ?? 'Drs. H. Ahmad Sudrajat, M.Pd.' }}</h3>
@@ -111,25 +111,6 @@
             </div>
         </div>
 
-    </div>
-
-    <!-- Quick Navigation to Program Keahlian & Kontak -->
-    <div class="profil-quick-nav">
-        <a href="{{ route('web.jurusan.index') }}" class="quick-nav-card">
-            <div>
-                <span class="quick-nav-label">Kurikulum Terapan</span>
-                <div class="quick-nav-title">Eksplorasi 3 Konsentrasi Keahlian (RPL, APHP, TSM)</div>
-            </div>
-            <span class="quick-nav-arrow">&rarr;</span>
-        </a>
-
-        <a href="{{ route('web.kontak') }}" class="quick-nav-card">
-            <div>
-                <span class="quick-nav-label">Layanan Komunikasi</span>
-                <div class="quick-nav-title">Kunjungi Kampus &amp; Hubungi Sekretariat Sekolah</div>
-            </div>
-            <span class="quick-nav-arrow">&rarr;</span>
-        </a>
     </div>
 
 </div>
