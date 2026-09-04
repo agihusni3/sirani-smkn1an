@@ -525,46 +525,229 @@
 
     /* ── Teaching Factory Industrial Portfolio ── */
     .tefa-strip {
-        background: #090d16;
+        background: linear-gradient(180deg, #090d16 0%, #0f172a 100%);
+        border: 1px solid rgba(255, 255, 255, 0.08);
         border-radius: var(--radius-xl);
         padding: clamp(36px, 5vw, 54px);
         color: #ffffff;
         margin-bottom: 70px;
+        box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.35);
+        position: relative;
+        overflow: hidden;
     }
 
     .tefa-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(310px, 1fr));
         gap: 24px;
         margin-top: 36px;
     }
 
     .tefa-item-box {
-        background: rgba(255, 255, 255, 0.04);
-        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.08);
         border-radius: var(--radius-lg);
-        padding: 24px;
-        transition: var(--transition);
+        overflow: hidden;
+        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
         display: flex;
         flex-direction: column;
         justify-content: space-between;
     }
 
     .tefa-item-box:hover {
-        background: rgba(255, 255, 255, 0.08);
-        border-color: rgba(255, 255, 255, 0.25);
-        transform: translateY(-3px);
+        background: rgba(255, 255, 255, 0.06);
+        border-color: rgba(255, 255, 255, 0.22);
+        transform: translateY(-4px);
+        box-shadow: 0 14px 30px -5px rgba(0, 0, 0, 0.4);
     }
 
-    /* PPDB Fast Banner */
+    .tefa-thumb-box {
+        position: relative;
+        height: 180px;
+        width: 100%;
+        overflow: hidden;
+        background: #020617;
+    }
+
+    .tefa-thumb-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.5s ease;
+    }
+
+    .tefa-item-box:hover .tefa-thumb-img {
+        transform: scale(1.05);
+    }
+
+    .tefa-badge-float {
+        position: absolute;
+        top: 12px;
+        left: 12px;
+        background: rgba(15, 23, 42, 0.82);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        padding: 4px 10px;
+        border-radius: 6px;
+        font-family: var(--font-tech);
+        font-size: 0.7rem;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+    }
+
+    .tefa-badge-float.rpl { color: #38bdf8; border-color: rgba(56, 189, 248, 0.35); }
+    .tefa-badge-float.aphp { color: #34d399; border-color: rgba(52, 211, 153, 0.35); }
+    .tefa-badge-float.tsm { color: #fbbf24; border-color: rgba(251, 191, 36, 0.35); }
+
+    .tefa-body {
+        padding: 22px;
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        justify-content: space-between;
+    }
+
+    .tefa-item-title {
+        font-size: 1.15rem;
+        font-weight: 800;
+        margin-bottom: 8px;
+        color: #ffffff;
+        line-height: 1.3;
+    }
+
+    .tefa-item-desc {
+        font-size: 0.86rem;
+        color: #94a3b8;
+        line-height: 1.6;
+        margin-bottom: 20px;
+    }
+
+    .tefa-footer-bar {
+        border-top: 1px solid rgba(255, 255, 255, 0.07);
+        padding-top: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+    }
+
+    .tefa-status-pill {
+        font-size: 0.74rem;
+        font-weight: 700;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .tefa-status-pill .dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+    }
+
+    .btn-tefa-cta {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.78rem;
+        font-weight: 700;
+        padding: 7px 14px;
+        border-radius: 8px;
+        text-decoration: none;
+        transition: all 0.2s ease;
+    }
+
+    .btn-tefa-cta.blue {
+        background: rgba(37, 99, 235, 0.2);
+        color: #60a5fa;
+        border: 1px solid rgba(96, 165, 250, 0.35);
+    }
+    .btn-tefa-cta.blue:hover {
+        background: #2563eb;
+        color: #ffffff;
+        border-color: #2563eb;
+    }
+
+    .btn-tefa-cta.green {
+        background: rgba(16, 185, 129, 0.2);
+        color: #34d399;
+        border: 1px solid rgba(52, 211, 153, 0.35);
+    }
+    .btn-tefa-cta.green:hover {
+        background: #059669;
+        color: #ffffff;
+        border-color: #059669;
+    }
+
+    .btn-tefa-cta.amber {
+        background: rgba(245, 158, 11, 0.2);
+        color: #fbbf24;
+        border: 1px solid rgba(251, 191, 36, 0.35);
+    }
+    .btn-tefa-cta.amber:hover {
+        background: #d97706;
+        color: #ffffff;
+        border-color: #d97706;
+    }
+
+    /* PPDB Fast Banner Enhancements */
     .ppdb-banner-box {
-        background: linear-gradient(135deg, #1e3a8a 0%, #0f172a 100%);
+        background: linear-gradient(135deg, #091224 0%, #1e3a8a 50%, #0f172a 100%);
+        border: 1px solid rgba(255, 255, 255, 0.12);
         border-radius: var(--radius-xl);
         padding: clamp(36px, 5vw, 56px);
         color: #ffffff;
         margin-bottom: 70px;
         position: relative;
         overflow: hidden;
+        box-shadow: 0 20px 40px -15px rgba(15, 23, 42, 0.3);
+    }
+
+    .ppdb-benefit-pills {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-bottom: 26px;
+    }
+
+    .ppdb-benefit-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: rgba(255, 255, 255, 0.09);
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        border-radius: 9999px;
+        padding: 5px 14px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: #f1f5f9;
+    }
+
+    .ppdb-benefit-pill i {
+        color: #34d399;
+    }
+
+    .btn-ppdb-wa {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(16, 185, 129, 0.18);
+        border: 1px solid rgba(52, 211, 153, 0.4);
+        color: #34d399;
+        font-size: 0.92rem;
+        font-weight: 700;
+        padding: 13px 22px;
+        border-radius: 12px;
+        text-decoration: none;
+        transition: all 0.2s ease;
+    }
+
+    .btn-ppdb-wa:hover {
+        background: #059669;
+        color: #ffffff;
+        border-color: #059669;
+        transform: translateY(-2px);
     }
 
     @media (max-width: 900px) {
@@ -845,64 +1028,102 @@
         <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 20px;">
             <div>
                 <span style="font-family: var(--font-tech); font-size: 0.78rem; font-weight: 700; color: #fbbf24; text-transform: uppercase; letter-spacing: 0.08em;">
-                    TEACHING FACTORY (TEFA) PRODUCTION
+                    TEACHING FACTORY (TEFA) &amp; BENGKEL PRODUKSI
                 </span>
                 <h2 style="font-size: clamp(1.6rem, 3vw, 2.2rem); font-weight: 800; margin-top: 8px;">
                     Produk &amp; Portofolio Nyata Karya Siswa
                 </h2>
             </div>
-            <span style="font-size: 0.85rem; color: #94a3b8;">Pembuktian keterampilan hands-on berstandar komersial</span>
+            <span style="font-size: 0.85rem; color: #94a3b8; max-width: 420px; text-align: right;">
+                Pembuktian keahlian praktis berstandar komersial yang diproduksi langsung di workshop sekolah dan dinikmati masyarakat.
+            </span>
         </div>
 
         <div class="tefa-grid">
+            <!-- 01 RPL TEFA -->
             <div class="tefa-item-box">
-                <div>
-                    <div style="font-size: 0.74rem; font-family: var(--font-tech); color: #60a5fa; font-weight: 700; margin-bottom: 8px;">
-                        REKAYASA PERANGKAT LUNAK
+                <div class="tefa-thumb-box">
+                    <img src="{{ asset('images/web/jurusan_rpl.jpg') }}" alt="Proyek IoT SIRANI RPL" class="tefa-thumb-img">
+                    <div class="tefa-badge-float rpl">
+                        <i class="fa-solid fa-microchip"></i> IOT &amp; SOFTWARE PRODUCTION
                     </div>
-                    <h3 style="font-size: 1.15rem; font-weight: 800; margin-bottom: 10px; color: #ffffff;">
-                        Sistem Presensi IoT SIRANI &amp; Smart Gate
-                    </h3>
-                    <p style="font-size: 0.85rem; color: #94a3b8; line-height: 1.6;">
-                        Ekosistem absensi digital mandiri dengan kartu RFID dan QR-Code yang kini mengontrol kedisiplinan dan laporan presensi harian seluruh civitas sekolah.
-                    </p>
                 </div>
-                <div style="margin-top: 20px; font-size: 0.82rem; font-weight: 700; color: #60a5fa;">
-                    Dipakai Resmi di SMKN 1 Air Naningan
+                <div class="tefa-body">
+                    <div>
+                        <h3 class="tefa-item-title">
+                            Sistem Presensi IoT SIRANI &amp; Smart Gate
+                        </h3>
+                        <p class="tefa-item-desc">
+                            Inovasi presensi digital terpadu berbasis pembaca kartu RFID dan mikrokontroler karya siswa RPL. Aktif mencatat kedisiplinan dan notifikasi kehadiran orang tua secara real-time.
+                        </p>
+                    </div>
+                    <div class="tefa-footer-bar">
+                        <div class="tefa-status-pill" style="color: #38bdf8;">
+                            <span class="dot" style="background: #38bdf8; box-shadow: 0 0 0 2px rgba(56,189,248,0.25);"></span>
+                            <span>Terpasang Resmi di Kampus</span>
+                        </div>
+                        <a href="{{ route('portal.ortu.index') }}" class="btn-tefa-cta blue">
+                            <span>Lihat Demo</span> <i class="fa-solid fa-arrow-right"></i>
+                        </a>
+                    </div>
                 </div>
             </div>
 
+            <!-- 02 APHP TEFA -->
             <div class="tefa-item-box">
-                <div>
-                    <div style="font-size: 0.74rem; font-family: var(--font-tech); color: #34d399; font-weight: 700; margin-bottom: 8px;">
-                        AGRIBISNIS HASIL PERTANIAN
+                <div class="tefa-thumb-box">
+                    <img src="{{ asset('images/web/jurusan_aphp.jpg') }}" alt="Kopi Robusta Naningan Roast APHP" class="tefa-thumb-img">
+                    <div class="tefa-badge-float aphp">
+                        <i class="fa-solid fa-mug-hot"></i> FINE ROBUSTA TANGGAMUS
                     </div>
-                    <h3 style="font-size: 1.15rem; font-weight: 800; margin-bottom: 10px; color: #ffffff;">
-                        Kopi Robusta Naningan Roast &amp; Aneka Pangan
-                    </h3>
-                    <p style="font-size: 0.85rem; color: #94a3b8; line-height: 1.6;">
-                        Produk kopi bubuk kemasan premium hasil roasting biji kopi petani Air Naningan serta aneka keripik dan produk olahan pangan berstandar kebersihan tinggi.
-                    </p>
                 </div>
-                <div style="margin-top: 20px; font-size: 0.82rem; font-weight: 700; color: #34d399;">
-                    Produksi Teaching Factory Komersial
+                <div class="tefa-body">
+                    <div>
+                        <h3 class="tefa-item-title">
+                            Kopi Robusta Naningan Roast &amp; Aneka Pangan
+                        </h3>
+                        <p class="tefa-item-desc">
+                            Biji kopi petik merah perkebunan lereng Air Naningan diproses sangrai (*medium-dark roast*) dan dikemas modern berkatup aroma, berpadu aneka keripik pisang oven higienis.
+                        </p>
+                    </div>
+                    <div class="tefa-footer-bar">
+                        <div class="tefa-status-pill" style="color: #34d399;">
+                            <span class="dot" style="background: #34d399; box-shadow: 0 0 0 2px rgba(52,211,153,0.25);"></span>
+                            <span>Produk Siap Pesan (Komersial)</span>
+                        </div>
+                        <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $sekolah->telepon ?? '6281234567890') }}?text=Halo%20Admin%20TEFA%20APHP%20SMKN%201%20Air%20Naningan,%20saya%20tertarik%20memesan%20produk%20Kopi%20Naningan%20Roast" target="_blank" rel="noopener" class="btn-tefa-cta green">
+                            <i class="fa-brands fa-whatsapp"></i> <span>Pesan Produk</span>
+                        </a>
+                    </div>
                 </div>
             </div>
 
+            <!-- 03 TSM TEFA -->
             <div class="tefa-item-box">
-                <div>
-                    <div style="font-size: 0.74rem; font-family: var(--font-tech); color: #fbbf24; font-weight: 700; margin-bottom: 8px;">
-                        TEKNIK SEPEDA MOTOR
+                <div class="tefa-thumb-box">
+                    <img src="{{ asset('images/web/jurusan_tsm.jpg') }}" alt="Bengkel Servis Motor TSM" class="tefa-thumb-img">
+                    <div class="tefa-badge-float tsm">
+                        <i class="fa-solid fa-screwdriver-wrench"></i> BENGKEL BINAAN INDUSTRI
                     </div>
-                    <h3 style="font-size: 1.15rem; font-weight: 800; margin-bottom: 10px; color: #ffffff;">
-                        Unit Servis Ringan Binaan Bengkel APM
-                    </h3>
-                    <p style="font-size: 0.85rem; color: #94a3b8; line-height: 1.6;">
-                        Layanan servis berkala, ganti oli, tune up injeksi, dan perbaikan kelistrikan kendaraan bermotor roda dua untuk masyarakat sekitar kampus sekolah.
-                    </p>
                 </div>
-                <div style="margin-top: 20px; font-size: 0.82rem; font-weight: 700; color: #fbbf24;">
-                    Layanan Servis Binaan Industri
+                <div class="tefa-body">
+                    <div>
+                        <h3 class="tefa-item-title">
+                            Pos Servis Ringan &amp; Tune-Up Injeksi
+                        </h3>
+                        <p class="tefa-item-desc">
+                            Layanan servis berkala kendaraan roda dua masyarakat sekitar: pembersihan injector, tune up kelistrikan, ganti oli, dan perawatan CVT standar operasional bengkel APM resmi.
+                        </p>
+                    </div>
+                    <div class="tefa-footer-bar">
+                        <div class="tefa-status-pill" style="color: #fbbf24;">
+                            <span class="dot" style="background: #fbbf24; box-shadow: 0 0 0 2px rgba(251,191,36,0.25);"></span>
+                            <span>Buka Jam KBM Praktik</span>
+                        </div>
+                        <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $sekolah->telepon ?? '6281234567890') }}?text=Halo%20Bengkel%20TSM%20SMKN%201%20Air%20Naningan,%20saya%20ingin%20jadwal%20servis%20motor" target="_blank" rel="noopener" class="btn-tefa-cta amber">
+                            <i class="fa-solid fa-wrench"></i> <span>Booking Servis</span>
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
@@ -910,23 +1131,36 @@
 
     <!-- ═══ 5. PPDB CALLOUT BANNER ═══ -->
     <div class="ppdb-banner-box">
-        <div style="max-width: 720px;">
-            <div style="display: inline-flex; align-items: center; gap: 8px; background: rgba(255, 255, 255, 0.12); padding: 5px 14px; border-radius: 20px; font-size: 0.76rem; font-weight: 800; margin-bottom: 16px;">
-                <span style="display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #34d399;"></span>
-                PENERIMAAN PESERTA DIDIK BARU TP {{ date('Y') }}/{{ date('Y') + 1 }}
+        <div style="max-width: 780px;">
+            <div style="display: inline-flex; align-items: center; gap: 8px; background: rgba(255, 255, 255, 0.14); backdrop-filter: blur(8px); padding: 6px 16px; border-radius: 9999px; font-size: 0.76rem; font-weight: 800; margin-bottom: 18px; border: 1px solid rgba(255,255,255,0.25);">
+                <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #34d399; box-shadow: 0 0 0 2px rgba(52,211,153,0.3);"></span>
+                <span>GELOMBANG 1 TP {{ date('Y') }}/{{ date('Y') + 1 }} • BEBAS BIAYA PENDAFTARAN (100% GRATIS)</span>
             </div>
-            <h2 style="font-size: clamp(1.8rem, 3.2vw, 2.4rem); font-weight: 800; line-height: 1.2; margin-bottom: 14px;">
-                Daftar Online Mudah dari Rumah Tanpa Biaya Pendaftaran
+            
+            <h2 style="font-size: clamp(1.8rem, 3.4vw, 2.5rem); font-weight: 800; line-height: 1.18; margin-bottom: 16px;">
+                Daftar Online Mudah dari Rumah, Siap Cetak Generasi Vokasi Berkarakter
             </h2>
-            <p style="font-size: 0.95rem; color: #cbd5e1; line-height: 1.65; margin-bottom: 28px;">
-                Tersedia 3 Jalur: <strong>Reguler</strong> (Nilai Rapor), <strong>Prestasi</strong> (Piagam Lomba &amp; Tahfidz), dan <strong>Afirmasi</strong> (Pemegang KIP/PKH). Bebas biaya pendaftaran (100% Gratis).
+            
+            <p style="font-size: 0.98rem; color: #cbd5e1; line-height: 1.65; margin-bottom: 22px;">
+                Membuka 3 Jalur: <strong>Reguler</strong> (Nilai Rapor), <strong>Prestasi</strong> (Piagam Lomba &amp; Tahfidz), dan <strong>Afirmasi</strong> (KIP / PKH). Bebas uang gedung (SPI), didukung laboratorium bengkel presisi modern, serta terhubung sertifikasi kerja resmi BNSP.
             </p>
-            <div style="display: flex; flex-wrap: wrap; gap: 12px;">
-                <a href="{{ route('ppdb.formulir') }}" class="btn-industrial" style="background: #ffffff; color: #0f172a; font-weight: 800; padding: 12px 26px;">
+
+            <div class="ppdb-benefit-pills">
+                <span class="ppdb-benefit-pill"><i class="fa-solid fa-check"></i> Bebas Biaya Pendaftaran</span>
+                <span class="ppdb-benefit-pill"><i class="fa-solid fa-check"></i> Tanpa Uang Gedung (SPI)</span>
+                <span class="ppdb-benefit-pill"><i class="fa-solid fa-check"></i> Lisensi Sertifikasi BNSP</span>
+                <span class="ppdb-benefit-pill"><i class="fa-solid fa-check"></i> Penyaluran Kerja &amp; Industri</span>
+            </div>
+
+            <div style="display: flex; flex-wrap: wrap; gap: 12px; align-items: center;">
+                <a href="{{ route('ppdb.formulir') }}" class="btn-industrial" style="background: #ffffff; color: #0f172a; font-weight: 800; padding: 13px 28px; border-radius: 12px; box-shadow: 0 10px 25px -4px rgba(0,0,0,0.3);">
                     <i class="fa-solid fa-file-signature"></i> Isi Formulir PPDB Sekarang
                 </a>
-                <a href="{{ route('ppdb.status') }}" class="btn-industrial" style="background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255,255,255,0.25); color: #ffffff; padding: 12px 22px;">
-                    <i class="fa-solid fa-id-badge"></i> Cek Status &amp; Cetak Kartu
+                <a href="{{ route('ppdb.status') }}" class="btn-industrial" style="background: rgba(255, 255, 255, 0.14); border: 1px solid rgba(255,255,255,0.3); color: #ffffff; padding: 13px 22px; border-radius: 12px;">
+                    <i class="fa-solid fa-id-badge"></i> Cek Status Seleksi
+                </a>
+                <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $sekolah->telepon ?? '6281234567890') }}?text=Halo%20Panitia%20PPDB%20SMKN%201%20Air%20Naningan,%20saya%20ingin%20bertanya%20seputar%20pendaftaran" target="_blank" rel="noopener" class="btn-ppdb-wa">
+                    <i class="fa-brands fa-whatsapp"></i> Tanya Panitia PPDB
                 </a>
             </div>
         </div>
