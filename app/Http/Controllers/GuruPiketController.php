@@ -140,13 +140,6 @@ class GuruPiketController extends Controller
             ->whereIn('status', ['hadir', 'terlambat', 'bolos'])
             ->count();
 
-        // Data grouped per rombel untuk modal popup
-        $siswaBelumScanPulangGrouped = $absensiHariIni
-            ->whereNotNull('jam_masuk')
-            ->whereNull('jam_pulang')
-            ->whereIn('status', ['hadir', 'terlambat', 'bolos'])
-            ->groupBy(fn($ab) => $ab->siswaRombel?->rombel?->nama_rombel ?? 'Tanpa Kelas');
-
         // Flag: apakah sudah melewati jam tutup gerbang (17:00:00)
         $jamTutupGerbang   = $jadwal->jam_tutup_gerbang ?? '17:00:00';
         $sudahLewatJamTutup = $now->format('H:i:s') >= $jamTutupGerbang;
@@ -188,7 +181,6 @@ class GuruPiketController extends Controller
             'jadwalPiketSeminggu',
             'canKoreksi',
             'siswaBelumScanPulang',
-            'siswaBelumScanPulangGrouped',
             'sudahLewatJamTutup'
         ));
     }

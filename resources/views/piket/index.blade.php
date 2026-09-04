@@ -774,14 +774,14 @@
       </div>
 
       <!-- 6. Belum Scan Pulang -->
-      <div class="piket-kpi-card" onclick="selectSiswaFilter('belum_pulang'); openModal('modalRekapPulangPiket');" style="border:{{ $sudahLewatJamTutup ? '1.5px solid #000000' : '1px solid var(--border-2)' }};">
+      <div class="piket-kpi-card" onclick="selectSiswaFilter('belum_pulang')" style="border:{{ $sudahLewatJamTutup ? '1.5px solid #000000' : '1px solid var(--border-2)' }};">
         <div class="piket-kpi-top">
           <span>Blm Scan Pulang</span>
           <i class="bi bi-door-open-fill" style="color:#06B6D4;"></i>
         </div>
         <div class="piket-kpi-value" style="color:#0891B2;">{{ $siswaBelumScanPulang }}</div>
         <div class="piket-kpi-sub" style="color:{{ $sudahLewatJamTutup ? '#000000' : 'var(--text-3)' }}; font-weight:{{ $sudahLewatJamTutup ? '800' : '600' }};">
-          {{ $sudahLewatJamTutup ? 'Lewat 17:00 (Klik)' : 'Klik → lihat detail' }}
+          {{ $sudahLewatJamTutup ? 'Lewat jam pulang' : 'Tampilkan di tabel' }}
         </div>
       </div>
     </div>
@@ -2409,186 +2409,7 @@
       }
     }
   }
-
-  // ── MODAL REKAP SISWA BELUM SCAN PULANG ──
-  function filterRombelModal(rombelSlug, btn) {
-    const cards = document.querySelectorAll('.rombel-modal-card');
-    const pills = document.querySelectorAll('.chip-filter-modal');
-    pills.forEach(p => {
-      p.style.background = '#FFFFFF';
-      p.style.color = 'var(--text)';
-      p.style.borderColor = 'var(--border-2)';
-    });
-    if (btn) {
-      btn.style.background = '#000000';
-      btn.style.color = '#FFFFFF';
-      btn.style.borderColor = '#000000';
-    }
-    cards.forEach(card => {
-      if (rombelSlug === 'all' || card.getAttribute('data-rombel') === rombelSlug) {
-        card.style.display = 'block';
-      } else {
-        card.style.display = 'none';
-      }
-    });
-  }
 </script>
-
-{{-- MODAL: REKAP SISWA BELUM SCAN PULANG --}}
-<div class="modal-overlay" id="modalRekapPulangPiket" style="background:rgba(15,23,42,0.65); backdrop-filter:blur(8px); z-index:9999;">
-  <div class="modal-card" style="max-width:780px; max-height:88vh; background:#FFFFFF !important; border-radius:16px; border:1px solid var(--border-2); box-shadow:0 25px 50px -12px rgba(0,0,0,0.35); overflow:hidden; display:flex; flex-direction:column; padding:0;">
-
-    {{-- Header Modal --}}
-    <div style="padding:18px 24px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; background:#FFFFFF; flex-shrink:0;">
-      <div style="display:flex; align-items:center; gap:12px;">
-        <div style="width:40px; height:40px; border-radius:10px; background:#000000; color:#FFFFFF; display:flex; align-items:center; justify-content:center; font-size:19px; flex-shrink:0;">
-          <i class="bi bi-door-open-fill"></i>
-        </div>
-        <div>
-          <div style="font-size:16px; font-weight:900; color:var(--text); line-height:1.2;">Rekap Siswa Hadir Pagi Belum Scan Pulang</div>
-          <div style="font-size:12px; color:var(--text-3); margin-top:2px;">
-            Siswa yang absen masuk pagi tapi belum scan pulang (Batas Tutup Gerbang: <span style="font-family:var(--font-mono); font-weight:800; color:var(--text);">{{ substr($jadwal->jam_tutup_gerbang ?? '17:00', 0, 5) }} WIB</span>)
-          </div>
-        </div>
-
-      </div>
-      <div style="display:flex; align-items:center; gap:10px;">
-        @if($siswaBelumScanPulang > 0)
-          <span style="background:#000000; color:#FFFFFF; border-radius:20px; padding:5px 14px; font-size:12px; font-weight:800; font-family:var(--font-mono); display:inline-flex; align-items:center; gap:6px;">
-            <i class="bi bi-exclamation-circle-fill" style="font-size:11px;"></i>
-            {{ $siswaBelumScanPulang }} Siswa
-          </span>
-        @else
-          <span style="background:#F1F3F5; color:var(--text-3); border:1px solid var(--border-2); border-radius:20px; padding:5px 14px; font-size:12px; font-weight:700; display:inline-flex; align-items:center; gap:6px;">
-            <i class="bi bi-check-circle-fill" style="color:#16A34A;"></i>
-            Semua Sudah Pulang
-          </span>
-        @endif
-        <button type="button" class="btn btn-sm btn-outline" onclick="closeModal('modalRekapPulangPiket')" style="width:34px; height:34px; padding:0; display:flex; align-items:center; justify-content:center; border-radius:8px; border:1px solid var(--border-2); color:var(--text);">
-          <i class="bi bi-x-lg" style="font-size:14px;"></i>
-        </button>
-      </div>
-    </div>
-
-    {{-- Filter Chips per Rombel --}}
-    @if($siswaBelumScanPulang > 0)
-      <div style="padding:10px 24px; background:#F8F9FA; border-bottom:1px solid var(--border); display:flex; gap:8px; flex-wrap:wrap; align-items:center; flex-shrink:0;">
-        <span style="font-size:11px; font-weight:800; text-transform:uppercase; color:var(--text-3); letter-spacing:0.5px; margin-right:4px;">Filter Kelas:</span>
-        <button type="button" class="chip-filter-modal" onclick="filterRombelModal('all', this)"
-          style="background:#000000; color:#FFFFFF; border:1px solid #000000; border-radius:20px; padding:4px 12px; font-size:11.5px; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; gap:6px; transition:all .15s;">
-          <span>Semua</span>
-          <span style="background:rgba(255,255,255,0.25); color:#FFFFFF; border-radius:10px; padding:1px 6px; font-size:10px; font-family:var(--font-mono);">{{ $siswaBelumScanPulang }}</span>
-        </button>
-        @foreach($siswaBelumScanPulangGrouped as $namaRombel => $items)
-          <button type="button" class="chip-filter-modal" onclick="filterRombelModal('{{ Str::slug($namaRombel) }}', this)"
-            style="background:#FFFFFF; color:var(--text); border:1px solid var(--border-2); border-radius:20px; padding:4px 12px; font-size:11.5px; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; gap:6px; transition:all .15s;">
-            <span>{{ $namaRombel }}</span>
-            <span style="background:#000000; color:#FFFFFF; border-radius:10px; padding:1px 6px; font-size:10px; font-family:var(--font-mono);">{{ $items->count() }}</span>
-          </button>
-        @endforeach
-      </div>
-    @endif
-
-    {{-- Body Modal (Scrollable) --}}
-    <div style="overflow-y:auto; flex:1; padding:20px 24px; background:#F8F9FA;">
-      @if($siswaBelumScanPulang === 0)
-        <div style="padding:48px 20px; text-align:center; color:var(--text-3); background:#FFFFFF; border:1px solid var(--border); border-radius:12px;">
-          <i class="bi bi-patch-check-fill" style="font-size:52px; color:#16A34A; opacity:0.85;"></i>
-          <div style="font-weight:800; margin-top:14px; font-size:15px; color:var(--text);">Semua Siswa Sudah Scan Pulang</div>
-          <div style="font-size:12.5px; color:var(--text-3); margin-top:4px;">Tidak ada siswa yang tertinggal belum absen pulang hari ini.</div>
-        </div>
-      @else
-        <div style="display:flex; flex-direction:column; gap:16px;">
-          @foreach($siswaBelumScanPulangGrouped as $namaRombel => $items)
-            <div class="rombel-modal-card" data-rombel="{{ Str::slug($namaRombel) }}" style="background:#FFFFFF; border:1px solid var(--border-2); border-radius:12px; overflow:hidden; box-shadow:0 1px 3px rgba(0,0,0,0.04);">
-              {{-- Header Rombel --}}
-              <div style="background:#F1F3F5; padding:10px 16px; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border);">
-                <div style="display:flex; align-items:center; gap:8px;">
-                  <i class="bi bi-people-fill" style="color:#000000; font-size:14px;"></i>
-                  <span style="font-weight:900; font-size:13.5px; color:var(--text);">{{ $namaRombel }}</span>
-                </div>
-                <span style="font-family:var(--font-mono); font-size:11.5px; font-weight:800; background:#FFFFFF; border:1px solid var(--border-2); border-radius:6px; padding:2px 10px; color:var(--text);">
-                  {{ $items->count() }} siswa
-                </span>
-              </div>
-              {{-- Tabel Siswa --}}
-              <table style="width:100%; border-collapse:collapse; font-size:12.5px; background:#FFFFFF;">
-                <thead>
-                  <tr style="background:#FAFAFA;">
-                    <th style="padding:8px 16px; text-align:center; font-weight:800; color:var(--text-3); font-size:10.5px; text-transform:uppercase; letter-spacing:0.5px; border-bottom:1px solid var(--border); width:40px;">No</th>
-                    <th style="padding:8px 16px; text-align:left; font-weight:800; color:var(--text-3); font-size:10.5px; text-transform:uppercase; letter-spacing:0.5px; border-bottom:1px solid var(--border);">Nama Siswa</th>
-                    <th style="padding:8px 16px; text-align:center; font-weight:800; color:var(--text-3); font-size:10.5px; text-transform:uppercase; letter-spacing:0.5px; border-bottom:1px solid var(--border); width:120px;">Jam Masuk</th>
-                    <th style="padding:8px 16px; text-align:center; font-weight:800; color:var(--text-3); font-size:10.5px; text-transform:uppercase; letter-spacing:0.5px; border-bottom:1px solid var(--border); width:120px;">Status Masuk</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  @foreach($items as $idx => $absen)
-                    @php
-                      $siswa = $absen->siswa ?? $absen->siswaRombel?->siswa ?? null;
-                    @endphp
-                    <tr style="border-bottom:1px solid var(--border); background:#FFFFFF; transition:background .1s;" onmouseover="this.style.background='#F8F9FA'" onmouseout="this.style.background='#FFFFFF'">
-                      <td style="padding:10px 16px; text-align:center; font-weight:700; font-family:var(--font-mono); color:var(--text-3);">{{ $idx + 1 }}</td>
-                      <td style="padding:10px 16px;">
-                        <div style="display:flex; align-items:center; gap:10px;">
-                          <div class="avatar-circle avatar-sm" style="width:32px; height:32px; font-size:12px; font-weight:800; background:#F1F3F5; color:#0F172A; border:1px solid var(--border-2); border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
-                            @if($siswa && $siswa->foto_url)
-                              <img src="{{ $siswa->foto_url }}" alt="{{ $siswa->nama ?? '-' }}" class="avatar-img" style="width:100%; height:100%; border-radius:50%; object-fit:cover;" />
-                            @else
-                              {{ strtoupper(substr($siswa->nama ?? 'S', 0, 2)) }}
-                            @endif
-                          </div>
-                          <div>
-                            <div style="font-weight:800; color:var(--text); font-size:13px;">{{ $siswa->nama ?? '-' }}</div>
-                            <div style="font-size:11px; color:var(--text-3); font-family:var(--font-mono); margin-top:1px;">
-                              {{ $siswa->nisn ? 'NISN: '.$siswa->nisn : 'Non-NISN' }}
-                            </div>
-                          </div>
-                        </div>
-                      </td>
-                      <td style="padding:10px 16px; text-align:center;">
-                        <span style="font-family:var(--font-mono); font-weight:800; font-size:12px; color:#0F172A; background:#F1F3F5; border:1px solid var(--border-2); padding:3px 8px; border-radius:6px;">
-                          {{ $absen->jam_masuk ? substr($absen->jam_masuk, 0, 5) . ' WIB' : '-' }}
-                        </span>
-                      </td>
-                      <td style="padding:10px 16px; text-align:center;">
-                        @if($absen->status === 'terlambat')
-                          <span style="background:rgba(245,158,11,0.12); color:#B45309; border:1px solid rgba(245,158,11,0.3); font-weight:800; font-size:10.5px; padding:3px 10px; border-radius:6px; text-transform:uppercase; letter-spacing:0.3px;">
-                            TERLAMBAT
-                          </span>
-                        @else
-                          <span style="background:rgba(22,163,74,0.1); color:#16A34A; border:1px solid rgba(22,163,74,0.25); font-weight:800; font-size:10.5px; padding:3px 10px; border-radius:6px; text-transform:uppercase; letter-spacing:0.3px;">
-                            HADIR
-                          </span>
-                        @endif
-                      </td>
-                    </tr>
-                  @endforeach
-                </tbody>
-              </table>
-            </div>
-          @endforeach
-        </div>
-      @endif
-    </div>
-
-    {{-- Footer Modal --}}
-    <div style="padding:14px 24px; border-top:1px solid var(--border); background:#FFFFFF; display:flex; justify-content:space-between; align-items:center; flex-shrink:0;">
-      <div style="font-size:12px; color:var(--text-3); font-weight:600; display:flex; align-items:center; gap:6px;">
-        <i class="bi bi-info-circle-fill" style="color:var(--text-3);"></i>
-        Data siswa yang tercatat hadir pagi dan belum melakukan scan kepulangan.
-      </div>
-      <div style="display:flex; align-items:center; gap:10px;">
-        <button type="button" onclick="closeModal('modalRekapPulangPiket'); selectSiswaFilter('belum_pulang');" class="btn btn-primary" style="background:#000000; color:#FFFFFF; height:38px; padding:0 20px; font-weight:800; font-size:13px; border-radius:8px; display:inline-flex; align-items:center; gap:6px;">
-          <i class="bi bi-table"></i> Lihat di Tabel Presensi
-        </button>
-        <button type="button" onclick="closeModal('modalRekapPulangPiket')" class="btn btn-outline" style="height:38px; padding:0 22px; font-weight:800; font-size:13px; border-radius:8px;">
-          Tutup
-        </button>
-      </div>
-    </div>
-
-  </div>
-</div>
 
 </body>
 </html>
