@@ -693,15 +693,55 @@
 
     /* PPDB Fast Banner Enhancements */
     .ppdb-banner-box {
-        background: linear-gradient(135deg, #091224 0%, #1e3a8a 50%, #0f172a 100%);
-        border: 1px solid rgba(255, 255, 255, 0.12);
+        position: relative;
+        border: 1px solid rgba(255, 255, 255, 0.16);
         border-radius: var(--radius-xl);
         padding: clamp(36px, 5vw, 56px);
         color: #ffffff;
         margin-bottom: 70px;
-        position: relative;
         overflow: hidden;
-        box-shadow: 0 20px 40px -15px rgba(15, 23, 42, 0.3);
+        box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.45);
+        background-color: #0b1329;
+    }
+
+    .ppdb-bg-media {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center right;
+        z-index: 1;
+        transition: transform 0.6s ease;
+    }
+
+    .ppdb-banner-box:hover .ppdb-bg-media {
+        transform: scale(1.02);
+    }
+
+    .ppdb-scrim-overlay {
+        position: absolute;
+        inset: 0;
+        z-index: 2;
+        background: linear-gradient(90deg, 
+            rgba(8, 14, 30, 0.96) 0%, 
+            rgba(11, 20, 45, 0.92) 45%, 
+            rgba(15, 23, 42, 0.75) 72%, 
+            rgba(15, 23, 42, 0.48) 100%);
+    }
+
+    @media (max-width: 768px) {
+        .ppdb-scrim-overlay {
+            background: linear-gradient(180deg, 
+                rgba(8, 14, 30, 0.90) 0%, 
+                rgba(11, 20, 45, 0.95) 100%);
+        }
+    }
+
+    .ppdb-content-relative {
+        position: relative;
+        z-index: 3;
+        max-width: 800px;
     }
 
     .ppdb-benefit-pills {
@@ -1129,36 +1169,86 @@
         </div>
     </div>
 
-    <!-- ═══ 5. PPDB CALLOUT BANNER ═══ -->
+    <!-- ═══ 5. PPDB CALLOUT BANNER (ADMIN CUSTOMIZABLE) ═══ -->
+    @php
+        $ppdbImgUrl = ($ppdbBanner && $ppdbBanner->gambar) 
+            ? $ppdbBanner->gambar_url 
+            : asset('images/web/ppdb_banner_bg.jpg');
+        $ppdbBadge = ($ppdbBanner && $ppdbBanner->badge_text) 
+            ? $ppdbBanner->badge_text 
+            : ('GELOMBANG 1 TP ' . date('Y') . '/' . (date('Y') + 1) . ' • BEBAS BIAYA PENDAFTARAN (100% GRATIS)');
+        $ppdbJudul = ($ppdbBanner && $ppdbBanner->judul) 
+            ? $ppdbBanner->judul 
+            : 'Daftar Online Mudah dari Rumah, Siap Cetak Generasi Vokasi Berkarakter';
+        $ppdbSubjudul = ($ppdbBanner && $ppdbBanner->subjudul) 
+            ? $ppdbBanner->subjudul 
+            : 'Membuka 3 Jalur: Reguler (Nilai Rapor), Prestasi (Piagam Lomba & Tahfidz), dan Afirmasi (KIP / PKH). Bebas uang gedung (SPI), didukung laboratorium bengkel presisi modern, serta terhubung sertifikasi kerja resmi BNSP.';
+        
+        $rawPills = ($ppdbBanner && $ppdbBanner->tag_overlay) 
+            ? $ppdbBanner->tag_overlay 
+            : 'Bebas Biaya Pendaftaran | Tanpa Uang Gedung (SPI) | Lisensi Sertifikasi BNSP | Penyaluran Kerja & Industri';
+        $pills = array_filter(array_map('trim', preg_split('/[|,]/', $rawPills)));
+        if (empty($pills)) {
+            $pills = [
+                'Bebas Biaya Pendaftaran',
+                'Tanpa Uang Gedung (SPI)',
+                'Lisensi Sertifikasi BNSP',
+                'Penyaluran Kerja & Industri'
+            ];
+        }
+
+        $btn1Text = ($ppdbBanner && $ppdbBanner->tombol_teks_1) ? $ppdbBanner->tombol_teks_1 : 'Isi Formulir PPDB Sekarang';
+        $btn1Url  = ($ppdbBanner && $ppdbBanner->tombol_url_1) ? $ppdbBanner->tombol_url_1 : route('ppdb.formulir');
+        $btn2Text = ($ppdbBanner && $ppdbBanner->tombol_teks_2) ? $ppdbBanner->tombol_teks_2 : 'Cek Status Seleksi';
+        $btn2Url  = ($ppdbBanner && $ppdbBanner->tombol_url_2) ? $ppdbBanner->tombol_url_2 : route('ppdb.status');
+    @endphp
+
     <div class="ppdb-banner-box">
-        <div style="max-width: 780px;">
+        <img src="{{ $ppdbImgUrl }}" alt="{{ $ppdbJudul }}" class="ppdb-bg-media">
+        <div class="ppdb-scrim-overlay"></div>
+
+        @if(auth()->check() && (auth()->user()->isAdmin() || auth()->user()->isSuperAdmin()) && $ppdbBanner)
+            <a href="{{ route('admin.banner.edit', $ppdbBanner->id) }}" 
+               style="position: absolute; top: 16px; right: 16px; z-index: 5; background: rgba(15, 23, 42, 0.78); backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.25); color: #ffffff; padding: 6px 14px; border-radius: 8px; font-size: 0.78rem; font-weight: 700; display: inline-flex; align-items: center; gap: 6px; text-decoration: none; transition: all 0.2s;"
+               title="Ubah Latar Foto & Tulisan di Admin CMS">
+                <i class="fa-solid fa-pen-to-square" style="color: #60a5fa;"></i>
+                <span>Edit Banner PPDB</span>
+            </a>
+        @endif
+
+        <div class="ppdb-content-relative">
             <div style="display: inline-flex; align-items: center; gap: 8px; background: rgba(255, 255, 255, 0.14); backdrop-filter: blur(8px); padding: 6px 16px; border-radius: 9999px; font-size: 0.76rem; font-weight: 800; margin-bottom: 18px; border: 1px solid rgba(255,255,255,0.25);">
                 <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #34d399; box-shadow: 0 0 0 2px rgba(52,211,153,0.3);"></span>
-                <span>GELOMBANG 1 TP {{ date('Y') }}/{{ date('Y') + 1 }} • BEBAS BIAYA PENDAFTARAN (100% GRATIS)</span>
+                <span>{{ $ppdbBadge }}</span>
             </div>
             
-            <h2 style="font-size: clamp(1.8rem, 3.4vw, 2.5rem); font-weight: 800; line-height: 1.18; margin-bottom: 16px;">
-                Daftar Online Mudah dari Rumah, Siap Cetak Generasi Vokasi Berkarakter
+            <h2 style="font-size: clamp(1.8rem, 3.4vw, 2.5rem); font-weight: 800; line-height: 1.18; margin-bottom: 16px; text-shadow: 0 2px 8px rgba(0,0,0,0.4);">
+                {{ $ppdbJudul }}
             </h2>
             
-            <p style="font-size: 0.98rem; color: #cbd5e1; line-height: 1.65; margin-bottom: 22px;">
-                Membuka 3 Jalur: <strong>Reguler</strong> (Nilai Rapor), <strong>Prestasi</strong> (Piagam Lomba &amp; Tahfidz), dan <strong>Afirmasi</strong> (KIP / PKH). Bebas uang gedung (SPI), didukung laboratorium bengkel presisi modern, serta terhubung sertifikasi kerja resmi BNSP.
+            <p style="font-size: 0.98rem; color: #cbd5e1; line-height: 1.65; margin-bottom: 22px; text-shadow: 0 1px 4px rgba(0,0,0,0.3);">
+                {!! nl2br(e($ppdbSubjudul)) !!}
             </p>
 
             <div class="ppdb-benefit-pills">
-                <span class="ppdb-benefit-pill"><i class="fa-solid fa-check"></i> Bebas Biaya Pendaftaran</span>
-                <span class="ppdb-benefit-pill"><i class="fa-solid fa-check"></i> Tanpa Uang Gedung (SPI)</span>
-                <span class="ppdb-benefit-pill"><i class="fa-solid fa-check"></i> Lisensi Sertifikasi BNSP</span>
-                <span class="ppdb-benefit-pill"><i class="fa-solid fa-check"></i> Penyaluran Kerja &amp; Industri</span>
+                @foreach($pills as $pill)
+                    <span class="ppdb-benefit-pill"><i class="fa-solid fa-check"></i> {{ $pill }}</span>
+                @endforeach
             </div>
 
             <div style="display: flex; flex-wrap: wrap; gap: 12px; align-items: center;">
-                <a href="{{ route('ppdb.formulir') }}" class="btn-industrial" style="background: #ffffff; color: #0f172a; font-weight: 800; padding: 13px 28px; border-radius: 12px; box-shadow: 0 10px 25px -4px rgba(0,0,0,0.3);">
-                    <i class="fa-solid fa-file-signature"></i> Isi Formulir PPDB Sekarang
-                </a>
-                <a href="{{ route('ppdb.status') }}" class="btn-industrial" style="background: rgba(255, 255, 255, 0.14); border: 1px solid rgba(255,255,255,0.3); color: #ffffff; padding: 13px 22px; border-radius: 12px;">
-                    <i class="fa-solid fa-id-badge"></i> Cek Status Seleksi
-                </a>
+                @if($btn1Text && $btn1Url)
+                    <a href="{{ $btn1Url }}" class="btn-industrial" style="background: #ffffff; color: #0f172a; font-weight: 800; padding: 13px 28px; border-radius: 12px; box-shadow: 0 10px 25px -4px rgba(0,0,0,0.3);">
+                        <i class="fa-solid fa-file-signature"></i> {{ $btn1Text }}
+                    </a>
+                @endif
+
+                @if($btn2Text && $btn2Url)
+                    <a href="{{ $btn2Url }}" class="btn-industrial" style="background: rgba(255, 255, 255, 0.14); border: 1px solid rgba(255,255,255,0.3); color: #ffffff; padding: 13px 22px; border-radius: 12px;">
+                        <i class="fa-solid fa-id-badge"></i> {{ $btn2Text }}
+                    </a>
+                @endif
+
                 <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $sekolah->telepon ?? '6281234567890') }}?text=Halo%20Panitia%20PPDB%20SMKN%201%20Air%20Naningan,%20saya%20ingin%20bertanya%20seputar%20pendaftaran" target="_blank" rel="noopener" class="btn-ppdb-wa">
                     <i class="fa-brands fa-whatsapp"></i> Tanya Panitia PPDB
                 </a>

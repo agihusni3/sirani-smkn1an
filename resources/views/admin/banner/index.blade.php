@@ -102,6 +102,20 @@
                 {{-- Headline & Narasi --}}
                 <td style="padding:12px 14px;">
                   <div style="display:flex; align-items:center; gap:6px; margin-bottom:4px; flex-wrap:wrap;">
+                    @if($banner->posisi === 'ppdb_callout')
+                      <span style="font-size:10px; font-weight:800; color:#1d4ed8; background:#dbeafe; border:1px solid #bfdbfe; padding:2px 8px; border-radius:4px; text-transform:uppercase;">
+                        <i class="bi bi-person-check-fill"></i> Callout PPDB
+                      </span>
+                    @elseif($banner->posisi === 'hero_home')
+                      <span style="font-size:10px; font-weight:800; color:#047857; background:#d1fae5; border:1px solid #a7f3d0; padding:2px 8px; border-radius:4px; text-transform:uppercase;">
+                        <i class="bi bi-images"></i> Hero Slider
+                      </span>
+                    @else
+                      <span style="font-size:10px; font-weight:800; color:#64748b; background:#f1f5f9; border:1px solid #e2e8f0; padding:2px 8px; border-radius:4px; text-transform:uppercase;">
+                        {{ $banner->posisi }}
+                      </span>
+                    @endif
+
                     @if($banner->badge_text)
                       <span style="font-size:10px; font-weight:800; color:#b45309; background:#fef3c7; border:1px solid #fde68a; padding:2px 8px; border-radius:4px; text-transform:uppercase;">
                         {{ $banner->badge_text }}

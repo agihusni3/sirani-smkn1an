@@ -35,12 +35,12 @@ class WebsiteBannerController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'posisi'         => 'required|string|in:hero_home,top_bar,popup_modal',
+            'posisi'         => 'required|string|in:hero_home,top_bar,popup_modal,ppdb_callout',
             'posisi_teks'    => 'nullable|string|in:left,center,right',
             'judul'          => 'required|string|max:255',
             'subjudul'       => 'nullable|string|max:600',
             'badge_text'     => 'nullable|string|max:100',
-            'tag_overlay'    => 'nullable|string|max:150',
+            'tag_overlay'    => 'nullable|string|max:255',
             'tombol_teks_1'  => 'nullable|string|max:60',
             'tombol_url_1'   => 'nullable|string|max:255',
             'tombol_teks_2'  => 'nullable|string|max:60',
@@ -59,7 +59,7 @@ class WebsiteBannerController extends Controller
         WebsiteBanner::create($validated);
 
         return redirect()->route('admin.banner.index')
-            ->with('success', 'Hero Banner baru berhasil dipublikasikan!');
+            ->with('success', 'Banner Website baru berhasil dipublikasikan!');
     }
 
     /**
@@ -76,12 +76,12 @@ class WebsiteBannerController extends Controller
     public function update(Request $request, WebsiteBanner $banner)
     {
         $validated = $request->validate([
-            'posisi'         => 'required|string|in:hero_home,top_bar,popup_modal',
+            'posisi'         => 'required|string|in:hero_home,top_bar,popup_modal,ppdb_callout',
             'posisi_teks'    => 'nullable|string|in:left,center,right',
             'judul'          => 'required|string|max:255',
             'subjudul'       => 'nullable|string|max:600',
             'badge_text'     => 'nullable|string|max:100',
-            'tag_overlay'    => 'nullable|string|max:150',
+            'tag_overlay'    => 'nullable|string|max:255',
             'tombol_teks_1'  => 'nullable|string|max:60',
             'tombol_url_1'   => 'nullable|string|max:255',
             'tombol_teks_2'  => 'nullable|string|max:60',
@@ -104,7 +104,7 @@ class WebsiteBannerController extends Controller
         $banner->update($validated);
 
         return redirect()->route('admin.banner.index')
-            ->with('success', 'Hero Banner berhasil diperbarui!');
+            ->with('success', 'Banner Website berhasil diperbarui!');
     }
 
     /**

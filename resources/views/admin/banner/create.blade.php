@@ -51,6 +51,7 @@
             </label>
             <select name="posisi" required style="width:100%; padding:9px 12px; font-size:13px; border-radius:6px; border:1px solid var(--border); background:var(--surface); color:var(--text);">
               <option value="hero_home" selected>Hero Utama Beranda Web (Full Photo Slider)</option>
+              <option value="ppdb_callout">Banner Callout PPDB (Beranda Web)</option>
               <option value="top_bar">Top Bar Pengumuman</option>
               <option value="popup_modal">Modal Pengumuman Penting</option>
             </select>
@@ -114,10 +115,10 @@
 
           <div>
             <label style="display:block; font-size:12px; font-weight:700; color:var(--text-2); margin-bottom:4px;">
-              Tag Keterangan di Atas Foto (Overlay)
+              Tag Keterangan / Benefit Pills (Overlay)
             </label>
-            <input type="text" name="tag_overlay" value="{{ old('tag_overlay', 'SMKN 1 Air Naningan • Tanggamus, Lampung') }}" placeholder="Contoh: Kampus Utama • Tanggamus, Lampung" style="width:100%; padding:9px 12px; font-size:13px; border-radius:6px; border:1px solid var(--border); background:var(--surface); color:var(--text);">
-            <div style="font-size:11px; color:var(--text-3); margin-top:3px;">Keterangan kartu kecil yang menempel di pojok bawah foto.</div>
+            <input type="text" name="tag_overlay" value="{{ old('tag_overlay', 'SMKN 1 Air Naningan • Tanggamus, Lampung') }}" placeholder="Contoh: Bebas Biaya Pendaftaran | Tanpa Uang Gedung | Lisensi BNSP" style="width:100%; padding:9px 12px; font-size:13px; border-radius:6px; border:1px solid var(--border); background:var(--surface); color:var(--text);">
+            <div style="font-size:11px; color:var(--text-3); margin-top:3px;">Untuk Banner PPDB: pisahkan poin keunggulan dengan tanda | atau koma.</div>
           </div>
         </div>
 

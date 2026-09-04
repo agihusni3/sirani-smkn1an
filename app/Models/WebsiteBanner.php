@@ -50,12 +50,23 @@ class WebsiteBanner extends Model
     }
 
     /**
+     * Scope untuk banner posisi ppdb_callout.
+     */
+    public function scopePpdbCallout($query)
+    {
+        return $query->where('posisi', 'ppdb_callout');
+    }
+
+    /**
      * Accessor URL Gambar dengan fallback ke hero bawaan.
      */
     public function getGambarUrlAttribute(): string
     {
         if ($this->gambar && Storage::disk('public')->exists($this->gambar)) {
             return Storage::disk('public')->url($this->gambar);
+        }
+        if ($this->posisi === 'ppdb_callout' && file_exists(public_path('images/web/ppdb_banner_bg.jpg'))) {
+            return asset('images/web/ppdb_banner_bg.jpg');
         }
         if ($this->urutan % 2 === 0 && file_exists(public_path('images/web/jurusan_rpl.jpg'))) {
             return asset('images/web/jurusan_rpl.jpg');

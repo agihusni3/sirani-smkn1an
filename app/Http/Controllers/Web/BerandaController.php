@@ -35,6 +35,11 @@ class BerandaController extends Controller
             ->orderBy('urutan')
             ->get();
 
-        return view('web.index', compact('sekolah', 'stats', 'jurusans', 'beritas', 'heroBanners'));
+        $ppdbBanner = WebsiteBanner::active()
+            ->ppdbCallout()
+            ->orderBy('urutan')
+            ->first();
+
+        return view('web.index', compact('sekolah', 'stats', 'jurusans', 'beritas', 'heroBanners', 'ppdbBanner'));
     }
 }
