@@ -127,21 +127,24 @@ class EvaluasiPresensiService
 
                         if (!$adaIzinPulang) {
                             $absensi->update([
-                                'status' => 'bolos',
+                                'status'      => 'bolos',
                                 'sumber_absen' => 'auto_evaluasi_bolos',
                             ]);
                             $countBolos++;
 
                             if ($membership->siswa) {
                                 try {
-                                    NotifikasiDraftService::buatDraft($membership->siswa, 'bolos', [
-                                        'tanggal' => $tanggal,
-                                        'jam'     => Carbon::now()->format('H:i'),
-                                    ], 'sistem_cron');
+                                    // Kirim WA otomatis langsung ke orang tua (tanpa perlu verifikasi admin)
+                                    NotifikasiDraftService::kirimNotifikasiBolosOtomatis(
+                                        $membership->siswa,
+                                        $tanggal,
+                                        'sistem_evaluasi'
+                                    );
+                                    // Cek akumulasi & buat panggilan ortu jika melewati batas
                                     NotifikasiDraftService::cekAkumulasiAlphaDanBuatPanggilan($membership->siswa, 'sistem_cron');
                                     KasusDisiplin::syncFromPresensi($membership->siswa_id);
                                 } catch (\Throwable $e) {
-                                    Log::warning("Gagal buat notif bolos: " . $e->getMessage());
+                                    Log::warning("Gagal kirim notif bolos: " . $e->getMessage());
                                 }
                             }
                         }

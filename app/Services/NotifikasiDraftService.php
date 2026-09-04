@@ -157,6 +157,129 @@ class NotifikasiDraftService
     }
 
     /**
+     * Kirim notifikasi WhatsApp bolos OTOMATIS langsung ke orang tua siswa (tanpa verifikasi manual).
+     * Dipanggil saat sistem mendeteksi siswa pulang tanpa tap / tanpa izin.
+     */
+    public static function kirimNotifikasiBolosOtomatis(Siswa $siswa, string $tanggal, string $dibuatOleh = 'sistem_evaluasi'): ?NotifikasiOrtu
+    {
+        $setting = PengaturanNotifikasi::getPengaturan();
+
+        // 1. Cek apakah notifikasi bolos diaktifkan
+        if (!$setting->isKategoriAktif('bolos')) {
+            return null;
+        }
+
+        // 2. Anti-duplikasi: cegah kiriman dobel hari yang sama
+        $existing = NotifikasiOrtu::where('siswa_id', $siswa->id)
+            ->where('kategori', 'bolos')
+            ->whereDate('tanggal', $tanggal)
+            ->whereIn('status', ['pending', 'diverifikasi', 'terkirim'])
+            ->first();
+
+        if ($existing) {
+            return $existing;
+        }
+
+        // 3. Cek nomor HP orang tua
+        $noHpOrtu = $siswa->no_hp_ortu ?: $siswa->no_hp_siswa;
+        if (empty($noHpOrtu)) {
+            \Illuminate\Support\Facades\Log::warning("[SIRANI BOLOS] Siswa {$siswa->nama} tidak memiliki nomor HP orang tua.");
+            return null;
+        }
+
+        // 4. Ambil data rombel
+        $rombelAktif = $siswa->siswaRombels()
+            ->where('status_keanggotaan', 'aktif')
+            ->with(['rombel.waliKelas', 'rombel.jurusan'])
+            ->first();
+
+        $rombel      = $rombelAktif?->rombel;
+        $namaRombel  = $rombel?->nama_rombel ?? '-';
+        $namaJurusan = $rombel?->jurusan?->nama_jurusan ?? '-';
+        $namaWali    = $rombel?->waliKelas?->nama ?? '-';
+
+        // 5. Hitung akumulasi pelanggaran
+        $totalAlpha      = Absensi::where('pemilik_type', 'siswa')->where('pemilik_id', $siswa->id)->where('status', 'alpha')->count();
+        $totalBolos      = Absensi::where('pemilik_type', 'siswa')->where('pemilik_id', $siswa->id)->where('status', 'bolos')->count();
+        $totalTerlambat  = Absensi::where('pemilik_type', 'siswa')->where('pemilik_id', $siswa->id)->where('status', 'terlambat')->count();
+        $totalPelanggaran = $totalAlpha + $totalBolos;
+
+        // Riwayat 5 pelanggaran terakhir
+        $riwayat = Absensi::where('pemilik_type', 'siswa')
+            ->where('pemilik_id', $siswa->id)
+            ->whereIn('status', ['alpha', 'bolos'])
+            ->orderBy('tanggal', 'desc')
+            ->take(5)
+            ->get();
+
+        $rincianList = [];
+        foreach ($riwayat as $p) {
+            $tglFormat   = Carbon::parse($p->tanggal)->translatedFormat('d/m/Y (l)');
+            $statusStr   = $p->status === 'alpha' ? '❌ Alpha' : '🚫 Bolos';
+            $rincianList[] = "• {$tglFormat} : {$statusStr}";
+        }
+        $rincianPelanggaran = !empty($rincianList)
+            ? implode("\n", $rincianList)
+            : "• Tanggal {$tanggal} : 🚫 Bolos (Pulang Tanpa Izin)";
+
+        // 6. Parse template bolos dari pengaturan
+        $template = $setting->template_bolos
+            ?: "🚫 *PERINGATAN BOLOS — PULANG TANPA IZIN*\n*SMK NEGERI 1 AIR NANINGAN*\n\nYth. Bapak/Ibu Wali dari *{nama_siswa}*,\n\nKami informasikan ananda terdeteksi meninggalkan sekolah sebelum jam pulang resmi tanpa izin Guru Piket:\n\n• Tanggal : {tanggal}\n• Jam Evaluasi : {jam} WIB\n• Status : 🚫 *BOLOS (Pulang Tanpa Izin)*\n• Rombel : {kelas}\n• Total Pelanggaran : {total_pelanggaran}x (Alpha: {total_alpha}x, Bolos: {total_bolos}x)\n\n📋 *Riwayat 5 Pelanggaran Terakhir:*\n{rincian_pelanggaran}\n\nMohon perhatian dan konfirmasi dari Bapak/Ibu. Hubungi Wali Kelas ({nama_wali_kelas}) untuk koordinasi lebih lanjut.\n\n_SIRANI — SMKN 1 Air Naningan_";
+
+        $tglIndo = Carbon::parse($tanggal)->translatedFormat('d F Y');
+        $jam     = Carbon::now()->format('H:i');
+
+        $replacements = [
+            '{nama_siswa}'          => $siswa->nama,
+            '{nis}'                 => $siswa->nisn ?: '-',
+            '{nisn}'                => $siswa->nisn ?: '-',
+            '{kelas}'               => $namaRombel,
+            '{rombel}'              => $namaRombel,
+            '{jurusan}'             => $namaJurusan,
+            '{nama_wali_kelas}'     => $namaWali,
+            '{tanggal}'             => $tglIndo,
+            '{jam}'                 => $jam,
+            '{total_alpha}'         => (string) $totalAlpha,
+            '{total_bolos}'         => (string) $totalBolos,
+            '{total_terlambat}'     => (string) $totalTerlambat,
+            '{total_pelanggaran}'   => (string) $totalPelanggaran,
+            '{rincian_pelanggaran}' => $rincianPelanggaran,
+            '{nama_ortu}'           => $siswa->nama_ortu ?: 'Bapak/Ibu Orang Tua/Wali',
+            '{link_portal}'         => url('/portal-siswa/' . ($siswa->nisn ?: $siswa->id)),
+        ];
+
+        $pesanParsed = str_replace(array_keys($replacements), array_values($replacements), $template);
+
+        $judul = "🚫 Peringatan Bolos: {$siswa->nama} ({$namaRombel}) — {$tglIndo}";
+
+        // 7. Simpan notifikasi langsung dengan status 'terkirim' (auto-sent)
+        $notif = NotifikasiOrtu::create([
+            'siswa_id'          => $siswa->id,
+            'kategori'          => 'bolos',
+            'tanggal'           => $tanggal,
+            'no_tujuan'         => $noHpOrtu,
+            'nama_ortu'         => $siswa->nama_ortu,
+            'judul'             => $judul,
+            'pesan'             => $pesanParsed,
+            'status'            => 'terkirim',
+            'dibuat_oleh'       => $dibuatOleh,
+            'diverifikasi_oleh' => 'Sistem Otomatis (Auto-Bolos)',
+            'waktu_verifikasi'  => now(),
+            'waktu_kirim'       => now(),
+            'catatan_error'     => '[AUTO-SENT] Terkirim otomatis saat status bolos dikunci sistem.',
+        ]);
+
+        // 8. Kirim via gateway WhatsApp
+        try {
+            app(WhatsAppNotificationService::class)->kirim($notif);
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning("[SIRANI BOLOS WA] Gagal kirim WA ke {$noHpOrtu}: " . $e->getMessage());
+        }
+
+        return $notif;
+    }
+
+    /**
      * Parse template pesan untuk notifikasi tertentu sesuai template PengaturanNotifikasi.
      */
     public static function parsePesan(Siswa $siswa, string $kategori, array $params = []): string
