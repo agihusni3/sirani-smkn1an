@@ -616,34 +616,60 @@
     .piket-search-box {
       position: relative;
       width: 100%;
-      max-width: 260px;
+      max-width: 320px;
       flex-shrink: 0;
     }
     .piket-search-input {
       width: 100%;
-      height: 34px;
-      padding: 0 12px 0 32px;
-      background: var(--bg-3);
-      border: 1px solid var(--border-2);
-      border-radius: 6px;
-      font-size: 11.5px;
+      height: 36px;
+      padding: 0 36px 0 36px;
+      background: var(--bg-2, #fff);
+      border: 1.5px solid var(--border-2);
+      border-radius: 8px;
+      font-size: 12px;
       color: var(--text);
-      transition: all .15s ease;
+      transition: border-color .2s ease, box-shadow .2s ease;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    }
+    .piket-search-input::placeholder {
+      color: var(--text-3);
+      font-style: italic;
     }
     .piket-search-input:focus {
-      border-color: #000000;
-      background: var(--bg-2);
+      border-color: #4f46e5;
+      background: #fff;
       outline: none;
+      box-shadow: 0 0 0 3px rgba(79,70,229,0.10);
     }
     .piket-search-icon {
       position: absolute;
-      left: 10px;
+      left: 11px;
       top: 50%;
       transform: translateY(-50%);
-      color: var(--text-3);
-      font-size: 12px;
+      color: #9ca3af;
+      font-size: 13px;
       pointer-events: none;
+      transition: color .2s;
     }
+    .piket-search-box:focus-within .piket-search-icon {
+      color: #4f46e5;
+    }
+    .piket-search-clear {
+      position: absolute;
+      right: 9px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #9ca3af;
+      font-size: 13px;
+      padding: 2px;
+      display: none;
+      line-height: 1;
+    }
+    .piket-search-clear:hover { color: #ef4444; }
+    .piket-search-input:not(:placeholder-shown) ~ .piket-search-clear { display: block; }
 
     /* Filter Chips Horizontal Strip */
     .piket-chips-strip {
@@ -1183,7 +1209,8 @@
         {{-- Search Bar --}}
         <div class="piket-search-box">
           <i class="bi bi-search piket-search-icon"></i>
-          <input type="text" id="searchSiswaPiket" onkeyup="searchSiswaPiketTable()" class="piket-search-input" placeholder="Cari nama, NISN, rombel..." />
+          <input type="text" id="searchSiswaPiket" oninput="searchSiswaPiketTable()" class="piket-search-input" placeholder="Cari nama, NISN, rombel..." autocomplete="off" />
+          <button type="button" class="piket-search-clear" onclick="clearPiketSearch()" title="Hapus pencarian">&times;</button>
         </div>
       </div>
     </div>
@@ -1575,6 +1602,8 @@
     if (kpiSiswa) kpiSiswa.style.display = view === 'siswa' ? 'grid' : 'none';
     if (kpiGuru)  kpiGuru.style.display  = view === 'guru'  ? 'grid' : 'none';
 
+    _activeMainView = view; // track view aktif
+
     if (searchInput) {
       searchInput.value = '';
       searchInput.placeholder = view === 'siswa' ? 'Cari nama, NISN, rombel...' : 'Cari nama guru, NIP, jabatan...';
@@ -1841,6 +1870,7 @@
   // ── INSTANTIATE PAGINATORS ──
   let tableSiswaPiket_paginator = null;
   let tableGuruPiket_paginator = null;
+  let _activeMainView = 'siswa'; // track view aktif: 'siswa' | 'guru'
 
   document.addEventListener('DOMContentLoaded', () => {
     // 1. Paginator Siswa (termasuk baris Belum Hadir)
@@ -1897,12 +1927,21 @@
   }
 
   function searchSiswaPiketTable() {
-    const q = document.getElementById('searchSiswaPiket')?.value || '';
-    const isGuruActive = document.getElementById('view-guru')?.style.display !== 'none';
-    if (isGuruActive) {
+    const q = (document.getElementById('searchSiswaPiket')?.value || '').trim();
+    if (_activeMainView === 'guru') {
       if (tableGuruPiket_paginator) tableGuruPiket_paginator.setSearch(q);
     } else {
       if (tableSiswaPiket_paginator) tableSiswaPiket_paginator.setSearch(q);
+    }
+  }
+
+  function clearPiketSearch() {
+    const inp = document.getElementById('searchSiswaPiket');
+    if (inp) { inp.value = ''; inp.focus(); }
+    if (_activeMainView === 'guru') {
+      if (tableGuruPiket_paginator) tableGuruPiket_paginator.setSearch('');
+    } else {
+      if (tableSiswaPiket_paginator) tableSiswaPiket_paginator.setSearch('');
     }
   }
 
@@ -1912,11 +1951,6 @@
       btn.classList.add('active');
     }
     if (tableGuruPiket_paginator) tableGuruPiket_paginator.setFilter(status);
-  }
-
-  function searchGuruPiketTable() {
-    const q = document.getElementById('searchGuruPiket')?.value || '';
-    if (tableGuruPiket_paginator) tableGuruPiket_paginator.setSearch(q);
   }
 
   // ── Modal Helper Global Meja Piket ──
