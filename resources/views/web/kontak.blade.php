@@ -1,7 +1,7 @@
 @extends('web.layouts.app')
 
-@section('title', 'Hubungi Kampus & Navigasi Lokasi — SMKN 1 Air Naningan')
-@section('meta_description', 'Pusat layanan informasi resmi, alamat kampus, navigasi Google Maps, dan saluran komunikasi terpadu SMKN 1 Air Naningan Kabupaten Tanggamus.')
+@section('title', 'Hubungi Sekolah & Navigasi Lokasi — SMKN 1 Air Naningan')
+@section('meta_description', 'Pusat layanan informasi resmi, alamat Sekolah, navigasi Google Maps, dan saluran komunikasi terpadu SMKN 1 Air Naningan Kabupaten Tanggamus.')
 
 @push('styles')
 <link rel="stylesheet" href="{{ asset('css/web-kontak.css') }}?v={{ filemtime(public_path('css/web-kontak.css')) }}">
@@ -13,9 +13,9 @@
     <!-- Header Halaman -->
     <div class="kontak-header">
         <div class="kontak-category-badge">
-            Pusat Informasi &amp; Navigasi Kampus
+            Pusat Informasi &amp; Navigasi Sekolah
         </div>
-        <h1 class="kontak-heading">Hubungi Kampus SMKN 1 Air Naningan</h1>
+        <h1 class="kontak-heading">Hubungi SMKN 1 Air Naningan</h1>
         <p class="kontak-subheading">
             Layanan terpadu kemitraan industri, informasi pendaftaran siswa baru (PPDB), kurikulum kejuruan, serta administrasi alumni.
         </p>
@@ -50,7 +50,7 @@
                 
                 <!-- Alamat -->
                 <div class="kontak-detail-row">
-                    <span class="kontak-detail-label">Alamat Lengkap Kampus</span>
+                    <span class="kontak-detail-label">Alamat Lengkap Sekolah</span>
                     <span class="kontak-detail-value" id="campusAddressText">
                         {{ $sekolah->alamat ?? 'Jl. Makam Baturuguk, Pekon Karang Sari, Kec. Air Naningan, Kab. Tanggamus, Lampung' }}
                     </span>
@@ -179,7 +179,7 @@
 
 <!-- Interactive Toast Feedback -->
 <div id="kontakToast" class="kontak-toast">
-    Alamat kampus berhasil disalin ke papan klip.
+    Alamat Sekolah berhasil disalin ke papan klip.
 </div>
 
 <script>
