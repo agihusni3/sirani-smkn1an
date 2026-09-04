@@ -509,155 +509,192 @@
         </div>
       </div>
 
-      {{-- HEADER FEED & SELECT ALL --}}
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; padding:0 4px;">
-        <div style="display:flex; align-items:center; gap:8px;">
-          <label style="font-size:12px; font-weight:800; color:var(--text); display:inline-flex; align-items:center; gap:6px; cursor:pointer;">
-            <input type="checkbox" id="checkAll" onchange="toggleCheckAll(this)" style="cursor:pointer;" />
-            <span>Pilih Semua ({{ $notifikasis->total() }} Pesan)</span>
-          </label>
+      {{-- ══ TABEL DATA NOTIFIKASI RAPI & RINGKAS ══ --}}
+      <div class="panel" style="padding:0; overflow:hidden; border-radius:var(--r-md); border:1px solid var(--border); background:var(--bg-2); box-shadow:var(--shadow-sm); margin-bottom:20px;">
+        <div style="padding:10px 16px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; background:var(--surface); flex-wrap:wrap; gap:8px;">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <label style="font-size:12px; font-weight:800; color:var(--text); display:inline-flex; align-items:center; gap:8px; cursor:pointer; margin:0;">
+              <input type="checkbox" id="checkAll" onchange="toggleCheckAll(this)" style="cursor:pointer; width:15px; height:15px; accent-color:#000000;" />
+              <span>Pilih Semua di Halaman Ini ({{ $notifikasis->count() }} dari {{ $notifikasis->total() }} Pesan)</span>
+            </label>
+          </div>
+          <div style="font-size:11.5px; color:var(--text-3); font-weight:700;">
+            Halaman {{ $notifikasis->currentPage() }} dari {{ $notifikasis->lastPage() }}
+          </div>
         </div>
-        <div style="font-size:11.5px; color:var(--text-3); font-weight:600;">
-          Halaman {{ $notifikasis->currentPage() }} dari {{ $notifikasis->lastPage() }}
-        </div>
-      </div>
 
-      {{-- ══ FEED TIMELINE KARTU NOTIFIKASI ══ --}}
-      <div class="feed-container">
-        @forelse($notifikasis as $idx => $notif)
-          @php
-            $isTargetGuru = str_contains($notif->kategori, 'eskalasi') || str_contains($notif->kategori, 'pengingat') || $notif->kategori === 'peringatan_wali_kelas';
-            $cleanNo = preg_replace('/[^0-9]/', '', $notif->no_tujuan ?? '');
-            if (str_starts_with($cleanNo, '0')) $cleanNo = '62' . substr($cleanNo, 1);
-            $cleanNamaOrtu = str_replace([' (Fallback Wakasis)', '((', '))'], ['', '(', ')'], $notif->nama_ortu ?: ($isTargetGuru ? 'Pejabat Sekolah' : 'Orang Tua Siswa'));
-          @endphp
+        <div class="table-responsive" style="overflow-x:auto; -webkit-overflow-scrolling:touch; width:100%;">
+          <table class="data-table" style="width:100%; min-width:980px; border-collapse:collapse; margin:0;">
+            <thead>
+              <tr style="background:var(--bg-3); border-bottom:1.5px solid var(--border); font-size:11px; text-transform:uppercase; letter-spacing:0.5px; color:var(--text-2);">
+                <th style="width:36px; text-align:center; padding:10px 6px;"></th>
+                <th style="width:40px; text-align:center; padding:10px 6px;">No</th>
+                <th style="min-width:180px; padding:10px 12px;">Siswa &amp; Kelas</th>
+                <th style="min-width:110px; padding:10px 10px;">Kategori</th>
+                <th style="min-width:160px; padding:10px 12px;">Penerima (Wali Murid)</th>
+                <th style="min-width:240px; padding:10px 12px;">Isi Pesan WhatsApp</th>
+                <th style="min-width:120px; padding:10px 10px;">Waktu Presensi</th>
+                <th style="min-width:120px; padding:10px 10px;">Status Antrean</th>
+                <th style="width:130px; text-align:center; padding:10px 12px;">Aksi</th>
+              </tr>
+            </thead>
+            <tbody>
+              @forelse($notifikasis as $idx => $notif)
+                @php
+                  $isTargetGuru = str_contains($notif->kategori, 'eskalasi') || str_contains($notif->kategori, 'pengingat') || $notif->kategori === 'peringatan_wali_kelas';
+                  $cleanNo = preg_replace('/[^0-9]/', '', $notif->no_tujuan ?? '');
+                  if (str_starts_with($cleanNo, '0')) $cleanNo = '62' . substr($cleanNo, 1);
+                  $cleanNamaOrtu = str_replace([' (Fallback Wakasis)', '((', '))'], ['', '(', ')'], $notif->nama_ortu ?: ($isTargetGuru ? 'Pejabat Sekolah' : 'Orang Tua Siswa'));
+                  $namaSiswa = $notif->siswa->nama ?? ($cleanNamaOrtu ?: 'Pemberitahuan');
+                  $rombelNama = $notif->siswa?->siswaRombels?->where('status_keanggotaan', 'aktif')->first()?->rombel?->nama_rombel ?? '-';
+                  $nisn = $notif->siswa->nisn ?? '-';
+                @endphp
+                <tr style="border-bottom:1px solid var(--border); transition:background 0.15s ease;" onmouseover="this.style.background='var(--surface)'" onmouseout="this.style.background='transparent'">
+                  {{-- Checkbox --}}
+                  <td style="text-align:center; padding:8px 6px; vertical-align:middle;">
+                    <input type="checkbox" name="ids[]" value="{{ $notif->id }}" class="notif-item-check" onchange="updateBatchBar()" style="cursor:pointer; width:15px; height:15px; accent-color:#000000;" />
+                  </td>
 
-          <div class="feed-card">
-            {{-- Header Kartu --}}
-            <div class="feed-card-header">
-              <div class="feed-student-info">
-                <input type="checkbox" name="ids[]" value="{{ $notif->id }}" class="notif-item-check" onchange="updateBatchBar()" style="cursor:pointer;" />
-                <div class="feed-avatar">
-                  {{ substr($notif->siswa->nama ?? ($cleanNamaOrtu ?: 'P'), 0, 1) }}
-                </div>
-                <div>
-                  <div class="feed-student-name">{{ $notif->siswa->nama ?? 'Pemberitahuan Umum' }}</div>
-                  <div class="feed-student-sub">
-                    NISN: {{ $notif->siswa->nisn ?? '-' }} · <strong style="color:var(--text-2);">{{ $notif->siswa->siswaRombels->where('status_keanggotaan', 'aktif')->first()?->rombel?->nama_rombel ?? '-' }}</strong>
-                  </div>
-                </div>
-              </div>
+                  {{-- No --}}
+                  <td style="text-align:center; font-weight:700; color:var(--text-3); font-family:var(--font-mono); font-size:11.5px; vertical-align:middle; padding:8px 6px;">
+                    {{ $notifikasis->firstItem() + $idx }}
+                  </td>
 
-              <div class="feed-meta-right">
-                @if(str_contains($notif->kategori, 'eskalasi'))
-                  <span class="pill-kategori pill-eskalasi"><i class="bi bi-bell-fill"></i> Eskalasi Disiplin</span>
-                @elseif(str_contains($notif->kategori, 'pemberitahuan_disiplin'))
-                  <span class="pill-kategori pill-disiplin-ortu"><i class="bi bi-megaphone-fill"></i> Disiplin Ortu</span>
-                @elseif(str_contains($notif->kategori, 'pengingat_disiplin'))
-                  <span class="pill-kategori pill-pengingat"><i class="bi bi-alarm-fill"></i> Pengingat Harian</span>
-                @elseif($notif->kategori === 'panggilan_ortu')
-                  <span class="pill-kategori pill-panggilan"><i class="bi bi-telephone-outbound-fill"></i> Panggilan Ortu</span>
-                @elseif($notif->kategori === 'alpha')
-                  <span class="pill-kategori" style="background:rgba(239,68,68,0.1); color:#DC2626; border:1px solid rgba(239,68,68,0.3);"><i class="bi bi-x-circle-fill"></i> Alpha</span>
-                @elseif($notif->kategori === 'terlambat')
-                  <span class="pill-kategori" style="background:rgba(245,158,11,0.1); color:#D97706; border:1px solid rgba(245,158,11,0.3);"><i class="bi bi-clock-history"></i> Terlambat</span>
-                @elseif($notif->kategori === 'bolos')
-                  <span class="pill-kategori" style="background:rgba(239,68,68,0.1); color:#DC2626; border:1px solid rgba(239,68,68,0.3);"><i class="bi bi-door-open-fill"></i> Bolos</span>
-                @else
-                  <span class="pill-kategori pill-presensi"><i class="bi bi-info-circle-fill"></i> {{ ucwords(str_replace('_', ' ', $notif->kategori)) }}</span>
-                @endif
-                <span class="feed-time">{{ $notif->created_at->translatedFormat('d M Y · H:i') }}</span>
-              </div>
-            </div>
+                  {{-- Siswa & Kelas --}}
+                  <td style="padding:8px 12px; vertical-align:middle;">
+                    <div style="display:flex; align-items:center; gap:8px;">
+                      <div style="width:28px; height:28px; border-radius:50%; background:var(--surface); border:1px solid var(--border); display:flex; align-items:center; justify-content:center; font-weight:800; font-size:11px; color:var(--text); flex-shrink:0;">
+                        {{ substr($namaSiswa, 0, 1) }}
+                      </div>
+                      <div style="min-width:0;">
+                        <div style="font-size:12.5px; font-weight:800; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="{{ $namaSiswa }}">{{ $namaSiswa }}</div>
+                        <div style="font-size:10.5px; color:var(--text-3); font-family:var(--font-mono);">NISN: {{ $nisn }} · <strong style="color:var(--text-2);">{{ $rombelNama }}</strong></div>
+                      </div>
+                    </div>
+                  </td>
 
-            {{-- Body Pesan --}}
-            <div class="feed-card-body">
-              <div class="feed-recipient-row">
-                <div class="feed-recipient-name">
-                  <i class="bi {{ $isTargetGuru ? 'bi-person-badge-fill' : 'bi-person-fill' }}"></i>
-                  <span>Penerima: <strong>{{ $cleanNamaOrtu }}</strong></span>
-                </div>
-                @if($notif->no_tujuan)
-                  <a href="https://wa.me/{{ $cleanNo }}" target="_blank" class="feed-wa-pill" title="Kirim Pesan WhatsApp Langsung">
-                    <i class="bi bi-whatsapp"></i> {{ $notif->no_tujuan }}
-                  </a>
-                @else
-                  <span style="font-size:11px; color:var(--text-3); font-weight:700;"><i class="bi bi-x-circle"></i> Tanpa No WhatsApp</span>
-                @endif
-              </div>
+                  {{-- Kategori --}}
+                  <td style="padding:8px 10px; vertical-align:middle; white-space:nowrap;">
+                    @if(str_contains($notif->kategori, 'eskalasi'))
+                      <span class="pill-kategori pill-eskalasi" style="font-size:10.5px; padding:2px 7px;"><i class="bi bi-bell-fill"></i> Eskalasi</span>
+                    @elseif(str_contains($notif->kategori, 'pemberitahuan_disiplin'))
+                      <span class="pill-kategori pill-disiplin-ortu" style="font-size:10.5px; padding:2px 7px;"><i class="bi bi-megaphone-fill"></i> Disiplin</span>
+                    @elseif(str_contains($notif->kategori, 'pengingat_disiplin'))
+                      <span class="pill-kategori pill-pengingat" style="font-size:10.5px; padding:2px 7px;"><i class="bi bi-alarm-fill"></i> Pengingat</span>
+                    @elseif($notif->kategori === 'panggilan_ortu')
+                      <span class="pill-kategori pill-panggilan" style="font-size:10.5px; padding:2px 7px;"><i class="bi bi-telephone-outbound-fill"></i> Panggilan</span>
+                    @elseif($notif->kategori === 'alpha')
+                      <span class="pill-kategori" style="background:rgba(239,68,68,0.1); color:#DC2626; border:1px solid rgba(239,68,68,0.3); font-size:10.5px; padding:2px 7px;"><i class="bi bi-x-circle-fill"></i> Alpha</span>
+                    @elseif($notif->kategori === 'terlambat')
+                      <span class="pill-kategori" style="background:rgba(245,158,11,0.1); color:#D97706; border:1px solid rgba(245,158,11,0.3); font-size:10.5px; padding:2px 7px;"><i class="bi bi-clock-history"></i> Terlambat</span>
+                    @elseif($notif->kategori === 'bolos')
+                      <span class="pill-kategori" style="background:rgba(239,68,68,0.1); color:#DC2626; border:1px solid rgba(239,68,68,0.3); font-size:10.5px; padding:2px 7px;"><i class="bi bi-door-open-fill"></i> Bolos</span>
+                    @else
+                      <span class="pill-kategori pill-presensi" style="font-size:10.5px; padding:2px 7px;"><i class="bi bi-info-circle-fill"></i> {{ ucwords(str_replace('_', ' ', $notif->kategori)) }}</span>
+                    @endif
+                  </td>
 
-              <div class="feed-message-text">
-                {{ $notif->pesan }}
-              </div>
-              <a href="javascript:void(0)" onclick="previewPesanModal({{ json_encode($notif) }})" class="feed-expand-btn">
-                <i class="bi bi-eye"></i> Baca Pesan Lengkap
-              </a>
-            </div>
+                  {{-- Penerima & Kontak --}}
+                  <td style="padding:8px 12px; vertical-align:middle;">
+                    <div style="font-size:12px; font-weight:800; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="{{ $cleanNamaOrtu }}">{{ $cleanNamaOrtu }}</div>
+                    <div style="margin-top:2px;">
+                      @if($notif->no_tujuan && $notif->no_tujuan !== '-')
+                        <a href="https://wa.me/{{ $cleanNo }}" target="_blank" style="font-size:10.5px; color:#16A34A; font-weight:800; font-family:var(--font-mono); text-decoration:none; display:inline-flex; align-items:center; gap:3px;" title="Chat WhatsApp Langsung">
+                          <i class="bi bi-whatsapp"></i> {{ $notif->no_tujuan }}
+                        </a>
+                      @elseif($notif->siswa?->no_hp_siswa)
+                        <a href="https://wa.me/{{ preg_replace('/^0/', '62', preg_replace('/[^0-9]/', '', $notif->siswa->no_hp_siswa)) }}" target="_blank" style="font-size:10.5px; color:#2563EB; font-weight:700; font-family:var(--font-mono); text-decoration:none; display:inline-flex; align-items:center; gap:3px;" title="No HP Siswa (Ortu Kosong)">
+                          <i class="bi bi-phone"></i> {{ $notif->siswa->no_hp_siswa }}
+                        </a>
+                      @else
+                        <span style="font-size:10.5px; color:var(--text-3); font-weight:600;"><i class="bi bi-x-circle"></i> Tanpa WA</span>
+                      @endif
+                    </div>
+                  </td>
 
-            {{-- Footer Kartu: Status & Aksi --}}
-            <div class="feed-card-footer">
-              <div class="feed-status-wrap">
-                @if($notif->status === 'terkirim')
-                  <span class="badge" style="background:rgba(34,197,94,0.1); color:#16A34A; border:1px solid rgba(34,197,94,0.3); font-weight:800; font-size:11px;">
-                    <i class="bi bi-check2-all"></i> Terkirim
-                  </span>
-                  <span style="font-size:11px; color:var(--text-3); font-family:var(--font-mono);">
-                    {{ $notif->waktu_kirim ? $notif->waktu_kirim->format('H:i') . ' WIB' : $notif->created_at->format('H:i') . ' WIB' }}
-                  </span>
-                @elseif($notif->status === 'pending')
-                  <span class="badge" style="background:rgba(234,179,8,0.1); color:#CA8A04; border:1px solid rgba(234,179,8,0.3); font-weight:800; font-size:11px;">
-                    <i class="bi bi-hourglass-split"></i> Pending Verifikasi
-                  </span>
-                @elseif($notif->status === 'dibatalkan')
-                  <span class="badge" style="background:var(--bg-3); border:1px solid var(--border-2); color:var(--text-3); font-size:11px; font-weight:800;">
-                    Dibatalkan
-                  </span>
-                @else
-                  <span class="badge" style="background:rgba(239,68,68,0.1); color:#DC2626; border:1px solid rgba(239,68,68,0.3); font-weight:800; font-size:11px;">
-                    <i class="bi bi-x-circle-fill"></i> Gagal Kirim
-                  </span>
-                  @if($notif->catatan_error)
-                    <span style="font-size:10.5px; color:var(--red);">({{ Str::limit($notif->catatan_error, 35) }})</span>
-                  @endif
-                @endif
-                <span style="font-size:10.5px; color:var(--text-3); margin-left:4px;">· {{ $notif->diverifikasi_oleh ?: 'Sistem Otomatis' }}</span>
-              </div>
-
-              <div class="feed-actions">
-                @if($notif->status === 'pending')
-                  <button type="button" class="btn btn-sm btn-gold" style="background:#22C55E; color:#fff; border:none; font-size:11px; padding:0 12px; height:30px; font-weight:800; border-radius:6px; display:inline-flex; align-items:center; gap:4px;" onclick="approveDirect({{ $notif->id }})" title="Setujui &amp; Kirim Sekarang">
-                    <i class="bi bi-send-fill"></i> Kirim Sekarang
-                  </button>
-                  <button type="button" class="btn btn-sm btn-danger" style="font-size:11px; padding:0 10px; height:30px; border-radius:6px; display:inline-flex; align-items:center; gap:3px;" onclick="rejectDirect({{ $notif->id }})" title="Batalkan Pesan">
-                    <i class="bi bi-x-lg"></i> Batalkan
-                  </button>
-                @elseif($notif->status === 'gagal')
-                  <button type="button" class="btn btn-sm btn-gold" style="font-size:11px; padding:0 12px; height:30px; font-weight:800; border-radius:6px; display:inline-flex; align-items:center; gap:4px;" onclick="approveDirect({{ $notif->id }})" title="Kirim Ulang Pesan">
-                    <i class="bi bi-arrow-repeat"></i> Kirim Ulang
-                  </button>
-                  <button type="button" class="btn btn-sm btn-outline" style="font-size:11px; padding:0 10px; height:30px; border-radius:6px; display:inline-flex; align-items:center; gap:3px;" onclick="previewPesanModal({{ json_encode($notif) }})" title="Detail Error">
-                    <i class="bi bi-info-circle"></i> Detail
-                  </button>
-                @else
-                  @if($notif->siswa_id)
-                    <a href="{{ route('surat.cetak', ['siswa_id' => $notif->siswa_id, 'kategori' => ($notif->kategori === 'panggilan_ortu' ? 'panggilan_ortu' : 'berita_acara')]) }}" target="_blank" class="btn btn-sm btn-outline" style="font-size:11px; padding:0 10px; height:30px; font-weight:800; border-radius:6px; display:inline-flex; align-items:center; gap:4px;" title="Cetak Surat Fisik">
-                      <i class="bi bi-printer-fill"></i> Cetak Surat
+                  {{-- Isi Pesan WhatsApp --}}
+                  <td style="padding:8px 12px; vertical-align:middle; max-width:280px;">
+                    <div style="font-size:11.5px; color:var(--text); line-height:1.4; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="{{ $notif->pesan }}">
+                      {{ Str::limit($notif->pesan, 65) }}
+                    </div>
+                    <a href="javascript:void(0)" onclick="previewPesanModal({{ json_encode($notif) }})" style="font-size:11px; color:#25D366; font-weight:800; text-decoration:none; display:inline-flex; align-items:center; gap:3px; margin-top:2px;">
+                      <i class="bi bi-eye-fill"></i> Tinjau &amp; Edit Pesan
                     </a>
-                  @endif
-                  <button type="button" class="btn btn-sm btn-outline" style="font-size:11px; padding:0 10px; height:30px; border-radius:6px; display:inline-flex; align-items:center; gap:3px;" onclick="previewPesanModal({{ json_encode($notif) }})" title="Lihat Pesan">
-                    <i class="bi bi-eye"></i> Detail
-                  </button>
-                @endif
-              </div>
-            </div>
-          </div>
-        @empty
-          <div class="panel" style="text-align:center; padding:48px 20px; color:var(--text-3); background:var(--bg-2);">
-            <i class="bi bi-chat-square-dots" style="font-size:40px; opacity:0.35;"></i>
-            <div style="font-weight:800; margin-top:10px; font-size:15px; color:var(--text);">Tidak ada riwayat notifikasi WhatsApp</div>
-            <p style="font-size:12px; color:var(--text-2); margin-top:4px;">Notifikasi baru akan otomatis masuk ke antrean saat terjadi ketidakhadiran atau pelanggaran disiplin.</p>
-          </div>
-        @endforelse
+                  </td>
+
+                  {{-- Waktu Presensi --}}
+                  <td style="padding:8px 10px; vertical-align:middle; white-space:nowrap;">
+                    <div style="font-size:11.5px; font-weight:700; color:var(--text);">{{ $notif->created_at->translatedFormat('d M Y') }}</div>
+                    <div style="font-size:10.5px; color:var(--text-3); font-family:var(--font-mono); font-weight:700;">{{ $notif->created_at->format('H:i:s') }} WIB</div>
+                  </td>
+
+                  {{-- Status Antrean --}}
+                  <td style="padding:8px 10px; vertical-align:middle; white-space:nowrap;">
+                    @if($notif->status === 'terkirim')
+                      <span class="badge" style="background:rgba(34,197,94,0.1); color:#16A34A; border:1px solid rgba(34,197,94,0.3); font-weight:800; font-size:10.5px; padding:2px 7px;">
+                        <i class="bi bi-check2-all"></i> Terkirim
+                      </span>
+                    @elseif($notif->status === 'pending')
+                      <span class="badge" style="background:rgba(234,179,8,0.12); color:#CA8A04; border:1px solid rgba(234,179,8,0.3); font-weight:800; font-size:10.5px; padding:2px 7px;">
+                        <i class="bi bi-hourglass-split"></i> Pending
+                      </span>
+                    @elseif($notif->status === 'dibatalkan')
+                      <span class="badge" style="background:var(--bg-3); border:1px solid var(--border-2); color:var(--text-3); font-size:10.5px; font-weight:700; padding:2px 7px;">
+                        Dibatalkan
+                      </span>
+                    @else
+                      <span class="badge" style="background:rgba(239,68,68,0.1); color:#DC2626; border:1px solid rgba(239,68,68,0.3); font-weight:800; font-size:10.5px; padding:2px 7px;">
+                        <i class="bi bi-x-circle-fill"></i> Gagal
+                      </span>
+                    @endif
+                  </td>
+
+                  {{-- Aksi --}}
+                  <td style="padding:8px 12px; vertical-align:middle; text-align:center; white-space:nowrap;">
+                    @if($notif->status === 'pending')
+                      <div style="display:inline-flex; align-items:center; gap:4px;">
+                        <button type="button" class="btn btn-sm btn-gold" style="background:#22C55E; color:#fff; border:none; font-size:11px; padding:0 8px; height:28px; font-weight:800; border-radius:6px; display:inline-flex; align-items:center; gap:3px;" onclick="approveDirect({{ $notif->id }})" title="Setujui &amp; Kirim Sekarang">
+                          <i class="bi bi-send-fill"></i> Kirim
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline" style="color:#DC2626; border-color:rgba(239,68,68,0.3); font-size:11px; padding:0 6px; height:28px; border-radius:6px;" onclick="rejectDirect({{ $notif->id }})" title="Batalkan Pesan">
+                          <i class="bi bi-x-lg"></i>
+                        </button>
+                      </div>
+                    @elseif($notif->status === 'gagal')
+                      <div style="display:inline-flex; align-items:center; gap:4px;">
+                        <button type="button" class="btn btn-sm btn-gold" style="font-size:11px; padding:0 8px; height:28px; font-weight:800; border-radius:6px; display:inline-flex; align-items:center; gap:3px;" onclick="approveDirect({{ $notif->id }})" title="Kirim Ulang">
+                          <i class="bi bi-arrow-repeat"></i> Ulang
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline" style="font-size:11px; padding:0 6px; height:28px; border-radius:6px;" onclick="previewPesanModal({{ json_encode($notif) }})" title="Detail">
+                          <i class="bi bi-eye"></i>
+                        </button>
+                      </div>
+                    @else
+                      <div style="display:inline-flex; align-items:center; gap:4px;">
+                        @if($notif->siswa_id)
+                          <a href="{{ route('surat.cetak', ['siswa_id' => $notif->siswa_id, 'kategori' => ($notif->kategori === 'panggilan_ortu' ? 'panggilan_ortu' : 'berita_acara')]) }}" target="_blank" class="btn btn-sm btn-outline" style="font-size:11px; padding:0 6px; height:28px; border-radius:6px;" title="Cetak Surat Fisik">
+                            <i class="bi bi-printer-fill"></i>
+                          </a>
+                        @endif
+                        <button type="button" class="btn btn-sm btn-outline" style="font-size:11px; padding:0 8px; height:28px; border-radius:6px; font-weight:700;" onclick="previewPesanModal({{ json_encode($notif) }})" title="Lihat Pesan">
+                          <i class="bi bi-eye"></i> Detail
+                        </button>
+                      </div>
+                    @endif
+                  </td>
+                </tr>
+              @empty
+                <tr>
+                  <td colspan="9" style="text-align:center; padding:48px 20px; color:var(--text-3); background:var(--bg-2);">
+                    <i class="bi bi-chat-square-dots" style="font-size:36px; opacity:0.35;"></i>
+                    <div style="font-weight:800; margin-top:8px; font-size:14px; color:var(--text);">Tidak ada riwayat notifikasi WhatsApp</div>
+                    <p style="font-size:12px; color:var(--text-2); margin-top:2px;">Notifikasi baru akan otomatis masuk ke antrean saat terjadi ketidakhadiran atau pelanggaran disiplin.</p>
+                  </td>
+                </tr>
+              @endforelse
+            </tbody>
+          </table>
+        </div>
       </div>
 
       @if($notifikasis->hasPages())
