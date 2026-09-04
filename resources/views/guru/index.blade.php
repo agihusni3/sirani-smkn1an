@@ -51,6 +51,62 @@
       align-items: center;
       gap: 4px;
     }
+    /* Modal Card Statis (Ukuran Tetap & Scroll Internal) */
+    .modal-card-static {
+      width: 100% !important;
+      max-width: 720px !important;
+      height: 610px !important;
+      max-height: 88vh !important;
+      display: flex !important;
+      flex-direction: column !important;
+      overflow: hidden !important;
+      padding: 22px 24px !important;
+      box-sizing: border-box !important;
+    }
+    .modal-card-static form {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      min-height: 0;
+      overflow: hidden;
+    }
+    .gtk-tab-body-scroll {
+      flex: 1;
+      min-height: 0;
+      overflow-y: auto;
+      padding-right: 6px;
+      padding-bottom: 8px;
+      scrollbar-width: thin;
+      scrollbar-color: var(--border-2) transparent;
+    }
+    .gtk-tab-body-scroll::-webkit-scrollbar {
+      width: 6px;
+    }
+    .gtk-tab-body-scroll::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .gtk-tab-body-scroll::-webkit-scrollbar-thumb {
+      background-color: var(--border-2);
+      border-radius: 4px;
+    }
+    .modal-footer-static {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 8px;
+      margin-top: auto;
+      padding-top: 14px;
+      border-top: 1px solid var(--border);
+      flex-shrink: 0;
+      background: var(--bg-2);
+    }
+    @media (max-width: 640px) {
+      .modal-card-static {
+        height: 92vh !important;
+        max-height: 92vh !important;
+        padding: 16px !important;
+      }
+    }
     .badge-sertifikasi-belum {
       background: #f1f5f9;
       color: #64748b;
@@ -719,8 +775,8 @@
 
 <!-- Modal Portofolio Sertifikat Pelatihan Guru -->
 <div id="portofolioModal" class="modal-overlay">
-  <div class="modal-card" style="max-width:720px; padding:24px;">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+  <div class="modal-card modal-card-static" style="max-width:740px;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; padding-bottom:8px; border-bottom:1px solid var(--border); flex-shrink:0;">
       <div style="display:flex; align-items:center; gap:8px;">
         <div style="width:36px; height:36px; border-radius:8px; background:rgba(37, 99, 235, 0.1); color:#2563eb; display:flex; align-items:center; justify-content:center; font-size:18px;">
           <i class="bi bi-award-fill"></i>
@@ -737,64 +793,66 @@
       <button type="button" class="btn btn-sm btn-outline" onclick="closeModal('portofolioModal')"><i class="bi bi-x-lg"></i></button>
     </div>
 
-    {{-- Form Tambah Sertifikat Baru --}}
-    <div style="background:var(--bg-3); border:1px solid var(--border); border-radius:var(--r-md); padding:14px; margin-bottom:18px;">
-      <div style="font-weight:800; font-size:13px; color:var(--text); margin-bottom:10px; display:flex; align-items:center; gap:6px;">
-        <i class="bi bi-plus-circle-fill" style="color:#2563eb;"></i> Unggah Sertifikat Pelatihan Baru
+    <div class="gtk-tab-body-scroll">
+      {{-- Form Tambah Sertifikat Baru --}}
+      <div style="background:var(--bg-3); border:1px solid var(--border); border-radius:var(--r-md); padding:14px; margin-bottom:18px;">
+        <div style="font-weight:800; font-size:13px; color:var(--text); margin-bottom:10px; display:flex; align-items:center; gap:6px;">
+          <i class="bi bi-plus-circle-fill" style="color:#2563eb;"></i> Unggah Sertifikat Pelatihan Baru
+        </div>
+        <form id="formTambahSertifikat" method="POST" enctype="multipart/form-data">
+          @csrf
+          <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap:10px; margin-bottom:10px;">
+            <div>
+              <label style="display:block; font-size:11.5px; font-weight:700; color:var(--text-2); margin-bottom:4px;">Nama Pelatihan / Workshop <span style="color:var(--red);">*</span></label>
+              <input type="text" name="nama_pelatihan" required placeholder="Contoh: Diklat Kurikulum Merdeka PMM" style="width:100%; height:34px; font-size:12px;" />
+            </div>
+            <div>
+              <label style="display:block; font-size:11.5px; font-weight:700; color:var(--text-2); margin-bottom:4px;">Lembaga Penyelenggara <span style="color:var(--red);">*</span></label>
+              <input type="text" name="penyelenggara" required placeholder="Contoh: Kemendikbudristek / BBPPMPV" style="width:100%; height:34px; font-size:12px;" />
+            </div>
+            <div>
+              <label style="display:block; font-size:11.5px; font-weight:700; color:var(--text-2); margin-bottom:4px;">Tahun Pelaksanaan <span style="color:var(--red);">*</span></label>
+              <input type="text" name="tahun" maxlength="10" required placeholder="Contoh: 2025" style="width:100%; height:34px; font-size:12px;" />
+            </div>
+            <div>
+              <label style="display:block; font-size:11.5px; font-weight:700; color:var(--text-2); margin-bottom:4px;">Unggah File Dokumen (PDF/JPG)</label>
+              <input type="file" name="file_sertifikat" accept=".pdf,image/*" style="width:100%; height:34px; font-size:11.5px;" />
+            </div>
+          </div>
+          <div style="display:flex; justify-content:flex-end;">
+            <button type="submit" class="btn btn-sm btn-gold" style="font-size:11.5px; font-weight:800; height:32px;">
+              <i class="bi bi-cloud-arrow-up-fill"></i> Simpan Sertifikat
+            </button>
+          </div>
+        </form>
       </div>
-      <form id="formTambahSertifikat" method="POST" enctype="multipart/form-data">
-        @csrf
-        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap:10px; margin-bottom:10px;">
-          <div>
-            <label style="display:block; font-size:11.5px; font-weight:700; color:var(--text-2); margin-bottom:4px;">Nama Pelatihan / Workshop <span style="color:var(--red);">*</span></label>
-            <input type="text" name="nama_pelatihan" required placeholder="Contoh: Diklat Kurikulum Merdeka PMM" style="width:100%; height:34px; font-size:12px;" />
-          </div>
-          <div>
-            <label style="display:block; font-size:11.5px; font-weight:700; color:var(--text-2); margin-bottom:4px;">Lembaga Penyelenggara <span style="color:var(--red);">*</span></label>
-            <input type="text" name="penyelenggara" required placeholder="Contoh: Kemendikbudristek / BBPPMPV" style="width:100%; height:34px; font-size:12px;" />
-          </div>
-          <div>
-            <label style="display:block; font-size:11.5px; font-weight:700; color:var(--text-2); margin-bottom:4px;">Tahun Pelaksanaan <span style="color:var(--red);">*</span></label>
-            <input type="text" name="tahun" maxlength="10" required placeholder="Contoh: 2025" style="width:100%; height:34px; font-size:12px;" />
-          </div>
-          <div>
-            <label style="display:block; font-size:11.5px; font-weight:700; color:var(--text-2); margin-bottom:4px;">Unggah File Dokumen (PDF/JPG)</label>
-            <input type="file" name="file_sertifikat" accept=".pdf,image/*" style="width:100%; height:34px; font-size:11.5px;" />
-          </div>
-        </div>
-        <div style="display:flex; justify-content:flex-end;">
-          <button type="submit" class="btn btn-sm btn-gold" style="font-size:11.5px; font-weight:800; height:32px;">
-            <i class="bi bi-cloud-arrow-up-fill"></i> Simpan Sertifikat
-          </button>
-        </div>
-      </form>
+
+      {{-- Tabel Riwayat Sertifikat --}}
+      <div style="font-weight:800; font-size:13px; color:var(--text); margin-bottom:8px; display:flex; align-items:center; gap:6px;">
+        <i class="bi bi-collection-fill" style="color:var(--text-3);"></i> Berkas Sertifikat yang Dimiliki (<span id="portofolio_count_display">0</span>)
+      </div>
+      <div style="border:1px solid var(--border); border-radius:var(--r-sm);">
+        <table style="width:100%; border-collapse:collapse; font-size:12px;">
+          <thead>
+            <tr style="background:var(--bg-3); border-bottom:1px solid var(--border); text-align:left;">
+              <th style="padding:8px 10px; width:30px;">No</th>
+              <th style="padding:8px 10px;">Nama Pelatihan / Workshop</th>
+              <th style="padding:8px 10px;">Penyelenggara</th>
+              <th style="padding:8px 10px; width:70px; text-align:center;">Tahun</th>
+              <th style="padding:8px 10px; width:90px; text-align:center;">Berkas</th>
+              <th style="padding:8px 10px; width:50px; text-align:center;">Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="portofolio_table_body">
+            <tr>
+              <td colspan="6" style="text-align:center; padding:18px; color:var(--text-3);">Memuat data sertifikat...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
 
-    {{-- Tabel Riwayat Sertifikat --}}
-    <div style="font-weight:800; font-size:13px; color:var(--text); margin-bottom:8px; display:flex; align-items:center; gap:6px;">
-      <i class="bi bi-collection-fill" style="color:var(--text-3);"></i> Berkas Sertifikat yang Dimiliki (<span id="portofolio_count_display">0</span>)
-    </div>
-    <div style="max-height:280px; overflow-y:auto; border:1px solid var(--border); border-radius:var(--r-sm);">
-      <table style="width:100%; border-collapse:collapse; font-size:12px;">
-        <thead>
-          <tr style="background:var(--bg-3); border-bottom:1px solid var(--border); text-align:left;">
-            <th style="padding:8px 10px; width:30px;">No</th>
-            <th style="padding:8px 10px;">Nama Pelatihan / Workshop</th>
-            <th style="padding:8px 10px;">Penyelenggara</th>
-            <th style="padding:8px 10px; width:70px; text-align:center;">Tahun</th>
-            <th style="padding:8px 10px; width:90px; text-align:center;">Berkas</th>
-            <th style="padding:8px 10px; width:50px; text-align:center;">Aksi</th>
-          </tr>
-        </thead>
-        <tbody id="portofolio_table_body">
-          <tr>
-            <td colspan="6" style="text-align:center; padding:18px; color:var(--text-3);">Memuat data sertifikat...</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-    <div style="display:flex; justify-content:flex-end; margin-top:16px;">
+    <div class="modal-footer-static">
       <button type="button" class="btn btn-outline" onclick="closeModal('portofolioModal')">Tutup</button>
     </div>
   </div>
@@ -802,8 +860,8 @@
 
 <!-- Modal Edit Guru / GTK Lengkap -->
 <div id="editGuruModal" class="modal-overlay">
-  <div class="modal-card" style="max-width:680px; padding:24px;">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; padding-bottom:8px; border-bottom:1px solid var(--border);">
+  <div class="modal-card modal-card-static" style="max-width:720px;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; padding-bottom:8px; border-bottom:1px solid var(--border); flex-shrink:0;">
       <h3 style="font-size:16px; font-weight:900; color:var(--text); margin:0; display:flex; align-items:center; gap:6px;">
         <i class="bi bi-pencil-square" style="color:#000000;"></i> Edit Data GTK Guru / Tenaga Kependidikan
       </h3>
@@ -814,7 +872,7 @@
       @csrf @method('PUT')
       
       {{-- TAB NAVIGATION EDIT --}}
-      <div class="gtk-tab-nav">
+      <div class="gtk-tab-nav" style="flex-shrink:0;">
         <button type="button" class="gtk-tab-btn active" onclick="switchGtkTab('edit', 'tab_edit_identitas', this)">
           1. Biodata
         </button>
@@ -829,8 +887,10 @@
         </button>
       </div>
 
-      {{-- TAB 1 EDIT: BIODATA --}}
-      <div id="tab_edit_identitas" class="gtk-tab-content">
+      {{-- SCROLLABLE TAB BODY WRAPPER --}}
+      <div class="gtk-tab-body-scroll">
+        {{-- TAB 1 EDIT: BIODATA --}}
+        <div id="tab_edit_identitas" class="gtk-tab-content">
         <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:12px;">
           <div>
             <label class="form-label" style="font-weight:700; font-size:12px; margin-bottom:4px;">Nama Lengkap (Tanpa Gelar) <span style="color:var(--red);">*</span></label>
@@ -1037,9 +1097,9 @@
             </div>
           </div>
         </div>
-      </div>
+      </div> {{-- end gtk-tab-body-scroll --}}
 
-      <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:16px; border-top:1px solid var(--border); padding-top:12px;">
+      <div class="modal-footer-static">
         <button type="button" class="btn btn-outline" onclick="closeModal('editGuruModal')">Batal</button>
         <button type="submit" class="btn btn-gold">Simpan Perubahan</button>
       </div>
@@ -1158,7 +1218,11 @@
     
     btnElement.classList.add('active');
     const target = document.getElementById(tabId);
-    if (target) target.style.display = 'block';
+    if (target) {
+      target.style.display = 'block';
+      const scrollBody = parent.querySelector('.gtk-tab-body-scroll');
+      if (scrollBody) scrollBody.scrollTop = 0;
+    }
   }
 
   function toggleHariMengajar(context, val) {
@@ -1228,6 +1292,10 @@
     document.querySelectorAll('.edit-hari-cb').forEach(cb => {
       cb.checked = hariList.includes(cb.getAttribute('data-hari'));
     });
+
+    // Reset ke tab 1 (Biodata)
+    const firstEditTabBtn = document.querySelector('#editGuruModal .gtk-tab-btn');
+    if (firstEditTabBtn) switchGtkTab('edit', 'tab_edit_identitas', firstEditTabBtn);
 
     document.getElementById('editGuruForm').action = '/guru/' + guru.id;
     openModal('editGuruModal');
