@@ -46,11 +46,13 @@ php artisan config:cache
 php artisan route:cache
 php artisan view:cache
 
-# 4. Perbaiki hak akses file untuk www-data
+# 4. Perbaiki hak akses file untuk user dan webserver www-data
 echo -e "\n${YELLOW}[4/4] Memastikan izin akses file webserver...${NC}"
+LOGIN_USER="${SUDO_USER:-$USER}"
 if [ "$EUID" -eq 0 ]; then
-    chown -R www-data:www-data "$APP_DIR"
+    chown -R "${LOGIN_USER}:www-data" "$APP_DIR"
     chmod -R 775 "$APP_DIR/storage" "$APP_DIR/bootstrap/cache"
+    chmod -R u+rw "$APP_DIR/.git" 2>/dev/null || true
     if [ -f "$APP_DIR/database/database.sqlite" ]; then
         chmod 664 "$APP_DIR/database/database.sqlite"
         chmod 775 "$APP_DIR/database"
@@ -60,8 +62,9 @@ if [ "$EUID" -eq 0 ]; then
     echo -e "${GREEN}✔ Layanan webserver direload.${NC}"
 else
     echo -e "${YELLOW}ℹ Memperbaiki hak akses dengan sudo...${NC}"
-    sudo chown -R www-data:www-data "$APP_DIR" 2>/dev/null || true
+    sudo chown -R "${LOGIN_USER}:www-data" "$APP_DIR" 2>/dev/null || true
     sudo chmod -R 775 "$APP_DIR/storage" "$APP_DIR/bootstrap/cache" 2>/dev/null || true
+    sudo chmod -R u+rw "$APP_DIR/.git" 2>/dev/null || true
     if [ -f "$APP_DIR/database/database.sqlite" ]; then
         sudo chmod 664 "$APP_DIR/database/database.sqlite" 2>/dev/null || true
         sudo chmod 775 "$APP_DIR/database" 2>/dev/null || true
