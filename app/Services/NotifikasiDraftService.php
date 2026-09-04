@@ -179,7 +179,8 @@ class NotifikasiDraftService
         $namaWali = $rombel?->waliKelas?->nama ?? '-';
 
         $tanggal = $params['tanggal'] ?? Carbon::today()->toDateString();
-        $tglIndo = Carbon::parse($tanggal)->translatedFormat('d F Y');
+        $cleanTgl = substr((string)$tanggal, 0, 10);
+        $tglIndo = Carbon::parse($cleanTgl)->translatedFormat('d F Y');
         $jam = $params['jam'] ?? Carbon::now()->format('H:i:s');
         $batasJam = $params['batas_jam'] ?? '07:15';
         $keterangan = $params['keterangan'] ?? '-';
@@ -223,7 +224,9 @@ class NotifikasiDraftService
         $drafts = NotifikasiOrtu::where('status', 'pending')
             ->where(function ($q) {
                 $q->where('pesan', 'like', '%telah melakukan presensi%')
-                  ->orWhere('pesan', 'like', '%Scan Barcode/RFID%');
+                  ->orWhere('pesan', 'like', '%Scan Barcode/RFID%')
+                  ->orWhere('pesan', 'like', '%.000000Z%')
+                  ->orWhere('pesan', 'like', '%2026-%T%');
             })
             ->with('siswa')
             ->get();
@@ -232,7 +235,7 @@ class NotifikasiDraftService
         foreach ($drafts as $d) {
             if ($d->siswa) {
                 preg_match('/pukul\s+([0-9:]+)/i', $d->pesan, $m);
-                $jam = $m[1] ?? Carbon::now()->format('H:i:s');
+                $jam = $m[1] ?? ($d->created_at ? Carbon::parse($d->created_at)->format('H:i:s') : Carbon::now()->format('H:i:s'));
                 $pesanBaru = self::parsePesan($d->siswa, $d->kategori, [
                     'tanggal'   => $d->tanggal,
                     'jam'       => $jam,

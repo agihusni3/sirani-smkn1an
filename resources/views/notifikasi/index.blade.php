@@ -700,12 +700,7 @@
 
     <div style="margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
       <span style="font-size:11.5px; color:#8696A0; font-weight:600;"><i class="bi bi-pencil-square"></i> Isi Pesan WhatsApp (Dapat Diedit):</span>
-      <div style="display:flex; align-items:center; gap:8px;">
-        <button type="button" onclick="muatUlangTemplateResmi()" style="background:#202C33; color:#25D366; border:1px solid #3B4A54; border-radius:6px; font-size:11px; font-weight:700; padding:3px 9px; cursor:pointer; display:inline-flex; align-items:center; gap:4px; transition:background 0.2s;" title="Terapkan template resmi dari Pengaturan">
-          <i class="bi bi-arrow-repeat"></i> Sinkronkan Template
-        </button>
-        <span style="font-size:10.5px; color:#8696A0;" id="charCountPreview">0 karakter</span>
-      </div>
+      <span style="font-size:10.5px; color:#8696A0;" id="charCountPreview">0 karakter</span>
     </div>
 
     <textarea id="modalPreviewPesan" rows="9" style="width:100% !important; background:#0B141A !important; color:#E9EDEF !important; border:1px solid #2A3942 !important; border-radius:10px !important; padding:12px !important; font-size:13px !important; line-height:1.6 !important; font-family:system-ui, -apple-system, sans-serif !important; resize:vertical !important; outline:none !important;" placeholder="Tulis isi pesan..."></textarea>
@@ -977,6 +972,24 @@
     bolos: {!! json_encode($setting->template_bolos) !!},
   };
 
+  function formatTanggalIndo(dateStr) {
+    if (!dateStr) return '';
+    try {
+      const clean = String(dateStr).split('T')[0];
+      const parts = clean.split('-');
+      if (parts.length === 3) {
+        const bulan = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+        const d = parseInt(parts[2], 10);
+        const m = parseInt(parts[1], 10) - 1;
+        const y = parts[0];
+        if (!isNaN(d) && m >= 0 && m < 12) {
+          return d + ' ' + bulan[m] + ' ' + y;
+        }
+      }
+    } catch (e) {}
+    return String(dateStr).split('T')[0];
+  }
+
   function renderTemplateFromConfig(notif) {
     let tpl = templateConfig[notif.kategori] || notif.pesan || '';
     if (!tpl) return notif.pesan || '';
@@ -988,10 +1001,25 @@
     }
 
     let jam = '07:15';
-    let matchJam = (notif.pesan || '').match(/pukul\s+([0-9:]+)/i);
-    if (matchJam) jam = matchJam[1];
+    let matchJam = (notif.pesan || '').match(/pukul\s+([0-9:]{5,8})/i);
+    if (matchJam) {
+      jam = matchJam[1];
+    } else if (notif.created_at) {
+      try {
+        let cd = new Date(notif.created_at);
+        if (!isNaN(cd.getTime())) {
+          jam = cd.toLocaleTimeString('id-ID', {
+            timeZone: 'Asia/Jakarta',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: false
+          }).replace(/\./g, ':');
+        }
+      } catch (e) {}
+    }
 
-    let tgl = notif.tanggal || new Date().toISOString().split('T')[0];
+    let tgl = formatTanggalIndo(notif.tanggal);
 
     return tpl
       .replace(/{nama_siswa}/g, nama)
@@ -1005,15 +1033,6 @@
       .replace(/{nama_ortu}/g, notif.nama_ortu || 'Bapak/Ibu Orang Tua/Wali');
   }
 
-  function muatUlangTemplateResmi() {
-    if (!activeNotif) return;
-    const textarea = document.getElementById('modalPreviewPesan');
-    if (textarea) {
-      textarea.value = renderTemplateFromConfig(activeNotif);
-      updateModalDirectWa();
-    }
-  }
-
   function previewPesanModal(notif) {
     activeNotif = notif;
     document.getElementById('modalPreviewNama').innerText = notif.nama_ortu || (notif.siswa ? notif.siswa.nama : 'Penerima');
@@ -1022,9 +1041,12 @@
     const textarea = document.getElementById('modalPreviewPesan');
     let pesanAwal = notif.pesan || '';
     
-    // Jika draf ini masih membawa teks hardcoded lama (via Scan Barcode/RFID), otomatis ubah ke template resmi!
-    if (pesanAwal.includes('Scan Barcode/RFID') || pesanAwal.includes('telah melakukan presensi')) {
+    // Otomatis ubah pesan jika masih teks lama atau ISO string
+    if (pesanAwal.includes('Scan Barcode/RFID') || pesanAwal.includes('telah melakukan presensi') || pesanAwal.includes('.000000Z') || pesanAwal.includes('2026-09-03T')) {
       pesanAwal = renderTemplateFromConfig(notif);
+    } else {
+      // Bersihkan jika ada format tanggal ISO yang tersisa di teks pesan
+      pesanAwal = pesanAwal.replace(/[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9:.]+Z?/g, formatTanggalIndo(notif.tanggal));
     }
     if (textarea) textarea.value = pesanAwal;
 
