@@ -51,16 +51,16 @@
       align-items: center;
       gap: 4px;
     }
-    /* Modal Card Statis (Ukuran Tetap & Scroll Internal) */
+    /* Modal Card Statis Tanpa Scroll Vertikal */
     .modal-card-static {
       width: 100% !important;
-      max-width: 720px !important;
-      height: 610px !important;
-      max-height: 88vh !important;
+      max-width: 880px !important;
+      height: 475px !important;
+      max-height: 94vh !important;
       display: flex !important;
       flex-direction: column !important;
       overflow: hidden !important;
-      padding: 22px 24px !important;
+      padding: 16px 22px !important;
       box-sizing: border-box !important;
     }
     .modal-card-static form {
@@ -73,21 +73,9 @@
     .gtk-tab-body-scroll {
       flex: 1;
       min-height: 0;
-      overflow-y: auto;
-      padding-right: 6px;
-      padding-bottom: 8px;
-      scrollbar-width: thin;
-      scrollbar-color: var(--border-2) transparent;
-    }
-    .gtk-tab-body-scroll::-webkit-scrollbar {
-      width: 6px;
-    }
-    .gtk-tab-body-scroll::-webkit-scrollbar-track {
-      background: transparent;
-    }
-    .gtk-tab-body-scroll::-webkit-scrollbar-thumb {
-      background-color: var(--border-2);
-      border-radius: 4px;
+      overflow: hidden !important;
+      padding-right: 0;
+      padding-bottom: 0;
     }
     .modal-footer-static {
       display: flex;
@@ -95,16 +83,19 @@
       align-items: center;
       gap: 8px;
       margin-top: auto;
-      padding-top: 14px;
+      padding-top: 10px;
       border-top: 1px solid var(--border);
       flex-shrink: 0;
       background: var(--bg-2);
     }
-    @media (max-width: 640px) {
+    @media (max-width: 768px) {
       .modal-card-static {
-        height: 92vh !important;
-        max-height: 92vh !important;
-        padding: 16px !important;
+        height: 94vh !important;
+        max-height: 94vh !important;
+        padding: 14px 16px !important;
+      }
+      .gtk-tab-body-scroll {
+        overflow-y: auto !important;
       }
     }
     .badge-sertifikasi-belum {
@@ -814,7 +805,7 @@
       <button type="button" class="btn btn-sm btn-outline" onclick="closeModal('portofolioModal')"><i class="bi bi-x-lg"></i></button>
     </div>
 
-    <div class="gtk-tab-body-scroll">
+    <div class="gtk-tab-body-scroll" style="overflow-y: auto !important; padding-right: 6px;">
       {{-- Form Tambah Sertifikat Baru --}}
       <div style="background:var(--bg-3); border:1px solid var(--border); border-radius:var(--r-md); padding:14px; margin-bottom:18px;">
         <div style="font-weight:800; font-size:13px; color:var(--text); margin-bottom:10px; display:flex; align-items:center; gap:6px;">
@@ -881,8 +872,8 @@
 
 <!-- Modal Edit Guru / GTK Lengkap -->
 <div id="editGuruModal" class="modal-overlay">
-  <div class="modal-card modal-card-static" style="max-width:720px;">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; padding-bottom:8px; border-bottom:1px solid var(--border); flex-shrink:0;">
+  <div class="modal-card modal-card-static" style="max-width:880px;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; padding-bottom:8px; border-bottom:1px solid var(--border); flex-shrink:0;">
       <h3 style="font-size:16px; font-weight:900; color:var(--text); margin:0; display:flex; align-items:center; gap:6px;">
         <i class="bi bi-pencil-square" style="color:#000000;"></i> Edit Data GTK Guru / Tenaga Kependidikan
       </h3>
@@ -893,7 +884,7 @@
       @csrf @method('PUT')
       
       {{-- TAB NAVIGATION EDIT --}}
-      <div class="gtk-tab-nav" style="flex-shrink:0;">
+      <div class="gtk-tab-nav" style="flex-shrink:0; margin-bottom:12px;">
         <button type="button" class="gtk-tab-btn active" onclick="switchGtkTab('edit', 'tab_edit_identitas', this)">
           1. Biodata
         </button>
@@ -912,210 +903,225 @@
       <div class="gtk-tab-body-scroll">
         {{-- TAB 1 EDIT: BIODATA --}}
         <div id="tab_edit_identitas" class="gtk-tab-content">
-        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:12px;">
-          <div>
-            <label class="form-label" style="font-weight:700; font-size:12px; margin-bottom:4px;">Nama Lengkap (Tanpa Gelar) <span style="color:var(--red);">*</span></label>
-            <input type="text" id="edit_guru_nama" name="nama" required class="input-field" style="width:100%; height:36px;" />
+          <div style="display:grid; grid-template-columns: 2fr 1fr 1fr 1.5fr; gap:10px 12px; margin-bottom:10px;">
+            <div>
+              <label class="form-label" style="font-weight:700; font-size:11.5px; margin-bottom:3px;">Nama Lengkap (Tanpa Gelar) <span style="color:var(--red);">*</span></label>
+              <input type="text" id="edit_guru_nama" name="nama" required class="input-field" style="width:100%; height:34px; font-size:12px;" />
+            </div>
+            <div>
+              <label class="form-label" style="font-weight:700; font-size:11.5px; margin-bottom:3px;">Gelar Depan</label>
+              <input type="text" id="edit_guru_gelar_depan" name="gelar_depan" placeholder="Drs. / Ir." class="input-field" style="width:100%; height:34px; font-size:12px;" />
+            </div>
+            <div>
+              <label class="form-label" style="font-weight:700; font-size:11.5px; margin-bottom:3px;">Gelar Belakang</label>
+              <input type="text" id="edit_guru_gelar_belakang" name="gelar_belakang" placeholder="S.Pd. / M.T." class="input-field" style="width:100%; height:34px; font-size:12px;" />
+            </div>
+            <div>
+              <label class="form-label" style="font-weight:700; font-size:11.5px; margin-bottom:3px;">NIK (16 Digit)</label>
+              <input type="text" id="edit_guru_nik" name="nik" maxlength="16" class="input-field" style="width:100%; height:34px; font-size:12px;" />
+            </div>
           </div>
-          <div>
-            <label class="form-label" style="font-weight:700; font-size:12px; margin-bottom:4px;">Gelar Depan</label>
-            <input type="text" id="edit_guru_gelar_depan" name="gelar_depan" class="input-field" style="width:100%; height:36px;" />
+
+          <div style="display:grid; grid-template-columns: 1fr 1.2fr 1.1fr 1.1fr; gap:10px 12px; margin-bottom:10px;">
+            <div>
+              <label class="form-label" style="font-weight:700; font-size:11.5px; margin-bottom:3px;">Jenis Kelamin</label>
+              <select id="edit_guru_jenis_kelamin" name="jenis_kelamin" class="input-field" style="width:100%; height:34px; font-size:12px;">
+                <option value="">-- Pilih --</option>
+                <option value="L">Laki-laki (L)</option>
+                <option value="P">Perempuan (P)</option>
+              </select>
+            </div>
+            <div>
+              <label class="form-label" style="font-weight:700; font-size:11.5px; margin-bottom:3px;">Tempat Lahir</label>
+              <input type="text" id="edit_guru_tempat_lahir" name="tempat_lahir" class="input-field" style="width:100%; height:34px; font-size:12px;" />
+            </div>
+            <div>
+              <label class="form-label" style="font-weight:700; font-size:11.5px; margin-bottom:3px;">Tanggal Lahir</label>
+              <input type="date" id="edit_guru_tanggal_lahir" name="tanggal_lahir" class="input-field" style="width:100%; height:34px; font-size:12px;" />
+            </div>
+            <div>
+              <label class="form-label" style="font-weight:700; font-size:11.5px; margin-bottom:3px;">Agama</label>
+              <select id="edit_guru_agama" name="agama" class="input-field" style="width:100%; height:34px; font-size:12px;">
+                <option value="Islam">Islam</option>
+                <option value="Kristen Protestan">Kristen Protestan</option>
+                <option value="Katolik">Katolik</option>
+                <option value="Hindu">Hindu</option>
+                <option value="Buddha">Buddha</option>
+                <option value="Khonghucu">Khonghucu</option>
+              </select>
+            </div>
           </div>
-          <div>
-            <label class="form-label" style="font-weight:700; font-size:12px; margin-bottom:4px;">Gelar Belakang</label>
-            <input type="text" id="edit_guru_gelar_belakang" name="gelar_belakang" class="input-field" style="width:100%; height:36px;" />
-          </div>
-          <div>
-            <label class="form-label" style="font-weight:700; font-size:12px; margin-bottom:4px;">NIK (16 Digit)</label>
-            <input type="text" id="edit_guru_nik" name="nik" maxlength="16" class="input-field" style="width:100%; height:36px;" />
-          </div>
-          <div>
-            <label class="form-label" style="font-weight:700; font-size:12px; margin-bottom:4px;">Jenis Kelamin</label>
-            <select id="edit_guru_jenis_kelamin" name="jenis_kelamin" class="input-field" style="width:100%; height:36px;">
-              <option value="">-- Pilih --</option>
-              <option value="L">Laki-laki (L)</option>
-              <option value="P">Perempuan (P)</option>
-            </select>
-          </div>
-          <div>
-            <label class="form-label" style="font-weight:700; font-size:12px; margin-bottom:4px;">Tempat Lahir</label>
-            <input type="text" id="edit_guru_tempat_lahir" name="tempat_lahir" class="input-field" style="width:100%; height:36px;" />
-          </div>
-          <div>
-            <label class="form-label" style="font-weight:700; font-size:12px; margin-bottom:4px;">Tanggal Lahir</label>
-            <input type="date" id="edit_guru_tanggal_lahir" name="tanggal_lahir" class="input-field" style="width:100%; height:36px;" />
-          </div>
-          <div>
-            <label class="form-label" style="font-weight:700; font-size:12px; margin-bottom:4px;">Agama</label>
-            <select id="edit_guru_agama" name="agama" class="input-field" style="width:100%; height:36px;">
-              <option value="Islam">Islam</option>
-              <option value="Kristen Protestan">Kristen Protestan</option>
-              <option value="Katolik">Katolik</option>
-              <option value="Hindu">Hindu</option>
-              <option value="Buddha">Buddha</option>
-              <option value="Khonghucu">Khonghucu</option>
-            </select>
-          </div>
-          <div>
-            <label class="form-label" style="font-weight:700; font-size:12px; margin-bottom:4px;">No. WhatsApp / HP</label>
-            <input type="text" id="edit_guru_no_hp" name="no_hp" class="input-field" style="width:100%; height:36px;" />
-          </div>
-          <div>
-            <label class="form-label" style="font-weight:700; font-size:12px; margin-bottom:4px;">Status Keaktifan</label>
-            <select id="edit_guru_status" name="status" class="input-field" style="width:100%; height:36px;">
-              <option value="aktif">Aktif</option>
-              <option value="cuti">Cuti</option>
-              <option value="nonaktif">Nonaktif</option>
-            </select>
-          </div>
-          <div style="grid-column: 1 / -1;">
-            <label class="form-label" style="font-weight:700; font-size:12px; margin-bottom:4px;">Alamat Domisili</label>
-            <textarea id="edit_guru_alamat" name="alamat" rows="2" class="input-field" style="width:100%; font-size:12px; padding:6px;"></textarea>
-          </div>
-          <div style="grid-column: 1 / -1;">
-            <label class="form-label" style="font-weight:700; font-size:12px; display:flex; justify-content:space-between; margin-bottom:4px;">
-              <span>Ganti Foto Profil</span>
-            </label>
-            <div style="display:flex; align-items:center; gap:10px;">
-              <div style="width:36px; height:36px; border-radius:50%; border:1.5px solid var(--border-2); background:var(--bg-3); display:flex; align-items:center; justify-content:center; overflow:hidden; flex-shrink:0;">
-                <img id="edit_guru_foto_img" src="/img/user-default.png" style="width:100%; height:100%; object-fit:cover;" />
+
+          <div style="display:grid; grid-template-columns: 1.3fr 1fr 2fr; gap:10px 12px; margin-bottom:10px;">
+            <div>
+              <label class="form-label" style="font-weight:700; font-size:11.5px; margin-bottom:3px;">No. WhatsApp / HP</label>
+              <input type="text" id="edit_guru_no_hp" name="no_hp" class="input-field" style="width:100%; height:34px; font-size:12px;" />
+            </div>
+            <div>
+              <label class="form-label" style="font-weight:700; font-size:11.5px; margin-bottom:3px;">Status Keaktifan</label>
+              <select id="edit_guru_status" name="status" class="input-field" style="width:100%; height:34px; font-size:12px;">
+                <option value="aktif">Aktif</option>
+                <option value="cuti">Cuti</option>
+                <option value="nonaktif">Nonaktif</option>
+              </select>
+            </div>
+            <div>
+              <label class="form-label" style="font-weight:700; font-size:11.5px; margin-bottom:3px;">Ganti Foto Profil</label>
+              <div style="display:flex; align-items:center; gap:8px;">
+                <div style="width:34px; height:34px; border-radius:50%; border:1.5px solid var(--border-2); background:var(--bg-3); display:flex; align-items:center; justify-content:center; overflow:hidden; flex-shrink:0;">
+                  <img id="edit_guru_foto_img" src="/img/user-default.png" style="width:100%; height:100%; object-fit:cover;" />
+                </div>
+                <input type="file" name="foto" accept="image/*" class="input-field" style="flex:1; height:34px; font-size:11px; padding:3px 6px;" />
               </div>
-              <input type="file" name="foto" accept="image/*" class="input-field" style="flex:1; height:36px;" />
+            </div>
+          </div>
+
+          <div>
+            <label class="form-label" style="font-weight:700; font-size:11.5px; margin-bottom:3px;">Alamat Domisili</label>
+            <input type="text" id="edit_guru_alamat" name="alamat" placeholder="Alamat lengkap tempat tinggal" class="input-field" style="width:100%; height:34px; font-size:12px;" />
+          </div>
+        </div>
+
+        {{-- TAB 2 EDIT: KEPEGAWAIAN --}}
+        <div id="tab_edit_kepegawaian" class="gtk-tab-content" style="display:none;">
+          <div style="display:grid; grid-template-columns: 1fr 1fr 1.4fr; gap:10px 12px; margin-bottom:10px;">
+            <div>
+              <label class="form-label" style="font-weight:700; font-size:11.5px; margin-bottom:3px;">NIP / NI PPPK</label>
+              <input type="text" id="edit_guru_nip" name="nip" class="input-field" style="width:100%; height:34px; font-size:12px;" />
+            </div>
+            <div>
+              <label class="form-label" style="font-weight:700; font-size:11.5px; margin-bottom:3px;">NUPTK (16 Digit)</label>
+              <input type="text" id="edit_guru_nuptk" name="nuptk" maxlength="16" class="input-field" style="width:100%; height:34px; font-size:12px;" />
+            </div>
+            <div>
+              <label class="form-label" style="font-weight:700; font-size:11.5px; margin-bottom:3px;">Jenis PTK <span style="color:var(--red);">*</span></label>
+              <select id="edit_guru_jenis_ptk" name="jenis_ptk" class="input-field" style="width:100%; height:34px; font-size:12px;">
+                <option value="Guru Kejuruan / Produktif">Guru Kejuruan / Produktif</option>
+                <option value="Guru Normatif / Adaptif">Guru Normatif / Adaptif</option>
+                <option value="Guru BK">Guru BK (Bimbingan Konseling)</option>
+                <option value="Tenaga Administrasi Sekolah (TU)">Tenaga Administrasi Sekolah (TU)</option>
+                <option value="Laboran / Toolman Bengkel">Laboran / Toolman Bengkel</option>
+                <option value="Tenaga Perpustakaan">Tenaga Perpustakaan (Pustakawan)</option>
+              </select>
+            </div>
+          </div>
+
+          <div style="display:grid; grid-template-columns: 1.1fr 0.9fr 1.4fr; gap:10px 12px; margin-bottom:10px;">
+            <div>
+              <label class="form-label" style="font-weight:700; font-size:11.5px; margin-bottom:3px;">Status Kepegawaian <span style="color:var(--red);">*</span></label>
+              <select id="edit_guru_jenis_kepegawaian" name="jenis_kepegawaian" onchange="toggleHariMengajar('edit', this.value)" class="input-field" style="width:100%; height:34px; font-size:12px;">
+                <option value="pns">PNS (Pegawai Negeri Sipil)</option>
+                <option value="pppk">PPPK (P3K)</option>
+                <option value="honor">Guru Honor Daerah / GTT</option>
+                <option value="tendik">Tenaga Honorer Sekolah / PTT</option>
+              </select>
+            </div>
+            <div>
+              <label class="form-label" style="font-weight:700; font-size:11.5px; margin-bottom:3px;">Golongan / Pangkat</label>
+              <input type="text" id="edit_guru_golongan_pangkat" name="golongan_pangkat" placeholder="Contoh: III/a" class="input-field" style="width:100%; height:34px; font-size:12px;" />
+            </div>
+            <div>
+              <label class="form-label" style="font-weight:700; font-size:11.5px; margin-bottom:3px;">Nomor SK Pengangkatan</label>
+              <input type="text" id="edit_guru_nomor_sk_pengangkatan" name="nomor_sk_pengangkatan" class="input-field" style="width:100%; height:34px; font-size:12px;" />
+            </div>
+          </div>
+
+          <div style="display:grid; grid-template-columns: 1fr 1.3fr 1.3fr; gap:10px 12px;">
+            <div>
+              <label class="form-label" style="font-weight:700; font-size:11.5px; margin-bottom:3px;">TMT Kerja</label>
+              <input type="date" id="edit_guru_tmt_kerja" name="tmt_kerja" class="input-field" style="width:100%; height:34px; font-size:12px;" />
+            </div>
+            <div>
+              <label class="form-label" style="font-weight:700; font-size:11.5px; margin-bottom:3px;">Lembaga Pengangkat</label>
+              <select id="edit_guru_lembaga_pengangkat" name="lembaga_pengangkat" class="input-field" style="width:100%; height:34px; font-size:12px;">
+                <option value="Pemerintah Provinsi Lampung / Dinas Pendidikan">Pemerintah Provinsi Lampung / Dinas Pendidikan</option>
+                <option value="Kepala Sekolah">Kepala Sekolah (SK Tugas Mandiri)</option>
+              </select>
+            </div>
+            <div>
+              <label class="form-label" style="font-weight:700; font-size:11.5px; margin-bottom:3px;">Jabatan / Penugasan <span style="color:var(--red);">*</span></label>
+              <input type="text" id="edit_guru_jabatan" name="jabatan" required class="input-field" style="width:100%; height:34px; font-size:12px;" />
             </div>
           </div>
         </div>
-      </div>
 
-      {{-- TAB 2 EDIT: KEPEGAWAIAN --}}
-      <div id="tab_edit_kepegawaian" class="gtk-tab-content" style="display:none;">
-        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:12px;">
-          <div>
-            <label class="form-label" style="font-weight:700; font-size:12px; margin-bottom:4px;">NIP / NI PPPK</label>
-            <input type="text" id="edit_guru_nip" name="nip" class="input-field" style="width:100%; height:36px;" />
+        {{-- TAB 3 EDIT: KUALIFIKASI --}}
+        <div id="tab_edit_kualifikasi" class="gtk-tab-content" style="display:none;">
+          <div style="display:grid; grid-template-columns: 1fr 1.3fr 1.3fr; gap:10px 12px; margin-bottom:10px;">
+            <div>
+              <label class="form-label" style="font-weight:700; font-size:11.5px; margin-bottom:3px;">Pendidikan Terakhir</label>
+              <select id="edit_guru_pendidikan_terakhir" name="pendidikan_terakhir" class="input-field" style="width:100%; height:34px; font-size:12px;">
+                <option value="S1">S1 / D4 (Sarjana)</option>
+                <option value="S2">S2 (Magister)</option>
+                <option value="S3">S3 (Doktor)</option>
+                <option value="D3">D3 (Diploma III)</option>
+                <option value="SMA / SMK">SMA / SMK</option>
+              </select>
+            </div>
+            <div>
+              <label class="form-label" style="font-weight:700; font-size:11.5px; margin-bottom:3px;">Program Studi / Jurusan</label>
+              <input type="text" id="edit_guru_jurusan_kuliah" name="jurusan_kuliah" class="input-field" style="width:100%; height:34px; font-size:12px;" />
+            </div>
+            <div>
+              <label class="form-label" style="font-weight:700; font-size:11.5px; margin-bottom:3px;">Perguruan Tinggi / Kampus</label>
+              <input type="text" id="edit_guru_kampus" name="kampus" class="input-field" style="width:100%; height:34px; font-size:12px;" />
+            </div>
           </div>
-          <div>
-            <label class="form-label" style="font-weight:700; font-size:12px; margin-bottom:4px;">NUPTK (16 Digit)</label>
-            <input type="text" id="edit_guru_nuptk" name="nuptk" maxlength="16" class="input-field" style="width:100%; height:36px;" />
-          </div>
-          <div>
-            <label class="form-label" style="font-weight:700; font-size:12px; margin-bottom:4px;">Jenis PTK <span style="color:var(--red);">*</span></label>
-            <select id="edit_guru_jenis_ptk" name="jenis_ptk" class="input-field" style="width:100%; height:36px;">
-              <option value="Guru Kejuruan / Produktif">Guru Kejuruan / Produktif (RPL, TSM, APHP)</option>
-              <option value="Guru Normatif / Adaptif">Guru Normatif / Adaptif</option>
-              <option value="Guru BK">Guru BK (Bimbingan Konseling)</option>
-              <option value="Tenaga Administrasi Sekolah (TU)">Tenaga Administrasi Sekolah (TU / Operator)</option>
-              <option value="Laboran / Toolman Bengkel">Laboran / Toolman Bengkel</option>
-              <option value="Tenaga Perpustakaan">Tenaga Perpustakaan (Pustakawan)</option>
-            </select>
-          </div>
-          <div>
-            <label class="form-label" style="font-weight:700; font-size:12px; margin-bottom:4px;">Status Kepegawaian <span style="color:var(--red);">*</span></label>
-            <select id="edit_guru_jenis_kepegawaian" name="jenis_kepegawaian" onchange="toggleHariMengajar('edit', this.value)" class="input-field" style="width:100%; height:36px;">
-              <option value="pns">PNS (Pegawai Negeri Sipil)</option>
-              <option value="pppk">PPPK (P3K)</option>
-              <option value="honor">Guru Honor Daerah / GTT</option>
-              <option value="tendik">Tenaga Honorer Sekolah / PTT</option>
-            </select>
-          </div>
-          <div>
-            <label class="form-label" style="font-weight:700; font-size:12px; margin-bottom:4px;">Golongan / Pangkat</label>
-            <input type="text" id="edit_guru_golongan_pangkat" name="golongan_pangkat" class="input-field" style="width:100%; height:36px;" />
-          </div>
-          <div>
-            <label class="form-label" style="font-weight:700; font-size:12px; margin-bottom:4px;">Nomor SK Pengangkatan</label>
-            <input type="text" id="edit_guru_nomor_sk_pengangkatan" name="nomor_sk_pengangkatan" class="input-field" style="width:100%; height:36px;" />
-          </div>
-          <div>
-            <label class="form-label" style="font-weight:700; font-size:12px; margin-bottom:4px;">TMT Kerja</label>
-            <input type="date" id="edit_guru_tmt_kerja" name="tmt_kerja" class="input-field" style="width:100%; height:36px;" />
-          </div>
-          <div>
-            <label class="form-label" style="font-weight:700; font-size:12px; margin-bottom:4px;">Lembaga Pengangkat</label>
-            <select id="edit_guru_lembaga_pengangkat" name="lembaga_pengangkat" class="input-field" style="width:100%; height:36px;">
-              <option value="Pemerintah Provinsi Lampung / Dinas Pendidikan">Pemerintah Provinsi Lampung / Dinas Pendidikan</option>
-              <option value="Kepala Sekolah">Kepala Sekolah (SK Tugas Mandiri)</option>
-            </select>
-          </div>
-          <div>
-            <label class="form-label" style="font-weight:700; font-size:12px; margin-bottom:4px;">Jabatan / Penugasan <span style="color:var(--red);">*</span></label>
-            <input type="text" id="edit_guru_jabatan" name="jabatan" required class="input-field" style="width:100%; height:36px;" />
+
+          <div style="display:grid; grid-template-columns: 0.8fr 1.3fr 1.3fr; gap:10px 12px;">
+            <div>
+              <label class="form-label" style="font-weight:700; font-size:11.5px; margin-bottom:3px;">Tahun Lulus</label>
+              <input type="text" id="edit_guru_tahun_lulus" name="tahun_lulus" maxlength="4" class="input-field" style="width:100%; height:34px; font-size:12px;" />
+            </div>
+            <div>
+              <label class="form-label" style="font-weight:700; font-size:11.5px; margin-bottom:3px;">Status Sertifikasi Pendidik</label>
+              <select id="edit_guru_status_sertifikasi" name="status_sertifikasi" class="input-field" style="width:100%; height:34px; font-size:12px;">
+                <option value="belum">Belum Sertifikasi</option>
+                <option value="sudah">Sudah Sertifikasi Pendidik (Gr.)</option>
+              </select>
+            </div>
+            <div>
+              <label class="form-label" style="font-weight:700; font-size:11.5px; margin-bottom:3px;">Nomor Serdik (Jika Ada)</label>
+              <input type="text" id="edit_guru_nomor_serdik" name="nomor_serdik" class="input-field" style="width:100%; height:34px; font-size:12px;" />
+            </div>
           </div>
         </div>
-      </div>
 
-      {{-- TAB 3 EDIT: KUALIFIKASI --}}
-      <div id="tab_edit_kualifikasi" class="gtk-tab-content" style="display:none;">
-        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:12px;">
-          <div>
-            <label class="form-label" style="font-weight:700; font-size:12px; margin-bottom:4px;">Pendidikan Terakhir</label>
-            <select id="edit_guru_pendidikan_terakhir" name="pendidikan_terakhir" class="input-field" style="width:100%; height:36px;">
-              <option value="S1">S1 / D4 (Sarjana / Diploma IV)</option>
-              <option value="S2">S2 (Magister)</option>
-              <option value="S3">S3 (Doktor)</option>
-              <option value="D3">D3 (Diploma III)</option>
-              <option value="SMA / SMK">SMA / SMK</option>
-            </select>
-          </div>
-          <div>
-            <label class="form-label" style="font-weight:700; font-size:12px; margin-bottom:4px;">Program Studi / Jurusan Kuliah</label>
-            <input type="text" id="edit_guru_jurusan_kuliah" name="jurusan_kuliah" class="input-field" style="width:100%; height:36px;" />
-          </div>
-          <div>
-            <label class="form-label" style="font-weight:700; font-size:12px; margin-bottom:4px;">Perguruan Tinggi / Kampus</label>
-            <input type="text" id="edit_guru_kampus" name="kampus" class="input-field" style="width:100%; height:36px;" />
-          </div>
-          <div>
-            <label class="form-label" style="font-weight:700; font-size:12px; margin-bottom:4px;">Tahun Lulus Kuliah</label>
-            <input type="text" id="edit_guru_tahun_lulus" name="tahun_lulus" maxlength="4" class="input-field" style="width:100%; height:36px;" />
-          </div>
-          <div>
-            <label class="form-label" style="font-weight:700; font-size:12px; margin-bottom:4px;">Status Sertifikasi Pendidik</label>
-            <select id="edit_guru_status_sertifikasi" name="status_sertifikasi" class="input-field" style="width:100%; height:36px;">
-              <option value="belum">Belum Sertifikasi</option>
-              <option value="sudah">Sudah Sertifikasi Pendidik (Gr.)</option>
-            </select>
-          </div>
-          <div>
-            <label class="form-label" style="font-weight:700; font-size:12px; margin-bottom:4px;">Nomor Serdik (Jika Ada)</label>
-            <input type="text" id="edit_guru_nomor_serdik" name="nomor_serdik" class="input-field" style="width:100%; height:36px;" />
-          </div>
-        </div>
-      </div>
-
-      {{-- TAB 4 EDIT: TUGAS & JJM --}}
-      <div id="tab_edit_tugas" class="gtk-tab-content" style="display:none;">
-        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:12px;">
-          <div>
-            <label class="form-label" style="font-weight:700; font-size:12px; margin-bottom:2px;">Mata Pelajaran Diampu</label>
-            <span style="font-size:10px; color:var(--text-3); display:block; margin-bottom:4px;">Pisahkan dengan koma jika &gt; 1 mapel</span>
-            <input type="text" id="edit_guru_mapel_diampu" name="mapel_diampu" placeholder="Contoh: Pemrograman Web, Basis Data, PBO" class="input-field" style="width:100%; height:36px;" />
-          </div>
-          <div>
-            <label class="form-label" style="font-weight:700; font-size:12px; margin-bottom:2px;">JJM (Jam Mengajar / Minggu)</label>
-            <span style="font-size:10px; color:var(--text-3); display:block; margin-bottom:4px;">Total jam mengajar mingguan</span>
-            <input type="number" id="edit_guru_jjm" name="jjm" min="0" max="60" placeholder="Contoh: 24" class="input-field" style="width:100%; height:36px;" />
-          </div>
-          <div>
-            <label class="form-label" style="font-weight:700; font-size:12px; margin-bottom:2px;">Tugas Tambahan</label>
-            <span style="font-size:10px; color:var(--text-3); display:block; margin-bottom:4px;">Pisahkan dengan koma jika &gt; 1 tugas</span>
-            <input type="text" id="edit_guru_tugas_tambahan" name="tugas_tambahan" placeholder="Contoh: Kepala Bengkel RPL, Wali Kelas" class="input-field" style="width:100%; height:36px;" />
-          </div>
-          <div>
-            <label class="form-label" style="font-weight:700; font-size:12px; margin-bottom:2px;">SK Tugas Tambahan</label>
-            <span style="font-size:10px; color:var(--text-3); display:block; margin-bottom:4px;">Nomor SK Pembagian Tugas Semester ini</span>
-            <input type="text" id="edit_guru_sk_tugas_tambahan" name="sk_tugas_tambahan" placeholder="Contoh: 800/012/SMK.01/2026" class="input-field" style="width:100%; height:36px;" />
+        {{-- TAB 4 EDIT: TUGAS & JJM --}}
+        <div id="tab_edit_tugas" class="gtk-tab-content" style="display:none;">
+          <div style="display:grid; grid-template-columns: 1.4fr 0.8fr 1.4fr 1.4fr; gap:10px 12px; margin-bottom:10px;">
+            <div>
+              <label class="form-label" style="font-weight:700; font-size:11.5px; margin-bottom:2px;">Mata Pelajaran Diampu</label>
+              <span style="font-size:9.5px; color:var(--text-3); display:block; margin-bottom:3px;">Pisahkan koma jika &gt; 1</span>
+              <input type="text" id="edit_guru_mapel_diampu" name="mapel_diampu" placeholder="Contoh: Web, Basis Data" class="input-field" style="width:100%; height:34px; font-size:12px;" />
+            </div>
+            <div>
+              <label class="form-label" style="font-weight:700; font-size:11.5px; margin-bottom:2px;">JJM (Jam / Minggu)</label>
+              <span style="font-size:9.5px; color:var(--text-3); display:block; margin-bottom:3px;">Total jam tatap muka</span>
+              <input type="number" id="edit_guru_jjm" name="jjm" min="0" max="60" placeholder="24" class="input-field" style="width:100%; height:34px; font-size:12px;" />
+            </div>
+            <div>
+              <label class="form-label" style="font-weight:700; font-size:11.5px; margin-bottom:2px;">Tugas Tambahan</label>
+              <span style="font-size:9.5px; color:var(--text-3); display:block; margin-bottom:3px;">Pisahkan koma jika &gt; 1</span>
+              <input type="text" id="edit_guru_tugas_tambahan" name="tugas_tambahan" placeholder="Kepala Bengkel, Wali Kelas" class="input-field" style="width:100%; height:34px; font-size:12px;" />
+            </div>
+            <div>
+              <label class="form-label" style="font-weight:700; font-size:11.5px; margin-bottom:2px;">SK Tugas Tambahan</label>
+              <span style="font-size:9.5px; color:var(--text-3); display:block; margin-bottom:3px;">Nomor SK Penugasan</span>
+              <input type="text" id="edit_guru_sk_tugas_tambahan" name="sk_tugas_tambahan" placeholder="800/012/SMK.01/2026" class="input-field" style="width:100%; height:34px; font-size:12px;" />
+            </div>
           </div>
 
-          <div id="edit_hari_mengajar_box" style="grid-column: 1 / -1; background:var(--bg-3); border:1px solid var(--border-2); border-radius:var(--r-md); padding:10px 12px;">
+          <div id="edit_hari_mengajar_box" style="background:var(--bg-3); border:1px solid var(--border-2); border-radius:var(--r-md); padding:8px 12px;">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; flex-wrap:wrap; gap:4px;">
               <label style="font-weight:800; font-size:11.5px; color:var(--text); margin:0;">
                 <i class="bi bi-calendar-check-fill" style="color:#000000; margin-right:4px;"></i> Jadwal Hari Wajib Mengajar / Hadir:
               </label>
-              <span style="font-size:10.5px; color:var(--text-3);">Centang hari wajib hadir</span>
+              <span style="font-size:10px; color:var(--text-3);">Centang hari wajib hadir</span>
             </div>
             <div style="display:flex; flex-wrap:wrap; gap:8px;">
               @foreach(['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'] as $hari)
-                <label style="display:inline-flex; align-items:center; gap:5px; font-size:11.5px; font-weight:700; cursor:pointer; background:var(--bg-card); padding:4px 8px; border-radius:6px; border:1px solid var(--border);">
+                <label style="display:inline-flex; align-items:center; gap:5px; font-size:11.5px; font-weight:700; cursor:pointer; background:var(--bg-card); padding:3px 8px; border-radius:6px; border:1px solid var(--border);">
                   <input type="checkbox" name="hari_mengajar[]" value="{{ $hari }}" class="edit-hari-cb" data-hari="{{ $hari }}" /> {{ $hari }}
                 </label>
               @endforeach
