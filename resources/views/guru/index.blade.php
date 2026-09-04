@@ -367,10 +367,11 @@
             <div class="form-group" style="margin-bottom:0;">
               <label style="margin-bottom:5px; font-weight:700; font-size:12px; color:var(--text-2);">Jenis PTK <span style="color:var(--red);">*</span></label>
               <select name="jenis_ptk" style="width:100%; height:38px;" class="input-field">
-                <option value="Guru Kejuruan / Produktif">Guru Kejuruan / Produktif (RPL, TSM, APHP)</option>
+                <option value="Guru Kejuruan / Produktif">Guru Kejuruan / Produktif</option>
                 <option value="Guru Normatif / Adaptif">Guru Normatif / Adaptif</option>
                 <option value="Guru BK">Guru BK (Bimbingan Konseling)</option>
-                <option value="Tenaga Administrasi Sekolah (TU)">Tenaga Administrasi Sekolah (TU / Operator)</option>
+                <option value="Kepala Sekolah">Kepala Sekolah</option>
+                <option value="Tenaga Administrasi Sekolah (TU)">Tenaga Administrasi Sekolah (TU)</option>
                 <option value="Laboran / Toolman Bengkel">Laboran / Toolman Bengkel</option>
                 <option value="Tenaga Perpustakaan">Tenaga Perpustakaan (Pustakawan)</option>
               </select>
@@ -389,8 +390,8 @@
               <input type="text" name="golongan_pangkat" placeholder="Contoh: Penata Tk.I (III/d) / Golongan IX" style="width:100%; height:38px;" />
             </div>
             <div class="form-group" style="margin-bottom:0;">
-              <label style="margin-bottom:5px; font-weight:700; font-size:12px; color:var(--text-2);">Nomor SK Pengangkatan</label>
-              <input type="text" name="nomor_sk_pengangkatan" placeholder="Nomor SK Pengangkatan Resmi" style="width:100%; height:38px;" />
+              <label style="margin-bottom:5px; font-weight:700; font-size:12px; color:var(--text-2);">Nomor SK Pengangkatan Pegawai (Dinas / Pemda)</label>
+              <input type="text" name="nomor_sk_pengangkatan" placeholder="Nomor SK Pengangkatan Resmi dari Pemerintah/Dinas" style="width:100%; height:38px;" />
             </div>
             <div class="form-group" style="margin-bottom:0;">
               <label style="margin-bottom:5px; font-weight:700; font-size:12px; color:var(--text-2);">TMT Kerja (Terhitung Mulai Tanggal)</label>
@@ -402,10 +403,6 @@
                 <option value="Pemerintah Provinsi Lampung / Dinas Pendidikan">Pemerintah Provinsi Lampung / Dinas Pendidikan</option>
                 <option value="Kepala Sekolah">Kepala Sekolah (SK Tugas Mandiri)</option>
               </select>
-            </div>
-            <div class="form-group" style="margin-bottom:0;">
-              <label style="margin-bottom:5px; font-weight:700; font-size:12px; color:var(--text-2);">Jabatan / Posisi Kerja <span style="color:var(--red);">*</span></label>
-              <input type="text" name="jabatan" required placeholder="Contoh: Guru Pemrograman Web / Staf Tata Usaha" style="width:100%; height:38px;" />
             </div>
           </div>
         </div>
@@ -453,8 +450,8 @@
         <div id="tab_tambah_tugas" class="gtk-tab-content" style="display:none;">
           <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap:14px; margin-bottom:14px;">
             <div class="form-group" style="margin-bottom:0;">
-              <label style="margin-bottom:2px; font-weight:700; font-size:12px; color:var(--text-2);">Mata Pelajaran yang Diampu</label>
-              <span style="font-size:10.5px; color:var(--text-3); display:block; margin-bottom:5px;">Pisahkan dengan koma jika &gt; 1 mapel (Contoh: <em>Pemrograman Web, Basis Data, PBO</em>)</span>
+              <label style="margin-bottom:2px; font-weight:700; font-size:12px; color:var(--text-2);">Mata Pelajaran Pokok yang Diampu</label>
+              <span style="font-size:10.5px; color:var(--text-3); display:block; margin-bottom:5px;">Pisahkan dengan koma jika &gt; 1 (Otomatis menjadi jabatan mengajar guru)</span>
               <input type="text" name="mapel_diampu" placeholder="Contoh: Pemrograman Web, Basis Data, PBO" style="width:100%; height:38px;" />
             </div>
             <div class="form-group" style="margin-bottom:0;">
@@ -464,12 +461,12 @@
             </div>
             <div class="form-group" style="margin-bottom:0;">
               <label style="margin-bottom:2px; font-weight:700; font-size:12px; color:var(--text-2);">Tugas Tambahan di Sekolah</label>
-              <span style="font-size:10.5px; color:var(--text-3); display:block; margin-bottom:5px;">Pisahkan dengan koma jika &gt; 1 (Contoh: <em>Kepala Bengkel RPL (12 Jam), Wali Kelas (2 Jam)</em>)</span>
-              <input type="text" name="tugas_tambahan" placeholder="Contoh: Kepala Bengkel RPL, Wali Kelas XII RPL 1" style="width:100%; height:38px;" />
+              <span style="font-size:10.5px; color:var(--text-3); display:block; margin-bottom:5px;">Misal: Waka Kurikulum, Kepala Bengkel RPL, Pembina OSIS</span>
+              <input type="text" name="tugas_tambahan" placeholder="Contoh: Waka Kurikulum, Kepala Bengkel RPL" style="width:100%; height:38px;" />
             </div>
             <div class="form-group" style="margin-bottom:0;">
-              <label style="margin-bottom:2px; font-weight:700; font-size:12px; color:var(--text-2);">SK Tugas Tambahan</label>
-              <span style="font-size:10.5px; color:var(--text-3); display:block; margin-bottom:5px;">Nomor SK Pembagian Tugas Pokok &amp; Tambahan Semester ini</span>
+              <label style="margin-bottom:2px; font-weight:700; font-size:12px; color:var(--text-2);">SK Pembagian Tugas Mengajar &amp; JJM (Semester)</label>
+              <span style="font-size:10.5px; color:var(--text-3); display:block; margin-bottom:5px;">Nomor SK Beban Kerja Mengajar dari Kepala Sekolah</span>
               <input type="text" name="sk_tugas_tambahan" placeholder="Contoh: 800/012/SMK.01/2026" style="width:100%; height:38px;" />
             </div>
 
@@ -1036,6 +1033,7 @@
                 <option value="Guru Kejuruan / Produktif">Guru Kejuruan / Produktif</option>
                 <option value="Guru Normatif / Adaptif">Guru Normatif / Adaptif</option>
                 <option value="Guru BK">Guru BK (Bimbingan Konseling)</option>
+                <option value="Kepala Sekolah">Kepala Sekolah</option>
                 <option value="Tenaga Administrasi Sekolah (TU)">Tenaga Administrasi Sekolah (TU)</option>
                 <option value="Laboran / Toolman Bengkel">Laboran / Toolman Bengkel</option>
                 <option value="Tenaga Perpustakaan">Tenaga Perpustakaan (Pustakawan)</option>
@@ -1058,12 +1056,12 @@
               <input type="text" id="edit_guru_golongan_pangkat" name="golongan_pangkat" placeholder="Contoh: III/a" class="input-field" style="width:100%; height:34px; font-size:12px;" />
             </div>
             <div>
-              <label class="form-label" style="font-weight:700; font-size:11.5px; margin-bottom:3px;">Nomor SK Pengangkatan</label>
-              <input type="text" id="edit_guru_nomor_sk_pengangkatan" name="nomor_sk_pengangkatan" class="input-field" style="width:100%; height:34px; font-size:12px;" />
+              <label class="form-label" style="font-weight:700; font-size:11.5px; margin-bottom:3px;">Nomor SK Pengangkatan Pegawai (Dinas / Pemda)</label>
+              <input type="text" id="edit_guru_nomor_sk_pengangkatan" name="nomor_sk_pengangkatan" placeholder="Nomor SK Pengangkatan" class="input-field" style="width:100%; height:34px; font-size:12px;" />
             </div>
           </div>
 
-          <div style="display:grid; grid-template-columns: 1fr 1.3fr 1.3fr; gap:10px 12px;">
+          <div style="display:grid; grid-template-columns: 1fr 1.3fr; gap:10px 12px;">
             <div>
               <label class="form-label" style="font-weight:700; font-size:11.5px; margin-bottom:3px;">TMT Kerja</label>
               <input type="date" id="edit_guru_tmt_kerja" name="tmt_kerja" class="input-field" style="width:100%; height:34px; font-size:12px;" />
@@ -1074,10 +1072,7 @@
                 <option value="Pemerintah Provinsi Lampung / Dinas Pendidikan">Pemerintah Provinsi Lampung / Dinas Pendidikan</option>
                 <option value="Kepala Sekolah">Kepala Sekolah (SK Tugas Mandiri)</option>
               </select>
-            </div>
-            <div>
-              <label class="form-label" style="font-weight:700; font-size:11.5px; margin-bottom:3px;">Jabatan / Penugasan <span style="color:var(--red);">*</span></label>
-              <input type="text" id="edit_guru_jabatan" name="jabatan" required class="input-field" style="width:100%; height:34px; font-size:12px;" />
+              <input type="hidden" id="edit_guru_jabatan" name="jabatan" />
             </div>
           </div>
         </div>
@@ -1128,8 +1123,8 @@
         <div id="tab_edit_tugas" class="gtk-tab-content" style="display:none;">
           <div style="display:grid; grid-template-columns: 1.4fr 0.8fr 1.4fr 1.4fr; gap:10px 12px; margin-bottom:10px;">
             <div>
-              <label class="form-label" style="font-weight:700; font-size:11.5px; margin-bottom:2px;">Mata Pelajaran Diampu</label>
-              <span style="font-size:9.5px; color:var(--text-3); display:block; margin-bottom:3px;">Pisahkan koma jika &gt; 1</span>
+              <label class="form-label" style="font-weight:700; font-size:11.5px; margin-bottom:2px;">Mata Pelajaran Pokok Diampu</label>
+              <span style="font-size:9.5px; color:var(--text-3); display:block; margin-bottom:3px;">Otomatis menjadi jabatan mengajar</span>
               <input type="text" id="edit_guru_mapel_diampu" name="mapel_diampu" placeholder="Contoh: Web, Basis Data" class="input-field" style="width:100%; height:34px; font-size:12px;" />
             </div>
             <div>
@@ -1139,12 +1134,12 @@
             </div>
             <div>
               <label class="form-label" style="font-weight:700; font-size:11.5px; margin-bottom:2px;">Tugas Tambahan</label>
-              <span style="font-size:9.5px; color:var(--text-3); display:block; margin-bottom:3px;">Pisahkan koma jika &gt; 1</span>
+              <span style="font-size:9.5px; color:var(--text-3); display:block; margin-bottom:3px;">Misal: Waka, Kepala Bengkel</span>
               <input type="text" id="edit_guru_tugas_tambahan" name="tugas_tambahan" placeholder="Kepala Bengkel, Wali Kelas" class="input-field" style="width:100%; height:34px; font-size:12px;" />
             </div>
             <div>
-              <label class="form-label" style="font-weight:700; font-size:11.5px; margin-bottom:2px;">SK Tugas Tambahan</label>
-              <span style="font-size:9.5px; color:var(--text-3); display:block; margin-bottom:3px;">Nomor SK Penugasan</span>
+              <label class="form-label" style="font-weight:700; font-size:11.5px; margin-bottom:2px;">SK Tugas Mengajar &amp; JJM</label>
+              <span style="font-size:9.5px; color:var(--text-3); display:block; margin-bottom:3px;">SK Semester dari Kepala Sekolah</span>
               <input type="text" id="edit_guru_sk_tugas_tambahan" name="sk_tugas_tambahan" placeholder="800/012/SMK.01/2026" class="input-field" style="width:100%; height:34px; font-size:12px;" />
             </div>
           </div>

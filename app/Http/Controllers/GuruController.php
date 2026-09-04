@@ -149,6 +149,68 @@ class GuruController extends Controller
         ));
     }
 
+    /**
+     * Resolusi cerdas jabatan agar guru tidak perlu menginput hal yang sama berulang kali.
+     */
+    protected function resolveJabatan(Request $request, ?string $existingJabatan = null): string
+    {
+        $inputJabatan = trim($request->input('jabatan', ''));
+        $tugasTambahan = trim($request->input('tugas_tambahan', ''));
+        $mapelDiampu = trim($request->input('mapel_diampu', ''));
+        $jenisPtk = trim($request->input('jenis_ptk', ''));
+
+        // 1. Jika ada Tugas Tambahan Utama (Kepala Sekolah, Waka, dll), utamakan itu
+        if ($tugasTambahan) {
+            $lowerTugas = strtolower($tugasTambahan);
+            if (str_contains($lowerTugas, 'kepala sekolah') || str_contains($lowerTugas, 'kepsek')) {
+                return 'Kepala Sekolah';
+            }
+            if (str_contains($lowerTugas, 'waka') || str_contains($lowerTugas, 'wakil kepala')) {
+                return trim(explode(',', $tugasTambahan)[0]);
+            }
+        }
+
+        // 2. Jika jenis_ptk adalah Kepala Sekolah
+        if ($jenisPtk === 'Kepala Sekolah') {
+            return 'Kepala Sekolah';
+        }
+
+        // 3. Jika guru BK
+        if ($jenisPtk === 'Guru BK' || str_contains(strtolower($inputJabatan), 'bk') || str_contains(strtolower($inputJabatan), 'konseling')) {
+            return 'Guru Bimbingan Konseling';
+        }
+
+        // 4. Jika staf administrasi / perpustakaan / laboran
+        if ($jenisPtk && (str_contains($jenisPtk, 'Administrasi') || str_contains($jenisPtk, 'TU'))) {
+            return 'Tenaga Administrasi Sekolah (TU)';
+        }
+        if ($jenisPtk && str_contains($jenisPtk, 'Laboran')) {
+            return 'Laboran / Toolman Bengkel';
+        }
+        if ($jenisPtk && str_contains($jenisPtk, 'Perpustakaan')) {
+            return 'Tenaga Perpustakaan';
+        }
+
+        // 5. Jika ada mapel yang diampu
+        if ($mapelDiampu) {
+            $firstMapel = trim(explode(',', $mapelDiampu)[0]);
+            return str_starts_with(strtolower($firstMapel), 'guru') ? $firstMapel : 'Guru ' . $firstMapel;
+        }
+
+        // 6. Jika ada tugas tambahan lain (misal: Kepala Bengkel)
+        if ($tugasTambahan) {
+            return trim(explode(',', $tugasTambahan)[0]);
+        }
+
+        // 7. Jika jenis_ptk tersedia
+        if ($jenisPtk) {
+            return $jenisPtk;
+        }
+
+        // 8. Fallback ke input jabatan manual / eksisting
+        return $inputJabatan ?: ($existingJabatan ?: 'Guru Mata Pelajaran');
+    }
+
     public function store(Request $request)
     {
         $request->validate([
@@ -156,7 +218,7 @@ class GuruController extends Controller
             'nip' => 'nullable|string|max:25|unique:gurus,nip',
             'nik' => 'nullable|string|max:20',
             'nuptk' => 'nullable|string|max:25',
-            'jabatan' => 'required|string|max:100',
+            'jabatan' => 'nullable|string|max:100',
             'jenis_kepegawaian' => 'nullable|in:pns,pppk,honor,tendik',
             'jenis_ptk' => 'nullable|string|max:60',
             'status_sertifikasi' => 'nullable|in:sudah,belum',
@@ -175,6 +237,7 @@ class GuruController extends Controller
 
         $nama = trim($request->input('nama'));
         $namaLengkap = $request->filled('nama_lengkap') ? trim($request->input('nama_lengkap')) : $nama;
+        $jabatan = $this->resolveJabatan($request);
 
         $guru = Guru::create([
             'nip'                 => $request->input('nip') ?: null,
@@ -190,7 +253,7 @@ class GuruController extends Controller
             'agama'               => $request->input('agama') ?: null,
             'alamat'              => $request->input('alamat') ?: null,
             'id_gtk'              => $request->input('id_gtk') ?: null,
-            'jabatan'             => $request->input('jabatan'),
+            'jabatan'             => $jabatan,
             'jenis_kepegawaian'   => $request->input('jenis_kepegawaian', 'pns'),
             'jenis_ptk'           => $request->input('jenis_ptk') ?: null,
             'golongan_pangkat'    => $request->input('golongan_pangkat') ?: null,
@@ -214,7 +277,7 @@ class GuruController extends Controller
         ]);
 
         if ($request->filled('email_akun') && $request->filled('password_akun')) {
-            $jabatanLower = strtolower($request->input('jabatan', ''));
+            $jabatanLower = strtolower($jabatan);
             $defaultRole = 'guru';
             if (str_contains($jabatanLower, 'kepala sekolah')) {
                 $defaultRole = 'kepala_sekolah';
@@ -250,7 +313,7 @@ class GuruController extends Controller
             'nip' => 'nullable|string|max:25|unique:gurus,nip,' . $id,
             'nik' => 'nullable|string|max:20',
             'nuptk' => 'nullable|string|max:25',
-            'jabatan' => 'required|string|max:100',
+            'jabatan' => 'nullable|string|max:100',
             'jenis_kepegawaian' => 'nullable|in:pns,pppk,honor,tendik',
             'jenis_ptk' => 'nullable|string|max:60',
             'status_sertifikasi' => 'nullable|in:sudah,belum',
@@ -271,6 +334,7 @@ class GuruController extends Controller
 
         $nama = trim($request->input('nama'));
         $namaLengkap = $request->filled('nama_lengkap') ? trim($request->input('nama_lengkap')) : ($guru->nama_lengkap ?: $nama);
+        $jabatan = $this->resolveJabatan($request, $guru->jabatan);
 
         $guru->update([
             'nip'                 => $request->input('nip') ?: null,
@@ -286,7 +350,7 @@ class GuruController extends Controller
             'agama'               => $request->input('agama') ?: null,
             'alamat'              => $request->input('alamat') ?: null,
             'id_gtk'              => $request->input('id_gtk') ?: null,
-            'jabatan'             => $request->input('jabatan'),
+            'jabatan'             => $jabatan,
             'jenis_kepegawaian'   => $request->input('jenis_kepegawaian', 'pns'),
             'jenis_ptk'           => $request->input('jenis_ptk') ?: null,
             'golongan_pangkat'    => $request->input('golongan_pangkat') ?: null,
