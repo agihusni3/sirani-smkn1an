@@ -21,14 +21,23 @@ class PpdbMutasiService
 
             // 1. Cek atau Buat Siswa di tabel siswas
             $siswa = Siswa::firstOrNew(['nisn' => $pendaftar->nisn]);
+            $siswa->nik = $pendaftar->nik;
             $siswa->nama = $pendaftar->nama_lengkap;
+            $siswa->jenis_kelamin = $pendaftar->jenis_kelamin;
+            $siswa->tempat_lahir = $pendaftar->tempat_lahir;
+            $siswa->tanggal_lahir = $pendaftar->tanggal_lahir;
+            $siswa->agama = $pendaftar->agama;
+            $siswa->alamat = $pendaftar->alamat;
+            $siswa->nama_ayah = $pendaftar->nama_ayah;
+            $siswa->nama_ibu = $pendaftar->nama_ibu;
+            $siswa->nama_ortu = $pendaftar->nama_ibu ?? $pendaftar->nama_ayah;
+            $siswa->asal_sekolah = $pendaftar->asal_sekolah;
+            $siswa->no_hp_ortu = $pendaftar->no_hp_ortu;
+            $siswa->no_hp_siswa = $pendaftar->no_hp_siswa;
             $siswa->status = 'aktif';
             if ($pendaftar->berkas_foto && empty($siswa->foto)) {
                 $siswa->foto = $pendaftar->berkas_foto;
             }
-            $siswa->nama_ortu = $pendaftar->nama_ibu ?? $pendaftar->nama_ayah;
-            $siswa->no_hp_ortu = $pendaftar->no_hp_ortu;
-            $siswa->no_hp_siswa = $pendaftar->no_hp_siswa;
             $siswa->save();
 
             // 2. Hubungkan ke Rombel (Kelas X)

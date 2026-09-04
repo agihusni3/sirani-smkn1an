@@ -31,17 +31,36 @@ class Siswa extends Model
 
     protected $fillable = [
         'nisn',
+        'nik',
         'nama',
+        'jenis_kelamin',
+        'tempat_lahir',
+        'tanggal_lahir',
+        'agama',
+        'alamat',
+        'nama_ayah',
+        'nama_ibu',
         'nama_ortu',
+        'asal_sekolah',
         'no_hp_ortu',
         'no_hp_siswa',
         'foto',
         'status',
     ];
 
-    protected $casts = [];
+    protected $casts = [
+        'tanggal_lahir' => 'date',
+    ];
 
     protected $appends = ['foto_url', 'nomor_hp_ortu'];
+
+    public function getNamaOrtuAttribute(): ?string
+    {
+        return $this->attributes['nama_ortu'] 
+            ?? $this->attributes['nama_ibu'] 
+            ?? $this->attributes['nama_ayah'] 
+            ?? null;
+    }
 
     public function getNomorHpOrtuAttribute(): ?string
     {

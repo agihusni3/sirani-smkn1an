@@ -115,74 +115,173 @@
       <form id="formTambahSiswa" action="/siswa" method="POST" enctype="multipart/form-data">
         @csrf
         
-        <!-- Grid Input 2 Kolom Seimbang -->
-        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap:14px; margin-bottom:14px;">
-          {{-- Baris 1: Kolom 1 (NISN) --}}
-          <div class="form-group" style="margin-bottom:0;">
-            <label style="margin-bottom:6px; font-weight:700; font-size:12px; text-transform:uppercase; letter-spacing:0.4px; color:var(--text-2);">
-              NISN (Nomor Induk Siswa Nasional) <span style="color:var(--red);">*</span>
-            </label>
-            <input type="text" name="nisn" required placeholder="Contoh: 0071234567" style="width:100%; height:40px;" />
+        {{-- Seksi 1: Identitas Pokok & Rombel --}}
+        <div style="margin-bottom:16px;">
+          <div style="font-size:12px; font-weight:800; color:var(--text); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:10px; display:flex; align-items:center; gap:6px;">
+            <span style="width:6px; height:6px; border-radius:50%; background:var(--brand-blue, #2563eb);"></span> Identitas Pokok & Kelas
           </div>
+          <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap:12px;">
+            <div class="form-group" style="margin-bottom:0;">
+              <label style="margin-bottom:4px; font-weight:700; font-size:11.5px; text-transform:uppercase; letter-spacing:0.3px; color:var(--text-2);">
+                NISN (10 Digit) <span style="color:var(--red);">*</span>
+              </label>
+              <input type="text" name="nisn" maxlength="10" required placeholder="Contoh: 0071234567" style="width:100%; height:38px;" />
+            </div>
 
-          {{-- Baris 1: Kolom 2 (Nama Lengkap) --}}
-          <div class="form-group" style="margin-bottom:0;">
-            <label style="margin-bottom:6px; font-weight:700; font-size:12px; text-transform:uppercase; letter-spacing:0.4px; color:var(--text-2);">
-              Nama Lengkap Siswa <span style="color:var(--red);">*</span>
-            </label>
-            <input type="text" name="nama" required placeholder="Nama lengkap sesuai ijazah..." style="width:100%; height:40px;" />
+            <div class="form-group" style="margin-bottom:0;">
+              <label style="margin-bottom:4px; font-weight:700; font-size:11.5px; text-transform:uppercase; letter-spacing:0.3px; color:var(--text-2);">
+                NIK (KTP / KK)
+              </label>
+              <input type="text" name="nik" maxlength="16" placeholder="16 digit angka..." style="width:100%; height:38px;" />
+            </div>
+
+            <div class="form-group" style="margin-bottom:0; grid-column:span 1;">
+              <label style="margin-bottom:4px; font-weight:700; font-size:11.5px; text-transform:uppercase; letter-spacing:0.3px; color:var(--text-2);">
+                Nama Lengkap Siswa <span style="color:var(--red);">*</span>
+              </label>
+              <input type="text" name="nama" required placeholder="Nama lengkap sesuai ijazah/akta..." style="width:100%; height:38px;" />
+            </div>
+
+            <div class="form-group" style="margin-bottom:0;">
+              <label style="margin-bottom:4px; font-weight:700; font-size:11.5px; text-transform:uppercase; letter-spacing:0.3px; color:var(--text-2);">
+                Jenis Kelamin <span style="color:var(--red);">*</span>
+              </label>
+              <select name="jenis_kelamin" style="width:100%; height:38px;">
+                <option value="">-- Pilih L/P --</option>
+                <option value="L">Laki-laki (L)</option>
+                <option value="P">Perempuan (P)</option>
+              </select>
+            </div>
+
+            <div class="form-group" style="margin-bottom:0;">
+              <label style="margin-bottom:4px; font-weight:700; font-size:11.5px; text-transform:uppercase; letter-spacing:0.3px; color:var(--text-2);">
+                Kelas / Rombel <span style="color:var(--red);">*</span>
+              </label>
+              <select name="rombel_id" required style="width:100%; height:38px;">
+                @if(!$isWaliOnly || $rombels->count() > 1)
+                  <option value="">Pilih Rombel...</option>
+                @endif
+                @foreach($rombels as $r)
+                  <option value="{{ $r->id }}" {{ ($isWaliOnly && $rombels->count() === 1) ? 'selected' : '' }}>
+                    {{ $r->nama_rombel }} ({{ $r->jurusan->nama_jurusan ?? 'Umum' }})
+                  </option>
+                @endforeach
+              </select>
+            </div>
           </div>
+        </div>
 
-          {{-- Baris 2: Kolom 1 (Rombel) --}}
-          <div class="form-group" style="margin-bottom:0;">
-            <label style="margin-bottom:6px; font-weight:700; font-size:12px; text-transform:uppercase; letter-spacing:0.4px; color:var(--text-2);">
-              Kelas / Rombel <span style="color:var(--red);">*</span>
-            </label>
-            <select name="rombel_id" required style="width:100%; height:40px;">
-              @if(!$isWaliOnly || $rombels->count() > 1)
-                <option value="">Pilih Rombel...</option>
-              @endif
-              @foreach($rombels as $r)
-                <option value="{{ $r->id }}" {{ ($isWaliOnly && $rombels->count() === 1) ? 'selected' : '' }}>
-                  {{ $r->nama_rombel }} ({{ $r->jurusan->nama_jurusan ?? 'Umum' }})
-                </option>
-              @endforeach
-            </select>
+        {{-- Seksi 2: Kelahiran & Agama --}}
+        <div style="margin-bottom:16px; padding-top:12px; border-top:1px dashed var(--border);">
+          <div style="font-size:12px; font-weight:800; color:var(--text); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:10px; display:flex; align-items:center; gap:6px;">
+            <span style="width:6px; height:6px; border-radius:50%; background:var(--brand-emerald, #059669);"></span> Kelahiran & Agama
           </div>
+          <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap:12px;">
+            <div class="form-group" style="margin-bottom:0;">
+              <label style="margin-bottom:4px; font-weight:700; font-size:11.5px; text-transform:uppercase; letter-spacing:0.3px; color:var(--text-2);">
+                Tempat Lahir
+              </label>
+              <input type="text" name="tempat_lahir" placeholder="Contoh: Tanggamus" style="width:100%; height:38px;" />
+            </div>
 
-          {{-- Baris 2: Kolom 2 (Nama Orang Tua) --}}
-          <div class="form-group" style="margin-bottom:0;">
-            <label style="margin-bottom:6px; font-weight:700; font-size:12px; text-transform:uppercase; letter-spacing:0.4px; color:var(--text-2);">
-              Nama Orang Tua / Wali
-            </label>
-            <input type="text" name="nama_ortu" placeholder="Nama ayah / ibu / wali..." style="width:100%; height:40px;" />
+            <div class="form-group" style="margin-bottom:0;">
+              <label style="margin-bottom:4px; font-weight:700; font-size:11.5px; text-transform:uppercase; letter-spacing:0.3px; color:var(--text-2);">
+                Tanggal Lahir
+              </label>
+              <input type="date" name="tanggal_lahir" style="width:100%; height:38px;" />
+            </div>
+
+            <div class="form-group" style="margin-bottom:0;">
+              <label style="margin-bottom:4px; font-weight:700; font-size:11.5px; text-transform:uppercase; letter-spacing:0.3px; color:var(--text-2);">
+                Agama
+              </label>
+              <select name="agama" style="width:100%; height:38px;">
+                <option value="">-- Pilih Agama --</option>
+                <option value="Islam">Islam</option>
+                <option value="Kristen">Kristen</option>
+                <option value="Katolik">Katolik</option>
+                <option value="Hindu">Hindu</option>
+                <option value="Buddha">Buddha</option>
+                <option value="Khonghucu">Khonghucu</option>
+              </select>
+            </div>
           </div>
+        </div>
 
-          {{-- Baris 2: Kolom 3 (No WhatsApp Orang Tua) --}}
-          <div class="form-group" style="margin-bottom:0;">
-            <label style="margin-bottom:6px; font-weight:700; font-size:12px; text-transform:uppercase; letter-spacing:0.4px; color:var(--text-2);">
-              No. WhatsApp Orang Tua
-            </label>
-            <input type="text" name="no_hp_ortu" placeholder="08123456789" style="width:100%; height:40px;" />
+        {{-- Seksi 3: Orang Tua / Wali & Kontak --}}
+        <div style="margin-bottom:16px; padding-top:12px; border-top:1px dashed var(--border);">
+          <div style="font-size:12px; font-weight:800; color:var(--text); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:10px; display:flex; align-items:center; gap:6px;">
+            <span style="width:6px; height:6px; border-radius:50%; background:var(--brand-amber, #d97706);"></span> Orang Tua / Wali & Kontak WhatsApp
           </div>
+          <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap:12px;">
+            <div class="form-group" style="margin-bottom:0;">
+              <label style="margin-bottom:4px; font-weight:700; font-size:11.5px; text-transform:uppercase; letter-spacing:0.3px; color:var(--text-2);">
+                Nama Ayah Kandung
+              </label>
+              <input type="text" name="nama_ayah" placeholder="Nama ayah..." style="width:100%; height:38px;" />
+            </div>
 
-          {{-- Baris 3: Kolom 1 (No WhatsApp Siswa) --}}
-          <div class="form-group" style="margin-bottom:0;">
-            <label style="margin-bottom:6px; font-weight:700; font-size:12px; text-transform:uppercase; letter-spacing:0.4px; color:var(--text-2);">
-              No. WhatsApp Siswa (Pribadi)
-            </label>
-            <input type="text" name="no_hp_siswa" placeholder="08987654321 (Opsional)" style="width:100%; height:40px;" />
-          </div>          {{-- Baris 3: Kolom 2 (Foto) --}}
-          <div class="form-group" style="margin-bottom:0;">
-            <label style="margin-bottom:6px; font-weight:700; font-size:12px; text-transform:uppercase; letter-spacing:0.4px; color:var(--text-2); display:flex; justify-content:space-between;">
-              <span>Foto Profil</span>
-              <span style="color:#000000; font-size:11px; text-transform:none; font-weight:700;"><i class="bi bi-crop"></i> Auto-Crop Aktif</span>
-            </label>
-            <div style="display:flex; align-items:center; gap:10px;">
-              <div id="tambah_siswa_foto_preview" style="width:40px; height:40px; border-radius:50%; border:1.5px solid var(--border-2); background:var(--bg-3); display:flex; align-items:center; justify-content:center; overflow:hidden; flex-shrink:0;">
-                <i class="bi bi-person-fill" style="color:var(--text-3); font-size:20px;"></i>
+            <div class="form-group" style="margin-bottom:0;">
+              <label style="margin-bottom:4px; font-weight:700; font-size:11.5px; text-transform:uppercase; letter-spacing:0.3px; color:var(--text-2);">
+                Nama Ibu Kandung
+              </label>
+              <input type="text" name="nama_ibu" placeholder="Nama ibu..." style="width:100%; height:38px;" />
+            </div>
+
+            <div class="form-group" style="margin-bottom:0;">
+              <label style="margin-bottom:4px; font-weight:700; font-size:11.5px; text-transform:uppercase; letter-spacing:0.3px; color:var(--text-2);">
+                Nama Wali / Ortu Tambahan
+              </label>
+              <input type="text" name="nama_ortu" placeholder="Opsional jika diasuh wali..." style="width:100%; height:38px;" />
+            </div>
+
+            <div class="form-group" style="margin-bottom:0;">
+              <label style="margin-bottom:4px; font-weight:700; font-size:11.5px; text-transform:uppercase; letter-spacing:0.3px; color:var(--text-2);">
+                No. WhatsApp Orang Tua <span style="color:#059669; font-size:10px;">(Notif WA)</span>
+              </label>
+              <input type="text" name="no_hp_ortu" placeholder="08xxxxxxxxxx" style="width:100%; height:38px;" />
+            </div>
+
+            <div class="form-group" style="margin-bottom:0;">
+              <label style="margin-bottom:4px; font-weight:700; font-size:11.5px; text-transform:uppercase; letter-spacing:0.3px; color:var(--text-2);">
+                No. WhatsApp Siswa (Pribadi)
+              </label>
+              <input type="text" name="no_hp_siswa" placeholder="08xxxxxxxxxx (Opsional)" style="width:100%; height:38px;" />
+            </div>
+          </div>
+        </div>
+
+        {{-- Seksi 4: Domisili, Asal Sekolah & Foto --}}
+        <div style="margin-bottom:16px; padding-top:12px; border-top:1px dashed var(--border);">
+          <div style="font-size:12px; font-weight:800; color:var(--text); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:10px; display:flex; align-items:center; gap:6px;">
+            <span style="width:6px; height:6px; border-radius:50%; background:#8b5cf6;"></span> Domisili, Asal Sekolah & Foto
+          </div>
+          <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap:12px;">
+            <div class="form-group" style="margin-bottom:0; grid-column:span 1;">
+              <label style="margin-bottom:4px; font-weight:700; font-size:11.5px; text-transform:uppercase; letter-spacing:0.3px; color:var(--text-2);">
+                Asal Sekolah (SMP / MTs)
+              </label>
+              <input type="text" name="asal_sekolah" placeholder="Contoh: SMPN 1 Air Naningan" style="width:100%; height:38px;" />
+            </div>
+
+            <div class="form-group" style="margin-bottom:0; grid-column:span 1;">
+              <label style="margin-bottom:4px; font-weight:700; font-size:11.5px; text-transform:uppercase; letter-spacing:0.3px; color:var(--text-2); display:flex; justify-content:space-between;">
+                <span>Foto Profil</span>
+                <span style="color:#000000; font-size:11px; text-transform:none; font-weight:700;"><i class="bi bi-crop"></i> Auto-Crop</span>
+              </label>
+              <div style="display:flex; align-items:center; gap:8px;">
+                <div id="tambah_siswa_foto_preview" style="width:38px; height:38px; border-radius:50%; border:1.5px solid var(--border-2); background:var(--bg-3); display:flex; align-items:center; justify-content:center; overflow:hidden; flex-shrink:0;">
+                  <i class="bi bi-person-fill" style="color:var(--text-3); font-size:18px;"></i>
+                </div>
+                <input type="file" name="foto" id="inputFotoSiswaTambah" accept="image/*" onchange="initPhotoCrop(this, 'tambah_siswa_foto_preview', '1:1', 'Potong Foto Profil Siswa')" style="flex:1; height:38px;" />
               </div>
-              <input type="file" name="foto" id="inputFotoSiswaTambah" accept="image/*" onchange="initPhotoCrop(this, 'tambah_siswa_foto_preview', '1:1', 'Potong Foto Profil Siswa')" style="flex:1; height:40px;" />
+            </div>
+
+            <div class="form-group" style="margin-bottom:0; grid-column:1 / -1;">
+              <label style="margin-bottom:4px; font-weight:700; font-size:11.5px; text-transform:uppercase; letter-spacing:0.3px; color:var(--text-2);">
+                Alamat Tempat Tinggal Lengkap
+              </label>
+              <input type="text" name="alamat" placeholder="Jalan, RT/RW, Dusun, Pekon / Desa..." style="width:100%; height:38px;" />
             </div>
           </div>
         </div>
@@ -334,9 +433,18 @@
                       <img src="{{ $s->foto_url }}" alt="{{ $s->nama }}" class="avatar-img" />
                     </div>
                     <div>
-                      <strong style="color:var(--text); font-size:13.5px; display:block;">{{ $s->nama }}</strong>
-                      <div style="font-size:11.5px; color:var(--text-3); font-family:var(--font-mono); margin-top:2px;">
-                        NISN: <strong style="color:var(--text);">{{ $s->nisn ?: '-' }}</strong>
+                      <div style="display:flex; align-items:center; gap:6px;">
+                        <strong style="color:var(--text); font-size:13.5px;">{{ $s->nama }}</strong>
+                        @if($s->jenis_kelamin)
+                          <span style="font-size:10px; font-weight:800; padding:1px 5px; border-radius:4px; {{ $s->jenis_kelamin === 'L' ? 'background:#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe;' : 'background:#fdf2f8; color:#db2777; border:1px solid #fbcfe8;' }}" title="{{ $s->jenis_kelamin === 'L' ? 'Laki-laki' : 'Perempuan' }}">{{ $s->jenis_kelamin }}</span>
+                        @endif
+                      </div>
+                      <div style="font-size:11.5px; color:var(--text-3); font-family:var(--font-mono); margin-top:2px; display:flex; align-items:center; gap:6px;">
+                        <span>NISN: <strong style="color:var(--text);">{{ $s->nisn ?: '-' }}</strong></span>
+                        @if($s->nik)
+                          <span style="color:var(--border-2);">•</span>
+                          <span title="NIK Kependudukan">NIK: {{ $s->nik }}</span>
+                        @endif
                       </div>
                     </div>
                   </div>
@@ -474,70 +582,155 @@
 @if($canManageSiswa)
 <!-- Modal Edit Siswa -->
 <div id="editModal" class="modal-overlay">
-  <div class="modal-card" style="max-width:540px; padding:24px;">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+  <div class="modal-card" style="max-width:640px; max-height:90vh; overflow-y:auto; padding:24px;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; position:sticky; top:0; background:var(--surface, #ffffff); z-index:10; padding-bottom:8px; border-bottom:1px solid var(--border);">
       <h3 style="font-size:17px; font-weight:900; color:var(--text); margin:0;">
-        <i class="bi bi-pencil-square" style="color:#000000;"></i> Edit Data Siswa
+        <i class="bi bi-pencil-square" style="color:#000000;"></i> Edit Data Siswa (Standar Dapodik)
       </h3>
       <button type="button" class="btn btn-sm btn-outline" onclick="closeModal('editModal')"><i class="bi bi-x-lg"></i></button>
     </div>
 
     <form id="editForm" method="POST" enctype="multipart/form-data">
       @csrf @method('PUT')
-      <div style="display:flex; flex-direction:column; gap:12px;">
+      <div style="display:flex; flex-direction:column; gap:14px;">
+        
+        {{-- Seksi 1: Identitas Pokok & Rombel --}}
         <div>
-          <label class="form-label" style="font-weight:700; font-size:12px; display:block; margin-bottom:4px;">NISN (Nomor Induk Siswa Nasional) <span style="color:var(--red);">*</span></label>
-          <input type="text" id="edit_nisn" name="nisn" required class="input-field" style="width:100%;" />
-        </div>
-        <div>
-          <label class="form-label" style="font-weight:700; font-size:12px; display:block; margin-bottom:4px;">Nama Lengkap Siswa <span style="color:var(--red);">*</span></label>
-          <input type="text" id="edit_nama" name="nama" required class="input-field" style="width:100%;" />
-        </div>
-        <div>
-          <label class="form-label" style="font-weight:700; font-size:12px; display:block; margin-bottom:4px;">Rombel / Kelas <span style="color:var(--red);">*</span></label>
-          <select id="edit_rombel_id" name="rombel_id" required class="input-field" style="width:100%;">
-            <option value="">-- Pilih Rombel --</option>
-            @foreach($rombels as $r)
-              <option value="{{ $r->id }}">{{ $r->nama_rombel }} ({{ $r->jurusan->kode_jurusan ?? '' }})</option>
-            @endforeach
-          </select>
-        </div>
-        <div>
-          <label class="form-label" style="font-weight:700; font-size:12px; display:block; margin-bottom:4px;">Nama Orang Tua / Wali</label>
-          <input type="text" id="edit_nama_ortu" name="nama_ortu" class="input-field" style="width:100%;" />
-        </div>
-        <div>
-          <label class="form-label" style="font-weight:700; font-size:12px; display:block; margin-bottom:4px;">No. WhatsApp Orang Tua</label>
-          <input type="text" id="edit_no_hp_ortu" name="no_hp_ortu" class="input-field" style="width:100%;" />
-        </div>
-        <div>
-          <label class="form-label" style="font-weight:700; font-size:12px; display:block; margin-bottom:4px;">No. WhatsApp Siswa (Pribadi)</label>
-          <input type="text" id="edit_no_hp_siswa" name="no_hp_siswa" placeholder="08987654321 (Opsional)" class="input-field" style="width:100%;" />
-        </div>
-        <div>
-          <label class="form-label" style="font-weight:700; font-size:12px; display:block; margin-bottom:4px;">Status Keaktifan</label>
-          <select id="edit_status" name="status" class="input-field" style="width:100%;">
-            <option value="aktif">Aktif</option>
-            <option value="lulus">Lulus</option>
-            <option value="pindah">Pindah</option>
-            <option value="keluar">Keluar / DO</option>
-          </select>
-        </div>
-        <div>
-          <label class="form-label" style="font-weight:700; font-size:12px; display:flex; justify-content:space-between; margin-bottom:4px;">
-            <span>Ganti Foto Profil</span>
-            <span style="color:#000000; font-size:11px; font-weight:700;"><i class="bi bi-crop"></i> Auto-Crop Aktif</span>
-          </label>
-          <div style="display:flex; align-items:center; gap:10px;">
-            <div id="edit_siswa_foto_preview" style="width:40px; height:40px; border-radius:50%; border:1.5px solid rgba(0,0,0,0.15); background:var(--bg-3); display:flex; align-items:center; justify-content:center; overflow:hidden; flex-shrink:0;">
-              <img id="edit_siswa_foto_img" src="/img/user-default.png" style="width:100%; height:100%; object-fit:cover;" />
+          <div style="font-size:11.5px; font-weight:800; color:var(--text); text-transform:uppercase; letter-spacing:0.4px; margin-bottom:8px; display:flex; align-items:center; gap:6px;">
+            <span style="width:6px; height:6px; border-radius:50%; background:var(--brand-blue, #2563eb);"></span> Identitas Pokok & Kelas
+          </div>
+          <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap:10px;">
+            <div>
+              <label class="form-label" style="font-weight:700; font-size:11.5px; display:block; margin-bottom:4px;">NISN <span style="color:var(--red);">*</span></label>
+              <input type="text" id="edit_nisn" name="nisn" maxlength="10" required class="input-field" style="width:100%; height:38px;" />
             </div>
-            <input type="file" name="foto" id="inputFotoSiswaEdit" accept="image/*" onchange="initPhotoCrop(this, 'edit_siswa_foto_img', '1:1', 'Potong Foto Profil Siswa')" class="input-field" style="flex:1;" />
+            <div>
+              <label class="form-label" style="font-weight:700; font-size:11.5px; display:block; margin-bottom:4px;">NIK (KTP/KK)</label>
+              <input type="text" id="edit_nik" name="nik" maxlength="16" class="input-field" style="width:100%; height:38px;" />
+            </div>
+            <div style="grid-column:1 / -1;">
+              <label class="form-label" style="font-weight:700; font-size:11.5px; display:block; margin-bottom:4px;">Nama Lengkap Siswa <span style="color:var(--red);">*</span></label>
+              <input type="text" id="edit_nama" name="nama" required class="input-field" style="width:100%; height:38px;" />
+            </div>
+            <div>
+              <label class="form-label" style="font-weight:700; font-size:11.5px; display:block; margin-bottom:4px;">Jenis Kelamin</label>
+              <select id="edit_jenis_kelamin" name="jenis_kelamin" class="input-field" style="width:100%; height:38px;">
+                <option value="">-- Pilih L/P --</option>
+                <option value="L">Laki-laki (L)</option>
+                <option value="P">Perempuan (P)</option>
+              </select>
+            </div>
+            <div>
+              <label class="form-label" style="font-weight:700; font-size:11.5px; display:block; margin-bottom:4px;">Kelas / Rombel <span style="color:var(--red);">*</span></label>
+              <select id="edit_rombel_id" name="rombel_id" required class="input-field" style="width:100%; height:38px;">
+                <option value="">-- Pilih Rombel --</option>
+                @foreach($rombels as $r)
+                  <option value="{{ $r->id }}">{{ $r->nama_rombel }} ({{ $r->jurusan->nama_jurusan ?? '' }})</option>
+                @endforeach
+              </select>
+            </div>
+          </div>
+        </div>
+
+        {{-- Seksi 2: Kelahiran & Agama --}}
+        <div style="padding-top:10px; border-top:1px dashed var(--border);">
+          <div style="font-size:11.5px; font-weight:800; color:var(--text); text-transform:uppercase; letter-spacing:0.4px; margin-bottom:8px; display:flex; align-items:center; gap:6px;">
+            <span style="width:6px; height:6px; border-radius:50%; background:var(--brand-emerald, #059669);"></span> Kelahiran & Agama
+          </div>
+          <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap:10px;">
+            <div>
+              <label class="form-label" style="font-weight:700; font-size:11.5px; display:block; margin-bottom:4px;">Tempat Lahir</label>
+              <input type="text" id="edit_tempat_lahir" name="tempat_lahir" class="input-field" style="width:100%; height:38px;" />
+            </div>
+            <div>
+              <label class="form-label" style="font-weight:700; font-size:11.5px; display:block; margin-bottom:4px;">Tanggal Lahir</label>
+              <input type="date" id="edit_tanggal_lahir" name="tanggal_lahir" class="input-field" style="width:100%; height:38px;" />
+            </div>
+            <div>
+              <label class="form-label" style="font-weight:700; font-size:11.5px; display:block; margin-bottom:4px;">Agama</label>
+              <select id="edit_agama" name="agama" class="input-field" style="width:100%; height:38px;">
+                <option value="">-- Pilih Agama --</option>
+                <option value="Islam">Islam</option>
+                <option value="Kristen">Kristen</option>
+                <option value="Katolik">Katolik</option>
+                <option value="Hindu">Hindu</option>
+                <option value="Buddha">Buddha</option>
+                <option value="Khonghucu">Khonghucu</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        {{-- Seksi 3: Orang Tua / Wali & Kontak --}}
+        <div style="padding-top:10px; border-top:1px dashed var(--border);">
+          <div style="font-size:11.5px; font-weight:800; color:var(--text); text-transform:uppercase; letter-spacing:0.4px; margin-bottom:8px; display:flex; align-items:center; gap:6px;">
+            <span style="width:6px; height:6px; border-radius:50%; background:var(--brand-amber, #d97706);"></span> Orang Tua / Wali & Kontak WhatsApp
+          </div>
+          <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap:10px;">
+            <div>
+              <label class="form-label" style="font-weight:700; font-size:11.5px; display:block; margin-bottom:4px;">Nama Ayah Kandung</label>
+              <input type="text" id="edit_nama_ayah" name="nama_ayah" class="input-field" style="width:100%; height:38px;" />
+            </div>
+            <div>
+              <label class="form-label" style="font-weight:700; font-size:11.5px; display:block; margin-bottom:4px;">Nama Ibu Kandung</label>
+              <input type="text" id="edit_nama_ibu" name="nama_ibu" class="input-field" style="width:100%; height:38px;" />
+            </div>
+            <div>
+              <label class="form-label" style="font-weight:700; font-size:11.5px; display:block; margin-bottom:4px;">Nama Wali / Ortu</label>
+              <input type="text" id="edit_nama_ortu" name="nama_ortu" class="input-field" style="width:100%; height:38px;" />
+            </div>
+            <div>
+              <label class="form-label" style="font-weight:700; font-size:11.5px; display:block; margin-bottom:4px;">No. WA Orang Tua <span style="color:#059669; font-size:10px;">(Notif WA)</span></label>
+              <input type="text" id="edit_no_hp_ortu" name="no_hp_ortu" class="input-field" style="width:100%; height:38px;" />
+            </div>
+            <div>
+              <label class="form-label" style="font-weight:700; font-size:11.5px; display:block; margin-bottom:4px;">No. WA Siswa (Pribadi)</label>
+              <input type="text" id="edit_no_hp_siswa" name="no_hp_siswa" placeholder="08xxxxxxxxxx" class="input-field" style="width:100%; height:38px;" />
+            </div>
+          </div>
+        </div>
+
+        {{-- Seksi 4: Domisili, Asal Sekolah, Status & Foto --}}
+        <div style="padding-top:10px; border-top:1px dashed var(--border);">
+          <div style="font-size:11.5px; font-weight:800; color:var(--text); text-transform:uppercase; letter-spacing:0.4px; margin-bottom:8px; display:flex; align-items:center; gap:6px;">
+            <span style="width:6px; height:6px; border-radius:50%; background:#8b5cf6;"></span> Domisili, Status & Foto
+          </div>
+          <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap:10px;">
+            <div style="grid-column:1 / -1;">
+              <label class="form-label" style="font-weight:700; font-size:11.5px; display:block; margin-bottom:4px;">Alamat Tempat Tinggal Lengkap</label>
+              <input type="text" id="edit_alamat" name="alamat" class="input-field" style="width:100%; height:38px;" />
+            </div>
+            <div>
+              <label class="form-label" style="font-weight:700; font-size:11.5px; display:block; margin-bottom:4px;">Asal Sekolah (SMP/MTs)</label>
+              <input type="text" id="edit_asal_sekolah" name="asal_sekolah" class="input-field" style="width:100%; height:38px;" />
+            </div>
+            <div>
+              <label class="form-label" style="font-weight:700; font-size:11.5px; display:block; margin-bottom:4px;">Status Keaktifan</label>
+              <select id="edit_status" name="status" class="input-field" style="width:100%; height:38px;">
+                <option value="aktif">Aktif</option>
+                <option value="pkl">Praktik Kerja Lapangan (PKL)</option>
+                <option value="lulus">Lulus</option>
+                <option value="pindah">Pindah</option>
+                <option value="keluar">Keluar / DO</option>
+              </select>
+            </div>
+            <div style="grid-column:1 / -1;">
+              <label class="form-label" style="font-weight:700; font-size:11.5px; display:flex; justify-content:space-between; margin-bottom:4px;">
+                <span>Ganti Foto Profil</span>
+                <span style="color:#000000; font-size:11px; font-weight:700;"><i class="bi bi-crop"></i> Auto-Crop Aktif</span>
+              </label>
+              <div style="display:flex; align-items:center; gap:10px;">
+                <div id="edit_siswa_foto_preview" style="width:38px; height:38px; border-radius:50%; border:1.5px solid rgba(0,0,0,0.15); background:var(--bg-3); display:flex; align-items:center; justify-content:center; overflow:hidden; flex-shrink:0;">
+                  <img id="edit_siswa_foto_img" src="/img/user-default.png" style="width:100%; height:100%; object-fit:cover;" />
+                </div>
+                <input type="file" name="foto" id="inputFotoSiswaEdit" accept="image/*" onchange="initPhotoCrop(this, 'edit_siswa_foto_img', '1:1', 'Potong Foto Profil Siswa')" class="input-field" style="flex:1; height:38px;" />
+              </div>
+            </div>
           </div>
         </div>
       </div>
 
-      <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:18px;">
+      <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:18px; border-top:1px solid var(--border); padding-top:14px;">
         <button type="button" class="btn btn-outline" onclick="closeModal('editModal')">Batal</button>
         <button type="submit" class="btn btn-gold">Simpan Perubahan</button>
       </div>
@@ -550,21 +743,21 @@
   <div class="modal-card" style="max-width:520px; padding:24px;">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
       <h3 style="font-size:16.5px; font-weight:900; color:var(--text); margin:0;">
-        Import Data Siswa (CSV / Excel)
+        Import Data Siswa (CSV / Excel Dapodik)
       </h3>
       <button type="button" class="btn btn-sm btn-outline" onclick="closeModal('importModal')"><i class="bi bi-x-lg"></i></button>
     </div>
 
     <div style="background:var(--bg-3); border:1px solid var(--border-2); border-radius:var(--r-md); padding:14px; margin-bottom:16px; font-size:12px; line-height:1.5;">
       <div style="font-weight:800; color:var(--text); margin-bottom:4px;">
-        Format Kolom CSV Otomatis
+        Format Parser Otomatis Standar Dapodik
       </div>
       <div style="color:var(--text-2); font-size:11.5px; margin-bottom:10px;">
-        Sistem otomatis mengenali format kolom (NISN, Nama, Nama Ortu, No WA Ortu, No WA Siswa, dan Kelas).
+        Sistem otomatis mengenali kolom Dapodik (NISN, NIK, Nama, JK, TTL, Agama, Alamat, Ayah, Ibu, No HP Ortu, No HP Siswa, Asal Sekolah, dan Kelas).
       </div>
       <div>
         <a href="{{ route('siswa.template-csv') }}" class="btn btn-sm btn-outline" style="font-weight:800; font-size:11.5px; display:inline-flex; align-items:center; gap:6px; background:var(--surface); text-decoration:none; color:var(--text);">
-          Unduh Contoh Template CSV Siswa
+          <i class="bi bi-file-earmark-arrow-down"></i> Unduh Template CSV Siswa Dapodik
         </a>
       </div>
     </div>
@@ -607,11 +800,19 @@
 
   function openEditModal(siswa) {
     document.getElementById('edit_nisn').value = siswa.nisn || '';
-    document.getElementById('edit_nisn').value = siswa.nisn || '';
+    document.getElementById('edit_nik').value = siswa.nik || '';
     document.getElementById('edit_nama').value = siswa.nama || '';
+    document.getElementById('edit_jenis_kelamin').value = siswa.jenis_kelamin || '';
+    document.getElementById('edit_tempat_lahir').value = siswa.tempat_lahir || '';
+    document.getElementById('edit_tanggal_lahir').value = siswa.tanggal_lahir ? siswa.tanggal_lahir.substring(0, 10) : '';
+    document.getElementById('edit_agama').value = siswa.agama || '';
+    document.getElementById('edit_nama_ayah').value = siswa.nama_ayah || '';
+    document.getElementById('edit_nama_ibu').value = siswa.nama_ibu || '';
     document.getElementById('edit_nama_ortu').value = siswa.nama_ortu || '';
     document.getElementById('edit_no_hp_ortu').value = siswa.no_hp_ortu || '';
     document.getElementById('edit_no_hp_siswa').value = siswa.no_hp_siswa || '';
+    document.getElementById('edit_alamat').value = siswa.alamat || '';
+    document.getElementById('edit_asal_sekolah').value = siswa.asal_sekolah || '';
     document.getElementById('edit_status').value = siswa.status || 'aktif';
 
     const imgPreview = document.getElementById('edit_siswa_foto_img');

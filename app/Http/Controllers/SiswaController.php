@@ -145,13 +145,22 @@ class SiswaController extends Controller
         }
 
         $request->validate([
-            'nisn'        => 'required|unique:siswas,nisn',
-            'nama'        => 'required|string',
-            'rombel_id'   => 'required|exists:rombels,id',
-            'nama_ortu'   => 'nullable|string',
-            'no_hp_ortu'  => 'nullable|string',
-            'no_hp_siswa' => 'nullable|string',
-            'foto'        => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
+            'nisn'          => 'required|unique:siswas,nisn',
+            'nik'           => 'nullable|string|max:16',
+            'nama'          => 'required|string',
+            'jenis_kelamin' => 'nullable|in:L,P',
+            'tempat_lahir'  => 'nullable|string|max:100',
+            'tanggal_lahir' => 'nullable|date',
+            'agama'         => 'nullable|string|max:50',
+            'alamat'        => 'nullable|string',
+            'nama_ayah'     => 'nullable|string|max:100',
+            'nama_ibu'      => 'nullable|string|max:100',
+            'asal_sekolah'  => 'nullable|string|max:150',
+            'rombel_id'     => 'required|exists:rombels,id',
+            'nama_ortu'     => 'nullable|string',
+            'no_hp_ortu'    => 'nullable|string',
+            'no_hp_siswa'   => 'nullable|string',
+            'foto'          => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
         ]);
 
         $taAktif = TahunAjaran::where('is_active', true)->first();
@@ -164,14 +173,25 @@ class SiswaController extends Controller
             $fotoPath = $request->file('foto')->store('foto_siswa', 'public');
         }
 
+        $namaOrtu = $request->input('nama_ortu') ?: ($request->input('nama_ibu') ?: $request->input('nama_ayah') ?: null);
+
         $siswa = Siswa::create([
-            'nisn'        => $request->input('nisn'),
-            'nama'        => $request->input('nama'),
-            'nama_ortu'   => $request->input('nama_ortu') ?: null,
-            'no_hp_ortu'  => $request->input('no_hp_ortu') ?: null,
-            'no_hp_siswa' => $request->input('no_hp_siswa') ?: null,
-            'foto'        => $fotoPath,
-            'status'      => 'aktif',
+            'nisn'          => $request->input('nisn'),
+            'nik'           => $request->input('nik') ?: null,
+            'nama'          => $request->input('nama'),
+            'jenis_kelamin' => $request->input('jenis_kelamin') ?: null,
+            'tempat_lahir'  => $request->input('tempat_lahir') ?: null,
+            'tanggal_lahir' => $request->input('tanggal_lahir') ?: null,
+            'agama'         => $request->input('agama') ?: null,
+            'alamat'        => $request->input('alamat') ?: null,
+            'nama_ayah'     => $request->input('nama_ayah') ?: null,
+            'nama_ibu'      => $request->input('nama_ibu') ?: null,
+            'nama_ortu'     => $namaOrtu,
+            'asal_sekolah'  => $request->input('asal_sekolah') ?: null,
+            'no_hp_ortu'    => $request->input('no_hp_ortu') ?: null,
+            'no_hp_siswa'   => $request->input('no_hp_siswa') ?: null,
+            'foto'          => $fotoPath,
+            'status'        => 'aktif',
         ]);
 
         SiswaRombel::create([
@@ -202,13 +222,22 @@ class SiswaController extends Controller
         }
 
         $request->validate([
-            'nisn'        => 'required|unique:siswas,nisn,' . $id,
-            'nama'        => 'required|string',
-            'nama_ortu'   => 'nullable|string',
-            'no_hp_ortu'  => 'nullable|string',
-            'no_hp_siswa' => 'nullable|string',
-            'status'      => 'required|in:aktif,pkl,lulus,pindah,keluar',
-            'foto'        => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
+            'nisn'          => 'required|unique:siswas,nisn,' . $id,
+            'nik'           => 'nullable|string|max:16',
+            'nama'          => 'required|string',
+            'jenis_kelamin' => 'nullable|in:L,P',
+            'tempat_lahir'  => 'nullable|string|max:100',
+            'tanggal_lahir' => 'nullable|date',
+            'agama'         => 'nullable|string|max:50',
+            'alamat'        => 'nullable|string',
+            'nama_ayah'     => 'nullable|string|max:100',
+            'nama_ibu'      => 'nullable|string|max:100',
+            'asal_sekolah'  => 'nullable|string|max:150',
+            'nama_ortu'     => 'nullable|string',
+            'no_hp_ortu'    => 'nullable|string',
+            'no_hp_siswa'   => 'nullable|string',
+            'status'        => 'required|in:aktif,pkl,lulus,pindah,keluar',
+            'foto'          => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
         ]);
 
         $fotoPath = $siswa->foto;
@@ -219,14 +248,25 @@ class SiswaController extends Controller
             $fotoPath = $request->file('foto')->store('foto_siswa', 'public');
         }
 
+        $namaOrtu = $request->input('nama_ortu') ?: ($request->input('nama_ibu') ?: $request->input('nama_ayah') ?: $siswa->nama_ortu);
+
         $siswa->update([
-            'nisn'        => $request->input('nisn'),
-            'nama'        => $request->input('nama'),
-            'nama_ortu'   => $request->input('nama_ortu') ?: null,
-            'no_hp_ortu'  => $request->input('no_hp_ortu') ?: null,
-            'no_hp_siswa' => $request->input('no_hp_siswa') ?: null,
-            'foto'        => $fotoPath,
-            'status'      => $request->input('status'),
+            'nisn'          => $request->input('nisn'),
+            'nik'           => $request->input('nik') ?: null,
+            'nama'          => $request->input('nama'),
+            'jenis_kelamin' => $request->input('jenis_kelamin') ?: null,
+            'tempat_lahir'  => $request->input('tempat_lahir') ?: null,
+            'tanggal_lahir' => $request->input('tanggal_lahir') ?: null,
+            'agama'         => $request->input('agama') ?: null,
+            'alamat'        => $request->input('alamat') ?: null,
+            'nama_ayah'     => $request->input('nama_ayah') ?: null,
+            'nama_ibu'      => $request->input('nama_ibu') ?: null,
+            'nama_ortu'     => $namaOrtu,
+            'asal_sekolah'  => $request->input('asal_sekolah') ?: null,
+            'no_hp_ortu'    => $request->input('no_hp_ortu') ?: null,
+            'no_hp_siswa'   => $request->input('no_hp_siswa') ?: null,
+            'foto'          => $fotoPath,
+            'status'        => $request->input('status'),
         ]);
 
         if ($request->filled('rombel_id')) {
@@ -371,13 +411,13 @@ class SiswaController extends Controller
     }
 
     /**
-     * Unduh Template CSV Format Siswa Resmi.
+     * Unduh Template CSV Format Siswa Resmi (Standar Dapodik).
      */
     public function downloadTemplate()
     {
         $headers = [
             "Content-type"        => "text/csv; charset=UTF-8",
-            "Content-Disposition" => "attachment; filename=template_import_siswa_smkn1an.csv",
+            "Content-Disposition" => "attachment; filename=template_import_siswa_dapodik_smkn1an.csv",
             "Pragma"              => "no-cache",
             "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
             "Expires"             => "0"
@@ -386,10 +426,82 @@ class SiswaController extends Controller
         $callback = function () {
             $file = fopen('php://output', 'w');
             fprintf($file, chr(0xEF).chr(0xBB).chr(0xBF)); // BOM UTF-8
-            fputcsv($file, ['NISN', 'Nama Lengkap Siswa', 'Nama Orang Tua / Wali', 'No HP WhatsApp Ortu', 'No HP WhatsApp Siswa', 'Nama Kelas (Rombel)', 'Status (Aktif/PKL/Lulus)'], ';');
-            fputcsv($file, ['0091234001', 'Ahmad Dani Pratama', 'Bpk. Subagio', '081234567890', '081398765432', 'X RPL 1', 'Aktif'], ';');
-            fputcsv($file, ['0091234002', 'Siti Rahmawati', 'Ibu Maryam', '081234567891', '', 'X APHP 1', 'Aktif'], ';');
-            fputcsv($file, ['0091234003', 'Bagus Saputra', 'Bpk. Herman', '081234567892', '', 'X TSM 1', 'Aktif'], ';');
+            fputcsv($file, [
+                'NISN',
+                'NIK',
+                'Nama Lengkap Siswa',
+                'Jenis Kelamin (L/P)',
+                'Tempat Lahir',
+                'Tanggal Lahir (YYYY-MM-DD)',
+                'Agama',
+                'Alamat Lengkap',
+                'Nama Ayah',
+                'Nama Ibu',
+                'Nama Orang Tua / Wali',
+                'No HP WhatsApp Ortu',
+                'No HP WhatsApp Siswa',
+                'Asal Sekolah',
+                'Nama Kelas (Rombel)',
+                'Status (Aktif/PKL/Lulus)'
+            ], ';');
+
+            fputcsv($file, [
+                '0091234001',
+                '1806123456780001',
+                'Ahmad Dani Pratama',
+                'L',
+                'Tanggamus',
+                '2009-04-12',
+                'Islam',
+                'Jl. Raya Air Naningan RT 02 Dusun 01',
+                'Bpk. Subagio',
+                'Ibu Warsini',
+                'Bpk. Subagio',
+                '081234567890',
+                '081398765432',
+                'SMPN 1 Air Naningan',
+                'X RPL',
+                'Aktif'
+            ], ';');
+
+            fputcsv($file, [
+                '0091234002',
+                '1806123456780002',
+                'Siti Rahmawati',
+                'P',
+                'Pringsewu',
+                '2009-08-25',
+                'Islam',
+                'Pekon Datar Lebuay, Air Naningan',
+                'Bpk. Karsono',
+                'Ibu Maryam',
+                'Ibu Maryam',
+                '081234567891',
+                '',
+                'MTs Al-Falah',
+                'X APHP',
+                'Aktif'
+            ], ';');
+
+            fputcsv($file, [
+                '0091234003',
+                '1806123456780003',
+                'Bagus Saputra',
+                'L',
+                'Tanggamus',
+                '2008-11-05',
+                'Islam',
+                'Pekon Way Pring, Pugung',
+                'Bpk. Herman',
+                'Ibu Sumiati',
+                'Bpk. Herman',
+                '081234567892',
+                '',
+                'SMPN 2 Air Naningan',
+                'X TSM',
+                'Aktif'
+            ], ';');
+
             fclose($file);
         };
 
@@ -397,7 +509,7 @@ class SiswaController extends Controller
     }
 
     /**
-     * Import Data Siswa dari CSV / Excel dengan Parser Cerdas & Multi-Kolom.
+     * Import Data Siswa dari CSV / Excel dengan Parser Cerdas & Multi-Kolom (Mendukung Ekspor Dapodik).
      */
     public function import(Request $request)
     {
@@ -452,31 +564,59 @@ class SiswaController extends Controller
             if (str_contains($cleanName, 'nisn')) {
                 $headerMap['nisn'] = $colIdx;
                 $hasHeader = true;
-            } elseif (in_array($cleanName, ['nis', 'noinduk', 'nomorinduk']) && !isset($headerMap['nisn'])) {
+            } elseif (in_array($cleanName, ['nik', 'noktp', 'nokk', 'nikpd', 'nomorindukkependudukan'])) {
+                $headerMap['nik'] = $colIdx;
+                $hasHeader = true;
+            } elseif (in_array($cleanName, ['nis', 'noinduk', 'nomorinduk', 'nipd']) && !isset($headerMap['nisn'])) {
                 $headerMap['nisn'] = $colIdx;
                 $hasHeader = true;
-            } elseif (
-                (str_contains($cleanName, 'nama') || str_contains($cleanName, 'peserta') || str_contains($cleanName, 'siswa'))
-                && !str_contains($cleanName, 'ortu') && !str_contains($cleanName, 'wali') && !str_contains($cleanName, 'orangtua')
-                && !str_contains($cleanName, 'hp') && !str_contains($cleanName, 'wa') && !str_contains($cleanName, 'telepon') && !str_contains($cleanName, 'kontak')
-            ) {
-                $headerMap['nama'] = $colIdx;
+            } elseif (in_array($cleanName, ['jk', 'jeniskelamin', 'kelamin', 'gender', 'sex'])) {
+                $headerMap['jenis_kelamin'] = $colIdx;
+                $hasHeader = true;
+            } elseif (str_contains($cleanName, 'tempatlahir') || str_contains($cleanName, 'tmplahir')) {
+                $headerMap['tempat_lahir'] = $colIdx;
+                $hasHeader = true;
+            } elseif (str_contains($cleanName, 'tanggallahir') || str_contains($cleanName, 'tgllahir')) {
+                $headerMap['tanggal_lahir'] = $colIdx;
+                $hasHeader = true;
+            } elseif (str_contains($cleanName, 'agama')) {
+                $headerMap['agama'] = $colIdx;
+                $hasHeader = true;
+            } elseif (str_contains($cleanName, 'alamat') || str_contains($cleanName, 'domisili') || str_contains($cleanName, 'tempattinggal') || str_contains($cleanName, 'jalan')) {
+                $headerMap['alamat'] = $colIdx;
+                $hasHeader = true;
+            } elseif (str_contains($cleanName, 'asalsekolah') || str_contains($cleanName, 'sekolahasal') || str_contains($cleanName, 'smp') || str_contains($cleanName, 'mts')) {
+                $headerMap['asal_sekolah'] = $colIdx;
                 $hasHeader = true;
             } elseif (
-                (str_contains($cleanName, 'ortu') || str_contains($cleanName, 'wali') || str_contains($cleanName, 'orangtua') || str_contains($cleanName, 'ayah') || str_contains($cleanName, 'ibu'))
-                && (str_contains($cleanName, 'hp') || str_contains($cleanName, 'wa') || str_contains($cleanName, 'telepon') || str_contains($cleanName, 'kontak') || str_contains($cleanName, 'nohp') || str_contains($cleanName, 'nowa'))
+                (str_contains($cleanName, 'ayah') || str_contains($cleanName, 'ibu') || str_contains($cleanName, 'ortu') || str_contains($cleanName, 'wali') || str_contains($cleanName, 'orangtua'))
+                && (str_contains($cleanName, 'hp') || str_contains($cleanName, 'whatsapp') || str_contains($cleanName, 'nowa') || str_contains($cleanName, 'telepon') || str_contains($cleanName, 'kontak') || str_contains($cleanName, 'telp'))
             ) {
-                $headerMap['no_hp_ortu'] = $colIdx;
+                if (!isset($headerMap['no_hp_ortu'])) $headerMap['no_hp_ortu'] = $colIdx;
                 $hasHeader = true;
             } elseif (
                 (str_contains($cleanName, 'siswa') || str_contains($cleanName, 'peserta') || str_contains($cleanName, 'anak'))
-                && (str_contains($cleanName, 'hp') || str_contains($cleanName, 'wa') || str_contains($cleanName, 'telepon') || str_contains($cleanName, 'kontak') || str_contains($cleanName, 'nohp') || str_contains($cleanName, 'nowa'))
+                && (str_contains($cleanName, 'hp') || str_contains($cleanName, 'whatsapp') || str_contains($cleanName, 'nowa') || str_contains($cleanName, 'telepon') || str_contains($cleanName, 'kontak') || str_contains($cleanName, 'telp'))
             ) {
                 $headerMap['no_hp_siswa'] = $colIdx;
                 $hasHeader = true;
             } elseif (
-                (str_contains($cleanName, 'ortu') || str_contains($cleanName, 'wali') || str_contains($cleanName, 'orangtua') || str_contains($cleanName, 'ayah') || str_contains($cleanName, 'ibu'))
+                (str_contains($cleanName, 'nama') || str_contains($cleanName, 'peserta') || str_contains($cleanName, 'siswa'))
+                && !str_contains($cleanName, 'ortu') && !str_contains($cleanName, 'wali') && !str_contains($cleanName, 'orangtua')
+                && !str_contains($cleanName, 'ayah') && !str_contains($cleanName, 'ibu')
+                && !str_contains($cleanName, 'kelas') && !str_contains($cleanName, 'rombel')
+                && !str_contains($cleanName, 'sekolah')
+                && !str_contains($cleanName, 'hp') && !str_contains($cleanName, 'whatsapp') && !str_contains($cleanName, 'nowa') && !str_contains($cleanName, 'telepon') && !str_contains($cleanName, 'kontak')
             ) {
+                $headerMap['nama'] = $colIdx;
+                $hasHeader = true;
+            } elseif (str_contains($cleanName, 'ayah')) {
+                $headerMap['nama_ayah'] = $colIdx;
+                $hasHeader = true;
+            } elseif (str_contains($cleanName, 'ibu')) {
+                $headerMap['nama_ibu'] = $colIdx;
+                $hasHeader = true;
+            } elseif (str_contains($cleanName, 'ortu') || str_contains($cleanName, 'wali') || str_contains($cleanName, 'orangtua')) {
                 $headerMap['nama_ortu'] = $colIdx;
                 $hasHeader = true;
             } elseif (str_contains($cleanName, 'kelas') || str_contains($cleanName, 'rombel')) {
@@ -518,34 +658,80 @@ class SiswaController extends Controller
                     return trim($val, "'\" \t\n\r\0\x0B");
                 }, $row);
 
-                $nisn = null;
-                $nama = null;
-                $namaOrtu = null;
-                $noHpOrtu = null;
-                $noHpSiswa = null;
-                $namaRombel = null;
-                $status = 'aktif';
+                $nisn         = null;
+                $nik          = null;
+                $nama         = null;
+                $jenisKelamin = null;
+                $tempatLahir  = null;
+                $tanggalLahir = null;
+                $agama        = null;
+                $alamat       = null;
+                $namaAyah     = null;
+                $namaIbu      = null;
+                $namaOrtu     = null;
+                $asalSekolah  = null;
+                $noHpOrtu     = null;
+                $noHpSiswa    = null;
+                $namaRombel   = null;
+                $status       = 'aktif';
 
                 if ($hasHeader && isset($headerMap['nama'])) {
-                    $nisn = isset($headerMap['nisn']) ? ($cleanRow[$headerMap['nisn']] ?? null) : null;
-                    $nama = $cleanRow[$headerMap['nama']] ?? null;
-                    $namaOrtu = isset($headerMap['nama_ortu']) ? ($cleanRow[$headerMap['nama_ortu']] ?? null) : null;
-                    $noHpOrtu = isset($headerMap['no_hp_ortu']) ? ($cleanRow[$headerMap['no_hp_ortu']] ?? null) : null;
-                    $noHpSiswa = isset($headerMap['no_hp_siswa']) ? ($cleanRow[$headerMap['no_hp_siswa']] ?? null) : null;
-                    $namaRombel = isset($headerMap['rombel']) ? ($cleanRow[$headerMap['rombel']] ?? null) : null;
-                    $status = isset($headerMap['status']) ? ($cleanRow[$headerMap['status']] ?? null) : null;
+                    $nisn         = isset($headerMap['nisn']) ? ($cleanRow[$headerMap['nisn']] ?? null) : null;
+                    $nik          = isset($headerMap['nik']) ? ($cleanRow[$headerMap['nik']] ?? null) : null;
+                    $nama         = $cleanRow[$headerMap['nama']] ?? null;
+                    $jenisKelamin = isset($headerMap['jenis_kelamin']) ? ($cleanRow[$headerMap['jenis_kelamin']] ?? null) : null;
+                    $tempatLahir  = isset($headerMap['tempat_lahir']) ? ($cleanRow[$headerMap['tempat_lahir']] ?? null) : null;
+                    $tanggalLahir = isset($headerMap['tanggal_lahir']) ? ($cleanRow[$headerMap['tanggal_lahir']] ?? null) : null;
+                    $agama        = isset($headerMap['agama']) ? ($cleanRow[$headerMap['agama']] ?? null) : null;
+                    $alamat       = isset($headerMap['alamat']) ? ($cleanRow[$headerMap['alamat']] ?? null) : null;
+                    $namaAyah     = isset($headerMap['nama_ayah']) ? ($cleanRow[$headerMap['nama_ayah']] ?? null) : null;
+                    $namaIbu      = isset($headerMap['nama_ibu']) ? ($cleanRow[$headerMap['nama_ibu']] ?? null) : null;
+                    $namaOrtu     = isset($headerMap['nama_ortu']) ? ($cleanRow[$headerMap['nama_ortu']] ?? null) : null;
+                    $asalSekolah  = isset($headerMap['asal_sekolah']) ? ($cleanRow[$headerMap['asal_sekolah']] ?? null) : null;
+                    $noHpOrtu     = isset($headerMap['no_hp_ortu']) ? ($cleanRow[$headerMap['no_hp_ortu']] ?? null) : null;
+                    $noHpSiswa    = isset($headerMap['no_hp_siswa']) ? ($cleanRow[$headerMap['no_hp_siswa']] ?? null) : null;
+                    $namaRombel   = isset($headerMap['rombel']) ? ($cleanRow[$headerMap['rombel']] ?? null) : null;
+                    $status       = isset($headerMap['status']) ? ($cleanRow[$headerMap['status']] ?? null) : null;
                 } else {
-                    // Positional default parsing: [NISN, Nama, Nama Ortu, No HP Ortu, No HP Siswa, Rombel, Status]
-                    $nisn = !empty($cleanRow[0]) ? $cleanRow[0] : null;
-                    $nama = !empty($cleanRow[1]) ? $cleanRow[1] : null;
-                    $namaOrtu = !empty($cleanRow[2]) ? $cleanRow[2] : null;
-                    $noHpOrtu = !empty($cleanRow[3]) ? $cleanRow[3] : null;
-                    $noHpSiswa = !empty($cleanRow[4]) && (str_starts_with($cleanRow[4], '08') || str_starts_with($cleanRow[4], '62') || str_starts_with($cleanRow[4], '8')) ? $cleanRow[4] : null;
-                    $namaRombel = !empty($cleanRow[4]) && !$noHpSiswa ? $cleanRow[4] : (!empty($cleanRow[5]) ? $cleanRow[5] : null);
-                    $status = !empty($cleanRow[6]) ? $cleanRow[6] : (!empty($cleanRow[5]) && !$noHpSiswa ? $cleanRow[5] : 'aktif');
+                    // Positional default parsing
+                    $nisn        = !empty($cleanRow[0]) ? $cleanRow[0] : null;
+                    $nama        = !empty($cleanRow[1]) ? $cleanRow[1] : null;
+                    $namaOrtu    = !empty($cleanRow[2]) ? $cleanRow[2] : null;
+                    $noHpOrtu    = !empty($cleanRow[3]) ? $cleanRow[3] : null;
+                    $noHpSiswa   = !empty($cleanRow[4]) && (str_starts_with($cleanRow[4], '08') || str_starts_with($cleanRow[4], '62') || str_starts_with($cleanRow[4], '8')) ? $cleanRow[4] : null;
+                    $namaRombel  = !empty($cleanRow[4]) && !$noHpSiswa ? $cleanRow[4] : (!empty($cleanRow[5]) ? $cleanRow[5] : null);
+                    $status      = !empty($cleanRow[6]) ? $cleanRow[6] : (!empty($cleanRow[5]) && !$noHpSiswa ? $cleanRow[5] : 'aktif');
                 }
 
                 if (empty($nisn) || empty($nama)) continue;
+
+                // Sanitasi Jenis Kelamin (L / P)
+                if (!empty($jenisKelamin)) {
+                    $jkClean = strtoupper(trim($jenisKelamin));
+                    if (str_starts_with($jkClean, 'P') || str_starts_with($jkClean, 'W')) {
+                        $jenisKelamin = 'P';
+                    } elseif (str_starts_with($jkClean, 'L')) {
+                        $jenisKelamin = 'L';
+                    } else {
+                        $jenisKelamin = null;
+                    }
+                }
+
+                // Sanitasi Tanggal Lahir (YYYY-MM-DD atau DD/MM/YYYY)
+                if (!empty($tanggalLahir)) {
+                    $tglParsed = null;
+                    try {
+                        $tglParsed = \Carbon\Carbon::parse($tanggalLahir)->format('Y-m-d');
+                    } catch (\Exception $e) {
+                        $tglParsed = null;
+                    }
+                    $tanggalLahir = $tglParsed;
+                }
+
+                // Normalisasi Nama Ortu
+                if (empty($namaOrtu)) {
+                    $namaOrtu = $namaIbu ?: $namaAyah;
+                }
 
                 // Sanitasi Status
                 $validStatuses = ['aktif', 'pkl', 'lulus', 'pindah', 'keluar'];
@@ -573,22 +759,40 @@ class SiswaController extends Controller
 
                 if ($existingSiswa) {
                     $existingSiswa->update([
-                        'nisn'        => $nisn,
-                        'nama'        => $nama,
-                        'nama_ortu'   => $namaOrtu ?: $existingSiswa->nama_ortu,
-                        'no_hp_ortu'  => $noHpOrtu ?: $existingSiswa->no_hp_ortu,
-                        'no_hp_siswa' => $noHpSiswa ?: $existingSiswa->no_hp_siswa,
-                        'status'      => $status,
+                        'nisn'          => $nisn,
+                        'nik'           => $nik ?: $existingSiswa->nik,
+                        'nama'          => $nama,
+                        'jenis_kelamin' => $jenisKelamin ?: $existingSiswa->jenis_kelamin,
+                        'tempat_lahir'  => $tempatLahir ?: $existingSiswa->tempat_lahir,
+                        'tanggal_lahir' => $tanggalLahir ?: $existingSiswa->tanggal_lahir,
+                        'agama'         => $agama ?: $existingSiswa->agama,
+                        'alamat'        => $alamat ?: $existingSiswa->alamat,
+                        'nama_ayah'     => $namaAyah ?: $existingSiswa->nama_ayah,
+                        'nama_ibu'      => $namaIbu ?: $existingSiswa->nama_ibu,
+                        'nama_ortu'     => $namaOrtu ?: $existingSiswa->nama_ortu,
+                        'asal_sekolah'  => $asalSekolah ?: $existingSiswa->asal_sekolah,
+                        'no_hp_ortu'    => $noHpOrtu ?: $existingSiswa->no_hp_ortu,
+                        'no_hp_siswa'   => $noHpSiswa ?: $existingSiswa->no_hp_siswa,
+                        'status'        => $status,
                     ]);
                     $siswa = $existingSiswa;
                 } else {
                     $siswa = Siswa::create([
-                        'nisn'        => $nisn,
-                        'nama'        => $nama,
-                        'nama_ortu'   => $namaOrtu ?: null,
-                        'no_hp_ortu'  => $noHpOrtu ?: null,
-                        'no_hp_siswa' => $noHpSiswa ?: null,
-                        'status'      => $status,
+                        'nisn'          => $nisn,
+                        'nik'           => $nik ?: null,
+                        'nama'          => $nama,
+                        'jenis_kelamin' => $jenisKelamin ?: null,
+                        'tempat_lahir'  => $tempatLahir ?: null,
+                        'tanggal_lahir' => $tanggalLahir ?: null,
+                        'agama'         => $agama ?: null,
+                        'alamat'        => $alamat ?: null,
+                        'nama_ayah'     => $namaAyah ?: null,
+                        'nama_ibu'      => $namaIbu ?: null,
+                        'nama_ortu'     => $namaOrtu ?: null,
+                        'asal_sekolah'  => $asalSekolah ?: null,
+                        'no_hp_ortu'    => $noHpOrtu ?: null,
+                        'no_hp_siswa'   => $noHpSiswa ?: null,
+                        'status'        => $status,
                     ]);
                 }
 
@@ -599,6 +803,10 @@ class SiswaController extends Controller
                     } else {
                         $normalizedKey = strtolower(str_replace(' ', '', $namaRombel));
                         $targetRombelId = $rombelLowerMap[$normalizedKey] ?? null;
+                        if (!$targetRombelId) {
+                            $strippedKey = preg_replace('/[0-9]+$/', '', $normalizedKey);
+                            $targetRombelId = $rombelLowerMap[$strippedKey] ?? null;
+                        }
                     }
 
                     if ($targetRombelId) {

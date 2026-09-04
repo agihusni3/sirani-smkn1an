@@ -395,12 +395,13 @@
       <thead>
         <tr>
           <th style="width:4%;">No</th>
-          <th style="width:14%;">NISN</th>
-          <th style="width:22%;">Nama Lengkap Siswa</th>
-          <th style="width:15%;">No. WA Siswa</th>
-          <th style="width:17%;">Orang Tua / Wali</th>
-          <th style="width:15%;">No. WA Ortu</th>
-          <th style="width:13%;">Kelas</th>
+          <th style="width:13%;">NISN</th>
+          <th style="width:24%;">Nama Lengkap Siswa</th>
+          <th style="width:5%;">L/P</th>
+          <th style="width:12%;">Kelas</th>
+          <th style="width:16%;">Orang Tua / Wali</th>
+          <th style="width:13%;">No. WA Ortu</th>
+          <th style="width:13%;">No. WA Siswa</th>
         </tr>
       </thead>
       <tbody>
@@ -410,14 +411,15 @@
             <td class="text-center">{{ $idx + 1 }}</td>
             <td class="text-center" style="font-family:'JetBrains Mono', monospace; font-size:8.5pt; font-weight:700;">{{ $s->nisn ?? '-' }}</td>
             <td><strong>{{ $s->nama }}</strong></td>
-            <td class="text-center" style="font-family:'JetBrains Mono', monospace; font-size:8pt;">{{ $s->no_hp ?: '-' }}</td>
+            <td class="text-center" style="font-weight:700; font-size:8pt;">{{ $s->jenis_kelamin ?? '-' }}</td>
+            <td class="text-center" style="font-size:8pt; font-weight:700;">{{ $sr->rombel->nama_rombel ?? '-' }}</td>
             <td style="font-size:8pt;">{{ $s->nama_ortu ?: '-' }}</td>
             <td class="text-center" style="font-family:'JetBrains Mono', monospace; font-size:8pt;">{{ $s->no_hp_ortu ?: '-' }}</td>
-            <td class="text-center" style="font-size:8pt; font-weight:700;">{{ $sr->rombel->nama_rombel ?? '-' }}</td>
+            <td class="text-center" style="font-family:'JetBrains Mono', monospace; font-size:8pt;">{{ $s->no_hp ?: '-' }}</td>
           </tr>
         @empty
           <tr>
-            <td colspan="7" class="text-center" style="padding:16px; color:#666;">Tidak ada data siswa terdaftar.</td>
+            <td colspan="8" class="text-center" style="padding:16px; color:#666;">Tidak ada data siswa terdaftar.</td>
           </tr>
         @endforelse
       </tbody>
