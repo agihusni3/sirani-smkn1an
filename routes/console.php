@@ -25,3 +25,6 @@ Schedule::command('absensi:evaluasi-alpha')->dailyAt('17:00')->weekdays();
 
 // Pencadangan Otomatis Database (Auto-Backup) setiap malam pukul 23:00 WIB dengan retensi 14 hari
 Schedule::command('db:auto-backup --keep=14')->dailyAt('23:00');
+
+// 23:30 — Pembersihan Otomatis Draf Notifikasi Usang/Kadaluarsa Harian
+Schedule::command('sirani:bersihkan-notif')->dailyAt('23:30');

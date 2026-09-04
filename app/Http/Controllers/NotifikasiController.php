@@ -28,6 +28,21 @@ class NotifikasiController extends Controller
         $today = Carbon::today()->toDateString();
         $user  = auth()->user();
 
+        // 0. AUTO-CLEANUP OTOMATIS:
+        // Batalkan otomatis semua draf pending yang sudah lewat hari atau kategori kehadiran rutin normal (masuk/pulang).
+        // Hal ini menjamin halaman notifikasi selalu bersih dan antrean tidak pernah menumpuk ratusan pesan usang.
+        NotifikasiOrtu::where('status', 'pending')
+            ->where(function ($q) use ($today) {
+                $q->whereIn('kategori', ['masuk', 'pulang'])
+                  ->orWhereDate('tanggal', '<', $today);
+            })
+            ->update([
+                'status'            => 'dibatalkan',
+                'diverifikasi_oleh' => 'Sistem (Auto-Expire)',
+                'waktu_verifikasi'  => now(),
+                'catatan_error'     => 'Dibersihkan otomatis oleh sistem (draf kadaluarsa / anomali kehadiran rutin)',
+            ]);
+
         // Restriksi jika login sebagai Wali Kelas (hanya melihat kelas binaannya)
         $isWaliKelas   = $user && $user->isWaliKelas() && !$user->isAdmin() && $user->guru;
         $waliRombelIds = $isWaliKelas ? $user->guru->rombels()->pluck('id')->toArray() : [];
