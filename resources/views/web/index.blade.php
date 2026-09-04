@@ -424,103 +424,261 @@
         letter-spacing: 0.05em;
     }
 
-    /* ── Industrial Spec Sheets Layout (01, 02, 03) ── */
-    .spec-sheet-grid {
-        display: flex;
-        flex-direction: column;
-        gap: 30px;
-        margin-bottom: 70px;
+    /* ── Interactive Department Showcase Stage (Tabbed Product Tour) ── */
+    .dept-showcase-section {
+        margin-bottom: 75px;
     }
 
-    .spec-sheet-card {
+    .dept-tabs-bar {
+        display: inline-flex;
+        background: #ffffff;
+        padding: 6px;
+        border-radius: 18px;
+        border: 1px solid var(--border-main);
+        box-shadow: 0 4px 20px -4px rgba(15, 23, 42, 0.06);
+        margin-bottom: 28px;
+        gap: 6px;
+        flex-wrap: wrap;
+        max-width: 100%;
+    }
+
+    .dept-tab-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 22px;
+        border-radius: 12px;
+        font-size: 0.88rem;
+        font-weight: 700;
+        color: var(--text-muted);
+        border: 1px solid transparent;
+        background: transparent;
+        cursor: pointer;
+        transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+        font-family: inherit;
+        user-select: none;
+    }
+
+    .dept-tab-btn:hover {
+        color: var(--text-dark);
+        background: #f8fafc;
+    }
+
+    .dept-tab-btn.active {
+        background: #0f172a;
+        color: #ffffff;
+        box-shadow: 0 6px 16px -2px rgba(15, 23, 42, 0.28);
+    }
+
+    .dept-tab-icon {
+        width: 24px;
+        height: 24px;
+        border-radius: 6px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.82rem;
+    }
+    .dept-tab-icon.blue { color: #3b82f6; }
+    .dept-tab-icon.green { color: #10b981; }
+    .dept-tab-icon.amber { color: #f59e0b; }
+    .dept-tab-btn.active .dept-tab-icon { color: #38bdf8; }
+
+    .dept-stage-box {
         background: #ffffff;
         border: 1px solid var(--border-main);
         border-radius: var(--radius-xl);
-        overflow: hidden;
-        display: grid;
-        grid-template-columns: 1fr 1.2fr;
+        padding: clamp(28px, 4vw, 42px);
         box-shadow: var(--shadow-card);
-        transition: var(--transition);
-    }
-
-    .spec-sheet-card:hover {
-        border-color: var(--brand-blue);
-        box-shadow: var(--shadow-hover);
-        transform: translateY(-2px);
-    }
-
-    .spec-sheet-card.reverse {
-        grid-template-columns: 1.2fr 1fr;
-    }
-
-    .spec-media {
-        height: 100%;
-        min-height: 320px;
-        overflow: hidden;
         position: relative;
+        overflow: hidden;
     }
 
-    .spec-media img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        display: block;
-        transition: transform 0.5s ease;
+    .dept-panel {
+        display: none;
+        grid-template-columns: 1.15fr 1fr;
+        gap: clamp(24px, 4vw, 44px);
+        align-items: center;
+        opacity: 0;
+        transform: translateY(12px);
     }
 
-    .spec-sheet-card:hover .spec-media img {
-        transform: scale(1.04);
+    .dept-panel.active {
+        display: grid;
+        opacity: 1;
+        transform: translateY(0);
+        animation: deptCrossfade 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
 
-    .spec-content {
-        padding: clamp(30px, 4vw, 48px);
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
+    @keyframes deptCrossfade {
+        0% {
+            opacity: 0;
+            transform: translateY(12px);
+            filter: blur(4px);
+        }
+        100% {
+            opacity: 1;
+            transform: translateY(0);
+            filter: blur(0);
+        }
     }
 
-    .spec-index-no {
-        font-family: var(--font-tech);
-        font-size: 2.4rem;
-        font-weight: 700;
-        color: var(--border-main);
-        line-height: 1;
+    .dept-category-tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.74rem;
+        font-weight: 800;
+        padding: 5px 12px;
+        border-radius: 9999px;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        margin-bottom: 14px;
+    }
+    .dept-category-tag.blue { background: #eff6ff; color: #2563eb; border: 1px solid #bfdbfe; }
+    .dept-category-tag.green { background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0; }
+    .dept-category-tag.amber { background: #fffbeb; color: #d97706; border: 1px solid #fde68a; }
+
+    .dept-stage-title {
+        font-size: clamp(1.6rem, 2.5vw, 2.1rem);
+        font-weight: 900;
+        letter-spacing: -0.025em;
+        color: var(--text-dark);
+        line-height: 1.22;
         margin-bottom: 12px;
     }
 
-    .spec-title {
-        font-size: 1.5rem;
+    .dept-stage-desc {
+        font-size: 0.94rem;
+        color: var(--text-body);
+        line-height: 1.65;
+        margin-bottom: 24px;
+    }
+
+    .dept-spec-bento {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+        margin-bottom: 28px;
+    }
+
+    .dept-spec-item {
+        background: #f8fafc;
+        border: 1px solid var(--border-main);
+        padding: 12px 14px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+    .dept-spec-item:hover {
+        border-color: #cbd5e1;
+        transform: translateY(-1px);
+    }
+
+    .dept-spec-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.95rem;
+        flex-shrink: 0;
+    }
+    .dept-spec-icon.blue { background: #dbeafe; color: #1d4ed8; }
+    .dept-spec-icon.green { background: #d1fae5; color: #047857; }
+    .dept-spec-icon.amber { background: #fef3c7; color: #b45309; }
+
+    .dept-spec-label {
+        font-size: 0.7rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        color: var(--text-muted);
+    }
+
+    .dept-spec-value {
+        font-size: 0.83rem;
         font-weight: 800;
         color: var(--text-dark);
-        letter-spacing: -0.02em;
-        margin-bottom: 10px;
+        margin-top: 1px;
     }
 
-    .spec-table {
+    .dept-stage-visual {
+        position: relative;
+        height: 440px;
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 15px 35px -10px rgba(15, 23, 42, 0.2);
+    }
+
+    .dept-stage-img {
         width: 100%;
-        border-collapse: collapse;
-        font-size: 0.85rem;
-        margin: 20px 0;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.6s ease;
     }
 
-    .spec-table td {
-        padding: 9px 0;
-        border-bottom: 1px solid var(--border-main);
-        vertical-align: top;
+    .dept-stage-visual:hover .dept-stage-img {
+        transform: scale(1.04);
     }
 
-    .spec-table td:first-child {
-        width: 150px;
-        font-weight: 700;
-        color: var(--text-muted);
+    .dept-floating-stat {
+        position: absolute;
+        bottom: 18px;
+        left: 18px;
+        right: 18px;
+        background: rgba(15, 23, 42, 0.86);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        border-radius: 14px;
+        padding: 14px 20px;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+        color: #ffffff;
+    }
+
+    .dept-floating-stat .stat-label {
+        font-size: 0.7rem;
+        color: #94a3b8;
         text-transform: uppercase;
-        font-size: 0.74rem;
-        letter-spacing: 0.04em;
+        font-weight: 700;
     }
 
-    .spec-table td:last-child {
-        color: var(--text-dark);
-        font-weight: 600;
+    .dept-floating-stat .stat-val {
+        font-size: 1.1rem;
+        font-weight: 900;
+        color: #38bdf8;
+        margin-top: 2px;
+    }
+
+    @media (max-width: 960px) {
+        .dept-panel {
+            grid-template-columns: 1fr;
+            gap: 28px;
+        }
+        .dept-stage-visual {
+            height: 280px;
+            order: -1;
+        }
+        .dept-spec-bento {
+            grid-template-columns: 1fr;
+        }
+        .dept-tabs-bar {
+            width: 100%;
+            overflow-x: auto;
+            flex-wrap: nowrap;
+            -webkit-overflow-scrolling: touch;
+            padding: 4px;
+        }
+        .dept-tab-btn {
+            white-space: nowrap;
+            padding: 8px 16px;
+            font-size: 0.82rem;
+        }
     }
 
     /* ── Teaching Factory Industrial Portfolio ── */
@@ -939,129 +1097,228 @@
         </div>
     </div>
 
-    <!-- ═══ 3. THE 3 SPECIFICATION SHEETS (JURUSAN VOKASI) ═══ -->
-    <div class="section-header-clean">
-        <span class="section-tag">PROGRAM KEAHLIAN REKAYASA</span>
-        <h2 class="section-title-large">Lembar Spesifikasi Keahlian Berstandar Industri</h2>
-        <p style="color: var(--text-muted); font-size: 0.95rem; max-width: 650px; margin-top: 6px;">
-            Setiap program keahlian dirancang selaras dengan Standard Kompetensi Kerja Nasional Indonesia (SKKNI) dan didukung peralatan laboratorium modern.
-        </p>
-    </div>
+    <!-- ═══ 3. INTERACTIVE VOCATIONAL SHOWCASE STAGE (KONSEP 2) ═══ -->
+    <section class="dept-showcase-section" id="program-keahlian">
+        <div class="section-header-clean" style="margin-bottom: 24px;">
+            <span class="section-tag">PROGRAM KEAHLIAN UNGGULAN</span>
+            <h2 class="section-title-large">Spesifikasi Kompetensi &amp; Ekosistem Vokasi</h2>
+            <p style="color: var(--text-muted); font-size: 0.95rem; max-width: 680px; margin-top: 6px;">
+                Eksplorasi kurikulum berbasis industri, fasilitas workshop modern, dan sertifikasi lisensi BNSP yang membentuk talenta siap kerja SMKN 1 Air Naningan.
+            </p>
+        </div>
 
-    <div class="spec-sheet-grid">
-        
-        <!-- 01 RPL -->
-        <div class="spec-sheet-card">
-            <div class="spec-media">
-                <img src="{{ asset('images/web/jurusan_rpl.jpg') }}" alt="Lab Rekayasa Perangkat Lunak">
-            </div>
-            <div class="spec-content">
-                <div>
-                    <div class="spec-index-no">01 / SOFTWARE</div>
-                    <h3 class="spec-title">Rekayasa Perangkat Lunak (RPL)</h3>
-                    <p style="font-size: 0.9rem; color: var(--text-body); line-height: 1.6;">
-                        Fokus pada perancangan perangkat lunak modern, aplikasi web enterprise, komputasi awan, dan integrasi perangkat IoT berskala industri.
-                    </p>
-
-                    <table class="spec-table">
-                        <tr>
-                            <td>Core Stack</td>
-                            <td>Fullstack Web, Android/Mobile App, Cloud Database, IoT Device Firmware</td>
-                        </tr>
-                        <tr>
-                            <td>Fasilitas Praktik</td>
-                            <td>Dedicated High-Spec PC Lab, Dedicated Local IoT Server, Fiber Optic Network</td>
-                        </tr>
-                        <tr>
-                            <td>Standar Lisensi</td>
-                            <td>Junior Web Developer &amp; Programmer (LSP-P1 BNSP)</td>
-                        </tr>
-                    </table>
-                </div>
-
-                <div>
-                    <a href="{{ route('web.jurusan.show', 'rpl') }}" class="btn-industrial btn-industrial-outline" style="font-size: 0.82rem;">
-                        Lihat Kurikulum Lengkap RPL →
-                    </a>
-                </div>
+        <!-- Interactive Department Switcher Tabs -->
+        <div style="display: flex; justify-content: center;">
+            <div class="dept-tabs-bar" role="tablist" aria-label="Pilihan Program Keahlian">
+                <button type="button" class="dept-tab-btn active" role="tab" aria-selected="true" aria-controls="dept-panel-rpl" data-dept="rpl" onclick="switchDeptTab('rpl')">
+                    <span class="dept-tab-icon blue">💻</span>
+                    <span>Rekayasa Perangkat Lunak</span>
+                </button>
+                <button type="button" class="dept-tab-btn" role="tab" aria-selected="false" aria-controls="dept-panel-aphp" data-dept="aphp" onclick="switchDeptTab('aphp')">
+                    <span class="dept-tab-icon green">🌿</span>
+                    <span>Agribisnis Pengolahan Hasil Pertanian</span>
+                </button>
+                <button type="button" class="dept-tab-btn" role="tab" aria-selected="false" aria-controls="dept-panel-tsm" data-dept="tsm" onclick="switchDeptTab('tsm')">
+                    <span class="dept-tab-icon amber">⚙️</span>
+                    <span>Teknik Sepeda Motor</span>
+                </button>
             </div>
         </div>
 
-        <!-- 02 APHP -->
-        <div class="spec-sheet-card reverse">
-            <div class="spec-content">
+        <!-- Interactive Stage Box -->
+        <div class="dept-stage-box">
+            
+            <!-- Panel 01: RPL -->
+            <div class="dept-panel active" id="dept-panel-rpl" role="tabpanel" aria-labelledby="tab-rpl">
                 <div>
-                    <div class="spec-index-no">02 / AGRO-TECH</div>
-                    <h3 class="spec-title">Agribisnis Pengolahan Hasil Pertanian (APHP)</h3>
-                    <p style="font-size: 0.9rem; color: var(--text-body); line-height: 1.6;">
-                        Penguasaan teknologi pascapanen komoditas unggulan lokal Tanggamus (Kopi Robusta &amp; Hortikultura), pengolahan pangan higienis, serta manajemen mutu HACCP.
+                    <span class="dept-category-tag blue">01 / SOFTWARE ENGINEERING &amp; IOT</span>
+                    <h3 class="dept-stage-title">Rekayasa Perangkat Lunak (RPL)</h3>
+                    <p class="dept-stage-desc">
+                        Fokus pada perancangan perangkat lunak modern, aplikasi web enterprise, komputasi awan (cloud database), serta integrasi mikrokontroler dan sistem Internet of Things (IoT) berskala industri.
                     </p>
 
-                    <table class="spec-table">
-                        <tr>
-                            <td>Core Focus</td>
-                            <td>Hilirisasi Kopi Robusta Tanggamus, Standar Keamanan Pangan HACCP, Vacuum Packaging</td>
-                        </tr>
-                        <tr>
-                            <td>Fasilitas Praktik</td>
-                            <td>Digital Coffee Roaster, Mesin Grinding Presisi, Stainless Steel Processing Lab</td>
-                        </tr>
-                        <tr>
-                            <td>Standar Lisensi</td>
-                            <td>Pengolah Hasil Pertanian &amp; Mutu Pangan (LSP-P1 BNSP)</td>
-                        </tr>
-                    </table>
+                    <div class="dept-spec-bento">
+                        <div class="dept-spec-item">
+                            <div class="dept-spec-icon blue">🚀</div>
+                            <div>
+                                <div class="dept-spec-label">Core Tech Stack</div>
+                                <div class="dept-spec-value">Fullstack Web &amp; Mobile App</div>
+                            </div>
+                        </div>
+                        <div class="dept-spec-item">
+                            <div class="dept-spec-icon blue">🏢</div>
+                            <div>
+                                <div class="dept-spec-label">Fasilitas Praktik</div>
+                                <div class="dept-spec-value">High-Spec Lab &amp; Cloud Server</div>
+                            </div>
+                        </div>
+                        <div class="dept-spec-item">
+                            <div class="dept-spec-icon blue">🎖️</div>
+                            <div>
+                                <div class="dept-spec-label">Standar Lisensi</div>
+                                <div class="dept-spec-value">Junior Developer LSP-P1 BNSP</div>
+                            </div>
+                        </div>
+                        <div class="dept-spec-item">
+                            <div class="dept-spec-icon blue">💼</div>
+                            <div>
+                                <div class="dept-spec-label">Prospek Karir</div>
+                                <div class="dept-spec-value">Programmer, Web Dev, QA Engineer</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; gap: 14px; align-items: center; flex-wrap: wrap;">
+                        <a href="{{ route('web.jurusan.show', 'rpl') }}" class="btn-industrial btn-industrial-primary">
+                            Eksplorasi Kurikulum RPL →
+                        </a>
+                        <span style="font-size: 0.82rem; color: var(--text-muted);">Akreditasi B • Standar Industri</span>
+                    </div>
                 </div>
 
-                <div>
-                    <a href="{{ route('web.jurusan.show', 'aphp') }}" class="btn-industrial btn-industrial-outline" style="font-size: 0.82rem;">
-                        Lihat Kurikulum Lengkap APHP →
-                    </a>
+                <div class="dept-stage-visual">
+                    <img src="{{ asset('images/web/jurusan_rpl.jpg') }}" alt="Laboratorium Rekayasa Perangkat Lunak SMKN 1 Air Naningan" class="dept-stage-img">
+                    <div class="dept-floating-stat">
+                        <div>
+                            <div class="stat-label">Tingkat Kelulusan</div>
+                            <div class="stat-val">100% BNSP</div>
+                        </div>
+                        <div>
+                            <div class="stat-label">Koneksi Industri</div>
+                            <div class="stat-val" style="color: #38bdf8;">10+ Mitra IT</div>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div class="spec-media">
-                <img src="{{ asset('images/web/jurusan_aphp.jpg') }}" alt="Lab Agribisnis Hasil Pertanian">
-            </div>
-        </div>
 
-        <!-- 03 TSM -->
-        <div class="spec-sheet-card">
-            <div class="spec-media">
-                <img src="{{ asset('images/web/jurusan_tsm.jpg') }}" alt="Bengkel Teknik Sepeda Motor">
-            </div>
-            <div class="spec-content">
+            <!-- Panel 02: APHP -->
+            <div class="dept-panel" id="dept-panel-aphp" role="tabpanel" aria-labelledby="tab-aphp">
                 <div>
-                    <div class="spec-index-no">03 / AUTOMOTIVE</div>
-                    <h3 class="spec-title">Teknik &amp; Bisnis Sepeda Motor (TSM)</h3>
-                    <p style="font-size: 0.9rem; color: var(--text-body); line-height: 1.6;">
-                        Pemeliharaan dan perbaikan sepeda motor modern dengan sistem injeksi elektronik (EFI), diagnosis kelistrikan komputerisasi, dan manajemen operasional bengkel resmi.
+                    <span class="dept-category-tag green">02 / AGRO-TECHNOLOGY &amp; FOOD SCIENCE</span>
+                    <h3 class="dept-stage-title">Agribisnis Pengolahan Hasil Pertanian (APHP)</h3>
+                    <p class="dept-stage-desc">
+                        Penguasaan teknologi pascapanen komoditas unggulan lokal Tanggamus (Kopi Robusta &amp; Hortikultura), pengolahan pangan higienis modern, serta tata kelola keamanan mutu berstandar HACCP.
                     </p>
 
-                    <table class="spec-table">
-                        <tr>
-                            <td>Core Focus</td>
-                            <td>Electronic Fuel Injection (EFI), Computer Diagnostic Scanner, Overhaul Engine, Kelistrikan</td>
-                        </tr>
-                        <tr>
-                            <td>Fasilitas Praktik</td>
-                            <td>Hydraulic Bike-Lift, Multi-brand Diagnostic Scanner, Exhaust Gas Analyzer, Toolset APM</td>
-                        </tr>
-                        <tr>
-                            <td>Standar Lisensi</td>
-                            <td>Teknisi Perawatan Sepeda Motor Injeksi (LSP-P1 BNSP)</td>
-                        </tr>
-                    </table>
+                    <div class="dept-spec-bento">
+                        <div class="dept-spec-item">
+                            <div class="dept-spec-icon green">☕</div>
+                            <div>
+                                <div class="dept-spec-label">Core Focus</div>
+                                <div class="dept-spec-value">Hilirisasi Kopi &amp; Pangan Organik</div>
+                            </div>
+                        </div>
+                        <div class="dept-spec-item">
+                            <div class="dept-spec-icon green">🔬</div>
+                            <div>
+                                <div class="dept-spec-label">Fasilitas Praktik</div>
+                                <div class="dept-spec-value">Digital Roaster &amp; Lab Higienis</div>
+                            </div>
+                        </div>
+                        <div class="dept-spec-item">
+                            <div class="dept-spec-icon green">🛡️</div>
+                            <div>
+                                <div class="dept-spec-label">Standar Lisensi</div>
+                                <div class="dept-spec-value">Quality Control LSP-P1 BNSP</div>
+                            </div>
+                        </div>
+                        <div class="dept-spec-item">
+                            <div class="dept-spec-icon green">🌱</div>
+                            <div>
+                                <div class="dept-spec-label">Prospek Karir</div>
+                                <div class="dept-spec-value">Food QC, Barista &amp; Agripreneur</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; gap: 14px; align-items: center; flex-wrap: wrap;">
+                        <a href="{{ route('web.jurusan.show', 'aphp') }}" class="btn-industrial btn-industrial-primary" style="background: #059669; border-color: #059669;">
+                            Eksplorasi Kurikulum APHP →
+                        </a>
+                        <span style="font-size: 0.82rem; color: var(--text-muted);">Teaching Factory Kopi Robusta</span>
+                    </div>
                 </div>
 
-                <div>
-                    <a href="{{ route('web.jurusan.show', 'tsm') }}" class="btn-industrial btn-industrial-outline" style="font-size: 0.82rem;">
-                        Lihat Kurikulum Lengkap TSM →
-                    </a>
+                <div class="dept-stage-visual">
+                    <img src="{{ asset('images/web/jurusan_aphp.jpg') }}" alt="Laboratorium Pengolahan Pertanian SMKN 1 Air Naningan" class="dept-stage-img">
+                    <div class="dept-floating-stat">
+                        <div>
+                            <div class="stat-label">Produksi Unggulan</div>
+                            <div class="stat-val" style="color: #34d399;">Kopi Robusta TEFA</div>
+                        </div>
+                        <div>
+                            <div class="stat-label">Standar Mutu</div>
+                            <div class="stat-val" style="color: #6ee7b7;">HACCP Certified</div>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
 
-    </div>
+            <!-- Panel 03: TSM -->
+            <div class="dept-panel" id="dept-panel-tsm" role="tabpanel" aria-labelledby="tab-tsm">
+                <div>
+                    <span class="dept-category-tag amber">03 / AUTOMOTIVE ENGINEERING</span>
+                    <h3 class="dept-stage-title">Teknik &amp; Bisnis Sepeda Motor (TSM)</h3>
+                    <p class="dept-stage-desc">
+                        Pemeliharaan dan perbaikan sepeda motor modern dengan sistem injeksi elektronik (EFI), diagnosis kelistrikan komputerisasi, overhaul mesin presisi, serta manajemen operasional bengkel resmi.
+                    </p>
+
+                    <div class="dept-spec-bento">
+                        <div class="dept-spec-item">
+                            <div class="dept-spec-icon amber">⚡</div>
+                            <div>
+                                <div class="dept-spec-label">Core Focus</div>
+                                <div class="dept-spec-value">Electronic Fuel Injection &amp; Engine</div>
+                            </div>
+                        </div>
+                        <div class="dept-spec-item">
+                            <div class="dept-spec-icon amber">🔧</div>
+                            <div>
+                                <div class="dept-spec-label">Fasilitas Praktik</div>
+                                <div class="dept-spec-value">Hydraulic Lift &amp; OBD Diagnostic</div>
+                            </div>
+                        </div>
+                        <div class="dept-spec-item">
+                            <div class="dept-spec-icon amber">📜</div>
+                            <div>
+                                <div class="dept-spec-label">Standar Lisensi</div>
+                                <div class="dept-spec-value">Teknisi Motor Injeksi LSP BNSP</div>
+                            </div>
+                        </div>
+                        <div class="dept-spec-item">
+                            <div class="dept-spec-icon amber">🏁</div>
+                            <div>
+                                <div class="dept-spec-label">Prospek Karir</div>
+                                <div class="dept-spec-value">Service Advisor, Mekanik, Wirausaha</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; gap: 14px; align-items: center; flex-wrap: wrap;">
+                        <a href="{{ route('web.jurusan.show', 'tsm') }}" class="btn-industrial btn-industrial-primary" style="background: #d97706; border-color: #d97706;">
+                            Eksplorasi Kurikulum TSM →
+                        </a>
+                        <span style="font-size: 0.82rem; color: var(--text-muted);">Bengkel Praktik Berlisensi APM</span>
+                    </div>
+                </div>
+
+                <div class="dept-stage-visual">
+                    <img src="{{ asset('images/web/jurusan_tsm.jpg') }}" alt="Bengkel Teknik Sepeda Motor SMKN 1 Air Naningan" class="dept-stage-img">
+                    <div class="dept-floating-stat">
+                        <div>
+                            <div class="stat-label">Sertifikasi Praktik</div>
+                            <div class="stat-val" style="color: #fbbf24;">Teknisi Ahli BNSP</div>
+                        </div>
+                        <div>
+                            <div class="stat-label">Fasilitas Bengkel</div>
+                            <div class="stat-val" style="color: #fde68a;">Standar Dealer Resmi</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
 
     <!-- ═══ 4. TEACHING FACTORY SHOWCASE (BUKTI NYATA KARYA SISWA) ═══ -->
     <div class="tefa-strip">
@@ -1404,6 +1661,23 @@
             }, { passive: true });
         }
         resetHeroTimer();
+    }
+
+    // Vocational Department Tab Switcher (Konsep 2)
+    function switchDeptTab(deptId) {
+        const buttons = document.querySelectorAll('.dept-tab-btn');
+        const panels = document.querySelectorAll('.dept-panel');
+
+        buttons.forEach(btn => {
+            const isActive = btn.getAttribute('data-dept') === deptId;
+            btn.classList.toggle('active', isActive);
+            btn.setAttribute('aria-selected', isActive ? 'true' : 'false');
+        });
+
+        panels.forEach(panel => {
+            const isMatch = panel.id === `dept-panel-${deptId}`;
+            panel.classList.toggle('active', isMatch);
+        });
     }
 </script>
 @endpush
