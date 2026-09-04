@@ -1,238 +1,220 @@
 @extends('web.layouts.app')
 
-@section('title', 'Hubungi Kami & Lokasi Kampus — SMKN 1 Air Naningan')
-@section('meta_description', 'Pusat layanan komunikasi resmi, alamat kampus, jam operasional, dan helpdesk pendaftaran SMKN 1 Air Naningan Kabupaten Tanggamus.')
+@section('title', 'Hubungi Kampus & Navigasi Lokasi — SMKN 1 Air Naningan')
+@section('meta_description', 'Pusat layanan informasi resmi, alamat kampus, navigasi Google Maps, dan saluran komunikasi terpadu SMKN 1 Air Naningan Kabupaten Tanggamus.')
 
 @push('styles')
 <link rel="stylesheet" href="{{ asset('css/web-kontak.css') }}?v={{ filemtime(public_path('css/web-kontak.css')) }}">
 @endpush
 
 @section('content')
-<div class="container" style="padding-top: 40px; padding-bottom: 70px;">
+<div class="container kontak-page-container">
 
-    <!-- Section Title & Status -->
-    <div class="kontak-hero-wrap">
-        <span class="kontak-tag">
-            <i class="fa-solid fa-headset"></i> Pusat Informasi &amp; Komunikasi
-        </span>
-        <h1 class="kontak-title">Hubungi Kampus SMKN 1 Air Naningan</h1>
-        <p class="kontak-desc">
-            Kami membuka pintu kemitraan industri, layanan informasi kurikulum kejuruan, konsultasi pendaftaran peserta didik baru (PPDB), serta verifikasi administrasi alumni.
+    <!-- Header Halaman -->
+    <div class="kontak-header">
+        <div class="kontak-category-badge">
+            Pusat Informasi &amp; Navigasi Kampus
+        </div>
+        <h1 class="kontak-heading">Hubungi Kampus SMKN 1 Air Naningan</h1>
+        <p class="kontak-subheading">
+            Layanan terpadu kemitraan industri, informasi pendaftaran siswa baru (PPDB), kurikulum kejuruan, serta administrasi alumni.
         </p>
     </div>
 
-    <!-- Top Row: 3 Modern Quick-Connect Channel Cards -->
-    <div class="kontak-channels-grid">
+    <!-- Panoramic Map Canvas & Floating Glass Island (Apple Maps Style) -->
+    <div class="kontak-canvas-stage">
         
-        <!-- WhatsApp Helpdesk -->
-        <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $sekolah->telepon ?? '6281234567890') }}?text=Halo%20Admin%20SMKN%201%20Air%20Naningan,%20saya%20ingin%20berkonsultasi" 
-           target="_blank" rel="noopener" class="channel-card wa">
-            <div>
-                <div class="channel-card-top">
-                    <div class="channel-icon-box wa">
-                        <i class="fa-brands fa-whatsapp"></i>
-                    </div>
-                    <span class="channel-badge-status" style="background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0;">
-                        <span class="status-dot-pulse"></span> Respon Cepat
-                    </span>
-                </div>
-                <div class="channel-label">Konsultasi &amp; Helpdesk</div>
-                <div class="channel-value">WhatsApp Resmi</div>
-                <div class="channel-subtext">Layanan informasi PPDB &amp; administrasi siswa</div>
-            </div>
-            <div class="channel-action-arrow wa">
-                <span>Buka Percakapan Chat</span>
-                <i class="fa-solid fa-arrow-right"></i>
-            </div>
-        </a>
+        <!-- Interactive Map Iframe -->
+        <iframe 
+            class="kontak-map-iframe"
+            frameborder="0" 
+            scrolling="no" 
+            marginheight="0" 
+            marginwidth="0" 
+            src="https://maps.google.com/maps?q=SMK+Negeri+1+Air+Naningan+Tanggamus&t=&z=14&ie=UTF8&iwloc=&output=embed"
+            loading="eager"
+            title="Peta Lokasi SMK Negeri 1 Air Naningan">
+        </iframe>
 
-        <!-- Telephone / Voice -->
-        <a href="tel:{{ preg_replace('/[^0-9]/', '', $sekolah->telepon ?? '081234567890') }}" class="channel-card tel">
-            <div>
-                <div class="channel-card-top">
-                    <div class="channel-icon-box tel">
-                        <i class="fa-solid fa-phone-volume"></i>
-                    </div>
-                    <span class="channel-badge-status" style="background: #eff6ff; color: #2563eb; border: 1px solid #bfdbfe;">
-                        Telepon Kampus
-                    </span>
-                </div>
-                <div class="channel-label">Panggilan Kantor</div>
-                <div class="channel-value">{{ $sekolah->telepon ?? '(0721) 892110' }}</div>
-                <div class="channel-subtext">Aktif pada hari &amp; jam operasional kerja</div>
-            </div>
-            <div class="channel-action-arrow tel">
-                <span>Hubungi Langsung</span>
-                <i class="fa-solid fa-arrow-right"></i>
-            </div>
-        </a>
-
-        <!-- Email Official -->
-        <a href="mailto:{{ $sekolah->email ?? 'smkn1airnaningan@gmail.com' }}" class="channel-card mail">
-            <div>
-                <div class="channel-card-top">
-                    <div class="channel-icon-box mail">
-                        <i class="fa-solid fa-envelope-open-text"></i>
-                    </div>
-                    <span class="channel-badge-status" style="background: #fffbeb; color: #d97706; border: 1px solid #fde68a;">
-                        Korespondensi
-                    </span>
-                </div>
-                <div class="channel-label">Surat Elektronik</div>
-                <div class="channel-value" style="font-size: 0.95rem; word-break: break-all;">
-                    {{ $sekolah->email ?? 'smkn1airnaningan@gmail.com' }}
-                </div>
-                <div class="channel-subtext">Kerjasama kemitraan industri &amp; instansi resmi</div>
-            </div>
-            <div class="channel-action-arrow mail">
-                <span>Kirim Pesan Email</span>
-                <i class="fa-solid fa-arrow-right"></i>
-            </div>
-        </a>
-
-    </div>
-
-    <!-- Main Bento Grid: Office Details & Cinematic Map -->
-    <div class="kontak-bento-grid">
-        
-        <!-- Left: Office & Operational Hours -->
-        <div style="display: flex; flex-direction: column; gap: 20px;">
+        <!-- Floating Glass Island Overlay -->
+        <div class="floating-glass-island">
             
-            <div class="kontak-details-card">
-                <div>
-                    <div class="kontak-card-header">
-                        <div>
-                            <div class="kontak-card-title">Sekretariat &amp; Tata Usaha</div>
-                            <div class="kontak-card-subtitle">Gedung Pelayanan Administrasi Terpadu</div>
-                        </div>
-                        <span class="channel-badge-status" style="background: var(--brand-emerald-subtle); color: var(--brand-emerald); border: 1px solid rgba(4,120,87,0.2);">
-                            <span class="status-dot-pulse"></span> Buka Pelayanan
-                        </span>
-                    </div>
-
-                    <div class="kontak-items-list" style="margin-top: 18px;">
-                        <!-- Alamat Kampus -->
-                        <div class="kontak-item-row">
-                            <div class="kontak-item-icon loc">
-                                <i class="fa-solid fa-location-dot"></i>
-                            </div>
-                            <div>
-                                <div class="kontak-item-title">Alamat Lengkap Kampus</div>
-                                <div class="kontak-item-val">
-                                    {{ $sekolah->alamat ?? 'Jl. Makam Baturuguk, Pekon Karang Sari, Kec. Air Naningan, Kab. Tanggamus, Lampung' }}
-                                </div>
-                                <div class="kontak-item-sub">Kawasan Pendidikan Terpadu Air Naningan</div>
-                            </div>
-                        </div>
-
-                        <!-- Jam Operasional -->
-                        <div class="kontak-item-row">
-                            <div class="kontak-item-icon clock">
-                                <i class="fa-solid fa-business-time"></i>
-                            </div>
-                            <div>
-                                <div class="kontak-item-title">Waktu Operasional &amp; KBM</div>
-                                <div class="kontak-item-val">
-                                    Senin – Jumat : 07.15 – 15.30 WIB
-                                </div>
-                                <div class="kontak-item-sub">Sabtu &amp; Minggu : Pembinaan Ekstrakurikuler / Libur</div>
-                            </div>
-                        </div>
-
-                        <!-- NPSN & Akreditasi -->
-                        <div class="kontak-item-row">
-                            <div class="kontak-item-icon npsn">
-                                <i class="fa-solid fa-award"></i>
-                            </div>
-                            <div>
-                                <div class="kontak-item-title">Legalitas Lembaga Vokasi</div>
-                                <div class="kontak-item-val">
-                                    Akreditasi B • NPSN: {{ $sekolah->npsn ?? '69888999' }}
-                                </div>
-                                <div class="kontak-item-sub">Sekolah Menengah Kejuruan Negeri Tanggamus</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div>
-                    <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $sekolah->telepon ?? '6281234567890') }}?text=Halo%20Admin%20SMKN%201%20Air%20Naningan" 
-                       target="_blank" rel="noopener" class="footer-wa-pill" style="width: 100%; justify-content: center; padding: 12px 20px; font-size: 0.88rem; border-radius: var(--radius-md);">
-                        <i class="fa-brands fa-whatsapp" style="font-size: 1.15rem;"></i> Buka Percakapan WhatsApp Helpdesk
-                    </a>
+            <!-- Island Top Bar -->
+            <div class="island-top-bar">
+                <div class="island-status">
+                    <span class="island-pulse-dot"></span>
+                    <span>Layanan Aktif • Buka Hari Ini</span>
                 </div>
             </div>
 
-            <!-- PPDB Quick Gateway Callout -->
-            <div class="kontak-ppdb-callout">
-                <div>
-                    <div class="kontak-ppdb-title">
-                        <i class="fa-solid fa-graduation-cap" style="color: #38bdf8;"></i>
-                        Pendaftaran Siswa Baru (PPDB)
-                    </div>
-                    <div class="kontak-ppdb-sub">
-                        Pendaftaran siswa baru TP 2026/2027 telah dibuka bebas biaya untuk seluruh jurusan.
+            <!-- Island Title -->
+            <div class="island-title-block">
+                <h2 class="island-school-name">{{ $sekolah->nama ?? 'SMK Negeri 1 Air Naningan' }}</h2>
+                <p class="island-school-subtitle">Kawasan Pendidikan Terpadu Air Naningan, Tanggamus</p>
+            </div>
+
+            <!-- Information List -->
+            <div class="island-info-list">
+                
+                <!-- Alamat -->
+                <div class="island-info-row">
+                    <div class="island-info-label">Alamat Kampus</div>
+                    <div class="island-info-text" id="campusAddressText">
+                        {{ $sekolah->alamat ?? 'Jl. Makam Baturuguk, Pekon Karang Sari, Kec. Air Naningan, Kab. Tanggamus, Lampung' }}
                     </div>
                 </div>
-                <a href="{{ route('ppdb.index') }}" class="kontak-ppdb-btn">
-                    Portal PPDB <i class="fa-solid fa-arrow-right"></i>
+
+                <!-- Jam Kerja -->
+                <div class="island-info-row">
+                    <div class="island-info-label">Jam Operasional &amp; KBM</div>
+                    <div class="island-info-text">Senin – Jumat : 07.15 – 15.30 WIB</div>
+                    <div class="island-info-sub">Sabtu &amp; Minggu agenda ekstrakurikuler / libur</div>
+                </div>
+
+                <!-- Legalitas -->
+                <div class="island-info-row">
+                    <div class="island-info-label">Legalitas Lembaga</div>
+                    <div class="island-info-text">Akreditasi B • NPSN: {{ $sekolah->npsn ?? '69888999' }}</div>
+                </div>
+
+            </div>
+
+            <!-- Action Buttons Grid -->
+            <div class="island-actions-grid">
+                
+                <!-- Google Maps Direction -->
+                <a href="https://maps.google.com/maps?q=SMK+Negeri+1+Air+Naningan+Tanggamus" 
+                   target="_blank" rel="noopener" class="island-btn-primary">
+                    Buka Rute di Google Maps
                 </a>
+
+                <!-- WhatsApp Helpdesk -->
+                <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $sekolah->telepon ?? '6281234567890') }}?text=Halo%20Admin%20SMKN%201%20Air%20Naningan,%20saya%20ingin%20berkonsultasi" 
+                   target="_blank" rel="noopener" class="island-btn-wa">
+                    Chat WhatsApp
+                </a>
+
+                <!-- Copy Address Button -->
+                <button type="button" class="island-btn-outline" onclick="copyAddressToClipboard()">
+                    Salin Alamat
+                </button>
+
+                <!-- Phone Call -->
+                <a href="tel:{{ preg_replace('/[^0-9]/', '', $sekolah->telepon ?? '081234567890') }}" class="island-btn-outline" style="grid-column: span 2;">
+                    Panggilan Kantor: {{ $sekolah->telepon ?? '(0721) 892110' }}
+                </a>
+
+            </div>
+
+            <!-- Amenities Tags -->
+            <div class="island-tags-row">
+                <span class="island-tag">Akses Jalan Aspal Roda Dua &amp; Empat</span>
+                <span class="island-tag">Area Parkir Luas &amp; Aman</span>
             </div>
 
         </div>
 
-        <!-- Right: Cinematic Interactive Map -->
-        <div class="kontak-map-card">
+    </div>
+
+    <!-- Bottom Service Strip (3 Terfokus Tanpa Ikon) -->
+    <div class="kontak-services-grid">
+        
+        <!-- PPDB Gateway -->
+        <div class="kontak-service-card ppdb">
             <div>
-                <div class="kontak-map-header">
-                    <div>
-                        <div class="kontak-card-title">Peta Navigasi &amp; Penunjuk Arah</div>
-                        <div class="kontak-card-subtitle">Petunjuk rute Google Maps GPS interaktif</div>
-                    </div>
-                    <a href="https://maps.google.com/maps?q=SMK+Negeri+1+Air+Naningan+Tanggamus" 
-                       target="_blank" rel="noopener" class="kontak-map-btn">
-                        <i class="fa-solid fa-diamond-turn-right" style="color: var(--brand-blue);"></i>
-                        <span>Buka di Google Maps</span>
-                    </a>
-                </div>
-
-                <div class="kontak-map-frame-box">
-                    <iframe 
-                        class="kontak-map-frame"
-                        frameborder="0" 
-                        scrolling="no" 
-                        marginheight="0" 
-                        marginwidth="0" 
-                        src="https://maps.google.com/maps?q=SMK+Negeri+1+Air+Naningan+Tanggamus&t=&z=14&ie=UTF8&iwloc=&output=embed"
-                        loading="lazy">
-                    </iframe>
-                </div>
+                <div class="service-card-meta">Penerimaan Siswa Baru</div>
+                <h3 class="service-card-title">Pendaftaran Siswa Baru (PPDB)</h3>
+                <p class="service-card-desc">
+                    Informasi kuota jurusan, alur seleksi, serta pendaftaran online tahun pelajaran 2026/2027 bebas biaya pendidikan.
+                </p>
             </div>
+            <div>
+                <a href="{{ route('ppdb.index') }}" class="service-card-link">
+                    Menuju Portal PPDB &rarr;
+                </a>
+            </div>
+        </div>
 
-            <!-- Facility Chips -->
-            <div class="kontak-fac-grid">
-                <div class="kontak-fac-pill">
-                    <div class="kontak-fac-icon">
-                        <i class="fa-solid fa-road"></i>
-                    </div>
-                    <div>
-                        <div class="kontak-fac-title">Akses Jalan Raya</div>
-                        <div class="kontak-fac-text">Jalur aspal mulus untuk motor &amp; mobil</div>
-                    </div>
-                </div>
-                <div class="kontak-fac-pill">
-                    <div class="kontak-fac-icon" style="color: #059669;">
-                        <i class="fa-solid fa-square-parking"></i>
-                    </div>
-                    <div>
-                        <div class="kontak-fac-title">Fasilitas Area Parkir</div>
-                        <div class="kontak-fac-text">Halaman parkir tamu, guru &amp; siswa aman</div>
-                    </div>
-                </div>
+        <!-- Kerjasama Industri -->
+        <div class="kontak-service-card industry">
+            <div>
+                <div class="service-card-meta">Kemitraan Vokasi</div>
+                <h3 class="service-card-title">Kemitraan Industri &amp; Magang</h3>
+                <p class="service-card-desc">
+                    Kolaborasi kurikulum dunia usaha dunia industri (DUDI), penyaluran magang PKL siswa, serta unit bisnis Teaching Factory.
+                </p>
+            </div>
+            <div>
+                <a href="mailto:{{ $sekolah->email ?? 'smkn1airnaningan@gmail.com' }}?subject=Pengajuan%20Kerjasama%20Industri" class="service-card-link">
+                    Kirim Surat Kerjasama &rarr;
+                </a>
+            </div>
+        </div>
+
+        <!-- Sekretariat & Tata Usaha -->
+        <div class="kontak-service-card admin">
+            <div>
+                <div class="service-card-meta">Administrasi Sekolah</div>
+                <h3 class="service-card-title">Sekretariat &amp; Tata Usaha</h3>
+                <p class="service-card-desc">
+                    Pelayanan verifikasi berkas kelulusan alumni, penerbitan surat keterangan siswa aktif, serta arsip data kependidikan.
+                </p>
+            </div>
+            <div>
+                <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $sekolah->telepon ?? '6281234567890') }}?text=Halo%20Tata%20Usaha%20SMKN%201%20Air%20Naningan,%20saya%20memerlukan%20layanan%20administrasi" 
+                   target="_blank" rel="noopener" class="service-card-link">
+                    Hubungi Staf Administrasi &rarr;
+                </a>
             </div>
         </div>
 
     </div>
 
 </div>
+
+<!-- Interactive Toast Feedback -->
+<div id="kontakToast" class="kontak-toast">
+    Alamat kampus berhasil disalin ke papan klip.
+</div>
+
+<script>
+function copyAddressToClipboard() {
+    const addressEl = document.getElementById('campusAddressText');
+    const textToCopy = addressEl ? addressEl.innerText.trim() : 'SMKN 1 Air Naningan, Tanggamus, Lampung';
+    
+    if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(textToCopy).then(() => {
+            showToast();
+        }).catch(() => {
+            fallbackCopy(textToCopy);
+        });
+    } else {
+        fallbackCopy(textToCopy);
+    }
+}
+
+function fallbackCopy(text) {
+    const tempInput = document.createElement('textarea');
+    tempInput.value = text;
+    tempInput.style.position = 'fixed';
+    tempInput.style.left = '-9999px';
+    document.body.appendChild(tempInput);
+    tempInput.focus();
+    tempInput.select();
+    try {
+        document.execCommand('copy');
+        showToast();
+    } catch (e) {}
+    document.body.removeChild(tempInput);
+}
+
+function showToast() {
+    const toast = document.getElementById('kontakToast');
+    if (!toast) return;
+    toast.classList.add('show');
+    setTimeout(() => {
+        toast.classList.remove('show');
+    }, 2800);
+}
+</script>
 @endsection
