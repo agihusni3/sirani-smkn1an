@@ -691,16 +691,19 @@
       <button type="button" class="btn btn-sm btn-outline" onclick="closeModal('modalPreview')" style="color:#8696A0; border-color:#2A3942;"><i class="bi bi-x-lg"></i></button>
     </div>
 
-    <div style="background:#0B141A; border-radius:10px; padding:14px; max-height:360px; overflow-y:auto; font-size:12.5px; color:#E9EDEF; line-height:1.6; white-space:pre-wrap; font-family:system-ui, -apple-system, sans-serif;" id="modalPreviewPesan">
-      <!-- Diisi JS -->
+    <div style="margin-bottom:6px; display:flex; justify-content:space-between; align-items:center;">
+      <span style="font-size:11px; color:#8696A0; font-weight:600;"><i class="bi bi-pencil-square"></i> Tinjau &amp; Sesuaikan Pesan (Dapat Diedit):</span>
+      <span style="font-size:10.5px; color:#8696A0;" id="charCountPreview">0 karakter</span>
     </div>
 
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-top:18px; border-top:1px solid #2A3942; padding-top:12px;">
+    <textarea id="modalPreviewPesan" class="input-field" rows="10" style="width:100%; background:#0B141A; border:1px solid #2A3942; border-radius:10px; padding:12px; font-size:12px; color:#E9EDEF; line-height:1.6; font-family:system-ui, -apple-system, sans-serif; resize:vertical; outline:none;" placeholder="Tulis isi pesan..."></textarea>
+
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-top:16px; border-top:1px solid #2A3942; padding-top:12px;">
       <button type="button" class="btn btn-outline" onclick="closeModal('modalPreview')" style="color:#8696A0; border-color:#2A3942;">Tutup</button>
       
       <div style="display:flex; gap:8px;" id="modalActionButtons">
-        <a href="#" target="_blank" class="btn btn-gold" id="btnModalDirectWa" style="background:#25D366; color:#FFFFFF; border:none; font-weight:800; text-decoration:none; padding:6px 14px; border-radius:6px; display:inline-flex; align-items:center; gap:5px; font-size:12px;">
-          <i class="bi bi-whatsapp"></i> Chat WhatsApp
+        <a href="#" target="_blank" class="btn btn-gold" id="btnModalDirectWa" style="background:#25D366; color:#FFFFFF; border:none; font-weight:800; text-decoration:none; padding:7px 16px; border-radius:6px; display:inline-flex; align-items:center; gap:6px; font-size:12px; box-shadow:0 2px 8px rgba(37,211,102,0.3);">
+          <i class="bi bi-whatsapp"></i> Chat WhatsApp (Kirim Pesan)
         </a>
       </div>
     </div>
@@ -951,17 +954,43 @@
     }
   }
 
+  let currentTargetPhone = '';
+
   function previewPesanModal(notif) {
     document.getElementById('modalPreviewNama').innerText = notif.nama_ortu || (notif.siswa ? notif.siswa.nama : 'Penerima');
     document.getElementById('modalPreviewTujuan').innerText = (notif.no_tujuan ? notif.no_tujuan + ' · ' : '') + (notif.kategori || '').replace(/_/g, ' ').toUpperCase();
-    document.getElementById('modalPreviewPesan').innerText = notif.pesan || '';
+    
+    const textarea = document.getElementById('modalPreviewPesan');
+    if (textarea) textarea.value = notif.pesan || '';
 
     let clean = (notif.no_tujuan || '').replace(/[^0-9]/g, '');
     if (clean.startsWith('0')) clean = '62' + clean.substr(1);
-    document.getElementById('btnModalDirectWa').href = clean ? 'https://wa.me/' + clean : '#';
+    currentTargetPhone = clean;
 
+    updateModalDirectWa();
     openModal('modalPreview');
   }
+
+  function updateModalDirectWa() {
+    const textarea = document.getElementById('modalPreviewPesan');
+    const btn = document.getElementById('btnModalDirectWa');
+    const counter = document.getElementById('charCountPreview');
+    const msg = textarea ? textarea.value : '';
+
+    if (counter) counter.innerText = msg.length + ' karakter';
+
+    if (currentTargetPhone) {
+      btn.href = 'https://wa.me/' + currentTargetPhone + '?text=' + encodeURIComponent(msg);
+      btn.style.pointerEvents = 'auto';
+      btn.style.opacity = '1';
+    } else {
+      btn.href = '#';
+      btn.style.pointerEvents = 'none';
+      btn.style.opacity = '0.5';
+    }
+  }
+
+  document.getElementById('modalPreviewPesan')?.addEventListener('input', updateModalDirectWa);
 
   function openModal(id) { document.getElementById(id).classList.add('active'); }
   function closeModal(id) { document.getElementById(id).classList.remove('active'); }

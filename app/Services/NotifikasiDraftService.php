@@ -111,6 +111,7 @@ class NotifikasiDraftService
             '{nama_wali_kelas}'      => $namaWali,
             '{tanggal}'              => $tglIndo,
             '{jam}'                  => $jam,
+            '{waktu}'                => $jam,
             '{batas_jam}'            => $batasJam,
             '{keterangan}'           => $keterangan,
             '{total_alpha}'          => (string) $totalAlpha,
