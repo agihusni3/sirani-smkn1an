@@ -447,25 +447,42 @@ class SiswaController extends Controller
 
         foreach ($firstRow as $colIdx => $colName) {
             $cleanName = strtolower(trim(preg_replace('/[^a-zA-Z0-9]/', '', (string)$colName)));
-            if (in_array($cleanName, ['nisn', 'nomornisn', 'nis', 'nomorinduk', 'noinduk'])) {
+            
+            // Prioritas NISN lebih tinggi dari NIS biasa
+            if (str_contains($cleanName, 'nisn')) {
                 $headerMap['nisn'] = $colIdx;
                 $hasHeader = true;
-            } elseif (in_array($cleanName, ['nama', 'namasiswa', 'namalengkap', 'namapesertadidik'])) {
+            } elseif (in_array($cleanName, ['nis', 'noinduk', 'nomorinduk']) && !isset($headerMap['nisn'])) {
+                $headerMap['nisn'] = $colIdx;
+                $hasHeader = true;
+            } elseif (
+                (str_contains($cleanName, 'nama') || str_contains($cleanName, 'peserta') || str_contains($cleanName, 'siswa'))
+                && !str_contains($cleanName, 'ortu') && !str_contains($cleanName, 'wali') && !str_contains($cleanName, 'orangtua')
+                && !str_contains($cleanName, 'hp') && !str_contains($cleanName, 'wa') && !str_contains($cleanName, 'telepon') && !str_contains($cleanName, 'kontak')
+            ) {
                 $headerMap['nama'] = $colIdx;
                 $hasHeader = true;
-            } elseif (in_array($cleanName, ['namaortu', 'wali', 'namaorangtua', 'namaayah', 'namawali'])) {
-                $headerMap['nama_ortu'] = $colIdx;
-                $hasHeader = true;
-            } elseif (in_array($cleanName, ['nohportu', 'teleponortu', 'waortu', 'nowaortu', 'kontakortu', 'hportu'])) {
+            } elseif (
+                (str_contains($cleanName, 'ortu') || str_contains($cleanName, 'wali') || str_contains($cleanName, 'orangtua') || str_contains($cleanName, 'ayah') || str_contains($cleanName, 'ibu'))
+                && (str_contains($cleanName, 'hp') || str_contains($cleanName, 'wa') || str_contains($cleanName, 'telepon') || str_contains($cleanName, 'kontak') || str_contains($cleanName, 'nohp') || str_contains($cleanName, 'nowa'))
+            ) {
                 $headerMap['no_hp_ortu'] = $colIdx;
                 $hasHeader = true;
-            } elseif (in_array($cleanName, ['nohpsiswa', 'teleponsiswa', 'wasiswa', 'nowasiswa', 'hpsiswa', 'kontaksiswa'])) {
+            } elseif (
+                (str_contains($cleanName, 'siswa') || str_contains($cleanName, 'peserta') || str_contains($cleanName, 'anak'))
+                && (str_contains($cleanName, 'hp') || str_contains($cleanName, 'wa') || str_contains($cleanName, 'telepon') || str_contains($cleanName, 'kontak') || str_contains($cleanName, 'nohp') || str_contains($cleanName, 'nowa'))
+            ) {
                 $headerMap['no_hp_siswa'] = $colIdx;
                 $hasHeader = true;
-            } elseif (in_array($cleanName, ['kelas', 'rombel', 'namarombel', 'namakelas', 'rombonganbelajar'])) {
+            } elseif (
+                (str_contains($cleanName, 'ortu') || str_contains($cleanName, 'wali') || str_contains($cleanName, 'orangtua') || str_contains($cleanName, 'ayah') || str_contains($cleanName, 'ibu'))
+            ) {
+                $headerMap['nama_ortu'] = $colIdx;
+                $hasHeader = true;
+            } elseif (str_contains($cleanName, 'kelas') || str_contains($cleanName, 'rombel')) {
                 $headerMap['rombel'] = $colIdx;
                 $hasHeader = true;
-            } elseif (in_array($cleanName, ['status', 'keaktifan', 'statuskeaktifan', 'statussiswa'])) {
+            } elseif (str_contains($cleanName, 'status') || str_contains($cleanName, 'keaktifan')) {
                 $headerMap['status'] = $colIdx;
                 $hasHeader = true;
             }
@@ -534,12 +551,25 @@ class SiswaController extends Controller
                 $validStatuses = ['aktif', 'pkl', 'lulus', 'pindah', 'keluar'];
                 $status = in_array(strtolower($status ?? ''), $validStatuses) ? strtolower($status) : 'aktif';
 
-                // Format No HP
-                if ($noHpOrtu && str_starts_with($noHpOrtu, '8')) $noHpOrtu = '0' . $noHpOrtu;
-                if ($noHpSiswa && str_starts_with($noHpSiswa, '8')) $noHpSiswa = '0' . $noHpSiswa;
+                // Format No HP cerdas (buang strip/spasi, normalisasi 62/8 -> 08)
+                $cleanPhoneHelper = function($ph) {
+                    if (empty($ph)) return null;
+                    if (preg_match('/(ga ada|nggak|nggk|tidak ada|belum|none|hapal)/i', $ph)) return null;
+                    $dig = preg_replace('/[^0-9]/', '', $ph);
+                    if (empty($dig) || strlen($dig) < 7) return null;
+                    if (str_starts_with($dig, '62')) $dig = '0' . substr($dig, 2);
+                    elseif (str_starts_with($dig, '8')) $dig = '0' . $dig;
+                    return $dig;
+                };
+                $noHpOrtu = $cleanPhoneHelper($noHpOrtu);
+                $noHpSiswa = $cleanPhoneHelper($noHpSiswa);
 
                 // Cari siswa berdasarkan NISN
-                $existingSiswa = Siswa::where('nisn', $nisn)->first();
+                $cleanNisnCheck = preg_replace('/[^0-9]/', '', (string)$nisn);
+                $existingSiswa = Siswa::where('nisn', $nisn)
+                    ->orWhere('nisn', ltrim($cleanNisnCheck, '0'))
+                    ->orWhere('nisn', str_pad($cleanNisnCheck, 10, '0', STR_PAD_LEFT))
+                    ->first();
 
                 if ($existingSiswa) {
                     $existingSiswa->update([
