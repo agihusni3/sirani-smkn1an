@@ -307,8 +307,8 @@
                   </div>
                 </td>
                 <td>
-                  <span class="badge" style="background:var(--bg-3); font-size:11px; font-weight:700;">
-                    {{ $durasi }} Hari
+                  <span style="font-family:var(--font-mono); font-size:12px; font-weight:700; color:var(--text); display:inline-flex; align-items:center; gap:4px;">
+                    <i class="bi bi-clock-history" style="color:var(--text-3);"></i> {{ $durasi }} Hari
                   </span>
                 </td>
                 <td>{!! $libur->jenis_badge !!}</td>

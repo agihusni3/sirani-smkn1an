@@ -595,15 +595,15 @@
                 </td>
                 <td style="text-align:center;">
                   @if($s->status === 'aktif')
-                    <span style="font-weight:800; font-size:11px; color:#000000; letter-spacing:0.5px;">AKTIF</span>
+                    <span class="table-status-pill aktif"><i class="bi bi-check-circle-fill"></i> Aktif</span>
                   @elseif($s->status === 'pkl')
-                    <span style="font-weight:800; font-size:11px; color:var(--text-2); letter-spacing:0.5px;">PKL</span>
+                    <span class="table-status-pill pkl"><i class="bi bi-building"></i> PKL</span>
                   @elseif($s->status === 'lulus')
-                    <span style="font-weight:800; font-size:11px; color:var(--text-2); letter-spacing:0.5px;">LULUS</span>
+                    <span class="table-status-pill netral"><i class="bi bi-mortarboard-fill"></i> Lulus</span>
                   @elseif($s->status === 'pindah')
-                    <span style="font-weight:700; font-size:11px; color:var(--text-3); letter-spacing:0.5px;">PINDAH</span>
+                    <span class="table-status-pill netral"><i class="bi bi-box-arrow-right"></i> Pindah</span>
                   @else
-                    <span style="font-weight:700; font-size:11px; color:var(--text-3); text-decoration:line-through;">{{ strtoupper($s->status) }}</span>
+                    <span class="table-status-pill belum"><i class="bi bi-dash-circle-fill"></i> {{ ucfirst($s->status) }}</span>
                   @endif
                 </td>
                 <td style="text-align:center; font-weight:800; color:var(--text); font-size:13px;">

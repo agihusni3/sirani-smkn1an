@@ -356,8 +356,9 @@
               <tr>
                 <td style="font-family:var(--font-mono); color:var(--text-3); font-size:12px;">{{ $log->created_at->format('H:i:s') }}</td>
                 <td>
-                  <span class="btn btn-outline" style="padding:2px 8px; font-size:10px; pointer-events:none; border-color:{{ $isSiswa ? 'rgba(0,0,0,0.2)' : 'rgba(59,130,246,0.3)' }}; color:{{ $isSiswa ? '#000000' : 'var(--navy)' }}; font-weight:700;">
-                    {{ $isSiswa ? 'SISWA' : 'GURU/STAF' }}
+                  <span style="font-size:11px; font-weight:700; color:var(--text); display:inline-flex; align-items:center; gap:4px;">
+                    <i class="bi {{ $isSiswa ? 'bi-person' : 'bi-person-badge' }}" style="color:var(--text-3);"></i>
+                    {{ $isSiswa ? 'Siswa' : 'Guru / Staf' }}
                   </span>
                 </td>
                 <td>
@@ -376,11 +377,13 @@
                 <td style="font-family:var(--font-mono); font-weight:600;">{{ $log->jam_pulang ?? '-' }}</td>
                 <td>
                   @if($log->status === 'hadir')
-                    <span class="btn btn-outline" style="padding:2px 8px; font-size:11px; border-color:rgba(34,197,94,0.4); color:var(--green); pointer-events:none; font-weight:800;">HADIR</span>
+                    <span class="table-status-pill hadir"><i class="bi bi-check-circle-fill"></i> Hadir Tepat</span>
                   @elseif($log->status === 'terlambat')
-                    <span class="btn btn-outline" style="padding:2px 8px; font-size:11px; border-color:rgba(245,158,11,0.4); color:var(--amber); pointer-events:none; font-weight:800;">TERLAMBAT</span>
+                    <span class="table-status-pill terlambat"><i class="bi bi-clock-fill"></i> Terlambat</span>
+                  @elseif(in_array($log->status, ['izin', 'sakit', 'cuti', 'dispen']))
+                    <span class="table-status-pill izin"><i class="bi bi-file-earmark-text-fill"></i> {{ ucfirst($log->status) }}</span>
                   @else
-                    <span class="btn btn-outline" style="padding:2px 8px; font-size:11px; text-transform:uppercase; pointer-events:none;">{{ $log->status }}</span>
+                    <span class="table-status-pill belum"><i class="bi bi-exclamation-circle-fill"></i> {{ ucfirst($log->status) }}</span>
                   @endif
                 </td>
                 <td style="font-size:12.5px; color:var(--text-2);">

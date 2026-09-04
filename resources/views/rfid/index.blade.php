@@ -542,11 +542,11 @@
                 {{-- Tipe Kredensial --}}
                 <td style="vertical-align:middle; text-align:center; white-space:nowrap;">
                   @if($hasRfid)
-                    <span class="badge" style="background:rgba(34,197,94,0.1); color:#16a34a; border:1px solid rgba(34,197,94,0.3); font-weight:800; font-size:10.5px; display:inline-flex; align-items:center; gap:4px; padding:3px 8px; border-radius:6px;">
+                    <span class="table-status-pill hadir">
                       <i class="bi bi-broadcast"></i> RFID &amp; QR
                     </span>
                   @else
-                    <span class="badge" style="background:rgba(0,0,0,0.05); color:var(--text-2); border:1px solid var(--border-2); font-weight:700; font-size:10.5px; display:inline-flex; align-items:center; gap:4px; padding:3px 8px; border-radius:6px;">
+                    <span class="table-status-pill netral">
                       <i class="bi bi-qr-code-scan"></i> Barcode NISN
                     </span>
                   @endif

@@ -874,9 +874,9 @@
                     <td>
                       <strong style="color:var(--text); font-size:13.5px;">{{ $item->nama }}</strong>
                       @if(isset($item->jenis_kepegawaian) && $item->jenis_kepegawaian === 'honor')
-                        <div style="margin-top:2px;">
-                          <span class="badge" style="background:rgba(202,138,4,0.12); color:#CA8A04; font-size:10px; font-weight:800;">
-                            GTT / Honor (Jadwal: {{ !empty($item->hari_mengajar) ? implode(', ', $item->hari_mengajar) : 'Senin-Jumat' }})
+                        <div style="margin-top:3px;">
+                          <span style="color:#CA8A04; font-size:10.5px; font-weight:700; display:inline-flex; align-items:center; gap:4px;">
+                            <i class="bi bi-clock-history"></i> GTT / Honor ({{ !empty($item->hari_mengajar) ? implode(', ', $item->hari_mengajar) : 'Senin-Jumat' }})
                           </span>
                         </div>
                       @endif
@@ -1029,9 +1029,19 @@
                     {{ $lap->jam_pulang ?? '-' }}
                   </td>
                   <td style="text-align:center; white-space:nowrap;">
-                    <span style="font-weight:800; font-size:11.5px; text-transform:uppercase; color:{{ $lap->status === 'hadir' ? 'var(--text)' : ($lap->status === 'terlambat' ? '#CA8A04' : ($lap->status === 'alpha' || $lap->status === 'bolos' ? '#DC2626' : 'var(--text-2)')) }};">
-                      {{ strtoupper($lap->status) }}
-                    </span>
+                    @if($lap->status === 'hadir')
+                      <span class="table-status-pill hadir"><i class="bi bi-check-circle-fill"></i> Hadir</span>
+                    @elseif($lap->status === 'terlambat')
+                      <span class="table-status-pill terlambat"><i class="bi bi-clock-fill"></i> Terlambat</span>
+                    @elseif(in_array($lap->status, ['izin', 'sakit', 'cuti', 'dispen', 'dispensasi']))
+                      <span class="table-status-pill izin"><i class="bi bi-file-earmark-text-fill"></i> {{ ucfirst($lap->status) }}</span>
+                    @elseif($lap->status === 'pkl')
+                      <span class="table-status-pill pkl"><i class="bi bi-building"></i> PKL</span>
+                    @elseif($lap->status === 'bolos')
+                      <span class="table-status-pill bolos"><i class="bi bi-door-open-fill"></i> Bolos</span>
+                    @else
+                      <span class="table-status-pill belum"><i class="bi bi-x-circle-fill"></i> {{ ucfirst($lap->status) }}</span>
+                    @endif
                   </td>
                   <td style="text-align:left; font-size:12px;">
                     @if($lap->keterangan)
@@ -1190,9 +1200,19 @@
                     @endif
                   </td>
                   <td style="text-align:center; white-space:nowrap;">
-                    <span style="font-weight:800; font-size:11.5px; text-transform:uppercase; color:{{ $lap->status === 'hadir' ? 'var(--text)' : ($lap->status === 'terlambat' ? '#CA8A04' : ($lap->status === 'alpha' || $lap->status === 'bolos' ? '#DC2626' : 'var(--text-2)')) }};">
-                      {{ strtoupper($lap->status) }}
-                    </span>
+                    @if($lap->status === 'hadir')
+                      <span class="table-status-pill hadir"><i class="bi bi-check-circle-fill"></i> Hadir</span>
+                    @elseif($lap->status === 'terlambat')
+                      <span class="table-status-pill terlambat"><i class="bi bi-clock-fill"></i> Terlambat</span>
+                    @elseif(in_array($lap->status, ['izin', 'sakit', 'cuti', 'dispen', 'dispensasi']))
+                      <span class="table-status-pill izin"><i class="bi bi-file-earmark-text-fill"></i> {{ ucfirst($lap->status) }}</span>
+                    @elseif($lap->status === 'pkl')
+                      <span class="table-status-pill pkl"><i class="bi bi-building"></i> PKL</span>
+                    @elseif($lap->status === 'bolos')
+                      <span class="table-status-pill bolos"><i class="bi bi-door-open-fill"></i> Bolos</span>
+                    @else
+                      <span class="table-status-pill belum"><i class="bi bi-x-circle-fill"></i> {{ ucfirst($lap->status) }}</span>
+                    @endif
                   </td>
                   <td style="text-align:left; font-size:12px;">
                     @if($keteranganText)

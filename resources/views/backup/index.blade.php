@@ -215,10 +215,8 @@
                     <i class="bi bi-file-earmark-binary" style="color:#000000; margin-right:6px;"></i>{{ $b['filename'] }}
                   </td>
                   <td style="padding:12px 14px; color:var(--text-2); font-size:12px;">{{ $b['time'] }}</td>
-                  <td style="padding:12px 14px; font-weight:800; font-family:var(--font-mono); color:var(--text); text-align:center;">
-                    <span class="badge" style="background:var(--bg-3); border:1px solid var(--border-2); font-size:11px; padding:2px 8px;">
-                      {{ $b['size'] }}
-                    </span>
+                  <td style="padding:12px 14px; font-weight:700; font-family:var(--font-mono); color:var(--text-2); font-size:12px; text-align:center;">
+                    {{ $b['size'] }}
                   </td>
                   <td style="padding:12px 14px; text-align:right;">
                     <div style="display:inline-flex; align-items:center; gap:6px; justify-content:flex-end;">

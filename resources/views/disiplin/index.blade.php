@@ -440,11 +440,19 @@
                     </div>
                   </td>
                   <td>
-                    <div style="display:inline-flex; align-items:center; padding:4px 8px; border-radius:6px; background:{{ $tMeta['bg'] }}; border-left:3px solid {{ $tMeta['border'] }};">
-                      <span style="font-size:11.5px; font-weight:800; color:var(--text); white-space:nowrap;">
-                        {{ $tMeta['label'] }}
-                      </span>
-                    </div>
+                    @php
+                      $tahapIcon = match($kasus->status_tahap) {
+                        'tahap_1_wali_kelas' => 'bi-person-badge',
+                        'tahap_2_bk'         => 'bi-chat-heart',
+                        'tahap_3_wakasis'    => 'bi-shield-exclamation',
+                        'tahap_4_kepsek'     => 'bi-person-workspace',
+                        'selesai_pembinaan'  => 'bi-check-circle-fill',
+                        default              => 'bi-dot',
+                      };
+                    @endphp
+                    <span style="display:inline-flex; align-items:center; gap:5.5px; font-size:12px; font-weight:700; color:{{ $tMeta['color'] }}; white-space:nowrap;">
+                      <i class="bi {{ $tahapIcon }}"></i> {{ $tMeta['label'] }}
+                    </span>
                   </td>
                   <td>
                     <div style="font-size:12px; color:var(--text); line-height:1.4;">

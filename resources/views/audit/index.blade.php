@@ -163,50 +163,48 @@
       display: inline-flex;
       align-items: center;
       gap: 5px;
-      font-size: 11px;
+      font-size: 11.5px;
       font-weight: 800;
-      letter-spacing: 0.3px;
-      padding: 4px 10px;
-      border-radius: 20px;
+      letter-spacing: 0.1px;
+      padding: 0;
+      background: transparent !important;
+      border: none !important;
       white-space: nowrap;
-      border: 1px solid transparent;
     }
-    .badge-create        { background: rgba(34, 197, 94, 0.12);  color: #16A34A; border-color: rgba(34, 197, 94, 0.25); }
-    .badge-update        { background: rgba(59, 130, 246, 0.12); color: #2563EB; border-color: rgba(59, 130, 246, 0.25); }
-    .badge-delete        { background: rgba(239, 68, 68, 0.12);  color: #DC2626; border-color: rgba(239, 68, 68, 0.25); }
-    .badge-transisi      { background: rgba(168, 85, 247, 0.12); color: #9333EA; border-color: rgba(168, 85, 247, 0.25); }
-    .badge-koreksi       { background: rgba(245, 158, 11, 0.12); color: #D97706; border-color: rgba(245, 158, 11, 0.25); }
-    .badge-scan          { background: rgba(6, 182, 212, 0.12);  color: #0891B2; border-color: rgba(6, 182, 212, 0.25); }
-    .badge-login         { background: rgba(234, 179, 8, 0.12);  color: #CA8A04; border-color: rgba(234, 179, 8, 0.25); }
-    .badge-face          { background: rgba(99, 102, 241, 0.12); color: #4F46E5; border-color: rgba(99, 102, 241, 0.25); }
-    .badge-logout        { background: rgba(107, 114, 128, 0.12);color: #4B5563; border-color: rgba(107, 114, 128, 0.25); }
-    .badge-gerbang-buka  { background: rgba(16, 185, 129, 0.14); color: #059669; border-color: rgba(16, 185, 129, 0.30); }
-    .badge-gerbang-tutup { background: rgba(244, 63, 94, 0.14);  color: #E11D48; border-color: rgba(244, 63, 94, 0.30); }
-    .badge-default       { background: var(--bg-3); color: var(--text-2); border-color: var(--border-2); }
+    .badge-create        { color: #16A34A; }
+    .badge-update        { color: #2563EB; }
+    .badge-delete        { color: #DC2626; }
+    .badge-transisi      { color: #9333EA; }
+    .badge-koreksi       { color: #D97706; }
+    .badge-scan          { color: #0891B2; }
+    .badge-login         { color: #CA8A04; }
+    .badge-face          { color: #4F46E5; }
+    .badge-logout        { color: var(--text-3); }
+    .badge-gerbang-buka  { color: #059669; }
+    .badge-gerbang-tutup { color: #E11D48; }
+    .badge-default       { color: var(--text-2); }
 
-    [data-theme="dark"] .badge-create        { color: #4ADE80 !important; background: rgba(74, 222, 128, 0.16) !important; border-color: rgba(74, 222, 128, 0.3) !important; }
-    [data-theme="dark"] .badge-update        { color: #60A5FA !important; background: rgba(96, 165, 250, 0.16) !important; border-color: rgba(96, 165, 250, 0.3) !important; }
-    [data-theme="dark"] .badge-delete        { color: #F87171 !important; background: rgba(248, 113, 113, 0.16) !important; border-color: rgba(248, 113, 113, 0.3) !important; }
-    [data-theme="dark"] .badge-transisi      { color: #C084FC !important; background: rgba(192, 132, 252, 0.16) !important; border-color: rgba(192, 132, 252, 0.3) !important; }
-    [data-theme="dark"] .badge-koreksi       { color: #FBBF24 !important; background: rgba(251, 191, 36, 0.16) !important; border-color: rgba(251, 191, 36, 0.3) !important; }
-    [data-theme="dark"] .badge-scan          { color: #22D3EE !important; background: rgba(34, 211, 238, 0.16) !important; border-color: rgba(34, 211, 238, 0.3) !important; }
-    [data-theme="dark"] .badge-login         { color: #FDE047 !important; background: rgba(253, 224, 71, 0.16) !important; border-color: rgba(253, 224, 71, 0.3) !important; }
-    [data-theme="dark"] .badge-face          { color: #818CF8 !important; background: rgba(129, 140, 248, 0.16) !important; border-color: rgba(129, 140, 248, 0.3) !important; }
-    [data-theme="dark"] .badge-logout        { color: #9CA3AF !important; background: rgba(156, 163, 175, 0.16) !important; border-color: rgba(156, 163, 175, 0.3) !important; }
-    [data-theme="dark"] .badge-gerbang-buka  { color: #34D399 !important; background: rgba(52, 211, 153, 0.16) !important; border-color: rgba(52, 211, 153, 0.3) !important; }
-    [data-theme="dark"] .badge-gerbang-tutup { color: #FB7185 !important; background: rgba(251, 113, 133, 0.16) !important; border-color: rgba(251, 113, 133, 0.3) !important; }
+    [data-theme="dark"] .badge-create        { color: #4ADE80 !important; }
+    [data-theme="dark"] .badge-update        { color: #60A5FA !important; }
+    [data-theme="dark"] .badge-delete        { color: #F87171 !important; }
+    [data-theme="dark"] .badge-transisi      { color: #C084FC !important; }
+    [data-theme="dark"] .badge-koreksi       { color: #FBBF24 !important; }
+    [data-theme="dark"] .badge-scan          { color: #22D3EE !important; }
+    [data-theme="dark"] .badge-login         { color: #FDE047 !important; }
+    [data-theme="dark"] .badge-face          { color: #818CF8 !important; }
+    [data-theme="dark"] .badge-logout        { color: #9CA3AF !important; }
+    [data-theme="dark"] .badge-gerbang-buka  { color: #34D399 !important; }
+    [data-theme="dark"] .badge-gerbang-tutup { color: #FB7185 !important; }
 
     .modul-capsule {
       display: inline-flex;
       align-items: center;
-      padding: 3px 8px;
-      border-radius: 6px;
-      font-size: 10.5px;
-      font-weight: 800;
+      font-size: 11px;
+      font-weight: 700;
       font-family: var(--font-mono);
-      background: var(--bg-3);
+      background: transparent;
       color: var(--text-2);
-      border: 1px solid var(--border-2);
+      border: none;
       text-transform: uppercase;
     }
 

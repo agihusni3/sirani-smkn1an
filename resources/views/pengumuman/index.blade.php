@@ -539,13 +539,13 @@
                   @if($canManagePengumuman)
                     <form action="{{ route('pengumuman.toggle', $p->id) }}" method="POST" style="display:inline;">
                       @csrf
-                      <button type="submit" class="btn btn-sm" style="padding:2px 8px; font-size:10.5px; font-weight:800; color:{{ $p->is_active ? 'var(--text)' : 'var(--text-3)' }}; border:1px solid {{ $p->is_active ? 'var(--text)' : 'var(--border)' }};" data-tooltip="Klik untuk {{ $p->is_active ? 'Nonaktifkan' : 'Aktifkan' }}">
-                        {{ $p->is_active ? 'AKTIF' : 'OFF' }}
+                      <button type="submit" class="table-status-pill {{ $p->is_active ? 'aktif' : 'netral' }}" style="cursor:pointer;" title="Klik untuk {{ $p->is_active ? 'Nonaktifkan' : 'Aktifkan' }}">
+                        <i class="bi {{ $p->is_active ? 'bi-broadcast' : 'bi-dash-circle' }}"></i> {{ $p->is_active ? 'Aktif' : 'Nonaktif' }}
                       </button>
                     </form>
                   @else
-                    <span class="badge" style="background:{{ $p->is_active ? 'rgba(34,197,94,0.12)' : 'var(--bg-3)' }}; color:{{ $p->is_active ? '#16A34A' : 'var(--text-3)' }}; font-weight:800; font-size:10.5px; padding:2px 8px; border-radius:6px;">
-                      {{ $p->is_active ? 'AKTIF' : 'OFF' }}
+                    <span class="table-status-pill {{ $p->is_active ? 'aktif' : 'netral' }}">
+                      <i class="bi {{ $p->is_active ? 'bi-broadcast' : 'bi-dash-circle' }}"></i> {{ $p->is_active ? 'Aktif' : 'Nonaktif' }}
                     </span>
                   @endif
                 </td>

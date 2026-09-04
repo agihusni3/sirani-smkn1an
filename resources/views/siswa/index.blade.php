@@ -599,9 +599,17 @@
 
                 {{-- Status --}}
                 <td style="vertical-align:middle; text-align:center; padding:12px 8px; white-space:nowrap;">
-                  <span style="font-weight:800; font-size:11px; text-transform:uppercase; color:{{ $s->status === 'aktif' ? 'var(--text)' : 'var(--text-3)' }};">
-                    {{ $s->status }}
-                  </span>
+                  @if($s->status === 'aktif')
+                    <span class="table-status-pill aktif"><i class="bi bi-check-circle-fill"></i> Aktif</span>
+                  @elseif($s->status === 'pkl')
+                    <span class="table-status-pill pkl"><i class="bi bi-building"></i> PKL</span>
+                  @elseif($s->status === 'lulus')
+                    <span class="table-status-pill netral"><i class="bi bi-mortarboard-fill"></i> Lulus</span>
+                  @elseif($s->status === 'pindah')
+                    <span class="table-status-pill netral"><i class="bi bi-box-arrow-right"></i> Pindah</span>
+                  @else
+                    <span class="table-status-pill belum"><i class="bi bi-dash-circle-fill"></i> {{ ucfirst($s->status) }}</span>
+                  @endif
                 </td>
 
                 {{-- Aksi --}}

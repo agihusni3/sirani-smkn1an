@@ -653,8 +653,8 @@
                           {{ $terlambat->jam_masuk ? substr($terlambat->jam_masuk, 0, 5) . ' WIB' : '-' }}
                         </td>
                         <td style="text-align:center;">
-                          <span class="badge" style="background:rgba(245,158,11,0.12); color:#D97706; border:1px solid rgba(245,158,11,0.25); font-weight:800; font-size:10.5px; padding:2px 8px; border-radius:6px;">
-                            TERLAMBAT
+                          <span class="table-status-pill terlambat">
+                            <i class="bi bi-clock-fill"></i> Terlambat
                           </span>
                         </td>
                         <td style="text-align:right;">
@@ -1093,19 +1093,19 @@
       let statusBadge = '';
       const st = item.status;
       if (st === 'hadir') {
-        statusBadge = `<span class="badge" style="background:rgba(34,197,94,0.12); color:#16A34A; border:1px solid rgba(34,197,94,0.25); font-weight:800; font-size:11px; padding:4px 10px; border-radius:6px; white-space:nowrap; display:inline-block;">HADIR</span>`;
+        statusBadge = `<span class="table-status-pill hadir"><i class="bi bi-check-circle-fill"></i> Hadir Tepat</span>`;
       } else if (st === 'terlambat') {
-        statusBadge = `<span class="badge" style="background:rgba(245,158,11,0.12); color:#D97706; border:1px solid rgba(245,158,11,0.25); font-weight:800; font-size:11px; padding:4px 10px; border-radius:6px; white-space:nowrap; display:inline-block;">TERLAMBAT</span>`;
+        statusBadge = `<span class="table-status-pill terlambat"><i class="bi bi-clock-fill"></i> Terlambat</span>`;
       } else if (st === 'izin') {
-        statusBadge = `<span class="badge" style="background:rgba(59,130,246,0.12); color:#2563EB; border:1px solid rgba(59,130,246,0.25); font-weight:800; font-size:11px; padding:4px 10px; border-radius:6px; white-space:nowrap; display:inline-block;">IZIN</span>`;
+        statusBadge = `<span class="table-status-pill izin"><i class="bi bi-file-earmark-text-fill"></i> Izin</span>`;
       } else if (st === 'sakit') {
-        statusBadge = `<span class="badge" style="background:rgba(168,85,247,0.12); color:#9333EA; border:1px solid rgba(168,85,247,0.25); font-weight:800; font-size:11px; padding:4px 10px; border-radius:6px; white-space:nowrap; display:inline-block;">SAKIT</span>`;
+        statusBadge = `<span class="table-status-pill izin"><i class="bi bi-heart-pulse-fill"></i> Sakit</span>`;
       } else if (st === 'cuti' || st === 'dispen') {
-        statusBadge = `<span class="badge" style="background:rgba(59,130,246,0.12); color:#2563EB; border:1px solid rgba(59,130,246,0.25); font-weight:800; font-size:11px; padding:4px 10px; border-radius:6px; white-space:nowrap; display:inline-block;">${st.toUpperCase()}</span>`;
+        statusBadge = `<span class="table-status-pill izin"><i class="bi bi-file-earmark-text-fill"></i> ${st.toUpperCase()}</span>`;
       } else if (st === 'pkl') {
-        statusBadge = `<span class="badge" style="background:rgba(59,130,246,0.15); color:#1D4ED8; border:1px solid rgba(59,130,246,0.3); font-weight:800; font-size:11px; padding:4px 10px; border-radius:6px; white-space:nowrap; display:inline-block;">MAGANG / PKL</span>`;
+        statusBadge = `<span class="table-status-pill pkl"><i class="bi bi-building"></i> PKL</span>`;
       } else {
-        statusBadge = `<span class="badge" style="background:rgba(239,68,68,0.12); color:#DC2626; border:1px solid rgba(239,68,68,0.25); font-weight:800; font-size:11px; padding:4px 10px; border-radius:6px; white-space:nowrap; display:inline-block;">BELUM SCAN</span>`;
+        statusBadge = `<span class="table-status-pill belum"><i class="bi bi-exclamation-circle-fill"></i> Belum Scan</span>`;
       }
 
       let keteranganText = '-';

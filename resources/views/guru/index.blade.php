@@ -442,9 +442,9 @@
                         {{ $g->nip ? 'NIP: ' . $g->nip : 'Non-NIP' }}
                       </div>
                       @if($g->rombelWali)
-                        <span class="badge" style="background:rgba(0,0,0,0.06); color:#000000; border:1px solid rgba(0,0,0,0.12); font-size:9.5px; font-weight:700; margin-top:3px; display:inline-block;">
-                          Wali Kelas: {{ $g->rombelWali->nama_rombel }}
-                        </span>
+                        <div style="font-size:10.5px; font-weight:700; color:var(--text-2); margin-top:3px; display:inline-flex; align-items:center; gap:4px;">
+                          <i class="bi bi-mortarboard-fill" style="color:var(--text-3); font-size:10px;"></i> Wali: {{ $g->rombelWali->nama_rombel }}
+                        </div>
                       @endif
                     </div>
                   </div>
@@ -525,9 +525,13 @@
                   @endif
                 </td>
                 <td style="vertical-align:middle; text-align:center; padding:10px 8px; white-space:nowrap;">
-                  <span style="font-weight:800; font-size:11px; text-transform:uppercase; color:{{ $g->status === 'aktif' ? 'var(--text)' : 'var(--text-3)' }};">
-                    {{ $g->status }}
-                  </span>
+                  @if($g->status === 'aktif')
+                    <span class="table-status-pill aktif"><i class="bi bi-check-circle-fill"></i> Aktif</span>
+                  @elseif($g->status === 'cuti')
+                    <span class="table-status-pill izin"><i class="bi bi-calendar-event"></i> Cuti</span>
+                  @else
+                    <span class="table-status-pill netral"><i class="bi bi-dash-circle-fill"></i> {{ ucfirst($g->status) }}</span>
+                  @endif
                 </td>
                 <td style="vertical-align:middle; text-align:center; padding:10px 8px; white-space:nowrap;">
                   <div style="display:flex; gap:4px; justify-content:center; align-items:center;">

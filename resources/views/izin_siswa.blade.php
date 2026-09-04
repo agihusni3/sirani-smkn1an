@@ -546,21 +546,21 @@
                   </td>
                   <td>
                     @php
-                      $badgeStyle = match($izin->jenis) {
-                        'sakit' => 'background:rgba(59,130,246,0.12); color:#2563EB;',
-                        'izin' => 'background:rgba(245,158,11,0.12); color:#D97706;',
-                        'dispensasi' => 'background:rgba(16,185,129,0.12); color:#059669;',
-                        'pulang_cepat', 'pulang_awal' => 'background:rgba(168,85,247,0.12); color:#9333EA;',
-                        default => 'background:var(--bg-3); color:var(--text-2);'
+                      $jenisMeta = match($izin->jenis) {
+                        'sakit' => ['icon' => 'bi-heart-pulse-fill', 'class' => 'sakit', 'label' => 'Sakit'],
+                        'izin' => ['icon' => 'bi-file-earmark-text-fill', 'class' => 'izin', 'label' => 'Izin'],
+                        'dispensasi' => ['icon' => 'bi-award-fill', 'class' => 'dispen', 'label' => 'Dispensasi'],
+                        'pulang_cepat', 'pulang_awal' => ['icon' => 'bi-box-arrow-right', 'class' => 'pulang', 'label' => 'Pulang Awal'],
+                        default => ['icon' => 'bi-dot', 'class' => 'netral', 'label' => ucfirst(str_replace('_', ' ', $izin->jenis))]
                       };
                     @endphp
-                    <span class="badge" style="{{ $badgeStyle }} font-weight:800; font-size:11px; text-transform:uppercase;">
-                      {{ str_replace('_', ' ', $izin->jenis) }}
+                    <span class="table-status-pill {{ $jenisMeta['class'] }}">
+                      <i class="bi {{ $jenisMeta['icon'] }}"></i> {{ $jenisMeta['label'] }}
                     </span>
                   </td>
                   <td style="text-align:center;">
-                    <span class="badge" style="background:var(--green-dim); color:var(--green); font-weight:800; font-size:11px; text-transform:uppercase;">
-                      {{ $izin->status }}
+                    <span class="table-status-pill disetujui">
+                      <i class="bi bi-check-circle-fill"></i> {{ ucfirst($izin->status) }}
                     </span>
                   </td>
                   <td>
@@ -655,22 +655,22 @@
                   </td>
                   <td>
                     @php
-                      $badgeStyleGuru = match($izinG->jenis) {
-                        'sakit' => 'background:rgba(59,130,246,0.12); color:#2563EB;',
-                        'izin' => 'background:rgba(245,158,11,0.12); color:#D97706;',
-                        'dinas_luar' => 'background:rgba(168,85,247,0.12); color:#9333EA;',
-                        'cuti' => 'background:rgba(6,182,212,0.12); color:#0891B2;',
-                        'pulang_cepat' => 'background:rgba(168,85,247,0.12); color:#9333EA;',
-                        default => 'background:var(--bg-3); color:var(--text-2);'
+                      $jenisMetaG = match($izinG->jenis) {
+                        'sakit' => ['icon' => 'bi-heart-pulse-fill', 'class' => 'sakit', 'label' => 'Sakit'],
+                        'izin' => ['icon' => 'bi-file-earmark-text-fill', 'class' => 'izin', 'label' => 'Izin'],
+                        'dinas_luar' => ['icon' => 'bi-briefcase-fill', 'class' => 'pkl', 'label' => 'Dinas Luar'],
+                        'cuti' => ['icon' => 'bi-calendar2-check-fill', 'class' => 'izin', 'label' => 'Cuti'],
+                        'pulang_cepat' => ['icon' => 'bi-box-arrow-right', 'class' => 'pulang', 'label' => 'Pulang Cepat'],
+                        default => ['icon' => 'bi-dot', 'class' => 'netral', 'label' => ucfirst(str_replace('_', ' ', $izinG->jenis))]
                       };
                     @endphp
-                    <span class="badge" style="{{ $badgeStyleGuru }} font-weight:800; font-size:11px; text-transform:uppercase;">
-                      {{ str_replace('_', ' ', $izinG->jenis) }}
+                    <span class="table-status-pill {{ $jenisMetaG['class'] }}">
+                      <i class="bi {{ $jenisMetaG['icon'] }}"></i> {{ $jenisMetaG['label'] }}
                     </span>
                   </td>
                   <td style="text-align:center;">
-                    <span class="badge" style="background:var(--green-dim); color:var(--green); font-weight:800; font-size:11px; text-transform:uppercase;">
-                      {{ $izinG->status }}
+                    <span class="table-status-pill disetujui">
+                      <i class="bi bi-check-circle-fill"></i> {{ ucfirst($izinG->status) }}
                     </span>
                   </td>
                   <td>

@@ -631,19 +631,19 @@
                   {{-- Status Antrean --}}
                   <td style="padding:8px 10px; vertical-align:middle; white-space:nowrap;">
                     @if($notif->status === 'terkirim')
-                      <span class="badge" style="background:rgba(34,197,94,0.1); color:#16A34A; border:1px solid rgba(34,197,94,0.3); font-weight:800; font-size:10.5px; padding:2px 7px;">
+                      <span class="table-status-pill terkirim">
                         <i class="bi bi-check2-all"></i> Terkirim
                       </span>
                     @elseif($notif->status === 'pending')
-                      <span class="badge" style="background:rgba(234,179,8,0.12); color:#CA8A04; border:1px solid rgba(234,179,8,0.3); font-weight:800; font-size:10.5px; padding:2px 7px;">
+                      <span class="table-status-pill pending">
                         <i class="bi bi-hourglass-split"></i> Pending
                       </span>
                     @elseif($notif->status === 'dibatalkan')
-                      <span class="badge" style="background:var(--bg-3); border:1px solid var(--border-2); color:var(--text-3); font-size:10.5px; font-weight:700; padding:2px 7px;">
-                        Dibatalkan
+                      <span class="table-status-pill dibatalkan">
+                        <i class="bi bi-slash-circle"></i> Dibatalkan
                       </span>
                     @else
-                      <span class="badge" style="background:rgba(239,68,68,0.1); color:#DC2626; border:1px solid rgba(239,68,68,0.3); font-weight:800; font-size:10.5px; padding:2px 7px;">
+                      <span class="table-status-pill gagal">
                         <i class="bi bi-x-circle-fill"></i> Gagal
                       </span>
                     @endif

@@ -499,6 +499,109 @@
   }
   tr:hover td { background: rgba(0,0,0,0.02); }
 
+  /* ─── Modern Clean Status Indicators (No Background, No Border) ─── */
+  .piket-status-pill, .table-status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5.5px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.1px;
+    padding: 0;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    white-space: nowrap;
+    line-height: 1.2;
+    text-decoration: none !important;
+  }
+  .piket-status-pill i, .table-status-pill i {
+    font-size: 12.5px;
+    flex-shrink: 0;
+  }
+  .piket-status-pill.hadir, .table-status-pill.hadir,
+  .piket-status-pill.aktif, .table-status-pill.aktif,
+  .piket-status-pill.terkirim, .table-status-pill.terkirim,
+  .piket-status-pill.disetujui, .table-status-pill.disetujui,
+  .piket-status-pill.selesai, .table-status-pill.selesai {
+    color: #16A34A !important;
+  }
+  [data-theme="dark"] .piket-status-pill.hadir, [data-theme="dark"] .table-status-pill.hadir,
+  [data-theme="dark"] .piket-status-pill.aktif, [data-theme="dark"] .table-status-pill.aktif,
+  [data-theme="dark"] .piket-status-pill.terkirim, [data-theme="dark"] .table-status-pill.terkirim,
+  [data-theme="dark"] .piket-status-pill.disetujui, [data-theme="dark"] .table-status-pill.disetujui,
+  [data-theme="dark"] .piket-status-pill.selesai, [data-theme="dark"] .table-status-pill.selesai {
+    color: #22C55E !important;
+  }
+
+  .piket-status-pill.terlambat, .table-status-pill.terlambat,
+  .piket-status-pill.pending, .table-status-pill.pending,
+  .piket-status-pill.menunggu, .table-status-pill.menunggu {
+    color: #D97706 !important;
+  }
+  [data-theme="dark"] .piket-status-pill.terlambat, [data-theme="dark"] .table-status-pill.terlambat,
+  [data-theme="dark"] .piket-status-pill.pending, [data-theme="dark"] .table-status-pill.pending,
+  [data-theme="dark"] .piket-status-pill.menunggu, [data-theme="dark"] .table-status-pill.menunggu {
+    color: #F59E0B !important;
+  }
+
+  .piket-status-pill.pulang, .table-status-pill.pulang {
+    color: #0284C7 !important;
+  }
+  [data-theme="dark"] .piket-status-pill.pulang, [data-theme="dark"] .table-status-pill.pulang {
+    color: #38BDF8 !important;
+  }
+
+  .piket-status-pill.izin, .table-status-pill.izin,
+  .piket-status-pill.sakit, .table-status-pill.sakit,
+  .piket-status-pill.dispen, .table-status-pill.dispen,
+  .piket-status-pill.cuti, .table-status-pill.cuti,
+  .piket-status-pill.dinas_luar, .table-status-pill.dinas_luar {
+    color: #2563EB !important;
+  }
+  [data-theme="dark"] .piket-status-pill.izin, [data-theme="dark"] .table-status-pill.izin,
+  [data-theme="dark"] .piket-status-pill.sakit, [data-theme="dark"] .table-status-pill.sakit,
+  [data-theme="dark"] .piket-status-pill.dispen, [data-theme="dark"] .table-status-pill.dispen,
+  [data-theme="dark"] .piket-status-pill.cuti, [data-theme="dark"] .table-status-pill.cuti,
+  [data-theme="dark"] .piket-status-pill.dinas_luar, [data-theme="dark"] .table-status-pill.dinas_luar {
+    color: #60A5FA !important;
+  }
+
+  .piket-status-pill.pkl, .table-status-pill.pkl,
+  .piket-status-pill.magang, .table-status-pill.magang {
+    color: #7C3AED !important;
+  }
+  [data-theme="dark"] .piket-status-pill.pkl, [data-theme="dark"] .table-status-pill.pkl,
+  [data-theme="dark"] .piket-status-pill.magang, [data-theme="dark"] .table-status-pill.magang {
+    color: #A78BFA !important;
+  }
+
+  .piket-status-pill.belum, .table-status-pill.belum,
+  .piket-status-pill.alpha, .table-status-pill.alpha,
+  .piket-status-pill.gagal, .table-status-pill.gagal,
+  .piket-status-pill.ditolak, .table-status-pill.ditolak {
+    color: #DC2626 !important;
+  }
+  [data-theme="dark"] .piket-status-pill.belum, [data-theme="dark"] .table-status-pill.belum,
+  [data-theme="dark"] .piket-status-pill.alpha, [data-theme="dark"] .table-status-pill.alpha,
+  [data-theme="dark"] .piket-status-pill.gagal, [data-theme="dark"] .table-status-pill.gagal,
+  [data-theme="dark"] .piket-status-pill.ditolak, [data-theme="dark"] .table-status-pill.ditolak {
+    color: #EF4444 !important;
+  }
+
+  .piket-status-pill.bolos, .table-status-pill.bolos {
+    color: #E11D48 !important;
+  }
+  [data-theme="dark"] .piket-status-pill.bolos, [data-theme="dark"] .table-status-pill.bolos {
+    color: #F43F5E !important;
+  }
+
+  .piket-status-pill.netral, .table-status-pill.netral,
+  .piket-status-pill.nonaktif, .table-status-pill.nonaktif,
+  .piket-status-pill.dibatalkan, .table-status-pill.dibatalkan {
+    color: var(--text-3) !important;
+  }
+
   /* ─── Buttons — Minimalis ─── */
   .btn {
     display: inline-flex;
@@ -1771,7 +1874,7 @@
   }
 
   [data-theme="dark"] p,
-  [data-theme="dark"] span:not(.badge):not(.pulse-dot):not(.badge-mono),
+  [data-theme="dark"] span:not(.badge):not(.pulse-dot):not(.badge-mono):not(.piket-status-pill):not(.table-status-pill):not([class*="status-pill"]),
   [data-theme="dark"] div:not(.badge):not(.pulse-dot):not(.avatar-circle):not(.stat-icon):not(.lp-kpi-icon):not(.kpi-icon-mono),
   [data-theme="dark"] td, [data-theme="dark"] th {
     color: var(--text);

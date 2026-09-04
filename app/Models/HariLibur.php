@@ -88,14 +88,14 @@ class HariLibur extends Model
     {
         switch ($this->jenis) {
             case 'libur_nasional':
-                return '<span class="badge" style="background:rgba(239,68,68,0.12); color:#DC2626; border:1px solid rgba(239,68,68,0.3); font-size:11px; padding:2px 8px; border-radius:12px; font-weight:700;">Libur Nasional</span>';
+                return '<span class="table-status-pill belum"><i class="bi bi-calendar-x-fill"></i> Libur Nasional</span>';
             case 'cuti_bersama':
-                return '<span class="badge" style="background:rgba(245,158,11,0.12); color:#D97706; border:1px solid rgba(245,158,11,0.3); font-size:11px; padding:2px 8px; border-radius:12px; font-weight:700;">Cuti Bersama</span>';
+                return '<span class="table-status-pill terlambat"><i class="bi bi-calendar-check-fill"></i> Cuti Bersama</span>';
             case 'libur_semester':
-                return '<span class="badge" style="background:rgba(59,130,246,0.12); color:#2563EB; border:1px solid rgba(59,130,246,0.3); font-size:11px; padding:2px 8px; border-radius:12px; font-weight:700;">Libur Semester</span>';
+                return '<span class="table-status-pill izin"><i class="bi bi-mortarboard-fill"></i> Libur Semester</span>';
             case 'khusus_sekolah':
             default:
-                return '<span class="badge" style="background:rgba(168,85,247,0.12); color:#9333EA; border:1px solid rgba(168,85,247,0.3); font-size:11px; padding:2px 8px; border-radius:12px; font-weight:700;">Khusus Sekolah</span>';
+                return '<span class="table-status-pill pkl"><i class="bi bi-building"></i> Khusus Sekolah</span>';
         }
     }
 }
