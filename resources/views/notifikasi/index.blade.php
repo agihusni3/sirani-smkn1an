@@ -275,22 +275,22 @@
       gap: 6px;
     }
 
-    /* CATEGORY PILLS */
+    /* CATEGORY TEXT (Clean: Black Font, No Border, No BG) */
     .pill-kategori {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      padding: 3px 8px;
-      border-radius: 12px;
-      font-size: 10.5px;
+      display: inline-block;
+      font-size: 12px;
       font-weight: 700;
-      letter-spacing: .02em;
+      color: #000000 !important;
+      background: transparent !important;
+      border: none !important;
+      padding: 0 !important;
+      box-shadow: none !important;
     }
-    .pill-eskalasi { background: rgba(59,130,246,0.12); color: #2563EB; border: 1px solid rgba(59,130,246,0.3); }
-    .pill-disiplin-ortu { background: rgba(249,115,22,0.12); color: #EA580C; border: 1px solid rgba(249,115,22,0.3); }
-    .pill-pengingat { background: rgba(234,179,8,0.12); color: #CA8A04; border: 1px solid rgba(234,179,8,0.3); }
-    .pill-panggilan { background: rgba(239,68,68,0.12); color: #DC2626; border: 1px solid rgba(239,68,68,0.3); }
-    .pill-presensi { background: var(--bg-3); color: var(--text); border: 1px solid var(--border); }
+    .pill-eskalasi, .pill-disiplin-ortu, .pill-pengingat, .pill-panggilan, .pill-presensi {
+      background: transparent !important;
+      color: #000000 !important;
+      border: none !important;
+    }
 
     @media (max-width: 768px) {
       .notif-stat-grid {
@@ -575,23 +575,19 @@
 
                   {{-- Kategori --}}
                   <td style="padding:8px 10px; vertical-align:middle; white-space:nowrap;">
-                    @if(str_contains($notif->kategori, 'eskalasi'))
-                      <span class="pill-kategori pill-eskalasi" style="font-size:10.5px; padding:2px 7px;"><i class="bi bi-bell-fill"></i> Eskalasi</span>
-                    @elseif(str_contains($notif->kategori, 'pemberitahuan_disiplin'))
-                      <span class="pill-kategori pill-disiplin-ortu" style="font-size:10.5px; padding:2px 7px;"><i class="bi bi-megaphone-fill"></i> Disiplin</span>
-                    @elseif(str_contains($notif->kategori, 'pengingat_disiplin'))
-                      <span class="pill-kategori pill-pengingat" style="font-size:10.5px; padding:2px 7px;"><i class="bi bi-alarm-fill"></i> Pengingat</span>
-                    @elseif($notif->kategori === 'panggilan_ortu')
-                      <span class="pill-kategori pill-panggilan" style="font-size:10.5px; padding:2px 7px;"><i class="bi bi-telephone-outbound-fill"></i> Panggilan</span>
-                    @elseif($notif->kategori === 'alpha')
-                      <span class="pill-kategori" style="background:rgba(239,68,68,0.1); color:#DC2626; border:1px solid rgba(239,68,68,0.3); font-size:10.5px; padding:2px 7px;"><i class="bi bi-x-circle-fill"></i> Alpha</span>
-                    @elseif($notif->kategori === 'terlambat')
-                      <span class="pill-kategori" style="background:rgba(245,158,11,0.1); color:#D97706; border:1px solid rgba(245,158,11,0.3); font-size:10.5px; padding:2px 7px;"><i class="bi bi-clock-history"></i> Terlambat</span>
-                    @elseif($notif->kategori === 'bolos')
-                      <span class="pill-kategori" style="background:rgba(239,68,68,0.1); color:#DC2626; border:1px solid rgba(239,68,68,0.3); font-size:10.5px; padding:2px 7px;"><i class="bi bi-door-open-fill"></i> Bolos</span>
-                    @else
-                      <span class="pill-kategori pill-presensi" style="font-size:10.5px; padding:2px 7px;"><i class="bi bi-info-circle-fill"></i> {{ ucwords(str_replace('_', ' ', $notif->kategori)) }}</span>
-                    @endif
+                    @php
+                      $kategoriLabel = match(true) {
+                        str_contains($notif->kategori, 'eskalasi') => 'Eskalasi',
+                        str_contains($notif->kategori, 'pemberitahuan_disiplin') => 'Disiplin',
+                        str_contains($notif->kategori, 'pengingat_disiplin') => 'Pengingat',
+                        $notif->kategori === 'panggilan_ortu' => 'Panggilan',
+                        $notif->kategori === 'alpha' => 'Alpha',
+                        $notif->kategori === 'terlambat' => 'Terlambat',
+                        $notif->kategori === 'bolos' => 'Bolos',
+                        default => ucwords(str_replace('_', ' ', $notif->kategori)),
+                      };
+                    @endphp
+                    <span style="font-size:12px; font-weight:700; color:#000000;">{{ $kategoriLabel }}</span>
                   </td>
 
                   {{-- Penerima & Kontak --}}
