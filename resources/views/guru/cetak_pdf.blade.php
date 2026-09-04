@@ -388,7 +388,7 @@
           <tr>
             <td class="text-center">{{ $idx + 1 }}</td>
             <td class="text-center" style="font-family:'JetBrains Mono', monospace; font-size:8pt; font-weight:600;">{{ $g->nip ?? '-' }}</td>
-            <td><strong>{{ $g->nama }}</strong></td>
+            <td><strong>{{ $g->nama_lengkap_gelar }}</strong></td>
             <td style="font-size:8pt;">{{ $g->jabatan }}</td>
             <td class="text-center" style="font-family:'JetBrains Mono', monospace; font-size:8pt;">{{ $g->no_hp ?: '-' }}</td>
             <td style="font-family:'JetBrains Mono', monospace; font-size:7.5pt; word-break:break-all;">{{ $g->user ? $g->user->email : '-' }}</td>

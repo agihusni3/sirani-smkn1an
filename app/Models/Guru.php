@@ -31,8 +31,34 @@ class Guru extends Model
     protected $fillable = [
         'nip',
         'nama',
+        'nama_lengkap',
+        'gelar_depan',
+        'gelar_belakang',
+        'nik',
+        'nuptk',
+        'tempat_lahir',
+        'tanggal_lahir',
+        'jenis_kelamin',
+        'agama',
+        'alamat',
+        'id_gtk',
         'jabatan',
         'jenis_kepegawaian',
+        'jenis_ptk',
+        'golongan_pangkat',
+        'nomor_sk_pengangkatan',
+        'tmt_kerja',
+        'lembaga_pengangkat',
+        'pendidikan_terakhir',
+        'jurusan_kuliah',
+        'kampus',
+        'tahun_lulus',
+        'status_sertifikasi',
+        'nomor_serdik',
+        'mapel_diampu',
+        'jjm',
+        'tugas_tambahan',
+        'sk_tugas_tambahan',
         'hari_mengajar',
         'no_hp',
         'foto',
@@ -41,9 +67,39 @@ class Guru extends Model
 
     protected $casts = [
         'hari_mengajar' => 'array',
+        'tanggal_lahir' => 'date',
+        'tmt_kerja'     => 'date',
     ];
 
-    protected $appends = ['foto_url', 'label_kepegawaian'];
+    protected $appends = ['foto_url', 'label_kepegawaian', 'nama_lengkap_gelar'];
+
+    /**
+     * Dapatkan nama lengkap resmi beserta gelar depan dan belakang.
+     */
+    public function getNamaLengkapGelarAttribute(): string
+    {
+        $baseName = !empty($this->nama_lengkap) ? $this->nama_lengkap : $this->nama;
+        $depan = trim($this->gelar_depan ?? '');
+        $belakang = trim($this->gelar_belakang ?? '');
+
+        $formatted = $baseName;
+        if (!empty($depan) && !str_starts_with(strtolower($formatted), strtolower($depan))) {
+            $formatted = $depan . ' ' . $formatted;
+        }
+        if (!empty($belakang) && !str_ends_with(strtolower($formatted), strtolower($belakang))) {
+            $formatted = rtrim($formatted, ', ') . ', ' . $belakang;
+        }
+
+        return $formatted;
+    }
+
+    /**
+     * Relasi ke sertifikat pelatihan / pengembangan diri guru.
+     */
+    public function sertifikats(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(SertifikatGuru::class, 'guru_id')->orderBy('tahun', 'desc')->orderBy('id', 'desc');
+    }
 
     /**
      * Cek apakah guru bertaraf honorer / GTT.

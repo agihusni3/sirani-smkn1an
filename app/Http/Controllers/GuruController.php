@@ -4,26 +4,34 @@ namespace App\Http\Controllers;
 
 use App\Models\Guru;
 use App\Models\User;
+use App\Models\SertifikatGuru;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
 class GuruController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Guru::with(['user', 'rombels.tahunAjaran', 'kartuRfid']);
+        $query = Guru::with(['user', 'rombels.tahunAjaran', 'kartuRfid', 'sertifikats']);
 
         $search = $request->input('q');
         $kategori = $request->input('kategori'); // wali_kelas, bk, pimpinan, staf, guru
         $kepegawaian = $request->input('kepegawaian') ?: $request->input('jenis'); // pns, pppk, honor, tendik
         $status = $request->input('status'); // aktif, nonaktif
         $rfidFilter = $request->input('rfid'); // Filter RFID: ada, belum
+        $sertifikasi = $request->input('sertifikasi'); // sudah, belum
+        $ptk = $request->input('ptk'); // filter jenis ptk
 
         if ($search) {
             $query->where(function ($q) use ($search) {
                 $q->where('nama', 'like', "%{$search}%")
+                  ->orWhere('nama_lengkap', 'like', "%{$search}%")
                   ->orWhere('nip', 'like', "%{$search}%")
+                  ->orWhere('nuptk', 'like', "%{$search}%")
+                  ->orWhere('nik', 'like', "%{$search}%")
                   ->orWhere('jabatan', 'like', "%{$search}%")
+                  ->orWhere('mapel_diampu', 'like', "%{$search}%")
                   ->orWhere('no_hp', 'like', "%{$search}%")
                   ->orWhereHas('user', function ($uq) use ($search) {
                       $uq->where('email', 'like', "%{$search}%");
@@ -39,6 +47,13 @@ class GuruController extends Controller
             $query->where('jenis_kepegawaian', $kepegawaian);
         }
 
+        if ($sertifikasi) {
+            $query->where('status_sertifikasi', $sertifikasi);
+        }
+
+        if ($ptk) {
+            $query->where('jenis_ptk', $ptk);
+        }
 
         if ($rfidFilter === 'ada') {
             $query->whereHas('kartuRfid');
@@ -50,21 +65,24 @@ class GuruController extends Controller
             $query->whereHas('rombels');
         } elseif ($kategori === 'bk') {
             $query->where(function($q) {
-                $q->where('jabatan', 'like', '%BK%')->orWhere('jabatan', 'like', '%Bimbingan%');
+                $q->where('jabatan', 'like', '%BK%')->orWhere('jabatan', 'like', '%Bimbingan%')->orWhere('jenis_ptk', 'Guru BK');
             });
         } elseif ($kategori === 'pimpinan') {
             $query->where(function($q) {
                 $q->where('jabatan', 'like', '%Kepala%')
                   ->orWhere('jabatan', 'like', '%Wakil%')
                   ->orWhere('jabatan', 'like', '%Waka%')
-                  ->orWhere('jabatan', 'like', '%Kaprogli%');
+                  ->orWhere('jabatan', 'like', '%Kaprogli%')
+                  ->orWhere('tugas_tambahan', 'like', '%Kepala%')
+                  ->orWhere('tugas_tambahan', 'like', '%Waka%');
             });
         } elseif ($kategori === 'staf') {
             $query->where(function($q) {
                 $q->where('jabatan', 'like', '%Tata Usaha%')
                   ->orWhere('jabatan', 'like', '%Operator%')
                   ->orWhere('jabatan', 'like', '%Staf%')
-                  ->orWhere('jabatan', 'like', '%Pustakawan%');
+                  ->orWhere('jabatan', 'like', '%Pustakawan%')
+                  ->orWhere('jenis_kepegawaian', 'tendik');
             });
         }
 
@@ -90,11 +108,11 @@ class GuruController extends Controller
             default:
                 $query->orderByRaw("
                     CASE 
-                        WHEN jabatan LIKE '%Kepala Sekolah%' THEN 1
-                        WHEN jabatan LIKE '%Waka%' OR jabatan LIKE '%Wakil%' THEN 2
-                        WHEN jabatan LIKE '%Kaprog%' OR jabatan LIKE '%Ketua%' THEN 3
-                        WHEN jabatan LIKE '%BK%' OR jabatan LIKE '%Bimbingan%' THEN 4
-                        WHEN jabatan LIKE '%Wali Kelas%' THEN 5
+                        WHEN jabatan LIKE '%Kepala Sekolah%' OR tugas_tambahan LIKE '%Kepala Sekolah%' THEN 1
+                        WHEN jabatan LIKE '%Waka%' OR jabatan LIKE '%Wakil%' OR tugas_tambahan LIKE '%Waka%' THEN 2
+                        WHEN jabatan LIKE '%Kaprog%' OR jabatan LIKE '%Ketua%' OR tugas_tambahan LIKE '%Kaprog%' THEN 3
+                        WHEN jabatan LIKE '%BK%' OR jabatan LIKE '%Bimbingan%' OR jenis_ptk = 'Guru BK' THEN 4
+                        WHEN jabatan LIKE '%Wali Kelas%' OR tugas_tambahan LIKE '%Wali Kelas%' THEN 5
                         WHEN jabatan LIKE '%Guru%' THEN 6
                         WHEN jabatan LIKE '%Tata Usaha%' OR jabatan LIKE '%TU%' OR jabatan LIKE '%Staf%' OR jabatan LIKE '%Operator%' OR jabatan LIKE '%Tendik%' THEN 7
                         ELSE 8
@@ -109,23 +127,45 @@ class GuruController extends Controller
         $statTotal = Guru::count();
         $statWali = Guru::whereHas('rombels')->count();
         $statAkun = Guru::whereHas('user')->count();
+        $statSertifikasi = Guru::where('status_sertifikasi', 'sudah')->count();
+        $statTotalSertifikat = SertifikatGuru::count();
         $rfidStatus = $rfidFilter;
 
-        return view('guru.index', compact('gurus', 'statTotal', 'statWali', 'statAkun', 'search', 'kategori', 'kepegawaian', 'status', 'rfidStatus', 'sort'));
+        return view('guru.index', compact(
+            'gurus',
+            'statTotal',
+            'statWali',
+            'statAkun',
+            'statSertifikasi',
+            'statTotalSertifikat',
+            'search',
+            'kategori',
+            'kepegawaian',
+            'status',
+            'sertifikasi',
+            'ptk',
+            'rfidStatus',
+            'sort'
+        ));
     }
 
     public function store(Request $request)
     {
         $request->validate([
-            'nip' => 'nullable|unique:gurus,nip',
-            'nama' => 'required|string',
-            'jabatan' => 'required|string',
+            'nama' => 'required|string|max:150',
+            'nip' => 'nullable|string|max:25|unique:gurus,nip',
+            'nik' => 'nullable|string|max:20',
+            'nuptk' => 'nullable|string|max:25',
+            'jabatan' => 'required|string|max:100',
             'jenis_kepegawaian' => 'nullable|in:pns,pppk,honor,tendik',
+            'jenis_ptk' => 'nullable|string|max:60',
+            'status_sertifikasi' => 'nullable|in:sudah,belum',
+            'jjm' => 'nullable|integer|min:0|max:60',
             'hari_mengajar' => 'nullable|array',
             'no_hp' => 'nullable|string|max:25',
             'foto' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
             'email_akun' => 'nullable|email|unique:users,email',
-            'password_akun' => 'nullable|string|min:6',
+            'password_akun' => 'nullable|string|min:4',
         ]);
 
         $fotoPath = null;
@@ -133,15 +173,44 @@ class GuruController extends Controller
             $fotoPath = $request->file('foto')->store('foto_guru', 'public');
         }
 
+        $nama = trim($request->input('nama'));
+        $namaLengkap = $request->filled('nama_lengkap') ? trim($request->input('nama_lengkap')) : $nama;
+
         $guru = Guru::create([
-            'nip' => $request->input('nip') ?: null,
-            'nama' => $request->input('nama'),
-            'jabatan' => $request->input('jabatan'),
-            'jenis_kepegawaian' => $request->input('jenis_kepegawaian', 'pns'),
-            'hari_mengajar' => $request->input('hari_mengajar') ?: null,
-            'no_hp' => $request->input('no_hp') ?: null,
-            'foto' => $fotoPath,
-            'status' => 'aktif',
+            'nip'                 => $request->input('nip') ?: null,
+            'nama'                => $nama,
+            'nama_lengkap'        => $namaLengkap,
+            'gelar_depan'         => $request->input('gelar_depan') ?: null,
+            'gelar_belakang'      => $request->input('gelar_belakang') ?: null,
+            'nik'                 => $request->input('nik') ?: null,
+            'nuptk'               => $request->input('nuptk') ?: null,
+            'tempat_lahir'        => $request->input('tempat_lahir') ?: null,
+            'tanggal_lahir'       => $request->input('tanggal_lahir') ?: null,
+            'jenis_kelamin'       => $request->input('jenis_kelamin') ?: null,
+            'agama'               => $request->input('agama') ?: null,
+            'alamat'              => $request->input('alamat') ?: null,
+            'id_gtk'              => $request->input('id_gtk') ?: null,
+            'jabatan'             => $request->input('jabatan'),
+            'jenis_kepegawaian'   => $request->input('jenis_kepegawaian', 'pns'),
+            'jenis_ptk'           => $request->input('jenis_ptk') ?: null,
+            'golongan_pangkat'    => $request->input('golongan_pangkat') ?: null,
+            'nomor_sk_pengangkatan' => $request->input('nomor_sk_pengangkatan') ?: null,
+            'tmt_kerja'           => $request->input('tmt_kerja') ?: null,
+            'lembaga_pengangkat'  => $request->input('lembaga_pengangkat') ?: null,
+            'pendidikan_terakhir' => $request->input('pendidikan_terakhir') ?: null,
+            'jurusan_kuliah'      => $request->input('jurusan_kuliah') ?: null,
+            'kampus'              => $request->input('kampus') ?: null,
+            'tahun_lulus'         => $request->input('tahun_lulus') ?: null,
+            'status_sertifikasi'  => $request->input('status_sertifikasi', 'belum'),
+            'nomor_serdik'        => $request->input('nomor_serdik') ?: null,
+            'mapel_diampu'        => $request->input('mapel_diampu') ?: null,
+            'jjm'                 => $request->input('jjm') ?: null,
+            'tugas_tambahan'      => $request->input('tugas_tambahan') ?: null,
+            'sk_tugas_tambahan'   => $request->input('sk_tugas_tambahan') ?: null,
+            'hari_mengajar'       => $request->input('hari_mengajar') ?: null,
+            'no_hp'               => $request->input('no_hp') ?: null,
+            'foto'                => $fotoPath,
+            'status'              => 'aktif',
         ]);
 
         if ($request->filled('email_akun') && $request->filled('password_akun')) {
@@ -170,17 +239,22 @@ class GuruController extends Controller
             ]);
         }
 
-        return redirect()->back()->with('success', 'Data guru/pegawai dan pengaturan akses berhasil ditambahkan.');
+        return redirect()->back()->with('success', 'Data guru/pegawai GTK dan pengaturan akses berhasil ditambahkan.');
     }
 
     public function update(Request $request, $id)
     {
         $guru = Guru::findOrFail($id);
         $request->validate([
-            'nip' => 'nullable|unique:gurus,nip,' . $id,
-            'nama' => 'required|string',
-            'jabatan' => 'required|string',
+            'nama' => 'required|string|max:150',
+            'nip' => 'nullable|string|max:25|unique:gurus,nip,' . $id,
+            'nik' => 'nullable|string|max:20',
+            'nuptk' => 'nullable|string|max:25',
+            'jabatan' => 'required|string|max:100',
             'jenis_kepegawaian' => 'nullable|in:pns,pppk,honor,tendik',
+            'jenis_ptk' => 'nullable|string|max:60',
+            'status_sertifikasi' => 'nullable|in:sudah,belum',
+            'jjm' => 'nullable|integer|min:0|max:60',
             'hari_mengajar' => 'nullable|array',
             'no_hp' => 'nullable|string|max:25',
             'status' => 'required|in:aktif,nonaktif',
@@ -195,18 +269,47 @@ class GuruController extends Controller
             $fotoPath = $request->file('foto')->store('foto_guru', 'public');
         }
 
+        $nama = trim($request->input('nama'));
+        $namaLengkap = $request->filled('nama_lengkap') ? trim($request->input('nama_lengkap')) : ($guru->nama_lengkap ?: $nama);
+
         $guru->update([
-            'nip' => $request->input('nip') ?: null,
-            'nama' => $request->input('nama'),
-            'jabatan' => $request->input('jabatan'),
-            'jenis_kepegawaian' => $request->input('jenis_kepegawaian', 'pns'),
-            'hari_mengajar' => $request->input('hari_mengajar') ?: null,
-            'no_hp' => $request->input('no_hp') ?: null,
-            'foto' => $fotoPath,
-            'status' => $request->input('status'),
+            'nip'                 => $request->input('nip') ?: null,
+            'nama'                => $nama,
+            'nama_lengkap'        => $namaLengkap,
+            'gelar_depan'         => $request->input('gelar_depan') ?: null,
+            'gelar_belakang'      => $request->input('gelar_belakang') ?: null,
+            'nik'                 => $request->input('nik') ?: null,
+            'nuptk'               => $request->input('nuptk') ?: null,
+            'tempat_lahir'        => $request->input('tempat_lahir') ?: null,
+            'tanggal_lahir'       => $request->input('tanggal_lahir') ?: null,
+            'jenis_kelamin'       => $request->input('jenis_kelamin') ?: null,
+            'agama'               => $request->input('agama') ?: null,
+            'alamat'              => $request->input('alamat') ?: null,
+            'id_gtk'              => $request->input('id_gtk') ?: null,
+            'jabatan'             => $request->input('jabatan'),
+            'jenis_kepegawaian'   => $request->input('jenis_kepegawaian', 'pns'),
+            'jenis_ptk'           => $request->input('jenis_ptk') ?: null,
+            'golongan_pangkat'    => $request->input('golongan_pangkat') ?: null,
+            'nomor_sk_pengangkatan' => $request->input('nomor_sk_pengangkatan') ?: null,
+            'tmt_kerja'           => $request->input('tmt_kerja') ?: null,
+            'lembaga_pengangkat'  => $request->input('lembaga_pengangkat') ?: null,
+            'pendidikan_terakhir' => $request->input('pendidikan_terakhir') ?: null,
+            'jurusan_kuliah'      => $request->input('jurusan_kuliah') ?: null,
+            'kampus'              => $request->input('kampus') ?: null,
+            'tahun_lulus'         => $request->input('tahun_lulus') ?: null,
+            'status_sertifikasi'  => $request->input('status_sertifikasi', 'belum'),
+            'nomor_serdik'        => $request->input('nomor_serdik') ?: null,
+            'mapel_diampu'        => $request->input('mapel_diampu') ?: null,
+            'jjm'                 => $request->input('jjm') ?: null,
+            'tugas_tambahan'      => $request->input('tugas_tambahan') ?: null,
+            'sk_tugas_tambahan'   => $request->input('sk_tugas_tambahan') ?: null,
+            'hari_mengajar'       => $request->input('hari_mengajar') ?: null,
+            'no_hp'               => $request->input('no_hp') ?: null,
+            'foto'                => $fotoPath,
+            'status'              => $request->input('status'),
         ]);
 
-        return redirect()->back()->with('success', 'Data guru/pegawai berhasil diperbarui.');
+        return redirect()->back()->with('success', 'Data guru/pegawai GTK berhasil diperbarui.');
     }
 
     public function destroy($id)
@@ -223,8 +326,8 @@ class GuruController extends Controller
 
     public function export()
     {
-        $gurus = Guru::orderBy('nama')->get();
-        $csvFileName = 'data_guru_smkn1an_' . date('Y-m-d') . '.csv';
+        $gurus = Guru::withCount('sertifikats')->orderBy('nama')->get();
+        $csvFileName = 'data_gtk_guru_smkn1an_' . date('Y-m-d') . '.csv';
 
         $headers = [
             "Content-type" => "text/csv; charset=UTF-8",
@@ -239,15 +342,54 @@ class GuruController extends Controller
             fprintf($file, chr(0xEF).chr(0xBB).chr(0xBF)); // BOM UTF-8
             fwrite($file, "sep=;\n");
 
-            fputcsv($file, ['No', 'NIP', 'Nama Guru / Pegawai', 'Jabatan / Peran', 'No HP / WhatsApp', 'Status Kepegawaian'], ';');
+            fputcsv($file, [
+                'No',
+                'Nama Lengkap Beserta Gelar',
+                'Nama Lengkap (Tanpa Gelar)',
+                'Gelar Depan',
+                'Gelar Belakang',
+                'NIK',
+                'NUPTK',
+                'NIP / NI PPPK',
+                'Jenis PTK',
+                'Status Kepegawaian',
+                'Golongan / Pangkat',
+                'Pendidikan Terakhir',
+                'Program Studi / Jurusan',
+                'Perguruan Tinggi / Kampus',
+                'Status Sertifikasi',
+                'Nomor Serdik',
+                'Mata Pelajaran Diampu',
+                'JJM per Minggu',
+                'Tugas Tambahan',
+                'Nomor Handphone / WhatsApp',
+                'Jumlah Sertifikat Pelatihan',
+                'Status Keaktifan'
+            ], ';');
 
             foreach ($gurus as $idx => $g) {
                 fputcsv($file, [
                     $idx + 1,
+                    $g->nama_lengkap_gelar,
+                    $g->nama_lengkap ?: $g->nama,
+                    $g->gelar_depan ?: '-',
+                    $g->gelar_belakang ?: '-',
+                    $g->nik ? '="' . $g->nik . '"' : '-',
+                    $g->nuptk ? '="' . $g->nuptk . '"' : '-',
                     $g->nip ? '="' . $g->nip . '"' : '-',
-                    $g->nama,
-                    $g->jabatan,
+                    $g->jenis_ptk ?: $g->jabatan,
+                    strtoupper($g->jenis_kepegawaian),
+                    $g->golongan_pangkat ?: '-',
+                    $g->pendidikan_terakhir ?: '-',
+                    $g->jurusan_kuliah ?: '-',
+                    $g->kampus ?: '-',
+                    $g->status_sertifikasi === 'sudah' ? 'Sudah Sertifikasi' : 'Belum Sertifikasi',
+                    $g->nomor_serdik ?: '-',
+                    $g->mapel_diampu ?: '-',
+                    $g->jjm ? ($g->jjm . ' Jam') : '-',
+                    $g->tugas_tambahan ?: '-',
                     $g->no_hp ? '="' . $g->no_hp . '"' : '-',
+                    $g->sertifikats_count ?? 0,
                     strtoupper($g->status),
                 ], ';');
             }
@@ -262,7 +404,7 @@ class GuruController extends Controller
      */
     public function cetakPdf(Request $request)
     {
-        $gurus = Guru::with(['user'])->orderBy('nama')->get();
+        $gurus = Guru::with(['user', 'sertifikats'])->orderBy('nama')->get();
         $sekolah = \App\Models\PengaturanSekolah::getAktif();
 
         return view('guru.cetak_pdf', compact('gurus', 'sekolah'));
@@ -275,7 +417,7 @@ class GuruController extends Controller
     {
         $headers = [
             "Content-type"        => "text/csv; charset=UTF-8",
-            "Content-Disposition" => "attachment; filename=template_import_guru_smkn1an.csv",
+            "Content-Disposition" => "attachment; filename=template_import_gtk_smkn1an.csv",
             "Pragma"              => "no-cache",
             "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
             "Expires"             => "0"
@@ -284,10 +426,31 @@ class GuruController extends Controller
         $callback = function () {
             $file = fopen('php://output', 'w');
             fprintf($file, chr(0xEF).chr(0xBB).chr(0xBF)); // BOM UTF-8
-            fputcsv($file, ['Nama Lengkap & Gelar', 'NIP', 'Jabatan / Tugas', 'Status Kepegawaian (PNS/PPPK/Honor/Tendik)', 'No WhatsApp / HP', 'Status Keaktifan (Aktif/Nonaktif)'], ';');
-            fputcsv($file, ['Budi Santoso, S.Pd', '198501012010011005', 'Guru Matematika', 'PNS', '081234567890', 'Aktif'], ';');
-            fputcsv($file, ['Siska Widyawati, S.Pd', '198902052023212024', 'Guru PPKn', 'PPPK', '081373310855', 'Aktif'], ';');
-            fputcsv($file, ['Rian Kurniawan, S.Pd', '', 'Guru Penjaskes', 'Honor', '081272001006', 'Aktif'], ';');
+            fwrite($file, "sep=;\n");
+            fputcsv($file, [
+                'Nama Lengkap',
+                'Gelar Depan',
+                'Gelar Belakang',
+                'NIP',
+                'NUPTK',
+                'NIK',
+                'Jenis PTK',
+                'Status Kepegawaian (PNS/PPPK/Honor/Tendik)',
+                'Golongan Pangkat',
+                'Pendidikan Terakhir',
+                'Jurusan Kuliah',
+                'Perguruan Tinggi',
+                'Status Sertifikasi (Sudah/Belum)',
+                'Mata Pelajaran Diampu',
+                'JJM per Minggu',
+                'Tugas Tambahan',
+                'No WhatsApp / HP',
+                'Status Keaktifan (Aktif/Nonaktif)'
+            ], ';');
+
+            fputcsv($file, ['Budi Santoso', 'Drs.', 'M.Kom.', '198501012010011005', '1234567890123456', '1806010101850001', 'Guru Kejuruan', 'PNS', 'Penata Tk.I (III/d)', 'S2', 'Magister Komputer', 'Universitas Lampung', 'Sudah', 'Pemrograman Web & RPL', '24', 'Kepala Bengkel RPL', '081234567890', 'Aktif'], ';');
+            fputcsv($file, ['Siska Widyawati', '', 'S.Pd.', '198902052023212024', '9876543210987654', '1806020589000002', 'Guru Normatif / Adaptif', 'PPPK', 'Golongan IX', 'S1', 'Pendidikan Matematika', 'Universitas Negeri Yogyakarta', 'Sudah', 'Matematika', '24', 'Wali Kelas X RPL 1', '081373310855', 'Aktif'], ';');
+            fputcsv($file, ['Rian Kurniawan', '', 'S.T.', '', '', '1806031295000003', 'Laboran / Toolman', 'Honor', '-', 'S1', 'Teknik Otomotif', 'Politeknik Negeri Lampung', 'Belum', 'Praktikum TSM', '18', 'Toolman Bengkel TSM', '081272001006', 'Aktif'], ';');
             fclose($file);
         };
 
@@ -350,19 +513,45 @@ class GuruController extends Controller
             if (in_array($cleanName, ['nama', 'namaguru', 'namalengkap', 'namadanlengkap', 'namapegawai'])) {
                 $headerMap['nama'] = $colIdx;
                 $hasHeader = true;
-            } elseif (in_array($cleanName, ['nip', 'nipguru', 'noinduk', 'nippegawai', 'nuptk'])) {
+            } elseif (in_array($cleanName, ['gelardepan', 'gelarawal'])) {
+                $headerMap['gelar_depan'] = $colIdx;
+            } elseif (in_array($cleanName, ['gelarbelakang', 'gelarakhir'])) {
+                $headerMap['gelar_belakang'] = $colIdx;
+            } elseif (in_array($cleanName, ['nip', 'nipguru', 'noinduk', 'nippegawai'])) {
                 $headerMap['nip'] = $colIdx;
                 $hasHeader = true;
-            } elseif (in_array($cleanName, ['jabatan', 'tugas', 'penugasan', 'mapel', 'gurumapel'])) {
+            } elseif (in_array($cleanName, ['nuptk', 'nonuptk'])) {
+                $headerMap['nuptk'] = $colIdx;
+            } elseif (in_array($cleanName, ['nik', 'noktp', 'nonik'])) {
+                $headerMap['nik'] = $colIdx;
+            } elseif (in_array($cleanName, ['jabatan', 'tugas', 'penugasan'])) {
                 $headerMap['jabatan'] = $colIdx;
                 $hasHeader = true;
+            } elseif (in_array($cleanName, ['jenisptk', 'ptk', 'peran'])) {
+                $headerMap['jenis_ptk'] = $colIdx;
+            } elseif (in_array($cleanName, ['mapel', 'gurumapel', 'mapeldiampu', 'matapelajaran'])) {
+                $headerMap['mapel_diampu'] = $colIdx;
+            } elseif (in_array($cleanName, ['jjm', 'jam', 'jamngajar', 'jammengajar'])) {
+                $headerMap['jjm'] = $colIdx;
+            } elseif (in_array($cleanName, ['tugastambahan', 'tugasextra'])) {
+                $headerMap['tugas_tambahan'] = $colIdx;
+            } elseif (in_array($cleanName, ['pendidikan', 'pendidikanterakhir', 'ijazah'])) {
+                $headerMap['pendidikan_terakhir'] = $colIdx;
+            } elseif (in_array($cleanName, ['jurusan', 'prodi', 'jurusankuliah', 'programstudi'])) {
+                $headerMap['jurusan_kuliah'] = $colIdx;
+            } elseif (in_array($cleanName, ['kampus', 'universitas', 'perguruantinggi'])) {
+                $headerMap['kampus'] = $colIdx;
+            } elseif (in_array($cleanName, ['sertifikasi', 'statussertifikasi'])) {
+                $headerMap['status_sertifikasi'] = $colIdx;
+            } elseif (in_array($cleanName, ['golongan', 'gol', 'pangkat', 'golonganpangkat'])) {
+                $headerMap['golongan_pangkat'] = $colIdx;
             } elseif (in_array($cleanName, ['nohp', 'hp', 'wa', 'nowa', 'telepon', 'kontak', 'nohpwa', 'nomorhp'])) {
                 $headerMap['no_hp'] = $colIdx;
                 $hasHeader = true;
             } elseif (in_array($cleanName, ['status', 'keaktifan', 'statuskeaktifan'])) {
                 $headerMap['status'] = $colIdx;
                 $hasHeader = true;
-            } elseif (in_array($cleanName, ['statuskepegawaian', 'jeniskepegawaian', 'kepegawaian', 'pnsgtt', 'golongan'])) {
+            } elseif (in_array($cleanName, ['statuskepegawaian', 'jeniskepegawaian', 'kepegawaian', 'pnsgtt'])) {
                 $headerMap['jenis_kepegawaian'] = $colIdx;
                 $hasHeader = true;
             }
@@ -388,16 +577,44 @@ class GuruController extends Controller
                 }, $row);
 
                 $nama = null;
+                $namaLengkap = null;
+                $gelarDepan = null;
+                $gelarBelakang = null;
                 $nip = null;
+                $nuptk = null;
+                $nik = null;
                 $jabatan = null;
+                $jenisPtk = null;
+                $mapelDiampu = null;
+                $jjm = null;
+                $tugasTambahan = null;
+                $pendidikan = null;
+                $jurusan = null;
+                $kampus = null;
+                $statusSertifikasi = 'belum';
+                $golongan = null;
                 $noHp = null;
                 $status = 'aktif';
                 $jenisKepegawaian = 'pns';
 
                 if ($hasHeader && isset($headerMap['nama'])) {
                     $nama = $cleanRow[$headerMap['nama']] ?? null;
+                    $gelarDepan = isset($headerMap['gelar_depan']) ? ($cleanRow[$headerMap['gelar_depan']] ?? null) : null;
+                    $gelarBelakang = isset($headerMap['gelar_belakang']) ? ($cleanRow[$headerMap['gelar_belakang']] ?? null) : null;
                     $nip = isset($headerMap['nip']) ? ($cleanRow[$headerMap['nip']] ?? null) : null;
+                    $nuptk = isset($headerMap['nuptk']) ? ($cleanRow[$headerMap['nuptk']] ?? null) : null;
+                    $nik = isset($headerMap['nik']) ? ($cleanRow[$headerMap['nik']] ?? null) : null;
                     $jabatan = isset($headerMap['jabatan']) ? ($cleanRow[$headerMap['jabatan']] ?? null) : null;
+                    $jenisPtk = isset($headerMap['jenis_ptk']) ? ($cleanRow[$headerMap['jenis_ptk']] ?? null) : null;
+                    $mapelDiampu = isset($headerMap['mapel_diampu']) ? ($cleanRow[$headerMap['mapel_diampu']] ?? null) : null;
+                    $jjm = isset($headerMap['jjm']) ? (int)preg_replace('/[^0-9]/', '', (string)$cleanRow[$headerMap['jjm']]) : null;
+                    $tugasTambahan = isset($headerMap['tugas_tambahan']) ? ($cleanRow[$headerMap['tugas_tambahan']] ?? null) : null;
+                    $pendidikan = isset($headerMap['pendidikan_terakhir']) ? ($cleanRow[$headerMap['pendidikan_terakhir']] ?? null) : null;
+                    $jurusan = isset($headerMap['jurusan_kuliah']) ? ($cleanRow[$headerMap['jurusan_kuliah']] ?? null) : null;
+                    $kampus = isset($headerMap['kampus']) ? ($cleanRow[$headerMap['kampus']] ?? null) : null;
+                    $statusSertifikasiRaw = isset($headerMap['status_sertifikasi']) ? strtolower($cleanRow[$headerMap['status_sertifikasi']] ?? '') : '';
+                    $statusSertifikasi = (str_contains($statusSertifikasiRaw, 'sudah') || str_contains($statusSertifikasiRaw, 'ya')) ? 'sudah' : 'belum';
+                    $golongan = isset($headerMap['golongan_pangkat']) ? ($cleanRow[$headerMap['golongan_pangkat']] ?? null) : null;
                     $noHp = isset($headerMap['no_hp']) ? ($cleanRow[$headerMap['no_hp']] ?? null) : null;
                     $status = isset($headerMap['status']) ? ($cleanRow[$headerMap['status']] ?? null) : null;
                     $jenisKepegawaian = isset($headerMap['jenis_kepegawaian']) ? ($cleanRow[$headerMap['jenis_kepegawaian']] ?? null) : null;
@@ -422,9 +639,16 @@ class GuruController extends Controller
                             continue;
                         }
 
-                        // 3. Cek NIP (15 - 22 digit)
-                        if (strlen($digitsOnly) >= 15 && strlen($digitsOnly) <= 22) {
+                        // 3. Cek NIP (15 - 22 digit) atau NUPTK (16 digit) atau NIK (16 digit)
+                        if (strlen($digitsOnly) === 18) {
                             $nip = $digitsOnly;
+                            continue;
+                        } elseif (strlen($digitsOnly) === 16) {
+                            if (!$nuptk) {
+                                $nuptk = $digitsOnly;
+                            } else {
+                                $nik = $digitsOnly;
+                            }
                             continue;
                         }
 
@@ -485,40 +709,55 @@ class GuruController extends Controller
                     $noHp = '0' . $noHp;
                 }
 
-                // Cari guru berdasarkan NIP terlebih dahulu untuk menghindari UNIQUE constraint violation
+                // Cari guru berdasarkan NIP, NUPTK, NIK, atau Nama
                 $existingGuru = null;
                 if (!empty($nip)) {
                     $existingGuru = Guru::where('nip', $nip)->first();
+                }
+                if (!$existingGuru && !empty($nuptk)) {
+                    $existingGuru = Guru::where('nuptk', $nuptk)->first();
+                }
+                if (!$existingGuru && !empty($nik)) {
+                    $existingGuru = Guru::where('nik', $nik)->first();
                 }
                 if (!$existingGuru && !empty($nama)) {
                     $existingGuru = Guru::where('nama', $nama)->first();
                 }
 
+                $payload = [
+                    'nama'                => $nama,
+                    'nama_lengkap'        => $namaLengkap ?: $nama,
+                    'gelar_depan'         => $gelarDepan,
+                    'gelar_belakang'      => $gelarBelakang,
+                    'nip'                 => $nip,
+                    'nuptk'               => $nuptk,
+                    'nik'                 => $nik,
+                    'jabatan'             => $jabatan,
+                    'jenis_ptk'           => $jenisPtk ?: ($existingGuru->jenis_ptk ?? null),
+                    'mapel_diampu'        => $mapelDiampu ?: ($existingGuru->mapel_diampu ?? null),
+                    'jjm'                 => $jjm ?: ($existingGuru->jjm ?? null),
+                    'tugas_tambahan'      => $tugasTambahan ?: ($existingGuru->tugas_tambahan ?? null),
+                    'pendidikan_terakhir' => $pendidikan ?: ($existingGuru->pendidikan_terakhir ?? null),
+                    'jurusan_kuliah'      => $jurusan ?: ($existingGuru->jurusan_kuliah ?? null),
+                    'kampus'              => $kampus ?: ($existingGuru->kampus ?? null),
+                    'status_sertifikasi'  => $statusSertifikasi ?: ($existingGuru->status_sertifikasi ?? 'belum'),
+                    'golongan_pangkat'    => $golongan ?: ($existingGuru->golongan_pangkat ?? null),
+                    'status'              => $status,
+                    'no_hp'               => $noHp ?: ($existingGuru->no_hp ?? null),
+                    'jenis_kepegawaian'   => $jenisKepegawaian,
+                ];
+
                 if ($existingGuru) {
-                    $existingGuru->update([
-                        'nama'              => $nama,
-                        'nip'               => $nip ?: $existingGuru->nip,
-                        'jabatan'           => $jabatan,
-                        'status'            => $status,
-                        'no_hp'             => $noHp ?: $existingGuru->no_hp,
-                        'jenis_kepegawaian' => $jenisKepegawaian,
-                    ]);
+                    $existingGuru->update(array_filter($payload, fn($v) => !is_null($v)));
                 } else {
-                    Guru::create([
-                        'nama'              => $nama,
-                        'nip'               => $nip ?: null,
-                        'jabatan'           => $jabatan,
-                        'status'            => $status,
-                        'no_hp'             => $noHp ?: null,
-                        'jenis_kepegawaian' => $jenisKepegawaian,
-                    ]);
+                    Guru::create($payload);
                 }
 
                 $imported++;
             }
         });
 
-        return redirect()->back()->with('success', "Berhasil memproses dan mengimpor {$imported} data guru/pegawai.");
+        return redirect()->back()->with('success', "Berhasil memproses dan mengimpor {$imported} data guru/pegawai GTK.");
     }
 
     /**
@@ -598,5 +837,58 @@ class GuruController extends Controller
         }
 
         return redirect()->back()->with('success', "Akun login untuk {$guru->nama} berhasil dihapus.");
+    }
+
+    /**
+     * Tambahkan sertifikat pelatihan guru.
+     */
+    public function storeSertifikat(Request $request, $id)
+    {
+        $guru = Guru::findOrFail($id);
+
+        $request->validate([
+            'nama_pelatihan'  => 'required|string|max:255',
+            'penyelenggara'   => 'required|string|max:200',
+            'tahun'           => 'required|string|max:10',
+            'file_sertifikat' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120',
+        ], [
+            'nama_pelatihan.required' => 'Nama pelatihan / kegiatan wajib diisi.',
+            'penyelenggara.required'  => 'Nama lembaga / instansi penyelenggara wajib diisi.',
+            'tahun.required'          => 'Tahun pelaksanaan pelatihan wajib diisi.',
+            'file_sertifikat.mimes'   => 'Format berkas sertifikat harus berupa PDF, JPG, JPEG, atau PNG.',
+            'file_sertifikat.max'     => 'Ukuran berkas sertifikat maksimal 5 MB.',
+        ]);
+
+        $filePath = null;
+        if ($request->hasFile('file_sertifikat')) {
+            $filePath = $request->file('file_sertifikat')->store('sertifikat_guru', 'public');
+        }
+
+        SertifikatGuru::create([
+            'guru_id'         => $guru->id,
+            'nama_pelatihan'  => $request->input('nama_pelatihan'),
+            'penyelenggara'   => $request->input('penyelenggara'),
+            'tahun'           => $request->input('tahun'),
+            'file_sertifikat' => $filePath,
+        ]);
+
+        return redirect()->back()->with('success', "Sertifikat pelatihan \"{$request->input('nama_pelatihan')}\" berhasil ditambahkan ke portofolio {$guru->nama}.");
+    }
+
+    /**
+     * Hapus sertifikat pelatihan guru.
+     */
+    public function destroySertifikat($id, $sertifikatId)
+    {
+        $sertifikat = SertifikatGuru::where('guru_id', $id)->findOrFail($sertifikatId);
+        $namaPelatihan = $sertifikat->nama_pelatihan;
+
+        if ($sertifikat->file_sertifikat && \Illuminate\Support\Facades\Storage::disk('public')->exists($sertifikat->file_sertifikat)) {
+            \Illuminate\Support\Facades\Storage::disk('public')->delete($sertifikat->file_sertifikat);
+        }
+
+        $sertifikat->delete();
+
+        return redirect()->back()->with('success', "Sertifikat \"{$namaPelatihan}\" berhasil dihapus dari portofolio.");
     }
 }

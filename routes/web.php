@@ -254,9 +254,9 @@ Route::middleware('auth')->group(function () {
         Route::put('/guru/{id}', [GuruController::class, 'update'])->name('guru.update')->middleware('role:admin,staf_tu');
         Route::delete('/guru/{id}', [GuruController::class, 'destroy'])->name('guru.destroy')->middleware('role:admin');
         Route::post('/guru/{id}/akun', [GuruController::class, 'storeAkun'])->name('guru.akun.store')->middleware('role:admin');
-        Route::match(['post', 'put'], '/guru/{id}/user/{userId?}', [GuruController::class, 'storeAkun'])->middleware('role:admin');
         Route::delete('/guru/{id}/akun', [GuruController::class, 'destroyAkun'])->name('guru.akun.destroy')->middleware('role:admin');
-        Route::delete('/guru/{id}/user/{userId?}', [GuruController::class, 'destroyAkun'])->middleware('role:admin');
+        Route::post('/guru/{id}/sertifikat', [GuruController::class, 'storeSertifikat'])->name('guru.sertifikat.store')->middleware('role:admin,staf_tu,guru');
+        Route::delete('/guru/{id}/sertifikat/{sertifikatId}', [GuruController::class, 'destroySertifikat'])->name('guru.sertifikat.destroy')->middleware('role:admin,staf_tu,guru');
     });
 
     // 13b. Pusat Manajemen Kartu RFID & Cetak Barcode Kartu (Admin & Staf TU)

@@ -3,9 +3,86 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Master Data Guru &amp; Pegawai — SMKN 1 Air Naningan</title>
+  <title>Master Data GTK Guru &amp; Tenaga Kependidikan — SMKN 1 Air Naningan</title>
   @include('partials.styles')
   <link rel="stylesheet" href="{{ asset('css/guru.css') }}?v={{ filemtime(public_path('css/guru.css')) }}">
+  <style>
+    .gtk-tab-nav {
+      display: flex;
+      gap: 6px;
+      border-bottom: 2px solid var(--border);
+      margin-bottom: 18px;
+      overflow-x: auto;
+      padding-bottom: 2px;
+    }
+    .gtk-tab-btn {
+      background: none;
+      border: none;
+      padding: 8px 16px;
+      font-size: 12.5px;
+      font-weight: 800;
+      color: var(--text-3);
+      border-radius: 6px 6px 0 0;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+      transition: all .15s ease;
+    }
+    .gtk-tab-btn:hover {
+      color: var(--text);
+      background: var(--bg-3);
+    }
+    .gtk-tab-btn.active {
+      color: #000000;
+      border-bottom: 2.5px solid #000000;
+      background: rgba(0, 0, 0, 0.04);
+    }
+    .badge-sertifikasi-sudah {
+      background: #ecfdf5;
+      color: #059669;
+      border: 1px solid rgba(5, 150, 105, 0.3);
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .badge-sertifikasi-belum {
+      background: #f1f5f9;
+      color: #64748b;
+      border: 1px solid #cbd5e1;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .btn-sertifikat-portofolio {
+      background: #eff6ff;
+      color: #2563eb;
+      border: 1px solid rgba(37, 99, 235, 0.25);
+      border-radius: 6px;
+      padding: 4px 10px;
+      font-size: 11.5px;
+      font-weight: 800;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      text-decoration: none;
+      transition: all .15s ease;
+    }
+    .btn-sertifikat-portofolio:hover {
+      background: #2563eb;
+      color: #ffffff;
+    }
+  </style>
 </head>
 <body>
 <div class="app-container">
@@ -22,7 +99,7 @@
       <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
         <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
           <h1 style="margin:0; font-size:16px; font-weight:900; color:var(--text); display:inline-flex; align-items:center; gap:6px;">
-            <i class="bi bi-person-badge-fill" style="color:#000000; font-size:16px;"></i> Data Guru &amp; Pegawai
+            <i class="bi bi-person-badge-fill" style="color:#000000; font-size:16px;"></i> Data GTK Guru &amp; Tenaga Kependidikan
           </h1>
           <span style="color:var(--border-2); font-weight:300;">|</span>
           <span style="font-size:11.5px; color:var(--text-3);">
@@ -34,17 +111,17 @@
           @if($isAdmin || $isStafTu)
             <button type="button" id="btnToggleTambahGuru" onclick="toggleTambahGuru()" class="btn btn-sm btn-gold" style="height:32px; padding:0 12px; font-size:11.5px; font-weight:800; display:inline-flex; align-items:center; gap:5px; border-radius:6px; cursor:pointer;">
               <i class="bi bi-person-plus-fill" id="iconToggleTambahGuru"></i>
-              <span id="textToggleTambahGuru">Tambah Guru</span>
+              <span id="textToggleTambahGuru">Tambah GTK</span>
             </button>
             <button type="button" onclick="openModal('importGuruModal')" class="btn btn-sm btn-outline" style="height:32px; padding:0 10px; font-size:11.5px; font-weight:800; color:#000000; border:1px solid var(--border-2); background:var(--bg-2); display:inline-flex; align-items:center; gap:4px; border-radius:6px;">
-              <i class="bi bi-file-earmark-arrow-up-fill" style="color:#000000;"></i> Import CSV
+              <i class="bi bi-file-earmark-arrow-up-fill" style="color:#000000;"></i> Import CSV Dapodik
             </button>
           @endif
-          <a href="/guru/export" class="btn btn-sm btn-outline" style="height:32px; padding:0 10px; font-size:11.5px; font-weight:800; text-decoration:none; color:#000000; border:1px solid var(--border-2); background:var(--bg-2); display:inline-flex; align-items:center; gap:4px; border-radius:6px;" title="Unduh CSV Kompatibel Excel">
-            <i class="bi bi-file-earmark-excel-fill" style="color:#000000;"></i> Excel
+          <a href="/guru/export" class="btn btn-sm btn-outline" style="height:32px; padding:0 10px; font-size:11.5px; font-weight:800; text-decoration:none; color:#000000; border:1px solid var(--border-2); background:var(--bg-2); display:inline-flex; align-items:center; gap:4px; border-radius:6px;" title="Unduh CSV Lengkap Kompatibel Excel">
+            <i class="bi bi-file-earmark-excel-fill" style="color:#000000;"></i> Export CSV
           </a>
           <a href="/guru/cetak-pdf" target="_blank" class="btn btn-sm btn-outline" style="height:32px; padding:0 10px; font-size:11.5px; font-weight:800; text-decoration:none; color:#000000; border:1px solid var(--border-2); background:var(--bg-2); display:inline-flex; align-items:center; gap:4px; border-radius:6px;" title="Cetak Format A4 Kop Dinas">
-            <i class="bi bi-file-earmark-pdf-fill" style="color:#000000;"></i> PDF
+            <i class="bi bi-file-earmark-pdf-fill" style="color:#000000;"></i> Cetak PDF
           </a>
           @include('partials.header_actions')
         </div>
@@ -56,14 +133,14 @@
     @if(isset($errors) && $errors->any())<div class="alert-error" style="margin-bottom:16px;">@foreach($errors->all() as $err)<div><i class="bi bi-x-circle-fill" style="margin-right:6px;"></i>{{ $err }}</div>@endforeach</div>@endif
 
     {{-- KPI STAT CARDS --}}
-    <div class="guru-stat-grid">
+    <div class="guru-stat-grid" style="grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));">
       <div class="guru-stat-card">
         <div class="guru-stat-icon" style="background:var(--bg-3); border:1px solid var(--border-2); color:#000000;">
           <i class="bi bi-people-fill"></i>
         </div>
         <div>
           <div class="guru-stat-val">{{ $statTotal }}</div>
-          <div class="guru-stat-lbl">Total Guru &amp; Pegawai</div>
+          <div class="guru-stat-lbl">Total GTK Guru &amp; Tendik</div>
         </div>
       </div>
 
@@ -74,6 +151,26 @@
         <div>
           <div class="guru-stat-val">{{ $statWali }}</div>
           <div class="guru-stat-lbl">Ditugaskan Wali Kelas</div>
+        </div>
+      </div>
+
+      <div class="guru-stat-card">
+        <div class="guru-stat-icon" style="background:rgba(5, 150, 105, 0.08); border:1px solid rgba(5, 150, 105, 0.25); color:#059669;">
+          <i class="bi bi-award-fill"></i>
+        </div>
+        <div>
+          <div class="guru-stat-val" style="color:#059669;">{{ $statSertifikasi }}</div>
+          <div class="guru-stat-lbl">Sudah Sertifikasi Pendidik</div>
+        </div>
+      </div>
+
+      <div class="guru-stat-card">
+        <div class="guru-stat-icon" style="background:rgba(37, 99, 235, 0.08); border:1px solid rgba(37, 99, 235, 0.25); color:#2563eb;">
+          <i class="bi bi-file-earmark-check-fill"></i>
+        </div>
+        <div>
+          <div class="guru-stat-val" style="color:#2563eb;">{{ $statTotalSertifikat }}</div>
+          <div class="guru-stat-lbl">Portofolio Pelatihan Guru</div>
         </div>
       </div>
 
@@ -89,16 +186,16 @@
     </div>
 
     @if($isAdmin || $isStafTu)
-    <!-- Form Tambah Guru (Collapsible / Triggered) -->
+    <!-- Form Tambah Guru (Collapsible / Tabbed Bento) -->
     <div class="panel" id="panelTambahGuru" style="{{ (isset($errors) && $errors->any()) ? 'display:block;' : 'display:none;' }} margin-bottom: 20px; border-color: var(--border); background: var(--bg-2);">
-      <div class="panel-title" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px; padding-bottom:12px; border-bottom:1px solid var(--border);">
+      <div class="panel-title" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; padding-bottom:10px; border-bottom:1px solid var(--border);">
         <div style="display:flex; align-items:center; gap:8px;">
           <div class="stat-icon" style="width:36px; height:36px; border-radius:8px; background:rgba(0,0,0,0.06); color:#000000; display:flex; align-items:center; justify-content:center; font-size:18px;">
             <i class="bi bi-person-plus-fill"></i>
           </div>
           <div>
-            <span style="font-weight:800; font-size:15px; color:var(--text);">Form Tambah Guru &amp; Tenaga Kependidikan</span>
-            <div style="font-size:12px; color:var(--text-3);">Lengkapi profil tenaga pendidik/kependidikan.</div>
+            <span style="font-weight:800; font-size:15px; color:var(--text);">Form Tambah Pendidik &amp; Tenaga Kependidikan (GTK)</span>
+            <div style="font-size:12px; color:var(--text-3);">Standar Data Pokok Pendidik (Dapodik) SMKN 1 Air Naningan.</div>
           </div>
         </div>
         <button type="button" onclick="toggleTambahGuru(false)" class="btn btn-outline" style="height:32px; width:32px; padding:0; display:inline-flex; align-items:center; justify-content:center; border-radius:6px; color:var(--text-3);" title="Tutup Form">
@@ -109,92 +206,226 @@
       <form id="formTambahGuru" action="/guru" method="POST" enctype="multipart/form-data">
         @csrf
         
-        <!-- Grid Input 4 Kolom Seimbang -->
-        <div class="guru-form-grid" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap:14px; margin-bottom:14px;">
-          
-          {{-- Baris 1: Kolom 1 (NIP) --}}
-          <div class="form-group" style="margin-bottom:0;">
-            <label style="margin-bottom:6px; font-weight:700; font-size:12px; text-transform:uppercase; letter-spacing:0.4px; color:var(--text-2);">
-              NIP (Opsional)
-            </label>
-            <input type="text" name="nip" id="tambah_guru_nip" placeholder="Nomor NIP (Contoh: 19850101...)" style="width:100%; height:40px;" />
-          </div>
+        {{-- TAB NAVIGATION --}}
+        <div class="gtk-tab-nav">
+          <button type="button" class="gtk-tab-btn active" onclick="switchGtkTab('tambah', 'tab_tambah_identitas', this)">
+            <i class="bi bi-person-lines-fill"></i> 1. Biodata Utama
+          </button>
+          <button type="button" class="gtk-tab-btn" onclick="switchGtkTab('tambah', 'tab_tambah_kepegawaian', this)">
+            <i class="bi bi-briefcase-fill"></i> 2. Kepegawaian &amp; Legalitas
+          </button>
+          <button type="button" class="gtk-tab-btn" onclick="switchGtkTab('tambah', 'tab_tambah_kualifikasi', this)">
+            <i class="bi bi-mortarboard-fill"></i> 3. Kualifikasi &amp; Sertifikasi
+          </button>
+          <button type="button" class="gtk-tab-btn" onclick="switchGtkTab('tambah', 'tab_tambah_tugas', this)">
+            <i class="bi bi-calendar-range-fill"></i> 4. Tugas &amp; Beban Mengajar (JJM)
+          </button>
+        </div>
 
-          {{-- Baris 1: Kolom 2 (Nama Lengkap) --}}
-          <div class="form-group" style="margin-bottom:0;">
-            <label style="margin-bottom:6px; font-weight:700; font-size:12px; text-transform:uppercase; letter-spacing:0.4px; color:var(--text-2);">
-              Nama Lengkap &amp; Gelar <span style="color:var(--red);">*</span>
-            </label>
-            <input type="text" name="nama" id="tambah_guru_nama" required placeholder="Contoh: Drs. Sugeng Wardoyo, M.Pd" style="width:100%; height:40px;" />
-          </div>
-
-          {{-- Baris 1: Kolom 3 (Jabatan) --}}
-          <div class="form-group" style="margin-bottom:0;">
-            <label style="margin-bottom:6px; font-weight:700; font-size:12px; text-transform:uppercase; letter-spacing:0.4px; color:var(--text-2);">
-              Jabatan / Penugasan <span style="color:var(--red);">*</span>
-            </label>
-            <input type="text" name="jabatan" id="tambah_guru_jabatan" required placeholder="Contoh: Guru Matematika / Guru BK / TU" style="width:100%; height:40px;" />
-          </div>
-
-          {{-- Baris 1: Kolom 4 (Jenis Kepegawaian) --}}
-          <div class="form-group" style="margin-bottom:0;">
-            <label style="margin-bottom:6px; font-weight:700; font-size:12px; text-transform:uppercase; letter-spacing:0.4px; color:var(--text-2);">
-              Status Kepegawaian <span style="color:var(--red);">*</span>
-            </label>
-            <select name="jenis_kepegawaian" id="tambah_guru_jenis_kepegawaian" onchange="toggleHariMengajar('tambah', this.value)" style="width:100%; height:40px;" class="input-field">
-              <option value="pns">PNS (Pegawai Negeri Sipil)</option>
-              <option value="pppk">PPPK (P3K)</option>
-              <option value="honor">Guru Honor (GTT)</option>
-              <option value="tendik">Tenaga Kependidikan (TU/Staf)</option>
-            </select>
-          </div>
-
-          {{-- Baris 2: Kolom 1 (No WhatsApp) --}}
-          <div class="form-group" style="margin-bottom:0;">
-            <label style="margin-bottom:6px; font-weight:700; font-size:12px; text-transform:uppercase; letter-spacing:0.4px; color:var(--text-2);">
-              No. WhatsApp / HP
-            </label>
-            <input type="text" name="no_hp" id="tambah_guru_no_hp" placeholder="Contoh: 081277112233" style="width:100%; height:40px;" />
-          </div>
-
-          {{-- Baris 2: Kolom 2 (Foto Profil) --}}
-          <div class="form-group" style="margin-bottom:0;">
-            <label style="margin-bottom:6px; font-weight:700; font-size:12px; text-transform:uppercase; letter-spacing:0.4px; color:var(--text-2); display:flex; justify-content:space-between;">
-              <span>Foto Profil</span>
-              <span style="color:#000000; font-size:11px; text-transform:none; font-weight:700;"><i class="bi bi-crop"></i> Auto-Crop Aktif</span>
-            </label>
-            <div style="display:flex; align-items:center; gap:10px;">
-              <div id="tambah_guru_foto_preview" style="width:40px; height:40px; border-radius:50%; border:1.5px solid var(--border-2); background:var(--bg-3); display:flex; align-items:center; justify-content:center; overflow:hidden; flex-shrink:0;">
-                <i class="bi bi-person-fill" style="color:var(--text-3); font-size:20px;"></i>
-              </div>
-              <input type="file" name="foto" id="inputFotoGuruTambah" accept="image/*" onchange="initPhotoCrop(this, 'tambah_guru_foto_preview', '1:1', 'Potong Foto Profil Guru')" style="flex:1; height:40px;" />
+        {{-- TAB 1: BIODATA UTAMA --}}
+        <div id="tab_tambah_identitas" class="gtk-tab-content">
+          <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap:14px; margin-bottom:14px;">
+            <div class="form-group" style="margin-bottom:0;">
+              <label style="margin-bottom:5px; font-weight:700; font-size:12px; color:var(--text-2);">Nama Lengkap (Tanpa Gelar) <span style="color:var(--red);">*</span></label>
+              <input type="text" name="nama" required placeholder="Contoh: Sugeng Wardoyo" style="width:100%; height:38px;" />
             </div>
-          </div>
-
-          {{-- Baris 3: Jadwal Hari Mengajar (Centang Hari Aktif) --}}
-          <div id="tambah_hari_mengajar_box" style="grid-column: 1 / -1; background:var(--bg-3); border:1px solid var(--border-2); border-radius:var(--r-md); padding:12px 14px;">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; flex-wrap:wrap; gap:6px;">
-              <label style="font-weight:800; font-size:12px; color:var(--text); margin:0;">
-                <i class="bi bi-calendar-check-fill" style="color:#000000; margin-right:4px;"></i> Jadwal Hari Wajib Mengajar / Hadir:
-              </label>
-              <span style="font-size:11px; color:var(--text-3);">Centang hari di mana guru honorer wajib hadir di sekolah</span>
+            <div class="form-group" style="margin-bottom:0;">
+              <label style="margin-bottom:5px; font-weight:700; font-size:12px; color:var(--text-2);">Gelar Depan</label>
+              <input type="text" name="gelar_depan" placeholder="Contoh: Drs. / Dr. / Ir." style="width:100%; height:38px;" />
             </div>
-            <div style="display:flex; flex-wrap:wrap; gap:10px;">
-              @foreach(['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'] as $hari)
-                <label style="display:inline-flex; align-items:center; gap:6px; font-size:12px; font-weight:700; cursor:pointer; background:var(--bg-card); padding:5px 12px; border-radius:6px; border:1px solid var(--border);">
-                  <input type="checkbox" name="hari_mengajar[]" value="{{ $hari }}" {{ in_array($hari, ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat']) ? 'checked' : '' }} /> {{ $hari }}
-                </label>
-              @endforeach
+            <div class="form-group" style="margin-bottom:0;">
+              <label style="margin-bottom:5px; font-weight:700; font-size:12px; color:var(--text-2);">Gelar Belakang</label>
+              <input type="text" name="gelar_belakang" placeholder="Contoh: S.Pd. / M.Kom. / Gr." style="width:100%; height:38px;" />
             </div>
-            <div style="font-size:11px; color:var(--text-3); margin-top:6px;">
-              💡 <em>Guru honor yang tidak hadir di luar jadwal yang dicentang <strong>TIDAK AKAN dialpha</strong> oleh sistem. Jika hadir di luar jadwal, absensi tetap diterima &amp; tercatat sah.</em>
+            <div class="form-group" style="margin-bottom:0;">
+              <label style="margin-bottom:5px; font-weight:700; font-size:12px; color:var(--text-2);">NIK (16 Digit KTP)</label>
+              <input type="text" name="nik" maxlength="16" placeholder="16 Digit NIK Kependudukan" style="width:100%; height:38px;" />
+            </div>
+            <div class="form-group" style="margin-bottom:0;">
+              <label style="margin-bottom:5px; font-weight:700; font-size:12px; color:var(--text-2);">Jenis Kelamin</label>
+              <select name="jenis_kelamin" style="width:100%; height:38px;" class="input-field">
+                <option value="">-- Pilih Jenis Kelamin --</option>
+                <option value="L">Laki-laki (L)</option>
+                <option value="P">Perempuan (P)</option>
+              </select>
+            </div>
+            <div class="form-group" style="margin-bottom:0;">
+              <label style="margin-bottom:5px; font-weight:700; font-size:12px; color:var(--text-2);">Tempat Lahir</label>
+              <input type="text" name="tempat_lahir" placeholder="Kota / Kabupaten Kelahiran" style="width:100%; height:38px;" />
+            </div>
+            <div class="form-group" style="margin-bottom:0;">
+              <label style="margin-bottom:5px; font-weight:700; font-size:12px; color:var(--text-2);">Tanggal Lahir</label>
+              <input type="date" name="tanggal_lahir" style="width:100%; height:38px;" />
+            </div>
+            <div class="form-group" style="margin-bottom:0;">
+              <label style="margin-bottom:5px; font-weight:700; font-size:12px; color:var(--text-2);">Agama</label>
+              <select name="agama" style="width:100%; height:38px;" class="input-field">
+                <option value="Islam">Islam</option>
+                <option value="Kristen Protestan">Kristen Protestan</option>
+                <option value="Katolik">Katolik</option>
+                <option value="Hindu">Hindu</option>
+                <option value="Buddha">Buddha</option>
+                <option value="Khonghucu">Khonghucu</option>
+              </select>
+            </div>
+            <div class="form-group" style="margin-bottom:0;">
+              <label style="margin-bottom:5px; font-weight:700; font-size:12px; color:var(--text-2);">No. WhatsApp / HP</label>
+              <input type="text" name="no_hp" placeholder="08xxxxxxxxxx" style="width:100%; height:38px;" />
+            </div>
+            <div class="form-group" style="margin-bottom:0;">
+              <label style="margin-bottom:5px; font-weight:700; font-size:12px; color:var(--text-2);">Foto Profil Guru</label>
+              <input type="file" name="foto" accept="image/*" style="width:100%; height:38px;" />
+            </div>
+            <div class="form-group" style="grid-column: 1 / -1; margin-bottom:0;">
+              <label style="margin-bottom:5px; font-weight:700; font-size:12px; color:var(--text-2);">Alamat Domisili Tempat Tinggal</label>
+              <textarea name="alamat" rows="2" placeholder="Nama Jalan, RT/RW, Dusun/Pekon, Kecamatan, Kabupaten..." style="width:100%; font-size:12px; padding:8px;"></textarea>
             </div>
           </div>
         </div>
 
-        <div style="display:flex; justify-content:flex-end; gap:8px; border-top:1px solid var(--border); padding-top:14px;">
-          <button type="button" onclick="toggleTambahGuru(false)" class="btn btn-outline">Batal</button>
-          <button type="submit" class="btn btn-gold"><i class="bi bi-check2-circle"></i> Simpan Data Guru</button>
+        {{-- TAB 2: KEPEGAWAIAN & LEGALITAS --}}
+        <div id="tab_tambah_kepegawaian" class="gtk-tab-content" style="display:none;">
+          <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap:14px; margin-bottom:14px;">
+            <div class="form-group" style="margin-bottom:0;">
+              <label style="margin-bottom:5px; font-weight:700; font-size:12px; color:var(--text-2);">NIP / NI PPPK (Khusus ASN)</label>
+              <input type="text" name="nip" placeholder="Nomor NIP 18 Digit" style="width:100%; height:38px;" />
+            </div>
+            <div class="form-group" style="margin-bottom:0;">
+              <label style="margin-bottom:5px; font-weight:700; font-size:12px; color:var(--text-2);">NUPTK (16 Digit Pendidik)</label>
+              <input type="text" name="nuptk" maxlength="16" placeholder="Nomor Unik Pendidik 16 Digit" style="width:100%; height:38px;" />
+            </div>
+            <div class="form-group" style="margin-bottom:0;">
+              <label style="margin-bottom:5px; font-weight:700; font-size:12px; color:var(--text-2);">Jenis PTK <span style="color:var(--red);">*</span></label>
+              <select name="jenis_ptk" style="width:100%; height:38px;" class="input-field">
+                <option value="Guru Kejuruan / Produktif">Guru Kejuruan / Produktif (RPL, TSM, APHP)</option>
+                <option value="Guru Normatif / Adaptif">Guru Normatif / Adaptif</option>
+                <option value="Guru BK">Guru BK (Bimbingan Konseling)</option>
+                <option value="Tenaga Administrasi Sekolah (TU)">Tenaga Administrasi Sekolah (TU / Operator)</option>
+                <option value="Laboran / Toolman Bengkel">Laboran / Toolman Bengkel</option>
+                <option value="Tenaga Perpustakaan">Tenaga Perpustakaan (Pustakawan)</option>
+              </select>
+            </div>
+            <div class="form-group" style="margin-bottom:0;">
+              <label style="margin-bottom:5px; font-weight:700; font-size:12px; color:var(--text-2);">Status Kepegawaian <span style="color:var(--red);">*</span></label>
+              <select name="jenis_kepegawaian" onchange="toggleHariMengajar('tambah', this.value)" style="width:100%; height:38px;" class="input-field">
+                <option value="pns">PNS (Pegawai Negeri Sipil)</option>
+                <option value="pppk">PPPK (P3K)</option>
+                <option value="honor">Guru Honor Daerah / GTT</option>
+                <option value="tendik">Tenaga Honorer Sekolah / PTT</option>
+              </select>
+            </div>
+            <div class="form-group" style="margin-bottom:0;">
+              <label style="margin-bottom:5px; font-weight:700; font-size:12px; color:var(--text-2);">Golongan / Pangkat (Khusus ASN)</label>
+              <input type="text" name="golongan_pangkat" placeholder="Contoh: Penata Tk.I (III/d) / Golongan IX" style="width:100%; height:38px;" />
+            </div>
+            <div class="form-group" style="margin-bottom:0;">
+              <label style="margin-bottom:5px; font-weight:700; font-size:12px; color:var(--text-2);">Nomor SK Pengangkatan</label>
+              <input type="text" name="nomor_sk_pengangkatan" placeholder="Nomor SK Pengangkatan Resmi" style="width:100%; height:38px;" />
+            </div>
+            <div class="form-group" style="margin-bottom:0;">
+              <label style="margin-bottom:5px; font-weight:700; font-size:12px; color:var(--text-2);">TMT Kerja (Terhitung Mulai Tanggal)</label>
+              <input type="date" name="tmt_kerja" style="width:100%; height:38px;" />
+            </div>
+            <div class="form-group" style="margin-bottom:0;">
+              <label style="margin-bottom:5px; font-weight:700; font-size:12px; color:var(--text-2);">Lembaga Pengangkat</label>
+              <select name="lembaga_pengangkat" style="width:100%; height:38px;" class="input-field">
+                <option value="Pemerintah Provinsi Lampung / Dinas Pendidikan">Pemerintah Provinsi Lampung / Dinas Pendidikan</option>
+                <option value="Kepala Sekolah">Kepala Sekolah (SK Tugas Mandiri)</option>
+              </select>
+            </div>
+            <div class="form-group" style="margin-bottom:0;">
+              <label style="margin-bottom:5px; font-weight:700; font-size:12px; color:var(--text-2);">Jabatan / Posisi Kerja <span style="color:var(--red);">*</span></label>
+              <input type="text" name="jabatan" required placeholder="Contoh: Guru Pemrograman Web / Staf Tata Usaha" style="width:100%; height:38px;" />
+            </div>
+          </div>
+        </div>
+
+        {{-- TAB 3: KUALIFIKASI & SERTIFIKASI --}}
+        <div id="tab_tambah_kualifikasi" class="gtk-tab-content" style="display:none;">
+          <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap:14px; margin-bottom:14px;">
+            <div class="form-group" style="margin-bottom:0;">
+              <label style="margin-bottom:5px; font-weight:700; font-size:12px; color:var(--text-2);">Pendidikan Terakhir</label>
+              <select name="pendidikan_terakhir" style="width:100%; height:38px;" class="input-field">
+                <option value="S1">S1 / D4 (Sarjana / Diploma IV)</option>
+                <option value="S2">S2 (Magister)</option>
+                <option value="S3">S3 (Doktor)</option>
+                <option value="D3">D3 (Diploma III)</option>
+                <option value="SMA / SMK">SMA / SMK (Staf Pendukung)</option>
+              </select>
+            </div>
+            <div class="form-group" style="margin-bottom:0;">
+              <label style="margin-bottom:5px; font-weight:700; font-size:12px; color:var(--text-2);">Program Studi / Jurusan Kuliah</label>
+              <input type="text" name="jurusan_kuliah" placeholder="Contoh: Pendidikan Ilmu Komputer / Teknik Otomotif" style="width:100%; height:38px;" />
+            </div>
+            <div class="form-group" style="margin-bottom:0;">
+              <label style="margin-bottom:5px; font-weight:700; font-size:12px; color:var(--text-2);">Nama Perguruan Tinggi / Kampus</label>
+              <input type="text" name="kampus" placeholder="Contoh: Universitas Lampung / UNY / Polinela" style="width:100%; height:38px;" />
+            </div>
+            <div class="form-group" style="margin-bottom:0;">
+              <label style="margin-bottom:5px; font-weight:700; font-size:12px; color:var(--text-2);">Tahun Kelulusan Kuliah</label>
+              <input type="text" name="tahun_lulus" maxlength="4" placeholder="Contoh: 2012" style="width:100%; height:38px;" />
+            </div>
+            <div class="form-group" style="margin-bottom:0;">
+              <label style="margin-bottom:5px; font-weight:700; font-size:12px; color:var(--text-2);">Status Sertifikasi Pendidik</label>
+              <select name="status_sertifikasi" style="width:100%; height:38px;" class="input-field">
+                <option value="belum">Belum Sertifikasi</option>
+                <option value="sudah">Sudah Sertifikasi Pendidik (Gr.)</option>
+              </select>
+            </div>
+            <div class="form-group" style="margin-bottom:0;">
+              <label style="margin-bottom:5px; font-weight:700; font-size:12px; color:var(--text-2);">Nomor Sertifikat Pendidik (Serdik)</label>
+              <input type="text" name="nomor_serdik" placeholder="Nomor Registrasi Serdik" style="width:100%; height:38px;" />
+            </div>
+          </div>
+        </div>
+
+        {{-- TAB 4: TUGAS & JJM --}}
+        <div id="tab_tambah_tugas" class="gtk-tab-content" style="display:none;">
+          <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap:14px; margin-bottom:14px;">
+            <div class="form-group" style="margin-bottom:0;">
+              <label style="margin-bottom:5px; font-weight:700; font-size:12px; color:var(--text-2);">Mata Pelajaran yang Diampu</label>
+              <input type="text" name="mapel_diampu" placeholder="Contoh: Pemrograman Web, Matematika, PKn" style="width:100%; height:38px;" />
+            </div>
+            <div class="form-group" style="margin-bottom:0;">
+              <label style="margin-bottom:5px; font-weight:700; font-size:12px; color:var(--text-2);">Jumlah Jam Mengajar (JJM) / Minggu</label>
+              <input type="number" name="jjm" min="0" max="60" placeholder="Contoh: 24 (Jam)" style="width:100%; height:38px;" />
+            </div>
+            <div class="form-group" style="margin-bottom:0;">
+              <label style="margin-bottom:5px; font-weight:700; font-size:12px; color:var(--text-2);">Tugas Tambahan di Sekolah</label>
+              <input type="text" name="tugas_tambahan" placeholder="Contoh: Kepala Bengkel RPL / Waka Kesiswaan / Wali Kelas" style="width:100%; height:38px;" />
+            </div>
+            <div class="form-group" style="margin-bottom:0;">
+              <label style="margin-bottom:5px; font-weight:700; font-size:12px; color:var(--text-2);">SK Tugas Tambahan</label>
+              <input type="text" name="sk_tugas_tambahan" placeholder="Nomor SK Pembagian Tugas Semester Ini" style="width:100%; height:38px;" />
+            </div>
+
+            {{-- Jadwal Hari Mengajar (Centang Hari Aktif) --}}
+            <div id="tambah_hari_mengajar_box" style="grid-column: 1 / -1; background:var(--bg-3); border:1px solid var(--border-2); border-radius:var(--r-md); padding:12px 14px;">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; flex-wrap:wrap; gap:6px;">
+                <label style="font-weight:800; font-size:12px; color:var(--text); margin:0;">
+                  <i class="bi bi-calendar-check-fill" style="color:#000000; margin-right:4px;"></i> Jadwal Hari Wajib Hadir / Mengajar:
+                </label>
+                <span style="font-size:11px; color:var(--text-3);">Khusus guru honorer, hanya wajib hadir pada hari yang dicentang</span>
+              </div>
+              <div style="display:flex; flex-wrap:wrap; gap:10px;">
+                @foreach(['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'] as $hari)
+                  <label style="display:inline-flex; align-items:center; gap:6px; font-size:12px; font-weight:700; cursor:pointer; background:var(--bg-card); padding:5px 12px; border-radius:6px; border:1px solid var(--border);">
+                    <input type="checkbox" name="hari_mengajar[]" value="{{ $hari }}" {{ in_array($hari, ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat']) ? 'checked' : '' }} /> {{ $hari }}
+                  </label>
+                @endforeach
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid var(--border); padding-top:14px; margin-top:14px;">
+          <div style="font-size:11.5px; color:var(--text-3);">
+            💡 <em>Data GTK otomatis tersinkronisasi untuk absensi RFID, profil web, dan cetak laporan resmi.</em>
+          </div>
+          <div style="display:flex; gap:8px;">
+            <button type="button" onclick="toggleTambahGuru(false)" class="btn btn-outline">Batal</button>
+            <button type="submit" class="btn btn-gold"><i class="bi bi-check2-circle"></i> Simpan Data GTK</button>
+          </div>
         </div>
       </form>
     </div>
@@ -203,56 +434,61 @@
     <!-- Tabel Daftar Guru & Toolbar Terpadu -->
     <div class="panel" style="padding:0; overflow:hidden; border:1px solid var(--border); border-radius:var(--r-md); box-shadow:var(--shadow-sm); background:var(--bg-2); margin-bottom:24px;">
       {{-- Header & Toolbar Terpadu --}}
-      <div class="guru-table-toolbar" style="padding:8px 12px; border-bottom:1px solid var(--border); background:var(--surface); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+      <div class="guru-table-toolbar" style="padding:10px 14px; border-bottom:1px solid var(--border); background:var(--surface); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
         <div class="guru-table-title" style="font-weight:800; font-size:13.5px; color:var(--text); display:flex; align-items:center; gap:6px;">
           <i class="bi bi-people-fill" style="color:#000000;"></i>
-          <span>Daftar Guru &amp; Pegawai</span>
+          <span>Daftar Pendidik &amp; Tenaga Kependidikan</span>
         </div>
 
-        <form method="GET" action="{{ route('guru.index') }}" class="guru-table-form" style="display:flex; gap:6px; align-items:center; flex-wrap:wrap; flex:1; justify-content:flex-end; max-width:640px;">
-          <div class="guru-search-box" style="position:relative; flex:1.5; min-width:130px;">
+        <form method="GET" action="{{ route('guru.index') }}" class="guru-table-form" style="display:flex; gap:6px; align-items:center; flex-wrap:wrap; flex:1; justify-content:flex-end;">
+          <div class="guru-search-box" style="position:relative; min-width:160px; flex:1.5;">
             <i class="bi bi-search" style="position:absolute; left:10px; top:50%; transform:translateY(-50%); color:var(--text-3); font-size:11px;"></i>
-            <input type="text" name="q" value="{{ $search }}" placeholder="Cari nama, NIP, jabatan..." class="input-field" style="width:100%; height:32px; font-size:11.5px; background:var(--bg-2); border:1px solid var(--border-2); border-radius:var(--r-sm); padding-left:28px; padding-right:8px;" />
+            <input type="text" name="q" value="{{ $search }}" placeholder="Cari nama, NIP, NUPTK, mapel..." class="input-field" style="width:100%; height:32px; font-size:11.5px; background:var(--bg-2); border:1px solid var(--border-2); border-radius:var(--r-sm); padding-left:28px; padding-right:8px;" />
           </div>
 
-          <div class="guru-filter-group" style="display:flex; gap:6px; align-items:center; flex-wrap:wrap; flex:2;">
-            <div style="min-width:110px; flex:1;">
-              <select name="jenis" class="input-field" style="width:100%; height:32px; font-size:11.5px; background:var(--bg-2); border:1px solid var(--border-2); border-radius:var(--r-sm); padding:0 6px;" onchange="this.form.submit()">
-                <option value="">Kepegawaian</option>
-                <option value="pns" {{ ($jenis ?? '') === 'pns' ? 'selected' : '' }}>PNS</option>
-                <option value="pppk" {{ ($jenis ?? '') === 'pppk' ? 'selected' : '' }}>PPPK</option>
-                <option value="honor" {{ ($jenis ?? '') === 'honor' ? 'selected' : '' }}>Honor (GTT)</option>
-                <option value="tendik" {{ ($jenis ?? '') === 'tendik' ? 'selected' : '' }}>Tendik/TU</option>
-              </select>
-            </div>
-
-            <div style="min-width:90px; flex:1;">
-              <select name="status" class="input-field" style="width:100%; height:32px; font-size:11.5px; background:var(--bg-2); border:1px solid var(--border-2); border-radius:var(--r-sm); padding:0 6px;" onchange="this.form.submit()">
-                <option value="">Status</option>
-                <option value="aktif" {{ ($status ?? '') === 'aktif' ? 'selected' : '' }}>Aktif</option>
-                <option value="nonaktif" {{ ($status ?? '') === 'nonaktif' ? 'selected' : '' }}>Nonaktif</option>
-              </select>
-            </div>
-
-            <div style="min-width:105px; flex:1;">
-              <select name="sort" class="input-field" style="width:100%; height:32px; font-size:11.5px; background:var(--bg-2); border:1px solid var(--border-2); border-radius:var(--r-sm); padding:0 6px;" onchange="this.form.submit()">
-                <option value="hirarki" {{ ($sort ?? 'hirarki') === 'hirarki' ? 'selected' : '' }}>Hirarki</option>
-                <option value="nama_asc" {{ ($sort ?? '') === 'nama_asc' ? 'selected' : '' }}>Nama (A-Z)</option>
-                <option value="nip_asc" {{ ($sort ?? '') === 'nip_asc' ? 'selected' : '' }}>NIP (Kecil)</option>
-                <option value="terbaru" {{ ($sort ?? '') === 'terbaru' ? 'selected' : '' }}>Terbaru</option>
-              </select>
-            </div>
-
-            <button type="submit" class="btn btn-sm btn-outline" style="height:32px; padding:0 10px; font-size:11.5px; font-weight:800; border-radius:var(--r-sm); flex-shrink:0;">
-              Cari
-            </button>
-
-            @if($search || ($jenis ?? '') || ($status ?? ''))
-              <a href="{{ route('guru.index') }}" class="btn btn-sm btn-outline" style="height:32px; padding:0 8px; font-size:11px; font-weight:800; color:var(--red); border-color:rgba(239,68,68,0.4); border-radius:var(--r-sm); flex-shrink:0;" title="Reset Filter">
-                Reset
-              </a>
-            @endif
+          <div style="min-width:115px;">
+            <select name="kepegawaian" class="input-field" style="width:100%; height:32px; font-size:11.5px; background:var(--bg-2); border:1px solid var(--border-2); border-radius:var(--r-sm); padding:0 6px;" onchange="this.form.submit()">
+              <option value="">Semua Status</option>
+              <option value="pns" {{ ($kepegawaian ?? '') === 'pns' ? 'selected' : '' }}>PNS</option>
+              <option value="pppk" {{ ($kepegawaian ?? '') === 'pppk' ? 'selected' : '' }}>PPPK</option>
+              <option value="honor" {{ ($kepegawaian ?? '') === 'honor' ? 'selected' : '' }}>Honor (GTT)</option>
+              <option value="tendik" {{ ($kepegawaian ?? '') === 'tendik' ? 'selected' : '' }}>Tendik/TU</option>
+            </select>
           </div>
+
+          <div style="min-width:120px;">
+            <select name="sertifikasi" class="input-field" style="width:100%; height:32px; font-size:11.5px; background:var(--bg-2); border:1px solid var(--border-2); border-radius:var(--r-sm); padding:0 6px;" onchange="this.form.submit()">
+              <option value="">Sertifikasi</option>
+              <option value="sudah" {{ ($sertifikasi ?? '') === 'sudah' ? 'selected' : '' }}>Sudah Sertifikasi</option>
+              <option value="belum" {{ ($sertifikasi ?? '') === 'belum' ? 'selected' : '' }}>Belum Sertifikasi</option>
+            </select>
+          </div>
+
+          <div style="min-width:90px;">
+            <select name="status" class="input-field" style="width:100%; height:32px; font-size:11.5px; background:var(--bg-2); border:1px solid var(--border-2); border-radius:var(--r-sm); padding:0 6px;" onchange="this.form.submit()">
+              <option value="">Keaktifan</option>
+              <option value="aktif" {{ ($status ?? '') === 'aktif' ? 'selected' : '' }}>Aktif</option>
+              <option value="nonaktif" {{ ($status ?? '') === 'nonaktif' ? 'selected' : '' }}>Nonaktif</option>
+            </select>
+          </div>
+
+          <div style="min-width:100px;">
+            <select name="sort" class="input-field" style="width:100%; height:32px; font-size:11.5px; background:var(--bg-2); border:1px solid var(--border-2); border-radius:var(--r-sm); padding:0 6px;" onchange="this.form.submit()">
+              <option value="hirarki" {{ ($sort ?? 'hirarki') === 'hirarki' ? 'selected' : '' }}>Hirarki</option>
+              <option value="nama_asc" {{ ($sort ?? '') === 'nama_asc' ? 'selected' : '' }}>Nama (A-Z)</option>
+              <option value="terbaru" {{ ($sort ?? '') === 'terbaru' ? 'selected' : '' }}>Terbaru</option>
+            </select>
+          </div>
+
+          <button type="submit" class="btn btn-sm btn-outline" style="height:32px; padding:0 10px; font-size:11.5px; font-weight:800; border-radius:var(--r-sm); flex-shrink:0;">
+            Cari
+          </button>
+
+          @if($search || ($kepegawaian ?? '') || ($status ?? '') || ($sertifikasi ?? ''))
+            <a href="{{ route('guru.index') }}" class="btn btn-sm btn-outline" style="height:32px; padding:0 8px; font-size:11px; font-weight:800; color:var(--red); border-color:rgba(239,68,68,0.4); border-radius:var(--r-sm); flex-shrink:0;" title="Reset Filter">
+              Reset
+            </a>
+          @endif
         </form>
       </div>
 
@@ -261,10 +497,11 @@
           <thead>
             <tr>
               <th style="width:36px; text-align:center;">No</th>
-              <th>Guru &amp; Identitas</th>
-              <th>Jabatan</th>
-              <th>Status Kepegawaian</th>
-              <th>Kontak WhatsApp</th>
+              <th>Pendidik &amp; Legalitas</th>
+              <th>Tugas &amp; Mapel</th>
+              <th>Status &amp; Kualifikasi</th>
+              <th style="text-align:center;">Sertifikat Pelatihan</th>
+              <th>Kontak WA</th>
               <th style="text-align:center;">Kartu RFID</th>
               <th>Akun Login</th>
               <th style="text-align:center;">Status</th>
@@ -287,12 +524,21 @@
                       <img src="{{ $g->foto_url }}" alt="{{ $g->nama }}" class="avatar-img" />
                     </div>
                     <div style="min-width:0;">
-                      <div style="font-weight:800; font-size:13px; color:var(--text); line-height:1.25;">{{ $g->nama }}</div>
+                      <div style="font-weight:800; font-size:13.5px; color:var(--text); line-height:1.3;">
+                        {{ $g->nama_lengkap_gelar }}
+                      </div>
                       <div style="font-size:11px; font-family:var(--font-mono); color:var(--text-3); margin-top:2px;">
                         {{ $g->nip ? 'NIP: ' . $g->nip : 'Non-NIP' }}
+                        @if($g->nuptk)
+                          <span style="color:var(--border-2);">|</span> NUPTK: {{ $g->nuptk }}
+                        @endif
                       </div>
-                      @if($g->rombelWali)
-                        <div style="font-size:10.5px; font-weight:700; color:var(--text-2); margin-top:3px; display:inline-flex; align-items:center; gap:4px;">
+                      @if($g->tugas_tambahan)
+                        <div style="font-size:10.5px; font-weight:700; color:#2563eb; margin-top:2px; display:inline-flex; align-items:center; gap:4px;">
+                          <i class="bi bi-star-fill" style="font-size:9px;"></i> {{ $g->tugas_tambahan }}
+                        </div>
+                      @elseif($g->rombelWali)
+                        <div style="font-size:10.5px; font-weight:700; color:var(--text-2); margin-top:2px; display:inline-flex; align-items:center; gap:4px;">
                           <i class="bi bi-mortarboard-fill" style="color:var(--text-3); font-size:10px;"></i> Wali: {{ $g->rombelWali->nama_rombel }}
                         </div>
                       @endif
@@ -301,15 +547,57 @@
                 </td>
                 <td style="vertical-align:middle; padding:12px 12px;">
                   <div style="font-size:12.5px; font-weight:700; color:var(--text);">{{ $g->jabatan }}</div>
+                  @if($g->mapel_diampu)
+                    <div style="font-size:11px; color:var(--text-2); margin-top:2px;">
+                      Mapel: <strong>{{ $g->mapel_diampu }}</strong> {{ $g->jjm ? '(' . $g->jjm . ' JP)' : '' }}
+                    </div>
+                  @endif
+                  @if($g->jenis_ptk)
+                    <div style="font-size:10.5px; color:var(--text-3); margin-top:2px;">
+                      {{ $g->jenis_ptk }}
+                    </div>
+                  @endif
                 </td>
                 <td style="vertical-align:middle; padding:12px 12px;">
-                  <span style="font-size:11.5px; font-weight:700; color:var(--text-2); text-transform:uppercase; letter-spacing:0.3px;">
-                    {{ $g->label_kepegawaian }}
-                  </span>
+                  <div style="display:flex; flex-direction:column; gap:3px;">
+                    <div>
+                      <span style="font-size:11.5px; font-weight:800; color:var(--text); text-transform:uppercase;">
+                        {{ $g->label_kepegawaian }}
+                      </span>
+                      @if($g->golongan_pangkat)
+                        <span style="font-size:11px; color:var(--text-3);">({{ $g->golongan_pangkat }})</span>
+                      @endif
+                    </div>
+                    <div>
+                      @if($g->status_sertifikasi === 'sudah')
+                        <span class="badge-sertifikasi-sudah" title="Nomor Serdik: {{ $g->nomor_serdik ?: 'Terdaftar' }}">
+                          <i class="bi bi-patch-check-fill"></i> Sertifikasi
+                        </span>
+                      @else
+                        <span class="badge-sertifikasi-belum">
+                          Belum Sertifikasi
+                        </span>
+                      @endif
+                    </div>
+                    @if($g->pendidikan_terakhir)
+                      <div style="font-size:10.5px; color:var(--text-3);">
+                        {{ $g->pendidikan_terakhir }} {{ $g->jurusan_kuliah ? '- ' . $g->jurusan_kuliah : '' }}
+                      </div>
+                    @endif
+                  </div>
                 </td>
+
+                {{-- Kolom Sertifikat Pelatihan --}}
+                <td style="vertical-align:middle; text-align:center; padding:10px 12px; white-space:nowrap;">
+                  <button type="button" onclick="openPortofolioModal({{ json_encode($g) }}, {{ json_encode($g->sertifikats) }})" class="btn-sertifikat-portofolio" title="Buka &amp; Kelola Portofolio Sertifikat Pelatihan Guru">
+                    <i class="bi bi-award"></i>
+                    <span>{{ $g->sertifikats->count() }} Sertifikat</span>
+                  </button>
+                </td>
+
                 <td style="vertical-align:middle; padding:10px 12px; white-space:nowrap;">
                   @if($g->no_hp)
-                    <a href="https://wa.me/{{ $cleanHp }}" target="_blank" style="font-size:12px; font-weight:700; font-family:var(--font-mono); text-decoration:none; display:inline-block; color:var(--text); white-space:nowrap; transition:color .15s ease;" onmouseover="this.style.color='#25D366'" onmouseout="this.style.color='var(--text)'" title="Chat WhatsApp">
+                    <a href="https://wa.me/{{ $cleanHp }}" target="_blank" style="font-size:12px; font-weight:700; font-family:var(--font-mono); text-decoration:none; display:inline-block; color:var(--text); white-space:nowrap; transition:color .15s ease;" onmouseover="this.style.color='#25D366'" onmouseout="this.style.color='var(--text)'" title="Chat WhatsApp Guru">
                       {{ $g->no_hp }}
                     </a>
                   @else
@@ -347,6 +635,7 @@
                     @endif
                   @endif
                 </td>
+
                 <td style="vertical-align:middle; padding:10px 12px; white-space:nowrap;">
                   @if($g->user)
                     @if($isAdmin || $isStafTu)
@@ -374,6 +663,7 @@
                     @endif
                   @endif
                 </td>
+
                 <td style="vertical-align:middle; text-align:center; padding:10px 8px; white-space:nowrap;">
                   @if($g->status === 'aktif')
                     <span class="table-status-pill aktif"><i class="bi bi-check-circle-fill"></i> Aktif</span>
@@ -383,6 +673,7 @@
                     <span class="table-status-pill netral"><i class="bi bi-dash-circle-fill"></i> {{ ucfirst($g->status) }}</span>
                   @endif
                 </td>
+
                 <td style="vertical-align:middle; text-align:center; padding:10px 8px; white-space:nowrap;">
                   <div style="display:flex; gap:4px; justify-content:center; align-items:center;">
                     <a href="{{ route('kartu.digital.guru', ['id' => $g->id]) }}" target="_blank"
@@ -391,12 +682,12 @@
                        title="Lihat Barcode &amp; Kartu Digital Guru">
                        <i class="bi bi-qr-code-scan"></i>
                     </a>
-                    <button type="button" onclick="openEditGuru({{ json_encode($g) }})" class="btn-icon btn-icon-edit" style="width:30px; height:30px;" title="Edit Data Guru">
+                    <button type="button" onclick="openEditGuru({{ json_encode($g) }})" class="btn-icon btn-icon-edit" style="width:30px; height:30px;" title="Edit Data GTK Lengkap">
                       <i class="bi bi-pencil-square"></i>
                     </button>
-                    <form action="/guru/{{ $g->id }}" method="POST" onsubmit="return confirm('Hapus data guru {{ $g->nama }}?')" style="display:inline; margin:0;">
+                    <form action="/guru/{{ $g->id }}" method="POST" onsubmit="return confirm('Hapus data GTK {{ $g->nama }}?')" style="display:inline; margin:0;">
                       @csrf @method('DELETE')
-                      <button type="submit" class="btn-icon btn-icon-danger" style="width:30px; height:30px;" title="Hapus Guru">
+                      <button type="submit" class="btn-icon btn-icon-danger" style="width:30px; height:30px;" title="Hapus GTK">
                         <i class="bi bi-trash3-fill"></i>
                       </button>
                     </form>
@@ -405,9 +696,9 @@
               </tr>
             @empty
               <tr>
-                <td colspan="9" style="text-align:center; padding:36px; color:var(--text-3);">
+                <td colspan="10" style="text-align:center; padding:36px; color:var(--text-3);">
                   <i class="bi bi-person-x" style="font-size:32px; opacity:0.4;"></i>
-                  <div style="font-weight:700; margin-top:8px; font-size:14px; color:var(--text);">Tidak ada data guru yang cocok</div>
+                  <div style="font-weight:700; margin-top:8px; font-size:14px; color:var(--text);">Tidak ada data GTK yang cocok</div>
                   <p style="font-size:12px; margin-top:4px;">Coba gunakan kata kunci pencarian lain atau klik Reset.</p>
                 </td>
               </tr>
@@ -426,83 +717,329 @@
   </main>
 </div>
 
-<!-- Modal Edit Guru -->
-<div id="editGuruModal" class="modal-overlay">
-  <div class="modal-card" style="max-width:540px; padding:24px;">
+<!-- Modal Portofolio Sertifikat Pelatihan Guru -->
+<div id="portofolioModal" class="modal-overlay">
+  <div class="modal-card" style="max-width:720px; padding:24px;">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
-      <h3 style="font-size:17px; font-weight:900; color:var(--text); margin:0;">
-        <i class="bi bi-pencil-square" style="color:#000000;"></i> Edit Data Guru / Pegawai
+      <div style="display:flex; align-items:center; gap:8px;">
+        <div style="width:36px; height:36px; border-radius:8px; background:rgba(37, 99, 235, 0.1); color:#2563eb; display:flex; align-items:center; justify-content:center; font-size:18px;">
+          <i class="bi bi-award-fill"></i>
+        </div>
+        <div>
+          <h3 style="font-size:16px; font-weight:900; color:var(--text); margin:0;">
+            Portofolio Sertifikat Pelatihan Guru
+          </h3>
+          <div style="font-size:12px; color:var(--text-3);" id="portofolio_guru_subtitle">
+            Kelola arsip pelatihan, workshop, dan diklat peningkatan skill.
+          </div>
+        </div>
+      </div>
+      <button type="button" class="btn btn-sm btn-outline" onclick="closeModal('portofolioModal')"><i class="bi bi-x-lg"></i></button>
+    </div>
+
+    {{-- Form Tambah Sertifikat Baru --}}
+    <div style="background:var(--bg-3); border:1px solid var(--border); border-radius:var(--r-md); padding:14px; margin-bottom:18px;">
+      <div style="font-weight:800; font-size:13px; color:var(--text); margin-bottom:10px; display:flex; align-items:center; gap:6px;">
+        <i class="bi bi-plus-circle-fill" style="color:#2563eb;"></i> Unggah Sertifikat Pelatihan Baru
+      </div>
+      <form id="formTambahSertifikat" method="POST" enctype="multipart/form-data">
+        @csrf
+        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap:10px; margin-bottom:10px;">
+          <div>
+            <label style="display:block; font-size:11.5px; font-weight:700; color:var(--text-2); margin-bottom:4px;">Nama Pelatihan / Workshop <span style="color:var(--red);">*</span></label>
+            <input type="text" name="nama_pelatihan" required placeholder="Contoh: Diklat Kurikulum Merdeka PMM" style="width:100%; height:34px; font-size:12px;" />
+          </div>
+          <div>
+            <label style="display:block; font-size:11.5px; font-weight:700; color:var(--text-2); margin-bottom:4px;">Lembaga Penyelenggara <span style="color:var(--red);">*</span></label>
+            <input type="text" name="penyelenggara" required placeholder="Contoh: Kemendikbudristek / BBPPMPV" style="width:100%; height:34px; font-size:12px;" />
+          </div>
+          <div>
+            <label style="display:block; font-size:11.5px; font-weight:700; color:var(--text-2); margin-bottom:4px;">Tahun Pelaksanaan <span style="color:var(--red);">*</span></label>
+            <input type="text" name="tahun" maxlength="10" required placeholder="Contoh: 2025" style="width:100%; height:34px; font-size:12px;" />
+          </div>
+          <div>
+            <label style="display:block; font-size:11.5px; font-weight:700; color:var(--text-2); margin-bottom:4px;">Unggah File Dokumen (PDF/JPG)</label>
+            <input type="file" name="file_sertifikat" accept=".pdf,image/*" style="width:100%; height:34px; font-size:11.5px;" />
+          </div>
+        </div>
+        <div style="display:flex; justify-content:flex-end;">
+          <button type="submit" class="btn btn-sm btn-gold" style="font-size:11.5px; font-weight:800; height:32px;">
+            <i class="bi bi-cloud-arrow-up-fill"></i> Simpan Sertifikat
+          </button>
+        </div>
+      </form>
+    </div>
+
+    {{-- Tabel Riwayat Sertifikat --}}
+    <div style="font-weight:800; font-size:13px; color:var(--text); margin-bottom:8px; display:flex; align-items:center; gap:6px;">
+      <i class="bi bi-collection-fill" style="color:var(--text-3);"></i> Berkas Sertifikat yang Dimiliki (<span id="portofolio_count_display">0</span>)
+    </div>
+    <div style="max-height:280px; overflow-y:auto; border:1px solid var(--border); border-radius:var(--r-sm);">
+      <table style="width:100%; border-collapse:collapse; font-size:12px;">
+        <thead>
+          <tr style="background:var(--bg-3); border-bottom:1px solid var(--border); text-align:left;">
+            <th style="padding:8px 10px; width:30px;">No</th>
+            <th style="padding:8px 10px;">Nama Pelatihan / Workshop</th>
+            <th style="padding:8px 10px;">Penyelenggara</th>
+            <th style="padding:8px 10px; width:70px; text-align:center;">Tahun</th>
+            <th style="padding:8px 10px; width:90px; text-align:center;">Berkas</th>
+            <th style="padding:8px 10px; width:50px; text-align:center;">Aksi</th>
+          </tr>
+        </thead>
+        <tbody id="portofolio_table_body">
+          <tr>
+            <td colspan="6" style="text-align:center; padding:18px; color:var(--text-3);">Memuat data sertifikat...</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div style="display:flex; justify-content:flex-end; margin-top:16px;">
+      <button type="button" class="btn btn-outline" onclick="closeModal('portofolioModal')">Tutup</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Edit Guru / GTK Lengkap -->
+<div id="editGuruModal" class="modal-overlay">
+  <div class="modal-card" style="max-width:680px; padding:24px;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; padding-bottom:8px; border-bottom:1px solid var(--border);">
+      <h3 style="font-size:16px; font-weight:900; color:var(--text); margin:0; display:flex; align-items:center; gap:6px;">
+        <i class="bi bi-pencil-square" style="color:#000000;"></i> Edit Data GTK Guru / Tenaga Kependidikan
       </h3>
       <button type="button" class="btn btn-sm btn-outline" onclick="closeModal('editGuruModal')"><i class="bi bi-x-lg"></i></button>
     </div>
 
     <form id="editGuruForm" method="POST" enctype="multipart/form-data">
       @csrf @method('PUT')
-      <div style="display:flex; flex-direction:column; gap:12px;">
-        <div>
-          <label class="form-label" style="font-weight:700; font-size:12px; display:block; margin-bottom:4px;">NIP (Opsional)</label>
-          <input type="text" id="edit_guru_nip" name="nip" class="input-field" style="width:100%;" />
-        </div>
-        <div>
-          <label class="form-label" style="font-weight:700; font-size:12px; display:block; margin-bottom:4px;">Nama Lengkap &amp; Gelar <span style="color:var(--red);">*</span></label>
-          <input type="text" id="edit_guru_nama" name="nama" required class="input-field" style="width:100%;" />
-        </div>
-        <div>
-          <label class="form-label" style="font-weight:700; font-size:12px; display:block; margin-bottom:4px;">Jabatan / Penugasan <span style="color:var(--red);">*</span></label>
-          <input type="text" id="edit_guru_jabatan" name="jabatan" required class="input-field" style="width:100%;" />
-        </div>
-        <div>
-          <label class="form-label" style="font-weight:700; font-size:12px; display:block; margin-bottom:4px;">No. WhatsApp / HP</label>
-          <input type="text" id="edit_guru_no_hp" name="no_hp" class="input-field" style="width:100%;" />
-        </div>
-        <div>
-          <label class="form-label" style="font-weight:700; font-size:12px; display:block; margin-bottom:4px;">Status Kepegawaian <span style="color:var(--red);">*</span></label>
-          <select id="edit_guru_jenis_kepegawaian" name="jenis_kepegawaian" onchange="toggleHariMengajar('edit', this.value)" class="input-field" style="width:100%;">
-            <option value="pns">PNS (Pegawai Negeri Sipil)</option>
-            <option value="pppk">PPPK (P3K)</option>
-            <option value="honor">Guru Honor (GTT)</option>
-            <option value="tendik">Tenaga Kependidikan (TU/Staf)</option>
-          </select>
-        </div>
+      
+      {{-- TAB NAVIGATION EDIT --}}
+      <div class="gtk-tab-nav">
+        <button type="button" class="gtk-tab-btn active" onclick="switchGtkTab('edit', 'tab_edit_identitas', this)">
+          1. Biodata
+        </button>
+        <button type="button" class="gtk-tab-btn" onclick="switchGtkTab('edit', 'tab_edit_kepegawaian', this)">
+          2. Kepegawaian
+        </button>
+        <button type="button" class="gtk-tab-btn" onclick="switchGtkTab('edit', 'tab_edit_kualifikasi', this)">
+          3. Kualifikasi
+        </button>
+        <button type="button" class="gtk-tab-btn" onclick="switchGtkTab('edit', 'tab_edit_tugas', this)">
+          4. Tugas &amp; JJM
+        </button>
+      </div>
 
-        <div id="edit_hari_mengajar_box" style="background:var(--bg-3); border:1px solid var(--border-2); border-radius:var(--r-md); padding:10px 12px;">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; flex-wrap:wrap; gap:4px;">
-            <label style="font-weight:800; font-size:11.5px; color:var(--text); margin:0;">
-              <i class="bi bi-calendar-check-fill" style="color:#000000; margin-right:4px;"></i> Jadwal Hari Wajib Mengajar / Hadir:
+      {{-- TAB 1 EDIT: BIODATA --}}
+      <div id="tab_edit_identitas" class="gtk-tab-content">
+        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:12px;">
+          <div>
+            <label class="form-label" style="font-weight:700; font-size:12px; margin-bottom:4px;">Nama Lengkap (Tanpa Gelar) <span style="color:var(--red);">*</span></label>
+            <input type="text" id="edit_guru_nama" name="nama" required class="input-field" style="width:100%; height:36px;" />
+          </div>
+          <div>
+            <label class="form-label" style="font-weight:700; font-size:12px; margin-bottom:4px;">Gelar Depan</label>
+            <input type="text" id="edit_guru_gelar_depan" name="gelar_depan" class="input-field" style="width:100%; height:36px;" />
+          </div>
+          <div>
+            <label class="form-label" style="font-weight:700; font-size:12px; margin-bottom:4px;">Gelar Belakang</label>
+            <input type="text" id="edit_guru_gelar_belakang" name="gelar_belakang" class="input-field" style="width:100%; height:36px;" />
+          </div>
+          <div>
+            <label class="form-label" style="font-weight:700; font-size:12px; margin-bottom:4px;">NIK (16 Digit)</label>
+            <input type="text" id="edit_guru_nik" name="nik" maxlength="16" class="input-field" style="width:100%; height:36px;" />
+          </div>
+          <div>
+            <label class="form-label" style="font-weight:700; font-size:12px; margin-bottom:4px;">Jenis Kelamin</label>
+            <select id="edit_guru_jenis_kelamin" name="jenis_kelamin" class="input-field" style="width:100%; height:36px;">
+              <option value="">-- Pilih --</option>
+              <option value="L">Laki-laki (L)</option>
+              <option value="P">Perempuan (P)</option>
+            </select>
+          </div>
+          <div>
+            <label class="form-label" style="font-weight:700; font-size:12px; margin-bottom:4px;">Tempat Lahir</label>
+            <input type="text" id="edit_guru_tempat_lahir" name="tempat_lahir" class="input-field" style="width:100%; height:36px;" />
+          </div>
+          <div>
+            <label class="form-label" style="font-weight:700; font-size:12px; margin-bottom:4px;">Tanggal Lahir</label>
+            <input type="date" id="edit_guru_tanggal_lahir" name="tanggal_lahir" class="input-field" style="width:100%; height:36px;" />
+          </div>
+          <div>
+            <label class="form-label" style="font-weight:700; font-size:12px; margin-bottom:4px;">Agama</label>
+            <select id="edit_guru_agama" name="agama" class="input-field" style="width:100%; height:36px;">
+              <option value="Islam">Islam</option>
+              <option value="Kristen Protestan">Kristen Protestan</option>
+              <option value="Katolik">Katolik</option>
+              <option value="Hindu">Hindu</option>
+              <option value="Buddha">Buddha</option>
+              <option value="Khonghucu">Khonghucu</option>
+            </select>
+          </div>
+          <div>
+            <label class="form-label" style="font-weight:700; font-size:12px; margin-bottom:4px;">No. WhatsApp / HP</label>
+            <input type="text" id="edit_guru_no_hp" name="no_hp" class="input-field" style="width:100%; height:36px;" />
+          </div>
+          <div>
+            <label class="form-label" style="font-weight:700; font-size:12px; margin-bottom:4px;">Status Keaktifan</label>
+            <select id="edit_guru_status" name="status" class="input-field" style="width:100%; height:36px;">
+              <option value="aktif">Aktif</option>
+              <option value="cuti">Cuti</option>
+              <option value="nonaktif">Nonaktif</option>
+            </select>
+          </div>
+          <div style="grid-column: 1 / -1;">
+            <label class="form-label" style="font-weight:700; font-size:12px; margin-bottom:4px;">Alamat Domisili</label>
+            <textarea id="edit_guru_alamat" name="alamat" rows="2" class="input-field" style="width:100%; font-size:12px; padding:6px;"></textarea>
+          </div>
+          <div style="grid-column: 1 / -1;">
+            <label class="form-label" style="font-weight:700; font-size:12px; display:flex; justify-content:space-between; margin-bottom:4px;">
+              <span>Ganti Foto Profil</span>
             </label>
-            <span style="font-size:10.5px; color:var(--text-3);">Centang hari wajib hadir</span>
-          </div>
-          <div style="display:flex; flex-wrap:wrap; gap:8px;">
-            @foreach(['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'] as $hari)
-              <label style="display:inline-flex; align-items:center; gap:5px; font-size:11.5px; font-weight:700; cursor:pointer; background:var(--bg-card); padding:4px 8px; border-radius:6px; border:1px solid var(--border);">
-                <input type="checkbox" name="hari_mengajar[]" value="{{ $hari }}" class="edit-hari-cb" data-hari="{{ $hari }}" /> {{ $hari }}
-              </label>
-            @endforeach
-          </div>
-        </div>
-
-        <div>
-          <label class="form-label" style="font-weight:700; font-size:12px; display:block; margin-bottom:4px;">Status Keaktifan</label>
-          <select id="edit_guru_status" name="status" class="input-field" style="width:100%;">
-            <option value="aktif">Aktif</option>
-            <option value="nonaktif">Nonaktif</option>
-          </select>
-        </div>
-        <div>
-          <label class="form-label" style="font-weight:700; font-size:12px; display:flex; justify-content:space-between; margin-bottom:4px;">
-            <span>Ganti Foto Profil</span>
-            <span style="color:#000000; font-size:11px; font-weight:700;"><i class="bi bi-crop"></i> Auto-Crop Aktif</span>
-          </label>
-          <div style="display:flex; align-items:center; gap:10px;">
-            <div id="edit_guru_foto_preview" style="width:40px; height:40px; border-radius:50%; border:1.5px solid rgba(0,0,0,0.15); background:var(--bg-3); display:flex; align-items:center; justify-content:center; overflow:hidden; flex-shrink:0;">
-              <img id="edit_guru_foto_img" src="/img/user-default.png" style="width:100%; height:100%; object-fit:cover;" />
+            <div style="display:flex; align-items:center; gap:10px;">
+              <div style="width:36px; height:36px; border-radius:50%; border:1.5px solid var(--border-2); background:var(--bg-3); display:flex; align-items:center; justify-content:center; overflow:hidden; flex-shrink:0;">
+                <img id="edit_guru_foto_img" src="/img/user-default.png" style="width:100%; height:100%; object-fit:cover;" />
+              </div>
+              <input type="file" name="foto" accept="image/*" class="input-field" style="flex:1; height:36px;" />
             </div>
-            <input type="file" name="foto" id="inputFotoGuruEdit" accept="image/*" onchange="initPhotoCrop(this, 'edit_guru_foto_img', '1:1', 'Potong Foto Profil Guru')" class="input-field" style="flex:1;" />
           </div>
         </div>
       </div>
 
-      <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:18px;">
+      {{-- TAB 2 EDIT: KEPEGAWAIAN --}}
+      <div id="tab_edit_kepegawaian" class="gtk-tab-content" style="display:none;">
+        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:12px;">
+          <div>
+            <label class="form-label" style="font-weight:700; font-size:12px; margin-bottom:4px;">NIP / NI PPPK</label>
+            <input type="text" id="edit_guru_nip" name="nip" class="input-field" style="width:100%; height:36px;" />
+          </div>
+          <div>
+            <label class="form-label" style="font-weight:700; font-size:12px; margin-bottom:4px;">NUPTK (16 Digit)</label>
+            <input type="text" id="edit_guru_nuptk" name="nuptk" maxlength="16" class="input-field" style="width:100%; height:36px;" />
+          </div>
+          <div>
+            <label class="form-label" style="font-weight:700; font-size:12px; margin-bottom:4px;">Jenis PTK <span style="color:var(--red);">*</span></label>
+            <select id="edit_guru_jenis_ptk" name="jenis_ptk" class="input-field" style="width:100%; height:36px;">
+              <option value="Guru Kejuruan / Produktif">Guru Kejuruan / Produktif (RPL, TSM, APHP)</option>
+              <option value="Guru Normatif / Adaptif">Guru Normatif / Adaptif</option>
+              <option value="Guru BK">Guru BK (Bimbingan Konseling)</option>
+              <option value="Tenaga Administrasi Sekolah (TU)">Tenaga Administrasi Sekolah (TU / Operator)</option>
+              <option value="Laboran / Toolman Bengkel">Laboran / Toolman Bengkel</option>
+              <option value="Tenaga Perpustakaan">Tenaga Perpustakaan (Pustakawan)</option>
+            </select>
+          </div>
+          <div>
+            <label class="form-label" style="font-weight:700; font-size:12px; margin-bottom:4px;">Status Kepegawaian <span style="color:var(--red);">*</span></label>
+            <select id="edit_guru_jenis_kepegawaian" name="jenis_kepegawaian" onchange="toggleHariMengajar('edit', this.value)" class="input-field" style="width:100%; height:36px;">
+              <option value="pns">PNS (Pegawai Negeri Sipil)</option>
+              <option value="pppk">PPPK (P3K)</option>
+              <option value="honor">Guru Honor Daerah / GTT</option>
+              <option value="tendik">Tenaga Honorer Sekolah / PTT</option>
+            </select>
+          </div>
+          <div>
+            <label class="form-label" style="font-weight:700; font-size:12px; margin-bottom:4px;">Golongan / Pangkat</label>
+            <input type="text" id="edit_guru_golongan_pangkat" name="golongan_pangkat" class="input-field" style="width:100%; height:36px;" />
+          </div>
+          <div>
+            <label class="form-label" style="font-weight:700; font-size:12px; margin-bottom:4px;">Nomor SK Pengangkatan</label>
+            <input type="text" id="edit_guru_nomor_sk_pengangkatan" name="nomor_sk_pengangkatan" class="input-field" style="width:100%; height:36px;" />
+          </div>
+          <div>
+            <label class="form-label" style="font-weight:700; font-size:12px; margin-bottom:4px;">TMT Kerja</label>
+            <input type="date" id="edit_guru_tmt_kerja" name="tmt_kerja" class="input-field" style="width:100%; height:36px;" />
+          </div>
+          <div>
+            <label class="form-label" style="font-weight:700; font-size:12px; margin-bottom:4px;">Lembaga Pengangkat</label>
+            <select id="edit_guru_lembaga_pengangkat" name="lembaga_pengangkat" class="input-field" style="width:100%; height:36px;">
+              <option value="Pemerintah Provinsi Lampung / Dinas Pendidikan">Pemerintah Provinsi Lampung / Dinas Pendidikan</option>
+              <option value="Kepala Sekolah">Kepala Sekolah (SK Tugas Mandiri)</option>
+            </select>
+          </div>
+          <div>
+            <label class="form-label" style="font-weight:700; font-size:12px; margin-bottom:4px;">Jabatan / Penugasan <span style="color:var(--red);">*</span></label>
+            <input type="text" id="edit_guru_jabatan" name="jabatan" required class="input-field" style="width:100%; height:36px;" />
+          </div>
+        </div>
+      </div>
+
+      {{-- TAB 3 EDIT: KUALIFIKASI --}}
+      <div id="tab_edit_kualifikasi" class="gtk-tab-content" style="display:none;">
+        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:12px;">
+          <div>
+            <label class="form-label" style="font-weight:700; font-size:12px; margin-bottom:4px;">Pendidikan Terakhir</label>
+            <select id="edit_guru_pendidikan_terakhir" name="pendidikan_terakhir" class="input-field" style="width:100%; height:36px;">
+              <option value="S1">S1 / D4 (Sarjana / Diploma IV)</option>
+              <option value="S2">S2 (Magister)</option>
+              <option value="S3">S3 (Doktor)</option>
+              <option value="D3">D3 (Diploma III)</option>
+              <option value="SMA / SMK">SMA / SMK</option>
+            </select>
+          </div>
+          <div>
+            <label class="form-label" style="font-weight:700; font-size:12px; margin-bottom:4px;">Program Studi / Jurusan Kuliah</label>
+            <input type="text" id="edit_guru_jurusan_kuliah" name="jurusan_kuliah" class="input-field" style="width:100%; height:36px;" />
+          </div>
+          <div>
+            <label class="form-label" style="font-weight:700; font-size:12px; margin-bottom:4px;">Perguruan Tinggi / Kampus</label>
+            <input type="text" id="edit_guru_kampus" name="kampus" class="input-field" style="width:100%; height:36px;" />
+          </div>
+          <div>
+            <label class="form-label" style="font-weight:700; font-size:12px; margin-bottom:4px;">Tahun Lulus Kuliah</label>
+            <input type="text" id="edit_guru_tahun_lulus" name="tahun_lulus" maxlength="4" class="input-field" style="width:100%; height:36px;" />
+          </div>
+          <div>
+            <label class="form-label" style="font-weight:700; font-size:12px; margin-bottom:4px;">Status Sertifikasi Pendidik</label>
+            <select id="edit_guru_status_sertifikasi" name="status_sertifikasi" class="input-field" style="width:100%; height:36px;">
+              <option value="belum">Belum Sertifikasi</option>
+              <option value="sudah">Sudah Sertifikasi Pendidik (Gr.)</option>
+            </select>
+          </div>
+          <div>
+            <label class="form-label" style="font-weight:700; font-size:12px; margin-bottom:4px;">Nomor Serdik (Jika Ada)</label>
+            <input type="text" id="edit_guru_nomor_serdik" name="nomor_serdik" class="input-field" style="width:100%; height:36px;" />
+          </div>
+        </div>
+      </div>
+
+      {{-- TAB 4 EDIT: TUGAS & JJM --}}
+      <div id="tab_edit_tugas" class="gtk-tab-content" style="display:none;">
+        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:12px;">
+          <div>
+            <label class="form-label" style="font-weight:700; font-size:12px; margin-bottom:4px;">Mata Pelajaran Diampu</label>
+            <input type="text" id="edit_guru_mapel_diampu" name="mapel_diampu" class="input-field" style="width:100%; height:36px;" />
+          </div>
+          <div>
+            <label class="form-label" style="font-weight:700; font-size:12px; margin-bottom:4px;">JJM (Jam Mengajar / Minggu)</label>
+            <input type="number" id="edit_guru_jjm" name="jjm" min="0" max="60" class="input-field" style="width:100%; height:36px;" />
+          </div>
+          <div>
+            <label class="form-label" style="font-weight:700; font-size:12px; margin-bottom:4px;">Tugas Tambahan</label>
+            <input type="text" id="edit_guru_tugas_tambahan" name="tugas_tambahan" class="input-field" style="width:100%; height:36px;" />
+          </div>
+          <div>
+            <label class="form-label" style="font-weight:700; font-size:12px; margin-bottom:4px;">SK Tugas Tambahan</label>
+            <input type="text" id="edit_guru_sk_tugas_tambahan" name="sk_tugas_tambahan" class="input-field" style="width:100%; height:36px;" />
+          </div>
+
+          <div id="edit_hari_mengajar_box" style="grid-column: 1 / -1; background:var(--bg-3); border:1px solid var(--border-2); border-radius:var(--r-md); padding:10px 12px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; flex-wrap:wrap; gap:4px;">
+              <label style="font-weight:800; font-size:11.5px; color:var(--text); margin:0;">
+                <i class="bi bi-calendar-check-fill" style="color:#000000; margin-right:4px;"></i> Jadwal Hari Wajib Mengajar / Hadir:
+              </label>
+              <span style="font-size:10.5px; color:var(--text-3);">Centang hari wajib hadir</span>
+            </div>
+            <div style="display:flex; flex-wrap:wrap; gap:8px;">
+              @foreach(['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'] as $hari)
+                <label style="display:inline-flex; align-items:center; gap:5px; font-size:11.5px; font-weight:700; cursor:pointer; background:var(--bg-card); padding:4px 8px; border-radius:6px; border:1px solid var(--border);">
+                  <input type="checkbox" name="hari_mengajar[]" value="{{ $hari }}" class="edit-hari-cb" data-hari="{{ $hari }}" /> {{ $hari }}
+                </label>
+              @endforeach
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:16px; border-top:1px solid var(--border); padding-top:12px;">
         <button type="button" class="btn btn-outline" onclick="closeModal('editGuruModal')">Batal</button>
         <button type="submit" class="btn btn-gold">Simpan Perubahan</button>
       </div>
@@ -531,7 +1068,7 @@
         <div>
           <label class="form-label" style="font-weight:700; font-size:12px; display:block; margin-bottom:4px;">Nickname / Username Login <span style="color:var(--red);">*</span></label>
           <input type="text" id="akun_username" name="username" required class="input-field" placeholder="Contoh: sugeng, agihusni, atau NIP" style="width:100%;" />
-          <span style="font-size:10.5px; color:var(--text-3); margin-top:2px; display:block;">Bisa berupa nama panggilan (contoh: agihusni, sugeng, budi), inisial, atau NIP tanpa spasi. <strong>Tidak wajib menggunakan email</strong>.</span>
+          <span style="font-size:10.5px; color:var(--text-3); margin-top:2px; display:block;">Bisa berupa nama panggilan, inisial, atau NIP tanpa spasi. <strong>Tidak wajib menggunakan email</strong>.</span>
         </div>
 
         <div>
@@ -574,26 +1111,26 @@
   </div>
 </div>
 
-<!-- Modal Import Guru CSV -->
+<!-- Modal Import Guru CSV Dapodik -->
 <div id="importGuruModal" class="modal-overlay">
-  <div class="modal-card" style="max-width:520px; padding:24px;">
+  <div class="modal-card" style="max-width:540px; padding:24px;">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
       <h3 style="font-size:17px; font-weight:900; color:var(--text); margin:0;">
-        <i class="bi bi-file-earmark-arrow-up-fill" style="color:#000000;"></i> Import Data Guru &amp; Pegawai
+        <i class="bi bi-file-earmark-arrow-up-fill" style="color:#000000;"></i> Import Data GTK dari Dapodik / CSV
       </h3>
       <button type="button" class="btn btn-sm btn-outline" onclick="closeModal('importGuruModal')"><i class="bi bi-x-lg"></i></button>
     </div>
 
     <div style="background:var(--surface); border:1px solid var(--border-2); border-radius:12px; padding:12px 14px; margin-bottom:16px; font-size:12px; line-height:1.5;">
       <div style="font-weight:800; color:#000000; display:flex; align-items:center; gap:6px; margin-bottom:4px;">
-        <i class="bi bi-info-circle-fill"></i> Format Kolom CSV Fleksibel
+        <i class="bi bi-info-circle-fill"></i> Parser Cerdas Standar Dapodik
       </div>
       <div style="color:var(--text-2);">
-        Sistem otomatis mengenali format kolom (Nama, NIP, Jabatan/Mapel, Status Kepegawaian, dan No WhatsApp).
+        Sistem otomatis mengenali kolom Nama, Gelar, NIP, NUPTK, NIK, Jenis PTK, Status Kepegawaian, Golongan, Pendidikan, Mapel Diampu, JJM, dan No WhatsApp.
       </div>
       <div style="margin-top:8px;">
         <a href="{{ route('guru.template-csv') }}" class="btn btn-sm btn-outline-mono" style="font-weight:800; font-size:11.5px; display:inline-flex; align-items:center; gap:6px; background:var(--bg-2); text-decoration:none;">
-          <i class="bi bi-download" style="color:#000000;"></i> Unduh Contoh Template CSV Guru
+          <i class="bi bi-download" style="color:#000000;"></i> Unduh Template CSV GTK Lengkap
         </a>
       </div>
     </div>
@@ -607,23 +1144,27 @@
 
       <div style="display:flex; justify-content:flex-end; gap:8px;">
         <button type="button" class="btn btn-outline" onclick="closeModal('importGuruModal')">Batal</button>
-        <button type="submit" class="btn btn-gold"><i class="bi bi-cloud-arrow-up-fill"></i> Mulai Proses Import</button>
+        <button type="submit" class="btn btn-gold"><i class="bi bi-cloud-arrow-up-fill"></i> Mulai Import GTK</button>
       </div>
     </form>
   </div>
 </div>
 
-@include('partials.crop_modal')
-
 <script>
+  function switchGtkTab(scope, tabId, btnElement) {
+    const parent = btnElement.closest('.panel, .modal-card');
+    parent.querySelectorAll('.gtk-tab-btn').forEach(b => b.classList.remove('active'));
+    parent.querySelectorAll('.gtk-tab-content').forEach(c => c.style.display = 'none');
+    
+    btnElement.classList.add('active');
+    const target = document.getElementById(tabId);
+    if (target) target.style.display = 'block';
+  }
+
   function toggleHariMengajar(context, val) {
     const box = document.getElementById(context + '_hari_mengajar_box');
     if (box) {
-      if (val === 'honor') {
-        box.style.display = 'block';
-      } else {
-        box.style.display = 'block';
-      }
+      box.style.display = 'block';
     }
   }
 
@@ -635,7 +1176,7 @@
     
     panel.style.display = show ? 'block' : 'none';
     if (text) {
-      text.innerText = show ? 'Tutup Form' : 'Tambah Guru';
+      text.innerText = show ? 'Tutup Form' : 'Tambah GTK';
     }
     if (show) {
       panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -643,13 +1184,40 @@
   }
 
   function openEditGuru(guru) {
+    document.getElementById('edit_guru_nama').value = guru.nama_lengkap || guru.nama || '';
+    document.getElementById('edit_guru_gelar_depan').value = guru.gelar_depan || '';
+    document.getElementById('edit_guru_gelar_belakang').value = guru.gelar_belakang || '';
+    document.getElementById('edit_guru_nik').value = guru.nik || '';
     document.getElementById('edit_guru_nip').value = guru.nip || '';
-    document.getElementById('edit_guru_nama').value = guru.nama || '';
-    document.getElementById('edit_guru_jabatan').value = guru.jabatan || '';
-    document.getElementById('edit_guru_jenis_kepegawaian').value = guru.jenis_kepegawaian || 'pns';
+    document.getElementById('edit_guru_nuptk').value = guru.nuptk || '';
+    document.getElementById('edit_guru_tempat_lahir').value = guru.tempat_lahir || '';
+    document.getElementById('edit_guru_tanggal_lahir').value = guru.tanggal_lahir ? guru.tanggal_lahir.substring(0, 10) : '';
+    document.getElementById('edit_guru_jenis_kelamin').value = guru.jenis_kelamin || '';
+    document.getElementById('edit_guru_agama').value = guru.agama || 'Islam';
     document.getElementById('edit_guru_no_hp').value = guru.no_hp || '';
     document.getElementById('edit_guru_status').value = guru.status || 'aktif';
-    
+    document.getElementById('edit_guru_alamat').value = guru.alamat || '';
+
+    document.getElementById('edit_guru_jabatan').value = guru.jabatan || '';
+    document.getElementById('edit_guru_jenis_kepegawaian').value = guru.jenis_kepegawaian || 'pns';
+    document.getElementById('edit_guru_jenis_ptk').value = guru.jenis_ptk || 'Guru Kejuruan / Produktif';
+    document.getElementById('edit_guru_golongan_pangkat').value = guru.golongan_pangkat || '';
+    document.getElementById('edit_guru_nomor_sk_pengangkatan').value = guru.nomor_sk_pengangkatan || '';
+    document.getElementById('edit_guru_tmt_kerja').value = guru.tmt_kerja ? guru.tmt_kerja.substring(0, 10) : '';
+    document.getElementById('edit_guru_lembaga_pengangkat').value = guru.lembaga_pengangkat || 'Pemerintah Provinsi Lampung / Dinas Pendidikan';
+
+    document.getElementById('edit_guru_pendidikan_terakhir').value = guru.pendidikan_terakhir || 'S1';
+    document.getElementById('edit_guru_jurusan_kuliah').value = guru.jurusan_kuliah || '';
+    document.getElementById('edit_guru_kampus').value = guru.kampus || '';
+    document.getElementById('edit_guru_tahun_lulus').value = guru.tahun_lulus || '';
+    document.getElementById('edit_guru_status_sertifikasi').value = guru.status_sertifikasi || 'belum';
+    document.getElementById('edit_guru_nomor_serdik').value = guru.nomor_serdik || '';
+
+    document.getElementById('edit_guru_mapel_diampu').value = guru.mapel_diampu || '';
+    document.getElementById('edit_guru_jjm').value = guru.jjm || '';
+    document.getElementById('edit_guru_tugas_tambahan').value = guru.tugas_tambahan || '';
+    document.getElementById('edit_guru_sk_tugas_tambahan').value = guru.sk_tugas_tambahan || '';
+
     const imgPreview = document.getElementById('edit_guru_foto_img');
     if (imgPreview) {
       imgPreview.src = guru.foto_url || '/img/user-default.png';
@@ -665,8 +1233,60 @@
     openModal('editGuruModal');
   }
 
+  function openPortofolioModal(guru, sertifikats) {
+    document.getElementById('portofolio_guru_subtitle').innerText = 'Guru: ' + (guru.nama_lengkap_gelar || guru.nama) + ' (' + (guru.nip ? 'NIP: ' + guru.nip : (guru.nuptk ? 'NUPTK: ' + guru.nuptk : guru.label_kepegawaian)) + ')';
+    document.getElementById('formTambahSertifikat').action = '/guru/' + guru.id + '/sertifikat';
+    
+    const countDisplay = document.getElementById('portofolio_count_display');
+    const tableBody = document.getElementById('portofolio_table_body');
+    
+    const items = sertifikats || [];
+    countDisplay.innerText = items.length;
+
+    if (items.length === 0) {
+      tableBody.innerHTML = `
+        <tr>
+          <td colspan="6" style="text-align:center; padding:24px; color:var(--text-3);">
+            <i class="bi bi-file-earmark-x" style="font-size:24px; opacity:0.5;"></i>
+            <div style="font-weight:700; margin-top:4px;">Belum ada sertifikat pelatihan yang diunggah.</div>
+            <div style="font-size:11px;">Gunakan form di atas untuk menambahkan sertifikat baru.</div>
+          </td>
+        </tr>
+      `;
+    } else {
+      let html = '';
+      items.forEach((s, i) => {
+        const fileLink = s.file_sertifikat ? 
+          `<a href="/storage/${s.file_sertifikat}" target="_blank" class="btn btn-sm btn-outline" style="font-size:11px; padding:2px 8px; text-decoration:none; display:inline-flex; align-items:center; gap:4px;"><i class="bi bi-file-earmark-arrow-down"></i> Unduh</a>` : 
+          `<span style="color:var(--text-3); font-size:11px;">Tidak ada</span>`;
+        
+        html += `
+          <tr style="border-bottom:1px solid var(--border);">
+            <td style="padding:8px 10px; text-align:center; font-family:var(--font-mono);">${i + 1}</td>
+            <td style="padding:8px 10px; font-weight:700; color:var(--text);">${s.nama_pelatihan}</td>
+            <td style="padding:8px 10px; color:var(--text-2);">${s.penyelenggara}</td>
+            <td style="padding:8px 10px; text-align:center; font-family:var(--font-mono); font-weight:700;">${s.tahun}</td>
+            <td style="padding:8px 10px; text-align:center;">${fileLink}</td>
+            <td style="padding:8px 10px; text-align:center;">
+              <form action="/guru/${guru.id}/sertifikat/${s.id}" method="POST" onsubmit="return confirm('Hapus sertifikat ${s.nama_pelatihan}?')" style="display:inline; margin:0;">
+                <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                <input type="hidden" name="_method" value="DELETE">
+                <button type="submit" class="btn-icon btn-icon-danger" style="width:26px; height:26px;" title="Hapus Sertifikat">
+                  <i class="bi bi-trash3-fill" style="font-size:11px;"></i>
+                </button>
+              </form>
+            </td>
+          </tr>
+        `;
+      });
+      tableBody.innerHTML = html;
+    }
+
+    openModal('portofolioModal');
+  }
+
   function openAkunModal(guru) {
-    document.getElementById('akun_guru_nama_display').innerText = guru.nama;
+    document.getElementById('akun_guru_nama_display').innerText = guru.nama_lengkap_gelar || guru.nama;
     document.getElementById('akun_guru_jabatan_display').innerText = guru.jabatan || 'Guru / Pegawai';
     
     const form = document.getElementById('akunGuruForm');
