@@ -13,14 +13,19 @@
       align-items: center;
       flex-wrap: wrap;
       gap: 16px;
-      margin-bottom: 14px;
-      padding-bottom: 14px;
+      margin-bottom: 16px;
+      padding-bottom: 16px;
       border-bottom: 1px solid var(--border);
+    }
+    .piket-header-left {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
     }
     .piket-title-row {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 12px;
       flex-wrap: wrap;
     }
     .piket-page-title {
@@ -31,33 +36,130 @@
       margin: 0;
       line-height: 1.2;
     }
-    .piket-live-clock-pill {
+    .piket-date-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-2);
+      background: var(--bg-2);
+      border: 1px solid var(--border-2);
+      padding: 4px 10px;
+      border-radius: var(--r-sm);
+    }
+    .piket-holiday-badge {
+      background: rgba(239, 68, 68, 0.12);
+      color: #DC2626;
+      font-size: 11px;
+      font-weight: 800;
+      padding: 4px 10px;
+      border-radius: var(--r-sm);
+      border: 1px solid rgba(239, 68, 68, 0.25);
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    /* Modern Left-Aligned Time Cards */
+    .piket-time-strip {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .piket-time-card {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      background: var(--bg-2);
+      border: 1px solid var(--border-2);
+      padding: 6px 14px;
+      border-radius: var(--r-sm);
+      box-shadow: var(--shadow-sm);
+      transition: all 0.15s ease;
+    }
+    .piket-time-card:hover {
+      border-color: var(--border);
+      background: var(--surface);
+    }
+    .piket-time-card--live {
+      background: var(--bg-3);
+      border-color: rgba(22, 163, 74, 0.3);
+    }
+    [data-theme="dark"] .piket-time-card--live {
+      border-color: rgba(34, 197, 94, 0.35);
+      background: rgba(34, 197, 94, 0.05);
+    }
+    .piket-live-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #16A34A;
+      box-shadow: 0 0 0 0 rgba(22, 163, 74, 0.7);
+      animation: piketPulse 1.8s infinite;
+      flex-shrink: 0;
+    }
+    @keyframes piketPulse {
+      0% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(22, 163, 74, 0.7);
+      }
+      70% {
+        transform: scale(1);
+        box-shadow: 0 0 0 6px rgba(22, 163, 74, 0);
+      }
+      100% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(22, 163, 74, 0);
+      }
+    }
+    .piket-time-meta {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.15;
+    }
+    .piket-time-label {
+      font-size: 9.5px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-3);
+    }
+    .piket-time-val-wrap {
+      display: flex;
+      align-items: baseline;
+      gap: 4px;
+    }
+    .piket-time-val {
       font-family: var(--font-mono);
-      font-size: 13px;
+      font-size: 13.5px;
       font-weight: 800;
       color: var(--text);
-      background: var(--bg-3);
-      border: 1px solid var(--border-2);
-      padding: 3px 10px;
-      border-radius: 6px;
-      letter-spacing: 0.5px;
+      letter-spacing: 0.3px;
     }
-    .piket-clean-subtitle {
-      font-size: 12px;
+    .piket-time-card--live .piket-time-val {
+      font-size: 14.5px;
+      font-weight: 900;
+      color: var(--text);
+    }
+    .piket-time-unit {
+      font-size: 9.5px;
+      font-weight: 800;
       color: var(--text-3);
-      margin-top: 6px;
+      font-family: var(--font-mono);
+    }
+    .piket-time-icon {
+      font-size: 15px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .piket-header-right {
       display: flex;
       align-items: center;
       gap: 8px;
-      flex-wrap: wrap;
-    }
-    .piket-clean-subtitle strong {
-      color: var(--text);
-      font-family: var(--font-mono);
-      font-weight: 700;
-    }
-    .piket-dot-sep {
-      color: var(--border-2);
     }
     .piket-clean-actions {
       display: flex;
@@ -495,27 +597,62 @@
 
     {{-- ══ 1. CLEAN PAGE HEADER ══ --}}
     <div class="piket-clean-header no-print">
-      <div>
+      <div class="piket-header-left">
         <div class="piket-title-row">
           <h1 class="piket-page-title">Meja Piket</h1>
-          <span class="piket-live-clock-pill" id="livePiketClock">
-            {{ now()->format('H:i:s') }} WIB
+          <span class="piket-date-badge">
+            <i class="bi bi-calendar3"></i> {{ now()->locale('id')->isoFormat('dddd, D MMMM Y') }}
           </span>
           @if($isLibur)
-            <span class="badge" style="background:rgba(239,68,68,0.12); color:#DC2626; font-size:11px; font-weight:800; padding:3px 8px; border-radius:4px;">
-              HARI LIBUR
+            <span class="piket-holiday-badge">
+              <i class="bi bi-calendar-x-fill"></i> HARI LIBUR
             </span>
           @endif
         </div>
-        <div class="piket-clean-subtitle">
-          <span><i class="bi bi-calendar3"></i> {{ now()->locale('id')->isoFormat('dddd, D MMMM Y') }}</span>
-          <span class="piket-dot-sep">·</span>
-          <span>Batas Masuk: <strong>{{ substr($jadwal->jam_masuk_toleransi ?? '07:15', 0, 5) }}</strong></span>
-          <span class="piket-dot-sep">·</span>
-          <span>Tutup Gerbang: <strong>{{ substr($jadwal->jam_tutup_gerbang ?? '17:00', 0, 5) }}</strong></span>
+
+        {{-- TIME & GATE STATUS PILLS (GESER SEBELAH KIRI & DESAIN LEBIH BAGUS) --}}
+        <div class="piket-time-strip">
+          <!-- 1. Jam Server Realtime -->
+          <div class="piket-time-card piket-time-card--live" title="Waktu server realtime (WIB)">
+            <span class="piket-live-dot"></span>
+            <div class="piket-time-meta">
+              <span class="piket-time-label">JAM</span>
+              <div class="piket-time-val-wrap">
+                <span class="piket-time-val" id="livePiketClock">{{ now()->format('H:i:s') }}</span>
+                <span class="piket-time-unit">WIB</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 2. Batas Masuk Toleransi -->
+          <div class="piket-time-card" title="Batas toleransi jam masuk kehadiran">
+            <i class="bi bi-alarm piket-time-icon" style="color:#0284c7;"></i>
+            <div class="piket-time-meta">
+              <span class="piket-time-label">BATAS MASUK</span>
+              <div class="piket-time-val-wrap">
+                <span class="piket-time-val">{{ substr($jadwal->jam_masuk_toleransi ?? '07:15', 0, 5) }}</span>
+                <span class="piket-time-unit">WIB</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 3. Jam Tutup Gerbang -->
+          <div class="piket-time-card" title="Jadwal penutupan gerbang sekolah">
+            <i class="bi bi-door-closed piket-time-icon" style="color:#f59e0b;"></i>
+            <div class="piket-time-meta">
+              <span class="piket-time-label">TUTUP GERBANG</span>
+              <div class="piket-time-val-wrap">
+                <span class="piket-time-val">{{ substr($jadwal->jam_tutup_gerbang ?? '17:00', 0, 5) }}</span>
+                <span class="piket-time-unit">WIB</span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
+      <div class="piket-header-right">
+        @include('partials.header_actions')
+      </div>
     </div>
 
     {{-- ══ 2. STRIP PETUGAS PIKET HARI INI ══ --}}
