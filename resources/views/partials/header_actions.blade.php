@@ -55,19 +55,6 @@
           </button>
         @endif
 
-        @if($hasMultiRole)
-          <div style="padding:8px 10px 4px; font-size:10px; font-weight:800; text-transform:uppercase; color:var(--text-3); letter-spacing:0.5px; border-top:1px solid var(--border-2); margin-top:4px;">
-            Wewenang &amp; Penugasan Akun
-          </div>
-          <div style="padding:4px 8px 8px; display:flex; flex-wrap:wrap; gap:4px;">
-            @foreach($availableRolesData as $rData)
-              <span style="font-size:10.5px; font-weight:700; background:var(--bg-3); border:1px solid var(--border-2); color:var(--text); padding:3px 8px; border-radius:6px; display:inline-flex; align-items:center; gap:5px;">
-                <i class="bi {{ $rData['icon'] }}" style="font-size:11px; color:#0284c7;"></i>
-                {{ $rData['name'] }}
-              </span>
-            @endforeach
-          </div>
-        @endif
 
         <a href="{{ route('admin.portal') }}" class="acct-dropdown-item" style="width:100%; text-align:left; padding:9px 12px; font-size:12px; font-weight:700; color:var(--text); text-decoration:none; display:flex; align-items:center; gap:8px; white-space:nowrap; box-sizing:border-box;">
           <i class="bi bi-grid-3x3-gap-fill" style="font-size:14px; color:#0284c7;"></i> DCC SMKN 1 AN
