@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Guru;
 use App\Models\User;
 use App\Models\SertifikatGuru;
+use App\Models\PengaturanSekolah;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
@@ -206,6 +207,142 @@ class GuruController extends Controller
         return $inputJabatan ?: ($existingJabatan ?: 'Guru Mata Pelajaran');
     }
 
+    /**
+     * Sinkronisasi data GTK (Guru) ketika Role Akun diubah atau dibuat.
+     */
+    protected function syncRoleToGuruData(Guru $guru, string $newRole, ?string $oldRole = null): void
+    {
+        // 1. KEPALA SEKOLAH
+        if ($newRole === 'kepala_sekolah') {
+            $guru->jabatan = 'Kepala Sekolah';
+            $guru->tugas_tambahan = 'Kepala Sekolah';
+            $guru->jenis_ptk = 'Kepala Sekolah';
+            $guru->save();
+
+            // Sinkronkan data Kepala Sekolah ke Pengaturan Sekolah (Kop Surat & Profil Dinas)
+            try {
+                $sekolah = PengaturanSekolah::getAktif();
+                $sekolah->update([
+                    'nama_kepala_sekolah' => $guru->nama_lengkap_gelar ?: $guru->nama,
+                    'nip_kepala_sekolah'  => $guru->nip ?: null,
+                ]);
+            } catch (\Throwable $e) {
+                \Log::warning('Gagal sinkron PengaturanSekolah saat role kepsek: ' . $e->getMessage());
+            }
+
+            // Turunkan akun Kepala Sekolah lain jika ada (karena Kepsek aktif hanya 1 orang)
+            $otherKepseks = User::where('role', 'kepala_sekolah')
+                ->where('guru_id', '!=', $guru->id)
+                ->get();
+            foreach ($otherKepseks as $oldKepsekUser) {
+                $oldKepsekUser->update(['role' => 'guru']);
+                if ($oldKepsekUser->guru && $oldKepsekUser->guru->jabatan === 'Kepala Sekolah') {
+                    $demotedGuru = $oldKepsekUser->guru;
+                    $demotedGuru->tugas_tambahan = null;
+                    if ($demotedGuru->mapel_diampu) {
+                        $firstMpl = trim(explode(',', $demotedGuru->mapel_diampu)[0]);
+                        $demotedGuru->jabatan = str_starts_with(strtolower($firstMpl), 'guru') ? $firstMpl : 'Guru ' . $firstMpl;
+                        $demotedGuru->jenis_ptk = 'Guru Normatif / Adaptif';
+                    } else {
+                        $demotedGuru->jabatan = 'Guru Mata Pelajaran';
+                        $demotedGuru->jenis_ptk = 'Guru Normatif / Adaptif';
+                    }
+                    $demotedGuru->save();
+                }
+            }
+        } elseif ($oldRole === 'kepala_sekolah' && $newRole !== 'kepala_sekolah') {
+            // Jika sebelumnya Kepsek lalu diganti role lain, reset status jabatan Kepsek-nya
+            if ($guru->jabatan === 'Kepala Sekolah') {
+                $guru->tugas_tambahan = null;
+                if ($guru->mapel_diampu) {
+                    $firstMpl = trim(explode(',', $guru->mapel_diampu)[0]);
+                    $guru->jabatan = str_starts_with(strtolower($firstMpl), 'guru') ? $firstMpl : 'Guru ' . $firstMpl;
+                    $guru->jenis_ptk = 'Guru Normatif / Adaptif';
+                } else {
+                    $guru->jabatan = 'Guru Mata Pelajaran';
+                    $guru->jenis_ptk = 'Guru Normatif / Adaptif';
+                }
+                $guru->save();
+            }
+        }
+
+        // 2. WAKA KESISWAAN
+        if ($newRole === 'waka_kesiswaan') {
+            $tgs = array_filter(array_map('trim', explode(',', $guru->tugas_tambahan ?? '')));
+            if (!in_array('Waka Kesiswaan', $tgs) && !in_array('Wakil Kepala Sekolah Bidang Kesiswaan', $tgs)) {
+                $tgs[] = 'Waka Kesiswaan';
+                $guru->tugas_tambahan = implode(', ', $tgs);
+                $guru->save();
+            }
+        }
+
+        // 3. WAKA KURIKULUM
+        if ($newRole === 'waka_kurikulum') {
+            $tgs = array_filter(array_map('trim', explode(',', $guru->tugas_tambahan ?? '')));
+            if (!in_array('Waka Kurikulum', $tgs) && !in_array('Wakil Kepala Sekolah Bidang Kurikulum', $tgs)) {
+                $tgs[] = 'Waka Kurikulum';
+                $guru->tugas_tambahan = implode(', ', $tgs);
+                $guru->save();
+            }
+        }
+
+        // 4. GURU BK
+        if ($newRole === 'guru_bk') {
+            $guru->jenis_ptk = 'Guru BK';
+            if (empty($guru->mapel_diampu)) {
+                $guru->jabatan = 'Guru Bimbingan Konseling';
+            }
+            $guru->save();
+        }
+
+        // 5. STAF TU
+        if ($newRole === 'staf_tu') {
+            $guru->jenis_ptk = 'Tenaga Administrasi Sekolah (TU)';
+            $guru->jabatan = 'Tenaga Administrasi Sekolah (TU)';
+            $guru->save();
+        }
+    }
+
+    /**
+     * Sinkronisasi User Role & Pengaturan Sekolah ketika Data GTK (Guru) disimpan/diupdate.
+     */
+    protected function syncGuruDataToUserRole(Guru $guru): void
+    {
+        $isKepsek = ($guru->jabatan === 'Kepala Sekolah')
+            || (str_contains(strtolower($guru->tugas_tambahan ?? ''), 'kepala sekolah'))
+            || ($guru->jenis_ptk === 'Kepala Sekolah');
+
+        if ($isKepsek) {
+            // Pastikan jika ada akun login, role-nya otomatis kepala_sekolah
+            if ($guru->user) {
+                if ($guru->user->role !== 'kepala_sekolah') {
+                    $guru->user->update(['role' => 'kepala_sekolah']);
+                }
+            }
+
+            // Sinkronkan ke profil dinas PengaturanSekolah
+            try {
+                $sekolah = PengaturanSekolah::getAktif();
+                $sekolah->update([
+                    'nama_kepala_sekolah' => $guru->nama_lengkap_gelar ?: $guru->nama,
+                    'nip_kepala_sekolah'  => $guru->nip ?: null,
+                ]);
+            } catch (\Throwable $e) {
+                \Log::warning('Gagal sinkron PengaturanSekolah: ' . $e->getMessage());
+            }
+
+            // Turunkan akun kepala sekolah lain jika ada
+            User::where('role', 'kepala_sekolah')
+                ->where('guru_id', '!=', $guru->id)
+                ->update(['role' => 'guru']);
+        } else {
+            // Jika bukan kepsek tapi akunnya masih tercatat kepala_sekolah
+            if ($guru->user && $guru->user->role === 'kepala_sekolah') {
+                $guru->user->update(['role' => 'guru']);
+            }
+        }
+    }
+
     public function store(Request $request)
     {
         $request->validate([
@@ -288,13 +425,17 @@ class GuruController extends Controller
 
             $role = $request->input('role_akun') ?: ($request->input('role') ?: $defaultRole);
 
-            User::create([
+            $user = User::create([
                 'name' => $guru->nama,
                 'email' => $request->input('email_akun'),
                 'password' => Hash::make($request->input('password_akun')),
                 'guru_id' => $guru->id,
                 'role' => $role,
             ]);
+
+            $this->syncRoleToGuruData($guru, $role, null);
+        } else {
+            $this->syncGuruDataToUserRole($guru);
         }
 
         return redirect()->back()->with('success', 'Data guru/pegawai GTK dan pengaturan akses berhasil ditambahkan.');
@@ -367,6 +508,8 @@ class GuruController extends Controller
             'foto'                => $fotoPath,
             'status'              => $request->input('status'),
         ]);
+
+        $this->syncGuruDataToUserRole($guru);
 
         return redirect()->back()->with('success', 'Data guru/pegawai GTK berhasil diperbarui.');
     }
@@ -858,6 +1001,8 @@ class GuruController extends Controller
         $role = $request->input('role') ?: $defaultRole;
         $email = $request->filled('email') ? trim($request->input('email')) : ($username . '@sirani.local');
 
+        $oldRole = $guru->user ? $guru->user->role : null;
+
         if ($guru->user) {
             $updateData = [
                 'name'     => $guru->nama,
@@ -870,7 +1015,9 @@ class GuruController extends Controller
             }
             $guru->user->update($updateData);
 
-            return redirect()->back()->with('success', "Akun login untuk {$guru->nama} berhasil diperbarui (Nickname/Username: {$username}).");
+            $this->syncRoleToGuruData($guru, $role, $oldRole);
+
+            return redirect()->back()->with('success', "Akun login untuk {$guru->nama} berhasil diperbarui (Role: " . ucfirst(str_replace('_', ' ', $role)) . ", Nickname/Username: {$username}). Data penugasan otomatis disinkronkan.");
         }
 
         User::create([
@@ -882,7 +1029,9 @@ class GuruController extends Controller
             'role'     => $role,
         ]);
 
-        return redirect()->back()->with('success', "Akun login baru untuk {$guru->nama} berhasil dibuat (Nickname/Username: {$username}).");
+        $this->syncRoleToGuruData($guru, $role, null);
+
+        return redirect()->back()->with('success', "Akun login baru untuk {$guru->nama} berhasil dibuat (Role: " . ucfirst(str_replace('_', ' ', $role)) . ", Nickname/Username: {$username}). Data penugasan otomatis disinkronkan.");
     }
 
     /**
