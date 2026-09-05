@@ -275,10 +275,17 @@
                             <i class="fa-solid fa-id-card-clip" style="color: var(--brand-blue);"></i>
                             <span>Cek Presensi</span>
                         </a>
-                        <a href="{{ route('login') }}" class="btn-nav-login" title="Login ke Sistem &amp; Portal DCC">
-                            <i class="fa-solid fa-right-to-bracket" style="color: #38bdf8;"></i>
-                            <span>Login</span>
-                        </a>
+                        @auth
+                            <a href="{{ route('admin.portal') }}" class="btn-nav-login" title="Kembali ke Dashboard DCC">
+                                <i class="fa-solid fa-gauge-high" style="color: #38bdf8;"></i>
+                                <span>DCC Portal</span>
+                            </a>
+                        @else
+                            <a href="{{ route('login') }}" class="btn-nav-login" title="Login ke Sistem &amp; Portal DCC">
+                                <i class="fa-solid fa-right-to-bracket" style="color: #38bdf8;"></i>
+                                <span>Login</span>
+                            </a>
+                        @endauth
                     </div>
 
                     <button class="mobile-hamburger" id="navToggleBtn" aria-label="Menu Navigasi Mobile">
@@ -425,15 +432,27 @@
                             </div>
                         </a>
 
-                        <a href="{{ route('login') }}" class="drawer-gateway-card">
-                            <div class="gateway-icon-box dark">
-                                <i class="fa-solid fa-right-to-bracket"></i>
-                            </div>
-                            <div>
-                                <div class="gateway-card-title">Login Sistem</div>
-                                <div class="gateway-card-sub">Masuk DCC &amp; Portal GTK</div>
-                            </div>
-                        </a>
+                        @auth
+                            <a href="{{ route('admin.portal') }}" class="drawer-gateway-card">
+                                <div class="gateway-icon-box dark">
+                                    <i class="fa-solid fa-gauge-high"></i>
+                                </div>
+                                <div>
+                                    <div class="gateway-card-title">DCC Portal</div>
+                                    <div class="gateway-card-sub">Halo, {{ auth()->user()->name }}</div>
+                                </div>
+                            </a>
+                        @else
+                            <a href="{{ route('login') }}" class="drawer-gateway-card">
+                                <div class="gateway-icon-box dark">
+                                    <i class="fa-solid fa-right-to-bracket"></i>
+                                </div>
+                                <div>
+                                    <div class="gateway-card-title">Login Sistem</div>
+                                    <div class="gateway-card-sub">Masuk DCC &amp; Portal GTK</div>
+                                </div>
+                            </a>
+                        @endauth
                     </div>
                 </div>
 
