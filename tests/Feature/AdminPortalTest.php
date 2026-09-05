@@ -336,4 +336,38 @@ class AdminPortalTest extends TestCase
         $response->assertDontSee('Piket Harian');
         $response->assertDontSee('Smart Gate Presensi');
     }
+
+    public function test_situan_memiliki_dashboard_sendiri_dan_dapat_diakses_oleh_staf_tu_dan_admin(): void
+    {
+        $tu = User::create([
+            'name' => 'Staf Tata Usaha SMKN1',
+            'email' => 'stafftu@smkn1airnaningan.sch.id',
+            'role' => 'staf_tu',
+            'password' => Hash::make('password'),
+        ]);
+
+        $response = $this->actingAs($tu)->get('/situan');
+        $response->assertStatus(200);
+        $response->assertSee('SITUAN — SMKN 1 AN');
+        $response->assertSee('Pusat Data Induk');
+        $response->assertSee('Peserta Didik Aktif');
+        $response->assertSee('Audit Kelengkapan Data Pokok Siswa');
+        $response->assertSee('Dasbor Tata Usaha');
+        // Pastikan terisolasi dari operasional harian presensi SIRANI
+        $response->assertDontSee('Smart Gate Presensi');
+        $response->assertDontSee('Buku Kasus Disiplin');
+    }
+
+    public function test_guru_biasa_ditolak_akses_ke_dashboard_situan(): void
+    {
+        $guru = User::create([
+            'name' => 'Guru Pengajar',
+            'email' => 'gurupengajar@smkn1airnaningan.sch.id',
+            'role' => 'guru',
+            'password' => Hash::make('password'),
+        ]);
+
+        $response = $this->actingAs($guru)->get('/situan');
+        $response->assertStatus(403);
+    }
 }

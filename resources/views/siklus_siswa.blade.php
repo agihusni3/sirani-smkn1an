@@ -9,7 +9,7 @@
 </head>
 <body>
 <div class="app-container">
-  @include('partials.sidebar')
+  @include('partials.sidebar_situan')
   <main class="main-content">
     
     {{-- ULTRA COMPACT SLIM HEADER BAR --}}

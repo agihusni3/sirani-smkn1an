@@ -116,6 +116,13 @@ Route::middleware('auth')->group(function () {
     // 0d. Role Switcher Mode (Multi-Role Switching)
     Route::post('/switch-role', [AuthController::class, 'switchRole'])->name('switch-role');
 
+    // 0e. SITUAN — SMKN 1 AN (Sistem Informasi Tata Usaha & Data Pokok Sekolah)
+    Route::middleware('role:admin,kepala_sekolah,staf_tu,waka_kurikulum,waka_kesiswaan,waka_sarpras,waka_hubin,wali_kelas')->group(function () {
+        Route::get('/situan', [\App\Http\Controllers\SituanDashboardController::class, 'index'])->name('situan.index');
+        Route::get('/situan/dashboard', [\App\Http\Controllers\SituanDashboardController::class, 'index'])->name('situan.dashboard');
+        Route::get('/admin/situan', [\App\Http\Controllers\SituanDashboardController::class, 'index']);
+    });
+
     // 1. Dashboard Utama Modul SIRANI (Presensi & Kedisiplinan)
     Route::get('/dashboard', [DashboardController::class, 'index'])
         ->name('dashboard')

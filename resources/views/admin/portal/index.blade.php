@@ -963,7 +963,7 @@
 
         <div class="module-actions">
           @if($canAccessSituan)
-            <a href="{{ auth()->user() && auth()->user()->isWaliKelas() && !auth()->user()->isAdmin() && !auth()->user()->isStafTu() ? '/siswa' : '/guru' }}" class="btn-launch-primary" style="background:linear-gradient(135deg, #0284c7 0%, #0369a1 100%);">
+            <a href="{{ route('situan.index') }}" class="btn-launch-primary" style="background:linear-gradient(135deg, #0284c7 0%, #0369a1 100%);">
               <i class="bi bi-buildings-fill"></i> Buka Modul SITUAN <i class="bi bi-arrow-right-short" style="font-size:18px;"></i>
             </a>
             <div class="btn-launch-secondary-row">

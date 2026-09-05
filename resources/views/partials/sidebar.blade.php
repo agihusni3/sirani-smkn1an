@@ -213,54 +213,19 @@
       @endif
     </div>
 
-    {{-- 4. MASTER DATA (SITUAN - Core) --}}
-    <div class="nav-group">
-      <div class="nav-label" style="display:flex; justify-content:space-between; align-items:center;">
-        <span>Data Pokok (SITUAN)</span>
-        <span style="font-size:9px; font-weight:800; padding:1px 5px; border-radius:4px; background:rgba(2,132,199,0.12); color:#0284c7; border:1px solid rgba(2,132,199,0.25);">CORE</span>
-      </div>
-      @if($isAdmin || $isWakasis || $isStafTu || $isWakaKurikulum || $isWakaHubin)
-        <a href="/siklus-siswa" class="nav-item {{ request()->is('siklus-siswa*') ? 'active' : '' }}">
+    {{-- 4. KESISWAAN BINAAN (Khusus Wali Kelas) --}}
+    @if($isWali && !$isAdmin && !$isStafTu)
+      <div class="nav-group">
+        <div class="nav-label">Kelas Binaan</div>
+        <a href="/siswa?from=sirani" class="nav-item {{ request()->is('siswa*') ? 'active' : '' }}" title="Data Murid di Kelas Binaan Anda">
           <div class="nav-left-part">
-            <i class="bi bi-arrow-repeat nav-icon"></i>
-            <span class="nav-text">Siklus Akademik Siswa</span>
+            <i class="bi bi-people-fill nav-icon" style="color:#059669;"></i>
+            <span class="nav-text">Data Siswa Binaan</span>
           </div>
-        </a>
-      @endif
-      <a href="/siswa" class="nav-item {{ request()->is('siswa*') ? 'active' : '' }}">
-        <div class="nav-left-part">
-          <i class="bi bi-people-fill nav-icon"></i>
-          <span class="nav-text">{{ $isWali && !$isAdmin && !$isStafTu ? 'Data Siswa Binaan' : 'Data Siswa' }}</span>
-        </div>
-        @if($isWali && !$isAdmin && !$isStafTu)
           <span class="nav-count-badge" style="background:#ecfdf5; color:#059669; border-color:#a7f3d0; font-size:10px;">Kelas</span>
-        @endif
-      </a>
-      @if($isAdmin || $isPimpinan || $isStafTu)
-        <a href="/guru" class="nav-item {{ request()->is('guru*') ? 'active' : '' }}">
-          <div class="nav-left-part">
-            <i class="bi bi-person-badge-fill nav-icon"></i>
-            <span class="nav-text">Data Guru &amp; Pegawai</span>
-          </div>
         </a>
-      @endif
-      @if($isAdmin || $isStafTu)
-        <a href="/kartu-rfid" class="nav-item {{ request()->is('kartu-rfid*') || request()->is('manajemen-rfid*') ? 'active' : '' }}">
-          <div class="nav-left-part">
-            <i class="bi bi-person-vcard-fill nav-icon"></i>
-            <span class="nav-text">Kartu Barcode &amp; RFID</span>
-          </div>
-        </a>
-      @endif
-      @if(!$isWali)
-        <a href="/rombel" class="nav-item {{ request()->is('rombel*') ? 'active' : '' }}">
-          <div class="nav-left-part">
-            <i class="bi bi-building nav-icon"></i>
-            <span class="nav-text">Rombongan Belajar</span>
-          </div>
-        </a>
-      @endif
-    </div>
+      </div>
+    @endif
 
     {{-- 5. JADWAL & KALENDER --}}
     <div class="nav-group">
@@ -282,29 +247,29 @@
     </div>
   @endif
 
-  {{-- 6. SISTEM & PENGAWASAN --}}
+  {{-- 6. PENGAWASAN & AUDIT --}}
   @if($isAdmin || $isPimpinan)
     <div class="nav-group">
-      <div class="nav-label">Sistem &amp; Pengawasan</div>
-      @if($isAdmin)
-        <a href="/pengaturan-sekolah" class="nav-item {{ request()->is('pengaturan-sekolah*') ? 'active' : '' }}">
-          <div class="nav-left-part">
-            <i class="bi bi-bank2 nav-icon"></i>
-            <span class="nav-text">Profil &amp; Kop Surat</span>
-          </div>
-        </a>
-        <a href="/backup" class="nav-item {{ request()->is('backup*') ? 'active' : '' }}">
-          <div class="nav-left-part">
-            <i class="bi bi-database-down nav-icon"></i>
-            <span class="nav-text">Pencadangan Data</span>
-          </div>
-        </a>
-      @endif
+      <div class="nav-label">Pengawasan</div>
       <a href="/audit" class="nav-item {{ request()->is('audit*') ? 'active' : '' }}">
         <div class="nav-left-part">
           <i class="bi bi-shield-lock-fill nav-icon"></i>
-          <span class="nav-text">Audit Trail</span>
+          <span class="nav-text">Audit Trail Presensi</span>
         </div>
+      </a>
+    </div>
+  @endif
+
+  {{-- 7. PINTASAN KE MODUL SITUAN (Tata Usaha & Data Pokok) --}}
+  @if($user && $user->canAccessSituan())
+    <div class="nav-group" style="margin-top:auto; padding-top:14px; border-top:1px solid var(--border);">
+      <div class="nav-label">Administrasi Data Induk</div>
+      <a href="{{ route('situan.index') }}" class="nav-item" title="Buka Modul SITUAN (Tata Usaha &amp; Data Pokok)">
+        <div class="nav-left-part">
+          <i class="bi bi-buildings-fill nav-icon" style="color:#0284c7;"></i>
+          <span class="nav-text">SITUAN Tata Usaha</span>
+        </div>
+        <i class="bi bi-arrow-up-right" style="font-size:11px; color:var(--text-3);"></i>
       </a>
     </div>
   @endif

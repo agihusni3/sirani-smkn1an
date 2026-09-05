@@ -8,7 +8,7 @@
 </head>
 <body>
 <div class="app-container">
-  @include('partials.sidebar')
+  @include('partials.sidebar_situan')
   <main class="main-content">
     {{-- ULTRA COMPACT SLIM HEADER BAR --}}
     <div class="panel no-print" style="background:var(--bg-2); border:1px solid var(--border); padding:10px 16px; margin-bottom:12px; border-radius:var(--r-md); box-shadow:var(--shadow-sm);">

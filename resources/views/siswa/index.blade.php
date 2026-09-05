@@ -9,15 +9,22 @@
 </head>
 <body>
 <div class="app-container">
-  @include('partials.sidebar')
+  @php
+    $currentUser = auth()->user();
+    $isAdmin = $currentUser && $currentUser->isAdmin();
+    $isStafTu = $currentUser && $currentUser->isStafTu();
+    $isWali = $currentUser && $currentUser->isWaliKelas();
+    $canManageSiswa = $isAdmin || $isStafTu || $isWali;
+    $useSiraniSidebar = request()->get('from') === 'sirani' || ($isWali && !$isAdmin && !$isStafTu && !request()->has('from_situan'));
+  @endphp
+
+  @if($useSiraniSidebar)
+    @include('partials.sidebar')
+  @else
+    @include('partials.sidebar_situan')
+  @endif
+
   <main class="main-content">
-    @php
-      $currentUser = auth()->user();
-      $isAdmin = $currentUser && $currentUser->isAdmin();
-      $isStafTu = $currentUser && $currentUser->isStafTu();
-      $isWali = $currentUser && $currentUser->isWaliKelas();
-      $canManageSiswa = $isAdmin || $isStafTu || $isWali;
-    @endphp
     
     {{-- ULTRA COMPACT SLIM HEADER BAR --}}
     <div class="panel no-print" style="background:var(--bg-2); border:1px solid var(--border); padding:10px 16px; margin-bottom:12px; border-radius:var(--r-md); box-shadow:var(--shadow-sm);">

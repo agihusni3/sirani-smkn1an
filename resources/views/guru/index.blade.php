@@ -133,7 +133,7 @@
 </head>
 <body>
 <div class="app-container">
-  @include('partials.sidebar')
+  @include('partials.sidebar_situan')
   <main class="main-content">
     @php
       $currentUser = auth()->user();
