@@ -160,19 +160,24 @@
       box-sizing: border-box;
     }
 
-    /* ─── Hero Cockpit / Mission Control Banner ─── */
+    /* ─── Hero Cockpit / Mission Control Banner (Futuristic Cyber Glassmorphism) ─── */
     .cockpit-hero {
       position: relative;
       border-radius: 24px;
-      background: linear-gradient(135deg, #090d16 0%, #0f172a 45%, #1e1b4b 100%);
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      box-shadow: 0 20px 45px -15px rgba(15, 23, 42, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.15);
-      padding: 32px 36px;
+      background: radial-gradient(circle at 10% 20%, rgba(14, 165, 233, 0.22) 0%, transparent 45%),
+                  radial-gradient(circle at 88% 25%, rgba(99, 102, 241, 0.28) 0%, transparent 50%),
+                  radial-gradient(circle at 50% 90%, rgba(16, 185, 129, 0.15) 0%, transparent 45%),
+                  linear-gradient(135deg, #050814 0%, #0c1324 45%, #0e1b3a 100%);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      box-shadow: 0 25px 60px -15px rgba(2, 6, 23, 0.8),
+                  inset 0 1px 0 rgba(255, 255, 255, 0.2),
+                  inset 0 0 35px rgba(14, 165, 233, 0.06);
+      padding: 34px 38px;
       color: #ffffff;
       overflow: hidden;
       margin-bottom: 32px;
       display: grid;
-      grid-template-columns: 1.4fr 1fr;
+      grid-template-columns: 1.35fr 1fr;
       gap: 32px;
       align-items: center;
     }
@@ -181,148 +186,353 @@
       content: '';
       position: absolute;
       inset: 0;
-      background-image: radial-gradient(rgba(255, 255, 255, 0.07) 1px, transparent 1px);
-      background-size: 20px 20px;
-      opacity: 0.6;
+      background-image: 
+        linear-gradient(to right, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+      background-size: 32px 32px;
+      opacity: 0.85;
       pointer-events: none;
     }
 
     .cockpit-hero::after {
       content: '';
       position: absolute;
-      right: -80px;
-      bottom: -80px;
-      width: 320px;
-      height: 320px;
-      background: radial-gradient(circle, rgba(56, 189, 248, 0.2) 0%, rgba(99, 102, 241, 0.05) 50%, transparent 70%);
-      border-radius: 50%;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent 0%, rgba(56, 189, 248, 0.8) 25%, rgba(16, 185, 129, 0.8) 50%, rgba(139, 92, 246, 0.8) 75%, transparent 100%);
       pointer-events: none;
+    }
+
+    .cockpit-pill-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+      position: relative;
+      z-index: 2;
     }
 
     .portal-hero-pill {
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      background: rgba(255, 255, 255, 0.08);
-      backdrop-filter: blur(8px);
-      border: 1px solid rgba(255, 255, 255, 0.18);
-      padding: 4px 14px;
-      border-radius: 30px;
-      font-size: 11px;
+      background: rgba(15, 23, 42, 0.7);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      padding: 4px 12px;
+      border-radius: 999px;
+      font-size: 10.5px;
       font-weight: 800;
       letter-spacing: 0.05em;
       color: #38bdf8;
-      margin-bottom: 12px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+    }
+
+    .portal-hero-pill.glow-emerald {
+      border-color: rgba(16, 185, 129, 0.35);
+      color: #34d399;
+      background: rgba(6, 78, 59, 0.35);
+    }
+
+    .portal-hero-pill.glow-amber {
+      border-color: rgba(245, 158, 11, 0.35);
+      color: #fbbf24;
+      background: rgba(120, 53, 15, 0.35);
     }
 
     .cockpit-title {
-      font-size: 26px;
+      font-size: 28px;
       font-weight: 900;
       letter-spacing: -0.03em;
-      line-height: 1.25;
+      line-height: 1.22;
       margin: 0 0 10px;
+      position: relative;
+      z-index: 2;
+      background: linear-gradient(135deg, #ffffff 15%, #bae6fd 60%, #38bdf8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      display: inline-block;
+      text-shadow: 0 0 35px rgba(56, 189, 248, 0.25);
     }
 
     .cockpit-desc {
       font-size: 13.5px;
       color: #cbd5e1;
-      line-height: 1.55;
-      margin: 0 0 18px;
+      line-height: 1.6;
+      margin: 0 0 20px;
+      position: relative;
+      z-index: 2;
+      max-width: 620px;
     }
 
     .cockpit-meta-row {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 10px;
       flex-wrap: wrap;
+      margin-bottom: 20px;
+      position: relative;
+      z-index: 2;
     }
 
     .cockpit-clock-badge {
       font-family: var(--font-mono);
       font-size: 11.5px;
       font-weight: 700;
-      background: rgba(0, 0, 0, 0.35);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      padding: 5px 12px;
-      border-radius: 8px;
-      color: #e2e8f0;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    /* Right Visual Showcase Banner */
-    .cockpit-banner-frame {
-      position: relative;
-      border-radius: 18px;
-      overflow: hidden;
-      border: 1px solid rgba(255, 255, 255, 0.16);
-      box-shadow: 0 16px 36px -10px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.2);
-      aspect-ratio: 16 / 9;
-      max-height: 240px;
-      width: 100%;
-      background: #0f172a;
-    }
-
-    .cockpit-banner-img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-      transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-
-    .cockpit-banner-frame:hover .cockpit-banner-img {
-      transform: scale(1.05);
-    }
-
-    .cockpit-banner-scrim {
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(180deg, rgba(9, 13, 22, 0.15) 0%, rgba(9, 13, 22, 0.82) 100%);
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      padding: 14px 16px;
-      pointer-events: none;
-    }
-
-    .cockpit-banner-top-pill {
-      align-self: flex-end;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
       background: rgba(15, 23, 42, 0.75);
       backdrop-filter: blur(8px);
       -webkit-backdrop-filter: blur(8px);
-      border: 1px solid rgba(255, 255, 255, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      padding: 6px 13px;
+      border-radius: 10px;
+      color: #e2e8f0;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .cockpit-action-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      position: relative;
+      z-index: 2;
+    }
+
+    .cockpit-action-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 18px;
+      border-radius: 10px;
+      font-size: 12.5px;
+      font-weight: 800;
+      text-decoration: none;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .cockpit-action-btn.primary {
+      background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      box-shadow: 0 4px 14px rgba(2, 132, 199, 0.35);
+    }
+
+    .cockpit-action-btn.primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(2, 132, 199, 0.5);
+      background: linear-gradient(135deg, #0369a1 0%, #0284c7 100%);
+    }
+
+    .cockpit-action-btn.secondary {
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      color: #f1f5f9;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+    }
+
+    .cockpit-action-btn.secondary:hover {
+      background: rgba(255, 255, 255, 0.15);
+      border-color: rgba(255, 255, 255, 0.3);
+      transform: translateY(-2px);
+    }
+
+    /* ── Futuristic Cockpit HUD Showcase ── */
+    .cockpit-hud-card {
+      position: relative;
+      border-radius: 20px;
+      overflow: hidden;
+      border: 1px solid rgba(56, 189, 248, 0.35);
+      box-shadow: 0 20px 45px -10px rgba(0, 0, 0, 0.65), 
+                  0 0 25px rgba(56, 189, 248, 0.12),
+                  inset 0 1px 0 rgba(255, 255, 255, 0.25);
+      background: #090e1a;
+      aspect-ratio: 16 / 9.5;
+      min-height: 250px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: all 0.35s ease;
+    }
+
+    .cockpit-hud-card:hover {
+      border-color: rgba(56, 189, 248, 0.55);
+      box-shadow: 0 24px 50px -10px rgba(0, 0, 0, 0.75), 
+                  0 0 35px rgba(56, 189, 248, 0.2);
+    }
+
+    .cockpit-hud-bg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+      transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+      filter: saturate(1.15) brightness(0.9);
+    }
+
+    .cockpit-hud-card:hover .cockpit-hud-bg {
+      transform: scale(1.04);
+    }
+
+    /* Cyber Tech Brackets [ ] on corners */
+    .cockpit-hud-bracket {
+      position: absolute;
+      width: 14px;
+      height: 14px;
+      pointer-events: none;
+      z-index: 5;
+    }
+    .cockpit-hud-bracket.tl { top: 8px; left: 8px; border-top: 2px solid #38bdf8; border-left: 2px solid #38bdf8; }
+    .cockpit-hud-bracket.tr { top: 8px; right: 8px; border-top: 2px solid #38bdf8; border-right: 2px solid #38bdf8; }
+    .cockpit-hud-bracket.bl { bottom: 8px; left: 8px; border-bottom: 2px solid #38bdf8; border-left: 2px solid #38bdf8; }
+    .cockpit-hud-bracket.br { bottom: 8px; right: 8px; border-bottom: 2px solid #38bdf8; border-right: 2px solid #38bdf8; }
+
+    /* Scanning Laser Line Effect */
+    .cockpit-hud-scanline {
+      position: absolute;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent 0%, rgba(56, 189, 248, 0.8) 50%, transparent 100%);
+      box-shadow: 0 0 8px #38bdf8;
+      pointer-events: none;
+      z-index: 3;
+      animation: hudScan 5s ease-in-out infinite alternate;
+    }
+
+    @keyframes hudScan {
+      0% { top: 0%; opacity: 0.1; }
+      15% { opacity: 0.85; }
+      85% { opacity: 0.85; }
+      100% { top: 96%; opacity: 0.1; }
+    }
+
+    .cockpit-hud-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(7, 12, 22, 0.45) 0%, rgba(7, 12, 22, 0.25) 40%, rgba(7, 12, 22, 0.9) 100%);
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 16px 18px;
+    }
+
+    .cockpit-hud-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .hud-pill-live {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(15, 23, 42, 0.8);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border: 1px solid rgba(56, 189, 248, 0.4);
       color: #38bdf8;
       font-size: 10px;
       font-weight: 800;
       padding: 4px 10px;
-      border-radius: 20px;
-      letter-spacing: 0.04em;
+      border-radius: 999px;
+      letter-spacing: 0.05em;
     }
 
-    .cockpit-banner-caption {
-      color: #ffffff;
+    .hud-tag-sec {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid rgba(16, 185, 129, 0.4);
+      color: #34d399;
+      font-size: 9.5px;
+      font-weight: 800;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-family: var(--font-mono);
     }
 
-    .cockpit-banner-title {
-      font-size: 13.5px;
+    /* Live Telemetry Chips Inside HUD */
+    .cockpit-hud-telemetry {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 6px;
+      margin: 10px 0;
+    }
+
+    .hud-chip {
+      background: rgba(15, 23, 42, 0.75);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 8px;
+      padding: 6px 9px;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .hud-chip-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .hud-chip-dot.blue { background: #0ea5e9; box-shadow: 0 0 6px #0ea5e9; }
+    .hud-chip-dot.green { background: #10b981; box-shadow: 0 0 6px #10b981; }
+    .hud-chip-dot.amber { background: #f59e0b; box-shadow: 0 0 6px #f59e0b; }
+    .hud-chip-dot.purple { background: #a855f7; box-shadow: 0 0 6px #a855f7; }
+
+    .hud-chip-text {
+      font-size: 10px;
+      font-weight: 700;
+      color: #f1f5f9;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      line-height: 1.2;
+    }
+
+    .hud-chip-label {
+      font-size: 8.5px;
+      color: #94a3b8;
+      display: block;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    .cockpit-hud-bottom {
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      padding-top: 8px;
+    }
+
+    .cockpit-hud-title {
+      font-size: 12.5px;
       font-weight: 900;
-      letter-spacing: -0.01em;
-      margin-bottom: 2px;
+      color: #ffffff;
       display: flex;
       align-items: center;
       gap: 6px;
-      color: #ffffff;
+      letter-spacing: -0.01em;
     }
 
-    .cockpit-banner-sub {
-      font-size: 11px;
-      color: #cbd5e1;
+    .cockpit-hud-sub {
+      font-size: 10px;
+      color: #94a3b8;
       font-weight: 500;
+      margin-top: 2px;
     }
 
     /* ─── Section Header ─── */
@@ -855,21 +1065,43 @@
       @include('partials.header_actions')
     </div>
   </header>
-
+ 
   <main class="portal-container">
+    @php
+      $hour = (int) now()->timezone('Asia/Jakarta')->format('H');
+      $salam = $hour < 11 ? 'Selamat Pagi' : ($hour < 15 ? 'Selamat Siang' : ($hour < 18 ? 'Selamat Sore' : 'Selamat Malam'));
+    @endphp
 
     {{-- Hero Cockpit / Mission Control Banner --}}
     <div class="cockpit-hero">
       <div>
-        <div class="portal-hero-pill">
-          <i class="bi bi-cpu-fill"></i> DCC · DIGITAL COMMAND CENTER
+        <div class="cockpit-pill-group">
+          <div class="portal-hero-pill">
+            <span class="pulse-dot" style="background:#38bdf8; box-shadow:0 0 0 0 rgba(56,189,248,0.7);"></span>
+            <span>DCC · DIGITAL COMMAND CENTER</span>
+          </div>
+          <div class="portal-hero-pill glow-emerald">
+            <span class="pulse-dot" style="background:#10b981; box-shadow:0 0 0 0 rgba(16,185,129,0.7);"></span>
+            <span>4 MODUL ONLINE</span>
+          </div>
+          <div class="portal-hero-pill glow-amber">
+            <i class="bi bi-patch-check-fill" style="color:#fbbf24;"></i>
+            <span>SMKN 1 AIR NANINGAN</span>
+          </div>
+          <div class="portal-hero-pill" style="color:#e0f2fe; border-color:rgba(255,255,255,0.2); background:rgba(255,255,255,0.08);">
+            <i class="bi bi-brightness-high" style="color:#38bdf8;"></i>
+            <span>{{ $salam }}</span>
+          </div>
         </div>
+
         <h1 class="cockpit-title">
           Selamat Bertugas, {{ auth()->user()?->name ?? 'Administrator' }}
         </h1>
+        
         <p class="cockpit-desc">
-          Pintu gerbang manajemen terpadu SMKN 1 Air Naningan. Pilih modul operasional untuk mengelola absensi cerdas (SIRANI), seleksi siswa baru (PPDB 2026), maupun publikasi informasi publik (Web Profil).
+          Pusat Komando &amp; Integrasi Ekosistem Digital Vokasi 4.0. Akses terpusat data pokok kelembagaan (SITUAN), presensi RFID gerbang cerdas (SIRANI), seleksi PPDB 2026, dan publikasi institusi dalam satu kendali real-time.
         </p>
+
         <div class="cockpit-meta-row">
           <div class="cockpit-clock-badge" id="portalLiveClock">
             <i class="bi bi-clock-history" style="color:#38bdf8;"></i> Memuat waktu sistem...
@@ -877,23 +1109,92 @@
           <div class="cockpit-clock-badge" style="background:rgba(255,255,255,0.06);">
             <i class="bi bi-person-badge" style="color:#a78bfa;"></i> {{ auth()->user()?->role_display_name ?? 'Super Administrator' }}
           </div>
+          <div class="cockpit-clock-badge" style="background:rgba(16,185,129,0.1); border-color:rgba(16,185,129,0.3); color:#34d399;">
+            <i class="bi bi-shield-fill-check"></i> Gateway Aktif
+          </div>
+        </div>
+
+        <div class="cockpit-action-row">
+          <a href="#modul-aktif" class="cockpit-action-btn primary">
+            <i class="bi bi-grid-3x3-gap-fill"></i> Buka Modul Sistem
+          </a>
+          <a href="{{ route('audit.index') }}" class="cockpit-action-btn secondary">
+            <i class="bi bi-shield-shaded" style="color:#38bdf8;"></i> Audit Telemetri DCC
+          </a>
+          @if($canAccessSirani)
+            <a href="{{ route('dashboard') }}" class="cockpit-action-btn secondary" style="background:rgba(16,185,129,0.12); border-color:rgba(16,185,129,0.25); color:#34d399;">
+              <i class="bi bi-fingerprint"></i> Presensi Gerbang
+            </a>
+          @endif
         </div>
       </div>
 
-      {{-- Right: High-Tech Command Center Showcase Banner --}}
-      <div class="cockpit-banner-frame">
-        <img src="/images/web/dcc_command_center_banner.jpg" alt="DCC SMKN 1 AN Control Room" class="cockpit-banner-img" onerror="this.src='/images/web/hero_kampus.jpg';" />
-        <div class="cockpit-banner-scrim">
-          <div class="cockpit-banner-top-pill">
-            <span class="pulse-dot" style="width:6px; height:6px;"></span>
-            <span>DCC COMMAND CENTER</span>
-          </div>
-          <div class="cockpit-banner-caption">
-            <div class="cockpit-banner-title">
-              <i class="bi bi-shield-check" style="color:#38bdf8;"></i> Integrated Smart Campus
+      {{-- Right: High-Tech Cyber Command Center HUD Showcase --}}
+      <div class="cockpit-hud-card">
+        <img src="/images/web/dcc_command_center_banner.jpg" alt="DCC SMKN 1 AN Control Room" class="cockpit-hud-bg" onerror="this.src='/images/web/hero_kampus.jpg';" />
+        
+        {{-- Futuristic Tech Brackets --}}
+        <div class="cockpit-hud-bracket tl"></div>
+        <div class="cockpit-hud-bracket tr"></div>
+        <div class="cockpit-hud-bracket bl"></div>
+        <div class="cockpit-hud-bracket br"></div>
+
+        {{-- Scanning Laser Line --}}
+        <div class="cockpit-hud-scanline"></div>
+
+        {{-- Glassmorphic HUD Content --}}
+        <div class="cockpit-hud-overlay">
+          <div class="cockpit-hud-top">
+            <div class="hud-pill-live">
+              <span class="pulse-dot" style="width:6px; height:6px;"></span>
+              <span>LIVE COMMAND HUD</span>
             </div>
-            <div class="cockpit-banner-sub">
-              Pusat Komando Vokasi Digital 4.0 · SMKN 1 Air Naningan
+            <div class="hud-tag-sec">
+              <i class="bi bi-wifi"></i> ONLINE · 12ms
+            </div>
+          </div>
+
+          {{-- 4 Live Telemetry Chips --}}
+          <div class="cockpit-hud-telemetry">
+            <div class="hud-chip">
+              <span class="hud-chip-dot blue"></span>
+              <div>
+                <span class="hud-chip-label">SITUAN</span>
+                <span class="hud-chip-text">{{ number_format($totalSiswa) }} Siswa Aktif</span>
+              </div>
+            </div>
+
+            <div class="hud-chip">
+              <span class="hud-chip-dot green"></span>
+              <div>
+                <span class="hud-chip-label">SIRANI</span>
+                <span class="hud-chip-text">{{ $persenSiswaHadir }}% Hadir ({{ $isGerbangAktif ? 'Buka' : 'Tutup' }})</span>
+              </div>
+            </div>
+
+            <div class="hud-chip">
+              <span class="hud-chip-dot amber"></span>
+              <div>
+                <span class="hud-chip-label">PPDB 2026</span>
+                <span class="hud-chip-text">{{ number_format($totalPendaftar) }} Pendaftar</span>
+              </div>
+            </div>
+
+            <div class="hud-chip">
+              <span class="hud-chip-dot purple"></span>
+              <div>
+                <span class="hud-chip-label">HUMAS WEB</span>
+                <span class="hud-chip-text">{{ $totalBerita }} Berita &amp; Rilis</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="cockpit-hud-bottom">
+            <div class="cockpit-hud-title">
+              <i class="bi bi-cpu-fill" style="color:#38bdf8;"></i> Integrated Smart Campus 4.0
+            </div>
+            <div class="cockpit-hud-sub">
+              Pusat Kendali Ekosistem Digital · SMKN 1 Air Naningan
             </div>
           </div>
         </div>
@@ -901,7 +1202,7 @@
     </div>
 
     {{-- Section 1: Modul Operasional Aktif --}}
-    <div class="portal-section-head">
+    <div class="portal-section-head" id="modul-aktif">
       <h2 class="portal-section-title">
         <div class="portal-section-title-icon" style="background:rgba(37,99,235,0.12); color:#2563eb;">
           <i class="bi bi-boxes"></i>
