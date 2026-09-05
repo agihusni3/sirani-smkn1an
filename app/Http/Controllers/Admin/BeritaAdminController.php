@@ -27,7 +27,14 @@ class BeritaAdminController extends Controller
 
         $beritas = $query->latest('tanggal_publikasi')->paginate(15);
 
-        return view('admin.berita.index', compact('beritas'));
+        $counts = [
+            'total' => BeritaSekolah::count(),
+            'published' => BeritaSekolah::where('is_published', true)->count(),
+            'views' => BeritaSekolah::sum('views_count') ?? 0,
+            'banners' => \App\Models\WebsiteBanner::where('is_active', true)->count(),
+        ];
+
+        return view('admin.berita.index', compact('beritas', 'counts'));
     }
 
     public function create()

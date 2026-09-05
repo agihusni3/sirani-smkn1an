@@ -8,7 +8,7 @@
 </head>
 <body>
 <div class="app-container">
-  @include('partials.sidebar')
+  @include('partials.sidebar_web')
   <main class="main-content">
     
     {{-- HEADER BAR --}}

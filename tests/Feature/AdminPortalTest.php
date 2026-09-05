@@ -140,4 +140,67 @@ class AdminPortalTest extends TestCase
         $response->assertSee('Pusat Kendali Modul');
         $response->assertSee('app-launcher-wrap');
     }
+
+    public function test_sidebar_sirani_terisolasi_dan_bersih_dari_menu_ppdb_dan_web(): void
+    {
+        $admin = User::create([
+            'name' => 'Super Administrator',
+            'email' => 'admin@smkn1airnaningan.sch.id',
+            'role' => 'admin',
+            'password' => Hash::make('password'),
+        ]);
+
+        $response = $this->actingAs($admin)->get('/dashboard');
+        $response->assertStatus(200);
+        // Memuat navigasi SIRANI
+        $response->assertSee('SIRANI');
+        $response->assertSee('Dasbor Utama');
+        $response->assertSee('Buku Kasus Disiplin');
+        // Tidak memuat menu PPDB dan Web di sidebar SIRANI
+        $response->assertDontSee('Panitia PPDB 2026');
+        $response->assertDontSee('Hero &amp; Banner Web', false);
+    }
+
+    public function test_sidebar_ppdb_terisolasi_dan_bersih_dari_menu_presensi_sirani(): void
+    {
+        $admin = User::create([
+            'name' => 'Super Administrator',
+            'email' => 'admin@smkn1airnaningan.sch.id',
+            'role' => 'admin',
+            'password' => Hash::make('password'),
+        ]);
+
+        $response = $this->actingAs($admin)->get('/admin/ppdb');
+        $response->assertStatus(200);
+        // Memuat navigasi PPDB 2026
+        $response->assertSee('PPDB 2026');
+        $response->assertSee('Dasbor &amp; Statistik', false);
+        $response->assertSee('Pusat Kendali Modul');
+        // Tidak memuat menu absensi SIRANI di workspace PPDB
+        $response->assertDontSee('Buku Kasus Disiplin');
+        $response->assertDontSee('Piket Harian');
+        $response->assertDontSee('Smart Gate Presensi');
+    }
+
+    public function test_sidebar_web_humas_terisolasi_dan_bersih_dari_menu_presensi_sirani(): void
+    {
+        $admin = User::create([
+            'name' => 'Super Administrator',
+            'email' => 'admin@smkn1airnaningan.sch.id',
+            'role' => 'admin',
+            'password' => Hash::make('password'),
+        ]);
+
+        $response = $this->actingAs($admin)->get('/admin/berita');
+        $response->assertStatus(200);
+        // Memuat navigasi Humas
+        $response->assertSee('HUMAS &amp; WEB', false);
+        $response->assertSee('Kelola Berita &amp; Rilis', false);
+        $response->assertSee('Hero Slider &amp; Banner', false);
+        $response->assertSee('Pusat Kendali Modul');
+        // Tidak memuat menu absensi SIRANI di workspace Humas
+        $response->assertDontSee('Buku Kasus Disiplin');
+        $response->assertDontSee('Piket Harian');
+        $response->assertDontSee('Smart Gate Presensi');
+    }
 }

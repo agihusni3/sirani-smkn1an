@@ -46,13 +46,26 @@ class PpdbAdminController extends Controller
 
         $counts = [
             'total' => PpdbPendaftar::count(),
-            'menunggu' => PpdbPendaftar::where('status', 'menunggu_verifikasi')->count(),
-            'berkas_valid' => PpdbPendaftar::where('status', 'terverifikasi')->count(),
+            'menunggu' => PpdbPendaftar::whereIn('status', ['menunggu', 'menunggu_verifikasi', 'draft'])->count(),
+            'berkas_valid' => PpdbPendaftar::whereIn('status', ['terverifikasi', 'berkas_valid'])->count(),
             'diterima' => PpdbPendaftar::where('status', 'diterima')->count(),
             'ditolak' => PpdbPendaftar::where('status', 'ditolak')->count(),
         ];
 
-        return view('admin.ppdb.index', compact('pendaftars', 'jurusans', 'rombels', 'counts'));
+        // Statistik Peminatan Jurusan
+        $jurusanStats = $jurusans->map(function ($j) {
+            $peminat = PpdbPendaftar::where('jurusan_id_1', $j->id)->count();
+            $diterima = PpdbPendaftar::where('jurusan_diterima_id', $j->id)->where('status', 'diterima')->count();
+            return [
+                'id' => $j->id,
+                'kode' => $j->kode_jurusan,
+                'nama' => $j->nama_jurusan,
+                'peminat' => $peminat,
+                'diterima' => $diterima,
+            ];
+        });
+
+        return view('admin.ppdb.index', compact('pendaftars', 'jurusans', 'rombels', 'counts', 'jurusanStats'));
     }
 
     public function show($id)

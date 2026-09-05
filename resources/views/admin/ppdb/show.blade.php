@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Verifikasi Pendaftar {{ $pendaftar->nomor_pendaftaran }} — PPDB SIRANI</title>
+  <title>Verifikasi Pendaftar {{ $pendaftar->no_pendaftaran ?? $pendaftar->nomor_pendaftaran }} — PPDB 2026 SMKN 1 Air Naningan</title>
   @include('partials.styles')
 </head>
 <body>
 <div class="app-container">
-  @include('partials.sidebar')
+  @include('partials.sidebar_ppdb')
   <main class="main-content">
     
     {{-- HEADER BAR --}}

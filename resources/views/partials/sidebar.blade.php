@@ -122,46 +122,6 @@
     @endif
   </div>
 
-  {{-- WEB SEKOLAH & PPDB ONLINE TERPADU --}}
-  @php
-    $canAccessPpdb = $isAdmin || $isKepsek || $isWakasis || $isPanitiaPpdb;
-    $canAccessWeb = $isAdmin || $isKepsek || $isHumas;
-  @endphp
-  @if($canAccessPpdb || $canAccessWeb)
-  <div class="nav-group">
-    <div class="nav-label">Web &amp; PPDB Online</div>
-    @if($canAccessPpdb)
-      <a href="{{ route('admin.ppdb.index') }}" class="nav-item {{ request()->is('admin/ppdb*') ? 'active' : '' }}">
-        <div class="nav-left-part">
-          <i class="bi bi-mortarboard-fill nav-icon" style="color:#6366f1;"></i>
-          <span class="nav-text">Panitia PPDB 2026</span>
-        </div>
-        <span class="nav-count-badge" style="background:#eef2ff; color:#6366f1; border-color:#c7d2fe;">PPDB</span>
-      </a>
-    @endif
-    @if($canAccessWeb)
-      <a href="{{ route('admin.berita.index') }}" class="nav-item {{ request()->is('admin/berita*') ? 'active' : '' }}">
-        <div class="nav-left-part">
-          <i class="bi bi-newspaper nav-icon" style="color:#0ea5e9;"></i>
-          <span class="nav-text">Kelola Berita &amp; Info</span>
-        </div>
-      </a>
-      <a href="{{ route('admin.banner.index') }}" class="nav-item {{ request()->is('admin/banner*') ? 'active' : '' }}">
-        <div class="nav-left-part">
-          <i class="bi bi-images nav-icon" style="color:#f59e0b;"></i>
-          <span class="nav-text">Hero &amp; Banner Web</span>
-        </div>
-      </a>
-    @endif
-    <a href="{{ route('web.beranda') }}" target="_blank" class="nav-item">
-      <div class="nav-left-part">
-        <i class="bi bi-box-arrow-up-right nav-icon" style="color:#10b981;"></i>
-        <span class="nav-text">Kunjungi Website</span>
-      </div>
-    </a>
-  </div>
-  @endif
-
   {{-- 2. OPERASIONAL HARIAN --}}
   @if($isAdmin || $isGuruPiket || $isKepsek || $isWakasis || $isWakaKurikulum || $isBK || $isWali || $isStafTu)
     <div class="nav-group">

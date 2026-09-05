@@ -9,7 +9,7 @@
 </head>
 <body>
 <div class="app-container">
-  @include('partials.sidebar')
+  @include('partials.sidebar_web')
   <main class="main-content">
     
     <div class="panel no-print" style="background:var(--bg-2); border:1px solid var(--border); padding:12px 18px; margin-bottom:14px; border-radius:var(--r-md);">
