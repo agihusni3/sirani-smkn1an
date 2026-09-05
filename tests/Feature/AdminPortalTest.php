@@ -105,19 +105,131 @@ class AdminPortalTest extends TestCase
         $response->assertSee('Digital Command Center');
         $response->assertSee('Selamat Bertugas, Super Administrator');
 
-        // 3 Modul Aktif
+        // 4 Modul Aktif
+        $response->assertSee('4 Modul Ekosistem Terpadu');
+        $response->assertSee('SITUAN');
+        $response->assertSee('Sistem Informasi Tata Usaha SMKN 1 Air Naningan');
         $response->assertSee('SIRANI');
         $response->assertSee('Sistem Absensi &amp; Ketertiban Siswa/Guru', false);
         $response->assertSee('PPDB ONLINE 2026');
         $response->assertSee('WEB PROFIL &amp; HUMAS', false);
 
-        // 5 Modul Roadmap
-        $response->assertSee('SITUAN');
-        $response->assertSee('Tata Usaha &amp; Persuratan', false);
+        // 4 Modul Roadmap Masa Depan
         $response->assertSee('AKADEMIK &amp; KBM', false);
         $response->assertSee('SARPRAS &amp; ASET', false);
         $response->assertSee('TEFA &amp; UNIT PRODUKSI', false);
         $response->assertSee('PERPUSTAKAAN DIGITAL');
+    }
+
+    public function test_staf_tu_bisa_akses_modul_situan_data_pokok(): void
+    {
+        $tu = User::create([
+            'name' => 'Staf Tata Usaha',
+            'email' => 'tu@smkn1airnaningan.sch.id',
+            'role' => 'staf_tu',
+            'password' => Hash::make('password'),
+        ]);
+
+        $response = $this->actingAs($tu)->get('/portal');
+        $response->assertStatus(200);
+        $response->assertSee('SITUAN');
+        $response->assertSee('Buka Modul SITUAN');
+        $this->assertTrue($tu->canAccessSituan());
+    }
+
+    public function test_wali_kelas_bisa_read_dan_update_siswa_rombelnya_dan_ditolak_rombel_lain(): void
+    {
+        $guruWali = \App\Models\Guru::create([
+            'nama' => 'Wali Kelas X RPL 1',
+            'nip' => '198501012010011001',
+            'status' => 'aktif',
+        ]);
+
+        $userWali = User::create([
+            'name' => 'Wali Kelas X RPL 1',
+            'email' => 'walixrpl1@smkn1airnaningan.sch.id',
+            'role' => 'wali_kelas',
+            'guru_id' => $guruWali->id,
+            'password' => Hash::make('password'),
+        ]);
+
+        $jurusan = \App\Models\Jurusan::firstOrCreate(['kode_jurusan' => 'RPL'], ['nama_jurusan' => 'Rekayasa Perangkat Lunak']);
+        $ta = \App\Models\TahunAjaran::firstOrCreate(['nama' => '2025/2026', 'semester' => 'Ganjil', 'is_active' => true]);
+
+        $rombel1 = \App\Models\Rombel::create([
+            'nama_rombel' => 'X RPL 1',
+            'tingkat' => 10,
+            'jurusan_id' => $jurusan->id,
+            'tahun_ajaran_id' => $ta->id,
+            'wali_kelas_id' => $guruWali->id,
+        ]);
+
+        $rombel2 = \App\Models\Rombel::create([
+            'nama_rombel' => 'X RPL 2',
+            'tingkat' => 10,
+            'jurusan_id' => $jurusan->id,
+            'tahun_ajaran_id' => $ta->id,
+        ]);
+
+        $siswa1 = Siswa::create([
+            'nisn' => '1111111111',
+            'nama' => 'Budi Santoso',
+            'jenis_kelamin' => 'L',
+            'status' => 'aktif',
+        ]);
+
+        \App\Models\SiswaRombel::create([
+            'siswa_id' => $siswa1->id,
+            'rombel_id' => $rombel1->id,
+            'tahun_ajaran_id' => $ta->id,
+            'status_keanggotaan' => 'aktif',
+        ]);
+
+        $siswa2 = Siswa::create([
+            'nisn' => '2222222222',
+            'nama' => 'Dewi Lestari',
+            'jenis_kelamin' => 'P',
+            'status' => 'aktif',
+        ]);
+
+        \App\Models\SiswaRombel::create([
+            'siswa_id' => $siswa2->id,
+            'rombel_id' => $rombel2->id,
+            'tahun_ajaran_id' => $ta->id,
+            'status_keanggotaan' => 'aktif',
+        ]);
+
+        // 1. Wali kelas hanya melihat siswa di rombel binaannya
+        $responseIndex = $this->actingAs($userWali)->get('/siswa');
+        $responseIndex->assertStatus(200);
+        $responseIndex->assertSee('Budi Santoso');
+        $responseIndex->assertDontSee('Dewi Lestari');
+
+        // 2. Wali kelas sukses update data siswa di kelasnya
+        $responseUpdate = $this->actingAs($userWali)->put("/siswa/{$siswa1->id}", [
+            'nisn' => '1111111111',
+            'nama' => 'Budi Santoso Updated',
+            'status' => 'aktif',
+            'no_hp_ortu' => '081234567890',
+        ]);
+        $responseUpdate->assertRedirect();
+        $this->assertDatabaseHas('siswas', [
+            'id' => $siswa1->id,
+            'nama' => 'Budi Santoso Updated',
+            'no_hp_ortu' => '081234567890',
+        ]);
+
+        // 3. Wali kelas ditolak update siswa rombel lain
+        $responseReject = $this->actingAs($userWali)->put("/siswa/{$siswa2->id}", [
+            'nisn' => '2222222222',
+            'nama' => 'Hacked Dewi',
+            'status' => 'aktif',
+        ]);
+        $responseReject->assertSessionHas('error');
+        $this->assertDatabaseMissing('siswas', [
+            'id' => $siswa2->id,
+            'nama' => 'Hacked Dewi',
+        ]);
     }
 
     public function test_kepala_sekolah_bisa_mengakses_portal(): void

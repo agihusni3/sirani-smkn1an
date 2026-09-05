@@ -8,7 +8,9 @@ use App\Models\Guru;
 use App\Models\JadwalHariIni;
 use App\Models\KasusDisiplin;
 use App\Models\PpdbPendaftar;
+use App\Models\Rombel;
 use App\Models\Siswa;
+use App\Models\TahunAjaran;
 use App\Models\WebsiteBanner;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -22,21 +24,26 @@ class AdminPortalController extends Controller
     public function index()
     {
         $user = auth()->user();
+        $canAccessSituan = $user ? $user->canAccessSituan() : false;
         $canAccessSirani = $user ? $user->canAccessSirani() : false;
         $canAccessPpdb   = $user ? $user->canAccessPpdb() : false;
         $canAccessWeb    = $user ? $user->canAccessWebHumas() : false;
 
         $today = Carbon::today()->toDateString();
 
-        // 1. KPI Modul SIRANI (Presensi & Disiplin)
+        // 1. KPI Modul SITUAN — SMKN 1 AN (Data Pokok & Administrasi Tata Usaha)
         $totalSiswa = Siswa::where('status', 'aktif')->count();
+        $totalGuru = Guru::where('status', 'aktif')->count();
+        $totalRombel = Rombel::count();
+        $tahunAjaranAktif = TahunAjaran::where('is_active', true)->first();
+
+        // 2. KPI Modul SIRANI (Presensi & Disiplin)
         $siswaHadirToday = Absensi::where('pemilik_type', 'siswa')
             ->where('tanggal', $today)
             ->whereIn('status', ['hadir', 'terlambat'])
             ->count();
         $persenSiswaHadir = $totalSiswa > 0 ? round(($siswaHadirToday / $totalSiswa) * 100, 1) : 0;
 
-        $totalGuru = Guru::where('status', 'aktif')->count();
         $guruHadirToday = Absensi::where('pemilik_type', 'guru')
             ->where('tanggal', $today)
             ->whereIn('status', ['hadir', 'terlambat'])
@@ -47,30 +54,20 @@ class AdminPortalController extends Controller
             ->count();
         $isGerbangAktif = JadwalHariIni::isSesiAktif($today);
 
-        // 2. KPI Modul Web Profil Sekolah & CMS Humas
+        // 3. KPI Modul Web Profil Sekolah & CMS Humas
         $totalBerita = BeritaSekolah::count();
         $totalBannerAktif = WebsiteBanner::where('is_active', true)->count();
         $beritaTerbaru = BeritaSekolah::latest()->first();
 
-        // 3. KPI Modul PPDB Online 2026
+        // 4. KPI Modul PPDB Online 2026
         $totalPendaftar = PpdbPendaftar::count();
         $ppdbMenunggu = PpdbPendaftar::whereIn('status', ['menunggu', 'draft'])->count();
         $ppdbDiterima = PpdbPendaftar::where('status', 'diterima')->count();
         $ppdbDitolak  = PpdbPendaftar::where('status', 'ditolak')->count();
         $ppdbToday    = PpdbPendaftar::whereDate('created_at', $today)->count();
 
-        // 4. Daftar Roadmap Modul Masa Depan (Rancang Bangun)
+        // 5. Daftar Roadmap Modul Masa Depan (Rancang Bangun)
         $futureModules = [
-            [
-                'id'          => 'situan',
-                'name'        => 'SITUAN',
-                'subtitle'    => 'Tata Usaha & Persuratan',
-                'icon'        => 'bi-envelope-paper-heart-fill',
-                'color'       => '#0284c7',
-                'badge'       => 'Tahap Rancang',
-                'description' => 'Sistem Informasi Tata Usaha: agenda surat masuk/keluar, disposisi digital kepala sekolah, arsip SK kepegawaian & mutasi siswa.',
-                'lead'        => 'Kepala Tata Usaha & Staf Administrasi',
-            ],
             [
                 'id'          => 'akademik',
                 'name'        => 'AKADEMIK & KBM',
@@ -115,13 +112,16 @@ class AdminPortalController extends Controller
 
         return view('admin.portal.index', compact(
             'today',
+            'canAccessSituan',
             'canAccessSirani',
             'canAccessPpdb',
             'canAccessWeb',
             'totalSiswa',
+            'totalGuru',
+            'totalRombel',
+            'tahunAjaranAktif',
             'siswaHadirToday',
             'persenSiswaHadir',
-            'totalGuru',
             'guruHadirToday',
             'kasusDisiplinAktif',
             'isGerbangAktif',

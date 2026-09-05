@@ -213,9 +213,12 @@
       @endif
     </div>
 
-    {{-- 4. MASTER DATA --}}
+    {{-- 4. MASTER DATA (SITUAN - Core) --}}
     <div class="nav-group">
-      <div class="nav-label">Master Data</div>
+      <div class="nav-label" style="display:flex; justify-content:space-between; align-items:center;">
+        <span>Data Pokok (SITUAN)</span>
+        <span style="font-size:9px; font-weight:800; padding:1px 5px; border-radius:4px; background:rgba(2,132,199,0.12); color:#0284c7; border:1px solid rgba(2,132,199,0.25);">CORE</span>
+      </div>
       @if($isAdmin || $isWakasis || $isStafTu || $isWakaKurikulum || $isWakaHubin)
         <a href="/siklus-siswa" class="nav-item {{ request()->is('siklus-siswa*') ? 'active' : '' }}">
           <div class="nav-left-part">
@@ -227,8 +230,11 @@
       <a href="/siswa" class="nav-item {{ request()->is('siswa*') ? 'active' : '' }}">
         <div class="nav-left-part">
           <i class="bi bi-people-fill nav-icon"></i>
-          <span class="nav-text">Data Siswa</span>
+          <span class="nav-text">{{ $isWali && !$isAdmin && !$isStafTu ? 'Data Siswa Binaan' : 'Data Siswa' }}</span>
         </div>
+        @if($isWali && !$isAdmin && !$isStafTu)
+          <span class="nav-count-badge" style="background:#ecfdf5; color:#059669; border-color:#a7f3d0; font-size:10px;">Kelas</span>
+        @endif
       </a>
       @if($isAdmin || $isPimpinan || $isStafTu)
         <a href="/guru" class="nav-item {{ request()->is('guru*') ? 'active' : '' }}">

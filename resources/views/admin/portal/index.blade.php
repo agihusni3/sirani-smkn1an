@@ -364,11 +364,11 @@
       letter-spacing: 0.02em;
     }
 
-    /* ─── Active Module Grid (The 3 Core Modules) ─── */
+    /* ─── Active Module Grid (The 4 Core Ecosystem Modules) ─── */
     .portal-active-grid {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 24px;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
     }
 
     .module-card {
@@ -396,6 +396,10 @@
       transition: background 0.25s ease;
     }
 
+    .module-card.card-situan::before {
+      background: linear-gradient(90deg, #0284c7, #0369a1);
+    }
+
     .module-card.card-sirani::before {
       background: linear-gradient(90deg, #10b981, #059669);
     }
@@ -411,6 +415,10 @@
     .module-card:hover {
       transform: translateY(-4px);
       box-shadow: var(--dcc-card-hover);
+    }
+
+    .module-card.card-situan:hover {
+      border-color: rgba(2, 132, 199, 0.4);
     }
 
     .module-card.card-sirani:hover {
@@ -780,13 +788,16 @@
     }
 
     /* Responsive */
-    @media (max-width: 1200px) {
+    @media (max-width: 1280px) {
+      .portal-active-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
       .portal-roadmap-grid {
         grid-template-columns: repeat(3, 1fr);
       }
     }
 
-    @media (max-width: 1024px) {
+    @media (max-width: 900px) {
       .cockpit-hero {
         grid-template-columns: 1fr;
       }
@@ -897,12 +908,85 @@
         </div>
         <span>Modul Sistem Aktif</span>
       </h2>
-      <span class="portal-section-badge">3 Modul Siap Digunakan</span>
+      <span class="portal-section-badge">4 Modul Ekosistem Terpadu</span>
     </div>
 
     <div class="portal-active-grid">
-      
-      {{-- Card 1: SIRANI --}}
+
+      {{-- Card 1: SITUAN — SMKN 1 AN --}}
+      <div class="module-card card-situan {{ $canAccessSituan ? '' : 'is-locked' }}">
+        <div>
+          <div class="module-card-top">
+            <div class="module-card-icon-halo" style="background:linear-gradient(135deg, rgba(2,132,199,0.2), rgba(3,105,161,0.08)); color:#0284c7; border:1px solid rgba(2,132,199,0.25);">
+              <i class="bi bi-buildings-fill"></i>
+            </div>
+            <div style="display:flex; align-items:center; gap:6px;">
+              @if($canAccessSituan)
+                <span class="access-badge allowed"><i class="bi bi-shield-check"></i> Izin Aktif</span>
+              @else
+                <span class="access-badge locked"><i class="bi bi-lock-fill"></i> Akses Terbatas</span>
+              @endif
+              <span class="module-live-pill" style="background:rgba(2,132,199,0.1); color:#0284c7; border:1px solid rgba(2,132,199,0.25);">
+                <span class="pulse-dot" style="background:#0284c7; box-shadow:0 0 0 0 rgba(2,132,199,0.6);"></span> Data Induk
+              </span>
+            </div>
+          </div>
+
+          <h3 class="module-card-name">SITUAN</h3>
+          <p class="module-card-subtitle">Sistem Informasi Tata Usaha SMKN 1 Air Naningan</p>
+
+          <div class="kpi-row">
+            <div class="kpi-item">
+              <span class="kpi-label">Pendidik &amp; Tendik (PTK)</span>
+              <span class="kpi-val" style="color:#0284c7;">{{ $totalGuru }}</span>
+              <span class="kpi-sub">Guru &amp; Pegawai Aktif</span>
+            </div>
+            <div class="kpi-item">
+              <span class="kpi-label">Peserta Didik (Siswa)</span>
+              <span class="kpi-val" style="color:#10b981;">{{ $totalSiswa }}</span>
+              <span class="kpi-sub">Siswa Terdaftar Aktif</span>
+            </div>
+            <div class="kpi-item" style="margin-top:6px;">
+              <span class="kpi-label">Rombel &amp; Jurusan</span>
+              <span class="kpi-val" style="color:#d97706;">{{ $totalRombel }}</span>
+              <span class="kpi-sub">Kelas / 3 Jurusan</span>
+            </div>
+            <div class="kpi-item" style="margin-top:6px;">
+              <span class="kpi-label">Tahun Ajaran Aktif</span>
+              <span class="kpi-val" style="font-size:13px; color:#6366f1;">
+                {{ $tahunAjaranAktif ? $tahunAjaranAktif->nama : '2025/2026' }}
+              </span>
+              <span class="kpi-sub">{{ $tahunAjaranAktif ? ucfirst($tahunAjaranAktif->semester ?? 'Aktif') : 'Semester Berjalan' }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="module-actions">
+          @if($canAccessSituan)
+            <a href="{{ auth()->user() && auth()->user()->isWaliKelas() && !auth()->user()->isAdmin() && !auth()->user()->isStafTu() ? '/siswa' : '/guru' }}" class="btn-launch-primary" style="background:linear-gradient(135deg, #0284c7 0%, #0369a1 100%);">
+              <i class="bi bi-buildings-fill"></i> Buka Modul SITUAN <i class="bi bi-arrow-right-short" style="font-size:18px;"></i>
+            </a>
+            <div class="btn-launch-secondary-row">
+              <a href="/guru" class="btn-launch-secondary" title="Kelola Master Guru &amp; Pegawai">
+                <i class="bi bi-person-badge-fill" style="color:#0284c7;"></i> Data PTK
+              </a>
+              <a href="/siswa" class="btn-launch-secondary" title="Kelola Master Siswa {{ auth()->user() && auth()->user()->isWaliKelas() && !auth()->user()->isAdmin() ? '(Kelas Binaan)' : '' }}">
+                <i class="bi bi-people-fill" style="color:#10b981;"></i> Data Siswa
+              </a>
+            </div>
+          @else
+            <button type="button" class="btn-launch-primary btn-locked" disabled title="Akses ditolak: Hanya untuk Staf Tata Usaha, Pimpinan, dan Wali Kelas">
+              <i class="bi bi-lock-fill"></i> Akses Terbatas (Khusus Staf TU/Pimpinan)
+            </button>
+            <div class="btn-launch-secondary-row">
+              <span class="btn-launch-secondary btn-locked"><i class="bi bi-lock"></i> Data PTK Terkunci</span>
+              <span class="btn-launch-secondary btn-locked"><i class="bi bi-lock"></i> Data Siswa Terkunci</span>
+            </div>
+          @endif
+        </div>
+      </div>
+
+      {{-- Card 2: SIRANI --}}
       <div class="module-card card-sirani {{ $canAccessSirani ? '' : 'is-locked' }}">
         <div>
           <div class="module-card-top">

@@ -407,6 +407,17 @@ class User extends Authenticatable
     }
 
     /**
+     * Cek apakah pengguna memiliki hak akses ke Modul SITUAN (Sistem Informasi Tata Usaha & Data Pokok).
+     */
+    public function canAccessSituan(): bool
+    {
+        return $this->hasAnyRole([
+            'admin', 'kepala_sekolah', 'staf_tu', 'waka_kurikulum', 'waka_kesiswaan',
+            'waka_sarpras', 'waka_hubin', 'wali_kelas'
+        ]);
+    }
+
+    /**
      * Cek apakah pengguna memiliki hak akses ke Modul SIRANI (Presensi & Kedisiplinan).
      */
     public function canAccessSirani(): bool
