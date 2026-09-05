@@ -5,7 +5,14 @@
   --dcc-card-hover: 0 10px 25px -5px rgba(15, 23, 42, 0.06), 0 0 1px 1px rgba(15, 23, 42, 0.02);
   --dcc-telemetry-bg: #f8fafc;
   --dcc-telemetry-border: #e2e8f0;
-  --dcc-text-sub: #64748b;
+  --dcc-text-heading: #000000;
+  --dcc-text: #0f172a;
+  --dcc-text-sub: #475569;
+  --text: #0f172a;
+  --text-2: #334155;
+  --text-3: #64748b;
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 }
 
 [data-theme="dark"] {
@@ -15,7 +22,12 @@
   --dcc-card-hover: 0 12px 30px -8px rgba(0, 0, 0, 0.5), 0 0 1px 1px rgba(255, 255, 255, 0.08);
   --dcc-telemetry-bg: rgba(255, 255, 255, 0.03);
   --dcc-telemetry-border: rgba(255, 255, 255, 0.06);
+  --dcc-text-heading: #ffffff;
+  --dcc-text: #f8fafc;
   --dcc-text-sub: #94a3b8;
+  --text: #f8fafc;
+  --text-2: #cbd5e1;
+  --text-3: #94a3b8;
 }
 
 body {
@@ -28,6 +40,7 @@ body {
   display: flex;
   flex-direction: column;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 /* ─── Topbar ─── */
@@ -104,15 +117,15 @@ body {
   box-sizing: border-box;
 }
 
-/* ─── Hero Mission Control Banner (Minimalist Modern) ─── */
+/* ─── Hero Mission Control Banner (Minimalist Modern / Black Typography) ─── */
 .cockpit-hero {
   position: relative;
   border-radius: 16px;
-  background: #0f172a;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 8px 30px -6px rgba(0, 0, 0, 0.25);
-  padding: 30px 34px;
-  color: #ffffff;
+  background: var(--dcc-card-bg);
+  border: 1px solid var(--dcc-card-border);
+  box-shadow: 0 4px 20px -4px rgba(15, 23, 42, 0.05);
+  padding: 32px 36px;
+  color: #0f172a;
   overflow: hidden;
   margin-bottom: 24px;
   display: grid;
@@ -121,35 +134,56 @@ body {
   align-items: center;
 }
 
+[data-theme="dark"] .cockpit-hero {
+  background: #111827;
+  border-color: rgba(255, 255, 255, 0.08);
+  color: #f8fafc;
+}
+
 .cockpit-salam-badge {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
   padding: 4px 10px;
   border-radius: 6px;
-  font-size: 11px;
+  font-size: 11.5px;
   font-weight: 600;
-  color: #94a3b8;
+  color: #334155;
   margin-bottom: 12px;
 }
 
+[data-theme="dark"] .cockpit-salam-badge {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.1);
+  color: #94a3b8;
+}
+
 .cockpit-title {
-  font-size: 24px;
-  font-weight: 700;
-  letter-spacing: -0.02em;
+  font-size: 26px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
   line-height: 1.25;
   margin: 0 0 10px;
+  color: #0f172a;
+}
+
+[data-theme="dark"] .cockpit-title {
   color: #ffffff;
 }
 
 .cockpit-desc {
-  font-size: 13.5px;
-  color: #94a3b8;
-  line-height: 1.6;
+  font-size: 14px;
+  font-weight: 400;
+  color: #475569;
+  line-height: 1.65;
   margin: 0 0 20px;
   max-width: 580px;
+}
+
+[data-theme="dark"] .cockpit-desc {
+  color: #94a3b8;
 }
 
 .cockpit-meta-row {
@@ -163,14 +197,20 @@ body {
 .cockpit-meta-chip {
   font-size: 11.5px;
   font-weight: 600;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  padding: 5px 11px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  padding: 6px 12px;
   border-radius: 6px;
-  color: #cbd5e1;
+  color: #334155;
   display: inline-flex;
   align-items: center;
   gap: 6px;
+}
+
+[data-theme="dark"] .cockpit-meta-chip {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.08);
+  color: #cbd5e1;
 }
 
 .cockpit-action-row {
@@ -184,46 +224,63 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 7px;
-  padding: 8px 16px;
+  padding: 9px 18px;
   border-radius: 8px;
-  font-size: 12.5px;
+  font-size: 13px;
   font-weight: 600;
   text-decoration: none;
-  transition: all 0.2s ease;
+  transition: all 0.15s ease;
 }
 
 .cockpit-action-btn.primary {
-  background: #0284c7;
+  background: #0f172a;
   color: #ffffff;
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  border: 1px solid #0f172a;
 }
 
 .cockpit-action-btn.primary:hover {
-  background: #0369a1;
+  background: #1e293b;
+  border-color: #1e293b;
   transform: translateY(-1px);
+}
+
+[data-theme="dark"] .cockpit-action-btn.primary {
+  background: #2563eb;
+  border-color: #2563eb;
+  color: #ffffff;
 }
 
 .cockpit-action-btn.secondary {
-  background: rgba(255, 255, 255, 0.06);
-  color: #e2e8f0;
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: #ffffff;
+  color: #0f172a;
+  border: 1px solid #cbd5e1;
 }
 
 .cockpit-action-btn.secondary:hover {
-  background: rgba(255, 255, 255, 0.12);
-  color: #ffffff;
+  background: #f8fafc;
+  border-color: #94a3b8;
   transform: translateY(-1px);
+}
+
+[data-theme="dark"] .cockpit-action-btn.secondary {
+  background: rgba(255, 255, 255, 0.06);
+  color: #e2e8f0;
+  border-color: rgba(255, 255, 255, 0.12);
 }
 
 /* Right: Clean Framed Showcase Image */
 .cockpit-showcase-frame {
   border-radius: 12px;
   overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  border: 1px solid #e2e8f0;
   aspect-ratio: 16 / 9;
   position: relative;
   background: #090e1a;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.06);
+}
+
+[data-theme="dark"] .cockpit-showcase-frame {
+  border-color: rgba(255, 255, 255, 0.12);
 }
 
 .cockpit-showcase-img {
