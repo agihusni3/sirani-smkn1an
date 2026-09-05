@@ -1235,6 +1235,57 @@
           </select>
         </div>
 
+        <div>
+          <label class="form-label" style="font-weight:700; font-size:12px; display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+            <span>Peran Tambahan / Multi-Role (Opsional)</span>
+            <span style="font-size:10.5px; font-weight:600; color:var(--text-3);">Centang peran ganda</span>
+          </label>
+          <div style="background:var(--bg-3); border:1px solid var(--border-2); border-radius:var(--r-sm); padding:10px 12px; max-height:130px; overflow-y:auto; display:grid; grid-template-columns:1fr 1fr; gap:6px 12px;">
+            <label style="display:flex; align-items:center; gap:6px; font-size:11.5px; cursor:pointer;">
+              <input type="checkbox" name="roles[]" value="waka_sarpras" class="akun-sub-role" /> Waka Sarpras
+            </label>
+            <label style="display:flex; align-items:center; gap:6px; font-size:11.5px; cursor:pointer;">
+              <input type="checkbox" name="roles[]" value="waka_hubin" class="akun-sub-role" /> Waka Hubin
+            </label>
+            <label style="display:flex; align-items:center; gap:6px; font-size:11.5px; cursor:pointer;">
+              <input type="checkbox" name="roles[]" value="waka_kurikulum" class="akun-sub-role" /> Waka Kurikulum
+            </label>
+            <label style="display:flex; align-items:center; gap:6px; font-size:11.5px; cursor:pointer;">
+              <input type="checkbox" name="roles[]" value="waka_kesiswaan" class="akun-sub-role" /> Waka Kesiswaan
+            </label>
+            <label style="display:flex; align-items:center; gap:6px; font-size:11.5px; cursor:pointer;">
+              <input type="checkbox" name="roles[]" value="kaprog" class="akun-sub-role" /> Kaprog Jurusan
+            </label>
+            <label style="display:flex; align-items:center; gap:6px; font-size:11.5px; cursor:pointer;">
+              <input type="checkbox" name="roles[]" value="wali_kelas" class="akun-sub-role" /> Wali Kelas
+            </label>
+            <label style="display:flex; align-items:center; gap:6px; font-size:11.5px; cursor:pointer;">
+              <input type="checkbox" name="roles[]" value="guru_piket" class="akun-sub-role" /> Guru Piket
+            </label>
+            <label style="display:flex; align-items:center; gap:6px; font-size:11.5px; cursor:pointer;">
+              <input type="checkbox" name="roles[]" value="guru_bk" class="akun-sub-role" /> Guru BK
+            </label>
+            <label style="display:flex; align-items:center; gap:6px; font-size:11.5px; cursor:pointer;">
+              <input type="checkbox" name="roles[]" value="kepala_bengkel" class="akun-sub-role" /> Kepala Bengkel
+            </label>
+            <label style="display:flex; align-items:center; gap:6px; font-size:11.5px; cursor:pointer;">
+              <input type="checkbox" name="roles[]" value="pustakawan" class="akun-sub-role" /> Pustakawan
+            </label>
+            <label style="display:flex; align-items:center; gap:6px; font-size:11.5px; cursor:pointer;">
+              <input type="checkbox" name="roles[]" value="humas" class="akun-sub-role" /> Tim Humas &amp; Web
+            </label>
+            <label style="display:flex; align-items:center; gap:6px; font-size:11.5px; cursor:pointer;">
+              <input type="checkbox" name="roles[]" value="panitia_ppdb" class="akun-sub-role" /> Panitia PPDB
+            </label>
+            <label style="display:flex; align-items:center; gap:6px; font-size:11.5px; cursor:pointer;">
+              <input type="checkbox" name="roles[]" value="staf_tu" class="akun-sub-role" /> Staf TU
+            </label>
+          </div>
+          <div style="font-size:10.5px; color:var(--text-3); margin-top:3px;">
+            💡 Guru dengan multi-peran dapat berpindah mode kerja secara mandiri melalui <strong>Role Switcher</strong> di bilah atas.
+          </div>
+        </div>
+
         <div style="display:flex; justify-content:space-between; align-items:center; margin-top:12px;">
           <div id="akunDeleteBtnContainer"></div>
           <div style="display:flex; gap:8px;">
@@ -1449,6 +1500,9 @@
     const form = document.getElementById('akunGuruForm');
     const delContainer = document.getElementById('akunDeleteBtnContainer');
     
+    // Reset semua checkbox peran tambahan
+    document.querySelectorAll('.akun-sub-role').forEach(cb => cb.checked = false);
+
     if (guru.user) {
       document.getElementById('akun_username').value = guru.user.username || (guru.user.email ? guru.user.email.split('@')[0] : (guru.nip || ''));
       document.getElementById('akun_email').value = guru.user.email || '';
@@ -1462,6 +1516,14 @@
           <button type="submit" class="btn btn-sm btn-danger"><i class="bi bi-trash3-fill"></i> Hapus Akun</button>
         </form>
       `;
+
+      // Centang peran tambahan yang tersimpan
+      if (Array.isArray(guru.user.roles)) {
+        guru.user.roles.forEach(r => {
+          const cb = document.querySelector('.akun-sub-role[value="' + r + '"]');
+          if (cb) cb.checked = true;
+        });
+      }
     } else {
       let cleanName = (guru.nama || '').toLowerCase().replace(/[^a-z0-9]/g, ' ').trim();
       let defaultUsername = guru.nip ? guru.nip : (cleanName.split(/\s+/)[0] || 'guru');
@@ -1489,6 +1551,12 @@
       document.getElementById('akun_password_hint').style.display = 'none';
       form.action = '/guru/' + guru.id + '/akun';
       delContainer.innerHTML = '';
+
+      // Auto-check jika wali kelas atau piket
+      if (guru.rombels && guru.rombels.length > 0 && defaultRole !== 'wali_kelas') {
+        const cbWali = document.querySelector('.akun-sub-role[value="wali_kelas"]');
+        if (cbWali) cbWali.checked = true;
+      }
     }
     
     openModal('akunGuruModal');

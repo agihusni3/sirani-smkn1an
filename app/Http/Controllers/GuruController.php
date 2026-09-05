@@ -1092,6 +1092,8 @@ class GuruController extends Controller
             'email'    => 'nullable|email|max:255|unique:users,email,' . ($userId ?? 'NULL') . ',id',
             'password' => $userId ? 'nullable|min:4' : 'required|min:4',
             'role'     => 'nullable|in:admin,kepala_sekolah,waka_kesiswaan,waka_kurikulum,waka_sarpras,waka_hubin,kaprog,kepala_bengkel,pustakawan,guru_bk,wali_kelas,guru_piket,staf_tu,guru,humas,panitia_ppdb',
+            'roles'    => 'nullable|array',
+            'roles.*'  => 'in:admin,kepala_sekolah,waka_kesiswaan,waka_kurikulum,waka_sarpras,waka_hubin,kaprog,kepala_bengkel,pustakawan,guru_bk,wali_kelas,guru_piket,staf_tu,guru,humas,panitia_ppdb',
         ], [
             'username.required' => 'Nickname / Username login wajib diisi.',
             'username.unique'   => 'Nickname / Username ini sudah digunakan oleh akun lain.',
@@ -1104,10 +1106,13 @@ class GuruController extends Controller
         $role = $request->input('role') ?: $defaultRole;
         $email = $request->filled('email') ? trim($request->input('email')) : ($username . '@sirani.local');
 
+        $rolesInput = (array) $request->input('roles', []);
+        $rolesList = array_values(array_unique(array_filter(array_merge([$role], $rolesInput))));
+
         $oldRole = $guru->user ? $guru->user->role : null;
 
         // Proteksi self-lockout: Admin tidak boleh mencabut akses Admin dari akunnya sendiri
-        if ($guru->user && auth()->id() === $guru->user->id && $role !== 'admin') {
+        if ($guru->user && auth()->id() === $guru->user->id && $role !== 'admin' && !in_array('admin', $rolesList)) {
             return redirect()->back()->with('error', 'Anda tidak dapat mencabut hak akses Admin dari akun Anda sendiri demi mencegah akun terkunci (lockout).');
         }
 
@@ -1117,17 +1122,20 @@ class GuruController extends Controller
                 'username' => $username,
                 'email'    => $email,
                 'role'     => $role,
+                'roles'    => $rolesList,
             ];
             if ($request->filled('password')) {
                 $updateData['password'] = Hash::make($request->input('password'));
             }
             $guru->user->update($updateData);
 
-            $this->syncRoleToGuruData($guru, $role, $oldRole);
+            foreach ($rolesList as $r) {
+                $this->syncRoleToGuruData($guru, $r, ($r === $role ? $oldRole : null));
+            }
 
-            AuditLog::catat('update', 'auth', "Akun login untuk {$guru->nama} diperbarui (Role: {$role}, Username: {$username}) oleh " . (auth()->user()->name ?? 'Admin'));
+            AuditLog::catat('update', 'auth', "Akun login untuk {$guru->nama} diperbarui (Role Utama: {$role}, Multi-Role: " . implode(', ', $rolesList) . ", Username: {$username}) oleh " . (auth()->user()->name ?? 'Admin'));
 
-            return redirect()->back()->with('success', "Akun login untuk {$guru->nama} berhasil diperbarui (Role: " . ucfirst(str_replace('_', ' ', $role)) . ", Nickname/Username: {$username}). Data penugasan otomatis disinkronkan.");
+            return redirect()->back()->with('success', "Akun login untuk {$guru->nama} berhasil diperbarui (Peran: " . ucfirst(str_replace('_', ' ', $role)) . (count($rolesList) > 1 ? " + " . (count($rolesList) - 1) . " Peran Tambahan" : "") . ", Nickname: {$username}).");
         }
 
         User::create([
@@ -1137,13 +1145,16 @@ class GuruController extends Controller
             'password' => Hash::make($request->input('password')),
             'guru_id'  => $guru->id,
             'role'     => $role,
+            'roles'    => $rolesList,
         ]);
 
-        $this->syncRoleToGuruData($guru, $role, null);
+        foreach ($rolesList as $r) {
+            $this->syncRoleToGuruData($guru, $r, null);
+        }
 
-        AuditLog::catat('create', 'auth', "Akun login baru untuk {$guru->nama} dibuat (Role: {$role}, Username: {$username}) oleh " . (auth()->user()->name ?? 'Admin'));
+        AuditLog::catat('create', 'auth', "Akun login baru untuk {$guru->nama} dibuat (Role Utama: {$role}, Multi-Role: " . implode(', ', $rolesList) . ", Username: {$username}) oleh " . (auth()->user()->name ?? 'Admin'));
 
-        return redirect()->back()->with('success', "Akun login baru untuk {$guru->nama} berhasil dibuat (Role: " . ucfirst(str_replace('_', ' ', $role)) . ", Nickname/Username: {$username}). Data penugasan otomatis disinkronkan.");
+        return redirect()->back()->with('success', "Akun login baru untuk {$guru->nama} berhasil dibuat (Peran: " . ucfirst(str_replace('_', ' ', $role)) . (count($rolesList) > 1 ? " + " . (count($rolesList) - 1) . " Peran Tambahan" : "") . ", Nickname: {$username}).");
     }
 
     /**

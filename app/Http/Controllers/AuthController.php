@@ -162,5 +162,45 @@ class AuthController extends Controller
         return redirect()->back()->with('success', 'Profil dan akun login Anda berhasil diperbarui.');
     }
 
+    /**
+     * Beralih peran aktif pengguna (Role Switcher Mode).
+     */
+    public function switchRole(Request $request)
+    {
+        $user = Auth::user();
+        if (!$user) {
+            return redirect()->route('login');
+        }
+
+        $targetRole = trim((string) $request->input('role'));
+
+        if (!$user->hasAvailableRole($targetRole)) {
+            if ($request->expectsJson() || $request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Anda tidak memiliki hak akses ke peran tersebut.',
+                ], 403);
+            }
+            return redirect()->back()->with('error', 'Anda tidak memiliki hak akses untuk beralih ke peran tersebut.');
+        }
+
+        $user->setActiveRole($targetRole);
+        $meta = User::getRoleMetadata($targetRole);
+
+        AuditLog::catat('switch_role', 'auth', "Pengguna {$user->name} beralih peran ke: {$meta['name']} ({$targetRole})", null, ['target_role' => $targetRole]);
+
+        if ($request->expectsJson() || $request->ajax()) {
+            return response()->json([
+                'success'      => true,
+                'role'         => $targetRole,
+                'role_name'    => $meta['name'],
+                'message'      => 'Mode peran berhasil dialihkan ke ' . $meta['name'],
+                'redirect_url' => route('dashboard'),
+            ]);
+        }
+
+        return redirect()->route('dashboard')->with('success', 'Mode peran aktif dialihkan ke: ' . $meta['name']);
+    }
+
 }
 

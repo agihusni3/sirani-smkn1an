@@ -21,12 +21,12 @@ class RoleMiddleware
 
         $user = Auth::user();
 
-        // Administrator selalu memiliki izin akses ke seluruh rute jika role admin diizinkan atau bypass
-        if ($user->isAdmin()) {
+        // Administrator selalu memiliki izin akses ke seluruh rute
+        if ($user->hasAvailableRole('admin')) {
             return $next($request);
         }
 
-        // Cek kecocokan peran dengan parameter middleware
+        // 1. Cek kecocokan dengan peran aktif saat ini
         foreach ($roles as $role) {
             $role = trim($role);
             $matched = match($role) {
@@ -50,6 +50,14 @@ class RoleMiddleware
             };
 
             if ($matched) {
+                return $next($request);
+            }
+        }
+
+        // 2. Jika peran aktif tidak cocok, periksa apakah pengguna memiliki peran sah tersebut di daftar multi-role
+        foreach ($roles as $role) {
+            $role = trim($role);
+            if ($user->hasAvailableRole($role)) {
                 return $next($request);
             }
         }

@@ -7,6 +7,54 @@
   </button>
 
   @auth
+  @php
+    $currentUser = auth()->user();
+    $availableRolesData = $currentUser ? $currentUser->getAvailableRolesData() : [];
+    $hasMultiRole = count($availableRolesData) > 1;
+    $activeRoleMeta = $currentUser ? \App\Models\User::getRoleMetadata($currentUser->getActiveRole()) : null;
+  @endphp
+
+  @if($hasMultiRole && $activeRoleMeta)
+    {{-- Role Switcher: Minimalist Pill Trigger with Floating Menu --}}
+    <div class="role-switch-wrap" style="position:relative; flex-shrink:0;">
+      <button class="btn role-switch-btn" onclick="window.toggleRoleSwitchDropdown(event, this)" type="button" aria-label="Beralih Mode Peran" title="Mode Aktif: {{ $activeRoleMeta['name'] }} (Klik untuk Ganti Peran)" style="display:inline-flex; align-items:center; gap:6px; height:36px; padding:0 10px; background:var(--bg-2); border:1px solid var(--border-2); border-radius:var(--r-sm); cursor:pointer; font-size:12px; font-weight:800; color:var(--text); transition:all 0.15s ease;">
+        <i class="bi {{ $activeRoleMeta['icon'] }}" style="color:#000000; font-size:13.5px;"></i>
+        <span class="role-switch-badge" style="max-width:110px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; letter-spacing:-0.01em;">{{ $activeRoleMeta['badge'] }}</span>
+        <i class="bi bi-chevron-down" style="font-size:9.5px; opacity:0.5; margin-left:1px;"></i>
+      </button>
+
+      <div class="role-switch-dropdown acct-dropdown" style="right:0; left:auto; top:calc(100% + 6px); width:280px; min-width:260px; max-width:min(90vw, 320px); background:var(--bg-2); border:1px solid var(--border-2); border-radius:var(--r-md); box-shadow:0 16px 45px rgba(0,0,0,0.28); z-index:99999;">
+        <div style="padding:12px 14px; background:var(--bg-3); border-bottom:1px solid var(--border-2); display:flex; align-items:center; justify-content:space-between;">
+          <div style="font-size:12px; font-weight:800; color:var(--text); display:flex; align-items:center; gap:6px;">
+            <i class="bi bi-arrow-repeat" style="color:#10b981; font-size:14px;"></i> Beralih Mode Peran
+          </div>
+          <span style="font-size:10px; font-weight:700; color:var(--text-3); background:var(--bg-2); padding:1px 6px; border-radius:4px; border:1px solid var(--border);">
+            {{ count($availableRolesData) }} Peran
+          </span>
+        </div>
+        <div style="padding:8px; max-height:300px; overflow-y:auto;">
+          @foreach($availableRolesData as $rData)
+            <form action="{{ route('switch-role') }}" method="POST" style="margin:0;">
+              @csrf
+              <input type="hidden" name="role" value="{{ $rData['role'] }}">
+              <button type="submit" class="acct-dropdown-item {{ $rData['is_active'] ? 'active-role-item' : '' }}" style="width:100%; text-align:left; padding:9px 12px; font-size:12px; font-weight:{{ $rData['is_active'] ? '800' : '600' }}; color:var(--text); background:{{ $rData['is_active'] ? 'rgba(0,0,0,0.06)' : 'none' }}; border:1px solid {{ $rData['is_active'] ? 'var(--border-2)' : 'transparent' }}; border-radius:6px; cursor:pointer; display:flex; align-items:center; justify-content:space-between; margin-bottom:4px; box-sizing:border-box;">
+                <div style="display:flex; align-items:center; gap:8px; overflow:hidden;">
+                  <i class="bi {{ $rData['icon'] }}" style="font-size:14px; color:{{ $rData['is_active'] ? '#000000' : 'var(--text-2)' }};"></i>
+                  <div style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ $rData['name'] }}</div>
+                </div>
+                @if($rData['is_active'])
+                  <span style="display:inline-flex; align-items:center; justify-content:center; width:18px; height:18px; border-radius:50%; background:#10B981; color:#ffffff; font-size:10px; font-weight:900; flex-shrink:0;">
+                    <i class="bi bi-check"></i>
+                  </span>
+                @endif
+              </button>
+            </form>
+          @endforeach
+        </div>
+      </div>
+    </div>
+  @endif
+
   {{-- Account Dropdown (Logo/Avatar Only) --}}
   <div class="acct-wrap" style="position:relative; flex-shrink:0;">
     <button class="acct-btn btn-icon-header" onclick="window.toggleAcctDropdown(event, this)" type="button" aria-label="Akun & Logout" title="{{ auth()->user()?->name ?? 'Admin' }} (Klik untuk Menu / Logout)" style="display:inline-flex; align-items:center; justify-content:center; width:36px; height:36px; min-width:36px; max-width:36px; flex-shrink:0; background:var(--bg-2); border:1px solid var(--border-2); border-radius:var(--r-sm); padding:0; cursor:pointer;">
@@ -41,6 +89,29 @@
           <button type="button" onclick="openModalKartuGuruSaya()" class="acct-dropdown-item" style="width:100%; text-align:left; padding:9px 12px; font-size:12px; font-weight:800; color:#0284c7; background:rgba(2,132,199,0.08); border:1px solid rgba(2,132,199,0.2); border-radius:6px; cursor:pointer; display:flex; align-items:center; gap:8px; white-space:nowrap; box-sizing:border-box; margin-bottom:6px;">
             <i class="bi bi-qr-code-scan" style="font-size:14.5px; color:#0284c7;"></i> Kartu &amp; QR Presensi Saya
           </button>
+        @endif
+
+        @if($hasMultiRole)
+          <div style="padding:6px 8px 2px; font-size:10px; font-weight:800; text-transform:uppercase; color:var(--text-3); letter-spacing:0.5px; border-top:1px solid var(--border-2); margin-top:4px;">
+            Pilihan Mode Peran
+          </div>
+          <div style="margin-bottom:6px;">
+            @foreach($availableRolesData as $rData)
+              <form action="{{ route('switch-role') }}" method="POST" style="margin:0;">
+                @csrf
+                <input type="hidden" name="role" value="{{ $rData['role'] }}">
+                <button type="submit" class="acct-dropdown-item" style="width:100%; text-align:left; padding:7px 10px; font-size:11.5px; font-weight:{{ $rData['is_active'] ? '800' : '600' }}; color:var(--text); background:{{ $rData['is_active'] ? 'rgba(0,0,0,0.04)' : 'none' }}; border:none; border-radius:6px; cursor:pointer; display:flex; align-items:center; justify-content:space-between; box-sizing:border-box;">
+                  <span style="display:flex; align-items:center; gap:6px;">
+                    <i class="bi {{ $rData['icon'] }}" style="font-size:12px; color:{{ $rData['is_active'] ? '#000000' : 'var(--text-2)' }};"></i>
+                    {{ $rData['badge'] }}
+                  </span>
+                  @if($rData['is_active'])
+                    <i class="bi bi-check-circle-fill" style="color:#10B981; font-size:12px;"></i>
+                  @endif
+                </button>
+              </form>
+            @endforeach
+          </div>
         @endif
 
         <button type="button" onclick="openModalProfilMandiri()" class="acct-dropdown-item" style="width:100%; text-align:left; padding:9px 12px; font-size:12px; font-weight:700; color:var(--text); background:none; border:none; border-radius:6px; cursor:pointer; display:flex; align-items:center; gap:8px; white-space:nowrap; box-sizing:border-box;">
@@ -340,6 +411,16 @@ window.toggleTheme = function() {
   });
 };
 
+window.toggleRoleSwitchDropdown = function(e, btn) {
+  if (e && e.stopPropagation) e.stopPropagation();
+  const wrap = btn.closest('.role-switch-wrap');
+  const dropdown = wrap ? wrap.querySelector('.role-switch-dropdown') : null;
+  document.querySelectorAll('.acct-dropdown').forEach(d => {
+    if (d !== dropdown) d.classList.remove('open');
+  });
+  if (dropdown) dropdown.classList.toggle('open');
+};
+
 window.toggleAcctDropdown = function(e, btn) {
   if (e && e.stopPropagation) e.stopPropagation();
   const wrap = btn.closest('.acct-wrap');
@@ -351,7 +432,7 @@ window.toggleAcctDropdown = function(e, btn) {
 };
 
 document.addEventListener('click', function(e) {
-  if (!e.target.closest('.acct-wrap')) {
+  if (!e.target.closest('.acct-wrap') && !e.target.closest('.role-switch-wrap')) {
     document.querySelectorAll('.acct-dropdown').forEach(d => d.classList.remove('open'));
   }
 });

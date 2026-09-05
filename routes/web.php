@@ -106,6 +106,9 @@ Route::middleware('auth')->group(function () {
     // 0c. Pengaturan Profil & Ganti Password Mandiri (Semua Pengguna Terautentikasi)
     Route::post('/profil/update', [AuthController::class, 'updateProfil'])->name('profil.update');
 
+    // 0d. Role Switcher Mode (Multi-Role Switching)
+    Route::post('/switch-role', [AuthController::class, 'switchRole'])->name('switch-role');
+
     // 1. Dashboard Utama (Tampilan Cerdas Terisolasi Sesuai Hak Akses Peran)
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
