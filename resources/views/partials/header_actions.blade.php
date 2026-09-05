@@ -9,10 +9,80 @@
   @auth
   @php
     $currentUser = auth()->user();
+    $canAccessPortal = $currentUser && ($currentUser->isAdmin() || $currentUser->isKepalaSekolah());
     $availableRolesData = $currentUser ? $currentUser->getAvailableRolesData() : [];
     $hasMultiRole = count($availableRolesData) > 1;
     $activeRoleMeta = $currentUser ? \App\Models\User::getRoleMetadata($currentUser->getActiveRole()) : null;
   @endphp
+
+  @if($canAccessPortal)
+    {{-- 9-Dots Modular Ecosystem Switcher --}}
+    <div class="app-launcher-wrap" style="position:relative; flex-shrink:0;">
+      <button type="button" class="btn btn-icon-header" onclick="window.toggleAppLauncherDropdown(event, this)" style="width:36px; height:36px; min-width:36px; max-width:36px; padding:0; flex-shrink:0; display:inline-flex; align-items:center; justify-content:center; background:var(--bg-2); border:1px solid var(--border-2); border-radius:var(--r-sm); cursor:pointer;" title="Pusat Kendali & Switcher Modul" aria-label="Switcher Modul Ekosistem">
+        <i class="bi bi-grid-3x3-gap-fill" style="color:var(--text); font-size:14.5px;"></i>
+      </button>
+
+      <div class="app-launcher-dropdown acct-dropdown" style="right:0; left:auto; top:calc(100% + 6px); width:310px; min-width:290px; max-width:min(90vw, 340px); background:var(--bg-2); border:1px solid var(--border-2); border-radius:var(--r-md); box-shadow:0 18px 45px rgba(0,0,0,0.3); z-index:99999;">
+        <div style="padding:11px 14px; background:var(--bg-3); border-bottom:1px solid var(--border-2); display:flex; align-items:center; justify-content:space-between;">
+          <div style="font-size:11.5px; font-weight:900; color:var(--text); display:flex; align-items:center; gap:6px;">
+            <i class="bi bi-cpu-fill" style="color:#2563eb;"></i> EKOSISTEM DIGITAL
+          </div>
+          <a href="{{ route('admin.portal') }}" style="font-size:11px; font-weight:800; color:#2563eb; text-decoration:none; display:inline-flex; align-items:center; gap:2px;">
+            Pusat Kendali <i class="bi bi-arrow-right-short"></i>
+          </a>
+        </div>
+        <div style="padding:10px; display:grid; grid-template-columns:repeat(3, 1fr); gap:8px;">
+          <a href="{{ route('admin.portal') }}" style="display:flex; flex-direction:column; align-items:center; text-align:center; padding:10px 4px; border-radius:10px; text-decoration:none; color:var(--text); background:var(--surface); border:1px solid var(--border); transition:all 0.15s ease;">
+            <div style="width:32px; height:32px; border-radius:8px; background:rgba(37,99,235,0.1); color:#2563eb; display:flex; align-items:center; justify-content:center; font-size:15px; margin-bottom:5px;">
+              <i class="bi bi-speedometer2"></i>
+            </div>
+            <span style="font-size:10px; font-weight:800; line-height:1.2;">Portal KPI</span>
+            <span style="font-size:8.5px; color:var(--text-3); margin-top:2px;">Launchpad</span>
+          </a>
+
+          <a href="/dashboard" style="display:flex; flex-direction:column; align-items:center; text-align:center; padding:10px 4px; border-radius:10px; text-decoration:none; color:var(--text); background:var(--surface); border:1px solid var(--border); transition:all 0.15s ease;">
+            <div style="width:32px; height:32px; border-radius:8px; background:rgba(16,185,129,0.1); color:#10b981; display:flex; align-items:center; justify-content:center; font-size:15px; margin-bottom:5px;">
+              <i class="bi bi-fingerprint"></i>
+            </div>
+            <span style="font-size:10px; font-weight:800; line-height:1.2;">SIRANI</span>
+            <span style="font-size:8.5px; color:var(--text-3); margin-top:2px;">Presensi</span>
+          </a>
+
+          <a href="/admin/ppdb" style="display:flex; flex-direction:column; align-items:center; text-align:center; padding:10px 4px; border-radius:10px; text-decoration:none; color:var(--text); background:var(--surface); border:1px solid var(--border); transition:all 0.15s ease;">
+            <div style="width:32px; height:32px; border-radius:8px; background:rgba(217,119,6,0.1); color:#d97706; display:flex; align-items:center; justify-content:center; font-size:15px; margin-bottom:5px;">
+              <i class="bi bi-person-badge-fill"></i>
+            </div>
+            <span style="font-size:10px; font-weight:800; line-height:1.2;">PPDB 2026</span>
+            <span style="font-size:8.5px; color:var(--text-3); margin-top:2px;">Penerimaan</span>
+          </a>
+
+          <a href="/admin/berita" style="display:flex; flex-direction:column; align-items:center; text-align:center; padding:10px 4px; border-radius:10px; text-decoration:none; color:var(--text); background:var(--surface); border:1px solid var(--border); transition:all 0.15s ease;">
+            <div style="width:32px; height:32px; border-radius:8px; background:rgba(99,102,241,0.1); color:#6366f1; display:flex; align-items:center; justify-content:center; font-size:15px; margin-bottom:5px;">
+              <i class="bi bi-globe-americas"></i>
+            </div>
+            <span style="font-size:10px; font-weight:800; line-height:1.2;">Web Profil</span>
+            <span style="font-size:8.5px; color:var(--text-3); margin-top:2px;">Humas CMS</span>
+          </a>
+
+          <a href="/smart-gate" target="_blank" style="display:flex; flex-direction:column; align-items:center; text-align:center; padding:10px 4px; border-radius:10px; text-decoration:none; color:var(--text); background:var(--surface); border:1px solid var(--border); transition:all 0.15s ease;">
+            <div style="width:32px; height:32px; border-radius:8px; background:rgba(14,165,233,0.1); color:#0ea5e9; display:flex; align-items:center; justify-content:center; font-size:15px; margin-bottom:5px;">
+              <i class="bi bi-upc-scan"></i>
+            </div>
+            <span style="font-size:10px; font-weight:800; line-height:1.2;">Smart Gate</span>
+            <span style="font-size:8.5px; color:var(--text-3); margin-top:2px;">Kiosk Live</span>
+          </a>
+
+          <a href="/audit" style="display:flex; flex-direction:column; align-items:center; text-align:center; padding:10px 4px; border-radius:10px; text-decoration:none; color:var(--text); background:var(--surface); border:1px solid var(--border); transition:all 0.15s ease;">
+            <div style="width:32px; height:32px; border-radius:8px; background:rgba(100,116,139,0.1); color:#64748b; display:flex; align-items:center; justify-content:center; font-size:15px; margin-bottom:5px;">
+              <i class="bi bi-shield-check"></i>
+            </div>
+            <span style="font-size:10px; font-weight:800; line-height:1.2;">Audit Log</span>
+            <span style="font-size:8.5px; color:var(--text-3); margin-top:2px;">Keamanan</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  @endif
 
   @if($hasMultiRole && $activeRoleMeta)
     {{-- Role Switcher: Minimalist Pill Trigger with Floating Menu --}}
@@ -431,8 +501,18 @@ window.toggleAcctDropdown = function(e, btn) {
   if (dropdown) dropdown.classList.toggle('open');
 };
 
+window.toggleAppLauncherDropdown = function(e, btn) {
+  if (e && e.stopPropagation) e.stopPropagation();
+  const wrap = btn.closest('.app-launcher-wrap');
+  const dropdown = wrap ? wrap.querySelector('.app-launcher-dropdown') : null;
+  document.querySelectorAll('.acct-dropdown').forEach(d => {
+    if (d !== dropdown) d.classList.remove('open');
+  });
+  if (dropdown) dropdown.classList.toggle('open');
+};
+
 document.addEventListener('click', function(e) {
-  if (!e.target.closest('.acct-wrap') && !e.target.closest('.role-switch-wrap')) {
+  if (!e.target.closest('.acct-wrap') && !e.target.closest('.role-switch-wrap') && !e.target.closest('.app-launcher-wrap')) {
     document.querySelectorAll('.acct-dropdown').forEach(d => d.classList.remove('open'));
   }
 });

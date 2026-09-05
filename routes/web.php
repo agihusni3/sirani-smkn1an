@@ -87,8 +87,17 @@ Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:60
 
 Route::match(['get', 'post'], '/logout', [AuthController::class, 'logout'])->name('logout');
 
+use App\Http\Controllers\AdminPortalController;
+
 // Rute Internal Terproteksi Dasbor Utama & Master Data (Hanya Staf/Admin Terautentikasi)
 Route::middleware('auth')->group(function () {
+    // 00. Pusat Kendali Ekosistem Digital (Modular Command Center / Launchpad Admin & Pimpinan)
+    Route::middleware('role:admin,kepala_sekolah')->group(function () {
+        Route::get('/portal', [AdminPortalController::class, 'index'])->name('admin.portal');
+        Route::get('/hub', [AdminPortalController::class, 'index']);
+        Route::get('/admin/portal', [AdminPortalController::class, 'index']);
+    });
+
     // 0a. Smart Gate Kiosk RFID & Barcode (Hanya Admin & Guru Piket)
     Route::middleware('role:admin,guru_piket')->group(function () {
         Route::get('/smart-gate', [\App\Http\Controllers\RfidController::class, 'kiosk'])->name('rfid.kiosk');

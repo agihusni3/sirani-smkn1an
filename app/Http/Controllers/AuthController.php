@@ -88,7 +88,8 @@ class AuthController extends Controller
 
                 AuditLog::catat('login', 'auth', "Login berhasil: {$nama} ({$userIdentifier})", null, ['role' => $user->role ?? 'wali_kelas']);
 
-                return redirect()->intended('/dashboard')
+                $targetUrl = ($user->isAdmin() || $user->isKepalaSekolah()) ? '/portal' : '/dashboard';
+                return redirect()->intended($targetUrl)
                     ->with('success', 'Selamat datang kembali, ' . $nama . '!');
             }
         }

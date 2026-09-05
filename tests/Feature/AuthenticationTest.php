@@ -17,21 +17,39 @@ class AuthenticationTest extends TestCase
         $response->assertRedirect('/login');
     }
 
-    public function test_login_sukses_langsung_masuk_ke_dashboard(): void
+    public function test_login_sukses_admin_masuk_ke_portal_dan_guru_ke_dashboard(): void
     {
-        $user = User::create([
+        $admin = User::create([
             'name' => 'Admin Test',
             'email' => 'admin@smkn1airnaningan.sch.id',
+            'role' => 'admin',
             'password' => Hash::make('password'),
         ]);
 
-        $response = $this->post('/login', [
+        $responseAdmin = $this->post('/login', [
             'email' => 'admin@smkn1airnaningan.sch.id',
             'password' => 'password',
         ]);
 
-        $this->assertAuthenticatedAs($user);
-        $response->assertRedirect('/dashboard');
+        $this->assertAuthenticatedAs($admin);
+        $responseAdmin->assertRedirect('/portal');
+
+        $this->post('/logout');
+
+        $guru = User::create([
+            'name' => 'Guru Test',
+            'email' => 'guru@smkn1airnaningan.sch.id',
+            'role' => 'guru',
+            'password' => Hash::make('password'),
+        ]);
+
+        $responseGuru = $this->post('/login', [
+            'email' => 'guru@smkn1airnaningan.sch.id',
+            'password' => 'password',
+        ]);
+
+        $this->assertAuthenticatedAs($guru);
+        $responseGuru->assertRedirect('/dashboard');
     }
 
     public function test_login_gagal_menampilkan_pesan_error(): void
