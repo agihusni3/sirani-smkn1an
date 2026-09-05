@@ -129,7 +129,7 @@
       Silakan gunakan modul lain yang telah diizinkan atau hubungi <strong>Super Administrator</strong> jika Anda membutuhkan penugasan peran tambahan.
     </p>
     <a href="{{ route('admin.portal') }}" class="btn-return-portal">
-      <i class="bi bi-grid-fill"></i> Kembali ke DCC SMKN 1 AN
+      <i class="bi bi-command"></i> Kembali ke DCC SMKN 1 AN
     </a>
     <div class="footer-note">
       Digital Command Center · SMKN 1 Air Naningan

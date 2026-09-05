@@ -53,7 +53,7 @@
 
 
         <a href="{{ route('admin.portal') }}" class="acct-dropdown-item" style="width:100%; text-align:left; padding:9px 12px; font-size:12px; font-weight:700; color:var(--text); text-decoration:none; display:flex; align-items:center; gap:8px; white-space:nowrap; box-sizing:border-box;">
-          <i class="bi bi-grid-3x3-gap-fill" style="font-size:14px; color:#0284c7;"></i> DCC SMKN 1 AN
+          <i class="bi bi-command" style="font-size:14px; color:#0284c7;"></i> DCC SMKN 1 AN
         </a>
 
         <button type="button" onclick="openModalProfilMandiri()" class="acct-dropdown-item" style="width:100%; text-align:left; padding:9px 12px; font-size:12px; font-weight:700; color:var(--text); background:none; border:none; border-radius:6px; cursor:pointer; display:flex; align-items:center; gap:8px; white-space:nowrap; box-sizing:border-box;">

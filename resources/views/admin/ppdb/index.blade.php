@@ -85,7 +85,7 @@
 
       <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
         <a href="{{ route('admin.portal') }}" class="btn btn-sm" style="background:rgba(255,255,255,0.12); color:#ffffff; font-weight:800; border-radius:8px; font-size:12px; padding:8px 14px; border:1px solid rgba(255,255,255,0.25); text-decoration:none; display:inline-flex; align-items:center; gap:6px;" title="Buka Digital Command Center SMKN 1 AN">
-          <i class="bi bi-grid-3x3-gap-fill" style="color:#38bdf8;"></i> DCC SMKN 1 AN
+          <i class="bi bi-command" style="color:#38bdf8;"></i> DCC SMKN 1 AN
         </a>
         <a href="{{ route('ppdb.formulir') }}" target="_blank" class="btn btn-sm" style="background:#f59e0b; color:#000000; font-weight:900; border-radius:8px; font-size:12px; padding:8px 16px; border:none; text-decoration:none; display:inline-flex; align-items:center; gap:6px;">
           <i class="bi bi-box-arrow-up-right"></i> Form Pendaftaran Publik
