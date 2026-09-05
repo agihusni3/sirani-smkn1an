@@ -275,9 +275,9 @@
                             <i class="fa-solid fa-id-card-clip" style="color: var(--brand-blue);"></i>
                             <span>Cek Presensi</span>
                         </a>
-                        <a href="{{ route('dashboard') }}" class="btn-nav-sirani" title="Masuk Sistem SIRANI GTK &amp; Guru">
-                            <i class="fa-solid fa-shield-halved" style="color: #60a5fa;"></i>
-                            <span>SIRANI Hub</span>
+                        <a href="{{ route('login') }}" class="btn-nav-login" title="Login ke Sistem &amp; Portal DCC">
+                            <i class="fa-solid fa-right-to-bracket" style="color: #38bdf8;"></i>
+                            <span>Login</span>
                         </a>
                     </div>
 
@@ -425,13 +425,13 @@
                             </div>
                         </a>
 
-                        <a href="{{ route('dashboard') }}" class="drawer-gateway-card">
+                        <a href="{{ route('login') }}" class="drawer-gateway-card">
                             <div class="gateway-icon-box dark">
-                                <i class="fa-solid fa-shield-halved"></i>
+                                <i class="fa-solid fa-right-to-bracket"></i>
                             </div>
                             <div>
-                                <div class="gateway-card-title">SIRANI Hub System</div>
-                                <div class="gateway-card-sub">Login GTK, Guru &amp; Presensi</div>
+                                <div class="gateway-card-title">Login Sistem</div>
+                                <div class="gateway-card-sub">Masuk DCC &amp; Portal GTK</div>
                             </div>
                         </a>
                     </div>

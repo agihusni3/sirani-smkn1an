@@ -398,12 +398,13 @@
             box-shadow: 0 4px 12px rgba(0,0,0,0.06);
         }
 
+        .btn-nav-login,
         .btn-nav-sirani {
             display: inline-flex;
             align-items: center;
             gap: 7px;
-            padding: 6px 15px;
-            font-size: 0.8rem;
+            padding: 6px 16px;
+            font-size: 0.82rem;
             font-weight: 700;
             border-radius: 24px;
             background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
@@ -412,8 +413,10 @@
             box-shadow: 0 2px 8px rgba(15, 23, 42, 0.18);
             transition: var(--transition);
             white-space: nowrap;
+            text-decoration: none;
         }
 
+        .btn-nav-login:hover,
         .btn-nav-sirani:hover {
             background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
             transform: translateY(-1px);
