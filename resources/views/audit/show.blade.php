@@ -16,8 +16,19 @@
     <header class="header" style="margin-bottom: 20px;">
       <div class="header-title">
         <div style="font-size: 12px; margin-bottom: 6px;">
-          <a href="{{ route('audit.index') }}" style="color: var(--text-3); text-decoration: none; font-weight: 700; display: inline-flex; align-items: center; gap: 6px;">
-            <i class="bi bi-arrow-left"></i> Kembali ke Audit Trail
+          @php
+            $prevUrl = url()->previous();
+            $backText = 'Kembali ke Audit Trail Global';
+            if (str_contains($prevUrl, 'situan')) {
+                $backText = 'Kembali ke Log Modul SITUAN';
+            } elseif (str_contains($prevUrl, 'ppdb')) {
+                $backText = 'Kembali ke Log Modul PPDB';
+            } elseif (str_contains($prevUrl, 'berita') || str_contains($prevUrl, 'banner')) {
+                $backText = 'Kembali ke Log Modul Web Humas';
+            }
+          @endphp
+          <a href="{{ $prevUrl ?: route('audit.index') }}" style="color: var(--text-3); text-decoration: none; font-weight: 700; display: inline-flex; align-items: center; gap: 6px;">
+            <i class="bi bi-arrow-left"></i> {{ $backText }}
           </a>
         </div>
         <h1 style="margin:0; font-size:22px; display:flex; align-items:center; gap:8px;">

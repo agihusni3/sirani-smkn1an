@@ -63,7 +63,7 @@
   <div class="nav-group">
     <div class="nav-label">Navigasi Utama</div>
     
-    <a href="{{ route('situan.index') }}" class="nav-item {{ request()->is('situan*') ? 'active' : '' }}" title="Dasbor Statistik Administrasi &amp; Data Pokok">
+    <a href="{{ route('situan.index') }}" class="nav-item {{ (request()->is('situan') || request()->is('situan/dashboard')) ? 'active' : '' }}" title="Dasbor Statistik Administrasi &amp; Data Pokok">
       <div class="nav-left-part">
         <i class="bi bi-speedometer2 nav-icon" style="color:#0284c7;"></i>
         <span class="nav-text">Dasbor Tata Usaha</span>
@@ -136,6 +136,13 @@
     <div class="nav-group">
       <div class="nav-label">Administrasi Kelembagaan</div>
 
+      <a href="{{ route('situan.log') }}" class="nav-item {{ request()->is('situan/log*') ? 'active' : '' }}" title="Riwayat &amp; Log Mutasi Data Tata Usaha">
+        <div class="nav-left-part">
+          <i class="bi bi-journal-text nav-icon" style="color:#0284c7;"></i>
+          <span class="nav-text">Riwayat &amp; Log TU</span>
+        </div>
+      </a>
+
       @if($isAdmin)
         <a href="/pengaturan-sekolah" class="nav-item {{ request()->is('pengaturan-sekolah*') ? 'active' : '' }}" title="Profil Lembaga, Identitas Sekolah &amp; Kop Surat Resmi">
           <div class="nav-left-part">
@@ -153,10 +160,10 @@
       @endif
 
       @if($isAdmin || $isKepsek || $isWakasis)
-        <a href="/audit" class="nav-item {{ request()->is('audit*') ? 'active' : '' }}" title="Audit Trail Log Aktivitas Sistem">
+        <a href="/audit" class="nav-item {{ request()->is('audit*') ? 'active' : '' }}" title="Audit Trail Global DCC">
           <div class="nav-left-part">
             <i class="bi bi-shield-lock-fill nav-icon" style="color:#475569;"></i>
-            <span class="nav-text">Audit Trail</span>
+            <span class="nav-text">Audit Global (DCC)</span>
           </div>
         </a>
       @endif

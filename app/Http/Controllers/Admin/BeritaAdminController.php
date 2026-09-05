@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\AuditLog;
 use App\Models\BeritaSekolah;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -62,7 +63,17 @@ class BeritaAdminController extends Controller
         $validated['tanggal_publikasi'] = now();
         $validated['is_pinned'] = $request->has('is_pinned');
 
-        BeritaSekolah::create($validated);
+        $berita = BeritaSekolah::create($validated);
+
+        // Audit Trail Web Humas
+        AuditLog::catat(
+            'create',
+            'web_humas',
+            "Publikasi konten web/humas: '{$berita->judul}' (Kategori: {$berita->kategori}, Status: {$berita->status})",
+            null,
+            ['id' => $berita->id, 'judul' => $berita->judul, 'kategori' => $berita->kategori, 'status' => $berita->status],
+            $berita
+        );
 
         return redirect()->route('admin.berita.index')->with('success', 'Berita / Pengumuman berhasil ditambahkan.');
     }
@@ -76,6 +87,7 @@ class BeritaAdminController extends Controller
     public function update(Request $request, $id)
     {
         $berita = BeritaSekolah::findOrFail($id);
+        $oldData = ['judul' => $berita->judul, 'kategori' => $berita->kategori, 'status' => $berita->status];
 
         $validated = $request->validate([
             'judul' => 'required|string|max:200',
@@ -94,14 +106,62 @@ class BeritaAdminController extends Controller
         $validated['is_pinned'] = $request->has('is_pinned');
         $berita->update($validated);
 
+        // Audit Trail Web Humas
+        AuditLog::catat(
+            'update',
+            'web_humas',
+            "Pembaruan konten web/humas: '{$berita->judul}'",
+            $oldData,
+            ['id' => $berita->id, 'judul' => $berita->judul, 'kategori' => $berita->kategori, 'status' => $berita->status],
+            $berita
+        );
+
         return redirect()->route('admin.berita.index')->with('success', 'Berita berhasil diperbarui.');
     }
 
     public function destroy($id)
     {
         $berita = BeritaSekolah::findOrFail($id);
+        $oldData = ['id' => $berita->id, 'judul' => $berita->judul, 'kategori' => $berita->kategori];
+        $judul = $berita->judul;
+
         $berita->delete();
 
+        // Audit Trail Web Humas
+        AuditLog::catat(
+            'delete',
+            'web_humas',
+            "Menghapus artikel web/humas: '{$judul}'",
+            $oldData,
+            null,
+            $berita
+        );
+
         return redirect()->route('admin.berita.index')->with('success', 'Berita berhasil dihapus.');
+    }
+
+    /**
+     * Tampilkan Riwayat & Audit Trail Khusus Modul Humas & Website.
+     */
+    public function log(Request $request)
+    {
+        $filters = $request->only(['aksi', 'dari', 'sampai', 'cari']);
+
+        $logs = AuditLog::with('user')
+            ->webHumas()
+            ->filter($filters)
+            ->latest('created_at')
+            ->paginate(30)
+            ->withQueryString();
+
+        $aksiOptions = ['create', 'update', 'delete'];
+
+        $counts = [
+            'total'     => AuditLog::webHumas()->count(),
+            'hari_ini'  => AuditLog::webHumas()->whereDate('created_at', today())->count(),
+            'minggu_ini'=> AuditLog::webHumas()->whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()])->count(),
+        ];
+
+        return view('admin.berita.log', compact('logs', 'filters', 'aksiOptions', 'counts'));
     }
 }

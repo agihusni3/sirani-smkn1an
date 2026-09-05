@@ -163,7 +163,10 @@
                   </span>
                 </td>
                 <td>
-                  <span class="modul-capsule">{{ $log->modul }}</span>
+                  @php $grp = $log->modulGroupBadge(); @endphp
+                  <span class="modul-capsule" style="background:{{ $grp['bg'] }}; color:{{ $grp['warna'] }}; border-color:{{ $grp['border'] }}; font-weight:800; display:inline-flex; align-items:center; gap:4px;" title="{{ $grp['sub'] }} (Sub-modul: {{ $log->modul }})">
+                    <i class="bi {{ $grp['icon'] }}"></i> {{ $grp['nama'] }}
+                  </span>
                 </td>
                 <td>
                   <div style="font-size: 13px; color: var(--text); line-height: 1.45;">

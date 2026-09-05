@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Ppdb;
 
 use App\Http\Controllers\Controller;
+use App\Models\AuditLog;
 use App\Models\Jurusan;
 use App\Models\PpdbPendaftar;
 use App\Models\Rombel;
@@ -91,6 +92,9 @@ class PpdbAdminController extends Controller
         if ($st === 'menunggu') $st = 'menunggu_verifikasi';
         if ($st === 'berkas_valid') $st = 'terverifikasi';
 
+        $statusLama = $pendaftar->status;
+        $jurusanLama = $pendaftar->jurusan_diterima_id;
+
         $pendaftar->status = $st;
         if (!empty($validated['jurusan_diterima_id'])) {
             $pendaftar->jurusan_diterima_id = $validated['jurusan_diterima_id'];
@@ -101,6 +105,16 @@ class PpdbAdminController extends Controller
         $pendaftar->diverifikasi_oleh = auth()->user()->nama ?? auth()->user()->name ?? 'Admin';
         $pendaftar->diverifikasi_pada = now();
         $pendaftar->save();
+
+        // Audit Trail PPDB
+        AuditLog::catat(
+            'update',
+            'ppdb',
+            "Verifikasi pendaftar PPDB: {$pendaftar->nama_lengkap} ({$pendaftar->no_pendaftaran}) status diubah menjadi " . strtoupper($pendaftar->status),
+            ['status' => $statusLama, 'jurusan_diterima_id' => $jurusanLama],
+            ['status' => $pendaftar->status, 'jurusan_diterima_id' => $pendaftar->jurusan_diterima_id, 'catatan' => $pendaftar->catatan_panitia],
+            $pendaftar
+        );
 
         return back()->with('success', 'Status pendaftar ' . $pendaftar->nama_lengkap . ' berhasil diperbarui.');
     }
@@ -115,9 +129,45 @@ class PpdbAdminController extends Controller
 
         try {
             $siswa = $mutasiService->mutasiKeSiswa($pendaftar, $request->rombel_id);
+
+            // Audit Trail PPDB
+            AuditLog::catat(
+                'create',
+                'ppdb',
+                "Migrasi calon siswa PPDB {$pendaftar->nama_lengkap} ({$pendaftar->no_pendaftaran}) menjadi Siswa Aktif SITUAN/SIRANI (NISN: {$siswa->nisn})",
+                null,
+                ['pendaftar_id' => $pendaftar->id, 'siswa_id' => $siswa->id, 'rombel_id' => $request->rombel_id],
+                $pendaftar
+            );
+
             return back()->with('success', "Sukses! Calon siswa {$pendaftar->nama_lengkap} resmi dimutasi menjadi Siswa Aktif SIRANI (NISN: {$siswa->nisn}).");
         } catch (\Exception $e) {
             return back()->with('error', 'Gagal memutasi siswa: ' . $e->getMessage());
         }
+    }
+
+    /**
+     * Tampilkan Riwayat & Audit Trail Khusus Modul PPDB 2026.
+     */
+    public function log(Request $request)
+    {
+        $filters = $request->only(['aksi', 'dari', 'sampai', 'cari']);
+
+        $logs = AuditLog::with('user')
+            ->ppdb()
+            ->filter($filters)
+            ->latest('created_at')
+            ->paginate(30)
+            ->withQueryString();
+
+        $aksiOptions = ['create', 'update', 'delete'];
+
+        $counts = [
+            'total'     => AuditLog::ppdb()->count(),
+            'hari_ini'  => AuditLog::ppdb()->whereDate('created_at', today())->count(),
+            'minggu_ini'=> AuditLog::ppdb()->whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()])->count(),
+        ];
+
+        return view('admin.ppdb.log', compact('logs', 'filters', 'aksiOptions', 'counts'));
     }
 }

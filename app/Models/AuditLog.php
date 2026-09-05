@@ -119,8 +119,116 @@ class AuditLog extends Model
     }
 
     // ──────────────────────────────────────────────
+    // Kategori & Kelompok Modul Ekosistem
+    // ──────────────────────────────────────────────
+
+    public const MODUL_SITUAN = ['situan', 'siswa', 'guru', 'rombel', 'siklus', 'settings', 'backup'];
+    public const MODUL_SIRANI = ['sirani', 'absensi', 'piket', 'izin', 'izin_guru', 'rfid', 'disiplin', 'jadwal'];
+    public const MODUL_PPDB = ['ppdb', 'ppdb_verifikasi', 'ppdb_seleksi', 'ppdb_migrasi'];
+    public const MODUL_WEB_HUMAS = ['web_humas', 'web', 'humas', 'berita', 'banner'];
+
+    public function namaModulGroup(): string
+    {
+        $modul = strtolower($this->modul);
+        if (in_array($modul, self::MODUL_SITUAN)) {
+            return 'SITUAN (Tata Usaha)';
+        }
+        if (in_array($modul, self::MODUL_SIRANI)) {
+            return 'SIRANI (Presensi)';
+        }
+        if (in_array($modul, self::MODUL_PPDB)) {
+            return 'PPDB 2026';
+        }
+        if (in_array($modul, self::MODUL_WEB_HUMAS)) {
+            return 'Web & Humas';
+        }
+        if ($modul === 'auth') {
+            return 'Otentikasi / DCC';
+        }
+        return strtoupper($this->modul);
+    }
+
+    public function modulGroupBadge(): array
+    {
+        $modul = strtolower($this->modul);
+        if (in_array($modul, self::MODUL_SITUAN)) {
+            return [
+                'nama' => 'SITUAN',
+                'sub'  => 'Tata Usaha',
+                'warna'=> '#0284c7',
+                'bg'   => 'rgba(2, 132, 199, 0.12)',
+                'border'=> 'rgba(2, 132, 199, 0.3)',
+                'icon' => 'bi-buildings-fill',
+            ];
+        }
+        if (in_array($modul, self::MODUL_SIRANI)) {
+            return [
+                'nama' => 'SIRANI',
+                'sub'  => 'Presensi & Disiplin',
+                'warna'=> '#10b981',
+                'bg'   => 'rgba(16, 185, 129, 0.12)',
+                'border'=> 'rgba(16, 185, 129, 0.3)',
+                'icon' => 'bi-fingerprint',
+            ];
+        }
+        if (in_array($modul, self::MODUL_PPDB)) {
+            return [
+                'nama' => 'PPDB 2026',
+                'sub'  => 'Panitia Seleksi',
+                'warna'=> '#d97706',
+                'bg'   => 'rgba(217, 119, 6, 0.12)',
+                'border'=> 'rgba(217, 119, 6, 0.3)',
+                'icon' => 'bi-mortarboard-fill',
+            ];
+        }
+        if (in_array($modul, self::MODUL_WEB_HUMAS)) {
+            return [
+                'nama' => 'HUMAS & WEB',
+                'sub'  => 'Publikasi',
+                'warna'=> '#0ea5e9',
+                'bg'   => 'rgba(14, 165, 233, 0.12)',
+                'border'=> 'rgba(14, 165, 233, 0.3)',
+                'icon' => 'bi-globe-americas',
+            ];
+        }
+        return [
+            'nama' => strtoupper($this->modul),
+            'sub'  => 'Sistem',
+            'warna'=> '#64748b',
+            'bg'   => 'rgba(100, 116, 139, 0.12)',
+            'border'=> 'rgba(100, 116, 139, 0.3)',
+            'icon' => 'bi-shield-shaded',
+        ];
+    }
+
+    // ──────────────────────────────────────────────
     // Scopes
     // ──────────────────────────────────────────────
+
+    public function scopeSituan($query)
+    {
+        return $query->whereIn('modul', self::MODUL_SITUAN);
+    }
+
+    public function scopeSirani($query)
+    {
+        return $query->whereIn('modul', self::MODUL_SIRANI);
+    }
+
+    public function scopePpdb($query)
+    {
+        return $query->whereIn('modul', self::MODUL_PPDB);
+    }
+
+    public function scopeWebHumas($query)
+    {
+        return $query->whereIn('modul', self::MODUL_WEB_HUMAS);
+    }
+
+    public function scopeAuthModul($query)
+    {
+        return $query->where('modul', 'auth');
+    }
 
     public function scopeFilter($query, array $filters)
     {

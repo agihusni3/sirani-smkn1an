@@ -57,7 +57,7 @@
   <div class="nav-group">
     <div class="nav-label">Manajemen Publikasi</div>
     
-    <a href="{{ route('admin.berita.index') }}" class="nav-item {{ request()->is('admin/berita') ? 'active' : '' }}">
+    <a href="{{ route('admin.berita.index') }}" class="nav-item {{ (request()->is('admin/berita') && !request()->is('admin/berita/log*')) ? 'active' : '' }}">
       <div class="nav-left-part">
         <i class="bi bi-newspaper nav-icon" style="color:#0ea5e9;"></i>
         <span class="nav-text">Kelola Berita &amp; Rilis</span>
@@ -69,6 +69,13 @@
       <div class="nav-left-part">
         <i class="bi bi-pen-fill nav-icon" style="color:#10b981;"></i>
         <span class="nav-text">Tulis Berita Baru</span>
+      </div>
+    </a>
+
+    <a href="{{ route('admin.berita.log') }}" class="nav-item {{ request()->is('admin/berita/log*') ? 'active' : '' }}" title="Riwayat &amp; Log Publikasi Konten Humas &amp; Website">
+      <div class="nav-left-part">
+        <i class="bi bi-journal-text nav-icon" style="color:#6366f1;"></i>
+        <span class="nav-text">Log Riwayat Web</span>
       </div>
     </a>
   </div>

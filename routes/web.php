@@ -120,6 +120,7 @@ Route::middleware('auth')->group(function () {
     Route::middleware('role:admin,kepala_sekolah,staf_tu,waka_kurikulum,waka_kesiswaan,waka_sarpras,waka_hubin,wali_kelas')->group(function () {
         Route::get('/situan', [\App\Http\Controllers\SituanDashboardController::class, 'index'])->name('situan.index');
         Route::get('/situan/dashboard', [\App\Http\Controllers\SituanDashboardController::class, 'index'])->name('situan.dashboard');
+        Route::get('/situan/log', [\App\Http\Controllers\SituanDashboardController::class, 'log'])->name('situan.log');
         Route::get('/admin/situan', [\App\Http\Controllers\SituanDashboardController::class, 'index']);
     });
 
@@ -232,17 +233,16 @@ Route::middleware('auth')->group(function () {
 
     // 8. Kios Presensi Mandiri (Hanya Admin & Guru Piket)
     Route::middleware('role:admin,guru_piket')->group(function () {
-        Route::get('/kiosk', [\App\Http\Controllers\KioskController::class, 'index'])->name('kiosk.index');
-        Route::post('/kiosk/tap', [\App\Http\Controllers\KioskController::class, 'scan'])->name('kiosk.tap');
-        Route::post('/kiosk/stream', [\App\Http\Controllers\KioskController::class, 'streamLogs'])->name('kiosk.stream');
+        Route::get('/kiosk', [\App\Http\Controllers\RfidController::class, 'kiosk'])->name('kiosk.index');
+        Route::post('/kiosk/tap', [\App\Http\Controllers\RfidController::class, 'scan'])->name('kiosk.tap');
     });
 
     // 9. Surat Izin Siswa Terpadu (Admin, Wakasis & Guru Piket)
     Route::middleware('role:admin,waka_kesiswaan,guru_piket')->group(function () {
-        Route::get('/izin-siswa', [\App\Http\Controllers\IzinController::class, 'index'])->name('izin.index');
-        Route::get('/izin-siswa/cetak-pdf', [\App\Http\Controllers\IzinController::class, 'cetakPdf'])->name('izin.cetak-pdf');
-        Route::post('/izin-siswa', [\App\Http\Controllers\IzinController::class, 'store'])->name('izin.store');
-        Route::post('/izin-siswa/store', [\App\Http\Controllers\IzinController::class, 'store'])->name('izin-siswa.store');
+        Route::get('/izin-siswa', [\App\Http\Controllers\IzinSiswaController::class, 'index'])->name('izin.index');
+        Route::get('/izin-siswa/cetak-pdf', [\App\Http\Controllers\IzinSiswaController::class, 'cetakPdf'])->name('izin.cetak-pdf');
+        Route::post('/izin-siswa', [\App\Http\Controllers\IzinSiswaController::class, 'store'])->name('izin.store');
+        Route::post('/izin-siswa/store', [\App\Http\Controllers\IzinSiswaController::class, 'store'])->name('izin-siswa.store');
     });
 
     // 10. Guru Piket Operasional Meja Piket (Admin, Wakasis & Guru Piket)
@@ -332,6 +332,7 @@ Route::middleware('auth')->group(function () {
         // Panitia PPDB Online (Admin, Kepsek, Panitia PPDB, Waka Kesiswaan)
         Route::middleware('role:admin,kepala_sekolah,panitia_ppdb,waka_kesiswaan')->group(function () {
             Route::get('/ppdb', [PpdbAdminController::class, 'index'])->name('ppdb.index');
+            Route::get('/ppdb/log', [PpdbAdminController::class, 'log'])->name('ppdb.log');
             Route::get('/ppdb/{id}', [PpdbAdminController::class, 'show'])->name('ppdb.show');
             Route::put('/ppdb/{id}/status', [PpdbAdminController::class, 'updateStatus'])->name('ppdb.update_status');
             Route::post('/ppdb/{id}/mutasi', [PpdbAdminController::class, 'mutasi'])->name('ppdb.mutasi');
@@ -339,6 +340,7 @@ Route::middleware('auth')->group(function () {
 
         // Kelola Berita, Pengumuman, Agenda & Hero Banner (Admin, Kepsek, Humas)
         Route::middleware('role:admin,kepala_sekolah,humas')->group(function () {
+            Route::get('/berita/log', [BeritaAdminController::class, 'log'])->name('berita.log');
             Route::resource('/berita', BeritaAdminController::class);
             Route::resource('/banner', WebsiteBannerController::class);
             Route::post('/banner/{banner}/toggle', [WebsiteBannerController::class, 'toggle'])->name('banner.toggle');

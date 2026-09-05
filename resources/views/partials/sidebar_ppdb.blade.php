@@ -64,10 +64,17 @@
   <div class="nav-group">
     <div class="nav-label">Navigasi PPDB</div>
     
-    <a href="{{ route('admin.ppdb.index') }}" class="nav-item {{ (request()->is('admin/ppdb') && empty($statusQuery) && empty($jurusanQuery)) ? 'active' : '' }}">
+    <a href="{{ route('admin.ppdb.index') }}" class="nav-item {{ (request()->is('admin/ppdb') && empty($statusQuery) && empty($jurusanQuery) && !request()->is('admin/ppdb/log*')) ? 'active' : '' }}">
       <div class="nav-left-part">
         <i class="bi bi-speedometer2 nav-icon" style="color:#d97706;"></i>
         <span class="nav-text">Dasbor &amp; Statistik</span>
+      </div>
+    </a>
+
+    <a href="{{ route('admin.ppdb.log') }}" class="nav-item {{ request()->is('admin/ppdb/log*') ? 'active' : '' }}" title="Riwayat Verifikasi &amp; Log Aktivitas Panitia PPDB">
+      <div class="nav-left-part">
+        <i class="bi bi-journal-text nav-icon" style="color:#d97706;"></i>
+        <span class="nav-text">Log Riwayat PPDB</span>
       </div>
     </a>
   </div>

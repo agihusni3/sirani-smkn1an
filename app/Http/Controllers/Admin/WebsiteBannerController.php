@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\AuditLog;
 use App\Models\WebsiteBanner;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -58,7 +59,17 @@ class WebsiteBannerController extends Controller
 
         $validated['is_active'] = $request->has('is_active');
 
-        WebsiteBanner::create($validated);
+        $banner = WebsiteBanner::create($validated);
+
+        // Audit Trail Web Humas
+        AuditLog::catat(
+            'create',
+            'web_humas',
+            "Menambahkan banner website baru: '{$banner->judul}' (Posisi: {$banner->posisi})",
+            null,
+            ['id' => $banner->id, 'judul' => $banner->judul, 'posisi' => $banner->posisi, 'is_active' => $banner->is_active],
+            $banner
+        );
 
         return redirect()->route('admin.banner.index')
             ->with('success', 'Banner Website baru berhasil dipublikasikan!');
@@ -77,6 +88,8 @@ class WebsiteBannerController extends Controller
      */
     public function update(Request $request, WebsiteBanner $banner)
     {
+        $oldData = ['judul' => $banner->judul, 'posisi' => $banner->posisi, 'is_active' => $banner->is_active, 'urutan' => $banner->urutan];
+
         $validated = $request->validate([
             'posisi'         => 'required|string|in:hero_home,top_bar,popup_modal,ppdb_callout',
             'posisi_teks'    => 'nullable|string|in:left,center,right',
@@ -107,6 +120,16 @@ class WebsiteBannerController extends Controller
 
         $banner->update($validated);
 
+        // Audit Trail Web Humas
+        AuditLog::catat(
+            'update',
+            'web_humas',
+            "Memperbarui banner website: '{$banner->judul}'",
+            $oldData,
+            ['id' => $banner->id, 'judul' => $banner->judul, 'posisi' => $banner->posisi, 'is_active' => $banner->is_active],
+            $banner
+        );
+
         return redirect()->route('admin.banner.index')
             ->with('success', 'Banner Website berhasil diperbarui!');
     }
@@ -116,11 +139,24 @@ class WebsiteBannerController extends Controller
      */
     public function destroy(WebsiteBanner $banner)
     {
+        $oldData = ['id' => $banner->id, 'judul' => $banner->judul, 'posisi' => $banner->posisi];
+        $judul = $banner->judul;
+
         if ($banner->gambar && Storage::disk('public')->exists($banner->gambar)) {
             Storage::disk('public')->delete($banner->gambar);
         }
 
         $banner->delete();
+
+        // Audit Trail Web Humas
+        AuditLog::catat(
+            'delete',
+            'web_humas',
+            "Menghapus banner website: '{$judul}'",
+            $oldData,
+            null,
+            $banner
+        );
 
         return redirect()->route('admin.banner.index')
             ->with('success', 'Hero Banner berhasil dihapus.');
@@ -135,6 +171,17 @@ class WebsiteBannerController extends Controller
         $banner->save();
 
         $status = $banner->is_active ? 'diaktifkan' : 'dinonaktifkan';
+
+        // Audit Trail Web Humas
+        AuditLog::catat(
+            'update',
+            'web_humas',
+            "Mengubah status tayang banner '{$banner->judul}' menjadi {$status}",
+            null,
+            ['id' => $banner->id, 'judul' => $banner->judul, 'is_active' => $banner->is_active],
+            $banner
+        );
+
         return redirect()->route('admin.banner.index')
             ->with('success', "Banner '{$banner->judul}' berhasil {$status}.");
     }

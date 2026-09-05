@@ -92,4 +92,57 @@ class SituanDashboardController extends Controller
             'recentAuditLogs'
         ));
     }
+
+    /**
+     * Tampilkan Riwayat & Log Aktivitas Tata Usaha (SITUAN).
+     */
+    public function log(Request $request)
+    {
+        $user = auth()->user();
+        if (!$user || !$user->canAccessSituan()) {
+            abort(403, 'Akses Ditolak: Anda tidak memiliki wewenang untuk mengakses Modul SITUAN.');
+        }
+
+        $filters = $request->only(['modul', 'aksi', 'dari', 'sampai', 'cari']);
+
+        $query = AuditLog::with('user')->situan();
+
+        if (!empty($filters['modul'])) {
+            $query->where('modul', $filters['modul']);
+        }
+        if (!empty($filters['aksi'])) {
+            $query->where('aksi', $filters['aksi']);
+        }
+        if (!empty($filters['dari'])) {
+            $query->whereDate('created_at', '>=', $filters['dari']);
+        }
+        if (!empty($filters['sampai'])) {
+            $query->whereDate('created_at', '<=', $filters['sampai']);
+        }
+        if (!empty($filters['cari'])) {
+            $query->where('deskripsi', 'like', '%' . $filters['cari'] . '%');
+        }
+
+        $logs = $query->latest('created_at')->paginate(30)->withQueryString();
+
+        $subModulOptions = [
+            'siswa'    => 'Data Pokok Siswa',
+            'guru'     => 'Data Guru & PTK',
+            'rombel'   => 'Rombel & Jurusan',
+            'siklus'   => 'Siklus Akademik',
+            'settings' => 'Profil Lembaga',
+            'backup'   => 'Backup Database',
+            'situan'   => 'Tata Usaha Umum',
+        ];
+
+        $aksiOptions = ['create', 'update', 'delete', 'transisi', 'koreksi'];
+
+        $counts = [
+            'total'     => AuditLog::situan()->count(),
+            'hari_ini'  => AuditLog::situan()->whereDate('created_at', today())->count(),
+            'minggu_ini'=> AuditLog::situan()->whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()])->count(),
+        ];
+
+        return view('situan.log', compact('user', 'logs', 'filters', 'subModulOptions', 'aksiOptions', 'counts'));
+    }
 }
