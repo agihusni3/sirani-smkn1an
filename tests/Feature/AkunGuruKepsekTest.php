@@ -132,7 +132,7 @@ class AkunGuruKepsekTest extends TestCase
             'password' => 'kepsek123',
         ]);
 
-        $res->assertRedirect('/dashboard');
+        $res->assertRedirect('/portal');
         $this->assertAuthenticated();
     }
 
@@ -158,7 +158,7 @@ class AkunGuruKepsekTest extends TestCase
             'password' => 'guru1234',
         ]);
 
-        $res->assertRedirect('/dashboard');
+        $res->assertRedirect('/portal');
         $this->assertAuthenticated();
     }
 }

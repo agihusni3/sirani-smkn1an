@@ -20,7 +20,7 @@ class AdminPortalTest extends TestCase
         $response->assertRedirect('/login');
     }
 
-    public function test_guru_biasa_ditolak_akses_portal_dengan_status_403(): void
+    public function test_guru_biasa_bisa_mengakses_dcc_portal_dan_melihat_status_izin_modul(): void
     {
         $guru = User::create([
             'name' => 'Guru Biasa',
@@ -30,7 +30,28 @@ class AdminPortalTest extends TestCase
         ]);
 
         $response = $this->actingAs($guru)->get('/portal');
-        $response->assertStatus(403);
+        $response->assertStatus(200);
+        $response->assertSee('DCC SMKN 1 AN');
+        $response->assertSee('Buka Modul SIRANI');
+    }
+
+    public function test_guru_biasa_ditolak_akses_modul_ppdb_dan_web_humas_tanpa_wewenang(): void
+    {
+        $guru = User::create([
+            'name' => 'Guru Biasa',
+            'email' => 'guru@smkn1airnaningan.sch.id',
+            'role' => 'guru',
+            'password' => Hash::make('password'),
+        ]);
+
+        // Guru berhak ke SIRANI
+        $this->actingAs($guru)->get('/dashboard')->assertOk();
+
+        // Guru biasa ditolak akses ke Modul PPDB Admin
+        $this->actingAs($guru)->get('/admin/ppdb')->assertStatus(403);
+
+        // Guru biasa ditolak akses ke Modul Web Humas Admin
+        $this->actingAs($guru)->get('/admin/berita')->assertStatus(403);
     }
 
     public function test_admin_bisa_mengakses_portal_dan_melihat_modul_aktif_serta_roadmap(): void

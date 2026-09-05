@@ -21,6 +21,11 @@ class AdminPortalController extends Controller
      */
     public function index()
     {
+        $user = auth()->user();
+        $canAccessSirani = $user ? $user->canAccessSirani() : false;
+        $canAccessPpdb   = $user ? $user->canAccessPpdb() : false;
+        $canAccessWeb    = $user ? $user->canAccessWebHumas() : false;
+
         $today = Carbon::today()->toDateString();
 
         // 1. KPI Modul SIRANI (Presensi & Disiplin)
@@ -110,6 +115,9 @@ class AdminPortalController extends Controller
 
         return view('admin.portal.index', compact(
             'today',
+            'canAccessSirani',
+            'canAccessPpdb',
+            'canAccessWeb',
             'totalSiswa',
             'siswaHadirToday',
             'persenSiswaHadir',

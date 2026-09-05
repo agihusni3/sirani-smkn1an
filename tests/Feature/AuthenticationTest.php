@@ -17,7 +17,7 @@ class AuthenticationTest extends TestCase
         $response->assertRedirect('/login');
     }
 
-    public function test_login_sukses_admin_masuk_ke_portal_dan_guru_ke_dashboard(): void
+    public function test_login_sukses_semua_pengguna_diarahkan_ke_dcc_portal(): void
     {
         $admin = User::create([
             'name' => 'Admin Test',
@@ -49,7 +49,7 @@ class AuthenticationTest extends TestCase
         ]);
 
         $this->assertAuthenticatedAs($guru);
-        $responseGuru->assertRedirect('/dashboard');
+        $responseGuru->assertRedirect('/portal');
     }
 
     public function test_login_gagal_menampilkan_pesan_error(): void

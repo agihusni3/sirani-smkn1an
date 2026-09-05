@@ -454,6 +454,57 @@
       letter-spacing: 0.02em;
     }
 
+    .access-badge {
+      font-size: 10.5px;
+      font-weight: 800;
+      padding: 3px 8px;
+      border-radius: 8px;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      letter-spacing: 0.02em;
+    }
+
+    .access-badge.allowed {
+      background: rgba(16, 185, 129, 0.12);
+      color: #10b981;
+      border: 1px solid rgba(16, 185, 129, 0.25);
+    }
+
+    .access-badge.locked {
+      background: rgba(239, 68, 68, 0.1);
+      color: #ef4444;
+      border: 1px solid rgba(239, 68, 68, 0.2);
+    }
+
+    .module-card.is-locked {
+      background: rgba(15, 23, 42, 0.02);
+      border-style: dashed;
+      border-color: rgba(148, 163, 184, 0.35);
+    }
+
+    .dark .module-card.is-locked {
+      background: rgba(15, 23, 42, 0.4);
+      border-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .btn-launch-primary.btn-locked {
+      background: #334155 !important;
+      color: #94a3b8 !important;
+      cursor: not-allowed !important;
+      border: 1px dashed rgba(255, 255, 255, 0.12) !important;
+      box-shadow: none !important;
+      transform: none !important;
+      filter: none !important;
+    }
+
+    .btn-launch-secondary.btn-locked {
+      opacity: 0.45;
+      cursor: not-allowed;
+      pointer-events: none;
+      border-style: dashed;
+    }
+
     .module-card-name {
       font-size: 18px;
       font-weight: 900;
@@ -852,15 +903,22 @@
     <div class="portal-active-grid">
       
       {{-- Card 1: SIRANI --}}
-      <div class="module-card card-sirani">
+      <div class="module-card card-sirani {{ $canAccessSirani ? '' : 'is-locked' }}">
         <div>
           <div class="module-card-top">
             <div class="module-card-icon-halo" style="background:linear-gradient(135deg, rgba(16,185,129,0.2), rgba(5,150,105,0.08)); color:#10b981; border:1px solid rgba(16,185,129,0.25);">
               <i class="bi bi-fingerprint"></i>
             </div>
-            <span class="module-live-pill" style="background:rgba(16,185,129,0.1); color:#10b981; border:1px solid rgba(16,185,129,0.25);">
-              <span class="pulse-dot"></span> Aktif
-            </span>
+            <div style="display:flex; align-items:center; gap:6px;">
+              @if($canAccessSirani)
+                <span class="access-badge allowed"><i class="bi bi-shield-check"></i> Izin Aktif</span>
+              @else
+                <span class="access-badge locked"><i class="bi bi-lock-fill"></i> Akses Terbatas</span>
+              @endif
+              <span class="module-live-pill" style="background:rgba(16,185,129,0.1); color:#10b981; border:1px solid rgba(16,185,129,0.25);">
+                <span class="pulse-dot"></span> Aktif
+              </span>
+            </div>
           </div>
 
           <h3 class="module-card-name">SIRANI</h3>
@@ -893,30 +951,47 @@
         </div>
 
         <div class="module-actions">
-          <a href="/dashboard" class="btn-launch-primary" style="background:linear-gradient(135deg, #10b981 0%, #059669 100%);">
-            <i class="bi bi-speedometer2"></i> Buka Modul SIRANI <i class="bi bi-arrow-right-short" style="font-size:18px;"></i>
-          </a>
-          <div class="btn-launch-secondary-row">
-            <a href="/smart-gate" target="_blank" class="btn-launch-secondary">
-              <i class="bi bi-upc-scan" style="color:#10b981;"></i> Smart Gate
+          @if($canAccessSirani)
+            <a href="/dashboard" class="btn-launch-primary" style="background:linear-gradient(135deg, #10b981 0%, #059669 100%);">
+              <i class="bi bi-speedometer2"></i> Buka Modul SIRANI <i class="bi bi-arrow-right-short" style="font-size:18px;"></i>
             </a>
-            <a href="/laporan" class="btn-launch-secondary">
-              <i class="bi bi-file-earmark-bar-graph" style="color:#0284c7;"></i> Laporan
-            </a>
-          </div>
+            <div class="btn-launch-secondary-row">
+              <a href="/smart-gate" target="_blank" class="btn-launch-secondary">
+                <i class="bi bi-upc-scan" style="color:#10b981;"></i> Smart Gate
+              </a>
+              <a href="/laporan" class="btn-launch-secondary">
+                <i class="bi bi-file-earmark-bar-graph" style="color:#0284c7;"></i> Laporan
+              </a>
+            </div>
+          @else
+            <button type="button" class="btn-launch-primary btn-locked" disabled title="Akses ditolak: Anda tidak memiliki wewenang untuk membuka Modul SIRANI">
+              <i class="bi bi-lock-fill"></i> Akses Terbatas (Khusus Pendidik/Staf)
+            </button>
+            <div class="btn-launch-secondary-row">
+              <span class="btn-launch-secondary btn-locked"><i class="bi bi-lock"></i> Smart Gate Terkunci</span>
+              <span class="btn-launch-secondary btn-locked"><i class="bi bi-lock"></i> Laporan Terkunci</span>
+            </div>
+          @endif
         </div>
       </div>
 
       {{-- Card 2: PPDB ONLINE 2026 --}}
-      <div class="module-card card-ppdb">
+      <div class="module-card card-ppdb {{ $canAccessPpdb ? '' : 'is-locked' }}">
         <div>
           <div class="module-card-top">
             <div class="module-card-icon-halo" style="background:linear-gradient(135deg, rgba(245,158,11,0.2), rgba(217,119,6,0.08)); color:#d97706; border:1px solid rgba(245,158,11,0.25);">
               <i class="bi bi-mortarboard-fill"></i>
             </div>
-            <span class="module-live-pill" style="background:rgba(245,158,11,0.1); color:#d97706; border:1px solid rgba(245,158,11,0.25);">
-              <span class="pulse-dot" style="background:#d97706; box-shadow:0 0 0 0 rgba(217,119,6,0.6);"></span> Aktif 2026
-            </span>
+            <div style="display:flex; align-items:center; gap:6px;">
+              @if($canAccessPpdb)
+                <span class="access-badge allowed"><i class="bi bi-shield-check"></i> Izin Aktif</span>
+              @else
+                <span class="access-badge locked"><i class="bi bi-lock-fill"></i> Butuh Panitia</span>
+              @endif
+              <span class="module-live-pill" style="background:rgba(245,158,11,0.1); color:#d97706; border:1px solid rgba(245,158,11,0.25);">
+                <span class="pulse-dot" style="background:#d97706; box-shadow:0 0 0 0 rgba(217,119,6,0.6);"></span> Aktif 2026
+              </span>
+            </div>
           </div>
 
           <h3 class="module-card-name">PPDB ONLINE 2026</h3>
@@ -947,30 +1022,49 @@
         </div>
 
         <div class="module-actions">
-          <a href="/admin/ppdb" class="btn-launch-primary" style="background:linear-gradient(135deg, #f59e0b 0%, #d97706 100%);">
-            <i class="bi bi-people-fill"></i> Kelola PPDB 2026 <i class="bi bi-arrow-right-short" style="font-size:18px;"></i>
-          </a>
-          <div class="btn-launch-secondary-row">
-            <a href="/admin/ppdb?status=menunggu" class="btn-launch-secondary">
-              <i class="bi bi-clock" style="color:#d97706;"></i> Verifikasi Berkas
+          @if($canAccessPpdb)
+            <a href="/admin/ppdb" class="btn-launch-primary" style="background:linear-gradient(135deg, #f59e0b 0%, #d97706 100%);">
+              <i class="bi bi-people-fill"></i> Kelola PPDB 2026 <i class="bi bi-arrow-right-short" style="font-size:18px;"></i>
             </a>
-            <a href="/ppdb" target="_blank" class="btn-launch-secondary">
-              <i class="bi bi-box-arrow-up-right" style="color:#2563eb;"></i> Form Publik
-            </a>
-          </div>
+            <div class="btn-launch-secondary-row">
+              <a href="/admin/ppdb?status=menunggu" class="btn-launch-secondary">
+                <i class="bi bi-clock" style="color:#d97706;"></i> Verifikasi Berkas
+              </a>
+              <a href="/ppdb" target="_blank" class="btn-launch-secondary">
+                <i class="bi bi-box-arrow-up-right" style="color:#2563eb;"></i> Form Publik
+              </a>
+            </div>
+          @else
+            <button type="button" class="btn-launch-primary btn-locked" disabled title="Akses ditolak: Hanya untuk Panitia PPDB, Waka Kesiswaan, & Pimpinan">
+              <i class="bi bi-lock-fill"></i> Akses Terbatas (Khusus Panitia PPDB)
+            </button>
+            <div class="btn-launch-secondary-row">
+              <span class="btn-launch-secondary btn-locked"><i class="bi bi-lock"></i> Verifikasi Terkunci</span>
+              <a href="/ppdb" target="_blank" class="btn-launch-secondary">
+                <i class="bi bi-box-arrow-up-right" style="color:#2563eb;"></i> Form Publik
+              </a>
+            </div>
+          @endif
         </div>
       </div>
 
       {{-- Card 3: WEB PROFIL & HUMAS --}}
-      <div class="module-card card-web">
+      <div class="module-card card-web {{ $canAccessWeb ? '' : 'is-locked' }}">
         <div>
           <div class="module-card-top">
             <div class="module-card-icon-halo" style="background:linear-gradient(135deg, rgba(99,102,241,0.2), rgba(79,70,229,0.08)); color:#6366f1; border:1px solid rgba(99,102,241,0.25);">
               <i class="bi bi-globe-americas"></i>
             </div>
-            <span class="module-live-pill" style="background:rgba(99,102,241,0.1); color:#6366f1; border:1px solid rgba(99,102,241,0.25);">
-              <span class="pulse-dot" style="background:#6366f1; box-shadow:0 0 0 0 rgba(99,102,241,0.6);"></span> Publik
-            </span>
+            <div style="display:flex; align-items:center; gap:6px;">
+              @if($canAccessWeb)
+                <span class="access-badge allowed"><i class="bi bi-shield-check"></i> Izin Aktif</span>
+              @else
+                <span class="access-badge locked"><i class="bi bi-lock-fill"></i> Butuh Humas</span>
+              @endif
+              <span class="module-live-pill" style="background:rgba(99,102,241,0.1); color:#6366f1; border:1px solid rgba(99,102,241,0.25);">
+                <span class="pulse-dot" style="background:#6366f1; box-shadow:0 0 0 0 rgba(99,102,241,0.6);"></span> Publik
+              </span>
+            </div>
           </div>
 
           <h3 class="module-card-name">WEB PROFIL &amp; HUMAS</h3>
@@ -998,17 +1092,29 @@
         </div>
 
         <div class="module-actions">
-          <a href="/admin/berita" class="btn-launch-primary" style="background:linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);">
-            <i class="bi bi-newspaper"></i> Kelola Berita &amp; Rilis <i class="bi bi-arrow-right-short" style="font-size:18px;"></i>
-          </a>
-          <div class="btn-launch-secondary-row">
-            <a href="/admin/banner" class="btn-launch-secondary">
-              <i class="bi bi-images" style="color:#0ea5e9;"></i> Banner Hero
+          @if($canAccessWeb)
+            <a href="/admin/berita" class="btn-launch-primary" style="background:linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);">
+              <i class="bi bi-newspaper"></i> Kelola Berita &amp; Rilis <i class="bi bi-arrow-right-short" style="font-size:18px;"></i>
             </a>
-            <a href="/" target="_blank" class="btn-launch-secondary">
-              <i class="bi bi-box-arrow-up-right" style="color:#10b981;"></i> Lihat Website
-            </a>
-          </div>
+            <div class="btn-launch-secondary-row">
+              <a href="/admin/banner" class="btn-launch-secondary">
+                <i class="bi bi-images" style="color:#0ea5e9;"></i> Banner Hero
+              </a>
+              <a href="/" target="_blank" class="btn-launch-secondary">
+                <i class="bi bi-box-arrow-up-right" style="color:#10b981;"></i> Lihat Website
+              </a>
+            </div>
+          @else
+            <button type="button" class="btn-launch-primary btn-locked" disabled title="Akses ditolak: Hanya untuk Tim Humas, Webmaster, & Pimpinan">
+              <i class="bi bi-lock-fill"></i> Akses Terbatas (Khusus Tim Humas)
+            </button>
+            <div class="btn-launch-secondary-row">
+              <span class="btn-launch-secondary btn-locked"><i class="bi bi-lock"></i> Banner Terkunci</span>
+              <a href="/" target="_blank" class="btn-launch-secondary">
+                <i class="bi bi-box-arrow-up-right" style="color:#10b981;"></i> Lihat Website
+              </a>
+            </div>
+          @endif
         </div>
       </div>
 

@@ -91,12 +91,10 @@ use App\Http\Controllers\AdminPortalController;
 
 // Rute Internal Terproteksi Dasbor Utama & Master Data (Hanya Staf/Admin Terautentikasi)
 Route::middleware('auth')->group(function () {
-    // 00. Pusat Kendali Ekosistem Digital (Modular Command Center / Launchpad Admin & Pimpinan)
-    Route::middleware('role:admin,kepala_sekolah')->group(function () {
-        Route::get('/portal', [AdminPortalController::class, 'index'])->name('admin.portal');
-        Route::get('/hub', [AdminPortalController::class, 'index']);
-        Route::get('/admin/portal', [AdminPortalController::class, 'index']);
-    });
+    // 00. DCC - Digital Command Center (Pusat Kendali & Launchpad Terpadu Seluruh Pengguna Sekolah)
+    Route::get('/portal', [AdminPortalController::class, 'index'])->name('admin.portal');
+    Route::get('/hub', [AdminPortalController::class, 'index']);
+    Route::get('/admin/portal', [AdminPortalController::class, 'index']);
 
     // 0a. Smart Gate Kiosk RFID & Barcode (Hanya Admin & Guru Piket)
     Route::middleware('role:admin,guru_piket')->group(function () {
@@ -118,8 +116,10 @@ Route::middleware('auth')->group(function () {
     // 0d. Role Switcher Mode (Multi-Role Switching)
     Route::post('/switch-role', [AuthController::class, 'switchRole'])->name('switch-role');
 
-    // 1. Dashboard Utama (Tampilan Cerdas Terisolasi Sesuai Hak Akses Peran)
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    // 1. Dashboard Utama Modul SIRANI (Presensi & Kedisiplinan)
+    Route::get('/dashboard', [DashboardController::class, 'index'])
+        ->name('dashboard')
+        ->middleware('role:admin,kepala_sekolah,waka_kesiswaan,waka_kurikulum,waka_sarpras,waka_hubin,kaprog,kepala_bengkel,pustakawan,guru_bk,wali_kelas,guru_piket,staf_tu,guru');
 
     // 2. Laporan & Rekapitulasi Presensi
     Route::middleware('role:admin,kepala_sekolah,waka_kesiswaan,waka_kurikulum,waka_sarpras,waka_hubin,kaprog,kepala_bengkel,pustakawan,guru_bk,wali_kelas,guru_piket,staf_tu,guru')->group(function () {

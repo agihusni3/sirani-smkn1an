@@ -16,7 +16,7 @@ class AuthController extends Controller
     public function showLogin()
     {
         if (Auth::check()) {
-            return redirect('/dashboard');
+            return redirect('/portal');
         }
         return view('auth.login');
     }
@@ -88,7 +88,8 @@ class AuthController extends Controller
 
                 AuditLog::catat('login', 'auth', "Login berhasil: {$nama} ({$userIdentifier})", null, ['role' => $user->role ?? 'wali_kelas']);
 
-                $targetUrl = ($user->isAdmin() || $user->isKepalaSekolah()) ? '/portal' : '/dashboard';
+                // Seluruh pengguna diarahkan ke DCC (Digital Command Center) sebagai pintu gerbang utama ekosistem
+                $targetUrl = '/portal';
                 return redirect()->intended($targetUrl)
                     ->with('success', 'Selamat datang kembali, ' . $nama . '!');
             }

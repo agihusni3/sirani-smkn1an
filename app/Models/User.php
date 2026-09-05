@@ -405,4 +405,32 @@ class User extends Authenticatable
     {
         return static::getRoleMetadata($this->getActiveRole())['badge'];
     }
+
+    /**
+     * Cek apakah pengguna memiliki hak akses ke Modul SIRANI (Presensi & Kedisiplinan).
+     */
+    public function canAccessSirani(): bool
+    {
+        return $this->hasAnyRole([
+            'admin', 'kepala_sekolah', 'waka_kesiswaan', 'waka_kurikulum',
+            'waka_sarpras', 'waka_hubin', 'kaprog', 'kepala_bengkel',
+            'pustakawan', 'guru_bk', 'wali_kelas', 'guru_piket', 'staf_tu', 'guru'
+        ]) || $this->guru_id !== null;
+    }
+
+    /**
+     * Cek apakah pengguna memiliki hak akses ke Modul PPDB Online.
+     */
+    public function canAccessPpdb(): bool
+    {
+        return $this->hasAnyRole(['admin', 'kepala_sekolah', 'panitia_ppdb', 'waka_kesiswaan']);
+    }
+
+    /**
+     * Cek apakah pengguna memiliki hak akses ke Modul Web Profil & Berita Humas.
+     */
+    public function canAccessWebHumas(): bool
+    {
+        return $this->hasAnyRole(['admin', 'kepala_sekolah', 'humas', 'operator_web']);
+    }
 }
