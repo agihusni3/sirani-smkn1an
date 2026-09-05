@@ -6,6 +6,12 @@
   $isKepsek = $user ? $user->isKepalaSekolah() : false;
   $isWakasis = $user ? $user->isWakaKesiswaan() : false;
   $isWakaKurikulum = $user ? $user->isWakaKurikulum() : false;
+  $isWakaSarpras = $user ? $user->isWakaSarpras() : false;
+  $isWakaHubin = $user ? $user->isWakaHubin() : false;
+  $isKaprog = $user ? $user->isKaprog() : false;
+  $isKepalaBengkel = $user ? $user->isKepalaBengkel() : false;
+  $isPustakawan = $user ? $user->isPustakawan() : false;
+  $isPimpinan = $user ? $user->isPimpinan() : false;
   $isBK = $user ? $user->isGuruBk() : false;
   $isWali = $user ? $user->isWaliKelas() : false;
   $isStafTu = $user ? $user->isStafTu() : false;
@@ -13,7 +19,7 @@
   $isGuru = $user ? $user->isGuru() : false;
   $isHumas = $user ? $user->isHumas() : false;
   $isPanitiaPpdb = $user ? $user->isPanitiaPpdb() : false;
-  $isPiketHariIni = ($user && !$isKepsek && !$isWakasis && $user->guru) ? \App\Models\JadwalPiket::isGuruPiketHariIni($user->guru->id) : false;
+  $isPiketHariIni = ($user && !$isPimpinan && $user->guru) ? \App\Models\JadwalPiket::isGuruPiketHariIni($user->guru->id) : false;
 @endphp
 
 {{-- Mobile Top Bar with Integrated Actions (Theme + Account + Menu) --}}
@@ -167,7 +173,7 @@
           </div>
         </a>
       @endif
-      @if($isAdmin || $isKepsek || $isWakasis || $isWakaKurikulum || $isStafTu)
+      @if($isAdmin || $isPimpinan || $isStafTu)
         <a href="/jadwal-piket" class="nav-item {{ request()->is('jadwal-piket*') ? 'active' : '' }}">
           <div class="nav-left-part">
             <i class="bi bi-calendar2-check-fill nav-icon"></i>
@@ -218,7 +224,7 @@
           <span class="nav-text">Rekap Presensi</span>
         </div>
       </a>
-      @if($isAdmin || $isKepsek || $isWakasis || $isWakaKurikulum || $isBK || $isStafTu || $isGuruPiket || $isPiketHariIni)
+      @if($isAdmin || $isPimpinan || $isBK || $isStafTu || $isGuruPiket || $isPiketHariIni)
         <a href="/peringkat" class="nav-item {{ request()->is('peringkat*') ? 'active' : '' }}">
           <div class="nav-left-part">
             <i class="bi bi-trophy-fill nav-icon"></i>
@@ -239,7 +245,7 @@
     {{-- 4. MASTER DATA --}}
     <div class="nav-group">
       <div class="nav-label">Master Data</div>
-      @if($isAdmin || $isWakasis || $isStafTu || $isWakaKurikulum)
+      @if($isAdmin || $isWakasis || $isStafTu || $isWakaKurikulum || $isWakaHubin)
         <a href="/siklus-siswa" class="nav-item {{ request()->is('siklus-siswa*') ? 'active' : '' }}">
           <div class="nav-left-part">
             <i class="bi bi-arrow-repeat nav-icon"></i>
@@ -253,7 +259,7 @@
           <span class="nav-text">Data Siswa</span>
         </div>
       </a>
-      @if($isAdmin || $isKepsek || $isWakasis || $isWakaKurikulum || $isStafTu)
+      @if($isAdmin || $isPimpinan || $isStafTu)
         <a href="/guru" class="nav-item {{ request()->is('guru*') ? 'active' : '' }}">
           <div class="nav-left-part">
             <i class="bi bi-person-badge-fill nav-icon"></i>
@@ -282,7 +288,7 @@
     {{-- 5. JADWAL & KALENDER --}}
     <div class="nav-group">
       <div class="nav-label">Jadwal &amp; Kalender</div>
-      @if($isAdmin || $isKepsek || $isWakasis || $isWakaKurikulum || $isGuruPiket || $isPiketHariIni || $isStafTu || $isGuru)
+      @if($isAdmin || $isPimpinan || $isGuruPiket || $isPiketHariIni || $isStafTu || $isGuru)
         <a href="/jadwal-sekolah" class="nav-item {{ request()->is('jadwal-sekolah*') ? 'active' : '' }}">
           <div class="nav-left-part">
             <i class="bi bi-clock-history nav-icon"></i>
@@ -300,7 +306,7 @@
   @endif
 
   {{-- 6. SISTEM & PENGAWASAN --}}
-  @if($isAdmin || $isKepsek || $isWakasis)
+  @if($isAdmin || $isPimpinan)
     <div class="nav-group">
       <div class="nav-label">Sistem &amp; Pengawasan</div>
       @if($isAdmin)

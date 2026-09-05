@@ -287,7 +287,70 @@ class GuruController extends Controller
             }
         }
 
-        // 4. GURU BK
+        // 4. WAKA SARPRAS (Sarana & Prasarana)
+        if ($newRole === 'waka_sarpras') {
+            $tgs = array_filter(array_map('trim', explode(',', $guru->tugas_tambahan ?? '')));
+            if (!in_array('Waka Sarpras', $tgs) && !in_array('Wakil Kepala Sekolah Bidang Sarana Prasarana', $tgs)) {
+                $tgs[] = 'Waka Sarpras';
+                $guru->tugas_tambahan = implode(', ', $tgs);
+                $guru->save();
+            }
+        }
+
+        // 5. WAKA HUBIN (Hubungan Industri / DUDI)
+        if ($newRole === 'waka_hubin') {
+            $tgs = array_filter(array_map('trim', explode(',', $guru->tugas_tambahan ?? '')));
+            if (!in_array('Waka Hubin', $tgs) && !in_array('Wakil Kepala Sekolah Bidang Hubungan Industri', $tgs)) {
+                $tgs[] = 'Waka Hubin';
+                $guru->tugas_tambahan = implode(', ', $tgs);
+                $guru->save();
+            }
+        }
+
+        // 6. KEPALA PROGRAM KEAHLIAN (Kaprog / Jurusan)
+        if ($newRole === 'kaprog') {
+            $tgs = array_filter(array_map('trim', explode(',', $guru->tugas_tambahan ?? '')));
+            $hasKaprog = false;
+            foreach ($tgs as $t) {
+                if (str_contains(strtolower($t), 'kaprog') || str_contains(strtolower($t), 'kepala program') || str_contains(strtolower($t), 'ketua jurusan')) {
+                    $hasKaprog = true;
+                    break;
+                }
+            }
+            if (!$hasKaprog) {
+                $tgs[] = 'Kepala Program Keahlian';
+                $guru->tugas_tambahan = implode(', ', $tgs);
+                $guru->save();
+            }
+        }
+
+        // 7. KEPALA BENGKEL / LABORAN / TOOLMAN
+        if ($newRole === 'kepala_bengkel') {
+            $tgs = array_filter(array_map('trim', explode(',', $guru->tugas_tambahan ?? '')));
+            $hasKabeng = false;
+            foreach ($tgs as $t) {
+                if (str_contains(strtolower($t), 'kepala bengkel') || str_contains(strtolower($t), 'kabeng') || str_contains(strtolower($t), 'laboran') || str_contains(strtolower($t), 'toolman')) {
+                    $hasKabeng = true;
+                    break;
+                }
+            }
+            if (!$hasKabeng) {
+                $tgs[] = 'Kepala Bengkel';
+                $guru->tugas_tambahan = implode(', ', $tgs);
+                $guru->save();
+            }
+        }
+
+        // 8. PUSTAKAWAN
+        if ($newRole === 'pustakawan') {
+            $guru->jenis_ptk = 'Tenaga Perpustakaan';
+            if (empty($guru->mapel_diampu)) {
+                $guru->jabatan = 'Tenaga Perpustakaan';
+            }
+            $guru->save();
+        }
+
+        // 9. GURU BK
         if ($newRole === 'guru_bk') {
             $guru->jenis_ptk = 'Guru BK';
             if (empty($guru->mapel_diampu)) {
@@ -296,7 +359,7 @@ class GuruController extends Controller
             $guru->save();
         }
 
-        // 5. STAF TU
+        // 10. STAF TU
         if ($newRole === 'staf_tu') {
             $guru->jenis_ptk = 'Tenaga Administrasi Sekolah (TU)';
             $guru->jabatan = 'Tenaga Administrasi Sekolah (TU)';
@@ -410,17 +473,27 @@ class GuruController extends Controller
         ]);
 
         if ($request->filled('email_akun') && $request->filled('password_akun')) {
-            $jabatanLower = strtolower($jabatan);
+            $contextLower = strtolower($jabatan . ' ' . $request->input('tugas_tambahan', '') . ' ' . $request->input('jenis_ptk', ''));
             $defaultRole = 'guru';
-            if (str_contains($jabatanLower, 'kepala sekolah')) {
+            if (str_contains($contextLower, 'kepala sekolah') && !str_contains($contextLower, 'wakil') && !str_contains($contextLower, 'waka')) {
                 $defaultRole = 'kepala_sekolah';
-            } elseif (str_contains($jabatanLower, 'waka kesiswaan') || str_contains($jabatanLower, 'wakil kepala sekolah bidang kesiswaan')) {
+            } elseif (str_contains($contextLower, 'waka sarpras') || str_contains($contextLower, 'sarana prasarana') || str_contains($contextLower, 'sarpras')) {
+                $defaultRole = 'waka_sarpras';
+            } elseif (str_contains($contextLower, 'waka hubin') || str_contains($contextLower, 'hubungan industri') || str_contains($contextLower, 'hubin')) {
+                $defaultRole = 'waka_hubin';
+            } elseif (str_contains($contextLower, 'waka kesiswaan') || str_contains($contextLower, 'kesiswaan')) {
                 $defaultRole = 'waka_kesiswaan';
-            } elseif (str_contains($jabatanLower, 'waka kurikulum') || str_contains($jabatanLower, 'wakil kepala sekolah bidang kurikulum') || str_contains($jabatanLower, 'kurikulum')) {
+            } elseif (str_contains($contextLower, 'waka kurikulum') || str_contains($contextLower, 'kurikulum')) {
                 $defaultRole = 'waka_kurikulum';
-            } elseif (str_contains($jabatanLower, 'bimbingan konseling') || str_contains($jabatanLower, 'bk')) {
+            } elseif (str_contains($contextLower, 'kaprog') || str_contains($contextLower, 'kepala program') || str_contains($contextLower, 'ketua program') || str_contains($contextLower, 'ketua jurusan')) {
+                $defaultRole = 'kaprog';
+            } elseif (str_contains($contextLower, 'kepala bengkel') || str_contains($contextLower, 'kabeng') || str_contains($contextLower, 'toolman') || str_contains($contextLower, 'laboran')) {
+                $defaultRole = 'kepala_bengkel';
+            } elseif (str_contains($contextLower, 'perpustakaan') || str_contains($contextLower, 'pustakawan')) {
+                $defaultRole = 'pustakawan';
+            } elseif (str_contains($contextLower, 'bimbingan konseling') || str_contains($contextLower, 'bk')) {
                 $defaultRole = 'guru_bk';
-            } elseif (str_contains($jabatanLower, 'tata usaha') || str_contains($jabatanLower, 'tu') || str_contains($jabatanLower, 'tendik')) {
+            } elseif (str_contains($contextLower, 'tata usaha') || str_contains($contextLower, 'tu') || str_contains($contextLower, 'tendik') || str_contains($contextLower, 'administrasi')) {
                 $defaultRole = 'staf_tu';
             }
 
@@ -1018,7 +1091,7 @@ class GuruController extends Controller
             'username' => 'required|string|max:100|unique:users,username,' . ($userId ?? 'NULL') . ',id',
             'email'    => 'nullable|email|max:255|unique:users,email,' . ($userId ?? 'NULL') . ',id',
             'password' => $userId ? 'nullable|min:4' : 'required|min:4',
-            'role'     => 'nullable|in:admin,kepala_sekolah,waka_kesiswaan,waka_kurikulum,guru_bk,wali_kelas,guru_piket,staf_tu,guru,humas,panitia_ppdb',
+            'role'     => 'nullable|in:admin,kepala_sekolah,waka_kesiswaan,waka_kurikulum,waka_sarpras,waka_hubin,kaprog,kepala_bengkel,pustakawan,guru_bk,wali_kelas,guru_piket,staf_tu,guru,humas,panitia_ppdb',
         ], [
             'username.required' => 'Nickname / Username login wajib diisi.',
             'username.unique'   => 'Nickname / Username ini sudah digunakan oleh akun lain.',

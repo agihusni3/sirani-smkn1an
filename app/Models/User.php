@@ -61,6 +61,11 @@ class User extends Authenticatable
             && !$this->isKepalaSekolah() 
             && !$this->isWakaKesiswaan() 
             && !$this->isWakaKurikulum()
+            && !$this->isWakaSarpras()
+            && !$this->isWakaHubin()
+            && !$this->isKaprog()
+            && !$this->isKepalaBengkel()
+            && !$this->isPustakawan()
             && !$this->isGuruBk() 
             && !$this->isWaliKelas() 
             && !$this->isStafTu()
@@ -91,13 +96,72 @@ class User extends Authenticatable
 
     public function isWakaKurikulum(): bool
     {
-        return $this->role === 'waka_kurikulum' || ($this->guru && (str_contains(strtolower($this->guru->jabatan ?? ''), 'waka kurikulum') || str_contains(strtolower($this->guru->jabatan ?? ''), 'wakil kepala sekolah bidang kurikulum')));
+        return $this->role === 'waka_kurikulum' || ($this->guru && (str_contains(strtolower($this->guru->jabatan ?? ''), 'waka kurikulum') || str_contains(strtolower($this->guru->tugas_tambahan ?? ''), 'waka kurikulum')));
+    }
+
+    public function isWakaSarpras(): bool
+    {
+        return $this->role === 'waka_sarpras' || ($this->guru && (
+            str_contains(strtolower($this->guru->tugas_tambahan ?? ''), 'sarpras') ||
+            str_contains(strtolower($this->guru->jabatan ?? ''), 'sarpras')
+        ));
+    }
+
+    public function isWakaHubin(): bool
+    {
+        return $this->role === 'waka_hubin' || ($this->guru && (
+            str_contains(strtolower($this->guru->tugas_tambahan ?? ''), 'hubin') ||
+            str_contains(strtolower($this->guru->tugas_tambahan ?? ''), 'industri') ||
+            str_contains(strtolower($this->guru->jabatan ?? ''), 'hubin')
+        ));
+    }
+
+    public function isKaprog(): bool
+    {
+        return $this->role === 'kaprog' || ($this->guru && (
+            str_contains(strtolower($this->guru->tugas_tambahan ?? ''), 'kaprog') ||
+            str_contains(strtolower($this->guru->tugas_tambahan ?? ''), 'ketua program') ||
+            str_contains(strtolower($this->guru->tugas_tambahan ?? ''), 'kepala program') ||
+            str_contains(strtolower($this->guru->tugas_tambahan ?? ''), 'ketua jurusan')
+        ));
+    }
+
+    public function isKepalaBengkel(): bool
+    {
+        return $this->role === 'kepala_bengkel' || ($this->guru && (
+            str_contains(strtolower($this->guru->tugas_tambahan ?? ''), 'kepala bengkel') ||
+            str_contains(strtolower($this->guru->tugas_tambahan ?? ''), 'kabeng') ||
+            str_contains(strtolower($this->guru->jenis_ptk ?? ''), 'laboran') ||
+            str_contains(strtolower($this->guru->jenis_ptk ?? ''), 'toolman') ||
+            str_contains(strtolower($this->guru->jabatan ?? ''), 'toolman') ||
+            str_contains(strtolower($this->guru->jabatan ?? ''), 'laboran')
+        ));
+    }
+
+    public function isPustakawan(): bool
+    {
+        return $this->role === 'pustakawan' || ($this->guru && (
+            str_contains(strtolower($this->guru->jenis_ptk ?? ''), 'perpustakaan') ||
+            str_contains(strtolower($this->guru->jenis_ptk ?? ''), 'pustakawan') ||
+            str_contains(strtolower($this->guru->tugas_tambahan ?? ''), 'perpustakaan') ||
+            str_contains(strtolower($this->guru->jabatan ?? ''), 'perpustakaan')
+        ));
+    }
+
+    public function isPimpinan(): bool
+    {
+        return $this->isAdmin()
+            || $this->isKepalaSekolah()
+            || $this->isWakaKesiswaan()
+            || $this->isWakaKurikulum()
+            || $this->isWakaSarpras()
+            || $this->isWakaHubin();
     }
 
     public function isGuruBk(): bool
     {
-        // Kepala Sekolah, Waka Kesiswaan & Waka Kurikulum tidak boleh terdeteksi sebagai Guru BK
-        if ($this->isKepalaSekolah() || $this->isWakaKesiswaan() || $this->isWakaKurikulum()) {
+        // Jajaran pimpinan sekolah tidak boleh terdeteksi sebagai Guru BK
+        if ($this->isPimpinan()) {
             return false;
         }
         return $this->role === 'guru_bk' || ($this->guru && (str_contains(strtolower($this->guru->jabatan ?? ''), 'bimbingan konseling') || str_contains(strtolower($this->guru->jabatan ?? ''), 'bk')));
@@ -105,8 +169,8 @@ class User extends Authenticatable
 
     public function isWaliKelas(): bool
     {
-        // Kepala Sekolah, Waka Kesiswaan & Waka Kurikulum tidak boleh terdeteksi sebagai Wali Kelas
-        if ($this->isKepalaSekolah() || $this->isWakaKesiswaan() || $this->isWakaKurikulum()) {
+        // Jajaran pimpinan sekolah tidak boleh terdeteksi sebagai Wali Kelas
+        if ($this->isPimpinan()) {
             return false;
         }
 
@@ -133,15 +197,8 @@ class User extends Authenticatable
 
     public function isGuru(): bool
     {
-        return $this->role === 'guru' || ($this->guru_id !== null 
-            && !$this->isAdmin() 
-            && !$this->isKepalaSekolah() 
-            && !$this->isWakaKesiswaan() 
-            && !$this->isWakaKurikulum() 
-            && !$this->isGuruBk() 
-            && !$this->isWaliKelas() 
-            && !$this->isStafTu() 
-            && !$this->isGuruPiket());
+        // Setiap pengguna yang terikat pada data Guru memiliki hak akses fitur umum Guru
+        return $this->role === 'guru' || $this->guru_id !== null;
     }
 
     public function isGuruPiket(): bool
@@ -217,6 +274,11 @@ class User extends Authenticatable
         if ($this->isKepalaSekolah()) return 'Kepala Sekolah';
         if ($this->isWakaKesiswaan()) return 'Waka Kesiswaan';
         if ($this->isWakaKurikulum()) return 'Waka Kurikulum';
+        if ($this->isWakaSarpras()) return 'Waka Sarpras';
+        if ($this->isWakaHubin()) return 'Waka Hubin & Industri';
+        if ($this->isKaprog()) return 'Kepala Program Keahlian (Kaprog)';
+        if ($this->isKepalaBengkel()) return 'Kepala Bengkel / Toolman';
+        if ($this->isPustakawan()) return 'Tenaga Perpustakaan';
         if ($this->isGuruBk()) return 'Guru Bimbingan Konseling (BK)';
         if ($this->isWaliKelas()) return 'Wali Kelas';
         if ($this->isGuruPiket()) return 'Guru Piket';

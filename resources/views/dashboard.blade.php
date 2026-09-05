@@ -29,6 +29,11 @@
       $isKepalaSekolah = $currentUser ? $currentUser->isKepalaSekolah() : false;
       $isWakasis = $currentUser ? $currentUser->isWakaKesiswaan() : false;
       $isWakaKurikulum = $currentUser ? $currentUser->isWakaKurikulum() : false;
+      $isWakaSarpras = $currentUser ? $currentUser->isWakaSarpras() : false;
+      $isWakaHubin = $currentUser ? $currentUser->isWakaHubin() : false;
+      $isKaprog = $currentUser ? $currentUser->isKaprog() : false;
+      $isKepalaBengkel = $currentUser ? $currentUser->isKepalaBengkel() : false;
+      $isPustakawan = $currentUser ? $currentUser->isPustakawan() : false;
       $isGuruBk = $currentUser ? $currentUser->isGuruBk() : false;
       $isWaliKelas = $currentUser ? $currentUser->isWaliKelas() : false;
       $isStafTu = $currentUser ? $currentUser->isStafTu() : false;
@@ -37,21 +42,31 @@
       $isWaliSedangPiket = $isWaliSedangPiket ?? false;
 
       $roleTitle = match(true) {
-        $isKepalaSekolah                 => 'EXECUTIVE KEPALA SEKOLAH',
-        $isWakasis                       => 'WAKA KESISWAAN MONITORING',
-        $isWakaKurikulum                 => 'WAKA KURIKULUM MONITORING',
-        $isGuruBk                        => 'GURU BIMBINGAN & KONSELING (BK)',
+        $isKepalaSekolah                     => 'EXECUTIVE KEPALA SEKOLAH',
+        $isWakasis                           => 'WAKA KESISWAAN MONITORING',
+        $isWakaKurikulum                     => 'WAKA KURIKULUM MONITORING',
+        $isWakaSarpras                       => 'WAKA SARANA & PRASARANA MONITORING',
+        $isWakaHubin                         => 'WAKA HUBIN & INDUSTRI MONITORING',
+        $isKaprog                            => 'KEPALA PROGRAM KEAHLIAN (KAPROG)',
+        $isKepalaBengkel                     => 'KEPALA BENGKEL / TOOLMAN',
+        $isPustakawan                        => 'PERPUSTAKAAN & LITERASI',
+        $isGuruBk                            => 'GURU BIMBINGAN & KONSELING (BK)',
         ($isWaliKelas && $isWaliSedangPiket) => 'WALI KELAS MONITORING',
-        $isWaliKelas                     => 'WALI KELAS MONITORING',
-        $isStafTu                        => 'STAF TATA USAHA (TU)',
-        $isGuruPiket                     => 'GURU PIKET OPERATIONAL',
-        $isAdmin                         => 'ADMINISTRATOR MONITORING',
-        default                          => 'PORTAL GURU & PEGAWAI',
+        $isWaliKelas                         => 'WALI KELAS MONITORING',
+        $isStafTu                            => 'STAF TATA USAHA (TU)',
+        $isGuruPiket                         => 'GURU PIKET OPERATIONAL',
+        $isAdmin                             => 'ADMINISTRATOR MONITORING',
+        default                              => 'PORTAL GURU & PEGAWAI',
       };
       $roleIcon = match(true) {
         $isKepalaSekolah => 'bi-award-fill',
         $isWakasis       => 'bi-shield-shaded',
         $isWakaKurikulum => 'bi-calendar-range-fill',
+        $isWakaSarpras   => 'bi-tools',
+        $isWakaHubin     => 'bi-buildings-fill',
+        $isKaprog        => 'bi-diagram-3-fill',
+        $isKepalaBengkel => 'bi-gear-wide-connected',
+        $isPustakawan    => 'bi-book-half',
         $isGuruBk        => 'bi-heart-pulse-fill',
         $isWaliKelas     => 'bi-mortarboard-fill',
         $isStafTu        => 'bi-folder-symlink-fill',
@@ -538,9 +553,9 @@
     @endif
 
     <!-- ═══════════════════════════════════════════════════════════════════ -->
-    <!-- 4. VISUALISASI GRAFIK MULTI-DIMENSI (ADMIN, KEPSEK, WAKASIS, BK, WALI) -->
+    <!-- 4. VISUALISASI GRAFIK MULTI-DIMENSI (ADMIN, KEPSEK, WAKASIS, BK, WALI, WAKA SARPRAS, WAKA HUBIN, KAPROG) -->
     <!-- ═══════════════════════════════════════════════════════════════════ -->
-    @if($isAdmin || $isKepalaSekolah || $isWakasis || $isGuruBk || $isWaliKelas || $isWakaKurikulum)
+    @if($isAdmin || $isKepalaSekolah || $isWakasis || $isGuruBk || $isWaliKelas || $isWakaKurikulum || $isWakaSarpras || $isWakaHubin || $isKaprog)
       <div class="section-divider">
         <h2><i class="bi bi-pie-chart-fill" style="color:#000000;"></i> Grafik &amp; Analisis Visual Presensi</h2>
         <div class="section-divider-line"></div>
@@ -548,7 +563,7 @@
 
       <!-- ROW 1: TREN 30 HARI & KOMPOSISI DONUT HARI INI -->
       <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 18px; margin-bottom: 20px;">
-        <!-- Grafik 1: Tren Kehadiran 30 Hari (1 Bulan) -->
+        <!-- Grafik 1: Tren Kehadiran Siswa (30 Hari / 1 Bulan) -->
         <div class="panel" style="margin-bottom: 0; display:flex; flex-direction:column;">
           <div class="panel-title" style="margin-bottom: 14px; display:flex; justify-content:space-between; align-items:center;">
             <span style="font-size:13.5px; font-weight:800; display:flex; align-items:center; gap:8px; color:var(--text);">
@@ -579,8 +594,8 @@
         </div>
       </div>
 
-      <!-- ROW 2: TREN KEHADIRAN GURU & KOMPOSISI GURU HARI INI (ADMIN & KEPSEK) -->
-      @if($isAdmin || $isKepalaSekolah || $isWakaKurikulum)
+      <!-- ROW 2: TREN KEHADIRAN GURU & KOMPOSISI GURU HARI INI (ADMIN, KEPSEK, WAKA KURIKULUM, WAKA SARPRAS, WAKA HUBIN) -->
+      @if($isAdmin || $isKepalaSekolah || $isWakaKurikulum || $isWakaSarpras || $isWakaHubin)
         <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 18px; margin-bottom: 24px;">
           <!-- Grafik 3: Tren Kehadiran Guru & Pegawai (30 Hari / 1 Bulan) -->
           <div class="panel" style="margin-bottom: 0; display:flex; flex-direction:column;">

@@ -1220,6 +1220,11 @@
             <option value="kepala_sekolah">Kepala Sekolah (Dasbor Eksekutif &amp; Pengesahan Kasus)</option>
             <option value="waka_kesiswaan">Waka Kesiswaan (Disiplin Tahap 3, Transisi PKL, Pengawasan)</option>
             <option value="waka_kurikulum">Waka Kurikulum (Jadwal &amp; Laporan Jam Mengajar)</option>
+            <option value="waka_sarpras">Waka Sarpras (Aset, Inventaris Bengkel/Lab, Laporan Kerusakan)</option>
+            <option value="waka_hubin">Waka Hubin / Industri (Kemitraan DUDI, Magang &amp; Bursa Kerja Khusus)</option>
+            <option value="kaprog">Kepala Program Keahlian (Monitoring Praktik &amp; Bengkel Jurusan)</option>
+            <option value="kepala_bengkel">Kepala Bengkel / Laboran / Toolman (Perawatan Mesin &amp; BHP)</option>
+            <option value="pustakawan">Tenaga Perpustakaan (Sirkulasi Buku &amp; Literasi)</option>
             <option value="guru_bk">Guru BK / Konseling (Penanganan Kasus Tahap 2 &amp; Panggilan Ortu)</option>
             <option value="wali_kelas">Wali Kelas (Monitoring Kelas Binaan &amp; Pembinaan Tahap 1)</option>
             <option value="guru_piket">Guru Piket (Operasional Meja Piket &amp; Perizinan Siswa)</option>
@@ -1464,11 +1469,16 @@
       document.getElementById('akun_username').value = defaultUsername;
       document.getElementById('akun_email').value = '';
 
-      const jab = (guru.jabatan || '').toLowerCase();
+      const jab = ((guru.jabatan || '') + ' ' + (guru.tugas_tambahan || '') + ' ' + (guru.jenis_ptk || '')).toLowerCase();
       let defaultRole = 'guru';
       if (jab.includes('kepala sekolah') && !jab.includes('wakil') && !jab.includes('waka')) defaultRole = 'kepala_sekolah';
+      else if (jab.includes('waka sarpras') || jab.includes('sarana prasarana') || jab.includes('sarpras')) defaultRole = 'waka_sarpras';
+      else if (jab.includes('waka hubin') || jab.includes('hubungan industri') || jab.includes('hubin')) defaultRole = 'waka_hubin';
       else if (jab.includes('waka kesiswaan') || jab.includes('kesiswaan')) defaultRole = 'waka_kesiswaan';
       else if (jab.includes('waka kurikulum') || jab.includes('kurikulum')) defaultRole = 'waka_kurikulum';
+      else if (jab.includes('kaprog') || jab.includes('kepala program') || jab.includes('ketua jurusan') || jab.includes('ketua program')) defaultRole = 'kaprog';
+      else if (jab.includes('kepala bengkel') || jab.includes('kabeng') || jab.includes('toolman') || jab.includes('laboran')) defaultRole = 'kepala_bengkel';
+      else if (jab.includes('perpustakaan') || jab.includes('pustakawan')) defaultRole = 'pustakawan';
       else if (jab.includes('bk') || jab.includes('bimbingan')) defaultRole = 'guru_bk';
       else if (jab.includes('tata usaha') || jab.includes('tu') || jab.includes('staf') || jab.includes('administrasi')) defaultRole = 'staf_tu';
       else if (jab.includes('piket')) defaultRole = 'guru_piket';

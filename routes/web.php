@@ -110,7 +110,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     // 2. Laporan & Rekapitulasi Presensi
-    Route::middleware('role:admin,kepala_sekolah,waka_kesiswaan,waka_kurikulum,guru_bk,wali_kelas,guru_piket,staf_tu,guru')->group(function () {
+    Route::middleware('role:admin,kepala_sekolah,waka_kesiswaan,waka_kurikulum,waka_sarpras,waka_hubin,kaprog,kepala_bengkel,pustakawan,guru_bk,wali_kelas,guru_piket,staf_tu,guru')->group(function () {
         Route::get('/laporan', [LaporanController::class, 'index'])->name('laporan.index');
         Route::get('/laporan/export-csv', [LaporanController::class, 'exportCsv'])->name('laporan.export-csv');
         Route::get('/laporan/cetak-pdf', [LaporanController::class, 'cetakPdf'])->name('laporan.cetak-pdf');
@@ -174,7 +174,7 @@ Route::middleware('auth')->group(function () {
     });
 
     // 5b. Pusat Pengumuman & Broadcast Sekolah (Admin, Kepsek, Wakasis, Waka Kurikulum, BK, Wali Kelas, Guru Piket, Guru)
-    Route::middleware('role:admin,kepala_sekolah,waka_kesiswaan,waka_kurikulum,guru_bk,wali_kelas,guru_piket,guru')->group(function () {
+    Route::middleware('role:admin,kepala_sekolah,waka_kesiswaan,waka_kurikulum,waka_sarpras,waka_hubin,kaprog,kepala_bengkel,pustakawan,guru_bk,wali_kelas,guru_piket,guru')->group(function () {
         Route::get('/pengumuman', [PengumumanController::class, 'index'])->name('pengumuman.index');
         Route::post('/pengumuman', [PengumumanController::class, 'store'])->name('pengumuman.store');
         Route::post('/pengumuman/{id}/toggle', [PengumumanController::class, 'toggleStatus'])->name('pengumuman.toggle');
@@ -182,7 +182,7 @@ Route::middleware('auth')->group(function () {
     });
 
     // 6. Master Data Siswa & Rombel (Admin, Kepsek, Wakasis, Waka Kurikulum, BK, Wali Kelas, Staf TU, Guru)
-    Route::middleware('role:admin,kepala_sekolah,waka_kesiswaan,waka_kurikulum,guru_bk,wali_kelas,staf_tu,guru')->group(function () {
+    Route::middleware('role:admin,kepala_sekolah,waka_kesiswaan,waka_kurikulum,waka_sarpras,waka_hubin,kaprog,kepala_bengkel,pustakawan,guru_bk,wali_kelas,staf_tu,guru')->group(function () {
         Route::get('/siswa', [SiswaController::class, 'index'])->name('siswa.index');
         Route::get('/siswa/export', [SiswaController::class, 'export'])->name('siswa.export');
         Route::get('/siswa/template-csv', [SiswaController::class, 'downloadTemplate'])->name('siswa.template-csv');
@@ -203,48 +203,47 @@ Route::middleware('auth')->group(function () {
         Route::delete('/jurusan/{id}', [RombelController::class, 'destroyJurusan'])->name('jurusan.destroy')->middleware('role:admin');
     });
 
-    // 7. Siklus Siswa & Transisi Akademik / PKL (Admin, Wakasis, Waka Kurikulum, Staf TU)
-    Route::middleware('role:admin,waka_kesiswaan,waka_kurikulum,staf_tu')->group(function () {
+    // 7. Siklus Siswa & Transisi Akademik / PKL (Admin, Wakasis, Waka Kurikulum, Waka Hubin, Staf TU)
+    Route::middleware('role:admin,waka_kesiswaan,waka_kurikulum,waka_hubin,staf_tu')->group(function () {
         Route::get('/siklus-siswa', [SiklusSiswaController::class, 'index'])->name('siklus-siswa.index');
         Route::post('/siklus-siswa/transisi', [SiklusSiswaController::class, 'processTransisi'])->name('siklus-siswa.transisi');
         Route::post('/siklus-siswa/transisi-massal', [SiklusSiswaController::class, 'processTransisiMassal'])->name('siklus-siswa.transisi-massal');
+        Route::post('/siklus-siswa/alumni', [SiklusSiswaController::class, 'luluskanMassal'])->name('siklus-siswa.alumni');
     });
 
-    // 9. Perizinan Siswa & Guru (Hanya Guru Piket & Admin)
+    // 8. Kios Presensi Mandiri (Hanya Admin & Guru Piket)
     Route::middleware('role:admin,guru_piket')->group(function () {
-        Route::get('/izin-siswa', [IzinSiswaController::class, 'index'])->name('izin-siswa.index');
-        Route::post('/izin-siswa', [IzinSiswaController::class, 'store'])->name('izin-siswa.store');
-        Route::delete('/izin-siswa/{id}', [IzinSiswaController::class, 'destroy'])->name('izin-siswa.destroy');
-        Route::delete('/izin-guru/{id}', [IzinSiswaController::class, 'destroyGuru'])->name('izin-guru.destroy');
+        Route::get('/kiosk', [\App\Http\Controllers\KioskController::class, 'index'])->name('kiosk.index');
+        Route::post('/kiosk/tap', [\App\Http\Controllers\KioskController::class, 'scan'])->name('kiosk.tap');
+        Route::post('/kiosk/stream', [\App\Http\Controllers\KioskController::class, 'streamLogs'])->name('kiosk.stream');
     });
 
-    // 10. Presensi Manual / Lupa Kartu RFID (Admin, Wakasis, Guru Piket)
+    // 9. Surat Izin Siswa Terpadu (Admin, Wakasis & Guru Piket)
     Route::middleware('role:admin,waka_kesiswaan,guru_piket')->group(function () {
-        Route::get('/presensi-manual', [PresensiManualController::class, 'index'])->name('presensi-manual.index');
-        Route::post('/presensi-manual', [PresensiManualController::class, 'store'])->name('presensi-manual.store');
+        Route::get('/izin-siswa', [\App\Http\Controllers\IzinController::class, 'index'])->name('izin.index');
+        Route::get('/izin-siswa/cetak-pdf', [\App\Http\Controllers\IzinController::class, 'cetakPdf'])->name('izin.cetak-pdf');
+        Route::post('/izin-siswa', [\App\Http\Controllers\IzinController::class, 'store'])->name('izin.store');
     });
 
-    // 11. Guru Piket — Dashboard & Operasional Harian
+    // 10. Guru Piket Operasional Meja Piket (Admin, Wakasis & Guru Piket)
     Route::middleware('role:admin,waka_kesiswaan,guru_piket')->group(function () {
         Route::get('/piket', [GuruPiketController::class, 'index'])->name('piket.index');
-        Route::post('/piket/presensi-manual', [GuruPiketController::class, 'storePresensiManual'])->name('piket.presensi-manual.store');
-        Route::post('/piket/validasi-siswa', [GuruPiketController::class, 'validasiPresensiSiswa'])->name('piket.validasi-siswa');
-        Route::put('/piket/absensi/{id}', [GuruPiketController::class, 'updateAbsensi'])->name('piket.absensi.update');
-        Route::post('/piket/toggle-gerbang', [GuruPiketController::class, 'toggleSesiGerbang'])->name('piket.toggle-gerbang');
-        Route::post('/piket/kirim-wa', [GuruPiketController::class, 'kirimWaGateway'])->name('piket.kirim-wa');
+        Route::get('/piket/data', [GuruPiketController::class, 'data'])->name('piket.data');
+        Route::post('/piket/quick-absen', [GuruPiketController::class, 'quickAbsen'])->name('piket.quick-absen');
+        Route::post('/piket/alasan-telat', [GuruPiketController::class, 'storeAlasanTelat'])->name('piket.alasan-telat');
         Route::post('/piket/set-status-guru', [GuruPiketController::class, 'storeStatusGuruCepat'])->name('piket.set-status-guru');
         Route::post('/piket/kunci-alpha', [GuruPiketController::class, 'kunciAlphaSekarang'])->name('piket.kunci-alpha');
         Route::post('/piket/flagging-wa', [GuruPiketController::class, 'flaggingWaMassal'])->name('piket.flagging-wa');
     });
 
     // 12. Audit Trail System (Admin, Kepala Sekolah & Waka Kesiswaan)
-    Route::middleware('role:admin,kepala_sekolah,waka_kesiswaan')->group(function () {
+    Route::middleware('role:admin,kepala_sekolah,waka_kesiswaan,waka_sarpras,waka_hubin')->group(function () {
         Route::get('/audit', [AuditController::class, 'index'])->name('audit.index');
         Route::get('/audit/{id}', [AuditController::class, 'show'])->name('audit.show');
     });
 
     // 13. Master Guru & RFID (Admin, Kepala Sekolah, Waka Kesiswaan, Waka Kurikulum & Staf TU)
-    Route::middleware('role:admin,kepala_sekolah,waka_kesiswaan,waka_kurikulum,staf_tu')->group(function () {
+    Route::middleware('role:admin,kepala_sekolah,waka_kesiswaan,waka_kurikulum,waka_sarpras,waka_hubin,staf_tu')->group(function () {
         Route::get('/guru', [GuruController::class, 'index'])->name('guru.index');
         Route::get('/guru/export', [GuruController::class, 'export'])->name('guru.export');
         Route::get('/guru/template-csv', [GuruController::class, 'downloadTemplate'])->name('guru.template-csv');
@@ -273,12 +272,12 @@ Route::middleware('auth')->group(function () {
     Route::post('/kartu-rfid/kirim-wa-personal-alias', [\App\Http\Controllers\RfidController::class, 'kirimWaPersonal'])->name('rfid.kirimWaPersonal');
 
     // 14. Jam Operasional & Jadwal Sekolah (Admin, Kepsek, Wakasis, Waka Kurikulum, Guru Piket, Staf TU, Guru)
-    Route::middleware('role:admin,kepala_sekolah,waka_kesiswaan,waka_kurikulum,guru_piket,staf_tu,guru')->group(function () {
+    Route::middleware('role:admin,kepala_sekolah,waka_kesiswaan,waka_kurikulum,waka_sarpras,waka_hubin,guru_piket,staf_tu,guru')->group(function () {
         Route::get('/jadwal-sekolah', [DashboardController::class, 'jadwalSekolah'])->name('admin.jadwal.sekolah');
         Route::get('/jam-operasional', [DashboardController::class, 'jadwalSekolah'])->name('admin.jadwal.index');
-        Route::post('/jam-operasional', [DashboardController::class, 'updateJadwal'])->name('admin.jadwal.update')->middleware('role:admin,waka_kurikulum,waka_kesiswaan,kepala_sekolah');
-        Route::post('/jadwal-sekolah', [DashboardController::class, 'updateJadwal'])->name('admin.jadwal.sekolah.update')->middleware('role:admin,waka_kurikulum,waka_kesiswaan,kepala_sekolah');
-        Route::post('/jadwal-mingguan', [DashboardController::class, 'updateJadwalMingguan'])->name('admin.jadwal.mingguan.update')->middleware('role:admin,waka_kurikulum,waka_kesiswaan,kepala_sekolah');
+        Route::post('/jam-operasional', [DashboardController::class, 'updateJadwal'])->name('admin.jadwal.update')->middleware('role:admin,waka_kurikulum,waka_kesiswaan,kepala_sekolah,waka_sarpras,waka_hubin');
+        Route::post('/jadwal-sekolah', [DashboardController::class, 'updateJadwal'])->name('admin.jadwal.sekolah.update')->middleware('role:admin,waka_kurikulum,waka_kesiswaan,kepala_sekolah,waka_sarpras,waka_hubin');
+        Route::post('/jadwal-mingguan', [DashboardController::class, 'updateJadwalMingguan'])->name('admin.jadwal.mingguan.update')->middleware('role:admin,waka_kurikulum,waka_kesiswaan,kepala_sekolah,waka_sarpras,waka_hubin');
     });
 
 
