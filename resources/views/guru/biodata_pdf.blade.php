@@ -110,10 +110,24 @@
       padding-bottom: 8px;
       margin-bottom: 12px;
     }
+    .kop-logo-left, .kop-logo-right {
+      width: 72px;
+      min-width: 72px;
+      max-width: 72px;
+      height: 72px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
     .kop-logo {
-      width: 70px;
-      height: 70px;
+      max-width: 72px;
+      max-height: 72px;
+      width: auto;
+      height: auto;
       object-fit: contain;
+      display: block;
+      margin: 0 auto;
     }
     .kop-teks {
       flex: 1;
@@ -333,8 +347,12 @@
 
     <!-- KOP RESMI -->
     <div class="kop-surat">
-      <img src="{{ $sekolah && $sekolah->logo_sekolah ? asset('storage/' . $sekolah->logo_sekolah) : asset('images/logo_provinsi_lampung.png') }}" 
-           alt="Logo Instansi" class="kop-logo" onerror="this.src='{{ asset('images/logo_smk.png') }}';">
+      <div class="kop-logo-left">
+        <img src="{{ asset('img/logo_prov_lampung.png') }}" 
+             alt="Logo Provinsi Lampung" 
+             class="kop-logo" 
+             onerror="this.onerror=null; this.src='{{ asset('logo_prov_lampung.png') }}';">
+      </div>
       <div class="kop-teks">
         <div class="kop-instansi-atas">{{ $sekolah->nama_instansi_atas ?? 'PEMERINTAH PROVINSI LAMPUNG' }}</div>
         <div class="kop-dinas">{{ $sekolah->nama_dinas ?? 'DINAS PENDIDIKAN DAN KEBUDAYAAN' }}</div>
@@ -344,7 +362,19 @@
           Website: {{ $sekolah->website ?? 'smkn1airnaningan.sch.id' }} | Email: {{ $sekolah->email ?? 'smkn1airnaningan@gmail.com' }}
         </div>
       </div>
-      <img src="{{ asset('images/logo_smk.png') }}" alt="Logo SMK" class="kop-logo" onerror="this.style.opacity='0';">
+      <div class="kop-logo-right">
+        @if(!empty($sekolah->logo_sekolah) && file_exists(public_path('storage/' . $sekolah->logo_sekolah)))
+          <img src="{{ asset('storage/' . $sekolah->logo_sekolah) }}" 
+               alt="Logo SMK" 
+               class="kop-logo" 
+               onerror="this.onerror=null; this.src='{{ asset('img/logo.png') }}';">
+        @else
+          <img src="{{ asset('img/logo.png') }}" 
+               alt="Logo SMK" 
+               class="kop-logo" 
+               onerror="this.onerror=null; this.src='{{ asset('logo.png') }}';">
+        @endif
+      </div>
     </div>
 
     <!-- JUDUL DOKUMEN -->
