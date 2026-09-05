@@ -370,4 +370,35 @@ class AdminPortalTest extends TestCase
         $response = $this->actingAs($guru)->get('/situan');
         $response->assertStatus(403);
     }
+
+    public function test_dcc_dashboard_menggunakan_palette_warna_pastel_dan_font_hitam(): void
+    {
+        $admin = User::create([
+            'name' => 'Super Administrator',
+            'email' => 'admin-palette@smkn1airnaningan.sch.id',
+            'role' => 'admin',
+            'password' => Hash::make('password'),
+        ]);
+
+        $response = $this->actingAs($admin)->get('/portal');
+        $response->assertStatus(200);
+        $response->assertSee('admin-portal.css');
+
+        $cssContent = file_get_contents(public_path('css/admin-portal.css'));
+        // Verifikasi keberadaan token 4 warna Color Hunt: #a3dc9a, #dee791, #fff9bd, #ffd6ba
+        $this->assertStringContainsString('#a3dc9a', strtolower($cssContent));
+        $this->assertStringContainsString('#dee791', strtolower($cssContent));
+        $this->assertStringContainsString('#fff9bd', strtolower($cssContent));
+        $this->assertStringContainsString('#ffd6ba', strtolower($cssContent));
+
+        // Verifikasi modul tema spesifik
+        $this->assertStringContainsString('.card-situan', $cssContent);
+        $this->assertStringContainsString('.card-sirani', $cssContent);
+        $this->assertStringContainsString('.card-ppdb', $cssContent);
+        $this->assertStringContainsString('.card-web', $cssContent);
+
+        // Verifikasi font hitam tetap berlaku pada dashboard DCC
+        $this->assertStringContainsString('color: #000000', $cssContent);
+    }
 }
+

@@ -1,10 +1,15 @@
 :root {
-  --dcc-bg: #f8fafc;
+  --dcc-color-mint: #a3dc9a;
+  --dcc-color-lime: #dee791;
+  --dcc-color-cream: #fff9bd;
+  --dcc-color-peach: #ffd6ba;
+
+  --dcc-bg: #fafaf8;
   --dcc-card-bg: #ffffff;
-  --dcc-card-border: #e2e8f0;
-  --dcc-card-hover: 0 10px 25px -5px rgba(0, 0, 0, 0.06), 0 0 1px 1px rgba(0, 0, 0, 0.02);
-  --dcc-telemetry-bg: #f8fafc;
-  --dcc-telemetry-border: #e2e8f0;
+  --dcc-card-border: rgba(163, 220, 154, 0.45);
+  --dcc-card-hover: 0 12px 28px -6px rgba(163, 220, 154, 0.28), 0 0 1px 1px rgba(163, 220, 154, 0.35);
+  --dcc-telemetry-bg: #ffffff;
+  --dcc-telemetry-border: rgba(222, 231, 145, 0.45);
   --dcc-text-heading: #000000;
   --dcc-text: #000000;
   --dcc-text-sub: #000000;
@@ -18,10 +23,10 @@
 [data-theme="dark"] {
   --dcc-bg: #090d16;
   --dcc-card-bg: #111827;
-  --dcc-card-border: rgba(255, 255, 255, 0.08);
-  --dcc-card-hover: 0 12px 30px -8px rgba(0, 0, 0, 0.5), 0 0 1px 1px rgba(255, 255, 255, 0.08);
+  --dcc-card-border: rgba(163, 220, 154, 0.2);
+  --dcc-card-hover: 0 12px 30px -8px rgba(0, 0, 0, 0.5), 0 0 1px 1px rgba(163, 220, 154, 0.25);
   --dcc-telemetry-bg: rgba(255, 255, 255, 0.03);
-  --dcc-telemetry-border: rgba(255, 255, 255, 0.06);
+  --dcc-telemetry-border: rgba(255, 255, 255, 0.08);
   --dcc-text-heading: #ffffff;
   --dcc-text: #f8fafc;
   --dcc-text-sub: #94a3b8;
@@ -46,7 +51,7 @@ body {
 /* ─── Topbar ─── */
 .portal-topbar {
   background: rgba(255, 255, 255, 0.95);
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1.5px solid var(--dcc-card-border);
   position: sticky;
   top: 0;
   z-index: 100;
@@ -80,12 +85,13 @@ body {
   width: 38px;
   height: 38px;
   border-radius: 10px;
-  background: #0f172a;
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: linear-gradient(135deg, var(--dcc-color-mint) 0%, var(--dcc-color-lime) 100%);
+  border: 1.5px solid var(--dcc-color-mint);
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 4px;
+  box-shadow: 0 2px 8px rgba(163, 220, 154, 0.35);
 }
 
 .portal-brand-title {
@@ -117,15 +123,15 @@ body {
   box-sizing: border-box;
 }
 
-/* ─── Hero Mission Control Banner (Minimalist Modern / Black Typography) ─── */
+/* ─── Hero Mission Control Banner (Color Palette #A3DC9A, #DEE791, #FFF9BD, #FFD6BA / Black Typography) ─── */
 .cockpit-hero {
   position: relative;
-  border-radius: 16px;
-  background: var(--dcc-card-bg);
-  border: 1px solid var(--dcc-card-border);
-  box-shadow: 0 4px 20px -4px rgba(15, 23, 42, 0.05);
+  border-radius: 18px;
+  background: linear-gradient(135deg, rgba(255, 249, 189, 0.6) 0%, rgba(255, 214, 186, 0.45) 45%, rgba(163, 220, 154, 0.35) 100%);
+  border: 1.5px solid rgba(163, 220, 154, 0.65);
+  box-shadow: 0 10px 30px -5px rgba(163, 220, 154, 0.22);
   padding: 32px 36px;
-  color: #0f172a;
+  color: #000000;
   overflow: hidden;
   margin-bottom: 24px;
   display: grid;
@@ -144,19 +150,19 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  background: #f1f5f9;
-  border: 1px solid #cbd5e1;
-  padding: 4px 10px;
+  background: var(--dcc-color-lime);
+  border: 1px solid #c8d46b;
+  padding: 5px 12px;
   border-radius: 6px;
   font-size: 11.5px;
-  font-weight: 700;
+  font-weight: 800;
   color: #000000;
   margin-bottom: 12px;
 }
 
 [data-theme="dark"] .cockpit-salam-badge {
-  background: rgba(255, 255, 255, 0.06);
-  border-color: rgba(255, 255, 255, 0.1);
+  background: rgba(222, 231, 145, 0.2);
+  border-color: rgba(222, 231, 145, 0.4);
   color: #ffffff;
 }
 
@@ -175,7 +181,7 @@ body {
 
 .cockpit-desc {
   font-size: 14.5px;
-  font-weight: 500;
+  font-weight: 600;
   color: #000000;
   line-height: 1.65;
   margin: 0 0 20px;
@@ -196,10 +202,10 @@ body {
 
 .cockpit-meta-chip {
   font-size: 11.5px;
-  font-weight: 700;
-  background: #f8fafc;
-  border: 1px solid #cbd5e1;
-  padding: 6px 12px;
+  font-weight: 800;
+  background: var(--dcc-color-cream);
+  border: 1px solid var(--dcc-color-lime);
+  padding: 6px 14px;
   border-radius: 6px;
   color: #000000;
   display: inline-flex;
@@ -208,9 +214,9 @@ body {
 }
 
 [data-theme="dark"] .cockpit-meta-chip {
-  background: rgba(255, 255, 255, 0.05);
-  border-color: rgba(255, 255, 255, 0.08);
-  color: #cbd5e1;
+  background: rgba(255, 249, 189, 0.15);
+  border-color: rgba(222, 231, 145, 0.3);
+  color: #ffffff;
 }
 
 .cockpit-action-row {
@@ -227,38 +233,41 @@ body {
   padding: 9px 18px;
   border-radius: 8px;
   font-size: 13px;
-  font-weight: 700;
+  font-weight: 800;
   text-decoration: none;
   transition: all 0.15s ease;
 }
 
 .cockpit-action-btn.primary {
-  background: #000000;
-  color: #ffffff;
-  border: 1px solid #000000;
+  background: var(--dcc-color-mint);
+  color: #000000;
+  border: 1px solid #82cc77;
+  font-weight: 900;
+  box-shadow: 0 3px 10px rgba(163, 220, 154, 0.35);
 }
 
 .cockpit-action-btn.primary:hover {
-  background: #1e293b;
-  border-color: #1e293b;
+  background: #90d486;
+  border-color: #72be66;
   transform: translateY(-1px);
 }
 
 [data-theme="dark"] .cockpit-action-btn.primary {
-  background: #2563eb;
-  border-color: #2563eb;
-  color: #ffffff;
+  background: var(--dcc-color-mint);
+  border-color: #82cc77;
+  color: #000000;
 }
 
 .cockpit-action-btn.secondary {
   background: #ffffff;
   color: #000000;
-  border: 1px solid #000000;
+  border: 1px solid var(--dcc-color-lime);
 }
 
 .cockpit-action-btn.secondary:hover {
-  background: #f1f5f9;
-  border-color: #000000;
+  background: var(--dcc-color-cream);
+  border-color: var(--dcc-color-lime);
+  color: #000000;
   transform: translateY(-1px);
 }
 
@@ -272,11 +281,11 @@ body {
 .cockpit-showcase-frame {
   border-radius: 12px;
   overflow: hidden;
-  border: 1px solid #e2e8f0;
+  border: 1.5px solid var(--dcc-color-mint);
   aspect-ratio: 16 / 9;
   position: relative;
   background: #090e1a;
-  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.06);
+  box-shadow: 0 6px 20px rgba(163, 220, 154, 0.28);
 }
 
 [data-theme="dark"] .cockpit-showcase-frame {
@@ -316,14 +325,14 @@ body {
 
 .dcc-stat-card {
   background: var(--dcc-card-bg);
-  border: 1px solid var(--dcc-card-border);
+  border: 1.5px solid var(--dcc-card-border);
   border-radius: 14px;
   padding: 16px 18px;
   display: flex;
   align-items: flex-start;
   gap: 14px;
-  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.02);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 2px 6px rgba(163, 220, 154, 0.08);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
 }
 
 .dcc-stat-card:hover {
@@ -340,15 +349,44 @@ body {
   justify-content: center;
   font-size: 17px;
   flex-shrink: 0;
-  background: #f1f5f9;
-  border: 1px solid #e2e8f0;
   color: #000000;
+  font-weight: 700;
 }
 
-[data-theme="dark"] .dcc-stat-icon {
-  background: rgba(255, 255, 255, 0.06);
-  border-color: rgba(255, 255, 255, 0.1);
-  color: #ffffff;
+/* Card 1: SITUAN (Mint) */
+.dcc-stat-card:nth-child(1) .dcc-stat-icon {
+  background: rgba(163, 220, 154, 0.35);
+  border: 1.5px solid var(--dcc-color-mint);
+}
+.dcc-stat-card:nth-child(1):hover {
+  border-color: var(--dcc-color-mint);
+}
+
+/* Card 2: SIRANI (Lime) */
+.dcc-stat-card:nth-child(2) .dcc-stat-icon {
+  background: rgba(222, 231, 145, 0.35);
+  border: 1.5px solid var(--dcc-color-lime);
+}
+.dcc-stat-card:nth-child(2):hover {
+  border-color: var(--dcc-color-lime);
+}
+
+/* Card 3: PPDB (Peach) */
+.dcc-stat-card:nth-child(3) .dcc-stat-icon {
+  background: rgba(255, 214, 186, 0.45);
+  border: 1.5px solid var(--dcc-color-peach);
+}
+.dcc-stat-card:nth-child(3):hover {
+  border-color: var(--dcc-color-peach);
+}
+
+/* Card 4: HUMAS (Cream) */
+.dcc-stat-card:nth-child(4) .dcc-stat-icon {
+  background: rgba(255, 249, 189, 0.7);
+  border: 1.5px solid var(--dcc-color-lime);
+}
+.dcc-stat-card:nth-child(4):hover {
+  border-color: var(--dcc-color-lime);
 }
 
 .dcc-stat-body {
@@ -357,16 +395,12 @@ body {
 }
 
 .dcc-stat-label {
-  font-size: 10px;
-  font-weight: 800;
+  font-size: 10.5px;
+  font-weight: 900;
   color: #000000;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  margin-bottom: 2px;
-}
-
-[data-theme="dark"] .dcc-stat-label {
-  color: #94a3b8;
+  margin-bottom: 3px;
 }
 
 .dcc-stat-val {
@@ -377,35 +411,22 @@ body {
   font-family: var(--font-mono);
 }
 
-[data-theme="dark"] .dcc-stat-val {
-  color: #ffffff;
-}
-
 .dcc-stat-unit {
   font-size: 11.5px;
-  font-weight: 700;
+  font-weight: 800;
   color: #000000;
   font-family: var(--font-sans);
 }
 
-[data-theme="dark"] .dcc-stat-unit {
-  color: #cbd5e1;
-}
-
 .dcc-stat-sub {
   font-size: 11px;
-  font-weight: 600;
+  font-weight: 700;
   color: #000000;
   opacity: 0.85;
   margin-top: 3px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-}
-
-[data-theme="dark"] .dcc-stat-sub {
-  color: #94a3b8;
-  opacity: 1;
 }
 
 /* ─── Section Header ─── */
@@ -427,10 +448,6 @@ body {
   margin: 0;
 }
 
-[data-theme="dark"] .portal-section-title {
-  color: #ffffff;
-}
-
 .portal-section-title-icon {
   width: 26px;
   height: 26px;
@@ -439,22 +456,19 @@ body {
   align-items: center;
   justify-content: center;
   font-size: 13px;
+  background: var(--dcc-color-cream);
+  border: 1px solid var(--dcc-color-lime);
+  color: #000000;
 }
 
 .portal-section-badge {
   font-size: 11px;
-  font-weight: 700;
-  padding: 3px 9px;
+  font-weight: 800;
+  padding: 4px 10px;
   border-radius: 6px;
-  background: #f1f5f9;
-  border: 1px solid #cbd5e1;
+  background: var(--dcc-color-cream);
+  border: 1px solid var(--dcc-color-lime);
   color: #000000;
-}
-
-[data-theme="dark"] .portal-section-badge {
-  background: rgba(255, 255, 255, 0.05);
-  border-color: rgba(255, 255, 255, 0.1);
-  color: #cbd5e1;
 }
 
 /* ─── Active Module Grid (4 Core Ecosystem Modules) ─── */
@@ -466,13 +480,13 @@ body {
 
 .module-card {
   background: var(--dcc-card-bg);
-  border: 1px solid var(--dcc-card-border);
+  border: 1.5px solid var(--dcc-card-border);
   border-radius: 16px;
   padding: 20px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.02);
+  box-shadow: 0 2px 8px rgba(163, 220, 154, 0.08);
   transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
   position: relative;
 }
@@ -480,7 +494,6 @@ body {
 .module-card:hover {
   transform: translateY(-3px);
   box-shadow: var(--dcc-card-hover);
-  border-color: #000000;
 }
 
 .module-card-top {
@@ -491,41 +504,28 @@ body {
 }
 
 .module-card-icon-halo {
-  width: 38px;
-  height: 38px;
-  border-radius: 10px;
+  width: 40px;
+  height: 40px;
+  border-radius: 11px;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 18px;
-  background: #f1f5f9;
-  border: 1px solid #e2e8f0;
   color: #000000;
-}
-
-[data-theme="dark"] .module-card-icon-halo {
-  background: rgba(255, 255, 255, 0.06);
-  border-color: rgba(255, 255, 255, 0.1);
-  color: #ffffff;
+  font-weight: 800;
 }
 
 .module-live-pill {
   font-size: 10.5px;
-  font-weight: 700;
+  font-weight: 800;
   padding: 3px 8px;
   border-radius: 6px;
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  background: #f1f5f9;
-  border: 1px solid #e2e8f0;
+  background: var(--dcc-color-cream);
+  border: 1px solid var(--dcc-color-lime);
   color: #000000;
-}
-
-[data-theme="dark"] .module-live-pill {
-  background: rgba(255, 255, 255, 0.06);
-  border-color: rgba(255, 255, 255, 0.1);
-  color: #e2e8f0;
 }
 
 .access-badge {
@@ -539,36 +539,32 @@ body {
 }
 
 .access-badge.allowed {
-  background: #ecfdf5;
-  border: 1px solid #a7f3d0;
+  background: rgba(163, 220, 154, 0.35);
+  border: 1px solid var(--dcc-color-mint);
 }
 
 .access-badge.locked {
-  background: #fef2f2;
-  border: 1px solid #fecaca;
+  background: rgba(255, 214, 186, 0.4);
+  border: 1px solid var(--dcc-color-peach);
 }
 
 .module-card.is-locked {
-  opacity: 0.75;
-  background: rgba(15, 23, 42, 0.01);
+  opacity: 0.8;
+  background: rgba(255, 249, 189, 0.12);
   border-style: dashed;
 }
 
-.dark .module-card.is-locked {
-  background: rgba(15, 23, 42, 0.3);
-}
-
 .btn-launch-primary.btn-locked {
-  background: #334155 !important;
-  color: #94a3b8 !important;
+  background: #e2e8f0 !important;
+  color: #64748b !important;
   cursor: not-allowed !important;
-  border: 1px dashed rgba(255, 255, 255, 0.12) !important;
+  border: 1px dashed #cbd5e1 !important;
   box-shadow: none !important;
   transform: none !important;
 }
 
 .btn-launch-secondary.btn-locked {
-  opacity: 0.5;
+  opacity: 0.6;
   cursor: not-allowed;
   pointer-events: none;
 }
@@ -576,27 +572,18 @@ body {
 .module-card-name {
   font-size: 17px;
   font-weight: 900;
-  margin: 0 0 2px;
+  margin: 0 0 3px;
   letter-spacing: -0.01em;
   color: #000000;
-}
-
-[data-theme="dark"] .module-card-name {
-  color: #ffffff;
 }
 
 .module-card-subtitle {
   font-size: 11.5px;
   color: #000000;
   opacity: 0.85;
-  font-weight: 600;
+  font-weight: 700;
   margin: 0 0 16px;
   line-height: 1.4;
-}
-
-[data-theme="dark"] .module-card-subtitle {
-  color: #94a3b8;
-  opacity: 1;
 }
 
 /* Telemetry KPI Boxes */
@@ -604,16 +591,9 @@ body {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 8px;
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
   border-radius: 12px;
   padding: 10px 12px;
   margin-bottom: 18px;
-}
-
-[data-theme="dark"] .kpi-row {
-  background: rgba(255, 255, 255, 0.03);
-  border-color: rgba(255, 255, 255, 0.06);
 }
 
 .kpi-item {
@@ -630,10 +610,6 @@ body {
   margin-bottom: 2px;
 }
 
-[data-theme="dark"] .kpi-label {
-  color: #94a3b8;
-}
-
 .kpi-val {
   font-size: 18px;
   font-weight: 900;
@@ -642,28 +618,109 @@ body {
   line-height: 1.15;
 }
 
-[data-theme="dark"] .kpi-val {
-  color: #ffffff;
-}
-
 .kpi-sub {
   font-size: 10px;
-  font-weight: 600;
+  font-weight: 700;
   color: #000000;
   opacity: 0.85;
   margin-top: 1px;
 }
 
-[data-theme="dark"] .kpi-sub {
-  color: #94a3b8;
-  opacity: 1;
+/* ─── Distinct Module Theme Styling ─── */
+
+/* 1. SITUAN — Theme: Mint (#A3DC9A) */
+.card-situan .module-card-icon-halo {
+  background: rgba(163, 220, 154, 0.35);
+  border: 1.5px solid var(--dcc-color-mint);
+}
+.card-situan .kpi-row {
+  background: rgba(163, 220, 154, 0.14);
+  border: 1px solid rgba(163, 220, 154, 0.45);
+}
+.card-situan:hover {
+  border-color: var(--dcc-color-mint);
+}
+.card-situan .btn-launch-primary {
+  background: var(--dcc-color-mint);
+  border: 1.5px solid #82cc77;
+  color: #000000 !important;
+}
+.card-situan .btn-launch-primary:hover {
+  background: #92d388;
+  border-color: #6dbb62;
+}
+
+/* 2. SIRANI — Theme: Lime (#DEE791) */
+.card-sirani .module-card-icon-halo {
+  background: rgba(222, 231, 145, 0.35);
+  border: 1.5px solid var(--dcc-color-lime);
+}
+.card-sirani .kpi-row {
+  background: rgba(222, 231, 145, 0.16);
+  border: 1px solid rgba(222, 231, 145, 0.45);
+}
+.card-sirani:hover {
+  border-color: var(--dcc-color-lime);
+}
+.card-sirani .btn-launch-primary {
+  background: var(--dcc-color-lime);
+  border: 1.5px solid #c9d56c;
+  color: #000000 !important;
+}
+.card-sirani .btn-launch-primary:hover {
+  background: #d3de7c;
+  border-color: #b8c558;
+}
+
+/* 3. PPDB ONLINE 2026 — Theme: Peach (#FFD6BA) */
+.card-ppdb .module-card-icon-halo {
+  background: rgba(255, 214, 186, 0.45);
+  border: 1.5px solid var(--dcc-color-peach);
+}
+.card-ppdb .kpi-row {
+  background: rgba(255, 214, 186, 0.2);
+  border: 1px solid rgba(255, 214, 186, 0.55);
+}
+.card-ppdb:hover {
+  border-color: var(--dcc-color-peach);
+}
+.card-ppdb .btn-launch-primary {
+  background: var(--dcc-color-peach);
+  border: 1.5px solid #f6be9d;
+  color: #000000 !important;
+}
+.card-ppdb .btn-launch-primary:hover {
+  background: #ffc8a6;
+  border-color: #efa77f;
+}
+
+/* 4. WEB PROFIL & HUMAS — Theme: Cream (#FFF9BD) */
+.card-web .module-card-icon-halo {
+  background: rgba(255, 249, 189, 0.7);
+  border: 1.5px solid var(--dcc-color-lime);
+}
+.card-web .kpi-row {
+  background: rgba(255, 249, 189, 0.35);
+  border: 1px solid rgba(222, 231, 145, 0.45);
+}
+.card-web:hover {
+  border-color: var(--dcc-color-lime);
+}
+.card-web .btn-launch-primary {
+  background: var(--dcc-color-cream);
+  border: 1.5px solid var(--dcc-color-lime);
+  color: #000000 !important;
+}
+.card-web .btn-launch-primary:hover {
+  background: #fdf5a7;
+  border-color: #b8c558;
 }
 
 /* Actions Deck */
 .module-actions {
   display: flex;
   flex-direction: column;
-  gap: 7px;
+  gap: 8px;
   margin-top: auto;
 }
 
@@ -675,25 +732,16 @@ body {
   height: 38px;
   border-radius: 10px;
   font-size: 12.5px;
-  font-weight: 800;
+  font-weight: 900;
   text-decoration: none;
-  background: #000000;
-  color: #ffffff;
-  border: 1px solid #000000;
   cursor: pointer;
   transition: all 0.15s ease;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
 }
 
 .btn-launch-primary:hover {
-  background: #1e293b;
-  border-color: #1e293b;
   transform: translateY(-1px);
-}
-
-[data-theme="dark"] .btn-launch-primary {
-  background: #2563eb;
-  border-color: #2563eb;
-  color: #ffffff;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
 }
 
 .btn-launch-secondary-row {
@@ -709,24 +757,18 @@ body {
   height: 32px;
   border-radius: 8px;
   font-size: 11px;
-  font-weight: 700;
+  font-weight: 800;
   text-decoration: none;
   background: #ffffff;
-  border: 1px solid #cbd5e1;
-  color: #000000;
+  border: 1px solid var(--dcc-color-lime);
+  color: #000000 !important;
   transition: all 0.15s ease;
 }
 
 .btn-launch-secondary:hover {
-  background: #f1f5f9;
-  color: #000000;
-  border-color: #000000;
-}
-
-[data-theme="dark"] .btn-launch-secondary {
-  background: rgba(255, 255, 255, 0.05);
-  color: #e2e8f0;
-  border-color: rgba(255, 255, 255, 0.1);
+  background: var(--dcc-color-cream);
+  border-color: var(--dcc-color-mint);
+  color: #000000 !important;
 }
 
 /* ─── Future Roadmap Blueprint Cards ─── */
@@ -738,7 +780,7 @@ body {
 
 .roadmap-card {
   background: var(--dcc-card-bg);
-  border: 1px solid var(--dcc-card-border);
+  border: 1.5px solid var(--dcc-card-border);
   border-radius: 14px;
   padding: 16px;
   display: flex;
@@ -748,8 +790,9 @@ body {
 }
 
 .roadmap-card:hover {
-  border-color: #000000;
+  border-color: var(--dcc-color-mint);
   transform: translateY(-2px);
+  box-shadow: var(--dcc-card-hover);
 }
 
 .roadmap-top {
@@ -767,15 +810,30 @@ body {
   align-items: center;
   justify-content: center;
   font-size: 16px;
-  background: #f1f5f9;
-  border: 1px solid #e2e8f0;
   color: #000000;
+  font-weight: 800;
 }
 
-[data-theme="dark"] .roadmap-icon-wrap {
-  background: rgba(255, 255, 255, 0.06);
-  border-color: rgba(255, 255, 255, 0.1);
-  color: #ffffff;
+/* Roadmap card halos alternating across the palette */
+.roadmap-card:nth-child(1) .roadmap-icon-wrap {
+  background: rgba(163, 220, 154, 0.35);
+  border: 1.5px solid var(--dcc-color-mint);
+}
+.roadmap-card:nth-child(2) .roadmap-icon-wrap {
+  background: rgba(222, 231, 145, 0.35);
+  border: 1.5px solid var(--dcc-color-lime);
+}
+.roadmap-card:nth-child(3) .roadmap-icon-wrap {
+  background: rgba(255, 214, 186, 0.45);
+  border: 1.5px solid var(--dcc-color-peach);
+}
+.roadmap-card:nth-child(4) .roadmap-icon-wrap {
+  background: rgba(255, 249, 189, 0.7);
+  border: 1.5px solid var(--dcc-color-lime);
+}
+.roadmap-card:nth-child(5) .roadmap-icon-wrap {
+  background: rgba(163, 220, 154, 0.35);
+  border: 1.5px solid var(--dcc-color-mint);
 }
 
 .roadmap-badge {
@@ -784,9 +842,9 @@ body {
   letter-spacing: 0.03em;
   padding: 2px 7px;
   border-radius: 6px;
-  background: #fef3c7;
+  background: var(--dcc-color-cream);
   color: #000000;
-  border: 1px solid #fde68a;
+  border: 1px solid var(--dcc-color-lime);
 }
 
 .roadmap-title {
@@ -796,21 +854,12 @@ body {
   color: #000000;
 }
 
-[data-theme="dark"] .roadmap-title {
-  color: #ffffff;
-}
-
 .roadmap-sub {
   font-size: 10.5px;
-  font-weight: 700;
+  font-weight: 800;
   color: #000000;
   opacity: 0.85;
   margin: 0 0 8px;
-}
-
-[data-theme="dark"] .roadmap-sub {
-  color: #94a3b8;
-  opacity: 1;
 }
 
 .roadmap-desc {
@@ -820,12 +869,7 @@ body {
   opacity: 0.9;
   margin: 0 0 12px;
   flex: 1;
-  font-weight: 500;
-}
-
-[data-theme="dark"] .roadmap-desc {
-  color: #cbd5e1;
-  opacity: 1;
+  font-weight: 600;
 }
 
 .roadmap-progress-wrap {
@@ -834,47 +878,37 @@ body {
 
 .roadmap-progress-bar {
   width: 100%;
-  height: 3px;
+  height: 4px;
   border-radius: 2px;
-  background: var(--dcc-telemetry-border);
+  background: rgba(222, 231, 145, 0.35);
   overflow: hidden;
 }
 
 .roadmap-progress-fill {
   height: 100%;
   border-radius: 2px;
-  background: #000000;
-}
-
-[data-theme="dark"] .roadmap-progress-fill {
-  background: #38bdf8;
+  background: linear-gradient(90deg, var(--dcc-color-mint) 0%, var(--dcc-color-lime) 100%);
 }
 
 .roadmap-lead {
   font-size: 10px;
-  font-weight: 700;
+  font-weight: 800;
   color: #000000;
-  background: #f8fafc;
+  background: rgba(255, 249, 189, 0.5);
   padding: 5px 8px;
   border-radius: 6px;
-  border: 1px solid #e2e8f0;
+  border: 1px solid rgba(222, 231, 145, 0.5);
   display: flex;
   align-items: center;
   gap: 5px;
 }
 
-[data-theme="dark"] .roadmap-lead {
-  background: rgba(255, 255, 255, 0.05);
-  border-color: rgba(255, 255, 255, 0.08);
-  color: #cbd5e1;
-}
-
 /* ─── Bottom Console Strip ─── */
 .system-strip {
   margin-top: 32px;
-  background: var(--dcc-card-bg);
-  border: 1px solid var(--dcc-card-border);
-  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(255, 249, 189, 0.45) 0%, rgba(255, 214, 186, 0.35) 50%, rgba(163, 220, 154, 0.25) 100%);
+  border: 1.5px solid var(--dcc-card-border);
+  border-radius: 14px;
   padding: 14px 20px;
   display: flex;
   align-items: center;
@@ -884,31 +918,19 @@ body {
   color: #000000;
 }
 
-[data-theme="dark"] .system-strip {
-  color: #ffffff;
-}
-
 .system-strip-left {
   display: flex;
   align-items: center;
   gap: 14px;
   font-size: 11.5px;
   color: #000000;
-  font-weight: 600;
+  font-weight: 700;
   flex-wrap: wrap;
-}
-
-[data-theme="dark"] .system-strip-left {
-  color: #cbd5e1;
 }
 
 .system-strip-left strong {
   color: #000000;
   font-weight: 900;
-}
-
-[data-theme="dark"] .system-strip-left strong {
-  color: #ffffff;
 }
 
 .system-strip-links {
@@ -919,28 +941,22 @@ body {
 
 .system-strip-link {
   font-size: 11px;
-  font-weight: 700;
-  color: #000000;
+  font-weight: 800;
+  color: #000000 !important;
   text-decoration: none;
   padding: 5px 12px;
   border-radius: 6px;
   background: #ffffff;
-  border: 1px solid #cbd5e1;
+  border: 1.5px solid var(--dcc-color-lime);
   transition: all 0.15s ease;
   display: inline-flex;
   align-items: center;
 }
 
 .system-strip-link:hover {
-  background: #f1f5f9;
-  border-color: #000000;
-  color: #000000;
-}
-
-[data-theme="dark"] .system-strip-link {
-  background: rgba(255, 255, 255, 0.05);
-  border-color: rgba(255, 255, 255, 0.1);
-  color: #e2e8f0;
+  background: var(--dcc-color-mint);
+  border-color: #82cc77;
+  color: #000000 !important;
 }
 
 /* Responsive */
