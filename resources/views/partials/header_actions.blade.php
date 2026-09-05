@@ -49,11 +49,7 @@
         </div>
       </div>
       <div style="padding:8px; background:var(--bg-2);">
-        @if(auth()->user()?->guru)
-          <button type="button" onclick="openModalKartuGuruSaya()" class="acct-dropdown-item" style="width:100%; text-align:left; padding:9px 12px; font-size:12px; font-weight:800; color:#0284c7; background:rgba(2,132,199,0.08); border:1px solid rgba(2,132,199,0.2); border-radius:6px; cursor:pointer; display:flex; align-items:center; gap:8px; white-space:nowrap; box-sizing:border-box; margin-bottom:6px;">
-            <i class="bi bi-qr-code-scan" style="font-size:14.5px; color:#0284c7;"></i> Kartu &amp; QR Presensi Saya
-          </button>
-        @endif
+
 
 
         <a href="{{ route('admin.portal') }}" class="acct-dropdown-item" style="width:100%; text-align:left; padding:9px 12px; font-size:12px; font-weight:700; color:var(--text); text-decoration:none; display:flex; align-items:center; gap:8px; white-space:nowrap; box-sizing:border-box;">
