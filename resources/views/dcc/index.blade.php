@@ -20,17 +20,12 @@
       <div>
         <div class="portal-brand-title">
           <span>DCC SMKN 1 AN</span>
-          <span class="portal-brand-badge">PRO v2.0</span>
         </div>
         <div class="portal-brand-subtitle">Digital Command Center · SMKN 1 Air Naningan</div>
       </div>
     </a>
 
     <div class="portal-top-right">
-      <div class="portal-status-beacon" title="Koneksi seluruh modul & database normal">
-        <span class="pulse-dot"></span>
-        <span>SISTEM NORMAL</span>
-      </div>
       @include('partials.header_actions')
     </div>
   </header>
@@ -41,26 +36,12 @@
       $salam = $hour < 11 ? 'Selamat Pagi' : ($hour < 15 ? 'Selamat Siang' : ($hour < 18 ? 'Selamat Sore' : 'Selamat Malam'));
     @endphp
 
-    {{-- Hero Cockpit / Mission Control Banner --}}
+    {{-- Hero Mission Control Banner (Minimalist Modern) --}}
     <div class="cockpit-hero">
-      <div>
-        <div class="cockpit-pill-group">
-          <div class="portal-hero-pill">
-            <span class="pulse-dot" style="background:#38bdf8; box-shadow:0 0 0 0 rgba(56,189,248,0.7);"></span>
-            <span>DCC · DIGITAL COMMAND CENTER</span>
-          </div>
-          <div class="portal-hero-pill glow-emerald">
-            <span class="pulse-dot" style="background:#10b981; box-shadow:0 0 0 0 rgba(16,185,129,0.7);"></span>
-            <span>4 MODUL ONLINE</span>
-          </div>
-          <div class="portal-hero-pill glow-amber">
-            <i class="bi bi-patch-check-fill" style="color:#fbbf24;"></i>
-            <span>SMKN 1 AIR NANINGAN</span>
-          </div>
-          <div class="portal-hero-pill" style="color:#e0f2fe; border-color:rgba(255,255,255,0.2); background:rgba(255,255,255,0.08);">
-            <i class="bi bi-brightness-high" style="color:#38bdf8;"></i>
-            <span>{{ $salam }}</span>
-          </div>
+      <div class="cockpit-hero-left">
+        <div class="cockpit-salam-badge">
+          <i class="bi bi-clock-history"></i>
+          <span>{{ $salam }} · SMKN 1 Air Naningan</span>
         </div>
 
         <h1 class="cockpit-title">
@@ -68,104 +49,77 @@
         </h1>
         
         <p class="cockpit-desc">
-          Pusat Komando &amp; Integrasi Ekosistem Digital Vokasi 4.0. Akses terpusat data pokok kelembagaan (SITUAN), presensi RFID gerbang cerdas (SIRANI), seleksi PPDB 2026, dan publikasi institusi dalam satu kendali real-time.
+          Pusat kendali ekosistem digital terpadu SMKN 1 Air Naningan. Akses data pokok kelembagaan, presensi gerbang, seleksi PPDB, dan publikasi institusi dalam satu sistem terintegrasi.
         </p>
 
         <div class="cockpit-meta-row">
-          <div class="cockpit-clock-badge" id="portalLiveClock">
-            <i class="bi bi-clock-history" style="color:#38bdf8;"></i> Memuat waktu sistem...
+          <div class="cockpit-meta-chip" id="portalLiveClock">
+            <i class="bi bi-calendar3"></i> Memuat waktu sistem...
           </div>
-          <div class="cockpit-clock-badge" style="background:rgba(255,255,255,0.06);">
-            <i class="bi bi-person-badge" style="color:#a78bfa;"></i> {{ auth()->user()?->role_display_name ?? 'Super Administrator' }}
-          </div>
-          <div class="cockpit-clock-badge" style="background:rgba(16,185,129,0.1); border-color:rgba(16,185,129,0.3); color:#34d399;">
-            <i class="bi bi-shield-fill-check"></i> Gateway Aktif
+          <div class="cockpit-meta-chip">
+            <i class="bi bi-shield-check"></i> {{ auth()->user()?->role_display_name ?? 'Super Administrator' }}
           </div>
         </div>
 
         <div class="cockpit-action-row">
           <a href="#modul-aktif" class="cockpit-action-btn primary">
-            <i class="bi bi-grid-3x3-gap-fill"></i> Buka Modul Sistem
+            <i class="bi bi-grid-fill"></i> Buka Modul Sistem
           </a>
           <a href="{{ route('audit.index') }}" class="cockpit-action-btn secondary">
-            <i class="bi bi-shield-shaded" style="color:#38bdf8;"></i> Audit Telemetri DCC
+            <i class="bi bi-shield-shaded"></i> Audit Telemetri
           </a>
           @if($canAccessSirani)
-            <a href="{{ route('dashboard') }}" class="cockpit-action-btn secondary" style="background:rgba(16,185,129,0.12); border-color:rgba(16,185,129,0.25); color:#34d399;">
+            <a href="{{ route('dashboard') }}" class="cockpit-action-btn secondary">
               <i class="bi bi-fingerprint"></i> Presensi Gerbang
             </a>
           @endif
         </div>
       </div>
 
-      {{-- Right: High-Tech Cyber Command Center HUD Showcase --}}
-      <div class="cockpit-hud-card">
-        <img src="/images/web/dcc_command_center_banner.jpg" alt="DCC SMKN 1 AN Control Room" class="cockpit-hud-bg" onerror="this.src='/images/web/hero_kampus.jpg';" />
-        
-        {{-- Futuristic Tech Brackets --}}
-        <div class="cockpit-hud-bracket tl"></div>
-        <div class="cockpit-hud-bracket tr"></div>
-        <div class="cockpit-hud-bracket bl"></div>
-        <div class="cockpit-hud-bracket br"></div>
+      {{-- Right: Clean Framed Showcase Image --}}
+      <div class="cockpit-showcase-frame">
+        <img src="/images/web/dcc_command_center_banner.jpg" alt="DCC SMKN 1 AN Command Center" class="cockpit-showcase-img" onerror="this.src='/images/web/hero_kampus.jpg';" />
+        <div class="cockpit-showcase-caption">
+          <i class="bi bi-cpu"></i> Smart Command Center · SMKN 1 Air Naningan
+        </div>
+      </div>
+    </div>
 
-        {{-- Scanning Laser Line --}}
-        <div class="cockpit-hud-scanline"></div>
+    {{-- Minimalist Quick Telemetry Bar --}}
+    <div class="dcc-stat-strip">
+      <div class="dcc-stat-card">
+        <div class="dcc-stat-icon situan"><i class="bi bi-buildings"></i></div>
+        <div class="dcc-stat-body">
+          <div class="dcc-stat-label">SITUAN · DATA POKOK</div>
+          <div class="dcc-stat-val">{{ number_format($totalSiswa) }} <span class="dcc-stat-unit">Siswa</span></div>
+          <div class="dcc-stat-sub">{{ $totalGuru }} PTK Aktif · {{ $totalRombel }} Rombel</div>
+        </div>
+      </div>
 
-        {{-- Glassmorphic HUD Content --}}
-        <div class="cockpit-hud-overlay">
-          <div class="cockpit-hud-top">
-            <div class="hud-pill-live">
-              <span class="pulse-dot" style="width:6px; height:6px;"></span>
-              <span>LIVE COMMAND HUD</span>
-            </div>
-            <div class="hud-tag-sec">
-              <i class="bi bi-wifi"></i> ONLINE · 12ms
-            </div>
-          </div>
+      <div class="dcc-stat-card">
+        <div class="dcc-stat-icon sirani"><i class="bi bi-fingerprint"></i></div>
+        <div class="dcc-stat-body">
+          <div class="dcc-stat-label">SIRANI · PRESENSI HARI INI</div>
+          <div class="dcc-stat-val">{{ $persenSiswaHadir }}% <span class="dcc-stat-unit">Kehadiran</span></div>
+          <div class="dcc-stat-sub">{{ $siswaHadirToday }} Siswa Hadir · Gerbang {{ $isGerbangAktif ? 'Buka' : 'Tutup' }}</div>
+        </div>
+      </div>
 
-          {{-- 4 Live Telemetry Chips --}}
-          <div class="cockpit-hud-telemetry">
-            <div class="hud-chip">
-              <span class="hud-chip-dot blue"></span>
-              <div>
-                <span class="hud-chip-label">SITUAN</span>
-                <span class="hud-chip-text">{{ number_format($totalSiswa) }} Siswa Aktif</span>
-              </div>
-            </div>
+      <div class="dcc-stat-card">
+        <div class="dcc-stat-icon ppdb"><i class="bi bi-person-plus"></i></div>
+        <div class="dcc-stat-body">
+          <div class="dcc-stat-label">PPDB 2026 · PENDAFTARAN</div>
+          <div class="dcc-stat-val">{{ number_format($totalPendaftar) }} <span class="dcc-stat-unit">Calon</span></div>
+          <div class="dcc-stat-sub">{{ $ppdbMenunggu }} Menunggu · {{ $ppdbDiterima }} Diterima</div>
+        </div>
+      </div>
 
-            <div class="hud-chip">
-              <span class="hud-chip-dot green"></span>
-              <div>
-                <span class="hud-chip-label">SIRANI</span>
-                <span class="hud-chip-text">{{ $persenSiswaHadir }}% Hadir ({{ $isGerbangAktif ? 'Buka' : 'Tutup' }})</span>
-              </div>
-            </div>
-
-            <div class="hud-chip">
-              <span class="hud-chip-dot amber"></span>
-              <div>
-                <span class="hud-chip-label">PPDB 2026</span>
-                <span class="hud-chip-text">{{ number_format($totalPendaftar) }} Pendaftar</span>
-              </div>
-            </div>
-
-            <div class="hud-chip">
-              <span class="hud-chip-dot purple"></span>
-              <div>
-                <span class="hud-chip-label">HUMAS WEB</span>
-                <span class="hud-chip-text">{{ $totalBerita }} Berita &amp; Rilis</span>
-              </div>
-            </div>
-          </div>
-
-          <div class="cockpit-hud-bottom">
-            <div class="cockpit-hud-title">
-              <i class="bi bi-cpu-fill" style="color:#38bdf8;"></i> Integrated Smart Campus 4.0
-            </div>
-            <div class="cockpit-hud-sub">
-              Pusat Kendali Ekosistem Digital · SMKN 1 Air Naningan
-            </div>
-          </div>
+      <div class="dcc-stat-card">
+        <div class="dcc-stat-icon web"><i class="bi bi-globe2"></i></div>
+        <div class="dcc-stat-body">
+          <div class="dcc-stat-label">HUMAS · PUBLIKASI</div>
+          <div class="dcc-stat-val">{{ $totalBerita }} <span class="dcc-stat-unit">Rilis</span></div>
+          <div class="dcc-stat-sub">{{ $totalBannerAktif }} Banner Aktif Beranda</div>
         </div>
       </div>
     </div>
