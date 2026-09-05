@@ -12,13 +12,13 @@
   @include('partials.sidebar_web')
   <main class="main-content">
     
-    <div class="panel no-print" style="background:var(--bg-2); border:1px solid var(--border); padding:12px 18px; margin-bottom:14px; border-radius:var(--r-md);">
+    <div class="panel no-print" style="background:#f2efe7; border:1px solid #c8dfdb; padding:12px 18px; margin-bottom:14px; border-radius:var(--r-md);">
       <div style="display:flex; justify-content:space-between; align-items:center;">
         <div style="display:flex; align-items:center; gap:8px;">
-          <a href="{{ route('admin.banner.index') }}" class="btn btn-sm" style="background:var(--surface); border:1px solid var(--border); color:var(--text); padding:5px 10px; border-radius:6px; font-size:12px;">
-            <i class="bi bi-arrow-left"></i> Kembali ke Daftar
+          <a href="{{ route('admin.banner.index') }}" class="btn btn-sm" style="background:#ffffff; border:1px solid #c8dfdb; color:#000000; font-weight:700; padding:6px 12px; border-radius:6px; font-size:12px; text-decoration:none;">
+            <i class="bi bi-arrow-left" style="color:#3368a0;"></i> Kembali ke Daftar
           </a>
-          <h1 style="margin:0; font-size:16px; font-weight:900; color:var(--text);">Edit Hero Banner #{{ $banner->id }}</h1>
+          <h1 style="margin:0; font-size:16px; font-weight:900; color:#000000;">Edit Hero Banner #{{ $banner->id }}</h1>
         </div>
       </div>
     </div>
@@ -33,7 +33,7 @@
       </div>
     @endif
 
-    <div class="panel" style="background:var(--bg-2); border:1px solid var(--border); border-radius:var(--r-sm); padding:24px; max-width:860px;">
+    <div class="panel" style="background:#ffffff; border:1px solid #c8dfdb; border-radius:12px; padding:24px; max-width:860px; box-shadow:0 2px 8px rgba(0,0,0,0.02);">
       <form action="{{ route('admin.banner.update', $banner->id) }}" method="POST" enctype="multipart/form-data">
         @csrf
         @method('PUT')
@@ -41,7 +41,7 @@
         {{-- Posisi & Urutan --}}
         <div style="display:grid; grid-template-columns:1fr 140px; gap:16px; margin-bottom:16px;">
           <div>
-            <label style="display:block; font-size:12px; font-weight:700; color:var(--text-2); margin-bottom:4px;">
+            <label style="display:block; font-size:12px; font-weight:800; color:#000000; margin-bottom:5px;">
               Posisi Penempatan <span style="color:#ef4444;">*</span>
             </label>
             <select name="posisi" required style="width:100%; padding:9px 12px; font-size:13px; border-radius:6px; border:1px solid var(--border); background:var(--surface); color:var(--text);">
@@ -206,11 +206,11 @@
         </div>
 
         {{-- Tombol Submit --}}
-        <div style="display:flex; justify-content:flex-end; gap:10px; border-top:1px solid var(--border); padding-top:16px;">
-          <a href="{{ route('admin.banner.index') }}" class="btn" style="background:var(--surface); border:1px solid var(--border); color:var(--text); padding:8px 18px; border-radius:6px; font-weight:700; font-size:12.5px;">
+        <div style="display:flex; justify-content:flex-end; gap:10px; border-top:1px solid #c8dfdb; padding-top:16px;">
+          <a href="{{ route('admin.banner.index') }}" class="btn" style="background:#ffffff; border:1px solid #c8dfdb; color:#000000; padding:8px 18px; border-radius:6px; font-weight:700; font-size:12.5px; text-decoration:none;">
             Batal
           </a>
-          <button type="submit" class="btn btn-primary" style="font-weight:800; font-size:13px; padding:8px 22px; border-radius:6px;">
+          <button type="submit" class="btn" style="background:#3368a0; color:#ffffff; font-weight:800; font-size:13px; padding:9px 24px; border-radius:6px; border:none; cursor:pointer; box-shadow:0 2px 6px rgba(51,104,160,0.25);">
             <i class="bi bi-check-lg"></i> Perbarui Banner
           </button>
         </div>

@@ -1,15 +1,14 @@
 /* ─── Source: admin/banner/create.blade.php ─── */
-    .posisi-teks-radio:checked + .posisi-card {
-      border-color: var(--brand) !important;
-      background: rgba(37, 99, 235, 0.08) !important;
-      box-shadow: 0 0 0 1px var(--brand);
-    }
-  
+.posisi-teks-radio:checked + .posisi-card {
+  border-color: #3368a0 !important;
+  background: rgba(51, 104, 160, 0.08) !important;
+  box-shadow: 0 0 0 1px #3368a0 !important;
+}
 
 /* ─── Source: admin/banner/edit.blade.php ─── */
-    .posisi-teks-radio:checked + .posisi-card {
-      border-color: var(--brand) !important;
-      background: rgba(37, 99, 235, 0.08) !important;
-      box-shadow: 0 0 0 1px var(--brand);
-    }
+.posisi-teks-radio:checked + .posisi-card {
+  border-color: #3368a0 !important;
+  background: rgba(51, 104, 160, 0.08) !important;
+  box-shadow: 0 0 0 1px #3368a0 !important;
+}
   

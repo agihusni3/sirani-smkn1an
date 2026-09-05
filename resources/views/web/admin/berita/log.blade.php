@@ -15,40 +15,40 @@
     {{-- Header Bar Humas & Web Log --}}
     <header class="topbar no-print" style="margin-bottom:16px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
       <div style="display:flex; align-items:center; gap:8px;">
-        <span style="font-size:12px; font-weight:700; color:var(--text-3);">
-          <a href="{{ route('admin.portal') }}" style="color:var(--text-3); text-decoration:none;"><i class="bi bi-command"></i> DCC</a>
-          <span style="margin:0 4px;">/</span>
-          <a href="{{ route('admin.berita.index') }}" style="color:var(--text-3); text-decoration:none;">HUMAS &amp; WEB</a>
-          <span style="margin:0 4px;">/</span>
-          <span style="color:#0ea5e9;">Log Publikasi</span>
+        <span style="font-size:12px; font-weight:700; color:#000000;">
+          <a href="{{ route('admin.portal') }}" style="color:#000000; text-decoration:none;"><i class="bi bi-command"></i> DCC</a>
+          <span style="margin:0 4px; color:#c8dfdb;">/</span>
+          <a href="{{ route('admin.berita.index') }}" style="color:#000000; text-decoration:none;">HUMAS &amp; WEB</a>
+          <span style="margin:0 4px; color:#c8dfdb;">/</span>
+          <span style="color:#3368a0; font-weight:800;">Log Publikasi</span>
         </span>
       </div>
       @include('partials.header_actions')
     </header>
 
     {{-- Banner Ringkasan Ruang Log Humas & Web --}}
-    <div style="background:linear-gradient(135deg, #075985 0%, #0284c7 50%, #4338ca 100%); border-radius:16px; padding:20px 24px; color:#ffffff; margin-bottom:20px; box-shadow:0 8px 24px rgba(14,165,233,0.2); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:14px; border:1px solid rgba(255,255,255,0.15);">
+    <div style="background:linear-gradient(135deg, #3368a0 0%, #467fac 50%, #66a3bf 100%); border-radius:16px; padding:20px 24px; color:#ffffff; margin-bottom:20px; box-shadow:0 8px 24px rgba(51,104,160,0.2); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:14px; border:1px solid #c8dfdb;">
       <div>
         <div style="display:flex; align-items:center; gap:10px; margin-bottom:4px;">
-          <h1 style="margin:0; font-size:19px; font-weight:900; letter-spacing:-0.02em; display:flex; align-items:center; gap:8px;">
-            <i class="bi bi-globe-americas" style="color:#7dd3fc;"></i> Audit Trail Modul Humas &amp; Website
+          <h1 style="margin:0; font-size:19px; font-weight:900; letter-spacing:-0.02em; display:flex; align-items:center; gap:8px; color:#ffffff;">
+            <i class="bi bi-globe-americas" style="color:#c8dfdb;"></i> Audit Trail Modul Humas &amp; Website
           </h1>
-          <span style="font-size:10px; font-weight:800; background:rgba(255,255,255,0.2); padding:3px 9px; border-radius:999px; text-transform:uppercase; letter-spacing:0.05em;">Publikasi &amp; Konten</span>
+          <span style="font-size:10px; font-weight:800; background:rgba(200,223,219,0.25); color:#f2efe7; border:1px solid #c8dfdb; padding:3px 9px; border-radius:999px; text-transform:uppercase; letter-spacing:0.05em;">Publikasi &amp; Konten</span>
         </div>
-        <p style="margin:0; font-size:12.5px; color:rgba(255,255,255,0.9);">
+        <p style="margin:0; font-size:12.5px; color:#f2efe7; font-weight:500;">
           Rekam jejak pembuatan berita, pengumuman sekolah, agenda, pembaruan konten, perubahan hero slider, dan aktivasi etalase website.
         </p>
       </div>
 
       <div style="display:flex; align-items:center; gap:8px;">
-        <a href="{{ route('admin.berita.index') }}" class="btn" style="background:rgba(255,255,255,0.15); color:#ffffff; border:1px solid rgba(255,255,255,0.3); font-size:12px; font-weight:700; padding:8px 14px; border-radius:8px; text-decoration:none; display:inline-flex; align-items:center; gap:6px;">
+        <a href="{{ route('admin.berita.index') }}" class="btn" style="background:rgba(255,255,255,0.18); color:#ffffff; border:1px solid #c8dfdb; font-size:12px; font-weight:700; padding:8px 14px; border-radius:8px; text-decoration:none; display:inline-flex; align-items:center; gap:6px;">
           <i class="bi bi-newspaper"></i> Kelola Berita
         </a>
-        <a href="{{ route('admin.banner.index') }}" class="btn" style="background:rgba(255,255,255,0.15); color:#ffffff; border:1px solid rgba(255,255,255,0.3); font-size:12px; font-weight:700; padding:8px 14px; border-radius:8px; text-decoration:none; display:inline-flex; align-items:center; gap:6px;">
+        <a href="{{ route('admin.banner.index') }}" class="btn" style="background:rgba(255,255,255,0.18); color:#ffffff; border:1px solid #c8dfdb; font-size:12px; font-weight:700; padding:8px 14px; border-radius:8px; text-decoration:none; display:inline-flex; align-items:center; gap:6px;">
           <i class="bi bi-images"></i> Banner Hero
         </a>
         @if(auth()->user()->isAdmin() || auth()->user()->isKepalaSekolah())
-          <a href="{{ route('audit.index') }}" class="btn" style="background:#ffffff; color:#075985; font-size:12px; font-weight:800; padding:8px 14px; border-radius:8px; text-decoration:none; display:inline-flex; align-items:center; gap:6px;">
+          <a href="{{ route('audit.index') }}" class="btn" style="background:#f2efe7; color:#3368a0; font-size:12px; font-weight:900; padding:8px 14px; border-radius:8px; text-decoration:none; display:inline-flex; align-items:center; gap:6px;">
             <i class="bi bi-shield-shaded"></i> Master Telemetri DCC
           </a>
         @endif
@@ -57,32 +57,32 @@
 
     {{-- 3 KPI Cards Log Humas & Web --}}
     <div class="audit-kpi-grid">
-      <div class="audit-kpi-card">
+      <div class="audit-kpi-card" style="border:1px solid #c8dfdb; background:#ffffff;">
         <div class="audit-kpi-info">
-          <div class="audit-kpi-lbl">Aktivitas Web Hari Ini</div>
-          <div class="audit-kpi-val">{{ number_format($counts['hari_ini']) }}</div>
+          <div class="audit-kpi-lbl" style="color:#000000; font-weight:800;">Aktivitas Web Hari Ini</div>
+          <div class="audit-kpi-val" style="color:#000000; font-weight:900;">{{ number_format($counts['hari_ini']) }}</div>
         </div>
-        <div class="audit-kpi-icon" style="color:#0ea5e9; background:rgba(14,165,233,0.1); border-color:rgba(14,165,233,0.25);">
+        <div class="audit-kpi-icon" style="color:#3368a0; background:rgba(51,104,160,0.12); border-color:#c8dfdb;">
           <i class="bi bi-calendar2-day-fill"></i>
         </div>
       </div>
 
-      <div class="audit-kpi-card">
+      <div class="audit-kpi-card" style="border:1px solid #c8dfdb; background:#ffffff;">
         <div class="audit-kpi-info">
-          <div class="audit-kpi-lbl">Aktivitas Web Minggu Ini</div>
-          <div class="audit-kpi-val">{{ number_format($counts['minggu_ini']) }}</div>
+          <div class="audit-kpi-lbl" style="color:#000000; font-weight:800;">Aktivitas Web Minggu Ini</div>
+          <div class="audit-kpi-val" style="color:#000000; font-weight:900;">{{ number_format($counts['minggu_ini']) }}</div>
         </div>
-        <div class="audit-kpi-icon" style="color:#6366f1; background:rgba(99,102,241,0.1); border-color:rgba(99,102,241,0.25);">
+        <div class="audit-kpi-icon" style="color:#66a3bf; background:rgba(102,163,191,0.15); border-color:#c8dfdb;">
           <i class="bi bi-calendar2-week-fill"></i>
         </div>
       </div>
 
-      <div class="audit-kpi-card">
+      <div class="audit-kpi-card" style="border:1px solid #c8dfdb; background:#ffffff;">
         <div class="audit-kpi-info">
-          <div class="audit-kpi-lbl">Total Riwayat Konten Web</div>
-          <div class="audit-kpi-val">{{ number_format($counts['total']) }}</div>
+          <div class="audit-kpi-lbl" style="color:#000000; font-weight:800;">Total Riwayat Konten Web</div>
+          <div class="audit-kpi-val" style="color:#000000; font-weight:900;">{{ number_format($counts['total']) }}</div>
         </div>
-        <div class="audit-kpi-icon" style="color:#0369a1; background:rgba(3,105,161,0.1); border-color:rgba(3,105,161,0.25);">
+        <div class="audit-kpi-icon" style="color:#3368a0; background:rgba(200,223,219,0.35); border-color:#c8dfdb;">
           <i class="bi bi-database-fill-check"></i>
         </div>
       </div>

@@ -9,10 +9,14 @@
   <style>
     :root {
       --stat-text: #000000;
-      --stat-text-sub: #111827;
-      --stat-bg: #f8fafc;
+      --stat-text-sub: #000000;
+      --stat-bg: #ffffff;
       --stat-card: #ffffff;
-      --stat-border: #e2e8f0;
+      --stat-border: #c8dfdb;
+      --palette-deep: #3368a0;
+      --palette-ocean: #66a3bf;
+      --palette-mint: #c8dfdb;
+      --palette-cream: #f2efe7;
     }
 
     body {
@@ -21,8 +25,8 @@
     }
 
     .stat-hero-header {
-      background: var(--stat-card);
-      border: 1px solid var(--stat-border);
+      background: #f2efe7;
+      border: 1px solid #c8dfdb;
       border-radius: 16px;
       padding: 24px 28px;
       margin-bottom: 22px;
@@ -31,7 +35,7 @@
       align-items: center;
       flex-wrap: wrap;
       gap: 16px;
-      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+      box-shadow: 0 4px 16px rgba(51, 104, 160, 0.05);
     }
 
     .stat-title {
@@ -54,8 +58,8 @@
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      background: #f1f5f9;
-      border: 1px solid #cbd5e1;
+      background: #ffffff;
+      border: 1px solid #c8dfdb;
       padding: 4px;
       border-radius: 10px;
     }
@@ -71,13 +75,14 @@
     }
 
     .stat-period-btn.active {
-      background: #000000;
+      background: #3368a0;
       color: #ffffff;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+      box-shadow: 0 2px 6px rgba(51, 104, 160, 0.25);
     }
 
     .stat-period-btn:not(.active):hover {
-      background: #e2e8f0;
+      background: #c8dfdb;
+      color: #000000;
     }
 
     /* Grid 4 Kartu KPI */
@@ -90,7 +95,7 @@
 
     .stat-kpi-card {
       background: var(--stat-card);
-      border: 1px solid var(--stat-border);
+      border: 1px solid #c8dfdb;
       border-radius: 14px;
       padding: 18px 20px;
       box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
@@ -99,7 +104,8 @@
 
     .stat-kpi-card:hover {
       transform: translateY(-2px);
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+      border-color: #3368a0;
+      box-shadow: 0 8px 20px rgba(51, 104, 160, 0.08);
     }
 
     .stat-kpi-label {
@@ -137,7 +143,7 @@
 
     .stat-chart-box {
       background: var(--stat-card);
-      border: 1px solid var(--stat-border);
+      border: 1px solid #c8dfdb;
       border-radius: 16px;
       padding: 22px 24px;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
@@ -162,15 +168,15 @@
       font-weight: 800;
       padding: 3px 9px;
       border-radius: 6px;
-      background: #f1f5f9;
-      border: 1px solid #cbd5e1;
+      background: #f2efe7;
+      border: 1px solid #c8dfdb;
       color: #000000;
     }
 
     /* Top Pages Table */
     .stat-table-box {
       background: var(--stat-card);
-      border: 1px solid var(--stat-border);
+      border: 1px solid #c8dfdb;
       border-radius: 16px;
       padding: 22px 24px;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
@@ -191,8 +197,8 @@
       text-transform: uppercase;
       letter-spacing: 0.04em;
       padding: 10px 14px;
-      border-bottom: 2px solid #cbd5e1;
-      background: #f8fafc;
+      border-bottom: 2px solid #c8dfdb;
+      background: #f2efe7;
     }
 
     .stat-table td {
@@ -200,11 +206,11 @@
       font-size: 12.5px;
       color: #000000;
       font-weight: 600;
-      border-bottom: 1px solid #f1f5f9;
+      border-bottom: 1px solid #c8dfdb;
     }
 
     .stat-table tr:hover td {
-      background: #f8fafc;
+      background: #f2efe7;
     }
 
     .rank-badge {
@@ -214,7 +220,7 @@
       width: 22px;
       height: 22px;
       border-radius: 6px;
-      background: #000000;
+      background: #3368a0;
       color: #ffffff;
       font-size: 11px;
       font-weight: 800;
@@ -241,7 +247,7 @@
     {{-- Top Hero Header --}}
     <div class="stat-hero-header">
       <div>
-        <div style="display:inline-flex; align-items:center; gap:6px; background:#f1f5f9; border:1px solid #cbd5e1; border-radius:6px; padding:3px 8px; font-size:10.5px; font-weight:800; color:#000000; margin-bottom:8px;">
+        <div style="display:inline-flex; align-items:center; gap:6px; background:#c8dfdb; border:1px solid #66a3bf; border-radius:6px; padding:3px 8px; font-size:10.5px; font-weight:800; color:#3368a0; margin-bottom:8px;">
           <span>Hak Akses: Administrator Eksklusif</span>
         </div>
         <h1 class="stat-title">Grafik &amp; Analisis Pengunjung Website</h1>
@@ -313,7 +319,7 @@
         <div style="position:relative; height:210px; width:100%; display:flex; align-items:center; justify-content:center;">
           <canvas id="deviceDonutChart"></canvas>
         </div>
-        <div style="display:flex; justify-content:space-around; margin-top:16px; border-top:1px solid #e2e8f0; padding-top:12px;">
+        <div style="display:flex; justify-content:space-around; margin-top:16px; border-top:1px solid #c8dfdb; padding-top:12px;">
           <div style="text-align:center;">
             <div style="font-size:10px; font-weight:800; color:#000000; text-transform:uppercase;">Mobile (HP)</div>
             <div style="font-size:16px; font-weight:900; color:#000000;">{{ $devices['mobile_pct'] }}%</div>
@@ -343,7 +349,7 @@
           <h2 style="font-size:15px; font-weight:900; color:#000000; margin:0 0 2px;">Halaman Paling Sering Dikunjungi</h2>
           <span style="font-size:11.5px; color:#000000; font-weight:600; opacity:0.8;">10 Halaman &amp; Konten Terpopuler dalam {{ $days }} Hari Terakhir</span>
         </div>
-        <a href="{{ route('admin.portal') }}" class="btn" style="font-size:11.5px; font-weight:800; background:#000000; color:#ffffff; border:1px solid #000000; padding:6px 14px; border-radius:8px; text-decoration:none;">
+        <a href="{{ route('admin.portal') }}" class="btn" style="font-size:11.5px; font-weight:800; background:#3368a0; color:#ffffff; border:none; padding:7px 16px; border-radius:8px; text-decoration:none; box-shadow:0 2px 6px rgba(51,104,160,0.25);">
           Kembali ke DCC
         </a>
       </div>
@@ -407,25 +413,25 @@
             {
               label: 'Total Tayangan (Views)',
               data: views,
-              borderColor: '#000000',
-              backgroundColor: 'rgba(0, 0, 0, 0.06)',
+              borderColor: '#3368a0',
+              backgroundColor: 'rgba(51, 104, 160, 0.12)',
               fill: true,
               tension: 0.35,
               borderWidth: 2.5,
               pointRadius: 3,
-              pointBackgroundColor: '#000000',
+              pointBackgroundColor: '#3368a0',
               pointHoverRadius: 6,
             },
             {
               label: 'Pengunjung Unik (Visitors)',
               data: uniques,
-              borderColor: '#0284c7',
+              borderColor: '#66a3bf',
               backgroundColor: 'transparent',
               borderDash: [4, 4],
               tension: 0.35,
               borderWidth: 2,
               pointRadius: 3,
-              pointBackgroundColor: '#0284c7',
+              pointBackgroundColor: '#66a3bf',
               pointHoverRadius: 5,
             }
           ]
@@ -445,7 +451,7 @@
               }
             },
             tooltip: {
-              backgroundColor: '#000000',
+              backgroundColor: '#3368a0',
               titleColor: '#ffffff',
               bodyColor: '#ffffff',
               padding: 10,
@@ -456,10 +462,10 @@
             x: {
               ticks: {
                 color: '#000000',
-                font: { weight: '600', size: 10.5 }
+                font: { weight: '700', size: 10.5 }
               },
               grid: {
-                color: 'rgba(0, 0, 0, 0.05)'
+                color: 'rgba(200, 223, 219, 0.35)'
               }
             },
             y: {
@@ -467,10 +473,10 @@
               ticks: {
                 precision: 0,
                 color: '#000000',
-                font: { weight: '700', size: 10.5 }
+                font: { weight: '800', size: 10.5 }
               },
               grid: {
-                color: 'rgba(0, 0, 0, 0.06)'
+                color: 'rgba(200, 223, 219, 0.35)'
               }
             }
           }
@@ -491,7 +497,7 @@
           labels: ['Mobile (HP)', 'Desktop', 'Tablet'],
           datasets: [{
             data: [mobCount, dskCount, tabCount],
-            backgroundColor: ['#000000', '#0284c7', '#f59e0b'],
+            backgroundColor: ['#3368a0', '#66a3bf', '#c8dfdb'],
             borderWidth: 2,
             borderColor: '#ffffff'
           }]
@@ -504,7 +510,7 @@
               display: false
             },
             tooltip: {
-              backgroundColor: '#000000',
+              backgroundColor: '#3368a0',
               titleColor: '#ffffff',
               bodyColor: '#ffffff',
               padding: 10
