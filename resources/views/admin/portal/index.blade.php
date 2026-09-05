@@ -251,61 +251,78 @@
       gap: 6px;
     }
 
-    /* Right Telemetry Card */
-    .cockpit-telemetry-hud {
-      background: rgba(255, 255, 255, 0.05);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border: 1px solid rgba(255, 255, 255, 0.12);
+    /* Right Visual Showcase Banner */
+    .cockpit-banner-frame {
+      position: relative;
       border-radius: 18px;
-      padding: 20px 22px;
-      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.25);
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      box-shadow: 0 16px 36px -10px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+      aspect-ratio: 16 / 9;
+      max-height: 240px;
+      width: 100%;
+      background: #0f172a;
     }
 
-    .telemetry-hud-title {
-      font-size: 11px;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      color: #94a3b8;
+    .cockpit-banner-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .cockpit-banner-frame:hover .cockpit-banner-img {
+      transform: scale(1.05);
+    }
+
+    .cockpit-banner-scrim {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(9, 13, 22, 0.15) 0%, rgba(9, 13, 22, 0.82) 100%);
       display: flex;
-      align-items: center;
+      flex-direction: column;
       justify-content: space-between;
-      margin-bottom: 14px;
-      padding-bottom: 8px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 14px 16px;
+      pointer-events: none;
     }
 
-    .telemetry-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 12px;
-    }
-
-    .telemetry-item {
-      background: rgba(0, 0, 0, 0.22);
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      border-radius: 10px;
-      padding: 10px 12px;
-    }
-
-    .telemetry-item-label {
+    .cockpit-banner-top-pill {
+      align-self: flex-end;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(15, 23, 42, 0.75);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #38bdf8;
       font-size: 10px;
-      font-weight: 700;
-      color: #94a3b8;
-      text-transform: uppercase;
-      letter-spacing: 0.03em;
-      margin-bottom: 3px;
+      font-weight: 800;
+      padding: 4px 10px;
+      border-radius: 20px;
+      letter-spacing: 0.04em;
     }
 
-    .telemetry-item-value {
-      font-size: 15px;
-      font-weight: 900;
-      font-family: var(--font-mono);
+    .cockpit-banner-caption {
       color: #ffffff;
+    }
+
+    .cockpit-banner-title {
+      font-size: 13.5px;
+      font-weight: 900;
+      letter-spacing: -0.01em;
+      margin-bottom: 2px;
       display: flex;
       align-items: center;
       gap: 6px;
+      color: #ffffff;
+    }
+
+    .cockpit-banner-sub {
+      font-size: 11px;
+      color: #cbd5e1;
+      font-weight: 500;
     }
 
     /* ─── Section Header ─── */
@@ -801,39 +818,20 @@
         </div>
       </div>
 
-      {{-- Right Telemetry Card HUD --}}
-      <div class="cockpit-telemetry-hud">
-        <div class="telemetry-hud-title">
-          <span><i class="bi bi-activity"></i> TELEMETRI EKOSISTEM</span>
-          <span style="color:#38bdf8; font-family:var(--font-mono);">LIVE FEED</span>
-        </div>
-        <div class="telemetry-grid">
-          <div class="telemetry-item">
-            <div class="telemetry-item-label">Modul Aktif</div>
-            <div class="telemetry-item-value">
-              <span style="color:#10b981;">3</span>
-              <span style="font-size:10px; color:#94a3b8; font-weight:600;">/ 3 Siap Pakai</span>
-            </div>
+      {{-- Right: High-Tech Command Center Showcase Banner --}}
+      <div class="cockpit-banner-frame">
+        <img src="/images/web/dcc_command_center_banner.jpg" alt="DCC SMKN 1 AN Control Room" class="cockpit-banner-img" onerror="this.src='/images/web/hero_kampus.jpg';" />
+        <div class="cockpit-banner-scrim">
+          <div class="cockpit-banner-top-pill">
+            <span class="pulse-dot" style="width:6px; height:6px;"></span>
+            <span>DCC COMMAND CENTER</span>
           </div>
-          <div class="telemetry-item">
-            <div class="telemetry-item-label">Smart Gate</div>
-            <div class="telemetry-item-value">
-              <span style="color:{{ $isGerbangAktif ? '#10b981' : '#f59e0b' }}; font-size:13px;">
-                {{ $isGerbangAktif ? 'SESI BUKA' : 'STANDBY' }}
-              </span>
+          <div class="cockpit-banner-caption">
+            <div class="cockpit-banner-title">
+              <i class="bi bi-shield-check" style="color:#38bdf8;"></i> Integrated Smart Campus
             </div>
-          </div>
-          <div class="telemetry-item">
-            <div class="telemetry-item-label">Roadmap Baru</div>
-            <div class="telemetry-item-value">
-              <span style="color:#38bdf8;">5</span>
-              <span style="font-size:10px; color:#94a3b8; font-weight:600;">Modul Terencana</span>
-            </div>
-          </div>
-          <div class="telemetry-item">
-            <div class="telemetry-item-label">Keamanan Data</div>
-            <div class="telemetry-item-value">
-              <span style="color:#a78bfa; font-size:12px;">TERENKRIPSI</span>
+            <div class="cockpit-banner-sub">
+              Pusat Komando Vokasi Digital 4.0 · SMKN 1 Air Naningan
             </div>
           </div>
         </div>
