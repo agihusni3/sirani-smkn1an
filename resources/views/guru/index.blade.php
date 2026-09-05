@@ -715,7 +715,7 @@
                 {{-- Kolom Akun Akses SIRANI --}}
                 <td style="vertical-align:middle; padding:10px 12px; white-space:nowrap;">
                   @if($g->user)
-                    @if($isAdmin || $isStafTu)
+                    @if($isAdmin)
                       <button type="button" onclick="openAkunModal({{ json_encode($g) }})" style="background:transparent; border:none; padding:2px 0; font-size:12px; font-weight:700; color:var(--text); cursor:pointer; white-space:nowrap; text-align:left;" title="Klik untuk atur akun (Nickname: {{ $g->user->username }})">
                         <span style="text-transform:capitalize; display:block;">{{ str_replace('_', ' ', $g->user->role) }}</span>
                         <span style="font-size:10.5px; color:var(--text-3); font-family:var(--font-mono); font-weight:600;">{{ $g->user->username ?: ($g->user->email ? explode('@', $g->user->email)[0] : '-') }}</span>
@@ -731,7 +731,7 @@
                       </div>
                     @endif
                   @else
-                    @if($isAdmin || $isStafTu)
+                    @if($isAdmin)
                       <button type="button" onclick="openAkunModal({{ json_encode($g) }})" style="background:transparent; border:none; padding:4px 0; font-size:11.5px; font-weight:800; color:var(--text-2); cursor:pointer; white-space:nowrap;" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--text-2)'" title="Buat Akun Login dengan Nickname/Username">
                         + Buat Akun
                       </button>
@@ -755,6 +755,12 @@
                 {{-- Aksi --}}
                 <td style="vertical-align:middle; text-align:center; padding:10px 8px; white-space:nowrap;">
                   <div style="display:flex; gap:4px; justify-content:center; align-items:center;">
+                    <a href="{{ route('guru.biodata.cetak', ['id' => $g->id]) }}" target="_blank"
+                       class="btn-icon"
+                       style="width:30px; height:30px; text-decoration:none; color:#0284c7; background:rgba(2,132,199,0.08); border:1px solid rgba(2,132,199,0.25); border-radius:6px; display:inline-flex; align-items:center; justify-content:center; transition:all .15s ease;"
+                       title="Cetak Lembar Biodata GTK Resmi (PDF/A4 Format Dapodik/BKN)">
+                       <i class="bi bi-file-earmark-person-fill"></i>
+                    </a>
                     <a href="{{ route('kartu.digital.guru', ['id' => $g->id]) }}" target="_blank"
                        class="btn-icon btn-icon-view"
                        style="width:30px; height:30px; text-decoration:none;"
@@ -1159,9 +1165,14 @@
         </div>
       </div> {{-- end gtk-tab-body-scroll --}}
 
-      <div class="modal-footer-static">
-        <button type="button" class="btn btn-outline" onclick="closeModal('editGuruModal')">Batal</button>
-        <button type="submit" class="btn btn-gold">Simpan Perubahan</button>
+      <div class="modal-footer-static" style="display:flex; justify-content:space-between; align-items:center;">
+        <a id="btn_edit_cetak_biodata" href="#" target="_blank" class="btn btn-outline" style="text-decoration:none; font-size:12px; font-weight:700; color:#0284c7; border-color:rgba(2,132,199,0.3); background:rgba(2,132,199,0.06); display:inline-flex; align-items:center; gap:6px;">
+          <i class="bi bi-file-earmark-person-fill"></i> Cetak Biodata GTK
+        </a>
+        <div style="display:flex; gap:8px;">
+          <button type="button" class="btn btn-outline" onclick="closeModal('editGuruModal')">Batal</button>
+          <button type="submit" class="btn btn-gold">Simpan Perubahan</button>
+        </div>
       </div>
     </form>
   </div>
@@ -1353,6 +1364,11 @@
       editFotoText.innerText = 'Ganti & potong foto';
       editFotoText.style.color = 'var(--text-3)';
       editFotoText.style.fontWeight = 'normal';
+    }
+
+    const btnCetakBiodata = document.getElementById('btn_edit_cetak_biodata');
+    if (btnCetakBiodata) {
+      btnCetakBiodata.href = '/guru/' + guru.id + '/biodata';
     }
 
     // Set hari mengajar checkboxes

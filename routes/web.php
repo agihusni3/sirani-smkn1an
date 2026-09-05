@@ -249,6 +249,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/guru/export', [GuruController::class, 'export'])->name('guru.export');
         Route::get('/guru/template-csv', [GuruController::class, 'downloadTemplate'])->name('guru.template-csv');
         Route::get('/guru/cetak-pdf', [GuruController::class, 'cetakPdf'])->name('guru.cetak-pdf');
+        Route::get('/guru/{id}/biodata', [GuruController::class, 'cetakBiodata'])->name('guru.biodata.cetak');
         Route::post('/guru', [GuruController::class, 'store'])->name('guru.store')->middleware('role:admin,staf_tu');
         Route::post('/guru/import', [GuruController::class, 'import'])->name('guru.import')->middleware('role:admin,staf_tu');
         Route::put('/guru/{id}', [GuruController::class, 'update'])->name('guru.update')->middleware('role:admin,staf_tu');

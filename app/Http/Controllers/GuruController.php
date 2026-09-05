@@ -6,6 +6,7 @@ use App\Models\Guru;
 use App\Models\User;
 use App\Models\SertifikatGuru;
 use App\Models\PengaturanSekolah;
+use App\Models\AuditLog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
@@ -518,12 +519,19 @@ class GuruController extends Controller
     {
         $guru = Guru::findOrFail($id);
         $nama = $guru->nama;
+
+        // Bersihkan akun login jika ada agar tidak menjadi orphaned user
+        if ($guru->user) {
+            AuditLog::catat('delete', 'auth', "Akun login {$guru->user->username} ikut dihapus karena data GTK {$nama} dihapus oleh " . (auth()->user()->name ?? 'Admin'));
+            $guru->user->delete();
+        }
+
         if ($guru->foto && \Illuminate\Support\Facades\Storage::disk('public')->exists($guru->foto)) {
             \Illuminate\Support\Facades\Storage::disk('public')->delete($guru->foto);
         }
         $guru->delete();
 
-        return redirect()->back()->with('success', "Data guru {$nama} berhasil dihapus.");
+        return redirect()->back()->with('success', "Data guru {$nama} dan akun terkait berhasil dihapus.");
     }
 
     public function export()
@@ -607,9 +615,21 @@ class GuruController extends Controller
     public function cetakPdf(Request $request)
     {
         $gurus = Guru::with(['user', 'sertifikats'])->orderBy('nama')->get();
-        $sekolah = \App\Models\PengaturanSekolah::getAktif();
+        $sekolah = PengaturanSekolah::getAktif();
 
         return view('guru.cetak_pdf', compact('gurus', 'sekolah'));
+    }
+
+    /**
+     * Cetak Lembar Biodata Resmi Pendidik & Tenaga Kependidikan (GTK) Format A4.
+     * Standar dokumen profil individu untuk verifikasi BKN / Cabang Dinas / Dapodik.
+     */
+    public function cetakBiodata($id)
+    {
+        $guru = Guru::with(['user', 'sertifikats', 'kartuRfid'])->findOrFail($id);
+        $sekolah = PengaturanSekolah::getAktif();
+
+        return view('guru.biodata_pdf', compact('guru', 'sekolah'));
     }
 
     /**
@@ -959,6 +979,16 @@ class GuruController extends Controller
             }
         });
 
+        // Sinkronkan data Kepala Sekolah jika terdeteksi dari hasil impor
+        $kepsekGuru = Guru::where('jabatan', 'Kepala Sekolah')
+            ->orWhere('tugas_tambahan', 'like', '%Kepala Sekolah%')
+            ->first();
+        if ($kepsekGuru) {
+            $this->syncGuruDataToUserRole($kepsekGuru);
+        }
+
+        AuditLog::catat('import', 'guru', "Berhasil mengimpor {$imported} data GTK dari berkas CSV oleh " . (auth()->user()->name ?? 'Admin'));
+
         return redirect()->back()->with('success', "Berhasil memproses dan mengimpor {$imported} data guru/pegawai GTK.");
     }
 
@@ -1003,6 +1033,11 @@ class GuruController extends Controller
 
         $oldRole = $guru->user ? $guru->user->role : null;
 
+        // Proteksi self-lockout: Admin tidak boleh mencabut akses Admin dari akunnya sendiri
+        if ($guru->user && auth()->id() === $guru->user->id && $role !== 'admin') {
+            return redirect()->back()->with('error', 'Anda tidak dapat mencabut hak akses Admin dari akun Anda sendiri demi mencegah akun terkunci (lockout).');
+        }
+
         if ($guru->user) {
             $updateData = [
                 'name'     => $guru->nama,
@@ -1016,6 +1051,8 @@ class GuruController extends Controller
             $guru->user->update($updateData);
 
             $this->syncRoleToGuruData($guru, $role, $oldRole);
+
+            AuditLog::catat('update', 'auth', "Akun login untuk {$guru->nama} diperbarui (Role: {$role}, Username: {$username}) oleh " . (auth()->user()->name ?? 'Admin'));
 
             return redirect()->back()->with('success', "Akun login untuk {$guru->nama} berhasil diperbarui (Role: " . ucfirst(str_replace('_', ' ', $role)) . ", Nickname/Username: {$username}). Data penugasan otomatis disinkronkan.");
         }
@@ -1031,6 +1068,8 @@ class GuruController extends Controller
 
         $this->syncRoleToGuruData($guru, $role, null);
 
+        AuditLog::catat('create', 'auth', "Akun login baru untuk {$guru->nama} dibuat (Role: {$role}, Username: {$username}) oleh " . (auth()->user()->name ?? 'Admin'));
+
         return redirect()->back()->with('success', "Akun login baru untuk {$guru->nama} berhasil dibuat (Role: " . ucfirst(str_replace('_', ' ', $role)) . ", Nickname/Username: {$username}). Data penugasan otomatis disinkronkan.");
     }
 
@@ -1041,7 +1080,9 @@ class GuruController extends Controller
     {
         $guru = Guru::findOrFail($id);
         if ($guru->user) {
+            $username = $guru->user->username;
             $guru->user->delete();
+            AuditLog::catat('delete', 'auth', "Akun login {$username} milik {$guru->nama} dihapus oleh " . (auth()->user()->name ?? 'Admin'));
         }
 
         return redirect()->back()->with('success', "Akun login untuk {$guru->nama} berhasil dihapus.");
