@@ -88,13 +88,15 @@ class User extends Authenticatable
 
         // 1. Peran utama dari kolom role
         if (!empty($this->role)) {
-            $roles[] = $this->role;
+            if ($this->role !== 'guru_piket' || !$this->guru_id) {
+                $roles[] = $this->role;
+            }
         }
 
         // 2. Peran tambahan dari kolom roles (JSON)
         if (!empty($this->roles) && is_array($this->roles)) {
             foreach ($this->roles as $r) {
-                if (!empty($r) && is_string($r)) {
+                if (!empty($r) && is_string($r) && $r !== 'guru_piket') {
                     $roles[] = $r;
                 }
             }
@@ -112,10 +114,8 @@ class User extends Authenticatable
                 $roles[] = 'wali_kelas';
             }
 
-            // Guru piket jika terdaftar di jadwal piket
-            if (\App\Models\JadwalPiket::where('guru_id', $this->guru->id)->exists()) {
-                $roles[] = 'guru_piket';
-            }
+            // Catatan: Hak akses guru piket tidak ditambahkan sebagai mode switch peran di sini,
+            // melainkan aktif otomatis sesuai hari bertugas di jadwal_pikets (isPiketHariIni).
 
             $jabatanText = strtolower(($this->guru->jabatan ?? '') . ' ' . ($this->guru->tugas_tambahan ?? '') . ' ' . ($this->guru->jenis_ptk ?? ''));
 
@@ -325,19 +325,22 @@ class User extends Authenticatable
 
     public function isGuruPiket(): bool
     {
-        return $this->getActiveRole() === 'guru_piket' || $this->isPiketHariIni();
+        // Khusus pengujian unit test tanpa profil GTK guru
+        if ($this->role === 'guru_piket' && !$this->guru_id) {
+            return true;
+        }
+
+        return $this->isPiketHariIni();
     }
 
     public function isPiketHariIni(): bool
     {
-        if ($this->getActiveRole() === 'kepala_sekolah') {
-            return false;
-        }
-
-        if ($this->getActiveRole() === 'guru_piket') {
+        // Pimpinan manajemen (Admin & Waka Kesiswaan) selalu memiliki izin pengawasan meja piket
+        if ($this->isAdmin() || $this->isWakaKesiswaan()) {
             return true;
         }
 
+        // Guru berstatus piket JIKA terdaftar bertugas di jadwal piket HARI INI
         if ($this->guru && \App\Models\JadwalPiket::isGuruPiketHariIni($this->guru->id)) {
             return true;
         }

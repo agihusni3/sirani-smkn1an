@@ -1227,7 +1227,6 @@
             <option value="pustakawan">Tenaga Perpustakaan (Sirkulasi Buku &amp; Literasi)</option>
             <option value="guru_bk">Guru BK / Konseling (Penanganan Kasus Tahap 2 &amp; Panggilan Ortu)</option>
             <option value="wali_kelas">Wali Kelas (Monitoring Kelas Binaan &amp; Pembinaan Tahap 1)</option>
-            <option value="guru_piket">Guru Piket (Operasional Meja Piket &amp; Perizinan Siswa)</option>
             <option value="staf_tu">Staf Tata Usaha / Kepegawaian (Data Master Siswa/Guru)</option>
             <option value="humas">Tim Humas &amp; Web (Pengelola Banner &amp; Publikasi Berita)</option>
             <option value="panitia_ppdb">Panitia PPDB 2026 (Verifikasi Dokumen Pendaftar Baru)</option>
@@ -1260,9 +1259,6 @@
               <input type="checkbox" name="roles[]" value="wali_kelas" class="akun-sub-role" /> Wali Kelas
             </label>
             <label style="display:flex; align-items:center; gap:6px; font-size:11.5px; cursor:pointer;">
-              <input type="checkbox" name="roles[]" value="guru_piket" class="akun-sub-role" /> Guru Piket
-            </label>
-            <label style="display:flex; align-items:center; gap:6px; font-size:11.5px; cursor:pointer;">
               <input type="checkbox" name="roles[]" value="guru_bk" class="akun-sub-role" /> Guru BK
             </label>
             <label style="display:flex; align-items:center; gap:6px; font-size:11.5px; cursor:pointer;">
@@ -1281,7 +1277,11 @@
               <input type="checkbox" name="roles[]" value="staf_tu" class="akun-sub-role" /> Staf TU
             </label>
           </div>
-          <div style="font-size:10.5px; color:var(--text-3); margin-top:3px;">
+          <div style="margin-top:6px; font-size:11px; color:var(--text-3); line-height:1.4; display:flex; align-items:flex-start; gap:6px;">
+            <i class="bi bi-info-circle-fill" style="color:var(--primary); font-size:12px; margin-top:1px;"></i>
+            <span><strong>Guru Piket:</strong> Hak akses operasional meja piket aktif otomatis pada hari penugasan guru di menu <a href="/jadwal-piket" target="_blank" style="color:var(--primary); font-weight:700; text-decoration:underline;">Jadwal Petugas Piket</a> tanpa perlu ganti akun / switch mode.</span>
+          </div>
+          <div style="font-size:10.5px; color:var(--text-3); margin-top:4px;">
             💡 Guru dengan multi-peran dapat berpindah mode kerja secara mandiri melalui <strong>Role Switcher</strong> di bilah atas.
           </div>
         </div>
@@ -1543,7 +1543,6 @@
       else if (jab.includes('perpustakaan') || jab.includes('pustakawan')) defaultRole = 'pustakawan';
       else if (jab.includes('bk') || jab.includes('bimbingan')) defaultRole = 'guru_bk';
       else if (jab.includes('tata usaha') || jab.includes('tu') || jab.includes('staf') || jab.includes('administrasi')) defaultRole = 'staf_tu';
-      else if (jab.includes('piket')) defaultRole = 'guru_piket';
       else if (guru.rombels && guru.rombels.length > 0) defaultRole = 'wali_kelas';
 
       document.getElementById('akun_role').value = defaultRole;

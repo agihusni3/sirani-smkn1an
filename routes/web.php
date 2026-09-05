@@ -226,13 +226,19 @@ Route::middleware('auth')->group(function () {
         Route::get('/izin-siswa', [\App\Http\Controllers\IzinController::class, 'index'])->name('izin.index');
         Route::get('/izin-siswa/cetak-pdf', [\App\Http\Controllers\IzinController::class, 'cetakPdf'])->name('izin.cetak-pdf');
         Route::post('/izin-siswa', [\App\Http\Controllers\IzinController::class, 'store'])->name('izin.store');
+        Route::post('/izin-siswa/store', [\App\Http\Controllers\IzinController::class, 'store'])->name('izin-siswa.store');
     });
 
     // 10. Guru Piket Operasional Meja Piket (Admin, Wakasis & Guru Piket)
     Route::middleware('role:admin,waka_kesiswaan,guru_piket')->group(function () {
         Route::get('/piket', [GuruPiketController::class, 'index'])->name('piket.index');
         Route::get('/piket/data', [GuruPiketController::class, 'data'])->name('piket.data');
-        Route::post('/piket/quick-absen', [GuruPiketController::class, 'quickAbsen'])->name('piket.quick-absen');
+        Route::post('/piket/presensi-manual', [GuruPiketController::class, 'storePresensiManual'])->name('piket.presensi-manual.store');
+        Route::put('/piket/absensi/{id}', [GuruPiketController::class, 'updateAbsensi'])->name('piket.absensi.update');
+        Route::post('/piket/toggle-gerbang', [GuruPiketController::class, 'toggleSesiGerbang'])->name('piket.toggle-gerbang');
+        Route::post('/piket/validasi-presensi', [GuruPiketController::class, 'validasiPresensiSiswa'])->name('piket.validasi-siswa');
+        Route::post('/piket/validasi-siswa', [GuruPiketController::class, 'validasiPresensiSiswa']);
+        Route::post('/piket/kirim-wa', [GuruPiketController::class, 'kirimWaGateway'])->name('piket.kirim-wa');
         Route::post('/piket/alasan-telat', [GuruPiketController::class, 'storeAlasanTelat'])->name('piket.alasan-telat');
         Route::post('/piket/set-status-guru', [GuruPiketController::class, 'storeStatusGuruCepat'])->name('piket.set-status-guru');
         Route::post('/piket/kunci-alpha', [GuruPiketController::class, 'kunciAlphaSekarang'])->name('piket.kunci-alpha');

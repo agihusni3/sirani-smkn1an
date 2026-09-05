@@ -154,18 +154,21 @@
   @endif
 
   {{-- 2. OPERASIONAL HARIAN --}}
-  @if($isAdmin || $isGuruPiket || $isPiketHariIni || $isKepsek || $isWakasis || $isWakaKurikulum || $isBK || $isWali || $isStafTu)
+  @if($isAdmin || $isGuruPiket || $isKepsek || $isWakasis || $isWakaKurikulum || $isBK || $isWali || $isStafTu)
     <div class="nav-group">
       <div class="nav-label">Operasional Harian</div>
-      @if($isAdmin || $isWakasis || $isGuruPiket || $isPiketHariIni)
-        <a href="/piket" class="nav-item {{ request()->is('piket*') ? 'active' : '' }}">
+      @if($isAdmin || $isWakasis || $isGuruPiket)
+        <a href="/piket" class="nav-item {{ request()->is('piket*') ? 'active' : '' }}" title="Akses Meja Piket & Absensi Harian">
           <div class="nav-left-part">
             <i class="bi bi-person-badge-fill nav-icon"></i>
             <span class="nav-text">Piket Harian</span>
           </div>
+          @if(!$isAdmin && !$isWakasis && $isGuruPiket)
+            <span class="nav-count-badge" style="background:#ecfdf5; color:#059669; border-color:#a7f3d0; font-size:10px; font-weight:700;">Tugas Hari Ini</span>
+          @endif
         </a>
       @endif
-      @if($isAdmin || $isGuruPiket || $isPiketHariIni)
+      @if($isAdmin || $isGuruPiket)
         <a href="/izin-siswa" class="nav-item {{ request()->is('izin*') ? 'active' : '' }}">
           <div class="nav-left-part">
             <i class="bi bi-file-earmark-check-fill nav-icon"></i>
