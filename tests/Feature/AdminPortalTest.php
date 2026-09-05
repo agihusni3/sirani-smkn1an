@@ -159,7 +159,7 @@ class AdminPortalTest extends TestCase
         $response = $this->actingAs($admin)->get('/dashboard');
         $response->assertStatus(200);
         $response->assertSee('DCC SMKN 1 AN');
-        $response->assertSee('app-launcher-wrap');
+        $response->assertDontSee('app-launcher-wrap');
     }
 
     public function test_sidebar_sirani_terisolasi_dan_bersih_dari_menu_ppdb_dan_web(): void
