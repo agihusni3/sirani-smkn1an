@@ -33,26 +33,29 @@ use App\Http\Controllers\Ppdb\PpdbDaftarController;
 use App\Http\Controllers\Ppdb\PpdbAdminController;
 use App\Http\Controllers\Admin\BeritaAdminController;
 use App\Http\Controllers\Admin\WebsiteBannerController;
+use App\Http\Controllers\Admin\WebsiteStatistikController;
 
-// ══ 1. Website Resmi Publik SMKN 1 Air Naningan (Bento-Grid Modern) ══
-Route::get('/', [BerandaController::class, 'index'])->name('web.beranda');
-Route::get('/profil', [ProfilController::class, 'index'])->name('web.profil');
-Route::get('/konsentrasi-keahlian', [JurusanController::class, 'index'])->name('web.jurusan.index');
-Route::get('/konsentrasi-keahlian/{kode}', [JurusanController::class, 'show'])->name('web.jurusan.show');
-Route::get('/ekosistem', [EkosistemController::class, 'index'])->name('web.ekosistem.index');
-Route::get('/ekosistem/{slug}', [EkosistemController::class, 'show'])->name('web.ekosistem.show');
-Route::get('/kontak', [KontakController::class, 'index'])->name('web.kontak');
-Route::get('/kabar-sekolah', [BeritaWebController::class, 'index'])->name('web.berita.index');
-Route::get('/kabar-sekolah/{slug}', [BeritaWebController::class, 'show'])->name('web.berita.show');
+// ══ 1. Website Resmi Publik SMKN 1 Air Naningan (Dilindungi Pelacak Kunjungan Otomatis) ══
+Route::middleware('track.visitor')->group(function () {
+    Route::get('/', [BerandaController::class, 'index'])->name('web.beranda');
+    Route::get('/profil', [ProfilController::class, 'index'])->name('web.profil');
+    Route::get('/konsentrasi-keahlian', [JurusanController::class, 'index'])->name('web.jurusan.index');
+    Route::get('/konsentrasi-keahlian/{kode}', [JurusanController::class, 'show'])->name('web.jurusan.show');
+    Route::get('/ekosistem', [EkosistemController::class, 'index'])->name('web.ekosistem.index');
+    Route::get('/ekosistem/{slug}', [EkosistemController::class, 'show'])->name('web.ekosistem.show');
+    Route::get('/kontak', [KontakController::class, 'index'])->name('web.kontak');
+    Route::get('/kabar-sekolah', [BeritaWebController::class, 'index'])->name('web.berita.index');
+    Route::get('/kabar-sekolah/{slug}', [BeritaWebController::class, 'show'])->name('web.berita.show');
 
-// ══ 2. PPDB Online Publik (Penerimaan Peserta Didik Baru) ══
-Route::prefix('ppdb')->name('ppdb.')->group(function () {
-    Route::get('/', [PpdbDaftarController::class, 'index'])->name('index');
-    Route::get('/daftar', [PpdbDaftarController::class, 'formulir'])->name('formulir');
-    Route::post('/daftar', [PpdbDaftarController::class, 'simpan'])->name('simpan');
-    Route::get('/sukses/{nomor}', [PpdbDaftarController::class, 'sukses'])->name('sukses');
-    Route::get('/status', [PpdbDaftarController::class, 'status'])->name('status');
-    Route::get('/cetak-kartu/{nomor}', [PpdbDaftarController::class, 'cetakKartu'])->name('cetak');
+    // ══ 2. PPDB Online Publik (Penerimaan Peserta Didik Baru) ══
+    Route::prefix('ppdb')->name('ppdb.')->group(function () {
+        Route::get('/', [PpdbDaftarController::class, 'index'])->name('index');
+        Route::get('/daftar', [PpdbDaftarController::class, 'formulir'])->name('formulir');
+        Route::post('/daftar', [PpdbDaftarController::class, 'simpan'])->name('simpan');
+        Route::get('/sukses/{nomor}', [PpdbDaftarController::class, 'sukses'])->name('sukses');
+        Route::get('/status', [PpdbDaftarController::class, 'status'])->name('status');
+        Route::get('/cetak-kartu/{nomor}', [PpdbDaftarController::class, 'cetakKartu'])->name('cetak');
+    });
 });
 
 
@@ -344,6 +347,11 @@ Route::middleware('auth')->group(function () {
             Route::resource('/berita', BeritaAdminController::class);
             Route::resource('/banner', WebsiteBannerController::class);
             Route::post('/banner/{banner}/toggle', [WebsiteBannerController::class, 'toggle'])->name('banner.toggle');
+        });
+
+        // Analisis & Grafik Pengunjung Website (Eksklusif Administrator)
+        Route::middleware('role:admin')->group(function () {
+            Route::get('/statistik-web', [WebsiteStatistikController::class, 'index'])->name('statistik.web');
         });
     });
 });

@@ -12,6 +12,7 @@ use App\Models\Rombel;
 use App\Models\Siswa;
 use App\Models\TahunAjaran;
 use App\Models\WebsiteBanner;
+use App\Models\WebsiteVisitor;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
@@ -58,6 +59,9 @@ class AdminPortalController extends Controller
         $totalBerita = BeritaSekolah::count();
         $totalBannerAktif = WebsiteBanner::where('is_active', true)->count();
         $beritaTerbaru = BeritaSekolah::latest()->first();
+        $todayVisitors = WebsiteVisitor::where('visited_date', $today)->count();
+        $todayUniqueVisitors = WebsiteVisitor::where('visited_date', $today)->distinct('ip_hash')->count('ip_hash');
+        $totalVisitors = WebsiteVisitor::count();
 
         // 4. KPI Modul PPDB Online 2026
         $totalPendaftar = PpdbPendaftar::count();
@@ -128,6 +132,9 @@ class AdminPortalController extends Controller
             'totalBerita',
             'totalBannerAktif',
             'beritaTerbaru',
+            'todayVisitors',
+            'todayUniqueVisitors',
+            'totalVisitors',
             'totalPendaftar',
             'ppdbMenunggu',
             'ppdbDiterima',

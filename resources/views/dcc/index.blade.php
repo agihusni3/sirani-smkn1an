@@ -381,9 +381,9 @@
               <span class="kpi-sub">Artikel Terpublikasi</span>
             </div>
             <div class="kpi-item">
-              <span class="kpi-label">Hero Banner Aktif</span>
-              <span class="kpi-val">{{ $totalBannerAktif }}</span>
-              <span class="kpi-sub">Slide Halaman Depan</span>
+              <span class="kpi-label">Pengunjung Web</span>
+              <span class="kpi-val">{{ number_format($todayVisitors) }}</span>
+              <span class="kpi-sub">{{ number_format($todayUniqueVisitors) }} Unik Hari Ini</span>
             </div>
             <div class="kpi-item" style="grid-column: span 2; margin-top:6px;">
               <span class="kpi-label">Berita Terakhir</span>
@@ -404,9 +404,15 @@
               <a href="/admin/banner" class="btn-launch-secondary">
                 Banner Hero
               </a>
-              <a href="/" target="_blank" class="btn-launch-secondary">
-                Lihat Website
-              </a>
+              @if(auth()->user()?->isAdmin())
+                <a href="{{ route('admin.statistik.web') }}" class="btn-launch-secondary" style="font-weight:800; border-color:#000000;" title="Hanya Administrator yang dapat melihat grafik pengunjung">
+                  Grafik Pengunjung
+                </a>
+              @else
+                <a href="/" target="_blank" class="btn-launch-secondary">
+                  Lihat Website
+                </a>
+              @endif
             </div>
           @else
             <button type="button" class="btn-launch-primary btn-locked" disabled title="Akses ditolak: Hanya untuk Tim Humas, Webmaster, & Pimpinan">

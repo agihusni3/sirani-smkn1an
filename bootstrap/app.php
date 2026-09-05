@@ -14,8 +14,9 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->trustProxies(at: '*');
         $middleware->alias([
-            'role'       => \App\Http\Middleware\RoleMiddleware::class,
-            'role.admin' => \App\Http\Middleware\RoleAdminMiddleware::class,
+            'role'          => \App\Http\Middleware\RoleMiddleware::class,
+            'role.admin'    => \App\Http\Middleware\RoleAdminMiddleware::class,
+            'track.visitor' => \App\Http\Middleware\TrackWebsiteVisitor::class,
         ]);
         // Kecualikan CSRF untuk endpoint login, face login, dan logout (mencegah error 419 jika tab terbuka lama / sesi expired)
         $middleware->validateCsrfTokens(except: [

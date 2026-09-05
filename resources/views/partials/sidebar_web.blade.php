@@ -91,6 +91,16 @@
       </div>
       <span class="nav-count-badge" style="background:#fef3c7; color:#b45309; border-color:#fde68a;">{{ $countBanner }}</span>
     </a>
+
+    @if($isAdmin)
+      <a href="{{ route('admin.statistik.web') }}" class="nav-item {{ request()->is('admin/statistik-web*') ? 'active' : '' }}" title="Statistik &amp; Grafik Pengunjung Website (Khusus Administrator)">
+        <div class="nav-left-part">
+          <i class="bi bi-graph-up-arrow nav-icon" style="color:#0ea5e9;"></i>
+          <span class="nav-text">Grafik Pengunjung</span>
+        </div>
+        <span class="nav-count-badge" style="background:#0f172a; color:#ffffff; font-weight:800;">Admin</span>
+      </a>
+    @endif
   </div>
 
   {{-- 3. TAUTAN & MODUL LAIN --}}
