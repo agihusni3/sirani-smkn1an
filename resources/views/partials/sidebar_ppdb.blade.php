@@ -52,11 +52,11 @@
     </button>
   </div>
 
-  {{-- Tombol Navigasi Kembali ke Pusat Kendali Modul --}}
+  {{-- Tombol Navigasi Kembali ke DCC SMKN 1 AN --}}
   <div style="margin-bottom:16px;">
-    <a href="{{ route('admin.portal') }}" class="btn" style="width:100%; display:flex; align-items:center; justify-content:center; gap:8px; padding:8px 12px; font-size:11.5px; font-weight:800; background:linear-gradient(135deg, #1e293b 0%, #0f172a 100%); color:#ffffff; border:1px solid rgba(255,255,255,0.12); border-radius:var(--r-sm); text-decoration:none; box-shadow:0 3px 10px rgba(0,0,0,0.12); box-sizing:border-box;">
+    <a href="{{ route('admin.portal') }}" class="btn" style="width:100%; display:flex; align-items:center; justify-content:center; gap:8px; padding:8px 12px; font-size:11.5px; font-weight:800; background:linear-gradient(135deg, #1e293b 0%, #0f172a 100%); color:#ffffff; border:1px solid rgba(255,255,255,0.12); border-radius:var(--r-sm); text-decoration:none; box-shadow:0 3px 10px rgba(0,0,0,0.12); box-sizing:border-box;" title="Buka Digital Command Center SMKN 1 AN">
       <i class="bi bi-grid-3x3-gap-fill" style="color:#38bdf8; font-size:13px;"></i>
-      <span>Pusat Kendali Modul</span>
+      <span>DCC SMKN 1 AN</span>
     </a>
   </div>
 

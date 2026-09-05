@@ -80,8 +80,8 @@ class AdminPortalTest extends TestCase
         $response = $this->actingAs($admin)->get('/portal');
 
         $response->assertStatus(200);
-        $response->assertSee('EKOSISTEM DIGITAL');
-        $response->assertSee('PUSAT KENDALI');
+        $response->assertSee('DCC SMKN 1 AN');
+        $response->assertSee('Digital Command Center');
         $response->assertSee('Selamat Bertugas, Super Administrator');
 
         // 3 Modul Aktif
@@ -137,7 +137,7 @@ class AdminPortalTest extends TestCase
 
         $response = $this->actingAs($admin)->get('/dashboard');
         $response->assertStatus(200);
-        $response->assertSee('Pusat Kendali Modul');
+        $response->assertSee('DCC SMKN 1 AN');
         $response->assertSee('app-launcher-wrap');
     }
 
@@ -175,7 +175,7 @@ class AdminPortalTest extends TestCase
         // Memuat navigasi PPDB 2026
         $response->assertSee('PPDB 2026');
         $response->assertSee('Dasbor &amp; Statistik', false);
-        $response->assertSee('Pusat Kendali Modul');
+        $response->assertSee('DCC SMKN 1 AN');
         // Tidak memuat menu absensi SIRANI di workspace PPDB
         $response->assertDontSee('Buku Kasus Disiplin');
         $response->assertDontSee('Piket Harian');
@@ -197,7 +197,7 @@ class AdminPortalTest extends TestCase
         $response->assertSee('HUMAS &amp; WEB', false);
         $response->assertSee('Kelola Berita &amp; Rilis', false);
         $response->assertSee('Hero Slider &amp; Banner', false);
-        $response->assertSee('Pusat Kendali Modul');
+        $response->assertSee('DCC SMKN 1 AN');
         // Tidak memuat menu absensi SIRANI di workspace Humas
         $response->assertDontSee('Buku Kasus Disiplin');
         $response->assertDontSee('Piket Harian');

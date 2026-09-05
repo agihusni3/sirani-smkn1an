@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Pusat Kendali Ekosistem Digital — SMKN 1 Air Naningan</title>
+  <title>Digital Command Center — SMKN 1 AN</title>
   @include('partials.styles')
   <style>
     :root {
@@ -530,8 +530,8 @@
         <img src="/img/logo.png" alt="SMKN 1 AN" style="width:100%; height:100%; object-fit:contain;" />
       </div>
       <div>
-        <div class="portal-brand-title">EKOSISTEM DIGITAL</div>
-        <div class="portal-brand-subtitle">SMKN 1 AIR NANINGAN · PUSAT KENDALI</div>
+        <div class="portal-brand-title">DCC SMKN 1 AN</div>
+        <div class="portal-brand-subtitle">Digital Command Center · SMKN 1 Air Naningan</div>
       </div>
     </a>
 
@@ -545,7 +545,7 @@
     {{-- Hero Command Center Banner --}}
     <div class="portal-hero">
       <div class="portal-hero-pill">
-        <i class="bi bi-cpu-fill"></i> PUSAT KENDALI MODULAR TERPADU
+        <i class="bi bi-cpu-fill"></i> DCC · DIGITAL COMMAND CENTER
       </div>
       <h1 class="portal-hero-title">
         Selamat Bertugas, {{ auth()->user()?->name ?? 'Administrator' }}
@@ -735,7 +735,7 @@
     <div class="portal-section-head">
       <div>
         <h2 class="portal-section-title">
-          <i class="bi bi-diagram-3-fill" style="color:#d97706;"></i> Roadmap Ekosistem Digital SMKN 1 AN
+          <i class="bi bi-diagram-3-fill" style="color:#d97706;"></i> Roadmap Modul DCC SMKN 1 AN
         </h2>
         <span style="font-size:12px; color:var(--text-3); font-weight:600;">
           Modul yang telah dipetakan dalam arsitektur digital sekolah dan siap diaktifkan secara bertahap.

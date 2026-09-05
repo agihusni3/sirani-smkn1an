@@ -18,17 +18,17 @@
   @if($canAccessPortal)
     {{-- 9-Dots Modular Ecosystem Switcher --}}
     <div class="app-launcher-wrap" style="position:relative; flex-shrink:0;">
-      <button type="button" class="btn btn-icon-header" onclick="window.toggleAppLauncherDropdown(event, this)" style="width:36px; height:36px; min-width:36px; max-width:36px; padding:0; flex-shrink:0; display:inline-flex; align-items:center; justify-content:center; background:var(--bg-2); border:1px solid var(--border-2); border-radius:var(--r-sm); cursor:pointer;" title="Pusat Kendali & Switcher Modul" aria-label="Switcher Modul Ekosistem">
+      <button type="button" class="btn btn-icon-header" onclick="window.toggleAppLauncherDropdown(event, this)" style="width:36px; height:36px; min-width:36px; max-width:36px; padding:0; flex-shrink:0; display:inline-flex; align-items:center; justify-content:center; background:var(--bg-2); border:1px solid var(--border-2); border-radius:var(--r-sm); cursor:pointer;" title="DCC SMKN 1 AN · Digital Command Center" aria-label="Switcher Modul DCC">
         <i class="bi bi-grid-3x3-gap-fill" style="color:var(--text); font-size:14.5px;"></i>
       </button>
 
       <div class="app-launcher-dropdown acct-dropdown" style="right:0; left:auto; top:calc(100% + 6px); width:310px; min-width:290px; max-width:min(90vw, 340px); background:var(--bg-2); border:1px solid var(--border-2); border-radius:var(--r-md); box-shadow:0 18px 45px rgba(0,0,0,0.3); z-index:99999;">
         <div style="padding:11px 14px; background:var(--bg-3); border-bottom:1px solid var(--border-2); display:flex; align-items:center; justify-content:space-between;">
           <div style="font-size:11.5px; font-weight:900; color:var(--text); display:flex; align-items:center; gap:6px;">
-            <i class="bi bi-cpu-fill" style="color:#2563eb;"></i> EKOSISTEM DIGITAL
+            <i class="bi bi-cpu-fill" style="color:#2563eb;"></i> DCC SMKN 1 AN
           </div>
           <a href="{{ route('admin.portal') }}" style="font-size:11px; font-weight:800; color:#2563eb; text-decoration:none; display:inline-flex; align-items:center; gap:2px;">
-            Pusat Kendali <i class="bi bi-arrow-right-short"></i>
+            Buka DCC <i class="bi bi-arrow-right-short"></i>
           </a>
         </div>
         <div style="padding:10px; display:grid; grid-template-columns:repeat(3, 1fr); gap:8px;">
@@ -36,8 +36,8 @@
             <div style="width:32px; height:32px; border-radius:8px; background:rgba(37,99,235,0.1); color:#2563eb; display:flex; align-items:center; justify-content:center; font-size:15px; margin-bottom:5px;">
               <i class="bi bi-speedometer2"></i>
             </div>
-            <span style="font-size:10px; font-weight:800; line-height:1.2;">Portal KPI</span>
-            <span style="font-size:8.5px; color:var(--text-3); margin-top:2px;">Launchpad</span>
+            <span style="font-size:10px; font-weight:800; line-height:1.2;">DCC Portal</span>
+            <span style="font-size:8.5px; color:var(--text-3); margin-top:2px;">Command Center</span>
           </a>
 
           <a href="/dashboard" style="display:flex; flex-direction:column; align-items:center; text-align:center; padding:10px 4px; border-radius:10px; text-decoration:none; color:var(--text); background:var(--surface); border:1px solid var(--border); transition:all 0.15s ease;">

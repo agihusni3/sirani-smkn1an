@@ -69,8 +69,8 @@
       </div>
 
       <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-        <a href="{{ route('admin.portal') }}" class="btn btn-sm" style="background:rgba(255,255,255,0.15); color:#ffffff; font-weight:800; border-radius:8px; font-size:12px; padding:8px 14px; border:1px solid rgba(255,255,255,0.25); text-decoration:none; display:inline-flex; align-items:center; gap:6px;">
-          <i class="bi bi-grid-3x3-gap-fill" style="color:#7dd3fc;"></i> Pusat Kendali Modul
+        <a href="{{ route('admin.portal') }}" class="btn btn-sm" style="background:rgba(255,255,255,0.15); color:#ffffff; font-weight:800; border-radius:8px; font-size:12px; padding:8px 14px; border:1px solid rgba(255,255,255,0.25); text-decoration:none; display:inline-flex; align-items:center; gap:6px;" title="Buka Digital Command Center SMKN 1 AN">
+          <i class="bi bi-grid-3x3-gap-fill" style="color:#7dd3fc;"></i> DCC SMKN 1 AN
         </a>
         <a href="{{ route('admin.berita.create') }}" class="btn btn-sm" style="background:#ffffff; color:#0369a1; font-weight:900; border-radius:8px; font-size:12px; padding:8px 16px; border:none; text-decoration:none; display:inline-flex; align-items:center; gap:6px; box-shadow:0 2px 8px rgba(0,0,0,0.1);">
           <i class="bi bi-plus-lg"></i> Tulis Berita Baru
