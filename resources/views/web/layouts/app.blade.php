@@ -281,9 +281,9 @@
                                 <span>DCC Portal</span>
                             </a>
                         @else
-                            <a href="{{ route('login') }}" class="btn-nav-login" title="Login ke Sistem &amp; Portal DCC">
+                            <a href="{{ route('login') }}" class="btn-nav-login" title="Login ke Digital Command Center (DCC)">
                                 <i class="fa-solid fa-right-to-bracket" style="color: #38bdf8;"></i>
-                                <span>Login</span>
+                                <span>Login DCC</span>
                             </a>
                         @endauth
                     </div>
@@ -448,8 +448,8 @@
                                     <i class="fa-solid fa-right-to-bracket"></i>
                                 </div>
                                 <div>
-                                    <div class="gateway-card-title">Login Sistem</div>
-                                    <div class="gateway-card-sub">Masuk DCC &amp; Portal GTK</div>
+                                    <div class="gateway-card-title">Login DCC</div>
+                                    <div class="gateway-card-sub">Pusat Komando &amp; Portal GTK</div>
                                 </div>
                             </a>
                         @endauth

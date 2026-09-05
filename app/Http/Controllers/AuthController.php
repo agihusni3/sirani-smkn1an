@@ -89,9 +89,8 @@ class AuthController extends Controller
                 AuditLog::catat('login', 'auth', "Login berhasil: {$nama} ({$userIdentifier})", null, ['role' => $user->role ?? 'wali_kelas']);
 
                 // Seluruh pengguna diarahkan ke DCC (Digital Command Center) sebagai pintu gerbang utama ekosistem
-                $targetUrl = '/portal';
-                return redirect()->intended($targetUrl)
-                    ->with('success', 'Selamat datang kembali, ' . $nama . '!');
+                return redirect('/portal')
+                    ->with('success', 'Selamat datang di DCC SMKN 1 Air Naningan, ' . $nama . '!');
             }
         }
 
