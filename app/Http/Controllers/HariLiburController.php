@@ -85,7 +85,7 @@ class HariLiburController extends Controller
 
         $namaBulan = Carbon::createFromDate($tahun, $bulan, 1)->translatedFormat('F Y');
 
-        return view('hari_libur.index', compact(
+        return view('sirani.hari_libur.index', compact(
             'bulan',
             'tahun',
             'namaBulan',

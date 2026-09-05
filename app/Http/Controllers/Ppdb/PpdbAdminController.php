@@ -66,7 +66,7 @@ class PpdbAdminController extends Controller
             ];
         });
 
-        return view('admin.ppdb.index', compact('pendaftars', 'jurusans', 'rombels', 'counts', 'jurusanStats'));
+        return view('ppdb.admin.index', compact('pendaftars', 'jurusans', 'rombels', 'counts', 'jurusanStats'));
     }
 
     public function show($id)
@@ -75,7 +75,7 @@ class PpdbAdminController extends Controller
         $jurusans = Jurusan::all();
         $rombels = Rombel::where('tingkat', '10')->orWhere('tingkat', 'X')->get();
 
-        return view('admin.ppdb.show', compact('pendaftar', 'jurusans', 'rombels'));
+        return view('ppdb.admin.show', compact('pendaftar', 'jurusans', 'rombels'));
     }
 
     public function updateStatus(Request $request, $id)
@@ -168,6 +168,6 @@ class PpdbAdminController extends Controller
             'minggu_ini'=> AuditLog::ppdb()->whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()])->count(),
         ];
 
-        return view('admin.ppdb.log', compact('logs', 'filters', 'aksiOptions', 'counts'));
+        return view('ppdb.admin.log', compact('logs', 'filters', 'aksiOptions', 'counts'));
     }
 }

@@ -145,7 +145,7 @@ class GuruPiketController extends Controller
         $sudahLewatJamTutup = $now->format('H:i:s') >= $jamTutupGerbang;
 
 
-        return view('piket.index', compact(
+        return view('sirani.piket.index', compact(
             'today',
             'now',
             'jadwal',

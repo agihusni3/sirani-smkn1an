@@ -110,7 +110,7 @@ class AdminPortalController extends Controller
             ],
         ];
 
-        return view('admin.portal.index', compact(
+        return view('dcc.index', compact(
             'today',
             'canAccessSituan',
             'canAccessSirani',

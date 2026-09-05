@@ -346,7 +346,7 @@ class LaporanController extends Controller
 
         $rombel = $rombelId ? Rombel::find($rombelId) : null;
 
-        return view('laporan.index', compact(
+        return view('sirani.laporan.index', compact(
             'laporans',
             'rekapData',
             'guruMap',
@@ -783,7 +783,7 @@ class LaporanController extends Controller
 
         $sekolah = \App\Models\PengaturanSekolah::getAktif();
 
-        return view('laporan.cetak_pdf', compact(
+        return view('sirani.laporan.cetak_pdf', compact(
             'kategori',
             'periode',
             'periodeText',

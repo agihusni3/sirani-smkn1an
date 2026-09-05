@@ -161,7 +161,7 @@ class RfidController extends Controller
         $allSiswas = Siswa::where('status', 'aktif')->with('siswaRombels.rombel')->orderBy('nama')->get();
         $allGurus = Guru::where('status', 'aktif')->orderBy('nama')->get();
 
-        return view('rfid.index', compact(
+        return view('sirani.rfid.index', compact(
             'kartus',
             'tab',
             'search',
@@ -217,7 +217,7 @@ class RfidController extends Controller
             $items = $guruQuery->orderBy('nama')->get();
         }
 
-        return view('rfid.cetak_kartu', compact(
+        return view('sirani.rfid.cetak_kartu', compact(
             'items',
             'tab',
             'rombelId',
@@ -259,7 +259,7 @@ class RfidController extends Controller
         $sekolah = PengaturanSekolah::getAktif();
         $codeValue = $guru->kartuRfid?->uid ?? ($guru->nip ?: 'GURU-'.$guru->id);
 
-        return view('rfid.kartu_digital_guru', compact('guru', 'sekolah', 'codeValue'));
+        return view('sirani.rfid.kartu_digital_guru', compact('guru', 'sekolah', 'codeValue'));
     }
 
     /**
@@ -636,7 +636,7 @@ class RfidController extends Controller
             ->with(['siswa.siswaRombel.rombel', 'guru'])
             ->get();
 
-        return view('rfid.kiosk', compact(
+        return view('sirani.rfid.kiosk', compact(
             'jadwal',
             'hariIni',
             'libur',

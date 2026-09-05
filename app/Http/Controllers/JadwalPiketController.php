@@ -22,7 +22,7 @@ class JadwalPiketController extends Controller
 
         $hariHariIni = JadwalPiket::getHariIndonesia();
 
-        return view('jadwal_piket.index', compact(
+        return view('sirani.jadwal_piket.index', compact(
             'gurus',
             'hariList',
             'jadwalGrouped',

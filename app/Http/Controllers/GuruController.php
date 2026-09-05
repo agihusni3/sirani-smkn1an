@@ -133,7 +133,7 @@ class GuruController extends Controller
         $statTotalSertifikat = SertifikatGuru::count();
         $rfidStatus = $rfidFilter;
 
-        return view('guru.index', compact(
+        return view('situan.guru.index', compact(
             'gurus',
             'statTotal',
             'statWali',
@@ -690,7 +690,7 @@ class GuruController extends Controller
         $gurus = Guru::with(['user', 'sertifikats'])->orderBy('nama')->get();
         $sekolah = PengaturanSekolah::getAktif();
 
-        return view('guru.cetak_pdf', compact('gurus', 'sekolah'));
+        return view('situan.guru.cetak_pdf', compact('gurus', 'sekolah'));
     }
 
     /**
@@ -702,7 +702,7 @@ class GuruController extends Controller
         $guru = Guru::with(['user', 'sertifikats', 'kartuRfid'])->findOrFail($id);
         $sekolah = PengaturanSekolah::getAktif();
 
-        return view('guru.biodata_pdf', compact('guru', 'sekolah'));
+        return view('situan.guru.biodata_pdf', compact('guru', 'sekolah'));
     }
 
     /**

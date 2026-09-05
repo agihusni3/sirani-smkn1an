@@ -41,7 +41,7 @@ class IzinSiswaController extends Controller
         $izins = IzinSiswa::with('siswa')->orderBy('tanggal', 'desc')->paginate(10, ['*'], 'page_siswa')->withQueryString();
         $izinGurus = IzinGuru::with('guru')->orderBy('tanggal', 'desc')->paginate(10, ['*'], 'page_guru')->withQueryString();
 
-        return view('izin_siswa', compact('siswas', 'gurus', 'izins', 'izinGurus'));
+        return view('sirani.izin_siswa', compact('siswas', 'gurus', 'izins', 'izinGurus'));
     }
 
     public function store(Request $request)

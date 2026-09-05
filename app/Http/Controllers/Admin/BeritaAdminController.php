@@ -35,12 +35,12 @@ class BeritaAdminController extends Controller
             'banners' => \App\Models\WebsiteBanner::where('is_active', true)->count(),
         ];
 
-        return view('admin.berita.index', compact('beritas', 'counts'));
+        return view('web.admin.berita.index', compact('beritas', 'counts'));
     }
 
     public function create()
     {
-        return view('admin.berita.create');
+        return view('web.admin.berita.create');
     }
 
     public function store(Request $request)
@@ -81,7 +81,7 @@ class BeritaAdminController extends Controller
     public function edit($id)
     {
         $berita = BeritaSekolah::findOrFail($id);
-        return view('admin.berita.edit', compact('berita'));
+        return view('web.admin.berita.edit', compact('berita'));
     }
 
     public function update(Request $request, $id)
@@ -162,6 +162,6 @@ class BeritaAdminController extends Controller
             'minggu_ini'=> AuditLog::webHumas()->whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()])->count(),
         ];
 
-        return view('admin.berita.log', compact('logs', 'filters', 'aksiOptions', 'counts'));
+        return view('web.admin.berita.log', compact('logs', 'filters', 'aksiOptions', 'counts'));
     }
 }

@@ -232,7 +232,7 @@ class SuratKesiswaanController extends Controller
         $nomorSurat = '421.5/' . sprintf('%03d', $siswa->id) . '/SMKN1AN/SKKB/' . date('Y');
         $tanggalSurat = Carbon::now()->translatedFormat('d F Y');
 
-        return view('siswa.surat_bebas_masalah', compact(
+        return view('situan.siswa.surat_bebas_masalah', compact(
             'sekolah',
             'siswa',
             'rombelAktif',

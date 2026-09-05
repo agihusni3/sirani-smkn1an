@@ -242,7 +242,7 @@ class PortalOrtuController extends Controller
         $pengaturanDisiplin = \App\Models\PengaturanDisiplin::getPengaturan();
         $pengumumans = \App\Models\Pengumuman::forPortal()->latest()->get();
 
-        return view('portal_ortu.index', compact(
+        return view('sirani.portal_ortu.index', compact(
             'keyword',
             'periode',
             'tanggal',

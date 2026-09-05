@@ -687,7 +687,7 @@ class DashboardController extends Controller
             ->limit(4)
             ->get();
 
-        return view('dashboard', compact(
+        return view('sirani.dashboard', compact(
             'today',
             'taAktif',
             'jadwalHariIni',
@@ -798,7 +798,7 @@ class DashboardController extends Controller
             ->limit(10)
             ->get();
 
-        return view('jadwal_sekolah.index', compact('today', 'jadwalHariIni', 'taAktif', 'riwayatJadwal', 'jadwalMingguanList'));
+        return view('sirani.jadwal_sekolah.index', compact('today', 'jadwalHariIni', 'taAktif', 'riwayatJadwal', 'jadwalMingguanList'));
     }
 
     /**

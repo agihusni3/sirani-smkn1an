@@ -98,7 +98,7 @@ class PeringkatController extends Controller
             ['path' => \Illuminate\Pagination\Paginator::resolveCurrentPath(), 'query' => request()->query()]
         );
 
-        return view('peringkat.index', compact(
+        return view('sirani.peringkat.index', compact(
             'kategori', 'periode', 'semesterTipe', 'bulan', 'tanggalMulai', 'tanggalSelesai',
             'taAktif', 'semuaTa', 'taPilihan', 'rombels', 'rombelId', 'isWaliKelas', 'waliRombel',
             'periodeLabel', 'startDate', 'effectiveEndDate', 'leaderboard', 'top1', 'top2', 'top3', 'totalRanked', 'sekolah'
@@ -519,7 +519,7 @@ class PeringkatController extends Controller
         $activeRombel = $siswa->siswaRombels->firstWhere('status_keanggotaan', 'aktif');
         $rombel = $activeRombel?->rombel;
 
-        return view('peringkat.piagam', [
+        return view('sirani.peringkat.piagam', [
             'tipe' => 'siswa',
             'person' => $siswa,
             'nama' => $siswa->nama,
@@ -548,7 +548,7 @@ class PeringkatController extends Controller
         $avgMasuk = $request->input('avg_masuk', '-');
         $durasi = $request->input('durasi', '-');
 
-        return view('peringkat.piagam', [
+        return view('sirani.peringkat.piagam', [
             'tipe' => 'guru',
             'person' => $guru,
             'nama' => $guru->nama,

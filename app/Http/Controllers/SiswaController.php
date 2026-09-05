@@ -126,7 +126,7 @@ class SiswaController extends Controller
         $waliRombel = $isWaliOnly && !empty($waliRombelIds) ? Rombel::find($waliRombelIds[0]) : null;
         $rfidStatus = $biometrikStatus;
 
-        return view('siswa.index', compact('siswas', 'rombels', 'taAktif', 'search', 'rombelId', 'status', 'rfidStatus', 'statusPkl', 'sort', 'tab', 'statTotal', 'statAlumni', 'statPkl', 'statRombel', 'isWaliOnly', 'waliRombel'));
+        return view('situan.siswa.index', compact('siswas', 'rombels', 'taAktif', 'search', 'rombelId', 'status', 'rfidStatus', 'statusPkl', 'sort', 'tab', 'statTotal', 'statAlumni', 'statPkl', 'statRombel', 'isWaliOnly', 'waliRombel'));
     }
 
     public function store(Request $request)
@@ -441,7 +441,7 @@ class SiswaController extends Controller
         $siswas = $query->get();
         $sekolah = \App\Models\PengaturanSekolah::getAktif();
 
-        return view('siswa.cetak_pdf', compact('siswas', 'rombel', 'rombelId', 'rombels', 'sekolah', 'isWaliOnly', 'selectedIds'));
+        return view('situan.siswa.cetak_pdf', compact('siswas', 'rombel', 'rombelId', 'rombels', 'sekolah', 'isWaliOnly', 'selectedIds'));
     }
 
     /**

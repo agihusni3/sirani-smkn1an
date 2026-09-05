@@ -18,7 +18,7 @@ class WebsiteBannerController extends Controller
         $banners = WebsiteBanner::orderBy('urutan', 'asc')->get();
         $totalAktif = $banners->where('is_active', true)->count();
 
-        return view('admin.banner.index', compact('banners', 'totalAktif'));
+        return view('web.admin.banner.index', compact('banners', 'totalAktif'));
     }
 
     /**
@@ -27,7 +27,7 @@ class WebsiteBannerController extends Controller
     public function create()
     {
         $nextUrutan = (WebsiteBanner::max('urutan') ?? 0) + 1;
-        return view('admin.banner.create', compact('nextUrutan'));
+        return view('web.admin.banner.create', compact('nextUrutan'));
     }
 
     /**
@@ -80,7 +80,7 @@ class WebsiteBannerController extends Controller
      */
     public function edit(WebsiteBanner $banner)
     {
-        return view('admin.banner.edit', compact('banner'));
+        return view('web.admin.banner.edit', compact('banner'));
     }
 
     /**

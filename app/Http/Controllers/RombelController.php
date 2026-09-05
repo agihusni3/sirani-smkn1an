@@ -16,7 +16,7 @@ class RombelController extends Controller
         $jurusans = Jurusan::all();
         $gurus = \App\Models\Guru::where('status', 'aktif')->orderBy('nama')->get();
 
-        return view('rombel.index', compact('rombels', 'tahunAjarans', 'jurusans', 'gurus'));
+        return view('situan.rombel.index', compact('rombels', 'tahunAjarans', 'jurusans', 'gurus'));
     }
 
     public function storeRombel(Request $request)

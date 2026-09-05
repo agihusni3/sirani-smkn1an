@@ -137,7 +137,7 @@ class KasusDisiplinController extends Controller
             $allSiswa = Siswa::where('status', 'aktif')->orderBy('nama')->get();
         }
 
-        return view('disiplin.index', compact(
+        return view('sirani.disiplin.index', compact(
             'kasusList',
             'statTahap1',
             'statTahap2',
@@ -279,7 +279,7 @@ class KasusDisiplinController extends Controller
         $katalogPelanggarans = KatalogPelanggaran::where('is_active', true)->orderBy('kategori')->orderBy('nama_pelanggaran')->get();
         $pengaturanDisiplin = PengaturanDisiplin::getPengaturan();
 
-        return view('disiplin.show', compact('kasus', 'siswa', 'user', 'absensiList', 'persenKehadiran', 'notifikasiList', 'katalogRewards', 'katalogPelanggarans', 'pengaturanDisiplin'));
+        return view('sirani.disiplin.show', compact('kasus', 'siswa', 'user', 'absensiList', 'persenKehadiran', 'notifikasiList', 'katalogRewards', 'katalogPelanggarans', 'pengaturanDisiplin'));
     }
 
     /**
@@ -659,7 +659,7 @@ class KasusDisiplinController extends Controller
         $totalBolos = Absensi::where('pemilik_type', 'siswa')->where('pemilik_id', $siswa->id)->where('status', 'bolos')->count();
         $totalTerlambat = Absensi::where('pemilik_type', 'siswa')->where('pemilik_id', $siswa->id)->where('status', 'terlambat')->count();
 
-        return view('disiplin.cetak_resume', compact(
+        return view('sirani.disiplin.cetak_resume', compact(
             'kasus',
             'siswa',
             'sekolah',
@@ -700,7 +700,7 @@ class KasusDisiplinController extends Controller
         $totalBolos = Absensi::where('pemilik_type', 'siswa')->where('pemilik_id', $siswa->id)->where('status', 'bolos')->count();
         $totalTerlambat = Absensi::where('pemilik_type', 'siswa')->where('pemilik_id', $siswa->id)->where('status', 'terlambat')->count();
 
-        return view('disiplin.cetak_sk', compact(
+        return view('sirani.disiplin.cetak_sk', compact(
             'kasus',
             'siswa',
             'sekolah',

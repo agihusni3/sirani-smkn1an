@@ -47,7 +47,7 @@ class PresensiManualController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
-        return view('presensi_manual.index', compact(
+        return view('sirani.presensi_manual.index', compact(
             'today',
             'semuaSiswa',
             'semuaGuru',
