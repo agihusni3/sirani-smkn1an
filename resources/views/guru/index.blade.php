@@ -1256,9 +1256,6 @@
               <input type="checkbox" name="roles[]" value="kaprog" class="akun-sub-role" /> Kaprog Jurusan
             </label>
             <label style="display:flex; align-items:center; gap:6px; font-size:11.5px; cursor:pointer;">
-              <input type="checkbox" name="roles[]" value="wali_kelas" class="akun-sub-role" /> Wali Kelas
-            </label>
-            <label style="display:flex; align-items:center; gap:6px; font-size:11.5px; cursor:pointer;">
               <input type="checkbox" name="roles[]" value="guru_bk" class="akun-sub-role" /> Guru BK
             </label>
             <label style="display:flex; align-items:center; gap:6px; font-size:11.5px; cursor:pointer;">
@@ -1277,9 +1274,15 @@
               <input type="checkbox" name="roles[]" value="staf_tu" class="akun-sub-role" /> Staf TU
             </label>
           </div>
-          <div style="margin-top:6px; font-size:11px; color:var(--text-3); line-height:1.4; display:flex; align-items:flex-start; gap:6px;">
-            <i class="bi bi-info-circle-fill" style="color:var(--primary); font-size:12px; margin-top:1px;"></i>
-            <span><strong>Guru Piket:</strong> Hak akses operasional meja piket aktif otomatis pada hari penugasan guru di menu <a href="/jadwal-piket" target="_blank" style="color:var(--primary); font-weight:700; text-decoration:underline;">Jadwal Petugas Piket</a> tanpa perlu ganti akun / switch mode.</span>
+          <div style="margin-top:6px; font-size:11px; color:var(--text-3); line-height:1.4; display:flex; flex-direction:column; gap:4px;">
+            <div style="display:flex; align-items:flex-start; gap:6px;">
+              <i class="bi bi-info-circle-fill" style="color:var(--primary); font-size:12px; margin-top:1px;"></i>
+              <span><strong>Wali Kelas:</strong> Hak akses otomatis terintegrasi pada akun Guru jika terdaftar membina kelas di menu <a href="/rombel" target="_blank" style="color:var(--primary); font-weight:700; text-decoration:underline;">Rombongan Belajar</a> tanpa perlu switch mode.</span>
+            </div>
+            <div style="display:flex; align-items:flex-start; gap:6px;">
+              <i class="bi bi-info-circle-fill" style="color:var(--primary); font-size:12px; margin-top:1px;"></i>
+              <span><strong>Guru Piket:</strong> Hak akses operasional meja piket aktif otomatis pada hari penugasan guru di menu <a href="/jadwal-piket" target="_blank" style="color:var(--primary); font-weight:700; text-decoration:underline;">Jadwal Petugas Piket</a> tanpa perlu ganti akun.</span>
+            </div>
           </div>
           <div style="font-size:10.5px; color:var(--text-3); margin-top:4px;">
             💡 Guru dengan multi-peran dapat berpindah mode kerja secara mandiri melalui <strong>Role Switcher</strong> di bilah atas.
@@ -1543,19 +1546,12 @@
       else if (jab.includes('perpustakaan') || jab.includes('pustakawan')) defaultRole = 'pustakawan';
       else if (jab.includes('bk') || jab.includes('bimbingan')) defaultRole = 'guru_bk';
       else if (jab.includes('tata usaha') || jab.includes('tu') || jab.includes('staf') || jab.includes('administrasi')) defaultRole = 'staf_tu';
-      else if (guru.rombels && guru.rombels.length > 0) defaultRole = 'wali_kelas';
 
       document.getElementById('akun_role').value = defaultRole;
       document.getElementById('akun_password').value = '';
       document.getElementById('akun_password_hint').style.display = 'none';
       form.action = '/guru/' + guru.id + '/akun';
       delContainer.innerHTML = '';
-
-      // Auto-check jika wali kelas atau piket
-      if (guru.rombels && guru.rombels.length > 0 && defaultRole !== 'wali_kelas') {
-        const cbWali = document.querySelector('.akun-sub-role[value="wali_kelas"]');
-        if (cbWali) cbWali.checked = true;
-      }
     }
     
     openModal('akunGuruModal');

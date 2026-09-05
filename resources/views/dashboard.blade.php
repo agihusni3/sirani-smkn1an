@@ -496,9 +496,9 @@
     @endif
 
     {{-- ═══════════════════════════════════════════════════════════════════ --}}
-    {{-- WIDGET RINGKASAN KELAS BINAAN (KHUSUS WALI KELAS YANG SEDANG PIKET) --}}
+    {{-- WIDGET RINGKASAN KELAS BINAAN (SEAMLESS UNTUK SETIAP WALI KELAS) --}}
     {{-- ═══════════════════════════════════════════════════════════════════ --}}
-    @if(isset($isWaliSedangPiket) && $isWaliSedangPiket && isset($waliRombel) && $waliRombel)
+    @if(isset($waliRombel) && $waliRombel)
       <div class="panel" style="margin-bottom:24px; padding:0; overflow:hidden; border:1.5px solid #16A34A; border-radius:var(--r-md); background:var(--bg-2);">
         <div style="padding:12px 18px; border-bottom:1px solid rgba(22,163,74,0.2); background:rgba(22,163,74,0.06); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
           <div style="font-size:13.5px; font-weight:800; color:#15803D; display:flex; align-items:center; gap:8px;">
@@ -506,10 +506,10 @@
             <span>📌 Ringkasan Kelas Binaan Anda: <strong>{{ $waliRombel->nama_rombel }}</strong></span>
           </div>
           <div style="display:flex; gap:8px;">
-            <a href="/siswa" class="btn btn-sm" style="font-size:11.5px; font-weight:800; padding:4px 12px; text-decoration:none; background:#15803D; color:#fff; border-radius:6px; display:inline-flex; align-items:center; gap:5px;">
-              <i class="bi bi-people-fill"></i> Data Siswa
+            <a href="/siswa?rombel_id={{ $waliRombel->id }}" class="btn btn-sm" style="font-size:11.5px; font-weight:800; padding:4px 12px; text-decoration:none; background:#15803D; color:#fff; border-radius:6px; display:inline-flex; align-items:center; gap:5px;">
+              <i class="bi bi-people-fill"></i> Siswa Kelas
             </a>
-            <a href="/disiplin" class="btn btn-sm btn-outline" style="font-size:11.5px; font-weight:800; padding:4px 12px; text-decoration:none; display:inline-flex; align-items:center; gap:5px; border-color:#16A34A; color:#15803D;">
+            <a href="/disiplin?rombel_id={{ $waliRombel->id }}" class="btn btn-sm btn-outline" style="font-size:11.5px; font-weight:800; padding:4px 12px; text-decoration:none; display:inline-flex; align-items:center; gap:5px; border-color:#16A34A; color:#15803D;">
               <i class="bi bi-journal-text"></i> Buku Disiplin
             </a>
           </div>

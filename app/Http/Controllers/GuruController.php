@@ -1107,7 +1107,7 @@ class GuruController extends Controller
         $email = $request->filled('email') ? trim($request->input('email')) : ($username . '@sirani.local');
 
         $rolesInput = (array) $request->input('roles', []);
-        $rolesList = array_values(array_diff(array_unique(array_filter(array_merge([$role], $rolesInput))), ['guru_piket']));
+        $rolesList = array_values(array_diff(array_unique(array_filter(array_merge([$role], $rolesInput))), ['guru_piket', 'wali_kelas']));
 
         $oldRole = $guru->user ? $guru->user->role : null;
 
