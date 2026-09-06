@@ -593,10 +593,13 @@ class GuruController extends Controller
         $guru = Guru::findOrFail($id);
         $nama = $guru->nama;
 
-        // Bersihkan akun login jika ada agar tidak menjadi orphaned user
-        if ($guru->user) {
+        // Bersihkan akun login jika ada agar tidak menjadi orphaned user (lindungi akun admin)
+        if ($guru->user && $guru->user->role !== 'admin') {
             AuditLog::catat('delete', 'auth', "Akun login {$guru->user->username} ikut dihapus karena data GTK {$nama} dihapus oleh " . (auth()->user()->name ?? 'Admin'));
             $guru->user->delete();
+        } elseif ($guru->user && $guru->user->role === 'admin') {
+            // Putuskan relasi guru_id agar akun admin tetap utuh dan independen
+            $guru->user->update(['guru_id' => null]);
         }
 
         if ($guru->foto && \Illuminate\Support\Facades\Storage::disk('public')->exists($guru->foto)) {
