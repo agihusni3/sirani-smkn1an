@@ -3,33 +3,45 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Siklus Akademik &amp; Transisi Siswa — SMKN 1 Air Naningan</title>
+  <title>Siklus Akademik &amp; Transisi Siswa — SITUAN SMKN 1 Air Naningan</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  
   @include('partials.styles')
+  <link rel="stylesheet" href="{{ asset('css/situan-app.css') }}?v={{ filemtime(public_path('css/situan-app.css')) }}">
   <link rel="stylesheet" href="{{ asset('css/siklus-siswa.css') }}?v={{ filemtime(public_path('css/siklus-siswa.css')) }}">
 </head>
-<body>
-<div class="app-container">
+<body class="situan-body">
+<div class="situan-layout">
   @include('partials.sidebar_situan')
-  <main class="main-content">
-    
-    {{-- ULTRA COMPACT SLIM HEADER BAR --}}
-    <div class="panel no-print" style="background:var(--bg-2); border:1px solid var(--border); padding:10px 16px; margin-bottom:12px; border-radius:var(--r-md); box-shadow:var(--shadow-sm);">
-      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
-        <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-          <h1 style="margin:0; font-size:16px; font-weight:900; color:var(--text); display:inline-flex; align-items:center; gap:6px;">
-            <i class="bi bi-arrow-repeat" style="color:#000000; font-size:16px;"></i> Siklus Akademik &amp; Transisi Siswa
-          </h1>
-          <span style="color:var(--border-2); font-weight:300;">|</span>
-          <span style="font-size:11.5px; color:var(--text-3);">
-            Kenaikan kelas, kelulusan, &amp; penugasan PKL
-          </span>
+  <main class="situan-main">
+    <div class="situan-content">
+      
+      {{-- Page Header --}}
+      <div class="situan-page-header">
+        <div style="display:flex; align-items:center; gap:12px;">
+          <button type="button" class="situan-mobile-menu-btn" onclick="window.toggleSituanSidebar()" aria-label="Buka Menu" style="background:#f8fafc; border:1.5px solid #cbd5e1; border-radius:8px; padding:6px 10px; font-size:17px; cursor:pointer; color:#000000;">
+            <i class="bi bi-list"></i>
+          </button>
+          <div>
+            <div class="situan-breadcrumb">
+              <a href="{{ route('admin.portal') }}" style="display:inline-flex; align-items:center; gap:4px;"><i class="bi bi-grid-fill" style="color:#0284c7; font-size:12px;"></i> DCC</a>
+              <span class="sep">/</span>
+              <a href="{{ route('situan.index') }}">SITUAN</a>
+              <span class="sep">/</span>
+              <span style="color:#0284c7; font-weight:800;">Siklus &amp; Buku Induk</span>
+            </div>
+            <h1 class="situan-page-title" style="margin-top:2px; font-size:20px;">Siklus Akademik &amp; Transisi Siswa</h1>
+          </div>
         </div>
 
-        <div style="display:flex; align-items:center; gap:8px;">
+        <div>
           @include('partials.header_actions')
         </div>
       </div>
-    </div>
 
     {{-- ALERT MESSAGES --}}
     @if(session('success'))

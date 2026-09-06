@@ -29,7 +29,10 @@
     {{-- Topbar Breadcrumbs --}}
     <div class="situan-topbar no-print">
       <div class="situan-breadcrumb">
-        <a href="{{ route('admin.portal') }}"><i class="bi bi-command"></i> DCC</a>
+        <button type="button" class="situan-mobile-menu-btn" onclick="window.toggleSituanSidebar()" aria-label="Buka Menu" style="background:#f8fafc; border:1.5px solid #cbd5e1; border-radius:8px; padding:4px 8px; font-size:15px; cursor:pointer; color:#000000; margin-right:4px;">
+          <i class="bi bi-list"></i>
+        </button>
+        <a href="{{ route('admin.portal') }}" style="display:inline-flex; align-items:center; gap:4px;"><i class="bi bi-grid-fill" style="color:#0284c7; font-size:12px;"></i> DCC</a>
         <span class="sep">/</span>
         <a href="{{ route('situan.index') }}">SITUAN</a>
         <span class="sep">/</span>
@@ -39,6 +42,7 @@
         <a href="{{ route('situan.index') }}" class="btn-situan btn-situan-outline" style="height:32px; font-size:11px;">
           <i class="bi bi-speedometer2"></i> Dasbor SITUAN
         </a>
+        @include('partials.header_actions')
       </div>
     </div>
 

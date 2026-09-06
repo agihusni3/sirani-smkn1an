@@ -100,6 +100,31 @@ body.situan-body {
   color: inherit;
 }
 
+.situan-close-btn {
+  display: none;
+  background: transparent;
+  border: none;
+  color: #000000;
+  font-size: 18px;
+  cursor: pointer;
+  padding: 4px 6px;
+  border-radius: 6px;
+  line-height: 1;
+  transition: background 0.15s ease;
+}
+
+.situan-close-btn:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+@media (max-width: 1024px) {
+  .situan-close-btn {
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
 .situan-brand-badge {
   width: 40px;
   height: 40px;
@@ -196,6 +221,17 @@ body.situan-body {
   font-weight: 700;
   transition: all 0.15s ease;
   position: relative;
+  outline: none !important;
+  border: 1px solid transparent;
+  user-select: none;
+}
+
+.situan-nav-link:focus,
+.situan-nav-link:active,
+.situan-nav-link:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
+  border-color: transparent !important;
 }
 
 .situan-nav-link-left {
@@ -203,6 +239,7 @@ body.situan-body {
   align-items: center;
   gap: 10px;
   min-width: 0;
+  white-space: nowrap;
 }
 
 .situan-nav-link-left i {
@@ -213,10 +250,17 @@ body.situan-body {
   align-items: center;
   justify-content: center;
   transition: color 0.15s ease;
+  flex-shrink: 0;
+}
+
+.situan-nav-link-left span {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .situan-nav-link:hover {
-  background: rgba(2, 132, 199, 0.07);
+  background: rgba(2, 132, 199, 0.08);
   color: #0284c7;
 }
 
@@ -224,7 +268,7 @@ body.situan-body {
   color: #0284c7;
 }
 
-/* Active State with clean rounded indicator */
+/* Active State with crisp clean rounded badge & background */
 .situan-nav-link.active {
   background: rgba(2, 132, 199, 0.12);
   color: #0284c7;
@@ -235,25 +279,16 @@ body.situan-body {
   color: #0284c7;
 }
 
-.situan-nav-link.active::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 6px;
-  bottom: 6px;
-  width: 3.5px;
-  border-radius: 0 4px 4px 0;
-  background: #0284c7;
-}
-
 .situan-nav-badge {
-  font-size: 10px;
+  font-size: 10.5px;
   font-weight: 800;
   padding: 2px 7px;
   border-radius: 999px;
   background: #f1f5f9;
   border: 1px solid #cbd5e1;
   color: #000000;
+  flex-shrink: 0;
+  margin-left: 6px;
 }
 
 .situan-nav-link.active .situan-nav-badge {
@@ -264,13 +299,14 @@ body.situan-body {
 
 /* Sidebar Footer / User Chip */
 .situan-sidebar-footer {
-  padding: 14px 16px;
+  padding: 12px 14px;
   border-top: 1.5px solid var(--situan-border-subtle);
   background: var(--situan-card-bg);
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 10px;
+  margin-top: auto;
 }
 
 .situan-user-mini {
@@ -278,12 +314,13 @@ body.situan-body {
   align-items: center;
   gap: 10px;
   min-width: 0;
+  flex: 1;
 }
 
 .situan-user-avatar {
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
   background: rgba(2, 132, 199, 0.15);
   border: 1px solid var(--situan-primary-border);
   color: #0284c7;
@@ -292,12 +329,14 @@ body.situan-body {
   justify-content: center;
   font-size: 13px;
   font-weight: 900;
+  flex-shrink: 0;
 }
 
 .situan-user-info {
   display: flex;
   flex-direction: column;
   min-width: 0;
+  flex: 1;
 }
 
 .situan-user-name {
@@ -313,7 +352,44 @@ body.situan-body {
   font-size: 10px;
   font-weight: 700;
   color: #64748b;
-  text-transform: capitalize;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.situan-logout-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #ef4444;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+}
+
+.situan-logout-btn:hover {
+  background: #ef4444;
+  color: #ffffff;
+  border-color: #ef4444;
+}
+
+/* Mobile Menu Button - Hidden on Desktop */
+.situan-mobile-menu-btn {
+  display: none !important;
+}
+
+@media (max-width: 1024px) {
+  .situan-mobile-menu-btn {
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+  }
 }
 
 /* ─── Main Content Area ─── */

@@ -31,12 +31,12 @@
       {{-- Page Header --}}
       <div class="situan-page-header">
         <div style="display:flex; align-items:center; gap:12px;">
-          <button type="button" class="situan-mobile-menu-btn d-lg-none" onclick="window.toggleSituanSidebar()" aria-label="Buka Menu" style="background:#f8fafc; border:1.5px solid #cbd5e1; border-radius:8px; padding:6px 10px; font-size:17px; cursor:pointer; color:#000000; display:inline-flex; align-items:center;">
+          <button type="button" class="situan-mobile-menu-btn" onclick="window.toggleSituanSidebar()" aria-label="Buka Menu" style="background:#f8fafc; border:1.5px solid #cbd5e1; border-radius:8px; padding:6px 10px; font-size:17px; cursor:pointer; color:#000000;">
             <i class="bi bi-list"></i>
           </button>
           <div>
             <div class="situan-breadcrumb">
-              <a href="{{ route('admin.portal') }}"><i class="bi bi-command"></i> DCC</a>
+              <a href="{{ route('admin.portal') }}" style="display:inline-flex; align-items:center; gap:4px;"><i class="bi bi-grid-fill" style="color:#0284c7; font-size:12px;"></i> DCC</a>
               <span class="sep">/</span>
               <a href="{{ route('situan.index') }}">SITUAN</a>
               <span class="sep">/</span>

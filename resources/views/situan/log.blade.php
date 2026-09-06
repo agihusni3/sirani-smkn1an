@@ -5,26 +5,36 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Riwayat &amp; Log Aktivitas — SITUAN SMKN 1 Air Naningan</title>
   @include('partials.styles')
+  <link rel="stylesheet" href="{{ asset('css/situan-app.css') }}?v={{ filemtime(public_path('css/situan-app.css')) }}">
   <link rel="stylesheet" href="{{ asset('css/audit.css') }}?v={{ filemtime(public_path('css/audit.css')) }}">
 </head>
-<body>
-<div class="app-container">
+<body class="situan-body">
+<div class="situan-layout">
   @include('partials.sidebar_situan')
 
-  <main class="main-content">
-    {{-- Header Bar SITUAN Log --}}
-    <header class="topbar no-print" style="margin-bottom:16px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
-      <div style="display:flex; align-items:center; gap:8px;">
-        <span style="font-size:12px; font-weight:700; color:var(--text-3);">
-          <a href="{{ route('admin.portal') }}" style="color:var(--text-3); text-decoration:none;"><i class="bi bi-command"></i> DCC</a>
-          <span style="margin:0 4px;">/</span>
-          <a href="{{ route('situan.index') }}" style="color:var(--text-3); text-decoration:none;">SITUAN</a>
-          <span style="margin:0 4px;">/</span>
-          <span style="color:#0284c7;">Log Aktivitas TU</span>
-        </span>
+  <main class="situan-main">
+    <div class="situan-content">
+      {{-- Header Bar SITUAN Log --}}
+      <div class="situan-page-header no-print">
+        <div style="display:flex; align-items:center; gap:12px;">
+          <button type="button" class="situan-mobile-menu-btn" onclick="window.toggleSituanSidebar()" aria-label="Buka Menu" style="background:#f8fafc; border:1.5px solid #cbd5e1; border-radius:8px; padding:6px 10px; font-size:17px; cursor:pointer; color:#000000;">
+            <i class="bi bi-list"></i>
+          </button>
+          <div>
+            <div class="situan-breadcrumb">
+              <a href="{{ route('admin.portal') }}" style="display:inline-flex; align-items:center; gap:4px;"><i class="bi bi-grid-fill" style="color:#0284c7; font-size:12px;"></i> DCC</a>
+              <span class="sep">/</span>
+              <a href="{{ route('situan.index') }}">SITUAN</a>
+              <span class="sep">/</span>
+              <span style="color:#0284c7; font-weight:800;">Log Aktivitas TU</span>
+            </div>
+            <h1 class="situan-page-title" style="margin-top:2px; font-size:20px;">Riwayat Mutasi &amp; Audit Log</h1>
+          </div>
+        </div>
+        <div style="display:flex; align-items:center; gap:8px;">
+          @include('partials.header_actions')
+        </div>
       </div>
-      @include('partials.header_actions')
-    </header>
 
     {{-- Banner Ringkasan Ruang Log SITUAN --}}
     <div style="background:linear-gradient(135deg, #0c4a6e 0%, #0369a1 100%); border-radius:16px; padding:20px 24px; color:#ffffff; margin-bottom:20px; box-shadow:0 8px 24px rgba(2,132,199,0.18); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:14px; border:1px solid rgba(255,255,255,0.15);">
@@ -254,7 +264,7 @@
         </div>
       @endif
     </div>
-
+    </div>
   </main>
 </div>
 </body>
