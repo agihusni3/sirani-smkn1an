@@ -182,6 +182,19 @@
           @endif
         </a>
       @endif
+
+      @php
+        $canAccessPtk = $isAdmin || $isKepsek || $isWakasis || $isWakaKurikulum || $isStafTu || ($user && in_array($user->role, ['waka_sarpras', 'waka_hubin']));
+      @endphp
+      @if($canAccessPtk)
+        <a href="/guru" class="nav-item {{ request()->is('guru*') ? 'active' : '' }}" title="Pangkalan Data Pendidik &amp; Tenaga Kependidikan (PTK)">
+          <div class="nav-left-part">
+            <i class="bi bi-person-badge-fill nav-icon" style="color:#0284c7;"></i>
+            <span class="nav-text">Data PTK (Guru &amp; Staf)</span>
+          </div>
+          <span class="nav-count-badge" style="background:#f0f9ff; color:#0284c7; border-color:#bae6fd;">PTK</span>
+        </a>
+      @endif
     </div>
   @endif
 

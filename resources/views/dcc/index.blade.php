@@ -193,7 +193,7 @@
           </div>
 
           <h3 class="module-card-name">SIRANI</h3>
-          <p class="module-card-subtitle">Sistem Absensi &amp; Ketertiban Siswa/Guru</p>
+          <p class="module-card-subtitle">Sistem Informasi Responsif Absensi</p>
 
           <div class="kpi-row">
             <div class="kpi-item">

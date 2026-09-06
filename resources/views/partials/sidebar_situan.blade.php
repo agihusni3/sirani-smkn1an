@@ -123,16 +123,16 @@
     </div>
 
     {{-- Nav Section: Master Kepegawaian (PTK) --}}
-    @if($isAdmin || $isKepsek || $isStafTu || $isWakaKurikulum || $isWakasis)
+    @if($isAdmin || $isKepsek || $isStafTu || $isWakaKurikulum || $isWakasis || ($user && in_array($user->role, ['waka_sarpras', 'waka_hubin'])))
       <div class="situan-nav-group">
-        <div class="situan-nav-group-title">Pendidik &amp; Tendik</div>
+        <div class="situan-nav-group-title">Pendidik &amp; Tendik (PTK)</div>
 
-        <a href="/guru" class="situan-nav-link {{ request()->is('guru*') ? 'active' : '' }}" title="Pangkalan Data Guru, Staf &amp; Tenaga Kependidikan">
+        <a href="/guru" class="situan-nav-link {{ request()->is('guru*') ? 'active' : '' }}" title="Pangkalan Data Pendidik &amp; Tenaga Kependidikan (PTK)">
           <div class="situan-nav-link-left">
             <i class="bi bi-person-badge-fill"></i>
-            <span>Data Guru &amp; Pegawai</span>
+            <span>Data PTK (Guru &amp; Staf)</span>
           </div>
-          <span class="situan-nav-badge">{{ $countGuru }}</span>
+          <span class="situan-nav-badge">{{ $countGuru }} PTK</span>
         </a>
       </div>
     @endif

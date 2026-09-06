@@ -110,7 +110,7 @@ class AdminPortalTest extends TestCase
         $response->assertSee('SITUAN');
         $response->assertSee('Sistem Informasi Tata Usaha SMKN 1 Air Naningan');
         $response->assertSee('SIRANI');
-        $response->assertSee('Sistem Absensi &amp; Ketertiban Siswa/Guru', false);
+        $response->assertSee('Sistem Informasi Responsif Absensi');
         $response->assertSee('PPDB ONLINE 2026');
         $response->assertSee('WEB PROFIL &amp; HUMAS', false);
 

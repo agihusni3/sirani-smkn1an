@@ -3,8 +3,15 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Master Data GTK Guru &amp; Tenaga Kependidikan — SMKN 1 Air Naningan</title>
+  <title>Data PTK (Pendidik &amp; Tenaga Kependidikan) — SITUAN SMKN 1 Air Naningan</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  
   @include('partials.styles')
+  <link rel="stylesheet" href="{{ asset('css/situan-app.css') }}?v={{ filemtime(public_path('css/situan-app.css')) }}">
   <link rel="stylesheet" href="{{ asset('css/guru.css') }}?v={{ filemtime(public_path('css/guru.css')) }}">
   <style>
     .gtk-tab-nav {
@@ -131,49 +138,54 @@
     }
   </style>
 </head>
-<body>
-<div class="app-container">
+<body class="situan-body">
+<div class="situan-layout">
   @include('partials.sidebar_situan')
-  <main class="main-content">
-    @php
-      $currentUser = auth()->user();
-      $isAdmin = $currentUser && $currentUser->isAdmin();
-      $isStafTu = $currentUser && $currentUser->isStafTu();
-    @endphp
+  <main class="situan-main">
+    <div class="situan-content">
+      @php
+        $currentUser = auth()->user();
+        $isAdmin = $currentUser && $currentUser->isAdmin();
+        $isStafTu = $currentUser && $currentUser->isStafTu();
+      @endphp
 
-    {{-- ULTRA COMPACT SLIM HEADER BAR --}}
-    <div class="panel no-print" style="background:var(--bg-2); border:1px solid var(--border); padding:10px 16px; margin-bottom:12px; border-radius:var(--r-md); box-shadow:var(--shadow-sm);">
-      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
-        <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-          <h1 style="margin:0; font-size:16px; font-weight:900; color:var(--text); display:inline-flex; align-items:center; gap:6px;">
-            <i class="bi bi-person-badge-fill" style="color:#000000; font-size:16px;"></i> Data GTK Guru &amp; Tenaga Kependidikan
-          </h1>
-          <span style="color:var(--border-2); font-weight:300;">|</span>
-          <span style="font-size:11.5px; color:var(--text-3);">
-            Total: <strong style="color:#000000;">{{ $statTotal }}</strong> Personel
-          </span>
+      {{-- Page Header --}}
+      <div class="situan-page-header">
+        <div style="display:flex; align-items:center; gap:12px;">
+          <button type="button" class="situan-mobile-menu-btn d-lg-none" onclick="window.toggleSituanSidebar()" aria-label="Buka Menu" style="background:#f8fafc; border:1.5px solid #cbd5e1; border-radius:8px; padding:6px 10px; font-size:17px; cursor:pointer; color:#000000; display:inline-flex; align-items:center;">
+            <i class="bi bi-list"></i>
+          </button>
+          <div>
+            <div class="situan-breadcrumb">
+              <a href="{{ route('admin.portal') }}"><i class="bi bi-command"></i> DCC</a>
+              <span class="sep">/</span>
+              <a href="{{ route('situan.index') }}">SITUAN</a>
+              <span class="sep">/</span>
+              <span style="color:#0284c7; font-weight:800;">PTK (Pendidik &amp; Tendik)</span>
+            </div>
+            <h1 class="situan-page-title" style="margin-top:2px; font-size:20px;">Data PTK &amp; Tenaga Kependidikan</h1>
+          </div>
         </div>
 
-        <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+        <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
           @if($isAdmin || $isStafTu)
-            <button type="button" id="btnToggleTambahGuru" onclick="toggleTambahGuru()" class="btn btn-sm btn-gold" style="height:32px; padding:0 12px; font-size:11.5px; font-weight:800; display:inline-flex; align-items:center; gap:5px; border-radius:6px; cursor:pointer;">
+            <button type="button" id="btnToggleTambahGuru" onclick="toggleTambahGuru()" class="situan-btn-primary">
               <i class="bi bi-person-plus-fill" id="iconToggleTambahGuru"></i>
               <span id="textToggleTambahGuru">Tambah GTK</span>
             </button>
-            <button type="button" onclick="openModal('importGuruModal')" class="btn btn-sm btn-outline" style="height:32px; padding:0 10px; font-size:11.5px; font-weight:800; color:#000000; border:1px solid var(--border-2); background:var(--bg-2); display:inline-flex; align-items:center; gap:4px; border-radius:6px;">
-              <i class="bi bi-file-earmark-arrow-up-fill" style="color:#000000;"></i> Import CSV Dapodik
+            <button type="button" onclick="openModal('importGuruModal')" class="situan-btn-outline">
+              <i class="bi bi-file-earmark-arrow-up-fill" style="color:#0284c7;"></i> Import CSV
             </button>
           @endif
-          <a href="/guru/export" class="btn btn-sm btn-outline" style="height:32px; padding:0 10px; font-size:11.5px; font-weight:800; text-decoration:none; color:#000000; border:1px solid var(--border-2); background:var(--bg-2); display:inline-flex; align-items:center; gap:4px; border-radius:6px;" title="Unduh CSV Lengkap Kompatibel Excel">
-            <i class="bi bi-file-earmark-excel-fill" style="color:#000000;"></i> Export CSV
+          <a href="/guru/export" class="situan-btn-outline" title="Unduh CSV Lengkap Kompatibel Excel">
+            <i class="bi bi-file-earmark-excel-fill" style="color:#10b981;"></i> Export CSV
           </a>
-          <a href="/guru/cetak-pdf" target="_blank" class="btn btn-sm btn-outline" style="height:32px; padding:0 10px; font-size:11.5px; font-weight:800; text-decoration:none; color:#000000; border:1px solid var(--border-2); background:var(--bg-2); display:inline-flex; align-items:center; gap:4px; border-radius:6px;" title="Cetak Format A4 Kop Dinas">
-            <i class="bi bi-file-earmark-pdf-fill" style="color:#000000;"></i> Cetak PDF
+          <a href="/guru/cetak-pdf" target="_blank" class="situan-btn-outline" title="Cetak Format A4 Kop Dinas">
+            <i class="bi bi-file-earmark-pdf-fill" style="color:#ef4444;"></i> Cetak PDF
           </a>
           @include('partials.header_actions')
         </div>
       </div>
-    </div>
 
     @if(session('success'))<div class="alert-success" style="margin-bottom:16px;"><i class="bi bi-check-circle-fill" style="margin-right:6px;"></i>{{ session('success') }}</div>@endif
     @if(session('error'))<div class="alert-error" style="margin-bottom:16px;"><i class="bi bi-exclamation-triangle-fill" style="margin-right:6px;"></i>{{ session('error') }}</div>@endif
@@ -798,6 +810,7 @@
           {{ $gurus->links() }}
         </div>
       @endif
+    </div>
     </div>
   </main>
 </div>
