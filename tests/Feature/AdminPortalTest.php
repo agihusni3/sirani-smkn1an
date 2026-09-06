@@ -371,7 +371,7 @@ class AdminPortalTest extends TestCase
         $response->assertStatus(403);
     }
 
-    public function test_dcc_dashboard_menggunakan_palette_warna_pastel_dan_font_hitam(): void
+    public function test_dcc_dashboard_menggunakan_palette_warna_baru_dan_font_hitam(): void
     {
         $admin = User::create([
             'name' => 'Super Administrator',
@@ -385,11 +385,11 @@ class AdminPortalTest extends TestCase
         $response->assertSee('admin-portal.css');
 
         $cssContent = file_get_contents(public_path('css/admin-portal.css'));
-        // Verifikasi keberadaan token 4 warna Color Hunt: #a3dc9a, #dee791, #fff9bd, #ffd6ba
-        $this->assertStringContainsString('#a3dc9a', strtolower($cssContent));
-        $this->assertStringContainsString('#dee791', strtolower($cssContent));
-        $this->assertStringContainsString('#fff9bd', strtolower($cssContent));
-        $this->assertStringContainsString('#ffd6ba', strtolower($cssContent));
+        // Verifikasi keberadaan token 4 warna Color Hunt: #3368a0, #66a3bf, #c8dfdb, #f2efe7
+        $this->assertStringContainsString('#3368a0', strtolower($cssContent));
+        $this->assertStringContainsString('#66a3bf', strtolower($cssContent));
+        $this->assertStringContainsString('#c8dfdb', strtolower($cssContent));
+        $this->assertStringContainsString('#f2efe7', strtolower($cssContent));
 
         // Verifikasi modul tema spesifik
         $this->assertStringContainsString('.card-situan', $cssContent);

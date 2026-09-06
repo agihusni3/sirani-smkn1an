@@ -32,9 +32,6 @@
       <div style="width:58px; height:58px; margin:0 auto 12px; border-radius:16px; padding:6px; background:var(--bg-2); border:1.5px solid var(--border-2); box-shadow:0 4px 14px rgba(0,0,0,0.1); display:flex; align-items:center; justify-content:center;">
         <img src="/img/logo.png" alt="Logo SMKN 1 Air Naningan" style="width:100%; height:100%; object-fit:contain;" />
       </div>
-      <div style="display:inline-flex; align-items:center; gap:6px; background:rgba(56, 189, 248, 0.1); border:1px solid rgba(56, 189, 248, 0.25); color:#38bdf8; font-size:10.5px; font-weight:800; letter-spacing:0.06em; text-transform:uppercase; padding:3px 10px; border-radius:999px; margin-bottom:10px;">
-        <i class="bi bi-command"></i> DIGITAL COMMAND CENTER
-      </div>
       <h1 style="font-size:24px; font-weight:900; letter-spacing:-0.03em; color:var(--text); margin-bottom:4px;">DCC SMKN 1 AN</h1>
       <p style="font-size:12px; font-weight:600; color:var(--text-3); line-height:1.4;">Pusat Komando &amp; Akses Layanan Terpadu Ekosistem Digital SMKN 1 Air Naningan</p>
     </div>
@@ -69,19 +66,6 @@
         <i class="bi bi-command"></i> Masuk ke DCC
       </button>
     </form>
-
-    <div class="card-footer">
-      <a href="/" class="back-home" title="Kembali ke Beranda Website Sekolah">
-        <i class="bi bi-arrow-left"></i> Web Sekolah
-      </a>
-      <a href="/portal-siswa" class="back-home" title="Portal Siswa Mandiri">
-        <i class="bi bi-person-badge"></i> Portal Siswa
-      </a>
-      <a href="/cek-presensi" class="back-home" title="Portal Presensi Siswa &amp; Orang Tua">
-        <i class="bi bi-people"></i> Portal Ortu
-      </a>
-    </div>
-
   </div>
 </div>
 

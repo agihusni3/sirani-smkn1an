@@ -1,15 +1,15 @@
 :root {
-  --dcc-color-mint: #a3dc9a;
-  --dcc-color-lime: #dee791;
-  --dcc-color-cream: #fff9bd;
-  --dcc-color-peach: #ffd6ba;
+  --dcc-color-primary: #3368a0;
+  --dcc-color-secondary: #66a3bf;
+  --dcc-color-ice: #c8dfdb;
+  --dcc-color-cream: #f2efe7;
 
-  --dcc-bg: #fafaf8;
+  --dcc-bg: #f8f8f6;
   --dcc-card-bg: #ffffff;
-  --dcc-card-border: rgba(163, 220, 154, 0.45);
-  --dcc-card-hover: 0 12px 28px -6px rgba(163, 220, 154, 0.28), 0 0 1px 1px rgba(163, 220, 154, 0.35);
+  --dcc-card-border: rgba(102, 163, 191, 0.4);
+  --dcc-card-hover: 0 12px 28px -6px rgba(51, 104, 160, 0.22), 0 0 1px 1px rgba(102, 163, 191, 0.3);
   --dcc-telemetry-bg: #ffffff;
-  --dcc-telemetry-border: rgba(222, 231, 145, 0.45);
+  --dcc-telemetry-border: rgba(200, 223, 219, 0.7);
   --dcc-text-heading: #000000;
   --dcc-text: #000000;
   --dcc-text-sub: #000000;
@@ -23,8 +23,8 @@
 [data-theme="dark"] {
   --dcc-bg: #090d16;
   --dcc-card-bg: #111827;
-  --dcc-card-border: rgba(163, 220, 154, 0.2);
-  --dcc-card-hover: 0 12px 30px -8px rgba(0, 0, 0, 0.5), 0 0 1px 1px rgba(163, 220, 154, 0.25);
+  --dcc-card-border: rgba(102, 163, 191, 0.25);
+  --dcc-card-hover: 0 12px 30px -8px rgba(0, 0, 0, 0.5), 0 0 1px 1px rgba(102, 163, 191, 0.25);
   --dcc-telemetry-bg: rgba(255, 255, 255, 0.03);
   --dcc-telemetry-border: rgba(255, 255, 255, 0.08);
   --dcc-text-heading: #ffffff;
@@ -50,7 +50,7 @@ body {
 
 /* ─── Topbar ─── */
 .portal-topbar {
-  background: rgba(255, 255, 255, 0.95);
+  background: rgba(255, 255, 255, 0.96);
   border-bottom: 1.5px solid var(--dcc-card-border);
   position: sticky;
   top: 0;
@@ -85,13 +85,13 @@ body {
   width: 38px;
   height: 38px;
   border-radius: 10px;
-  background: linear-gradient(135deg, var(--dcc-color-mint) 0%, var(--dcc-color-lime) 100%);
-  border: 1.5px solid var(--dcc-color-mint);
+  background: linear-gradient(135deg, var(--dcc-color-primary) 0%, var(--dcc-color-secondary) 100%);
+  border: 1.5px solid var(--dcc-color-primary);
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 4px;
-  box-shadow: 0 2px 8px rgba(163, 220, 154, 0.35);
+  box-shadow: 0 2px 8px rgba(51, 104, 160, 0.28);
 }
 
 .portal-brand-title {
@@ -123,13 +123,13 @@ body {
   box-sizing: border-box;
 }
 
-/* ─── Hero Mission Control Banner (Color Palette #A3DC9A, #DEE791, #FFF9BD, #FFD6BA / Black Typography) ─── */
+/* ─── Hero Mission Control Banner (Color Palette #3368A0, #66A3BF, #C8DFDB, #F2EFE7 / Black Typography) ─── */
 .cockpit-hero {
   position: relative;
   border-radius: 18px;
-  background: linear-gradient(135deg, rgba(255, 249, 189, 0.6) 0%, rgba(255, 214, 186, 0.45) 45%, rgba(163, 220, 154, 0.35) 100%);
-  border: 1.5px solid rgba(163, 220, 154, 0.65);
-  box-shadow: 0 10px 30px -5px rgba(163, 220, 154, 0.22);
+  background: linear-gradient(135deg, rgba(242, 239, 231, 0.95) 0%, rgba(200, 223, 219, 0.55) 50%, rgba(102, 163, 191, 0.22) 100%);
+  border: 1.5px solid rgba(102, 163, 191, 0.5);
+  box-shadow: 0 10px 30px -5px rgba(51, 104, 160, 0.12);
   padding: 32px 36px;
   color: #000000;
   overflow: hidden;
@@ -150,19 +150,19 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  background: var(--dcc-color-lime);
-  border: 1px solid #c8d46b;
+  background: var(--dcc-color-ice);
+  border: 1px solid var(--dcc-color-secondary);
   padding: 5px 12px;
   border-radius: 6px;
   font-size: 11.5px;
-  font-weight: 800;
+  font-weight: 900;
   color: #000000;
   margin-bottom: 12px;
 }
 
 [data-theme="dark"] .cockpit-salam-badge {
-  background: rgba(222, 231, 145, 0.2);
-  border-color: rgba(222, 231, 145, 0.4);
+  background: rgba(102, 163, 191, 0.2);
+  border-color: rgba(102, 163, 191, 0.4);
   color: #ffffff;
 }
 
@@ -204,7 +204,7 @@ body {
   font-size: 11.5px;
   font-weight: 800;
   background: var(--dcc-color-cream);
-  border: 1px solid var(--dcc-color-lime);
+  border: 1px solid var(--dcc-color-ice);
   padding: 6px 14px;
   border-radius: 6px;
   color: #000000;
@@ -214,8 +214,8 @@ body {
 }
 
 [data-theme="dark"] .cockpit-meta-chip {
-  background: rgba(255, 249, 189, 0.15);
-  border-color: rgba(222, 231, 145, 0.3);
+  background: rgba(200, 223, 219, 0.15);
+  border-color: rgba(102, 163, 191, 0.3);
   color: #ffffff;
 }
 
@@ -239,34 +239,34 @@ body {
 }
 
 .cockpit-action-btn.primary {
-  background: var(--dcc-color-mint);
-  color: #000000;
-  border: 1px solid #82cc77;
+  background: var(--dcc-color-primary);
+  color: #ffffff;
+  border: 1px solid #285483;
   font-weight: 900;
-  box-shadow: 0 3px 10px rgba(163, 220, 154, 0.35);
+  box-shadow: 0 3px 10px rgba(51, 104, 160, 0.3);
 }
 
 .cockpit-action-btn.primary:hover {
-  background: #90d486;
-  border-color: #72be66;
+  background: #2b5787;
+  border-color: #1f4268;
   transform: translateY(-1px);
 }
 
 [data-theme="dark"] .cockpit-action-btn.primary {
-  background: var(--dcc-color-mint);
-  border-color: #82cc77;
-  color: #000000;
+  background: var(--dcc-color-primary);
+  border-color: #285483;
+  color: #ffffff;
 }
 
 .cockpit-action-btn.secondary {
   background: #ffffff;
   color: #000000;
-  border: 1px solid var(--dcc-color-lime);
+  border: 1.5px solid var(--dcc-color-ice);
 }
 
 .cockpit-action-btn.secondary:hover {
   background: var(--dcc-color-cream);
-  border-color: var(--dcc-color-lime);
+  border-color: var(--dcc-color-secondary);
   color: #000000;
   transform: translateY(-1px);
 }
@@ -281,11 +281,11 @@ body {
 .cockpit-showcase-frame {
   border-radius: 12px;
   overflow: hidden;
-  border: 1.5px solid var(--dcc-color-mint);
+  border: 1.5px solid var(--dcc-color-secondary);
   aspect-ratio: 16 / 9;
   position: relative;
   background: #090e1a;
-  box-shadow: 0 6px 20px rgba(163, 220, 154, 0.28);
+  box-shadow: 0 6px 20px rgba(51, 104, 160, 0.2);
 }
 
 [data-theme="dark"] .cockpit-showcase-frame {
@@ -331,7 +331,7 @@ body {
   display: flex;
   align-items: flex-start;
   gap: 14px;
-  box-shadow: 0 2px 6px rgba(163, 220, 154, 0.08);
+  box-shadow: 0 2px 8px rgba(51, 104, 160, 0.05);
   transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
 }
 
@@ -353,40 +353,40 @@ body {
   font-weight: 700;
 }
 
-/* Card 1: SITUAN (Mint) */
+/* Card 1: SITUAN (#3368a0) */
 .dcc-stat-card:nth-child(1) .dcc-stat-icon {
-  background: rgba(163, 220, 154, 0.35);
-  border: 1.5px solid var(--dcc-color-mint);
+  background: rgba(51, 104, 160, 0.15);
+  border: 1.5px solid var(--dcc-color-primary);
 }
 .dcc-stat-card:nth-child(1):hover {
-  border-color: var(--dcc-color-mint);
+  border-color: var(--dcc-color-primary);
 }
 
-/* Card 2: SIRANI (Lime) */
+/* Card 2: SIRANI (#66a3bf) */
 .dcc-stat-card:nth-child(2) .dcc-stat-icon {
-  background: rgba(222, 231, 145, 0.35);
-  border: 1.5px solid var(--dcc-color-lime);
+  background: rgba(102, 163, 191, 0.2);
+  border: 1.5px solid var(--dcc-color-secondary);
 }
 .dcc-stat-card:nth-child(2):hover {
-  border-color: var(--dcc-color-lime);
+  border-color: var(--dcc-color-secondary);
 }
 
-/* Card 3: PPDB (Peach) */
+/* Card 3: PPDB (#c8dfdb) */
 .dcc-stat-card:nth-child(3) .dcc-stat-icon {
-  background: rgba(255, 214, 186, 0.45);
-  border: 1.5px solid var(--dcc-color-peach);
+  background: rgba(200, 223, 219, 0.5);
+  border: 1.5px solid #a6cfc8;
 }
 .dcc-stat-card:nth-child(3):hover {
-  border-color: var(--dcc-color-peach);
+  border-color: var(--dcc-color-secondary);
 }
 
-/* Card 4: HUMAS (Cream) */
+/* Card 4: HUMAS (#f2efe7) */
 .dcc-stat-card:nth-child(4) .dcc-stat-icon {
-  background: rgba(255, 249, 189, 0.7);
-  border: 1.5px solid var(--dcc-color-lime);
+  background: rgba(242, 239, 231, 0.9);
+  border: 1.5px solid var(--dcc-color-ice);
 }
 .dcc-stat-card:nth-child(4):hover {
-  border-color: var(--dcc-color-lime);
+  border-color: var(--dcc-color-ice);
 }
 
 .dcc-stat-body {
@@ -457,7 +457,7 @@ body {
   justify-content: center;
   font-size: 13px;
   background: var(--dcc-color-cream);
-  border: 1px solid var(--dcc-color-lime);
+  border: 1px solid var(--dcc-color-ice);
   color: #000000;
 }
 
@@ -467,7 +467,7 @@ body {
   padding: 4px 10px;
   border-radius: 6px;
   background: var(--dcc-color-cream);
-  border: 1px solid var(--dcc-color-lime);
+  border: 1px solid var(--dcc-color-ice);
   color: #000000;
 }
 
@@ -486,7 +486,7 @@ body {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  box-shadow: 0 2px 8px rgba(163, 220, 154, 0.08);
+  box-shadow: 0 2px 8px rgba(51, 104, 160, 0.05);
   transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
   position: relative;
 }
@@ -524,7 +524,7 @@ body {
   align-items: center;
   gap: 5px;
   background: var(--dcc-color-cream);
-  border: 1px solid var(--dcc-color-lime);
+  border: 1px solid var(--dcc-color-ice);
   color: #000000;
 }
 
@@ -539,18 +539,18 @@ body {
 }
 
 .access-badge.allowed {
-  background: rgba(163, 220, 154, 0.35);
-  border: 1px solid var(--dcc-color-mint);
+  background: rgba(200, 223, 219, 0.6);
+  border: 1px solid var(--dcc-color-secondary);
 }
 
 .access-badge.locked {
-  background: rgba(255, 214, 186, 0.4);
-  border: 1px solid var(--dcc-color-peach);
+  background: rgba(242, 239, 231, 0.75);
+  border: 1px solid #cbd5e1;
 }
 
 .module-card.is-locked {
   opacity: 0.8;
-  background: rgba(255, 249, 189, 0.12);
+  background: rgba(242, 239, 231, 0.3);
   border-style: dashed;
 }
 
@@ -628,92 +628,92 @@ body {
 
 /* ─── Distinct Module Theme Styling ─── */
 
-/* 1. SITUAN — Theme: Mint (#A3DC9A) */
+/* 1. SITUAN — Theme: Deep Blue (#3368a0) */
 .card-situan .module-card-icon-halo {
-  background: rgba(163, 220, 154, 0.35);
-  border: 1.5px solid var(--dcc-color-mint);
+  background: rgba(51, 104, 160, 0.15);
+  border: 1.5px solid var(--dcc-color-primary);
 }
 .card-situan .kpi-row {
-  background: rgba(163, 220, 154, 0.14);
-  border: 1px solid rgba(163, 220, 154, 0.45);
+  background: rgba(200, 223, 219, 0.35);
+  border: 1px solid rgba(102, 163, 191, 0.35);
 }
 .card-situan:hover {
-  border-color: var(--dcc-color-mint);
+  border-color: var(--dcc-color-primary);
 }
 .card-situan .btn-launch-primary {
-  background: var(--dcc-color-mint);
-  border: 1.5px solid #82cc77;
-  color: #000000 !important;
+  background: var(--dcc-color-primary);
+  border: 1.5px solid #285483;
+  color: #ffffff !important;
 }
 .card-situan .btn-launch-primary:hover {
-  background: #92d388;
-  border-color: #6dbb62;
+  background: #295687;
+  border-color: #1f4268;
 }
 
-/* 2. SIRANI — Theme: Lime (#DEE791) */
+/* 2. SIRANI — Theme: Slate Blue (#66a3bf) */
 .card-sirani .module-card-icon-halo {
-  background: rgba(222, 231, 145, 0.35);
-  border: 1.5px solid var(--dcc-color-lime);
+  background: rgba(102, 163, 191, 0.2);
+  border: 1.5px solid var(--dcc-color-secondary);
 }
 .card-sirani .kpi-row {
-  background: rgba(222, 231, 145, 0.16);
-  border: 1px solid rgba(222, 231, 145, 0.45);
+  background: rgba(242, 239, 231, 0.65);
+  border: 1px solid rgba(200, 223, 219, 0.6);
 }
 .card-sirani:hover {
-  border-color: var(--dcc-color-lime);
+  border-color: var(--dcc-color-secondary);
 }
 .card-sirani .btn-launch-primary {
-  background: var(--dcc-color-lime);
-  border: 1.5px solid #c9d56c;
-  color: #000000 !important;
+  background: var(--dcc-color-secondary);
+  border: 1.5px solid #528ea9;
+  color: #ffffff !important;
 }
 .card-sirani .btn-launch-primary:hover {
-  background: #d3de7c;
-  border-color: #b8c558;
+  background: #5793ae;
+  border-color: #447c96;
 }
 
-/* 3. PPDB ONLINE 2026 — Theme: Peach (#FFD6BA) */
+/* 3. PPDB ONLINE 2026 — Theme: Seafoam (#c8dfdb) */
 .card-ppdb .module-card-icon-halo {
-  background: rgba(255, 214, 186, 0.45);
-  border: 1.5px solid var(--dcc-color-peach);
+  background: rgba(200, 223, 219, 0.5);
+  border: 1.5px solid #a6cfc8;
 }
 .card-ppdb .kpi-row {
-  background: rgba(255, 214, 186, 0.2);
-  border: 1px solid rgba(255, 214, 186, 0.55);
+  background: rgba(200, 223, 219, 0.3);
+  border: 1px solid rgba(102, 163, 191, 0.3);
 }
 .card-ppdb:hover {
-  border-color: var(--dcc-color-peach);
+  border-color: var(--dcc-color-secondary);
 }
 .card-ppdb .btn-launch-primary {
-  background: var(--dcc-color-peach);
-  border: 1.5px solid #f6be9d;
+  background: var(--dcc-color-ice);
+  border: 1.5px solid #a6cfc8;
   color: #000000 !important;
 }
 .card-ppdb .btn-launch-primary:hover {
-  background: #ffc8a6;
-  border-color: #efa77f;
+  background: #b8d7d2;
+  border-color: #97c2bb;
 }
 
-/* 4. WEB PROFIL & HUMAS — Theme: Cream (#FFF9BD) */
+/* 4. WEB PROFIL & HUMAS — Theme: Warm Sand (#f2efe7) */
 .card-web .module-card-icon-halo {
-  background: rgba(255, 249, 189, 0.7);
-  border: 1.5px solid var(--dcc-color-lime);
+  background: rgba(242, 239, 231, 0.85);
+  border: 1.5px solid var(--dcc-color-ice);
 }
 .card-web .kpi-row {
-  background: rgba(255, 249, 189, 0.35);
-  border: 1px solid rgba(222, 231, 145, 0.45);
+  background: rgba(242, 239, 231, 0.65);
+  border: 1px solid rgba(200, 223, 219, 0.6);
 }
 .card-web:hover {
-  border-color: var(--dcc-color-lime);
+  border-color: var(--dcc-color-primary);
 }
 .card-web .btn-launch-primary {
   background: var(--dcc-color-cream);
-  border: 1.5px solid var(--dcc-color-lime);
+  border: 1.5px solid var(--dcc-color-ice);
   color: #000000 !important;
 }
 .card-web .btn-launch-primary:hover {
-  background: #fdf5a7;
-  border-color: #b8c558;
+  background: #e7e3d8;
+  border-color: #97c2bb;
 }
 
 /* Actions Deck */
@@ -760,14 +760,14 @@ body {
   font-weight: 800;
   text-decoration: none;
   background: #ffffff;
-  border: 1px solid var(--dcc-color-lime);
+  border: 1.5px solid var(--dcc-color-ice);
   color: #000000 !important;
   transition: all 0.15s ease;
 }
 
 .btn-launch-secondary:hover {
   background: var(--dcc-color-cream);
-  border-color: var(--dcc-color-mint);
+  border-color: var(--dcc-color-secondary);
   color: #000000 !important;
 }
 
@@ -790,7 +790,7 @@ body {
 }
 
 .roadmap-card:hover {
-  border-color: var(--dcc-color-mint);
+  border-color: var(--dcc-color-primary);
   transform: translateY(-2px);
   box-shadow: var(--dcc-card-hover);
 }
@@ -816,24 +816,24 @@ body {
 
 /* Roadmap card halos alternating across the palette */
 .roadmap-card:nth-child(1) .roadmap-icon-wrap {
-  background: rgba(163, 220, 154, 0.35);
-  border: 1.5px solid var(--dcc-color-mint);
+  background: rgba(51, 104, 160, 0.15);
+  border: 1.5px solid var(--dcc-color-primary);
 }
 .roadmap-card:nth-child(2) .roadmap-icon-wrap {
-  background: rgba(222, 231, 145, 0.35);
-  border: 1.5px solid var(--dcc-color-lime);
+  background: rgba(102, 163, 191, 0.2);
+  border: 1.5px solid var(--dcc-color-secondary);
 }
 .roadmap-card:nth-child(3) .roadmap-icon-wrap {
-  background: rgba(255, 214, 186, 0.45);
-  border: 1.5px solid var(--dcc-color-peach);
+  background: rgba(200, 223, 219, 0.5);
+  border: 1.5px solid #a6cfc8;
 }
 .roadmap-card:nth-child(4) .roadmap-icon-wrap {
-  background: rgba(255, 249, 189, 0.7);
-  border: 1.5px solid var(--dcc-color-lime);
+  background: rgba(242, 239, 231, 0.9);
+  border: 1.5px solid var(--dcc-color-ice);
 }
 .roadmap-card:nth-child(5) .roadmap-icon-wrap {
-  background: rgba(163, 220, 154, 0.35);
-  border: 1.5px solid var(--dcc-color-mint);
+  background: rgba(51, 104, 160, 0.15);
+  border: 1.5px solid var(--dcc-color-primary);
 }
 
 .roadmap-badge {
@@ -844,7 +844,7 @@ body {
   border-radius: 6px;
   background: var(--dcc-color-cream);
   color: #000000;
-  border: 1px solid var(--dcc-color-lime);
+  border: 1px solid var(--dcc-color-ice);
 }
 
 .roadmap-title {
@@ -880,24 +880,24 @@ body {
   width: 100%;
   height: 4px;
   border-radius: 2px;
-  background: rgba(222, 231, 145, 0.35);
+  background: rgba(200, 223, 219, 0.45);
   overflow: hidden;
 }
 
 .roadmap-progress-fill {
   height: 100%;
   border-radius: 2px;
-  background: linear-gradient(90deg, var(--dcc-color-mint) 0%, var(--dcc-color-lime) 100%);
+  background: linear-gradient(90deg, var(--dcc-color-primary) 0%, var(--dcc-color-secondary) 100%);
 }
 
 .roadmap-lead {
   font-size: 10px;
   font-weight: 800;
   color: #000000;
-  background: rgba(255, 249, 189, 0.5);
+  background: rgba(242, 239, 231, 0.7);
   padding: 5px 8px;
   border-radius: 6px;
-  border: 1px solid rgba(222, 231, 145, 0.5);
+  border: 1px solid var(--dcc-color-ice);
   display: flex;
   align-items: center;
   gap: 5px;
@@ -906,7 +906,7 @@ body {
 /* ─── Bottom Console Strip ─── */
 .system-strip {
   margin-top: 32px;
-  background: linear-gradient(135deg, rgba(255, 249, 189, 0.45) 0%, rgba(255, 214, 186, 0.35) 50%, rgba(163, 220, 154, 0.25) 100%);
+  background: linear-gradient(135deg, rgba(242, 239, 231, 0.9) 0%, rgba(200, 223, 219, 0.5) 50%, rgba(102, 163, 191, 0.25) 100%);
   border: 1.5px solid var(--dcc-card-border);
   border-radius: 14px;
   padding: 14px 20px;
@@ -947,15 +947,15 @@ body {
   padding: 5px 12px;
   border-radius: 6px;
   background: #ffffff;
-  border: 1.5px solid var(--dcc-color-lime);
+  border: 1.5px solid var(--dcc-color-ice);
   transition: all 0.15s ease;
   display: inline-flex;
   align-items: center;
 }
 
 .system-strip-link:hover {
-  background: var(--dcc-color-mint);
-  border-color: #82cc77;
+  background: var(--dcc-color-cream);
+  border-color: var(--dcc-color-secondary);
   color: #000000 !important;
 }
 
