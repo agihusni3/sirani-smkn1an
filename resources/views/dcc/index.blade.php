@@ -66,44 +66,6 @@
       </div>
     </div>
 
-    {{-- Minimalist Quick Telemetry Bar --}}
-    <div class="dcc-stat-strip">
-      <div class="dcc-stat-card">
-        <div class="dcc-stat-icon"><i class="bi bi-buildings"></i></div>
-        <div class="dcc-stat-body">
-          <div class="dcc-stat-label">SITUAN · DATA POKOK</div>
-          <div class="dcc-stat-val">{{ number_format($totalSiswa) }} <span class="dcc-stat-unit">Siswa</span></div>
-          <div class="dcc-stat-sub">{{ $totalGuru }} PTK Aktif · {{ $totalRombel }} Rombel</div>
-        </div>
-      </div>
-
-      <div class="dcc-stat-card">
-        <div class="dcc-stat-icon"><i class="bi bi-fingerprint"></i></div>
-        <div class="dcc-stat-body">
-          <div class="dcc-stat-label">SIRANI · PRESENSI HARI INI</div>
-          <div class="dcc-stat-val">{{ $persenSiswaHadir }}% <span class="dcc-stat-unit">Kehadiran</span></div>
-          <div class="dcc-stat-sub">{{ $siswaHadirToday }} Siswa Hadir · Gerbang {{ $isGerbangAktif ? 'Buka' : 'Tutup' }}</div>
-        </div>
-      </div>
-
-      <div class="dcc-stat-card">
-        <div class="dcc-stat-icon"><i class="bi bi-person-plus"></i></div>
-        <div class="dcc-stat-body">
-          <div class="dcc-stat-label">PPDB 2026 · PENDAFTARAN</div>
-          <div class="dcc-stat-val">{{ number_format($totalPendaftar) }} <span class="dcc-stat-unit">Calon</span></div>
-          <div class="dcc-stat-sub">{{ $ppdbMenunggu }} Menunggu · {{ $ppdbDiterima }} Diterima</div>
-        </div>
-      </div>
-
-      <div class="dcc-stat-card">
-        <div class="dcc-stat-icon"><i class="bi bi-globe2"></i></div>
-        <div class="dcc-stat-body">
-          <div class="dcc-stat-label">HUMAS · PUBLIKASI</div>
-          <div class="dcc-stat-val">{{ $totalBerita }} <span class="dcc-stat-unit">Rilis</span></div>
-          <div class="dcc-stat-sub">{{ $totalBannerAktif }} Banner Aktif Beranda</div>
-        </div>
-      </div>
-    </div>
 
     {{-- Section 1: Modul Operasional Aktif --}}
     <div class="portal-section-head" id="modul-aktif">
