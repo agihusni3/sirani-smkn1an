@@ -3,12 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Master Data Siswa — SMKN 1 Air Naningan</title>
+  <title>Master Data Siswa — SITUAN SMKN 1 Air Naningan</title>
   @include('partials.styles')
+  <link rel="stylesheet" href="{{ asset('css/situan-app.css') }}?v={{ filemtime(public_path('css/situan-app.css')) }}">
   <link rel="stylesheet" href="{{ asset('css/siswa.css') }}?v={{ filemtime(public_path('css/siswa.css')) }}">
 </head>
-<body>
-<div class="app-container">
+<body class="situan-body">
+<div class="situan-layout">
   @php
     $currentUser = auth()->user();
     $isAdmin = $currentUser && $currentUser->isAdmin();
@@ -24,82 +25,96 @@
     @include('partials.sidebar_situan')
   @endif
 
-  <main class="main-content">
-    
-    {{-- ULTRA COMPACT SLIM HEADER BAR --}}
-    <div class="panel no-print" style="background:var(--bg-2); border:1px solid var(--border); padding:10px 16px; margin-bottom:12px; border-radius:var(--r-md); box-shadow:var(--shadow-sm);">
-      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
-        <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-          <h1 style="margin:0; font-size:16px; font-weight:900; color:var(--text); display:inline-flex; align-items:center; gap:6px;">
-            <i class="bi bi-people-fill" style="color:#000000; font-size:16px;"></i> Data Siswa &amp; Alumni
-          </h1>
-          <span style="color:var(--border-2); font-weight:300;">|</span>
-          <span style="font-size:11.5px; color:var(--text-3);">
-            @if(!empty($isWaliOnly) && $waliRombel)
-              Rombel Binaan: <strong style="color:#000000;">{{ $waliRombel->nama_rombel }}</strong>
-            @else
-              Total: <strong style="color:#000000;">{{ $statTotal }}</strong> Siswa Aktif
-            @endif
-          </span>
+  <main class="situan-main">
+    {{-- Topbar Breadcrumbs --}}
+    <div class="situan-topbar no-print">
+      <div class="situan-breadcrumb">
+        <a href="{{ route('admin.portal') }}"><i class="bi bi-command"></i> DCC</a>
+        <span class="sep">/</span>
+        <a href="{{ route('situan.index') }}">SITUAN</a>
+        <span class="sep">/</span>
+        <span style="color:#0284c7; font-weight:800;">Data Siswa &amp; Alumni</span>
+      </div>
+      <div class="situan-topbar-actions">
+        <a href="{{ route('situan.index') }}" class="btn-situan btn-situan-outline" style="height:32px; font-size:11px;">
+          <i class="bi bi-speedometer2"></i> Dasbor SITUAN
+        </a>
+      </div>
+    </div>
+
+    <div class="situan-content">
+      {{-- SITUAN MODERN PAGE HEADER --}}
+      <div class="situan-page-header no-print">
+        <div class="situan-page-title-wrap">
+          <div class="situan-page-icon">
+            <i class="bi bi-people-fill"></i>
+          </div>
+          <div>
+            <h1 class="situan-page-title">Data Siswa &amp; Alumni</h1>
+            <div class="situan-page-subtitle">
+              @if(!empty($isWaliOnly) && $waliRombel)
+                Rombel Binaan: <strong style="color:#000000;">{{ $waliRombel->nama_rombel }}</strong> · 
+              @endif
+              Pangkalan Data Pokok Peserta Didik SMKN 1 Air Naningan · Total: <strong style="color:#000000;">{{ number_format($statTotal) }}</strong> Siswa Aktif
+            </div>
+          </div>
         </div>
 
-        <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+        <div class="situan-action-buttons">
           @if($canManageSiswa)
-            <button type="button" id="btnToggleTambahSiswa" onclick="toggleTambahSiswa()" class="btn btn-sm btn-gold" style="height:32px; padding:0 12px; font-size:11.5px; font-weight:800; display:inline-flex; align-items:center; gap:5px; border-radius:6px; cursor:pointer;">
+            <button type="button" id="btnToggleTambahSiswa" onclick="toggleTambahSiswa()" class="btn-situan btn-situan-primary">
               <i class="bi bi-person-plus-fill" id="iconToggleTambahSiswa"></i>
               <span id="textToggleTambahSiswa">Tambah Siswa</span>
             </button>
-            <button type="button" onclick="openModal('importModal')" class="btn btn-sm btn-outline" style="height:32px; padding:0 10px; font-size:11.5px; font-weight:800; color:#000000; border:1px solid var(--border-2); background:var(--bg-2); display:inline-flex; align-items:center; gap:4px; border-radius:6px;">
-              <i class="bi bi-file-earmark-arrow-up-fill" style="color:#000000;"></i> Import CSV
+            <button type="button" onclick="openModal('importModal')" class="btn-situan btn-situan-outline">
+              <i class="bi bi-file-earmark-arrow-up-fill"></i> Import CSV
             </button>
           @endif
-          <a href="/siswa/export" class="btn btn-sm btn-outline" style="height:32px; padding:0 10px; font-size:11.5px; font-weight:800; text-decoration:none; color:#000000; border:1px solid var(--border-2); background:var(--bg-2); display:inline-flex; align-items:center; gap:4px; border-radius:6px;" title="Unduh CSV Kompatibel Excel">
-            <i class="bi bi-file-earmark-excel-fill" style="color:#000000;"></i> Excel
+          <a href="/siswa/export" class="btn-situan btn-situan-outline" title="Unduh CSV Kompatibel Excel">
+            <i class="bi bi-file-earmark-excel-fill" style="color:#10b981;"></i> Excel
           </a>
-          <a href="/siswa/cetak-pdf{{ !empty($rombelId) ? '?rombel_id='.$rombelId : '' }}" id="btnTopCetakPdf" onclick="return handleTopCetakPdfClick(this, event)" target="_blank" class="btn btn-sm btn-outline" style="height:32px; padding:0 10px; font-size:11.5px; font-weight:800; text-decoration:none; color:#000000; border:1px solid var(--border-2); background:var(--bg-2); display:inline-flex; align-items:center; gap:4px; border-radius:6px;" title="Cetak Format A4 Kop Dinas">
-            <i class="bi bi-file-earmark-pdf-fill" style="color:#000000;"></i> PDF <span id="topSelectedBadge" style="display:none; background:#000000; color:#FFFFFF; border-radius:10px; padding:1px 6px; font-size:10px; font-family:var(--font-mono); margin-left:2px;">0</span>
+          <a href="/siswa/cetak-pdf{{ !empty($rombelId) ? '?rombel_id='.$rombelId : '' }}" id="btnTopCetakPdf" onclick="return handleTopCetakPdfClick(this, event)" target="_blank" class="btn-situan btn-situan-outline" title="Cetak Format A4 Kop Dinas">
+            <i class="bi bi-file-earmark-pdf-fill" style="color:#ef4444;"></i> PDF <span id="topSelectedBadge" style="display:none; background:#000000; color:#FFFFFF; border-radius:10px; padding:1px 6px; font-size:10px; font-family:monospace; margin-left:2px;">0</span>
           </a>
-          @include('partials.header_actions')
-        </div>
-      </div>
-    </div>
-
-    @if(session('success'))<div class="alert-success" style="margin-bottom:16px;"><i class="bi bi-check-circle-fill" style="margin-right:6px;"></i>{{ session('success') }}</div>@endif
-    @if(session('error'))<div class="alert-error" style="margin-bottom:16px;"><i class="bi bi-exclamation-triangle-fill" style="margin-right:6px;"></i>{{ session('error') }}</div>@endif
-    @if(isset($errors) && $errors->any())<div class="alert-error" style="margin-bottom:16px;">@foreach($errors->all() as $err)<div><i class="bi bi-x-circle-fill" style="margin-right:6px;"></i>{{ $err }}</div>@endforeach</div>@endif
-
-    {{-- KPI STAT CARDS --}}
-    <div class="siswa-stat-grid">
-      <div class="siswa-stat-card">
-        <div class="siswa-stat-icon" style="background:var(--bg-3); border:1px solid var(--border-2); color:#000000;">
-          <i class="bi bi-people-fill"></i>
-        </div>
-        <div>
-          <div class="siswa-stat-val">{{ $statTotal }}</div>
-          <div class="siswa-stat-lbl">Total Siswa Aktif</div>
         </div>
       </div>
 
-      <div class="siswa-stat-card">
-        <div class="siswa-stat-icon" style="background:var(--bg-3); border:1px solid var(--border-2); color:#000000;">
-          <i class="bi bi-mortarboard-fill"></i>
-        </div>
-        <div>
-          <div class="siswa-stat-val">{{ $statAlumni }}</div>
-          <div class="siswa-stat-lbl">Direktori Alumni / Lulus</div>
-        </div>
-      </div>
+      @if(session('success'))<div class="alert-success" style="margin-bottom:16px; border-radius:8px;"><i class="bi bi-check-circle-fill" style="margin-right:6px;"></i>{{ session('success') }}</div>@endif
+      @if(session('error'))<div class="alert-error" style="margin-bottom:16px; border-radius:8px;"><i class="bi bi-exclamation-triangle-fill" style="margin-right:6px;"></i>{{ session('error') }}</div>@endif
+      @if(isset($errors) && $errors->any())<div class="alert-error" style="margin-bottom:16px; border-radius:8px;">@foreach($errors->all() as $err)<div><i class="bi bi-x-circle-fill" style="margin-right:6px;"></i>{{ $err }}</div>@endforeach</div>@endif
 
-      <div class="siswa-stat-card">
-        <div class="siswa-stat-icon" style="background:var(--bg-3); border:1px solid var(--border-2); color:#000000;">
-          <i class="bi bi-briefcase-fill"></i>
+      {{-- SITUAN MODERN METRIC STRIP --}}
+      <div class="situan-metric-strip no-print">
+        <div class="situan-metric-card">
+          <div class="situan-metric-icon">
+            <i class="bi bi-people-fill"></i>
+          </div>
+          <div>
+            <div class="situan-metric-val">{{ number_format($statTotal) }}</div>
+            <div class="situan-metric-lbl">Total Siswa Aktif</div>
+          </div>
         </div>
-        <div>
-          <div class="siswa-stat-val">{{ $statPkl }}</div>
-          <div class="siswa-stat-lbl">Sedang Praktik Kerja (PKL)</div>
+
+        <div class="situan-metric-card">
+          <div class="situan-metric-icon" style="background:rgba(15,118,110,0.1); border-color:rgba(15,118,110,0.25); color:#0f766e;">
+            <i class="bi bi-mortarboard-fill"></i>
+          </div>
+          <div>
+            <div class="situan-metric-val">{{ number_format($statAlumni) }}</div>
+            <div class="situan-metric-lbl">Direktori Alumni / Lulus</div>
+          </div>
+        </div>
+
+        <div class="situan-metric-card">
+          <div class="situan-metric-icon" style="background:rgba(147,51,234,0.1); border-color:rgba(147,51,234,0.25); color:#7e22ce;">
+            <i class="bi bi-briefcase-fill"></i>
+          </div>
+          <div>
+            <div class="situan-metric-val">{{ number_format($statPkl) }}</div>
+            <div class="situan-metric-lbl">Sedang Praktik Kerja (PKL)</div>
+          </div>
         </div>
       </div>
-    </div>
 
     @if($canManageSiswa)
     <!-- Form Tambah Siswa (Collapsible / Triggered) -->
@@ -355,113 +370,108 @@
     </div>
     @endif
 
-    {{-- TAB NAV: AKTIF vs ALUMNI vs SEMUA --}}
-    <div class="tab-nav">
-      <a href="{{ route('siswa.index', array_merge(request()->except('tab', 'page'), ['tab' => 'aktif'])) }}" class="tab-btn {{ $tab === 'aktif' ? 'active' : '' }}">
-        <i class="bi bi-person-check-fill"></i> Peserta Didik Aktif <span style="color:#000000; font-size:12px; font-weight:800; margin-left:4px;">{{ $statTotal }}</span>
+    {{-- SITUAN MODERN TABS BAR --}}
+    <div class="situan-tabs-bar no-print">
+      <a href="{{ route('siswa.index', array_merge(request()->except('tab', 'page'), ['tab' => 'aktif'])) }}" class="situan-tab-item {{ $tab === 'aktif' ? 'active' : '' }}">
+        <i class="bi bi-person-check-fill"></i>
+        <span>Peserta Didik Aktif</span>
+        <span class="situan-tab-count">{{ $statTotal }}</span>
       </a>
-      <a href="{{ route('siswa.index', array_merge(request()->except('tab', 'page'), ['tab' => 'alumni'])) }}" class="tab-btn {{ $tab === 'alumni' ? 'active' : '' }}">
-        <i class="bi bi-mortarboard-fill"></i> Direktori Alumni / Lulusan <span style="color:#000000; font-size:12px; font-weight:800; margin-left:4px;">{{ $statAlumni }}</span>
+      <a href="{{ route('siswa.index', array_merge(request()->except('tab', 'page'), ['tab' => 'alumni'])) }}" class="situan-tab-item {{ $tab === 'alumni' ? 'active' : '' }}">
+        <i class="bi bi-mortarboard-fill"></i>
+        <span>Direktori Alumni / Lulusan</span>
+        <span class="situan-tab-count">{{ $statAlumni }}</span>
       </a>
-      <a href="{{ route('siswa.index', array_merge(request()->except('tab', 'page'), ['tab' => 'semua'])) }}" class="tab-btn {{ $tab === 'semua' ? 'active' : '' }}">
-        <i class="bi bi-collection-fill"></i> Semua Riwayat Siswa
+      <a href="{{ route('siswa.index', array_merge(request()->except('tab', 'page'), ['tab' => 'semua'])) }}" class="situan-tab-item {{ $tab === 'semua' ? 'active' : '' }}">
+        <i class="bi bi-collection-fill"></i>
+        <span>Semua Riwayat Siswa</span>
       </a>
     </div>
 
-    <!-- Tabel Daftar Siswa & Toolbar Terpadu -->
-    <div class="panel" style="padding:0; overflow:hidden; border:1px solid var(--border); border-radius:var(--r-md); box-shadow:var(--shadow-sm); background:var(--bg-2); margin-bottom:24px;">
-      
-      {{-- SELECTION ACTION BAR (MUNCUL DI ATAS CARI & ROMBEL KETIKA ADA PILIHAN) --}}
-      <div id="selectionHeaderBar" style="display:none; padding:10px 16px; background:#0F172A; color:#FFFFFF; border-bottom:1px solid rgba(255,255,255,0.1); justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
-        <div style="display:flex; align-items:center; gap:8px;">
-          <span style="background:#22C55E; color:#FFFFFF; border-radius:50%; width:22px; height:22px; display:inline-flex; align-items:center; justify-content:center; font-size:12px; font-weight:900;">
-            <i class="bi bi-check"></i>
-          </span>
-          <strong style="font-size:13px; font-weight:800;" id="selectedCountTextHeader">0 Siswa Dipilih</strong>
-          <span style="font-size:11.5px; color:#94A3B8;">— Siap untuk dicetak</span>
-        </div>
-        <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-          <button type="button" onclick="submitCetakPdfSelected()" class="btn btn-sm" style="background:#FFFFFF; color:#0F172A; font-weight:900; font-size:12px; height:32px; padding:0 14px; border-radius:6px; border:none; cursor:pointer; display:inline-flex; align-items:center; gap:6px; box-shadow:0 2px 8px rgba(255,255,255,0.2);">
-            <i class="bi bi-file-earmark-pdf-fill"></i> Cetak PDF Terpilih (<span class="selectedCountNum">0</span>)
-          </button>
-          <button type="button" onclick="submitCetakBarcodeSelected()" class="btn btn-sm" style="background:#2563EB; color:#FFFFFF; font-weight:900; font-size:12px; height:32px; padding:0 14px; border-radius:6px; border:none; cursor:pointer; display:inline-flex; align-items:center; gap:6px;">
-            <i class="bi bi-printer-fill"></i> Cetak Barcode Terpilih (<span class="selectedCountNum">0</span>)
-          </button>
-          <button type="button" onclick="clearAllSelections()" class="btn btn-sm btn-outline" style="height:32px; padding:0 10px; font-size:11.5px; font-weight:700; color:#E2E8F0; border-color:rgba(255,255,255,0.2); border-radius:6px; cursor:pointer; display:inline-flex; align-items:center; gap:4px;" title="Batalkan Pilihan">
-            <i class="bi bi-x-circle-fill"></i> Batal
-          </button>
-        </div>
+    {{-- SELECTION ACTION BAR (MUNCUL DI ATAS FILTER KETIKA ADA PILIHAN) --}}
+    <div id="selectionHeaderBar" style="display:none; padding:10px 16px; background:#0F172A; color:#FFFFFF; border-radius:8px; margin-bottom:14px; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; box-shadow:0 4px 14px rgba(15,23,42,0.15);">
+      <div style="display:flex; align-items:center; gap:8px;">
+        <span style="background:#22C55E; color:#FFFFFF; border-radius:50%; width:22px; height:22px; display:inline-flex; align-items:center; justify-content:center; font-size:12px; font-weight:900;">
+          <i class="bi bi-check"></i>
+        </span>
+        <strong style="font-size:13px; font-weight:800;" id="selectedCountTextHeader">0 Siswa Dipilih</strong>
+        <span style="font-size:11.5px; color:#94A3B8;">— Siap untuk dicetak</span>
+      </div>
+      <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+        <button type="button" onclick="submitCetakPdfSelected()" class="btn btn-sm" style="background:#FFFFFF; color:#0F172A; font-weight:900; font-size:12px; height:32px; padding:0 14px; border-radius:6px; border:none; cursor:pointer; display:inline-flex; align-items:center; gap:6px; box-shadow:0 2px 8px rgba(255,255,255,0.2);">
+          <i class="bi bi-file-earmark-pdf-fill"></i> Cetak PDF Terpilih (<span class="selectedCountNum">0</span>)
+        </button>
+        <button type="button" onclick="submitCetakBarcodeSelected()" class="btn btn-sm" style="background:#0284c7; color:#FFFFFF; font-weight:900; font-size:12px; height:32px; padding:0 14px; border-radius:6px; border:none; cursor:pointer; display:inline-flex; align-items:center; gap:6px;">
+          <i class="bi bi-printer-fill"></i> Cetak Barcode Terpilih (<span class="selectedCountNum">0</span>)
+        </button>
+        <button type="button" onclick="clearAllSelections()" class="btn btn-sm btn-outline" style="height:32px; padding:0 10px; font-size:11.5px; font-weight:700; color:#E2E8F0; border-color:rgba(255,255,255,0.2); border-radius:6px; cursor:pointer; display:inline-flex; align-items:center; gap:4px;" title="Batalkan Pilihan">
+          <i class="bi bi-x-circle-fill"></i> Batal
+        </button>
+      </div>
+    </div>
+
+    {{-- SITUAN MODERN FILTER & TOOLBAR --}}
+    <div class="situan-filter-panel no-print">
+      <div style="display:flex; align-items:center; gap:8px;">
+        <i class="bi bi-mortarboard-fill" style="color:#0284c7; font-size:16px;"></i>
+        <strong style="font-size:13.5px; color:#000000;">
+          Daftar Siswa @if($tab === 'alumni')<span style="font-size:11px; font-weight:600; color:#64748b;">(Alumni)</span>@endif
+        </strong>
       </div>
 
-      {{-- Header & Toolbar Terpadu --}}
-      <div class="siswa-table-toolbar" style="padding:8px 12px; border-bottom:1px solid var(--border); background:var(--surface); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
-        <div class="siswa-table-title" style="font-weight:800; font-size:13.5px; color:var(--text); display:flex; align-items:center; gap:6px;">
-          <i class="bi bi-mortarboard-fill" style="color:#000000;"></i>
-          <span>Daftar Peserta Didik
-            @if($tab === 'alumni')<span style="font-size:11px; font-weight:600; color:var(--text-3); margin-left:4px;">(Alumni)</span>@endif
-          </span>
+      <form method="GET" action="{{ route('siswa.index') }}" class="situan-filter-form">
+        <input type="hidden" name="tab" value="{{ $tab }}" />
+
+        <div class="situan-search-wrap">
+          <i class="bi bi-search"></i>
+          <input type="text" name="q" value="{{ $search }}" placeholder="Cari nama, NISN siswa..." class="situan-input-search" />
         </div>
 
-        <form method="GET" action="{{ route('siswa.index') }}" class="siswa-table-form" style="display:flex; gap:6px; align-items:center; flex-wrap:wrap; flex:1; justify-content:flex-end; max-width:720px;">
-          <input type="hidden" name="tab" value="{{ $tab }}" />
+        <select name="rombel_id" class="situan-select" onchange="this.form.submit()">
+          <option value="">Semua Rombel</option>
+          @foreach($rombels as $r)
+            <option value="{{ $r->id }}" {{ ($rombelId ?? '') == $r->id ? 'selected' : '' }}>
+              {{ $r->nama_rombel }}
+            </option>
+          @endforeach
+        </select>
 
-          <div class="siswa-search-box" style="position:relative; flex:1.5; min-width:130px;">
-            <i class="bi bi-search" style="position:absolute; left:10px; top:50%; transform:translateY(-50%); color:var(--text-3); font-size:11px;"></i>
-            <input type="text" name="q" value="{{ $search }}" placeholder="Cari nama, NISN..." class="input-field" style="width:100%; height:32px; font-size:11.5px; background:var(--bg-2); border:1px solid var(--border-2); border-radius:var(--r-sm); padding-left:28px; padding-right:8px;" />
-          </div>
+        <select name="status" class="situan-select" onchange="this.form.submit()">
+          <option value="">Semua Status</option>
+          <option value="aktif" {{ ($status ?? '') === 'aktif' ? 'selected' : '' }}>Aktif</option>
+          <option value="lulus" {{ ($status ?? '') === 'lulus' ? 'selected' : '' }}>Lulus</option>
+          <option value="pindah" {{ ($status ?? '') === 'pindah' ? 'selected' : '' }}>Pindah</option>
+          <option value="keluar" {{ ($status ?? '') === 'keluar' ? 'selected' : '' }}>Keluar/DO</option>
+        </select>
 
-          <div class="siswa-filter-group" style="display:flex; gap:6px; align-items:center; flex-wrap:wrap;">
-            <div style="min-width:110px; flex:1;">
-              <select name="rombel_id" class="input-field" style="width:100%; height:32px; font-size:11.5px; background:var(--bg-2); border:1px solid var(--border-2); border-radius:var(--r-sm); padding:0 6px;" onchange="this.form.submit()">
-                <option value="">Semua Rombel</option>
-                @foreach($rombels as $r)
-                  <option value="{{ $r->id }}" {{ ($rombelId ?? '') == $r->id ? 'selected' : '' }}>
-                    {{ $r->nama_rombel }}
-                  </option>
-                @endforeach
-              </select>
-            </div>
+        <select name="sort" class="situan-select" onchange="this.form.submit()" title="Urutkan Data Siswa">
+          <option value="nama_asc" {{ ($sort ?? '') === 'nama_asc' ? 'selected' : '' }}>Nama (A - Z)</option>
+          <option value="nama_desc" {{ ($sort ?? '') === 'nama_desc' ? 'selected' : '' }}>Nama (Z - A)</option>
+          <option value="terbaru" {{ in_array($sort ?? '', ['terbaru', 'terakhir_input', 'created_desc']) ? 'selected' : '' }}>Terbaru</option>
+          <option value="terlama" {{ in_array($sort ?? '', ['terlama', 'created_asc']) ? 'selected' : '' }}>Terlama</option>
+          <option value="nisn_asc" {{ ($sort ?? '') === 'nisn_asc' ? 'selected' : '' }}>NISN (Naik)</option>
+        </select>
 
-            <div style="min-width:95px; flex:1;">
-              <select name="status" class="input-field" style="width:100%; height:32px; font-size:11.5px; background:var(--bg-2); border:1px solid var(--border-2); border-radius:var(--r-sm); padding:0 6px;" onchange="this.form.submit()">
-                <option value="">Status</option>
-                <option value="aktif" {{ ($status ?? '') === 'aktif' ? 'selected' : '' }}>Aktif</option>
-                <option value="lulus" {{ ($status ?? '') === 'lulus' ? 'selected' : '' }}>Lulus</option>
-                <option value="pindah" {{ ($status ?? '') === 'pindah' ? 'selected' : '' }}>Pindah</option>
-                <option value="keluar" {{ ($status ?? '') === 'keluar' ? 'selected' : '' }}>Keluar/DO</option>
-              </select>
-            </div>
+        <button type="submit" class="btn-situan btn-situan-outline" style="height:36px; padding:0 12px;">
+          Cari
+        </button>
 
-            {{-- Dropdown Urutan / Sort By --}}
-            <div style="min-width:130px; flex:1;">
-              <select name="sort" class="input-field" style="width:100%; height:32px; font-size:11.5px; background:var(--bg-2); border:1px solid var(--border-2); border-radius:var(--r-sm); padding:0 6px; font-weight:700;" onchange="this.form.submit()" title="Urutkan Data Siswa">
-                <option value="nama_asc" {{ ($sort ?? '') === 'nama_asc' ? 'selected' : '' }}>Nama (A - Z)</option>
-                <option value="nama_desc" {{ ($sort ?? '') === 'nama_desc' ? 'selected' : '' }}>Nama (Z - A)</option>
-                <option value="terbaru" {{ in_array($sort ?? '', ['terbaru', 'terakhir_input', 'created_desc']) ? 'selected' : '' }}>Terakhir Diinput (Terbaru)</option>
-                <option value="terlama" {{ in_array($sort ?? '', ['terlama', 'created_asc']) ? 'selected' : '' }}>Pertama Diinput (Terlama)</option>
-                <option value="nisn_asc" {{ ($sort ?? '') === 'nisn_asc' ? 'selected' : '' }}>NISN (Urut Naik)</option>
-              </select>
-            </div>
+        @if($search || !empty($rombelId) || !empty($status) || (!empty($sort) && $sort !== 'nama_asc'))
+          <a href="{{ route('siswa.index', ['tab' => $tab]) }}" class="btn-situan btn-situan-outline" style="height:36px; padding:0 10px; color:#ef4444 !important; border-color:rgba(239,68,68,0.4);" title="Reset Filter &amp; Urutan">
+            Reset
+          </a>
+        @endif
+      </form>
+    </div>
 
-            <button type="submit" class="btn btn-sm btn-outline" style="height:32px; padding:0 10px; font-size:11.5px; font-weight:800; border-radius:var(--r-sm); flex-shrink:0;">
-              Cari
-            </button>
-
-            @if($search || !empty($rombelId) || !empty($status) || (!empty($sort) && $sort !== 'nama_asc'))
-              <a href="{{ route('siswa.index', ['tab' => $tab]) }}" class="btn btn-sm btn-outline" style="height:32px; padding:0 8px; font-size:11px; font-weight:800; color:var(--red); border-color:rgba(239,68,68,0.4); border-radius:var(--r-sm); flex-shrink:0;" title="Reset Filter &amp; Urutan">
-                Reset
-              </a>
-            @endif
-          </div>
-        </form>
-      </div>
-
-      <div class="table-responsive" style="overflow-x:auto;">
-        <table class="data-table">
+    <!-- Tabel Daftar Siswa & Data Card SITUAN -->
+    <div class="situan-table-card" style="margin-bottom:24px;">
+      <div class="situan-table-wrap">
+        <table class="situan-table">
           <thead>
             <tr>
-              <th style="width:38px; text-align:center; padding:8px 6px; white-space:nowrap;">
-                <input type="checkbox" id="selectAllCheckbox" onchange="toggleSelectAll(this)" style="cursor:pointer; width:15px; height:15px; accent-color:#000000; vertical-align:middle;" title="Pilih Semua di Halaman Ini" />
+              <th style="width:38px; text-align:center; padding:10px 8px; white-space:nowrap;">
+                <input type="checkbox" id="selectAllCheckbox" onchange="toggleSelectAll(this)" style="cursor:pointer; width:15px; height:15px; accent-color:#0284c7; vertical-align:middle;" title="Pilih Semua di Halaman Ini" />
               </th>
               <th style="width:36px; text-align:center;">No</th>
               <th>Siswa</th>
@@ -625,11 +635,12 @@
 
       {{-- PAGINATION CONTROLS --}}
       @if($siswas->hasPages())
-        <div style="padding:14px 18px; border-top:1px solid var(--border); display:flex; justify-content:center;">
+        <div style="padding:14px 18px; border-top:1px solid var(--situan-border); display:flex; justify-content:center;">
           {{ $siswas->links() }}
         </div>
       @endif
     </div>
+    </div> <!-- close situan-content -->
   </main>
 </div>
 

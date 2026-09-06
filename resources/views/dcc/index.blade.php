@@ -50,29 +50,6 @@
         <p class="cockpit-desc">
           Pusat kendali ekosistem digital terpadu SMKN 1 Air Naningan. Akses data pokok kelembagaan, presensi gerbang, seleksi PPDB, dan publikasi institusi dalam satu sistem terintegrasi.
         </p>
-
-        <div class="cockpit-meta-row">
-          <div class="cockpit-meta-chip" id="portalLiveClock">
-            Memuat waktu sistem...
-          </div>
-          <div class="cockpit-meta-chip">
-            {{ auth()->user()?->role_display_name ?? 'Super Administrator' }}
-          </div>
-        </div>
-
-        <div class="cockpit-action-row">
-          <a href="#modul-aktif" class="cockpit-action-btn primary">
-            Buka Modul Sistem
-          </a>
-          <a href="{{ route('audit.index') }}" class="cockpit-action-btn secondary">
-            Audit Telemetri
-          </a>
-          @if($canAccessSirani)
-            <a href="{{ route('dashboard') }}" class="cockpit-action-btn secondary">
-              Presensi Gerbang
-            </a>
-          @endif
-        </div>
       </div>
 
       {{-- Right: Clean Framed Showcase Image --}}
@@ -139,16 +116,6 @@
           <div class="module-card-top">
             <div class="module-card-icon-halo">
               <i class="bi bi-buildings"></i>
-            </div>
-            <div style="display:flex; align-items:center; gap:6px;">
-              @if($canAccessSituan)
-                <span class="access-badge allowed">Izin Aktif</span>
-              @else
-                <span class="access-badge locked">Akses Terbatas</span>
-              @endif
-              <span class="module-live-pill">
-                <span class="pulse-dot"></span> Data Induk
-              </span>
             </div>
           </div>
 
