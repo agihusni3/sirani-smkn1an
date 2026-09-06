@@ -49,6 +49,22 @@ class PpdbPendaftar extends Model
         'berkas_kip',
         'berkas_sktm',
         'status',
+        'jadwal_tes_tanggal',
+        'jadwal_tes_sesi',
+        'jadwal_tes_ruang',
+        'nilai_tes_tertulis',
+        'catatan_tes_tertulis',
+        'nilai_wawancara_motivasi',
+        'nilai_wawancara_karakter',
+        'nilai_wawancara_kejuruan',
+        'nilai_wawancara_ortu',
+        'nilai_wawancara_total',
+        'catatan_wawancara',
+        'pewawancara_id',
+        'diwawancara_pada',
+        'nilai_akhir',
+        'peringkat_jurusan',
+        'rekomendasi_jurusan_id',
         'jurusan_diterima_id',
         'catatan_panitia',
         'diverifikasi_oleh',
@@ -58,10 +74,19 @@ class PpdbPendaftar extends Model
     ];
 
     protected $casts = [
-        'tanggal_lahir'      => 'date',
-        'nilai_rata_rata'    => 'decimal:2',
-        'diverifikasi_pada'  => 'datetime',
-        'dimutasi_pada'      => 'datetime',
+        'tanggal_lahir'            => 'date',
+        'jadwal_tes_tanggal'       => 'date',
+        'diwawancara_pada'         => 'datetime',
+        'nilai_rata_rata'          => 'decimal:2',
+        'nilai_tes_tertulis'       => 'decimal:2',
+        'nilai_wawancara_motivasi' => 'decimal:2',
+        'nilai_wawancara_karakter' => 'decimal:2',
+        'nilai_wawancara_kejuruan' => 'decimal:2',
+        'nilai_wawancara_ortu'     => 'decimal:2',
+        'nilai_wawancara_total'    => 'decimal:2',
+        'nilai_akhir'              => 'decimal:2',
+        'diverifikasi_pada'        => 'datetime',
+        'dimutasi_pada'            => 'datetime',
     ];
 
     public function jurusan1()
@@ -89,9 +114,65 @@ class PpdbPendaftar extends Model
         return $this->belongsTo(Jurusan::class, 'jurusan_diterima_id');
     }
 
+    public function pewawancara()
+    {
+        return $this->belongsTo(User::class, 'pewawancara_id');
+    }
+
+    public function rekomendasiJurusan()
+    {
+        return $this->belongsTo(Jurusan::class, 'rekomendasi_jurusan_id');
+    }
+
+    public function ujianPeserta()
+    {
+        return $this->hasOne(PpdbUjianPeserta::class, 'ppdb_pendaftar_id');
+    }
+
     public function siswa()
     {
         return $this->belongsTo(Siswa::class, 'siswa_id');
+    }
+
+    /**
+     * Hitung nilai wawancara dari 4 kriteria:
+     * 1. Motivasi & Minat: 25%
+     * 2. Karakter & Sikap: 25%
+     * 3. Uji Khusus Kejuruan / Bebas Buta Warna: 30%
+     * 4. Komitmen Orang Tua: 20%
+     */
+    public function hitungNilaiWawancara(): float
+    {
+        $m = (float) ($this->nilai_wawancara_motivasi ?: 0);
+        $k = (float) ($this->nilai_wawancara_karakter ?: 0);
+        $j = (float) ($this->nilai_wawancara_kejuruan ?: 0);
+        $o = (float) ($this->nilai_wawancara_ortu ?: 0);
+
+        $total = round((0.25 * $m) + (0.25 * $k) + (0.30 * $j) + (0.20 * $o), 2);
+        $this->nilai_wawancara_total = $total;
+        return $total;
+    }
+
+    /**
+     * Hitung skor akhir seleksi terbobot:
+     * - Nilai Rapor / Administrasi: 30%
+     * - Nilai Tes Tertulis (PG + Esai): 35%
+     * - Nilai Tes Wawancara: 35%
+     */
+    public function hitungNilaiAkhir(): float
+    {
+        $rapor = (float) ($this->nilai_rata_rata ?: 0);
+        $tertulis = (float) ($this->nilai_tes_tertulis ?: 0);
+        $wawancara = (float) ($this->nilai_wawancara_total ?: $this->hitungNilaiWawancara());
+
+        // Jika nilai rapor dalam skala 10 atau puluhan (misal 7.8 atau 78)
+        if ($rapor > 0 && $rapor <= 10) {
+            $rapor = $rapor * 10; // normalisasi ke skala 0-100
+        }
+
+        $akhir = round((0.30 * $rapor) + (0.35 * $tertulis) + (0.35 * $wawancara), 2);
+        $this->nilai_akhir = $akhir;
+        return $akhir;
     }
 
     /**

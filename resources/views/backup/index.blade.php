@@ -24,9 +24,9 @@
               <span class="sep">/</span>
               <a href="{{ route('situan.index') }}">SITUAN</a>
               <span class="sep">/</span>
-              <span style="color:#0284c7; font-weight:800;">Cadangan Database</span>
+              <span style="color:#0284c7; font-weight:800;">Backup Database</span>
             </div>
-            <h1 class="situan-page-title" style="margin-top:2px; font-size:20px;">Pencadangan &amp; Auto-Backup Database</h1>
+            <h1 class="situan-page-title" style="margin-top:2px; font-size:20px;">Pencadangan &amp; Backup Database</h1>
           </div>
         </div>
 
@@ -148,7 +148,7 @@
           </span>
         </div>
         <a href="{{ route('admin.backup.download') }}" class="btn btn-outline" style="height:36px; padding:0 14px; font-size:12.5px; font-weight:800; color:#000000; border:1.5px solid #000000; background:var(--surface); display:inline-flex; align-items:center; gap:6px; text-decoration:none;" title="Unduh snapshot database aktif saat ini">
-          <i class="bi bi-download" style="color:#000000;"></i> Unduh Database Saat Ini
+          <i class="bi bi-download" style="color:#000000;"></i> Unduh Cadangan Sekarang
         </a>
       </div>
 

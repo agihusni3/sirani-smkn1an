@@ -64,11 +64,19 @@
   <div class="nav-group">
     <div class="nav-label">Navigasi PPDB</div>
     
-    <a href="{{ route('admin.ppdb.index') }}" class="nav-item {{ (request()->is('admin/ppdb') && empty($statusQuery) && empty($jurusanQuery) && !request()->is('admin/ppdb/log*')) ? 'active' : '' }}">
+    <a href="{{ route('admin.ppdb.index') }}" class="nav-item {{ (request()->is('admin/ppdb') && empty($statusQuery) && empty($jurusanQuery) && !request()->is('admin/ppdb/log*') && !request()->is('admin/ppdb/seleksi*')) ? 'active' : '' }}">
       <div class="nav-left-part">
         <i class="bi bi-speedometer2 nav-icon" style="color:#d97706;"></i>
         <span class="nav-text">Dasbor &amp; Statistik</span>
       </div>
+    </a>
+
+    <a href="{{ route('admin.ppdb.seleksi') }}" class="nav-item {{ request()->is('admin/ppdb/seleksi*') ? 'active' : '' }}" title="Seleksi Ujian Tertulis CBT &amp; Wawancara PPDB">
+      <div class="nav-left-part">
+        <i class="bi bi-laptop nav-icon" style="color:#2563eb;"></i>
+        <span class="nav-text">Seleksi &amp; Ujian CBT</span>
+      </div>
+      <span class="nav-count-badge" style="background:#eff6ff; color:#2563eb; border-color:#bfdbfe; font-weight:800;">CBT</span>
     </a>
 
     <a href="{{ route('admin.ppdb.log') }}" class="nav-item {{ request()->is('admin/ppdb/log*') ? 'active' : '' }}" title="Riwayat Verifikasi &amp; Log Aktivitas Panitia PPDB">

@@ -31,6 +31,7 @@ use App\Http\Controllers\Web\BeritaWebController;
 use App\Http\Controllers\Web\EkosistemController;
 use App\Http\Controllers\Ppdb\PpdbDaftarController;
 use App\Http\Controllers\Ppdb\PpdbAdminController;
+use App\Http\Controllers\Ppdb\PpdbUjianController;
 use App\Http\Controllers\Admin\BeritaAdminController;
 use App\Http\Controllers\Admin\WebsiteBannerController;
 use App\Http\Controllers\Admin\WebsiteStatistikController;
@@ -38,9 +39,9 @@ use App\Http\Controllers\Admin\WebsiteStatistikController;
 // ══ 1. Website Resmi Publik SMKN 1 Air Naningan (Dilindungi Pelacak Kunjungan Otomatis) ══
 Route::middleware('track.visitor')->group(function () {
     Route::get('/', [BerandaController::class, 'index'])->name('web.beranda');
-    Route::get('/profil', [ProfilController::class, 'index'])->name('web.profil');
+    Route::get('/profil-sekolah', [ProfilController::class, 'index'])->name('web.profil');
     Route::get('/konsentrasi-keahlian', [JurusanController::class, 'index'])->name('web.jurusan.index');
-    Route::get('/konsentrasi-keahlian/{kode}', [JurusanController::class, 'show'])->name('web.jurusan.show');
+    Route::get('/konsentrasi-keahlian/{slug}', [JurusanController::class, 'show'])->name('web.jurusan.show');
     Route::get('/ekosistem', [EkosistemController::class, 'index'])->name('web.ekosistem.index');
     Route::get('/ekosistem/{slug}', [EkosistemController::class, 'show'])->name('web.ekosistem.show');
     Route::get('/kontak', [KontakController::class, 'index'])->name('web.kontak');
@@ -55,6 +56,13 @@ Route::middleware('track.visitor')->group(function () {
         Route::get('/sukses/{nomor}', [PpdbDaftarController::class, 'sukses'])->name('sukses');
         Route::get('/status', [PpdbDaftarController::class, 'status'])->name('status');
         Route::get('/cetak-kartu/{nomor}', [PpdbDaftarController::class, 'cetakKartu'])->name('cetak');
+
+        // CBT Tes Tertulis Online (Naskah PDF + Lembar Jawab ABC & Esai)
+        Route::get('/ujian/{nomor}', [PpdbUjianController::class, 'konfirmasi'])->name('ujian.konfirmasi');
+        Route::get('/ujian/{nomor}/kerjakan', [PpdbUjianController::class, 'kerjakan'])->name('ujian.kerjakan');
+        Route::post('/ujian/{nomor}/simpan-draft', [PpdbUjianController::class, 'simpanDraft'])->name('ujian.simpan_draft');
+        Route::post('/ujian/{nomor}/selesai', [PpdbUjianController::class, 'selesai'])->name('ujian.selesai');
+        Route::get('/ujian/{nomor}/selesai', [PpdbUjianController::class, 'halamanSelesai'])->name('ujian.selesai_view');
     });
 });
 
@@ -336,6 +344,15 @@ Route::middleware('auth')->group(function () {
         Route::middleware('role:admin,kepala_sekolah,panitia_ppdb,waka_kesiswaan')->group(function () {
             Route::get('/ppdb', [PpdbAdminController::class, 'index'])->name('ppdb.index');
             Route::get('/ppdb/log', [PpdbAdminController::class, 'log'])->name('ppdb.log');
+            
+            // Seleksi Ujian & Wawancara PPDB 2026
+            Route::get('/ppdb/seleksi', [PpdbAdminController::class, 'seleksi'])->name('ppdb.seleksi');
+            Route::post('/ppdb/seleksi/setting', [PpdbAdminController::class, 'simpanSettingUjian'])->name('ppdb.seleksi.setting');
+            Route::post('/ppdb/seleksi/jadwalkan', [PpdbAdminController::class, 'jadwalkanMassal'])->name('ppdb.seleksi.jadwalkan');
+            Route::post('/ppdb/seleksi/nilai-esai/{id}', [PpdbAdminController::class, 'simpanNilaiEsai'])->name('ppdb.seleksi.nilai_esai');
+            Route::post('/ppdb/seleksi/nilai-wawancara/{id}', [PpdbAdminController::class, 'simpanNilaiWawancara'])->name('ppdb.seleksi.nilai_wawancara');
+            Route::post('/ppdb/seleksi/kalkulasi', [PpdbAdminController::class, 'kalkulasiKelulusan'])->name('ppdb.seleksi.kalkulasi');
+
             Route::get('/ppdb/{id}', [PpdbAdminController::class, 'show'])->name('ppdb.show');
             Route::put('/ppdb/{id}/status', [PpdbAdminController::class, 'updateStatus'])->name('ppdb.update_status');
             Route::post('/ppdb/{id}/mutasi', [PpdbAdminController::class, 'mutasi'])->name('ppdb.mutasi');
