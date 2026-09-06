@@ -40,6 +40,7 @@
     <div class="cockpit-hero">
       <div class="cockpit-hero-left">
         <div class="cockpit-salam-badge">
+          <span class="pulse-dot"></span>
           <span>{{ $salam }} · SMKN 1 Air Naningan</span>
         </div>
 
@@ -52,11 +53,15 @@
         </p>
       </div>
 
-      {{-- Right: Clean Framed Showcase Image --}}
-      <div class="cockpit-showcase-frame">
-        <img src="/images/web/dcc_command_center_banner.jpg" alt="DCC SMKN 1 AN Command Center" class="cockpit-showcase-img" onerror="this.src='/images/web/hero_kampus.jpg';" />
-        <div class="cockpit-showcase-caption">
-          Smart Command Center · SMKN 1 Air Naningan
+      {{-- Right: Sleek Live Clock & Status Card --}}
+      <div class="cockpit-hero-right">
+        <div class="cockpit-status-card">
+          <div class="cockpit-status-top">
+            <span class="pulse-dot" style="background:#10b981;"></span>
+            <span>STATUS SERVER NORMAL</span>
+          </div>
+          <div id="portalLiveClock" class="cockpit-live-clock">--:--:-- WIB</div>
+          <div class="cockpit-status-sub">Digital Command Center · Online</div>
         </div>
       </div>
     </div>
@@ -413,32 +418,17 @@
     <div class="portal-roadmap-grid">
       @foreach($futureModules as $mod)
         <div class="roadmap-card">
-          <div>
-            <div class="roadmap-top">
-              <div class="roadmap-icon-wrap">
-                <i class="bi {{ $mod['icon'] }}"></i>
-              </div>
-              <span class="roadmap-badge">{{ $mod['badge'] }}</span>
+          <div class="roadmap-top">
+            <div class="roadmap-icon-wrap">
+              <i class="bi {{ $mod['icon'] }}"></i>
             </div>
-            <h4 class="roadmap-title">{{ $mod['name'] }}</h4>
-            <div class="roadmap-sub">{{ $mod['subtitle'] }}</div>
-            <p class="roadmap-desc">{{ $mod['description'] }}</p>
+            <span class="roadmap-badge">{{ $mod['badge'] }}</span>
           </div>
-          
-          <div>
-            <div class="roadmap-progress-wrap">
-              <div style="display:flex; justify-content:space-between; font-size:9.5px; font-weight:700; color:#000000; margin-bottom:4px;">
-                <span>Tahap Desain</span>
-                <span style="color:#000000; font-weight:800;">Fase 1</span>
-              </div>
-              <div class="roadmap-progress-bar">
-                <div class="roadmap-progress-fill" style="width: 35%;"></div>
-              </div>
-            </div>
-
-            <div class="roadmap-lead">
-              <span>PIC: {{ $mod['lead'] }}</span>
-            </div>
+          <h4 class="roadmap-title">{{ $mod['name'] }}</h4>
+          <div class="roadmap-sub">{{ $mod['subtitle'] }}</div>
+          <p class="roadmap-desc">{{ $mod['description'] }}</p>
+          <div class="roadmap-lead">
+            <span>PIC: {{ $mod['lead'] }}</span>
           </div>
         </div>
       @endforeach
