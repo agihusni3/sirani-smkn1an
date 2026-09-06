@@ -34,7 +34,7 @@
               <span class="sep">/</span>
               <span style="color:#0284c7; font-weight:800;">Siklus &amp; Buku Induk</span>
             </div>
-            <h1 class="situan-page-title" style="margin-top:2px; font-size:20px;">Siklus Akademik &amp; Transisi Siswa</h1>
+            <h1 class="situan-page-title" style="margin-top:2px; font-size:20px;">Siklus Akademik Siswa &amp; Buku Induk</h1>
           </div>
         </div>
 
@@ -114,7 +114,7 @@
         {{-- Tab Switcher --}}
         <div class="segmented-control">
           <button type="button" id="tabBtnMassal" class="segmented-btn active" onclick="switchTransisiTab('massal')" style="padding:4px 10px; font-size:11.5px;">
-            <i class="bi bi-collection-fill"></i> Aksi Massal
+            <i class="bi bi-collection-fill"></i> Aksi Massal per Kelas
           </button>
           <button type="button" id="tabBtnIndividu" class="segmented-btn" onclick="switchTransisiTab('individu')" style="padding:4px 10px; font-size:11.5px;">
             <i class="bi bi-person-fill"></i> Perorangan

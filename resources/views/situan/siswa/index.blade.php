@@ -416,9 +416,9 @@
 
     {{-- SITUAN MODERN FILTER & TOOLBAR --}}
     <div class="situan-filter-panel no-print">
-      <div style="display:flex; align-items:center; gap:8px;">
+      <div class="situan-filter-title">
         <i class="bi bi-mortarboard-fill" style="color:#0284c7; font-size:16px;"></i>
-        <strong style="font-size:13.5px; color:#000000;">
+        <strong style="font-size:13.5px; color:#000000; white-space:nowrap;">
           Daftar Siswa @if($tab === 'alumni')<span style="font-size:11px; font-weight:600; color:#64748b;">(Alumni)</span>@endif
         </strong>
       </div>
@@ -431,7 +431,7 @@
           <input type="text" name="q" value="{{ $search }}" placeholder="Cari nama, NISN siswa..." class="situan-input-search" />
         </div>
 
-        <select name="rombel_id" class="situan-select" onchange="this.form.submit()">
+        <select name="rombel_id" class="situan-select" style="min-width:140px;" onchange="this.form.submit()">
           <option value="">Semua Rombel</option>
           @foreach($rombels as $r)
             <option value="{{ $r->id }}" {{ ($rombelId ?? '') == $r->id ? 'selected' : '' }}>
@@ -440,7 +440,7 @@
           @endforeach
         </select>
 
-        <select name="status" class="situan-select" onchange="this.form.submit()">
+        <select name="status" class="situan-select" style="min-width:125px;" onchange="this.form.submit()">
           <option value="">Semua Status</option>
           <option value="aktif" {{ ($status ?? '') === 'aktif' ? 'selected' : '' }}>Aktif</option>
           <option value="lulus" {{ ($status ?? '') === 'lulus' ? 'selected' : '' }}>Lulus</option>
@@ -448,7 +448,7 @@
           <option value="keluar" {{ ($status ?? '') === 'keluar' ? 'selected' : '' }}>Keluar/DO</option>
         </select>
 
-        <select name="sort" class="situan-select" onchange="this.form.submit()" title="Urutkan Data Siswa">
+        <select name="sort" class="situan-select" style="min-width:130px;" onchange="this.form.submit()" title="Urutkan Data Siswa">
           <option value="nama_asc" {{ ($sort ?? '') === 'nama_asc' ? 'selected' : '' }}>Nama (A - Z)</option>
           <option value="nama_desc" {{ ($sort ?? '') === 'nama_desc' ? 'selected' : '' }}>Nama (Z - A)</option>
           <option value="terbaru" {{ in_array($sort ?? '', ['terbaru', 'terakhir_input', 'created_desc']) ? 'selected' : '' }}>Terbaru</option>
@@ -456,13 +456,13 @@
           <option value="nisn_asc" {{ ($sort ?? '') === 'nisn_asc' ? 'selected' : '' }}>NISN (Naik)</option>
         </select>
 
-        <button type="submit" class="btn-situan btn-situan-outline" style="height:36px; padding:0 12px;">
-          Cari
+        <button type="submit" class="btn-situan btn-situan-outline" style="height:36px; padding:0 14px; white-space:nowrap; flex-shrink:0;">
+          <i class="bi bi-funnel"></i> Cari
         </button>
 
         @if($search || !empty($rombelId) || !empty($status) || (!empty($sort) && $sort !== 'nama_asc'))
-          <a href="{{ route('siswa.index', ['tab' => $tab]) }}" class="btn-situan btn-situan-outline" style="height:36px; padding:0 10px; color:#ef4444 !important; border-color:rgba(239,68,68,0.4);" title="Reset Filter &amp; Urutan">
-            Reset
+          <a href="{{ route('siswa.index', ['tab' => $tab]) }}" class="btn-situan btn-situan-outline" style="height:36px; padding:0 12px; color:#ef4444 !important; border-color:rgba(239,68,68,0.4); white-space:nowrap; flex-shrink:0;" title="Reset Filter &amp; Urutan">
+            <i class="bi bi-x-circle"></i> Reset
           </a>
         @endif
       </form>
