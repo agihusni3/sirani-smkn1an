@@ -113,6 +113,14 @@ class PortalOrtuController extends Controller
                     ->with('rombel.waliKelas', 'rombel.jurusan')
                     ->first();
 
+                // Fallback untuk alumni atau siswa transisi: ambil riwayat rombel terakhir yang diduduki
+                if (!$siswaRombel) {
+                    $siswaRombel = $siswa->siswaRombels()
+                        ->with('rombel.waliKelas', 'rombel.jurusan')
+                        ->latest('id')
+                        ->first();
+                }
+
                 $rombel = $siswaRombel?->rombel;
                 $waliKelas = $rombel?->waliKelas;
 

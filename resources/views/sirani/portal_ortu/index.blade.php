@@ -196,7 +196,7 @@
                 </div>
                 <span>SMK NEGERI 1 AIR NANINGAN</span>
               </div>
-              <div class="card-siswa-emerald-badge">SISWA</div>
+              <div class="card-siswa-emerald-badge">{{ $siswa->status === 'lulus' ? 'ALUMNI' : 'SISWA' }}</div>
             </div>
             <div class="card-siswa-emerald-body">
               <div class="card-siswa-emerald-avatar">
@@ -209,7 +209,13 @@
               <div class="card-siswa-emerald-info">
                 <div class="card-siswa-emerald-name">{{ $siswa->nama }}</div>
                 <div class="card-siswa-emerald-nisn">NISN: {{ $siswa->nisn ?: $siswa->nis }}</div>
-                <div class="card-siswa-emerald-kelas">{{ $rombel->nama_rombel ?? 'X' }} - {{ $rombel->jurusan->nama_jurusan ?? 'Semua Jurusan' }}</div>
+                <div class="card-siswa-emerald-kelas">
+                  @if($siswa->status === 'lulus')
+                    Alumni · {{ $rombel->nama_rombel ?? 'Lulusan' }} ({{ $rombel->jurusan->nama_jurusan ?? 'Semua Jurusan' }})
+                  @else
+                    {{ $rombel->nama_rombel ?? 'X' }} - {{ $rombel->jurusan->nama_jurusan ?? 'Semua Jurusan' }}
+                  @endif
+                </div>
               </div>
             </div>
           </div>
@@ -279,14 +285,28 @@
                 </div>
                 <div class="student-meta-tags">
                   <span class="tag-pill">
-                    <i class="bi bi-building"></i> Kelas {{ $rombel->nama_rombel ?? 'Belum Ada Rombel' }}
+                    <i class="bi bi-building"></i> {{ $siswa->status === 'lulus' ? 'Kelas Terakhir: ' : 'Kelas ' }}{{ $rombel->nama_rombel ?? 'Belum Ada Rombel' }}
                   </span>
-                  <span class="tag-pill">
-                    <i class="bi bi-book-half"></i> {{ $rombel->jurusan->nama_jurusan ?? '-' }}
-                  </span>
-                  @if($siswa->status === 'pkl')
+                  @if($rombel && $rombel->jurusan)
+                    <span class="tag-pill">
+                      <i class="bi bi-book-half"></i> {{ $rombel->jurusan->nama_jurusan }}
+                    </span>
+                  @endif
+                  @if($siswa->status === 'lulus')
+                    <span class="tag-pill" style="color:#0284c7; background:rgba(2,132,199,0.1); border-color:rgba(2,132,199,0.3); font-weight:800;">
+                      <i class="bi bi-mortarboard-fill"></i> Alumni / Lulusan
+                    </span>
+                  @elseif($siswa->status === 'pkl')
                     <span class="tag-pill" style="color:var(--text); font-weight:800;">
                       <i class="bi bi-briefcase"></i> Praktik Kerja (PKL)
+                    </span>
+                  @elseif($siswa->status === 'pindah')
+                    <span class="tag-pill" style="color:#d97706; background:rgba(217,119,6,0.1); border-color:rgba(217,119,6,0.3); font-weight:800;">
+                      <i class="bi bi-box-arrow-right"></i> Pindah
+                    </span>
+                  @elseif($siswa->status === 'keluar')
+                    <span class="tag-pill" style="color:#ef4444; background:rgba(239,68,68,0.1); border-color:rgba(239,68,68,0.3); font-weight:800;">
+                      <i class="bi bi-x-circle-fill"></i> Keluar
                     </span>
                   @endif
                   @if($waliKelas)
@@ -332,6 +352,8 @@
                     @elseif($todayAbsensi->status === 'alpha')
                       <span style="font-weight:800; font-size:12px; color:var(--text);">Alpha</span>
                     @endif
+                  @elseif($siswa->status === 'lulus')
+                    <span style="font-weight:800; font-size:12px; color:#0284c7;">Alumni (Telah Lulus)</span>
                   @elseif($siswa->status === 'pkl')
                     <span style="font-weight:800; font-size:12px; color:var(--text);">PKL</span>
                   @else
@@ -356,7 +378,7 @@
               </div>
               
               <div style="font-size:11px; color:var(--text-3); text-align:center; margin-top:8px;">
-                {{ $todayAbsensi ? ($todayAbsensi->keterangan ?: 'Tervalidasi via Smart Gate RFID/QR SMKN 1 AN') : ($siswa->status === 'pkl' ? 'Siswa sedang melaksanakan PKL di Industri' : 'Belum ada rekaman presensi di gerbang hari ini') }}
+                {{ $todayAbsensi ? ($todayAbsensi->keterangan ?: 'Tervalidasi via Smart Gate RFID/QR SMKN 1 AN') : ($siswa->status === 'lulus' ? 'Siswa telah menyelesaikan studi di SMKN 1 Air Naningan (Status: Alumni)' : ($siswa->status === 'pkl' ? 'Siswa sedang melaksanakan PKL di Industri' : 'Belum ada rekaman presensi di gerbang hari ini')) }}
               </div>
             </div>
           </div>
@@ -1807,7 +1829,13 @@
       </div>
       <div style="margin-top:14px; text-align:center;">
         <div style="font-size:18px; font-weight:900; color:#0f172a; line-height:1.2;">{{ $siswa->nama }}</div>
-        <div style="font-size:13px; font-weight:700; color:#64748b; margin-top:3px;">{{ $rombel->nama_rombel ?? 'X' }} · {{ $rombel->jurusan->nama_jurusan ?? 'Semua Jurusan' }}</div>
+        <div style="font-size:13px; font-weight:700; color:#64748b; margin-top:3px;">
+          @if($siswa->status === 'lulus')
+            Alumni · {{ $rombel->nama_rombel ?? 'Lulusan' }} ({{ $rombel->jurusan->nama_jurusan ?? 'Semua Jurusan' }})
+          @else
+            {{ $rombel->nama_rombel ?? 'X' }} · {{ $rombel->jurusan->nama_jurusan ?? 'Semua Jurusan' }}
+          @endif
+        </div>
       </div>
     </div>
     <div class="zoom-overlay-footer">
