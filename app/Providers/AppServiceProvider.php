@@ -24,7 +24,7 @@ class AppServiceProvider extends ServiceProvider
         if (!$this->app->runningInConsole()) {
             try {
                 $req = $this->app->make('request');
-                if ($req && ($req->server('HTTP_X_FORWARDED_PROTO') === 'https' || $req->isSecure() || str_contains($req->getHttpHost(), 'trycloudflare.com') || str_contains($req->getHttpHost(), 'ngrok-free.dev') || str_contains($req->getHttpHost(), 'ngrok.app') || str_contains($req->getHttpHost(), 'ngrok.io'))) {
+                if ($req && ($req->server('HTTP_X_FORWARDED_PROTO') === 'https' || $req->isSecure() || str_contains($req->getHttpHost(), 'smkn1airnaningan.sch.id') || str_contains($req->getHttpHost(), 'trycloudflare.com') || str_contains($req->getHttpHost(), 'ngrok-free.dev') || str_contains($req->getHttpHost(), 'ngrok.app') || str_contains($req->getHttpHost(), 'ngrok.io') || config('app.env') === 'production')) {
                     \Illuminate\Support\Facades\URL::forceScheme('https');
                 }
             } catch (\Throwable $e) {
