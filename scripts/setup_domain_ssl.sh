@@ -123,33 +123,49 @@ if ! command -v certbot &> /dev/null; then
 fi
 
 # 4. Ambil Sertifikat SSL Otomatis
-echo -e "\n${YELLOW}[4/5] Meminta sertifikat SSL HTTPS untuk ${DOMAIN}...${NC}"
-echo -e "Catatan: Pastikan DNS A-Record domain sudah diarahkan ke IP server ini."
+echo -e "\n${YELLOW}[4/5] Memeriksa DNS dan Meminta sertifikat SSL HTTPS untuk ${DOMAIN}...${NC}"
 
-# Cek apakah domain sudah mengarah ke IP publik server
-SERVER_PUBLIC_IP=$(curl -s -m 5 https://api.ipify.org 2>/dev/null || curl -s -m 5 https://icanhazip.com 2>/dev/null || echo "")
-DOMAIN_DNS_IP=$(dig +short ${DOMAIN} | tail -n1 || echo "")
+# Cek IP Publik server
+SERVER_PUBLIC_IP=$(curl -s -m 5 https://api.ipify.org 2>/dev/null || curl -s -m 5 https://icanhazip.com 2>/dev/null || curl -s -m 5 https://ifconfig.me 2>/dev/null || echo "")
 
-echo -e "IP Publik Server ini : ${BOLD}${SERVER_PUBLIC_IP}${NC}"
-echo -e "IP Tujuan Domain Saat Ini: ${BOLD}${DOMAIN_DNS_IP}${NC}"
+# Cek IP tujuan DNS domain saat ini
+DOMAIN_DNS_IP=$(python3 -c "import socket; print(socket.gethostbyname('${DOMAIN}'))" 2>/dev/null || dig +short ${DOMAIN} 2>/dev/null | tail -n1 || echo "")
+
+# Cek IP lokal server
+SERVER_LOCAL_IP=$(hostname -I 2>/dev/null | awk '{print $1}' || echo "")
+
+echo -e "IP Publik Server ini     : ${BOLD}${CYAN}${SERVER_PUBLIC_IP:-Tidak terdeteksi}${NC}"
+echo -e "IP Lokal Server (LAN)    : ${BOLD}${CYAN}${SERVER_LOCAL_IP:-Tidak terdeteksi}${NC}"
+echo -e "IP Tujuan Domain Saat Ini: ${BOLD}${YELLOW}${DOMAIN_DNS_IP:-Belum terhubung}${NC}"
+
+# Deteksi jika masih mengarah ke IP Parkir Bawaan Hostinger
+if [ "$DOMAIN_DNS_IP" = "2.57.91.91" ]; then
+    echo -e "\n${RED}╔══════════════════════════════════════════════════════════════════════╗${NC}"
+    echo -e "${RED}║ [DIAGNOSIS] Domain masih mengarah ke IP Parkir Hostinger (2.57.91.91) ║${NC}"
+    echo -e "${RED}╚══════════════════════════════════════════════════════════════════════╝${NC}"
+    echo -e "Penyebab IP terbaca salah:"
+    echo -e "1. Di dashboard penyedia domain (Hostinger), A Record masih berisi IP parkir bawaan."
+    echo -e "2. Anda perlu mengubah A Record (Name: @) ke IP Server Anda: ${BOLD}${GREEN}${SERVER_PUBLIC_IP}${NC}"
+    echo -e "3. Jika baru saja Anda ubah di Hostinger, DNS membutuhkan waktu 5-15 menit untuk merambat."
+fi
 
 if [ -n "$SERVER_PUBLIC_IP" ] && [ "$SERVER_PUBLIC_IP" = "$DOMAIN_DNS_IP" ]; then
-    echo -e "${GREEN}✔ DNS A-Record cocok! Menerbitkan SSL Let's Encrypt sekarang...${NC}"
+    echo -e "\n${GREEN}✔ IP DNS Domain sudah cocok dengan IP Server! Menerbitkan SSL Let's Encrypt...${NC}"
     certbot --nginx -d "${DOMAIN}" -d "${DOMAIN_WWW}" \
         --non-interactive --agree-tos \
         --email info@smkn1airnaningan.sch.id \
         --redirect || true
     echo -e "${GREEN}✔ Sertifikat SSL HTTPS aktif secara permanen dengan Auto-Renewal!${NC}"
 else
-    echo -e "${YELLOW}Perhatian:${NC} DNS domain (${DOMAIN_DNS_IP}) belum mengarah ke IP server (${SERVER_PUBLIC_IP})."
-    echo -e "Mencoba meminta SSL (jika DNS baru saja diubah, proses mungkin perlu menunggu beberapa saat)..."
+    echo -e "\n${YELLOW}ℹ Mencoba menjalankan certbot...${NC}"
     certbot --nginx -d "${DOMAIN}" -d "${DOMAIN_WWW}" \
         --non-interactive --agree-tos \
         --email info@smkn1airnaningan.sch.id \
         --redirect || {
-            echo -e "${YELLOW}ℹ Certbot belum dapat memvalidasi karena DNS belum terpropagasi.${NC}"
-            echo -e "Setelah Anda memperbarui DNS A Record di dashboard domain, cukup ulangi:"
-            echo -e "  ${BOLD}sudo certbot --nginx -d ${DOMAIN} -d ${DOMAIN_WWW}${NC}"
+            echo -e "\n${YELLOW}Catatan Penting:${NC}"
+            echo -e "Jika Certbot gagal verifikasi, pastikan:"
+            echo -e "  - A Record domain ${BOLD}${DOMAIN}${NC} diarahkan ke IP: ${BOLD}${GREEN}${SERVER_PUBLIC_IP}${NC}"
+            echo -e "  - Port 80 dan 443 terbuka di firewall (iptables / cloud security list)."
         }
 fi
 
