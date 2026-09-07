@@ -87,13 +87,23 @@ class PpdbUjianSetting extends Model
         $kosong = 0;
         $totalPg = max($soalPg->count(), (int) ($this->jumlah_soal_pg ?: 30));
 
+        // Deteksi secara akurat apakah key jawaban siswa menggunakan ID tabel atau nomor_urut
+        $keys = array_map('strval', array_keys($jawabanSiswa));
+        $ids = $soalPg->pluck('id')->map(fn($id) => (string) $id)->all();
+        $nomors = $soalPg->keys()->map(fn($n) => (string) $n)->all();
+
+        $idMatches = count(array_intersect($keys, $ids));
+        $nomorMatches = count(array_intersect($keys, $nomors));
+        $isKeyedById = ($idMatches > $nomorMatches);
+
         foreach ($soalPg as $nomor => $soal) {
             $kunci = $soal->kunci_jawaban ? strtoupper(trim($soal->kunci_jawaban)) : null;
             $jawab = null;
-            if (isset($jawabanSiswa[(string) $soal->id])) {
-                $jawab = strtoupper(trim($jawabanSiswa[(string) $soal->id]));
-            } elseif (isset($jawabanSiswa[(string) $nomor])) {
-                $jawab = strtoupper(trim($jawabanSiswa[(string) $nomor]));
+
+            if ($isKeyedById) {
+                $jawab = isset($jawabanSiswa[(string) $soal->id]) ? strtoupper(trim($jawabanSiswa[(string) $soal->id])) : null;
+            } else {
+                $jawab = isset($jawabanSiswa[(string) $nomor]) ? strtoupper(trim($jawabanSiswa[(string) $nomor])) : null;
             }
 
             if (empty($jawab)) {
