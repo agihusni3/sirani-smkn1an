@@ -56,8 +56,25 @@ fi
 iptables -I INPUT 1 -p tcp --dport 80 -j ACCEPT 2>/dev/null || true
 iptables -I INPUT 1 -p tcp --dport 443 -j ACCEPT 2>/dev/null || true
 
-# 2. Siapkan Konfigurasi Nginx Server Block
-echo -e "\n${YELLOW}[2/5] Membuat konfigurasi Nginx untuk ${DOMAIN}...${NC}"
+# 2. Siapkan Sertifikat SSL & Konfigurasi Nginx Server Block
+echo -e "\n${YELLOW}[2/5] Menyiapkan sertifikat SSL & Nginx untuk ${DOMAIN}...${NC}"
+
+# Buat sertifikat SSL agar port 443 selalu siap menerima koneksi Cloudflare
+mkdir -p /etc/nginx/ssl
+if [ ! -f /etc/nginx/ssl/sirani.crt ]; then
+    openssl req -x509 -nodes -days 3650 -newkey rsa:2048 \
+        -keyout /etc/nginx/ssl/sirani.key \
+        -out /etc/nginx/ssl/sirani.crt \
+        -subj "/C=ID/ST=Lampung/L=Tanggamus/O=SMKN 1 Air Naningan/CN=${DOMAIN}" 2>/dev/null || true
+fi
+
+# Tentukan sertifikat yang dipakai (Let's Encrypt jika ada, atau sertifikat lokal)
+SSL_CERT="/etc/nginx/ssl/sirani.crt"
+SSL_KEY="/etc/nginx/ssl/sirani.key"
+if [ -f "/etc/letsencrypt/live/${DOMAIN}/fullchain.pem" ]; then
+    SSL_CERT="/etc/letsencrypt/live/${DOMAIN}/fullchain.pem"
+    SSL_KEY="/etc/letsencrypt/live/${DOMAIN}/privkey.pem"
+fi
 
 NGINX_CONF="/etc/nginx/sites-available/sirani"
 
@@ -65,8 +82,15 @@ cat > "${NGINX_CONF}" << EOF
 server {
     listen 80;
     listen [::]:80;
+    listen 443 ssl;
+    listen [::]:443 ssl;
     server_name ${DOMAIN} ${DOMAIN_WWW} _;
     root ${APP_DIR}/public;
+
+    ssl_certificate ${SSL_CERT};
+    ssl_certificate_key ${SSL_KEY};
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_ciphers HIGH:!aNULL:!MD5;
 
     add_header X-Frame-Options "SAMEORIGIN";
     add_header X-Content-Type-Options "nosniff";
