@@ -27,9 +27,9 @@ class SituanDashboardController extends Controller
         }
 
         // 1. Data Ringkasan Peserta Didik (Siswa)
-        $totalSiswaAktif = Siswa::where('status', 'aktif')->count();
-        $totalSiswaLaki = Siswa::where('status', 'aktif')->where('jenis_kelamin', 'L')->count();
-        $totalSiswaPerempuan = Siswa::where('status', 'aktif')->where('jenis_kelamin', 'P')->count();
+        $totalSiswaAktif = Siswa::whereIn('status', ['aktif', 'pkl'])->count();
+        $totalSiswaLaki = Siswa::whereIn('status', ['aktif', 'pkl'])->where('jenis_kelamin', 'L')->count();
+        $totalSiswaPerempuan = Siswa::whereIn('status', ['aktif', 'pkl'])->where('jenis_kelamin', 'P')->count();
         $totalSiswaPkl = Siswa::where('status', 'pkl')->count();
         $totalAlumni = Siswa::where('status', 'lulus')->count();
 

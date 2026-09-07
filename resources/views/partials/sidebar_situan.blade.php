@@ -8,7 +8,7 @@
   $isWali = $user ? $user->isWaliKelas() : false;
 
   $countGuru = \App\Models\Guru::where('status', 'aktif')->count();
-  $countSiswa = \App\Models\Siswa::where('status', 'aktif')->count();
+  $countSiswa = \App\Models\Siswa::whereIn('status', ['aktif', 'pkl'])->count();
   $countRombel = \App\Models\Rombel::count();
 @endphp
 

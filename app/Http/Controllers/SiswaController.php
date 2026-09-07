@@ -111,7 +111,7 @@ class SiswaController extends Controller
             $statAlumni = Siswa::where('status', 'lulus')->whereHas('siswaRombels', function ($q) use ($waliRombelIds) {
                 $q->whereIn('rombel_id', $waliRombelIds);
             })->count();
-            $statPkl = Siswa::where('status', 'aktif')->where('status_pkl', 'aktif_pkl')->whereHas('siswaRombels', function ($q) use ($waliRombelIds) {
+            $statPkl = Siswa::where('status', 'pkl')->whereHas('siswaRombels', function ($q) use ($waliRombelIds) {
                 $q->whereIn('rombel_id', $waliRombelIds)->where('status_keanggotaan', 'aktif');
             })->count();
             $statRombel = count($waliRombelIds);
@@ -119,7 +119,7 @@ class SiswaController extends Controller
             $rombels = Rombel::orderBy('nama_rombel')->get();
             $statTotal = Siswa::whereIn('status', ['aktif', 'pkl'])->count();
             $statAlumni = Siswa::where('status', 'lulus')->count();
-            $statPkl = Siswa::where('status', 'aktif')->where('status_pkl', 'aktif_pkl')->count();
+            $statPkl = Siswa::where('status', 'pkl')->count();
             $statRombel = Rombel::count();
         }
 

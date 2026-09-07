@@ -33,7 +33,7 @@ class AdminPortalController extends Controller
         $today = Carbon::today()->toDateString();
 
         // 1. KPI Modul SITUAN — SMKN 1 AN (Data Pokok & Administrasi Tata Usaha)
-        $totalSiswa = Siswa::where('status', 'aktif')->count();
+        $totalSiswa = Siswa::whereIn('status', ['aktif', 'pkl'])->count();
         $totalGuru = Guru::where('status', 'aktif')->count();
         $totalRombel = Rombel::count();
         $tahunAjaranAktif = TahunAjaran::where('is_active', true)->first();
