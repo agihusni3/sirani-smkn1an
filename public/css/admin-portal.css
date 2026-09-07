@@ -398,6 +398,19 @@ body {
   line-height: 1.35;
 }
 
+.module-card-desc {
+  font-size: 12.5px;
+  line-height: 1.6;
+  color: #475569;
+  margin: 0 0 18px;
+  font-weight: 500;
+  min-height: 75px;
+}
+
+[data-theme="dark"] .module-card-desc {
+  color: #94a3b8;
+}
+
 /* Telemetry KPI Boxes */
 .kpi-row {
   display: grid;

@@ -89,18 +89,9 @@
           <h3 class="module-card-name">SITUAN</h3>
           <p class="module-card-subtitle">Sistem Informasi Tata Usaha SMKN 1 Air Naningan</p>
 
-          <div class="kpi-row">
-            <div class="kpi-item">
-              <span class="kpi-label">Peserta Didik (Siswa)</span>
-              <span class="kpi-val">{{ $totalSiswa }}</span>
-              <span class="kpi-sub">Siswa Aktif</span>
-            </div>
-            <div class="kpi-item">
-              <span class="kpi-label">Pendidik &amp; Tendik</span>
-              <span class="kpi-val">{{ $totalGuru }}</span>
-              <span class="kpi-sub">Guru &amp; Pegawai</span>
-            </div>
-          </div>
+          <p class="module-card-desc">
+            Pusat tata kelola administrasi kelembagaan sekolah terpadu, pengelolaan data pokok kesiswaan &amp; Dapodik, master data PTK, administrasi e-persuratan resmi, dan loket pelayanan surat mandiri siswa.
+          </p>
         </div>
 
         <div class="module-actions">
@@ -109,21 +100,10 @@
               <span>Buka Modul SITUAN</span>
               <i class="bi bi-arrow-right-short" style="font-size: 16px;"></i>
             </a>
-            <div class="btn-launch-secondary-row">
-              <a href="/guru" class="btn-launch-secondary" title="Kelola Master Guru &amp; Pegawai">
-                Data PTK
-              </a>
-              <a href="/siswa" class="btn-launch-secondary" title="Kelola Master Siswa {{ auth()->user() && auth()->user()->isWaliKelas() && !auth()->user()->isAdmin() ? '(Kelas Binaan)' : '' }}">
-                Data Siswa
-              </a>
-            </div>
           @else
             <div class="btn-module-locked">
               <i class="bi bi-lock-fill"></i>
               <span>Akses Terbatas Modul TU</span>
-            </div>
-            <div class="locked-info-note">
-              <i class="bi bi-shield-lock"></i> Khusus Staf Tata Usaha &amp; Pimpinan
             </div>
           @endif
         </div>
@@ -141,20 +121,9 @@
           <h3 class="module-card-name">SIRANI</h3>
           <p class="module-card-subtitle">Sistem Informasi Responsif Absensi</p>
 
-          <div class="kpi-row">
-            <div class="kpi-item">
-              <span class="kpi-label">Kehadiran Siswa</span>
-              <span class="kpi-val">{{ $persenSiswaHadir }}%</span>
-              <span class="kpi-sub">{{ $siswaHadirToday }} / {{ $totalSiswa }} Hadir</span>
-            </div>
-            <div class="kpi-item">
-              <span class="kpi-label">Smart Gate Gerbang</span>
-              <span class="kpi-val" style="font-size:14px; color:{{ $isGerbangAktif ? '#10b981' : '#64748b' }};">
-                {{ $isGerbangAktif ? 'ONLINE' : 'STANDBY' }}
-              </span>
-              <span class="kpi-sub">{{ $isGerbangAktif ? 'Sesi Presensi Buka' : 'Di Luar Jam Sesi' }}</span>
-            </div>
-          </div>
+          <p class="module-card-desc">
+            Sistem presensi harian cerdas terintegrasi Smart Gate RFID dan pemindai barcode, pencatatan kehadiran real-time GTK &amp; siswa, monitoring ketidakhadiran, serta rekapitulasi laporan presensi.
+          </p>
         </div>
 
         <div class="module-actions">
@@ -163,21 +132,10 @@
               <span>Buka Modul SIRANI</span>
               <i class="bi bi-arrow-right-short" style="font-size: 16px;"></i>
             </a>
-            <div class="btn-launch-secondary-row">
-              <a href="/smart-gate" target="_blank" class="btn-launch-secondary">
-                Smart Gate
-              </a>
-              <a href="/laporan" class="btn-launch-secondary">
-                Laporan
-              </a>
-            </div>
           @else
             <div class="btn-module-locked">
               <i class="bi bi-lock-fill"></i>
               <span>Akses Terbatas Modul Presensi</span>
-            </div>
-            <div class="locked-info-note">
-              <i class="bi bi-shield-lock"></i> Khusus Pendidik &amp; Staf
             </div>
           @endif
         </div>
@@ -195,46 +153,21 @@
           <h3 class="module-card-name">PPDB ONLINE 2026</h3>
           <p class="module-card-subtitle">Penerimaan Peserta Didik Baru Terpadu</p>
 
-          <div class="kpi-row">
-            <div class="kpi-item">
-              <span class="kpi-label">Total Pendaftar</span>
-              <span class="kpi-val">{{ $totalPendaftar }}</span>
-              <span class="kpi-sub">+{{ $ppdbToday }} Pendaftar Hari Ini</span>
-            </div>
-            <div class="kpi-item">
-              <span class="kpi-label">Lolos / Diterima</span>
-              <span class="kpi-val" style="color:#10b981;">{{ $ppdbDiterima }}</span>
-              <span class="kpi-sub">Calon Siswa Resmi</span>
-            </div>
-          </div>
+          <p class="module-card-desc">
+            Portal penerimaan peserta didik baru terpadu SMKN 1 Air Naningan, memfasilitasi pendaftaran calon siswa, verifikasi berkas, pelaksanaan tes seleksi CBT daring, hingga pengumuman kelulusan.
+          </p>
         </div>
 
         <div class="module-actions">
           @if($canAccessPpdb)
             <a href="/admin/ppdb" class="btn-launch-primary">
-              <span>Kelola PPDB 2026</span>
+              <span>Buka Modul PPDB</span>
               <i class="bi bi-arrow-right-short" style="font-size: 16px;"></i>
             </a>
-            <div class="btn-launch-secondary-row">
-              <a href="/admin/ppdb?status=menunggu" class="btn-launch-secondary">
-                Verifikasi Berkas
-              </a>
-              <a href="/ppdb/ujian" target="_blank" class="btn-launch-secondary" style="font-weight:700; color:#0284c7 !important;" title="Portal Ujian CBT Calon Siswa">
-                Ujian CBT
-              </a>
-            </div>
           @else
             <div class="btn-module-locked">
               <i class="bi bi-lock-fill"></i>
-              <span>Akses Khusus Panitia PPDB</span>
-            </div>
-            <div class="btn-launch-secondary-row">
-              <a href="/ppdb" target="_blank" class="btn-launch-secondary" title="Form Pendaftaran Siswa Baru">
-                Form Publik
-              </a>
-              <a href="/ppdb/ujian" target="_blank" class="btn-launch-secondary" style="font-weight:700; color:#0284c7 !important;" title="Portal Ujian CBT Calon Siswa">
-                Ujian CBT
-              </a>
+              <span>Akses Terbatas Panitia PPDB</span>
             </div>
           @endif
         </div>
@@ -252,47 +185,22 @@
           <h3 class="module-card-name">WEB PROFIL &amp; HUMAS</h3>
           <p class="module-card-subtitle">Etalase Publik &amp; Manajemen Publikasi</p>
 
-          <div class="kpi-row">
-            <div class="kpi-item">
-              <span class="kpi-label">Total Berita</span>
-              <span class="kpi-val">{{ $totalBerita }}</span>
-              <span class="kpi-sub">Artikel Terpublikasi</span>
-            </div>
-            <div class="kpi-item">
-              <span class="kpi-label">Pengunjung Web</span>
-              <span class="kpi-val">{{ number_format($todayVisitors) }}</span>
-              <span class="kpi-sub">{{ number_format($todayUniqueVisitors) }} Unik Hari Ini</span>
-            </div>
-          </div>
+          <p class="module-card-desc">
+            Etalase representasi profil resmi institusi sekolah, pengelolaan publikasi rilis berita kegiatan, etalase prestasi siswa &amp; sekolah, galeri dokumentasi, profil jurusan, dan transparansi informasi publik.
+          </p>
         </div>
 
         <div class="module-actions">
           @if($canAccessWeb)
             <a href="/admin/berita" class="btn-launch-primary">
-              <span>Kelola Berita &amp; Rilis</span>
+              <span>Buka Modul Web &amp; Humas</span>
               <i class="bi bi-arrow-right-short" style="font-size: 16px;"></i>
             </a>
-            <div class="btn-launch-secondary-row">
-              <a href="/admin/banner" class="btn-launch-secondary">
-                Banner Hero
-              </a>
-              @if(auth()->user()?->isAdmin())
-                <a href="{{ route('admin.statistik.web') }}" class="btn-launch-secondary" style="font-weight:800; border-color:#000000;" title="Hanya Administrator yang dapat melihat grafik pengunjung">
-                  Grafik Pengunjung
-                </a>
-              @else
-                <a href="/" target="_blank" class="btn-launch-secondary">
-                  Lihat Website
-                </a>
-              @endif
-            </div>
           @else
-            <div class="btn-module-locked">
-              <i class="bi bi-lock-fill"></i>
-              <span>Akses Khusus Tim Humas</span>
-            </div>
-            <a href="/" target="_blank" class="btn-launch-public">
-              <i class="bi bi-globe"></i> Kunjungi Website Utama
+            <a href="/" target="_blank" class="btn-launch-primary" title="Buka Portal Website Utama Sekolah">
+              <i class="bi bi-globe" style="font-size: 13px;"></i>
+              <span>Kunjungi Website Utama</span>
+              <i class="bi bi-box-arrow-up-right" style="font-size: 11px;"></i>
             </a>
           @endif
         </div>
