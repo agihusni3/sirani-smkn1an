@@ -21,11 +21,14 @@
                     SMKN 1 Air Naningan membuka penerimaan calon peserta didik baru untuk Program Keahlian Rekayasa Perangkat Lunak, Agro-Teknologi Pangan, dan Teknik Sepeda Motor tanpa dipungut biaya pendaftaran.
                 </p>
                 <div style="display: flex; flex-wrap: wrap; gap: 14px;">
-                    <a href="{{ route('ppdb.formulir') }}" class="btn-industrial btn-industrial-primary" style="padding: 12px 26px; font-size: 0.92rem;">
-                        <i class="fa-solid fa-file-signature"></i> Isi Formulir Pendaftaran Online
+                    <a href="{{ route('ppdb.formulir') }}" class="btn-industrial btn-industrial-primary" style="padding: 12px 24px; font-size: 0.92rem;">
+                        <i class="fa-solid fa-file-signature"></i> Isi Formulir Pendaftaran
+                    </a>
+                    <a href="{{ route('ppdb.ujian.portal') }}" class="btn-industrial" style="background: #0284c7; color: #ffffff; border: 1px solid #0369a1; padding: 12px 24px; font-size: 0.92rem; font-weight: 700; box-shadow: 0 4px 14px rgba(2, 132, 199, 0.35);">
+                        <i class="fa-solid fa-laptop-code"></i> Masuk Ujian CBT
                     </a>
                     <a href="{{ route('ppdb.status') }}" class="btn-industrial" style="background: rgba(255,255,255,0.1); color: #ffffff; border: 1px solid rgba(255,255,255,0.2); font-size: 0.92rem;">
-                        <i class="fa-solid fa-id-badge" style="color: #fbbf24;"></i> Cek Status &amp; Cetak Bukti
+                        <i class="fa-solid fa-id-badge" style="color: #fbbf24;"></i> Cek Status
                     </a>
                 </div>
             </div>

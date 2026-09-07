@@ -156,6 +156,20 @@
                                 </div>
                             </a>
 
+                            <!-- Modul Aktif: Ruang Ujian CBT PPDB -->
+                            <a href="{{ route('ppdb.ujian.portal') }}" class="dropdown-item-card">
+                                <div class="dropdown-item-icon" style="background: #e0f2fe; color: #0284c7;">
+                                    <i class="fa-solid fa-laptop-code"></i>
+                                </div>
+                                <div class="dropdown-item-info">
+                                    <div class="dropdown-item-title">
+                                        <span>Ruang Ujian CBT PPDB</span>
+                                        <span class="badge-subtle-status live" style="background: #e0f2fe; color: #0284c7;">CBT</span>
+                                    </div>
+                                    <div class="dropdown-item-sub">Login tes seleksi dengan No. Pendaftaran</div>
+                                </div>
+                            </a>
+
                             <!-- Modul Aktif: Monitoring Absen Mandiri SIRANI -->
                             <a href="{{ route('portal.ortu.index') }}" class="dropdown-item-card">
                                 <div class="dropdown-item-icon" style="background: var(--brand-blue-subtle); color: var(--brand-blue);">

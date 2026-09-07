@@ -58,7 +58,8 @@ Route::middleware('track.visitor')->group(function () {
         Route::get('/status', [PpdbDaftarController::class, 'status'])->name('status');
         Route::get('/cetak-kartu/{nomor}', [PpdbDaftarController::class, 'cetakKartu'])->name('cetak');
 
-        // CBT Tes Tertulis Online (Naskah PDF + Lembar Jawab ABC & Esai)
+        // CBT Tes Tertulis Online (Portal Masuk & Ujian)
+        Route::match(['get', 'post'], '/ujian', [PpdbUjianController::class, 'portal'])->name('ujian.portal');
         Route::get('/ujian/{nomor}', [PpdbUjianController::class, 'konfirmasi'])->name('ujian.konfirmasi');
         Route::get('/ujian/{nomor}/kerjakan', [PpdbUjianController::class, 'kerjakan'])->name('ujian.kerjakan');
         Route::post('/ujian/{nomor}/simpan-draft', [PpdbUjianController::class, 'simpanDraft'])->name('ujian.simpan_draft');

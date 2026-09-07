@@ -219,8 +219,8 @@
               <a href="/admin/ppdb?status=menunggu" class="btn-launch-secondary">
                 Verifikasi Berkas
               </a>
-              <a href="/ppdb" target="_blank" class="btn-launch-secondary">
-                Form Publik
+              <a href="/ppdb/ujian" target="_blank" class="btn-launch-secondary" style="font-weight:700; color:#0284c7 !important;" title="Portal Ujian CBT Calon Siswa">
+                Ujian CBT
               </a>
             </div>
           @else
@@ -228,9 +228,14 @@
               <i class="bi bi-lock-fill"></i>
               <span>Akses Khusus Panitia PPDB</span>
             </div>
-            <a href="/ppdb" target="_blank" class="btn-launch-public">
-              <i class="bi bi-box-arrow-up-right"></i> Form Pendaftaran Publik
-            </a>
+            <div class="btn-launch-secondary-row">
+              <a href="/ppdb" target="_blank" class="btn-launch-secondary" title="Form Pendaftaran Siswa Baru">
+                Form Publik
+              </a>
+              <a href="/ppdb/ujian" target="_blank" class="btn-launch-secondary" style="font-weight:700; color:#0284c7 !important;" title="Portal Ujian CBT Calon Siswa">
+                Ujian CBT
+              </a>
+            </div>
           @endif
         </div>
       </div>

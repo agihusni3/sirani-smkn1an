@@ -13,6 +13,65 @@ use Illuminate\Http\Request;
 class PpdbUjianController extends Controller
 {
     /**
+     * Portal Akses Ujian CBT Khusus Siswa (Pencarian by No Pendaftaran / NISN)
+     */
+    public function portal(Request $request)
+    {
+        $sekolah = PengaturanSekolah::getAktif();
+        $setting = PpdbUjianSetting::getAktif();
+
+        // Jika siswa submit nomor pendaftaran atau keyword
+        if ($request->filled('no_pendaftaran') || $request->filled('keyword')) {
+            $rawInput = trim($request->input('no_pendaftaran') ?: $request->input('keyword'));
+
+            // Format normalisasi (jika siswa ketik "1" atau "0001" -> "PPDB-2026-0001")
+            $searchNomor = $rawInput;
+            if (is_numeric($rawInput) && strlen($rawInput) <= 5) {
+                $searchNomor = sprintf('PPDB-%s-%04d', date('Y'), (int) $rawInput);
+            }
+
+            $pendaftar = PpdbPendaftar::with(['jurusanPilihan1', 'ujianPeserta'])
+                ->where('no_pendaftaran', $rawInput)
+                ->orWhere('no_pendaftaran', $searchNomor)
+                ->orWhere('nisn', $rawInput)
+                ->first();
+
+            if (!$pendaftar) {
+                return back()->withInput()->with('error', "Nomor pendaftaran '{$rawInput}' tidak ditemukan. Pastikan Anda telah mengisi formulir pendaftaran PPDB online dan memasukkan Nomor Pendaftaran atau NISN dengan benar.");
+            }
+
+            // Validasi 1: Sesi Ujian Aktif
+            if (!$setting || !$setting->is_active) {
+                return back()->withInput()->with('warning', "Sesi Ujian Seleksi CBT PPDB saat ini belum dibuka atau sedang ditutup oleh Panitia.");
+            }
+
+            // Validasi 2: Status Berkas Siswa
+            $statusValid = in_array($pendaftar->status, ['terverifikasi', 'berkas_valid', 'diterima', 'siap_tes']);
+            if (!$statusValid) {
+                $pesanStatus = match($pendaftar->status) {
+                    'menunggu' => "Halo {$pendaftar->nama_lengkap}, berkas pendaftaran Anda saat ini masih dalam antrean verifikasi oleh Panitia PPDB. Ujian CBT hanya dapat diikuti setelah berkas dinyatakan lolos verifikasi.",
+                    'perlu_perbaikan' => "Halo {$pendaftar->nama_lengkap}, berkas pendaftaran Anda memerlukan perbaikan dokumen. Silakan periksa catatan panitia pada menu Cek Status.",
+                    'ditolak' => "Halo {$pendaftar->nama_lengkap}, pendaftaran Anda dinyatakan tidak memenuhi syarat administrasi.",
+                    default => "Status pendaftaran Anda belum memenuhi syarat untuk mengikuti sesi ujian CBT."
+                };
+                return back()->withInput()->with('error', $pesanStatus);
+            }
+
+            // Validasi 3: Cek apakah sudah menyelesaikan ujian
+            $peserta = $pendaftar->ujianPeserta;
+            if ($peserta && in_array($peserta->status_pengerjaan, ['selesai', 'selesai_menunggu_koreksi', 'selesai_dinilai'])) {
+                return redirect()->route('ppdb.ujian.selesai', ['nomor' => $pendaftar->no_pendaftaran])
+                    ->with('info', "Anda telah menyelesaikan Ujian CBT ini sebelumnya. Hasil tersimpan di sistem.");
+            }
+
+            // Lolos semua kriteria: Masuk ke halaman konfirmasi ujian
+            return redirect()->route('ppdb.ujian.konfirmasi', ['nomor' => $pendaftar->no_pendaftaran]);
+        }
+
+        return view('ppdb.ujian.portal', compact('sekolah', 'setting'));
+    }
+
+    /**
      * Halaman Konfirmasi & Petunjuk Pra-Ujian
      */
     public function konfirmasi($nomor)
