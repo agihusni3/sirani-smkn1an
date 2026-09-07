@@ -5,10 +5,14 @@ namespace App\Http\Controllers;
 use App\Models\AuditLog;
 use App\Models\Guru;
 use App\Models\Jurusan;
+use App\Models\PelayananSurat;
 use App\Models\Rombel;
 use App\Models\Siswa;
+use App\Models\SuratKeluar;
+use App\Models\SuratMasuk;
 use App\Models\TahunAjaran;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class SituanDashboardController extends Controller
@@ -59,8 +63,24 @@ class SituanDashboardController extends Controller
         $rombelTingkat11 = Rombel::where('tingkat', 11)->count();
         $rombelTingkat12 = Rombel::where('tingkat', 12)->count();
 
-        // 6. Log Mutasi & Aktivitas Tata Usaha Terakhir
-        $recentAuditLogs = AuditLog::whereIn('modul', ['siswa', 'guru', 'rombel', 'settings', 'auth'])
+        // 6. Data Administrasi Tata Usaha Modern (Persuratan, Pelayanan, KGB)
+        $suratMasukPending = SuratMasuk::where('status_disposisi', 'menunggu')->count();
+        $suratKeluarTahunIni = SuratKeluar::where('tahun_agenda', (int) date('Y'))->count();
+        $pelayananSiswaTotal = PelayananSurat::count();
+
+        // Radar KGB Early Warning (< 60 hari atau sudah jatuh tempo)
+        $today = Carbon::today();
+        $radarKgbAlerts = Guru::where('status', 'aktif')
+            ->whereNotNull('tmt_kgb_terakhir')
+            ->get()
+            ->filter(function ($g) use ($today) {
+                $nextKgb = Carbon::parse($g->tmt_kgb_terakhir)->addYears(2);
+                return $today->diffInDays($nextKgb, false) <= 60;
+            })
+            ->count();
+
+        // 7. Log Mutasi & Aktivitas Tata Usaha Terakhir
+        $recentAuditLogs = AuditLog::whereIn('modul', ['siswa', 'guru', 'rombel', 'settings', 'auth', 'situan_surat_masuk', 'situan_surat_keluar', 'situan_disposisi', 'situan_pelayanan_surat'])
             ->latest()
             ->take(8)
             ->get();
@@ -89,6 +109,10 @@ class SituanDashboardController extends Controller
             'rombelTingkat10',
             'rombelTingkat11',
             'rombelTingkat12',
+            'suratMasukPending',
+            'suratKeluarTahunIni',
+            'pelayananSiswaTotal',
+            'radarKgbAlerts',
             'recentAuditLogs'
         ));
     }

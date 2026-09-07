@@ -63,6 +63,10 @@ class Guru extends Model
         'no_hp',
         'foto',
         'status',
+        'golongan_ruang',
+        'tmt_kgb_terakhir',
+        'tmt_pangkat_terakhir',
+        'jurusan_pendidikan',
     ];
 
     protected $casts = [
@@ -235,5 +239,10 @@ class Guru extends Model
     public function kartuRfids(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(KartuRfid::class, 'pemilik_id')->where('pemilik_type', 'guru');
+    }
+
+    public function arsipDokumens(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(ArsipDokumenPtk::class, 'guru_id');
     }
 }

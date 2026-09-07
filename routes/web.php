@@ -36,6 +36,9 @@ use App\Http\Controllers\Ppdb\PpdbSoalController;
 use App\Http\Controllers\Admin\BeritaAdminController;
 use App\Http\Controllers\Admin\WebsiteBannerController;
 use App\Http\Controllers\Admin\WebsiteStatistikController;
+use App\Http\Controllers\SituanPersuratanController;
+use App\Http\Controllers\SituanPelayananSuratController;
+use App\Http\Controllers\SituanKepegawaianController;
 
 // ══ 1. Website Resmi Publik SMKN 1 Air Naningan (Dilindungi Pelacak Kunjungan Otomatis) ══
 Route::middleware('track.visitor')->group(function () {
@@ -147,6 +150,29 @@ Route::middleware('auth')->group(function () {
         Route::get('/situan/dashboard', [\App\Http\Controllers\SituanDashboardController::class, 'index'])->name('situan.dashboard');
         Route::get('/situan/log', [\App\Http\Controllers\SituanDashboardController::class, 'log'])->name('situan.log');
         Route::get('/admin/situan', [\App\Http\Controllers\SituanDashboardController::class, 'index']);
+
+        // Persuratan Kedinasan & E-Disposisi
+        Route::get('/situan/surat-masuk', [SituanPersuratanController::class, 'suratMasukIndex'])->name('situan.surat-masuk.index');
+        Route::post('/situan/surat-masuk', [SituanPersuratanController::class, 'suratMasukStore'])->name('situan.surat-masuk.store');
+        Route::post('/situan/surat-masuk/{id}/disposisi', [SituanPersuratanController::class, 'suratMasukDisposisi'])->name('situan.surat-masuk.disposisi');
+        Route::get('/situan/surat-masuk/{id}/cetak-disposisi', [SituanPersuratanController::class, 'disposisiCetakLembar'])->name('situan.surat-masuk.cetak-disposisi');
+        Route::get('/situan/surat-keluar', [SituanPersuratanController::class, 'suratKeluarIndex'])->name('situan.surat-keluar.index');
+        Route::post('/situan/surat-keluar', [SituanPersuratanController::class, 'suratKeluarStore'])->name('situan.surat-keluar.store');
+        Route::get('/situan/buku-sk', [SituanPersuratanController::class, 'bukuSkIndex'])->name('situan.buku-sk.index');
+        Route::post('/situan/buku-sk', [SituanPersuratanController::class, 'bukuSkStore'])->name('situan.buku-sk.store');
+
+        // Loket Pelayanan Mandiri Siswa
+        Route::get('/situan/pelayanan', [SituanPelayananSuratController::class, 'index'])->name('situan.pelayanan.index');
+        Route::post('/situan/pelayanan/buat', [SituanPelayananSuratController::class, 'buatSurat'])->name('situan.pelayanan.buat');
+        Route::get('/situan/pelayanan/{id}/cetak', [SituanPelayananSuratController::class, 'cetakSurat'])->name('situan.pelayanan.cetak');
+
+        // E-Kepegawaian: Radar KGB, Pangkat & E-Arsip PTK
+        Route::get('/situan/radar-kgb', [SituanKepegawaianController::class, 'radarKgbIndex'])->name('situan.radar-kgb.index');
+        Route::post('/situan/radar-kgb/{id}/update', [SituanKepegawaianController::class, 'updateTmtGuru'])->name('situan.radar-kgb.update');
+        Route::get('/situan/radar-kgb/{id}/cetak-pengantar', [SituanKepegawaianController::class, 'cetakPengantarKgb'])->name('situan.radar-kgb.cetak-pengantar');
+        Route::get('/situan/arsip-ptk/{guruId}', [SituanKepegawaianController::class, 'arsipPtkIndex'])->name('situan.arsip-ptk.index');
+        Route::post('/situan/arsip-ptk/{guruId}', [SituanKepegawaianController::class, 'arsipPtkStore'])->name('situan.arsip-ptk.store');
+        Route::delete('/situan/arsip-ptk/{id}', [SituanKepegawaianController::class, 'arsipPtkDestroy'])->name('situan.arsip-ptk.destroy');
     });
 
     // 1. Modul SIRANI (Sistem Informasi Responsif Absensi & Kedisiplinan)
@@ -416,3 +442,7 @@ Route::middleware('auth')->group(function () {
 // Format Cetak Surat Resmi Kesiswaan
 Route::get('/surat', [SuratKesiswaanController::class, 'cetak'])->name('surat.index');
 Route::get('/surat/cetak/{id?}', [SuratKesiswaanController::class, 'cetak'])->name('surat.cetak');
+
+// Verifikasi Keabsahan Surat Resmi via QR Code (Akses Publik Tanpa Login)
+Route::get('/verifikasi-surat/{hash}', [SituanPelayananSuratController::class, 'verifikasiSuratPublik'])->name('situan.verifikasi-surat');
+

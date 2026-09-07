@@ -61,6 +61,61 @@
         </div>
       </div>
 
+      {{-- Modern TU Workload & Alerts Bar --}}
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(230px, 1fr)); gap:14px; margin-bottom:20px;">
+        {{-- Alert 1: Surat Masuk & Disposisi --}}
+        <a href="{{ route('situan.surat-masuk.index') }}" style="display:flex; align-items:center; gap:12px; padding:14px 16px; background:#ffffff; border:1.5px solid #e2e8f0; border-radius:12px; text-decoration:none; box-shadow:0 1px 3px rgba(0,0,0,0.04); transition:all 0.15s ease;">
+          <div style="width:42px; height:42px; border-radius:10px; background:rgba(2,132,199,0.12); color:#0284c7; display:flex; align-items:center; justify-content:center; font-size:20px; flex-shrink:0;">
+            <i class="bi bi-inbox-fill"></i>
+          </div>
+          <div>
+            <div style="font-size:11px; font-weight:800; color:#64748b; text-transform:uppercase;">Surat Masuk &amp; Disposisi</div>
+            <div style="font-size:15px; font-weight:900; color:#0f172a; margin-top:2px;">
+              {{ $suratMasukPending }} <span style="font-size:12px; font-weight:700; color:{{ $suratMasukPending > 0 ? '#dc2626' : '#10b981' }};">Menunggu Disposisi</span>
+            </div>
+          </div>
+        </a>
+
+        {{-- Alert 2: Agenda Surat Keluar --}}
+        <a href="{{ route('situan.surat-keluar.index') }}" style="display:flex; align-items:center; gap:12px; padding:14px 16px; background:#ffffff; border:1.5px solid #e2e8f0; border-radius:12px; text-decoration:none; box-shadow:0 1px 3px rgba(0,0,0,0.04); transition:all 0.15s ease;">
+          <div style="width:42px; height:42px; border-radius:10px; background:rgba(16,185,129,0.12); color:#10b981; display:flex; align-items:center; justify-content:center; font-size:20px; flex-shrink:0;">
+            <i class="bi bi-send-fill"></i>
+          </div>
+          <div>
+            <div style="font-size:11px; font-weight:800; color:#64748b; text-transform:uppercase;">Surat Keluar {{ date('Y') }}</div>
+            <div style="font-size:15px; font-weight:900; color:#0f172a; margin-top:2px;">
+              {{ $suratKeluarTahunIni }} <span style="font-size:12px; font-weight:700; color:#10b981;">No. Terbit Resmi</span>
+            </div>
+          </div>
+        </a>
+
+        {{-- Alert 3: Loket Pelayanan Mandiri Siswa --}}
+        <a href="{{ route('situan.pelayanan.index') }}" style="display:flex; align-items:center; gap:12px; padding:14px 16px; background:#ffffff; border:1.5px solid #e2e8f0; border-radius:12px; text-decoration:none; box-shadow:0 1px 3px rgba(0,0,0,0.04); transition:all 0.15s ease;">
+          <div style="width:42px; height:42px; border-radius:10px; background:rgba(99,102,241,0.12); color:#6366f1; display:flex; align-items:center; justify-content:center; font-size:20px; flex-shrink:0;">
+            <i class="bi bi-magic"></i>
+          </div>
+          <div>
+            <div style="font-size:11px; font-weight:800; color:#64748b; text-transform:uppercase;">Loket Surat Siswa (QR)</div>
+            <div style="font-size:15px; font-weight:900; color:#0f172a; margin-top:2px;">
+              {{ $pelayananSiswaTotal }} <span style="font-size:12px; font-weight:700; color:#6366f1;">Suket Diterbitkan</span>
+            </div>
+          </div>
+        </a>
+
+        {{-- Alert 4: Radar KGB & Pangkat --}}
+        <a href="{{ route('situan.radar-kgb.index') }}" style="display:flex; align-items:center; gap:12px; padding:14px 16px; background:{{ $radarKgbAlerts > 0 ? '#fff5f5' : '#ffffff' }}; border:1.5px solid {{ $radarKgbAlerts > 0 ? '#fecdd3' : '#e2e8f0' }}; border-radius:12px; text-decoration:none; box-shadow:0 1px 3px rgba(0,0,0,0.04); transition:all 0.15s ease;">
+          <div style="width:42px; height:42px; border-radius:10px; background:{{ $radarKgbAlerts > 0 ? 'rgba(239,68,68,0.15)' : 'rgba(16,185,129,0.12)' }}; color:{{ $radarKgbAlerts > 0 ? '#dc2626' : '#10b981' }}; display:flex; align-items:center; justify-content:center; font-size:20px; flex-shrink:0;">
+            <i class="bi bi-broadcast-pin"></i>
+          </div>
+          <div>
+            <div style="font-size:11px; font-weight:800; color:{{ $radarKgbAlerts > 0 ? '#dc2626' : '#64748b' }}; text-transform:uppercase;">Radar KGB &amp; Pangkat</div>
+            <div style="font-size:15px; font-weight:900; color:#0f172a; margin-top:2px;">
+              {{ $radarKgbAlerts }} <span style="font-size:12px; font-weight:700; color:{{ $radarKgbAlerts > 0 ? '#dc2626' : '#10b981' }};">{{ $radarKgbAlerts > 0 ? 'Perlu Pengusulan' : 'Semua Aman' }}</span>
+            </div>
+          </div>
+        </a>
+      </div>
+
       {{-- 4 Stat Cards --}}
       <div class="situan-grid-4">
         {{-- Card 1: Siswa Aktif --}}
@@ -196,6 +251,46 @@
               Aksi Cepat Administrasi Tata Usaha
             </div>
             <div class="situan-quick-grid">
+              <a href="{{ route('situan.surat-masuk.index') }}" class="situan-quick-card">
+                <div class="situan-quick-icon" style="background:rgba(2,132,199,0.12); color:#0284c7;">
+                  <i class="bi bi-inbox"></i>
+                </div>
+                <div class="situan-quick-name">Surat Masuk</div>
+                <div class="situan-quick-desc">Disposisi Digital Kepsek</div>
+              </a>
+
+              <a href="{{ route('situan.surat-keluar.index') }}" class="situan-quick-card">
+                <div class="situan-quick-icon" style="background:rgba(16,185,129,0.12); color:#10b981;">
+                  <i class="bi bi-send"></i>
+                </div>
+                <div class="situan-quick-name">Surat Keluar</div>
+                <div class="situan-quick-desc">No. Otomatis Kemendikdasmen</div>
+              </a>
+
+              <a href="{{ route('situan.pelayanan.index') }}" class="situan-quick-card">
+                <div class="situan-quick-icon" style="background:rgba(99,102,241,0.12); color:#6366f1;">
+                  <i class="bi bi-magic"></i>
+                </div>
+                <div class="situan-quick-name">Surat Siswa</div>
+                <div class="situan-quick-desc">Suket Aktif &amp; Mutasi (QR)</div>
+              </a>
+
+              <a href="{{ route('situan.radar-kgb.index') }}" class="situan-quick-card">
+                <div class="situan-quick-icon" style="background:rgba(239,68,68,0.12); color:#ef4444;">
+                  <i class="bi bi-broadcast-pin"></i>
+                </div>
+                <div class="situan-quick-name">Radar KGB</div>
+                <div class="situan-quick-desc">Kenaikan Gaji Berkala &amp; Pangkat</div>
+              </a>
+
+              <a href="{{ route('situan.buku-sk.index') }}" class="situan-quick-card">
+                <div class="situan-quick-icon" style="background:rgba(217,119,6,0.12); color:#d97706;">
+                  <i class="bi bi-file-earmark-lock"></i>
+                </div>
+                <div class="situan-quick-name">Register SK</div>
+                <div class="situan-quick-desc">Buku SK Kepala Sekolah</div>
+              </a>
+
               <a href="/guru" class="situan-quick-card">
                 <div class="situan-quick-icon" style="background:rgba(2,132,199,0.12); color:#0284c7;">
                   <i class="bi bi-person-badge"></i>
