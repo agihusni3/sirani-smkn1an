@@ -157,7 +157,10 @@ if [ "$DOMAIN_DNS_IP" = "2.57.91.91" ]; then
     echo -e "3. Jika baru saja Anda ubah di Hostinger, DNS membutuhkan waktu 5-15 menit untuk merambat."
 fi
 
-if [ -n "$SERVER_PUBLIC_IP" ] && [ "$SERVER_PUBLIC_IP" = "$DOMAIN_DNS_IP" ]; then
+if [ -d "/etc/letsencrypt/live/${DOMAIN}" ]; then
+    echo -e "\n${GREEN}✔ Sertifikat SSL HTTPS untuk ${DOMAIN} sudah terpasang dan aktif!${NC}"
+    systemctl reload nginx 2>/dev/null || true
+elif [ -n "$SERVER_PUBLIC_IP" ] && [ "$SERVER_PUBLIC_IP" = "$DOMAIN_DNS_IP" ]; then
     echo -e "\n${GREEN}✔ IP DNS Domain sudah cocok dengan IP Server! Menerbitkan SSL Let's Encrypt...${NC}"
     certbot --nginx -d "${DOMAIN}" -d "${DOMAIN_WWW}" \
         --non-interactive --agree-tos \

@@ -75,6 +75,12 @@ else
     echo -e "${GREEN}✔ Hak akses webserver www-data diperbarui.${NC}"
 fi
 
+# 5. Setup Domain Resmi & SSL Otomatis (smkn1airnaningan.sch.id)
+if [ -f "$APP_DIR/scripts/setup_domain_ssl.sh" ]; then
+    echo -e "\n${YELLOW}[5/5] Memastikan konfigurasi domain resmi smkn1airnaningan.sch.id & SSL...${NC}"
+    bash "$APP_DIR/scripts/setup_domain_ssl.sh" || true
+fi
+
 echo -e "\n${GREEN}==============================================================${NC}"
 echo -e "${GREEN}✔ UPDATE SELESAI! SIRANI berhasil diperbarui ke commit terbaru.${NC}"
 echo -e "${BLUE}Commit saat ini:${NC} $(git log -1 --oneline)"
