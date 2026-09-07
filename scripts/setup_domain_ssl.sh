@@ -40,13 +40,21 @@ echo -e "\n${CYAN}Direktori Aplikasi:${NC} $APP_DIR"
 echo -e "${CYAN}Domain Utama      :${NC} $DOMAIN"
 echo -e "${CYAN}Domain Sekunder   :${NC} $DOMAIN_WWW"
 
-# 1. Pastikan Nginx terpasang
-echo -e "\n${YELLOW}[1/5] Memeriksa webserver Nginx...${NC}"
+# 1. Pastikan Nginx terpasang & Buka Firewall Port 80 dan 443
+echo -e "\n${YELLOW}[1/5] Memeriksa webserver Nginx & Membuka Firewall...${NC}"
 if ! command -v nginx &> /dev/null; then
     apt update && apt install -y nginx
 fi
 systemctl enable nginx
 systemctl start nginx
+
+# Buka port 80 (HTTP) dan 443 (HTTPS) untuk verifikasi SSL Let's Encrypt
+if command -v ufw &> /dev/null; then
+    ufw allow 80/tcp 2>/dev/null || true
+    ufw allow 443/tcp 2>/dev/null || true
+fi
+iptables -I INPUT 1 -p tcp --dport 80 -j ACCEPT 2>/dev/null || true
+iptables -I INPUT 1 -p tcp --dport 443 -j ACCEPT 2>/dev/null || true
 
 # 2. Siapkan Konfigurasi Nginx Server Block
 echo -e "\n${YELLOW}[2/5] Membuat konfigurasi Nginx untuk ${DOMAIN}...${NC}"
