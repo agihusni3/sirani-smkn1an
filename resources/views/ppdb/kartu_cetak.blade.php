@@ -206,20 +206,72 @@
 
         <!-- Judul -->
         <div class="judul-kartu">
-            <h3>KARTU TANDA BUKTI PENDAFTARAN PPDB</h3>
-            <span>TAHUN PELAJARAN {{ $pendaftar->tahun_ajaran }}</span>
+            @if($pendaftar->status == 'diterima')
+                <h3>SURAT KETERANGAN LULUS SELEKSI &amp; BUKTI DITERIMA PPDB</h3>
+                <span>TAHUN PELAJARAN {{ $pendaftar->tahun_ajaran }}</span>
+            @else
+                <h3>KARTU TANDA BUKTI PENDAFTARAN &amp; JADWAL SELEKSI</h3>
+                <span>TAHUN PELAJARAN {{ $pendaftar->tahun_ajaran }}</span>
+            @endif
         </div>
 
         <!-- Status Nomor Registrasi -->
-        <div class="box-status">
+        <div class="box-status" style="{{ $pendaftar->status == 'diterima' ? 'background: #f0fdf4; border: 2px solid #16a34a;' : '' }}">
             <div>
                 <strong>NOMOR PENDAFTARAN:</strong> 
-                <span style="font-size: 13pt; font-family: monospace; font-weight: bold; margin-left: 6px;">{{ $pendaftar->nomor_pendaftaran }}</span>
+                <span style="font-size: 13pt; font-family: monospace; font-weight: bold; margin-left: 6px;">{{ $pendaftar->no_pendaftaran ?? $pendaftar->nomor_pendaftaran }}</span>
             </div>
             <div>
-                <strong>STATUS:</strong> {{ strtoupper(str_replace('_', ' ', $pendaftar->status_pendaftaran)) }}
+                <strong>STATUS:</strong> 
+                <span style="font-weight: bold; {{ $pendaftar->status == 'diterima' ? 'color: #15803d;' : '' }}">
+                    @if($pendaftar->status == 'diterima')
+                        LULUS / DITERIMA
+                    @elseif($pendaftar->status == 'cadangan')
+                        CADANGAN
+                    @elseif($pendaftar->status == 'terverifikasi' || $pendaftar->status == 'berkas_valid')
+                        BERKAS VALID / SIAP UJIAN
+                    @elseif($pendaftar->status == 'ditolak')
+                        TIDAK LOLOS
+                    @else
+                        MENUNGGU VERIFIKASI
+                    @endif
+                </span>
             </div>
         </div>
+
+        @if($pendaftar->status == 'diterima')
+            <!-- Panel Jurusan Diterima -->
+            <div style="background: #ecfdf5; border: 1.5px solid #a7f3d0; padding: 12px 18px; margin-bottom: 20px; border-radius: 4px;">
+                <div style="font-size: 9pt; color: #065f46; font-weight: bold; text-transform: uppercase;">Dinyatakan Diterima Pada:</div>
+                <div style="font-size: 13pt; font-weight: bold; color: #047857; margin: 2px 0;">
+                    {{ strtoupper($pendaftar->jurusanDiterima->nama_jurusan ?? ($pendaftar->jurusanPilihan1->nama_jurusan ?? '-')) }}
+                </div>
+                <div style="font-size: 9pt; color: #065f46; margin-top: 4px;">
+                    Peringkat Kelulusan: <strong>#{{ $pendaftar->peringkat_jurusan ?: '1' }}</strong> &bull; 
+                    Nilai Akhir: <strong>{{ number_format($pendaftar->nilai_akhir ?? 0, 2) }}</strong> &bull; 
+                    Jalur: <strong>{{ strtoupper($pendaftar->jalur_pendaftaran) }}</strong>
+                </div>
+            </div>
+        @elseif($pendaftar->jadwal_tes_tanggal)
+            <!-- Panel Jadwal Ujian CBT & Wawancara -->
+            <div style="background: #eff6ff; border: 1.5px solid #bfdbfe; padding: 10px 16px; margin-bottom: 20px; border-radius: 4px; font-size: 9.5pt;">
+                <strong style="color: #1e40af; display: block; margin-bottom: 4px;">JADWAL TES SELEKSI CBT &amp; WAWANCARA:</strong>
+                <table style="width: 100%; font-size: 9pt; border-collapse: collapse;">
+                    <tr>
+                        <td style="width: 120px; color: #475569;">Hari / Tanggal:</td>
+                        <td style="font-weight: bold; color: #0f172a;">{{ \Carbon\Carbon::parse($pendaftar->jadwal_tes_tanggal)->translatedFormat('l, d F Y') }}</td>
+                        <td style="width: 100px; color: #475569;">Ruang Ujian:</td>
+                        <td style="font-weight: bold; color: #0f172a;">{{ $pendaftar->jadwal_tes_ruang ?: 'Lab Komputer SMKN 1' }}</td>
+                    </tr>
+                    <tr>
+                        <td style="color: #475569;">Sesi Waktu:</td>
+                        <td style="font-weight: bold; color: #0f172a;">{{ $pendaftar->jadwal_tes_sesi ?: 'Sesi 1' }}</td>
+                        <td style="color: #475569;">Materi Ujian:</td>
+                        <td style="font-weight: bold; color: #0f172a;">CBT Tertulis + Wawancara Kejuruan</td>
+                    </tr>
+                </table>
+            </div>
+        @endif
 
         <!-- Detail Siswa & Foto -->
         <div class="grid-data">
@@ -268,37 +320,32 @@
                     <td>: {{ $pendaftar->jurusanPilihan2->nama_jurusan ?? '-' }}</td>
                 </tr>
                 <tr>
-                    <td>Hobi & Minat Organisasi</td>
-                    <td>: {{ $pendaftar->hobi ?: '-' }} {{ $pendaftar->organisasi_minat ? ' | Minat: ' . $pendaftar->organisasi_minat : '' }}</td>
+                    <td>Nama Orang Tua / Wali</td>
+                    <td>: {{ $pendaftar->nama_ibu ?: ($pendaftar->nama_ayah ?: '-') }}</td>
                 </tr>
                 <tr>
-                    <td>Data Ayah Kandung</td>
-                    <td>: {{ $pendaftar->nama_ayah ?: '-' }} {{ $pendaftar->pekerjaan_ayah ? '(' . $pendaftar->pekerjaan_ayah . ')' : '' }}</td>
-                </tr>
-                <tr>
-                    <td>Data Ibu Kandung</td>
-                    <td>: {{ $pendaftar->nama_ibu ?: '-' }} {{ $pendaftar->pekerjaan_ibu ? '(' . $pendaftar->pekerjaan_ibu . ')' : '' }}</td>
-                </tr>
-                <tr>
-                    <td>WhatsApp Siswa (Notifikasi)</td>
+                    <td>Kontak Siswa / Orang Tua</td>
                     <td>: <strong>{{ $pendaftar->no_hp_siswa ?: ($pendaftar->no_hp_ortu ?: '-') }}</strong></td>
                 </tr>
-                @if($pendaftar->no_hp_ortu && $pendaftar->no_hp_ortu !== $pendaftar->no_hp_siswa)
-                <tr>
-                    <td>WhatsApp Orang Tua</td>
-                    <td>: {{ $pendaftar->no_hp_ortu }}</td>
-                </tr>
-                @endif
             </table>
         </div>
 
         <div style="font-size: 8.5pt; color: #333; line-height: 1.5; border-top: 1px dashed #999; padding-top: 10px; margin-bottom: 20px;">
-            <strong>Catatan untuk Peserta:</strong>
-            <ol style="margin: 4px 0 0 16px; padding: 0;">
-                <li>Bawa kartu bukti pendaftaran ini saat jadwal verifikasi fisik atau daftar ulang di sekolah.</li>
-                <li>Lampirkan fotokopi KK, Akta Kelahiran, dan Ijazah/SKL yang dilegalisir saat verifikasi langsung.</li>
-                <li>Pantau terus pengumuman resmi berkala di website resmi: <code>{{ url('/') }}</code></li>
-            </ol>
+            @if($pendaftar->status == 'diterima')
+                <strong>Petunjuk Daftar Ulang Calon Siswa Diterima:</strong>
+                <ol style="margin: 4px 0 0 16px; padding: 0;">
+                    <li>Bawa Surat Keterangan Lulus ini ke Sekretariat PPDB SMKN 1 Air Naningan pada jadwal daftar ulang.</li>
+                    <li>Menyerahkan fotokopi legalisir: Ijazah/SKL (2 lbr), Kartu Keluarga (2 lbr), Akta Kelahiran (2 lbr).</li>
+                    <li>Menyerahkan Pas Foto berwarna terbaru 3x4 (4 lembar) dan menandatangani surat kesanggupan tata tertib sekolah.</li>
+                </ol>
+            @else
+                <strong>Catatan untuk Peserta:</strong>
+                <ol style="margin: 4px 0 0 16px; padding: 0;">
+                    <li>Bawa kartu bukti pendaftaran ini saat jadwal verifikasi fisik atau pelaksanaan tes di sekolah.</li>
+                    <li>Wajib hadir 30 menit sebelum sesi ujian CBT dan wawancara dimulai dengan mengenakan seragam sekolah asal.</li>
+                    <li>Pantau terus pengumuman resmi berkala di website resmi: <code>{{ url('/') }}</code></li>
+                </ol>
+            @endif
         </div>
 
         <!-- Tanda Tangan -->

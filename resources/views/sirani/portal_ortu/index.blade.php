@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>{{ $siswa ? ($modeAkses === 'siswa' ? 'Kartu & Presensi Siswa '.$siswa->nama.' — SIRANI' : 'Rekap Kehadiran '.$siswa->nama.' — Portal Wali Murid') : 'Portal Kehadiran Siswa & Orang Tua — SMKN 1 Air Naningan' }}</title>
+  <title>{{ $siswa ? ($modeAkses === 'siswa' ? 'Kartu & Presensi Siswa '.$siswa->nama.' — SIRANI' : 'Rekap Kehadiran '.$siswa->nama.' — Monitoring Absen Mandiri') : 'Monitoring Absen Mandiri — SMKN 1 Air Naningan' }}</title>
   
   {{-- PWA Meta Tags --}}
   <link rel="manifest" href="/manifest.json" />
@@ -34,19 +34,22 @@
   {{-- TOP NAVIGATION --}}
   <nav class="top-nav">
     <div class="top-nav-inner">
-      <a href="/cek-presensi" class="brand-logo">
+      <a href="/monitoring-absen" class="brand-logo">
         <div class="brand-icon">
           <i class="bi bi-mortarboard-fill"></i>
         </div>
         <div class="brand-text">
-          <h1>SIRANI · Portal Presensi Siswa &amp; Orang Tua</h1>
-          <p>SMK Negeri 1 Air Naningan</p>
+          <h1>SIRANI · Monitoring Absen Mandiri</h1>
+          <p>Layanan Pantau Kehadiran Siswa &amp; Orang Tua · SMKN 1 Air Naningan</p>
         </div>
       </a>
 
       <div class="nav-actions" style="display:flex; align-items:center; gap:8px;">
-        <button type="button" id="btnPwaInstall" onclick="triggerPwaInstall()" style="background:var(--text); color:var(--bg); border:none; padding:6px 12px; border-radius:var(--r-sm); font-size:11.5px; font-weight:800; cursor:pointer; display:inline-flex; align-items:center; gap:5px; font-family:var(--font-main);">
-          <i class="bi bi-phone"></i> <span>Instal Aplikasi</span>
+        <a href="/" style="text-decoration:none; color:var(--text-2); font-size:12px; font-weight:700; padding:6px 14px; border-radius:var(--r-sm); background:var(--bg-subtle); border:1px solid var(--border-2); display:inline-flex; align-items:center; gap:5px;">
+          Portal Sekolah
+        </a>
+        <button type="button" id="btnPwaInstall" onclick="triggerPwaInstall()" style="background:#0f172a; color:#ffffff; border:none; padding:6px 14px; border-radius:var(--r-sm); font-size:12px; font-weight:800; cursor:pointer; display:inline-flex; align-items:center; gap:5px; font-family:var(--font-main);">
+          Instal Aplikasi
         </button>
       </div>
     </div>
@@ -58,38 +61,39 @@
     @if(!$siswa)
       {{-- SEARCH CONSOLE (HERO SELAMAT DATANG) --}}
       <section class="search-console-card">
-        <span class="search-badge">
-          <i class="bi bi-shield-check"></i> Layanan Presensi Terpadu Siswa &amp; Orang Tua
-        </span>
-        <div id="savedStudentsContainer" style="display:none;"></div>
+        <div class="search-badge">
+          Layanan Presensi Mandiri Siswa &amp; Orang Tua
+        </div>
 
+        <h2 class="search-title">Monitoring Absen Mandiri</h2>
         <p class="search-desc">
-          Selamat datang di portal presensi mandiri SMKN 1 Air Naningan. Masukkan <strong>NISN</strong> atau <strong>Nomor WhatsApp Orang Tua</strong> untuk memantau catatan absensi, riwayat kehadiran, dan kedisiplinan secara real-time.
+          Pantau catatan absensi, riwayat kehadiran harian, kartu pelajar digital, dan catatan pembinaan siswa SMKN 1 Air Naningan secara real-time.
         </p>
+
+        <div id="savedStudentsContainer" style="display:none;"></div>
 
         <div class="search-form-box">
           <form method="GET" action="{{ route('portal.ortu.index') }}">
             <div class="search-input-wrap">
-              <i class="bi bi-search" style="align-self:center; margin-left:12px; color:var(--text-3); font-size:15px;"></i>
               <input
                 type="text"
                 name="keyword"
                 class="search-input"
                 value="{{ $keyword }}"
-                placeholder="Ketik NISN atau No. WhatsApp..."
+                placeholder="Masukkan NISN Siswa (contoh: 0071234567) atau No. WhatsApp..."
                 autocomplete="off"
                 required
                 autofocus
               />
-              <button type="button" onclick="startQrScanner()" class="btn-search" style="background:var(--bg-subtle); color:var(--text); border:1px solid var(--border-2); padding:0 12px;" title="Scan QR Code Kartu Pelajar">
-                <i class="bi bi-qr-code-scan"></i> <span style="display:none;" class="qr-btn-text">Scan</span>
+              <button type="button" onclick="startQrScanner()" class="btn-scan-qr" title="Scan QR Code Kartu Pelajar">
+                Scan QR
               </button>
               <button type="submit" class="btn-search">
-                <i class="bi bi-arrow-right-circle-fill"></i> Cek Presensi
+                Cek Presensi
               </button>
             </div>
-            <div style="font-size:11.5px; color:var(--text-3); margin-top:6px; display:flex; align-items:center; gap:4px;">
-              <i class="bi bi-info-circle"></i> <span>Tips: Bisa langsung cari menggunakan No. WhatsApp Orang Tua yang terdaftar.</span>
+            <div class="search-hints-row">
+              <span class="search-hint-pill">Pencarian dapat menggunakan <strong>NISN Siswa</strong> atau <strong>Nomor WhatsApp Orang Tua</strong> yang terdaftar.</span>
             </div>
           </form>
         </div>
@@ -97,30 +101,21 @@
         {{-- Highlight Layanan --}}
         <div class="portal-features-grid">
           <div class="portal-feature-item">
-            <div class="portal-feature-icon">
-              <i class="bi bi-qr-code-scan"></i>
-            </div>
             <div class="portal-feature-text">
-              <strong>Smart Gate RFID &amp; QR</strong>
-              <span>Presensi otomatis via kartu RFID &amp; QR Code di gerbang sekolah.</span>
+              <strong>Smart Gate Terintegrasi</strong>
+              <span>Presensi otomatis tercatat saat siswa tap kartu RFID atau QR Code di gerbang masuk sekolah.</span>
             </div>
           </div>
           <div class="portal-feature-item">
-            <div class="portal-feature-icon">
-              <i class="bi bi-bar-chart-line-fill"></i>
-            </div>
             <div class="portal-feature-text">
               <strong>Rekapitulasi Lengkap</strong>
-              <span>Pantauan riwayat harian, mingguan, bulanan, dan tahunan.</span>
+              <span>Akses pantauan riwayat kehadiran harian, mingguan, bulanan, dan persentase kehadiran transparan.</span>
             </div>
           </div>
           <div class="portal-feature-item">
-            <div class="portal-feature-icon">
-              <i class="bi bi-journal-bookmark-fill"></i>
-            </div>
             <div class="portal-feature-text">
-              <strong>Portofolio Karakter</strong>
-              <span>Transparansi poin apresiasi, prestasi, serta catatan pembinaan.</span>
+              <strong>Kartu Pelajar &amp; Karakter</strong>
+              <span>Transparansi kartu digital mandiri, rekap poin apresiasi, prestasi, dan catatan pembinaan siswa.</span>
             </div>
           </div>
         </div>

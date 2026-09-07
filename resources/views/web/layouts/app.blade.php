@@ -156,17 +156,17 @@
                                 </div>
                             </a>
 
-                            <!-- Modul Aktif: Presensi Mandiri SIRANI -->
+                            <!-- Modul Aktif: Monitoring Absen Mandiri SIRANI -->
                             <a href="{{ route('portal.ortu.index') }}" class="dropdown-item-card">
                                 <div class="dropdown-item-icon" style="background: var(--brand-blue-subtle); color: var(--brand-blue);">
                                     <i class="fa-solid fa-id-card-clip"></i>
                                 </div>
                                 <div class="dropdown-item-info">
                                     <div class="dropdown-item-title">
-                                        <span>Presensi Digital (SIRANI)</span>
+                                        <span>Monitoring Absen Mandiri</span>
                                         <span class="badge-subtle-status aktif">Aktif</span>
                                     </div>
-                                    <div class="dropdown-item-sub">Kartu RFID &amp; gateway kehadiran orang tua</div>
+                                    <div class="dropdown-item-sub">Pantauan kehadiran mandiri siswa &amp; orang tua</div>
                                 </div>
                             </a>
 
@@ -271,9 +271,9 @@
                 <!-- Desktop Action Gateways & Mobile Hamburger -->
                 <div class="nav-right-actions">
                     <div class="desktop-nav-actions">
-                        <a href="{{ route('portal.ortu.index') }}" class="btn-nav-presensi" title="Cek Presensi Mandiri Siswa &amp; Orang Tua">
+                        <a href="{{ route('portal.ortu.index') }}" class="btn-nav-presensi" title="Monitoring Absen Mandiri Siswa &amp; Orang Tua">
                             <i class="fa-solid fa-id-card-clip" style="color: var(--brand-blue);"></i>
-                            <span>Cek Presensi</span>
+                            <span>Monitoring Absen</span>
                         </a>
                         @auth
                             <a href="{{ route('admin.portal') }}" class="btn-nav-login" title="Kembali ke Dashboard DCC">
@@ -374,8 +374,8 @@
                         <a href="{{ route('portal.ortu.index') }}" class="drawer-nav-item">
                             <div class="drawer-nav-icon" style="background: var(--brand-blue-subtle); color: var(--brand-blue);"><i class="fa-solid fa-id-card-clip"></i></div>
                             <div class="drawer-nav-text">
-                                <span class="drawer-nav-title">Presensi Digital SIRANI</span>
-                                <span class="drawer-nav-desc">Kartu RFID &amp; portal orang tua</span>
+                                <span class="drawer-nav-title">Monitoring Absen Mandiri</span>
+                                <span class="drawer-nav-desc">Kartu RFID &amp; pantau presensi siswa</span>
                             </div>
                             <span class="badge-subtle-status aktif">Aktif</span>
                         </a>
@@ -427,7 +427,7 @@
                                 <i class="fa-solid fa-id-card-clip"></i>
                             </div>
                             <div>
-                                <div class="gateway-card-title">Cek Presensi Mandiri</div>
+                                <div class="gateway-card-title">Monitoring Absen Mandiri</div>
                                 <div class="gateway-card-sub">Khusus Siswa &amp; Orang Tua</div>
                             </div>
                         </a>

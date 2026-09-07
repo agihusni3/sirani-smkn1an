@@ -32,6 +32,7 @@ use App\Http\Controllers\Web\EkosistemController;
 use App\Http\Controllers\Ppdb\PpdbDaftarController;
 use App\Http\Controllers\Ppdb\PpdbAdminController;
 use App\Http\Controllers\Ppdb\PpdbUjianController;
+use App\Http\Controllers\Ppdb\PpdbSoalController;
 use App\Http\Controllers\Admin\BeritaAdminController;
 use App\Http\Controllers\Admin\WebsiteBannerController;
 use App\Http\Controllers\Admin\WebsiteStatistikController;
@@ -68,14 +69,18 @@ Route::middleware('track.visitor')->group(function () {
 
 
 
-// Portal Kehadiran Terpadu Siswa & Orang Tua (Cek Presensi Mandiri - Dilindungi Rate Limiting)
+// Monitoring Absen Mandiri Siswa & Orang Tua (Dilindungi Rate Limiting)
 Route::middleware('throttle:300,1')->group(function () {
+    Route::get('/monitoring-absen', [PortalOrtuController::class, 'index'])->name('monitoring.absen');
+    Route::post('/monitoring-absen', [PortalOrtuController::class, 'index'])->name('monitoring.absen.cari');
+    Route::get('/monitoring-absen/{nisn}', [PortalOrtuController::class, 'detail'])->name('monitoring.absen.detail');
+
     Route::get('/cek-presensi', [PortalOrtuController::class, 'index'])->name('portal.ortu.index');
     Route::post('/cek-presensi', [PortalOrtuController::class, 'index'])->name('portal.ortu.cari');
     Route::get('/cek-presensi/{nisn}', [PortalOrtuController::class, 'detail'])->name('portal.ortu.detail');
     Route::get('/presensi-siswa/{nisn}', [PortalOrtuController::class, 'detail'])->name('portal.ortu.direct');
     
-    // Redirect Alias dari rute lama ke portal terpadu
+    // Redirect Alias dari rute lama ke monitoring absen mandiri
     Route::get('/portal-siswa/{nisn?}', [\App\Http\Controllers\RfidController::class, 'portalSiswa'])->name('portal.siswa');
     Route::get('/kartu-digital/{nisn}', [\App\Http\Controllers\RfidController::class, 'kartuDigital'])->name('kartu.digital');
     Route::get('/kartu-digital-guru/{id}', [\App\Http\Controllers\RfidController::class, 'kartuDigitalGuru'])->name('kartu.digital.guru');
@@ -356,6 +361,16 @@ Route::middleware('auth')->group(function () {
             Route::get('/ppdb/{id}', [PpdbAdminController::class, 'show'])->name('ppdb.show');
             Route::put('/ppdb/{id}/status', [PpdbAdminController::class, 'updateStatus'])->name('ppdb.update_status');
             Route::post('/ppdb/{id}/mutasi', [PpdbAdminController::class, 'mutasi'])->name('ppdb.mutasi');
+            Route::post('/ppdb/mutasi-massal', [PpdbAdminController::class, 'mutasiMassal'])->name('ppdb.mutasi_massal');
+            Route::post('/ppdb/{id}/koreksi-jurusan', [PpdbAdminController::class, 'koreksiJurusan'])->name('ppdb.koreksi_jurusan');
+
+            // Bank Soal CBT PPDB
+            Route::get('/ppdb/soal/{settingId}', [PpdbSoalController::class, 'index'])->name('ppdb.soal.index');
+            Route::get('/ppdb/soal/{settingId}/tambah', [PpdbSoalController::class, 'create'])->name('ppdb.soal.create');
+            Route::post('/ppdb/soal/{settingId}', [PpdbSoalController::class, 'store'])->name('ppdb.soal.store');
+            Route::get('/ppdb/soal-edit/{id}', [PpdbSoalController::class, 'edit'])->name('ppdb.soal.edit');
+            Route::put('/ppdb/soal-edit/{id}', [PpdbSoalController::class, 'update'])->name('ppdb.soal.update');
+            Route::delete('/ppdb/soal-edit/{id}', [PpdbSoalController::class, 'destroy'])->name('ppdb.soal.destroy');
         });
 
         // Kelola Berita, Pengumuman, Agenda & Hero Banner (Admin, Kepsek, Humas)

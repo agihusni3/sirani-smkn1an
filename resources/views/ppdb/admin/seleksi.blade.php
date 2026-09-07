@@ -199,117 +199,123 @@
     @endphp
     <div class="seleksi-tabs no-print">
       <a href="javascript:void(0)" class="seleksi-tab-link {{ $curTab === 'pengaturan' ? 'active' : '' }}" onclick="switchTab('tab-pengaturan', this)">
-        <i class="bi bi-gear-fill"></i> 1. Pengaturan &amp; Kunci Jawaban
+        1. Pengaturan &amp; Bank Soal
       </a>
       <a href="javascript:void(0)" class="seleksi-tab-link {{ $curTab === 'penjadwalan' ? 'active' : '' }}" onclick="switchTab('tab-jadwal', this)">
-        <i class="bi bi-calendar-event-fill"></i> 2. Penjadwalan Sesi Lab
+        2. Penjadwalan Sesi Lab
       </a>
       <a href="javascript:void(0)" class="seleksi-tab-link {{ $curTab === 'tertulis' ? 'active' : '' }}" onclick="switchTab('tab-koreksi', this)">
-        <i class="bi bi-pencil-fill"></i> 3. Koreksi Esai &amp; CBT
+        3. Koreksi Esai &amp; CBT
       </a>
       <a href="javascript:void(0)" class="seleksi-tab-link {{ $curTab === 'wawancara' ? 'active' : '' }}" onclick="switchTab('tab-wawancara', this)">
-        <i class="bi bi-person-lines-fill"></i> 4. Penilaian Wawancara
+        4. Penilaian Wawancara
       </a>
       <a href="javascript:void(0)" class="seleksi-tab-link {{ $curTab === 'leaderboard' ? 'active' : '' }}" onclick="switchTab('tab-leaderboard', this)">
-        <i class="bi bi-trophy-fill"></i> 5. Peringkat &amp; Hasil Akhir
+        5. Peringkat &amp; Hasil Akhir
       </a>
     </div>
 
     {{-- ══════════════════════════════════════════════════════════════ --}}
-    {{-- TAB 1: PENGATURAN & KUNCI JAWABAN --}}
+    {{-- TAB 1: PENGATURAN & BANK SOAL CBT --}}
     {{-- ══════════════════════════════════════════════════════════════ --}}
     <div id="tab-pengaturan" class="tab-content-pane {{ $curTab === 'pengaturan' ? 'active' : '' }}">
-      <form action="{{ route('admin.ppdb.seleksi.setting') }}" method="POST" enctype="multipart/form-data">
+      
+      {{-- KARTU BANK SOAL CBT --}}
+      <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 22px 24px; margin-bottom: 24px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px; margin-bottom: 16px;">
+          <div>
+            <h3 style="font-size: 16px; font-weight: 800; margin: 0 0 4px; color: #0f172a;">
+              Bank Soal Ujian CBT PPDB
+            </h3>
+            <div style="font-size: 13px; color: #64748b;">
+              Soal diinput satu persatu ke dalam sistem. Saat siswa mengerjakan ujian, urutan soal akan teracak otomatis per peserta untuk meminimalisir pencontekan.
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 10px; align-items: center;">
+            <a href="{{ route('admin.ppdb.soal.index', $setting->id) }}" class="btn" style="background: #2563eb; color: #ffffff; font-weight: 700; padding: 9px 18px; border-radius: 8px; text-decoration: none; font-size: 13px;">
+              Kelola Bank Soal ({{ $setting->soals()->count() }} Soal)
+            </a>
+            <a href="{{ route('admin.ppdb.soal.create', $setting->id) }}" class="btn" style="background: #f1f5f9; border: 1px solid #cbd5e1; color: #1e293b; font-weight: 700; padding: 9px 16px; border-radius: 8px; text-decoration: none; font-size: 13px;">
+              + Tambah Soal
+            </a>
+          </div>
+        </div>
+
+        {{-- Ringkasan Soal --}}
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; background: #f8fafc; border-radius: 10px; padding: 14px 18px; border: 1px solid #e2e8f0;">
+          <div>
+            <div style="font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase;">Soal Pilihan Ganda (PG)</div>
+            <div style="font-size: 20px; font-weight: 800; color: #2563eb; margin-top: 2px;">{{ $setting->soalPg()->count() }} butir</div>
+            <div style="font-size: 11.5px; color: #64748b;">Koreksi otomatis berdasarkan kunci tiap soal</div>
+          </div>
+          <div>
+            <div style="font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase;">Soal Esai / Uraian</div>
+            <div style="font-size: 20px; font-weight: 800; color: #059669; margin-top: 2px;">{{ $setting->soalEsai()->count() }} butir</div>
+            <div style="font-size: 11.5px; color: #64748b;">Koreksi manual di tab Koreksi Esai</div>
+          </div>
+          <div>
+            <div style="font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase;">Anti-Contek (Random Soal)</div>
+            <div style="font-size: 14px; font-weight: 700; color: #059669; margin-top: 6px;">Aktif (Diacak per Siswa)</div>
+            <div style="font-size: 11.5px; color: #64748b;">Urutan soal berbeda untuk setiap siswa</div>
+          </div>
+        </div>
+      </div>
+
+      {{-- FORM PENGATURAN PARAMETER CBT --}}
+      <form action="{{ route('admin.ppdb.seleksi.setting') }}" method="POST">
         @csrf
 
         <div style="background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:24px; margin-bottom:24px;">
-          <h3 style="font-size:16px; font-weight:900; margin:0 0 16px; color:var(--text-1); display:flex; align-items:center; gap:8px;">
-            <i class="bi bi-sliders text-primary"></i> Parameter Ujian CBT Terpadu
+          <h3 style="font-size:16px; font-weight:800; margin:0 0 16px; color:var(--text-1);">
+            Parameter Sesi Ujian CBT
           </h3>
 
           <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr)); gap:18px; margin-bottom:20px;">
             <div>
-              <label style="display:block; font-size:12px; font-weight:800; color:var(--text-2); margin-bottom:6px;">Judul Naskah Ujian:</label>
+              <label style="display:block; font-size:12px; font-weight:700; color:var(--text-2); margin-bottom:6px;">Judul Ujian:</label>
               <input type="text" name="judul_ujian" class="form-control" value="{{ old('judul_ujian', $setting->judul_ujian ?? 'Tes Potensi Akademik & Minat Bakat PPDB 2026') }}" required style="font-weight:700;">
             </div>
 
             <div>
-              <label style="display:block; font-size:12px; font-weight:800; color:var(--text-2); margin-bottom:6px;">Durasi Pengerjaan (Menit):</label>
+              <label style="display:block; font-size:12px; font-weight:700; color:var(--text-2); margin-bottom:6px;">Durasi Pengerjaan (Menit):</label>
               <input type="number" name="durasi_menit" class="form-control" value="{{ old('durasi_menit', $setting->durasi_menit ?? 60) }}" min="15" max="180" required style="font-weight:800; font-family:monospace;">
             </div>
 
             <div>
-              <label style="display:block; font-size:12px; font-weight:800; color:var(--text-2); margin-bottom:6px;">Status Akses Ujian Peserta:</label>
+              <label style="display:block; font-size:12px; font-weight:700; color:var(--text-2); margin-bottom:6px;">Status Akses Ujian Peserta:</label>
               <div style="display:flex; align-items:center; gap:10px; margin-top:8px;">
                 <input type="checkbox" id="is_active" name="is_active" value="1" {{ !empty($setting->is_active) ? 'checked' : '' }} style="width:20px; height:20px; accent-color:#2563eb; cursor:pointer;">
-                <label for="is_active" style="font-weight:800; font-size:13px; color:var(--text-1); cursor:pointer;">
-                  Aktifkan Sesi Ujian (Peserta dapat login &amp; mulai ujian)
+                <label for="is_active" style="font-weight:700; font-size:13px; color:var(--text-1); cursor:pointer;">
+                  Aktifkan Sesi Ujian (Peserta dapat login &amp; mulai tes)
                 </label>
               </div>
             </div>
           </div>
 
-          <!-- Bobot Nilai & File Upload PDF -->
+          <!-- Bobot Nilai -->
           <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr)); gap:18px; margin-bottom:20px; padding:16px; background:#f8fafc; border-radius:10px; border:1px solid #e2e8f0;">
             <div>
-              <label style="display:block; font-size:12px; font-weight:800; color:var(--text-2); margin-bottom:6px;">Bobot Pilihan Ganda (%):</label>
+              <label style="display:block; font-size:12px; font-weight:700; color:var(--text-2); margin-bottom:6px;">Bobot Pilihan Ganda (%):</label>
               <input type="number" name="bobot_pg" class="form-control" value="{{ old('bobot_pg', $setting->bobot_pg ?? 70) }}" min="10" max="90" required style="font-weight:800;">
+              <div style="font-size:11px; color:#64748b; margin-top:4px;">Persentase nilai PG dalam nilai tertulis</div>
             </div>
 
             <div>
-              <label style="display:block; font-size:12px; font-weight:800; color:var(--text-2); margin-bottom:6px;">Bobot Soal Esai (%):</label>
+              <label style="display:block; font-size:12px; font-weight:700; color:var(--text-2); margin-bottom:6px;">Bobot Soal Esai (%):</label>
               <input type="number" name="bobot_esai" class="form-control" value="{{ old('bobot_esai', $setting->bobot_esai ?? 30) }}" min="10" max="90" required style="font-weight:800;">
-            </div>
-
-            <div>
-              <label style="display:block; font-size:12px; font-weight:800; color:var(--text-2); margin-bottom:6px;">Upload File PDF Naskah Soal:</label>
-              <input type="file" name="file_pdf_soal" class="form-control" accept="application/pdf">
-              @if(!empty($setting->file_pdf_soal))
-                <div style="margin-top:6px; font-size:11.5px;">
-                  <a href="{{ asset('storage/' . $setting->file_pdf_soal) }}" target="_blank" style="color:#2563eb; font-weight:700; text-decoration:none;">
-                    <i class="bi bi-file-earmark-pdf-fill text-danger"></i> Lihat File Naskah PDF Tersimpan ({{ $setting->nama_file_asli ?? 'soal.pdf' }})
-                  </a>
-                </div>
-              @endif
+              <div style="font-size:11px; color:#64748b; margin-top:4px;">Persentase nilai Esai dalam nilai tertulis</div>
             </div>
           </div>
 
           <div style="margin-bottom:24px;">
-            <label style="display:block; font-size:12px; font-weight:800; color:var(--text-2); margin-bottom:6px;">Petunjuk Pengerjaan Ujian:</label>
+            <label style="display:block; font-size:12px; font-weight:700; color:var(--text-2); margin-bottom:6px;">Petunjuk Pengerjaan Ujian:</label>
             <textarea name="petunjuk_ujian" class="form-control" rows="2" style="font-size:13px;">{{ old('petunjuk_ujian', $setting->petunjuk_ujian ?? '') }}</textarea>
           </div>
 
-          <!-- Kunci Jawaban 30 PG -->
-          <div style="border-top:1px dashed #cbd5e1; padding-top:20px;">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-              <div>
-                <h4 style="font-size:14px; font-weight:900; margin:0; color:var(--text-1);">
-                  <i class="bi bi-key-fill text-warning"></i> Kunci Jawaban Resmi 30 Soal Pilihan Ganda
-                </h4>
-                <div style="font-size:12px; color:var(--text-3);">Sistem akan mencocokkan otomatis lembar jawaban peserta dengan kunci di bawah ini</div>
-              </div>
-            </div>
-
-            <div class="key-grid">
-              @for($i = 1; $i <= 30; $i++)
-                @php
-                  $kunciVal = $setting->kunci_jawaban_pg[(string)$i] ?? 'A';
-                @endphp
-                <div class="key-box">
-                  <div style="font-size:11px; font-weight:800; color:var(--text-3); margin-bottom:4px;">No. {{ $i }}</div>
-                  <select name="kunci[{{ $i }}]">
-                    @foreach(['A', 'B', 'C', 'D', 'E'] as $opt)
-                      <option value="{{ $opt }}" {{ $kunciVal === $opt ? 'selected' : '' }}>{{ $opt }}</option>
-                    @endforeach
-                  </select>
-                </div>
-              @endfor
-            </div>
-          </div>
-
-          <div style="margin-top:24px; text-align:right;">
-            <button type="submit" class="btn" style="background:#2563eb; color:#ffffff; font-weight:800; padding:10px 24px; border-radius:8px; border:none; cursor:pointer;">
-              <i class="bi bi-save2-fill me-1"></i> Simpan Pengaturan &amp; Kunci Jawaban
+          <div style="margin-top:20px; text-align:right;">
+            <button type="submit" class="btn" style="background:#2563eb; color:#ffffff; font-weight:700; padding:10px 24px; border-radius:8px; border:none; cursor:pointer; font-size:13px;">
+              Simpan Pengaturan Sesi Ujian
             </button>
           </div>
 
@@ -581,6 +587,7 @@
     </div>
 
     {{-- ══════════════════════════════════════════════════════════════ --}}
+    {{-- ══════════════════════════════════════════════════════════════ --}}
     {{-- TAB 5: PERINGKAT & LEADERBOARD HASIL AKHIR --}}
     {{-- ══════════════════════════════════════════════════════════════ --}}
     <div id="tab-leaderboard" class="tab-content-pane {{ $curTab === 'leaderboard' ? 'active' : '' }}">
@@ -588,14 +595,19 @@
         <div style="padding:16px 20px; background:#f8fafc; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
           <div>
             <h3 style="font-size:15px; font-weight:900; margin:0; color:var(--text-1);">
-              <i class="bi bi-award-fill text-warning"></i> Leaderboard &amp; Peringkat Kelulusan
+              Leaderboard &amp; Peringkat Kelulusan
             </h3>
-            <div style="font-size:12px; color:var(--text-3);">Kalkulasi formula: Nilai Rapor (30%) + Tes Tertulis CBT (35%) + Wawancara (35%)</div>
+            <div style="font-size:12px; color:var(--text-3);">Kalkulasi formula: Rapor (30%) + CBT (35%) + Wawancara (35%) &bull; Diterima: {{ $stats['total_diterima'] ?? 0 }} siswa</div>
           </div>
 
-          <div style="display:flex; align-items:center; gap:8px;">
-            <button type="button" class="btn btn-sm" onclick="document.getElementById('modalKalkulasi').style.display = 'flex'" style="background:#10b981; color:#ffffff; font-weight:800; border-radius:6px; border:none; padding:6px 14px; font-size:12px; cursor:pointer;">
-              <i class="bi bi-calculator"></i> Kalkulasi Sekarang
+          <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+            @if(($stats['total_diterima'] ?? 0) > 0)
+              <a href="{{ route('admin.ppdb.index', ['status' => 'diterima']) }}" class="btn btn-sm" style="background:#059669; color:#ffffff; font-weight:800; border-radius:6px; padding:6px 14px; font-size:12px; text-decoration:none;">
+                Lanjut Mutasi Massal ({{ $stats['total_diterima'] }}) &rarr;
+              </a>
+            @endif
+            <button type="button" class="btn btn-sm" onclick="document.getElementById('modalKalkulasi').style.display = 'flex'" style="background:#2563eb; color:#ffffff; font-weight:800; border-radius:6px; border:none; padding:6px 14px; font-size:12px; cursor:pointer;">
+              Kalkulasi &amp; Ranking Otomatis
             </button>
           </div>
         </div>
@@ -605,11 +617,12 @@
             <tr>
               <th style="padding:12px 16px; text-align:center; width:50px;">Rank</th>
               <th style="padding:12px 16px;">Nama Calon Siswa</th>
-              <th style="padding:12px 16px;">Jurusan Pilihan</th>
+              <th style="padding:12px 16px;">Pilihan 1 &amp; 2</th>
               <th style="padding:12px 16px; text-align:center;">Rapor (30%)</th>
               <th style="padding:12px 16px; text-align:center;">Tertulis (35%)</th>
               <th style="padding:12px 16px; text-align:center;">Wawancara (35%)</th>
               <th style="padding:12px 16px; text-align:center;">NILAI AKHIR</th>
+              <th style="padding:12px 16px; text-align:center;">Diterima di Jurusan</th>
               <th style="padding:12px 16px; text-align:center;">Status PPDB</th>
             </tr>
           </thead>
@@ -632,7 +645,10 @@
                   <span style="font-family:monospace; color:#2563eb; font-weight:700;">{{ $row->no_pendaftaran }}</span>
                 </td>
                 <td style="padding:12px 16px;">
-                  <span style="font-weight:700; color:var(--text-1);">{{ $row->jurusan1->nama_jurusan ?? ($row->jurusanPilihan1->nama_jurusan ?? '-') }}</span>
+                  <div style="font-weight:700; color:var(--text-1);">1. {{ $row->jurusanPilihan1->kode_jurusan ?? '-' }}</div>
+                  @if($row->jurusanPilihan2)
+                    <div style="font-size:11px; color:var(--text-3);">2. {{ $row->jurusanPilihan2->kode_jurusan }}</div>
+                  @endif
                 </td>
                 <td style="padding:12px 16px; text-align:center; font-family:monospace; font-weight:800;">
                   {{ number_format($row->nilai_rapor ?? 0, 1) }}
@@ -647,9 +663,18 @@
                   {{ number_format($row->nilai_akhir ?? 0, 2) }}
                 </td>
                 <td style="padding:12px 16px; text-align:center;">
+                  @if($row->jurusanDiterima)
+                    <span style="font-weight:800; color:#15803d; background:#dcfce7; padding:3px 10px; border-radius:6px; font-size:11.5px; border:1px solid #a7f3d0;">
+                      {{ $row->jurusanDiterima->nama_jurusan }}
+                    </span>
+                  @else
+                    <span style="color:#94a3b8; font-size:12px;">—</span>
+                  @endif
+                </td>
+                <td style="padding:12px 16px; text-align:center;">
                   @if($row->status === 'diterima')
                     <span style="background:#ecfdf5; color:#059669; font-weight:900; font-size:11px; padding:4px 10px; border-radius:6px; border:1px solid #a7f3d0;">
-                      <i class="bi bi-check-circle-fill"></i> DITERIMA
+                      DITERIMA
                     </span>
                   @elseif($row->status === 'cadangan')
                     <span style="background:#fffbeb; color:#d97706; font-weight:900; font-size:11px; padding:4px 10px; border-radius:6px; border:1px solid #fde68a;">
@@ -668,7 +693,7 @@
               </tr>
             @empty
               <tr>
-                <td colspan="8" style="padding:30px; text-align:center; color:var(--text-3);">
+                <td colspan="9" style="padding:30px; text-align:center; color:var(--text-3);">
                   Belum ada data nilai pendaftar yang siap diperingkatkan.
                 </td>
               </tr>
@@ -768,21 +793,39 @@
 {{-- MODAL KALKULASI KELULUSAN --}}
 {{-- ══════════════════════════════════════════════════════════════ --}}
 <div id="modalKalkulasi" style="display:none; position:fixed; inset:0; background:rgba(15,23,42,0.6); backdrop-filter:blur(4px); z-index:1000; align-items:center; justify-content:center; padding:20px;">
-  <div style="background:#ffffff; border-radius:16px; max-width:480px; width:100%; padding:26px; text-align:center; box-shadow:0 20px 40px rgba(0,0,0,0.25);">
-    <div style="width:54px; height:54px; border-radius:50%; background:#ecfdf5; color:#059669; font-size:24px; display:flex; align-items:center; justify-content:center; margin:0 auto 16px auto;">
-      <i class="bi bi-calculator-fill"></i>
-    </div>
-    <h3 style="font-size:17px; font-weight:900; margin:0 0 8px; color:#000000;">Jalankan Kalkulasi Kelulusan?</h3>
-    <p style="font-size:13px; color:#64748b; line-height:1.5; margin-bottom:20px;">
-      Sistem akan menggabungkan nilai rapor (30%), nilai ujian CBT tertulis (35%), dan nilai wawancara (35%), kemudian meranking peserta berdasarkan kuota daya tampung masing-masing kejuruan.
+  <div style="background:#ffffff; border-radius:14px; max-width:500px; width:100%; padding:26px; box-shadow:0 20px 40px rgba(0,0,0,0.25);">
+    <h3 style="font-size:17px; font-weight:800; margin:0 0 6px; color:#0f172a;">Kalkulasi &amp; Penetapan Kelulusan</h3>
+    <p style="font-size:12.5px; color:#64748b; line-height:1.5; margin-bottom:18px;">
+      Sistem akan menghitung nilai akhir terbobot (Rapor 30% + CBT 35% + Wawancara 35%), lalu mengalokasikan kelulusan sesuai kuota jurusan Pilihan 1 &amp; Pilihan 2.
     </p>
 
     <form action="{{ route('admin.ppdb.seleksi.kalkulasi') }}" method="POST">
       @csrf
-      <div style="display:flex; justify-content:center; gap:10px;">
-        <button type="button" onclick="document.getElementById('modalKalkulasi').style.display='none'" class="btn" style="background:#f1f5f9; color:#475569; font-weight:700; cursor:pointer;">Batal</button>
-        <button type="submit" class="btn" style="background:#10b981; color:#ffffff; font-weight:800; cursor:pointer;">
-          <i class="bi bi-check2-circle me-1"></i> Mulai Kalkulasi &amp; Ranking
+
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:18px; text-align:left;">
+        <div>
+          <label style="display:block; font-size:12px; font-weight:700; color:#1e293b; margin-bottom:4px;">Kuota per Rombel:</label>
+          <input type="number" name="kuota_per_rombel" value="36" min="1" max="100" class="form-control" required style="font-weight:800;">
+          <div style="font-size:11px; color:#64748b; margin-top:3px;">Standar SMK: 36 siswa/kelas</div>
+        </div>
+
+        <div>
+          <label style="display:block; font-size:12px; font-weight:700; color:#1e293b; margin-bottom:4px;">Nilai Minimal Lulus:</label>
+          <input type="number" name="passing_grade" value="50" min="0" max="100" step="0.5" class="form-control" required style="font-weight:800;">
+          <div style="font-size:11px; color:#64748b; margin-top:3px;">Passing grade nilai akhir (0-100)</div>
+        </div>
+      </div>
+
+      <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:12px; margin-bottom:20px; font-size:11.5px; color:#475569; text-align:left; line-height:1.5;">
+        &bull; Siswa yang lolos kuota Pilihan 1 langsung berstatus <strong>Diterima</strong>.<br>
+        &bull; Jika kuota Pilihan 1 penuh, sistem otomatis mengevaluasi ketersediaan di Pilihan 2.<br>
+        &bull; Siswa yang belum tertampung kuota akan dialihkan ke status <strong>Cadangan</strong>.
+      </div>
+
+      <div style="display:flex; justify-content:flex-end; gap:10px;">
+        <button type="button" onclick="document.getElementById('modalKalkulasi').style.display='none'" class="btn" style="background:#f1f5f9; color:#475569; font-weight:700; padding:8px 18px; border-radius:6px; font-size:13px; cursor:pointer;">Batal</button>
+        <button type="submit" class="btn" style="background:#2563eb; color:#ffffff; font-weight:700; padding:8px 20px; border-radius:6px; font-size:13px; cursor:pointer;">
+          Jalankan Kalkulasi &amp; Ranking
         </button>
       </div>
     </form>
@@ -802,6 +845,8 @@
     cbs.forEach(cb => cb.checked = source.checked);
   }
 
+  const bankSoalEsai = @json($setting->soalEsai);
+
   // Koreksi Esai Popup Fill
   function bukaModalKoreksi(ujian, pendaftar) {
     document.getElementById('koreksiPesertaMeta').innerText = `${pendaftar.nama_lengkap} (${pendaftar.no_pendaftaran}) — Skor PG: ${ujian.nilai_pg || 0}`;
@@ -813,25 +858,52 @@
     const esaiData = ujian.jawaban_esai || {};
     const nilaiTersimpan = ujian.nilai_per_nomor_esai || {};
 
-    for (let num = 31; num <= 35; num++) {
-      const teksJawaban = esaiData[num] || '<span style="color:#ef4444; font-style:italic;">(Peserta tidak mengisi jawaban)</span>';
-      const skorDefault = nilaiTersimpan[num] !== undefined ? nilaiTersimpan[num] : 8;
-      
-      const itemHtml = `
-        <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:14px;">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-            <strong style="font-size:13px; color:#0f172a;">Soal Esai No. ${num}</strong>
-            <div style="display:flex; align-items:center; gap:6px;">
-              <span style="font-size:12px; font-weight:700;">Skor (0 - 10):</span>
-              <input type="number" name="nilai_esai_${num}" min="0" max="10" step="0.5" value="${skorDefault}" required class="form-control form-control-sm" style="width:70px; font-weight:800; text-align:center;">
+    if (bankSoalEsai && bankSoalEsai.length > 0) {
+      bankSoalEsai.forEach((soal, idx) => {
+        const key = soal.id;
+        const teksJawaban = esaiData[key] || esaiData[soal.nomor_urut] || '<span style="color:#ef4444; font-style:italic;">(Peserta tidak mengisi jawaban)</span>';
+        const skorDefault = (nilaiTersimpan[key] !== undefined) ? nilaiTersimpan[key] : (nilaiTersimpan[soal.nomor_urut] !== undefined ? nilaiTersimpan[soal.nomor_urut] : 8);
+
+        const itemHtml = `
+          <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:14px; margin-bottom:12px;">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px; gap:12px;">
+              <div>
+                <strong style="font-size:13px; color:#0f172a;">Soal Esai #${soal.nomor_urut}</strong>
+                <div style="font-size:12px; color:#475569; margin-top:2px;">${soal.pertanyaan}</div>
+              </div>
+              <div style="display:flex; align-items:center; gap:6px; flex-shrink:0;">
+                <span style="font-size:12px; font-weight:700;">Skor (0 - 10):</span>
+                <input type="number" name="nilai_esai[${key}]" min="0" max="10" step="0.5" value="${skorDefault}" required class="form-control form-control-sm" style="width:70px; font-weight:800; text-align:center;">
+              </div>
+            </div>
+            <div style="background:#ffffff; border:1px solid #cbd5e1; border-radius:8px; padding:10px; font-size:12.5px; color:#1e293b; white-space:pre-wrap; max-height:140px; overflow-y:auto;">
+              ${teksJawaban}
             </div>
           </div>
-          <div style="background:#ffffff; border:1px solid #cbd5e1; border-radius:8px; padding:10px; font-size:12.5px; color:#1e293b; white-space:pre-wrap; max-height:140px; overflow-y:auto;">
-            ${teksJawaban}
+        `;
+        container.insertAdjacentHTML('beforeend', itemHtml);
+      });
+    } else {
+      for (let num = 31; num <= 35; num++) {
+        const teksJawaban = esaiData[num] || '<span style="color:#ef4444; font-style:italic;">(Peserta tidak mengisi jawaban)</span>';
+        const skorDefault = nilaiTersimpan[num] !== undefined ? nilaiTersimpan[num] : 8;
+        
+        const itemHtml = `
+          <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:14px; margin-bottom:12px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+              <strong style="font-size:13px; color:#0f172a;">Soal Esai No. ${num}</strong>
+              <div style="display:flex; align-items:center; gap:6px;">
+                <span style="font-size:12px; font-weight:700;">Skor (0 - 10):</span>
+                <input type="number" name="nilai_esai_${num}" min="0" max="10" step="0.5" value="${skorDefault}" required class="form-control form-control-sm" style="width:70px; font-weight:800; text-align:center;">
+              </div>
+            </div>
+            <div style="background:#ffffff; border:1px solid #cbd5e1; border-radius:8px; padding:10px; font-size:12.5px; color:#1e293b; white-space:pre-wrap; max-height:140px; overflow-y:auto;">
+              ${teksJawaban}
+            </div>
           </div>
-        </div>
-      `;
-      container.insertAdjacentHTML('beforeend', itemHtml);
+        `;
+        container.insertAdjacentHTML('beforeend', itemHtml);
+      }
     }
 
     document.getElementById('modalKoreksi').style.display = 'flex';

@@ -107,8 +107,8 @@ class PpdbDaftarController extends Controller
         $p->pekerjaan_ibu = $validated['pekerjaan_ibu'] ?? null;
         $p->pendidikan_ibu = $validated['pendidikan_ibu'] ?? null;
         $p->no_hp_ibu = $validated['no_hp_ibu'] ?? null;
-        $p->pekerjaan_ortu = $validated['pekerjaan_ayah'] ?: ($validated['pekerjaan_ibu'] ?: null);
-        $p->no_hp_ortu = $validated['no_hp_ortu'] ?: ($validated['no_hp_ayah'] ?: ($validated['no_hp_ibu'] ?: $validated['no_hp_siswa']));
+        $p->pekerjaan_ortu = ($validated['pekerjaan_ayah'] ?? null) ?: (($validated['pekerjaan_ibu'] ?? null) ?: null);
+        $p->no_hp_ortu = ($validated['no_hp_ortu'] ?? null) ?: (($validated['no_hp_ayah'] ?? null) ?: (($validated['no_hp_ibu'] ?? null) ?: ($validated['no_hp_siswa'] ?? null)));
         $p->jurusan_id_1 = $validated['jurusan_pilihan_1_id'];
         $p->jurusan_id_2 = $validated['jurusan_pilihan_2_id'] ?? null;
         $p->jalur_pendaftaran = $validated['jalur_pendaftaran'];
@@ -181,10 +181,26 @@ class PpdbDaftarController extends Controller
     public function cetakKartu($nomor)
     {
         $sekolah = PengaturanSekolah::getAktif();
-        $pendaftar = PpdbPendaftar::with(['jurusanPilihan1', 'jurusanPilihan2', 'jurusanDiterima'])
+        $pendaftar = PpdbPendaftar::with(['jurusanPilihan1', 'jurusanPilihan2', 'jurusanDiterima', 'ujianPeserta'])
             ->where('no_pendaftaran', $nomor)
             ->firstOrFail();
 
-        return view('ppdb.kartu_cetak', compact('sekolah', 'pendaftar'));
+        $settingUjian = \App\Models\PpdbUjianSetting::getAktif();
+        $qrCode = null;
+        $statusUrl = route('ppdb.status', ['keyword' => $pendaftar->no_pendaftaran]);
+
+        try {
+            $qrOptions = new \chillerlan\QRCode\QROptions([
+                'outputType'  => \chillerlan\QRCode\QRCode::OUTPUT_IMAGE_PNG,
+                'eccLevel'    => \chillerlan\QRCode\QRCode::ECC_M,
+                'scale'       => 4,
+                'imageBase64' => true,
+            ]);
+            $qrCode = (new \chillerlan\QRCode\QRCode($qrOptions))->render($statusUrl);
+        } catch (\Throwable $e) {
+            $qrCode = null;
+        }
+
+        return view('ppdb.kartu_cetak', compact('sekolah', 'pendaftar', 'settingUjian', 'qrCode', 'statusUrl'));
     }
 }

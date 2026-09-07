@@ -306,6 +306,59 @@
       {{-- KOLOM KANAN: FORM KEPUTUSAN & MUTASI --}}
       <div style="display:flex; flex-direction:column; gap:16px;">
         
+        {{-- JURUSAN DITERIMA (highlight jika diterima) --}}
+        @if($pendaftar->status === 'diterima' || $pendaftar->jurusan_diterima_id)
+          @php $jd = $pendaftar->jurusanDiterima; @endphp
+          <div class="panel" style="background:linear-gradient(135deg,#f0fdf4,#dcfce7); border:1.5px solid #86efac; border-radius:var(--r-sm); padding:14px 16px;">
+            <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px;">
+              <div>
+                <div style="font-size:11px; font-weight:700; color:#166534; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:4px;">
+                  <i class="bi bi-diagram-3-fill"></i> Plotting Jurusan (Keputusan Akhir)
+                </div>
+                <div style="font-size:18px; font-weight:900; color:#15803d;">
+                  {{ $jd ? $jd->kode_jurusan . ' — ' . $jd->nama_jurusan : '—' }}
+                </div>
+                @if($pendaftar->siswa_id)
+                  <div style="font-size:11px; color:#16a34a; font-weight:700; margin-top:4px;"><i class="bi bi-check-circle-fill"></i> Sudah dimutasi ke SIRANI</div>
+                @endif
+              </div>
+              {{-- Tombol koreksi jurusan --}}
+              @if(!$pendaftar->siswa_id)
+                <button type="button" onclick="document.getElementById('panelKoreksiJurusan').classList.toggle('hidden')"
+                  style="background:#ffffff; color:#15803d; border:1.5px solid #86efac; font-weight:700; font-size:11.5px; padding:6px 12px; border-radius:6px; cursor:pointer; display:inline-flex; align-items:center; gap:5px;">
+                  <i class="bi bi-pencil-square"></i> Koreksi Jurusan
+                </button>
+              @endif
+            </div>
+
+            {{-- Form Koreksi Jurusan (tersembunyi, toggle) --}}
+            @if(!$pendaftar->siswa_id)
+              <div id="panelKoreksiJurusan" class="hidden" style="margin-top:12px; padding-top:12px; border-top:1px solid #bbf7d0;">
+                <form action="{{ route('admin.ppdb.koreksi_jurusan', $pendaftar->id) }}" method="POST">
+                  @csrf
+                  <div style="margin-bottom:8px;">
+                    <label style="display:block; font-size:11.5px; font-weight:700; color:#166534; margin-bottom:4px;">Ganti Jurusan Diterima</label>
+                    <select name="jurusan_diterima_id" required style="width:100%; padding:8px 10px; font-size:12px; border-radius:6px; border:1px solid #86efac; background:#fff; color:#0f172a;">
+                      @foreach($jurusans as $j)
+                        <option value="{{ $j->id }}" {{ $pendaftar->jurusan_diterima_id == $j->id ? 'selected' : '' }}>
+                          {{ $j->kode_jurusan }} – {{ $j->nama_jurusan }}
+                        </option>
+                      @endforeach
+                    </select>
+                  </div>
+                  <div style="margin-bottom:10px;">
+                    <label style="display:block; font-size:11.5px; font-weight:700; color:#166534; margin-bottom:4px;">Alasan Koreksi (opsional)</label>
+                    <input type="text" name="alasan_koreksi" placeholder="Mis: Revisi hasil wawancara..." style="width:100%; padding:7px 10px; font-size:12px; border-radius:6px; border:1px solid #86efac; background:#fff; color:#0f172a; box-sizing:border-box;">
+                  </div>
+                  <button type="submit" class="btn" style="width:100%; background:#16a34a; color:#fff; font-weight:800; font-size:12px; padding:8px; border-radius:6px; border:none; cursor:pointer;">
+                    <i class="bi bi-check2-circle"></i> Simpan Koreksi Jurusan
+                  </button>
+                </form>
+              </div>
+            @endif
+          </div>
+        @endif
+
         {{-- FORM UPDATE STATUS --}}
         <div class="panel" style="background:var(--bg-2); border:1px solid var(--border); border-radius:var(--r-sm); padding:16px;">
           <h3 style="font-size:14px; font-weight:800; margin-bottom:14px; color:var(--text); border-bottom:1px solid var(--border); padding-bottom:8px;">
@@ -319,20 +372,21 @@
             <div style="margin-bottom:12px;">
               <label style="display:block; font-size:11.5px; font-weight:700; color:var(--text-2); margin-bottom:4px;">Status Pendaftaran</label>
               <select name="status_pendaftaran" required style="width:100%; padding:8px 10px; font-size:12.5px; border-radius:6px; border:1px solid var(--border); background:var(--surface); color:var(--text);">
-                <option value="menunggu" {{ $pendaftar->status_pendaftaran == 'menunggu' ? 'selected' : '' }}>Menunggu Verifikasi</option>
-                <option value="berkas_valid" {{ $pendaftar->status_pendaftaran == 'berkas_valid' ? 'selected' : '' }}>Berkas Valid (Lolos Administrasi)</option>
-                <option value="diterima" {{ $pendaftar->status_pendaftaran == 'diterima' ? 'selected' : '' }}>DITERIMA (Lolos Seleksi)</option>
-                <option value="ditolak" {{ $pendaftar->status_pendaftaran == 'ditolak' ? 'selected' : '' }}>DITOLAK (Tidak Lolos)</option>
+                <option value="menunggu"     {{ in_array($pendaftar->status, ['menunggu','menunggu_verifikasi','draft']) ? 'selected' : '' }}>Menunggu Verifikasi</option>
+                <option value="berkas_valid" {{ in_array($pendaftar->status, ['berkas_valid','terverifikasi']) ? 'selected' : '' }}>Berkas Valid (Lolos Administrasi &amp; Siap Tes)</option>
+                <option value="diterima"     {{ $pendaftar->status == 'diterima' ? 'selected' : '' }}>DITERIMA (Lolos Seleksi)</option>
+                <option value="cadangan"     {{ $pendaftar->status == 'cadangan' ? 'selected' : '' }}>CADANGAN (Menunggu Kuota)</option>
+                <option value="ditolak"      {{ $pendaftar->status == 'ditolak' ? 'selected' : '' }}>DITOLAK (Tidak Memenuhi Syarat)</option>
               </select>
             </div>
 
             <div style="margin-bottom:12px;">
-              <label style="display:block; font-size:11.5px; font-weight:700; color:var(--text-2); margin-bottom:4px;">Jurusan Diterima (Jika Diterima)</label>
+              <label style="display:block; font-size:11.5px; font-weight:700; color:var(--text-2); margin-bottom:4px;">Tetapkan Jurusan Diterima</label>
               <select name="jurusan_diterima_id" style="width:100%; padding:8px 10px; font-size:12.5px; border-radius:6px; border:1px solid var(--border); background:var(--surface); color:var(--text);">
                 <option value="">-- Tetapkan Jurusan --</option>
                 @foreach($jurusans as $j)
-                  <option value="{{ $j->id }}" {{ $pendaftar->jurusan_diterima_id == $j->id || ($pendaftar->jurusan_pilihan_1_id == $j->id && !$pendaftar->jurusan_diterima_id) ? 'selected' : '' }}>
-                    {{ $j->kode }} - {{ $j->nama_jurusan }}
+                  <option value="{{ $j->id }}" {{ $pendaftar->jurusan_diterima_id == $j->id || ($pendaftar->jurusan_id_1 == $j->id && !$pendaftar->jurusan_diterima_id) ? 'selected' : '' }}>
+                    {{ $j->kode_jurusan }} – {{ $j->nama_jurusan }}
                   </option>
                 @endforeach
               </select>
@@ -340,7 +394,7 @@
 
             <div style="margin-bottom:14px;">
               <label style="display:block; font-size:11.5px; font-weight:700; color:var(--text-2); margin-bottom:4px;">Catatan untuk Calon Siswa</label>
-              <textarea name="catatan" rows="3" placeholder="Misal: Berkas lengkap, silakan daftar ulang..." style="width:100%; padding:8px 10px; font-size:12px; border-radius:6px; border:1px solid var(--border); background:var(--surface); color:var(--text);">{{ $pendaftar->catatan }}</textarea>
+              <textarea name="catatan" rows="3" placeholder="Misal: Berkas lengkap, silakan daftar ulang..." style="width:100%; padding:8px 10px; font-size:12px; border-radius:6px; border:1px solid var(--border); background:var(--surface); color:var(--text);">{{ $pendaftar->catatan_panitia }}</textarea>
             </div>
 
             <button type="submit" class="btn btn-primary" style="width:100%; padding:9px; font-size:12.5px; font-weight:800; border-radius:6px;">
@@ -350,10 +404,10 @@
         </div>
 
         {{-- MUTASI KE SIRANI --}}
-        @if($pendaftar->status_pendaftaran == 'diterima')
+        @if($pendaftar->status === 'diterima')
           <div class="panel" style="background:#f0fdf4; border:1px solid #86efac; border-radius:var(--r-sm); padding:16px;">
             <h3 style="font-size:14px; font-weight:800; margin-bottom:8px; color:#15803d;">
-              <i class="bi bi-box-arrow-in-right"></i> Mutasi Otomatis ke Siswa SIRANI
+              <i class="bi bi-box-arrow-in-right"></i> Mutasi ke Siswa SIRANI
             </h3>
             
             @if($pendaftar->siswa_id)
@@ -364,25 +418,43 @@
                 Lihat di Master Siswa →
               </a>
             @else
-              <p style="font-size:12px; color:#166534; margin-bottom:12px;">
-                Pendaftar berstatus <strong>Diterima</strong>. Anda dapat langsung memasukkannya ke rombel kelas X SIRANI dengan 1 klik:
-              </p>
+              @php
+                // Auto-detect rombel berdasarkan jurusan_diterima_id
+                $jurusanId = $pendaftar->jurusan_diterima_id ?? $pendaftar->jurusan_id_1;
+                $rombelAuto = $rombels->firstWhere('jurusan_id', $jurusanId);
+              @endphp
+
+              @if($rombelAuto)
+                <div style="background:#dcfce7; border:1px solid #86efac; border-radius:8px; padding:10px 14px; margin-bottom:12px; font-size:12.5px; color:#15803d;">
+                  <strong><i class="bi bi-arrow-right-circle-fill"></i> Auto-Routing:</strong>
+                  Siswa ini akan ditempatkan di <strong>{{ $rombelAuto->nama_rombel }}</strong> sesuai jurusan diterima.
+                </div>
+              @endif
 
               <form action="{{ route('admin.ppdb.mutasi', $pendaftar->id) }}" method="POST">
                 @csrf
-                <div style="margin-bottom:10px;">
-                  <label style="display:block; font-size:11.5px; font-weight:700; color:#166534; margin-bottom:4px;">Pilih Rombel Kelas X Tujuan</label>
-                  <select name="rombel_id" required style="width:100%; padding:8px 10px; font-size:12px; border-radius:6px; border:1px solid #86efac; background:#fff;">
-                    <option value="">-- Pilih Kelas X --</option>
-                    @foreach($rombels as $r)
-                      <option value="{{ $r->id }}">{{ $r->nama_rombel }}</option>
-                    @endforeach
-                  </select>
-                </div>
-
-                <button type="submit" class="btn" style="width:100%; background:#16a34a; color:#fff; font-weight:800; font-size:12.5px; padding:9px; border-radius:6px;">
-                  <i class="bi bi-person-check-fill"></i> Mutasikan Calon Siswa Ini
-                </button>
+                @if($rombelAuto)
+                  <input type="hidden" name="rombel_id" value="{{ $rombelAuto->id }}">
+                  <button type="submit" class="btn" onclick="return confirm('Mutasikan {{ $pendaftar->nama_lengkap }} ke {{ $rombelAuto->nama_rombel }}?')"
+                    style="width:100%; background:#16a34a; color:#fff; font-weight:800; font-size:12.5px; padding:9px; border-radius:6px; border:none; cursor:pointer;">
+                    <i class="bi bi-person-check-fill"></i> Mutasikan ke {{ $rombelAuto->nama_rombel }}
+                  </button>
+                @else
+                  <p style="font-size:12px; color:#ef4444; margin-bottom:10px;">
+                    <i class="bi bi-exclamation-triangle-fill"></i> Rombel Kelas X untuk jurusan ini belum ditemukan. Pilih manual:
+                  </p>
+                  <div style="margin-bottom:10px;">
+                    <select name="rombel_id" required style="width:100%; padding:8px 10px; font-size:12px; border-radius:6px; border:1px solid #86efac; background:#fff;">
+                      <option value="">-- Pilih Kelas X --</option>
+                      @foreach($rombels as $r)
+                        <option value="{{ $r->id }}">{{ $r->nama_rombel }}</option>
+                      @endforeach
+                    </select>
+                  </div>
+                  <button type="submit" class="btn" style="width:100%; background:#16a34a; color:#fff; font-weight:800; font-size:12.5px; padding:9px; border-radius:6px; border:none; cursor:pointer;">
+                    <i class="bi bi-person-check-fill"></i> Mutasikan Calon Siswa Ini
+                  </button>
+                @endif
               </form>
             @endif
           </div>
@@ -394,5 +466,9 @@
 
   </main>
 </div>
+
+<style>
+  .hidden { display: none; }
+</style>
 </body>
 </html>

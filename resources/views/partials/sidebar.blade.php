@@ -101,22 +101,13 @@
     @endif
 
     @if(!$isHumas && !$isPanitiaPpdb)
-      {{-- Portal Siswa (Mandiri) --}}
-      <a href="/portal-siswa" class="nav-item {{ request()->is('portal-siswa*') ? 'active' : '' }}" target="_blank" title="Buka Portal Mandiri Siswa (QR Presensi, Riwayat & Pengumuman)">
+      {{-- Monitoring Absen Mandiri (Siswa & Orang Tua) --}}
+      <a href="/cek-presensi" class="nav-item {{ request()->is('cek-presensi*') || request()->is('portal-siswa*') || request()->is('monitoring-absen*') ? 'active' : '' }}" target="_blank" title="Buka Monitoring Absen Mandiri (Cek Presensi Siswa & Orang Tua)">
         <div class="nav-left-part">
-          <i class="bi bi-person-workspace nav-icon" style="color:#059669;"></i>
-          <span class="nav-text">Portal Siswa</span>
+          <i class="bi bi-person-check nav-icon" style="color:#0284c7;"></i>
+          <span class="nav-text">Monitoring Absen Mandiri</span>
         </div>
-        <span class="nav-count-badge" style="background:#ecfdf5; color:#059669; border-color:#a7f3d0;">Siswa</span>
-      </a>
-
-      {{-- Portal Orang Tua (Cek Presensi Mandiri) --}}
-      <a href="/cek-presensi" class="nav-item {{ request()->is('cek-presensi*') ? 'active' : '' }}" target="_blank" title="Buka Portal Orang Tua (Cek Presensi Anak Mandiri)">
-        <div class="nav-left-part">
-          <i class="bi bi-people-fill nav-icon" style="color:#0284c7;"></i>
-          <span class="nav-text">Portal Orang Tua</span>
-        </div>
-        <span class="nav-count-badge" style="background:#f0f9ff; color:#0284c7; border-color:#bae6fd;">Ortu</span>
+        <span class="nav-count-badge" style="background:#f0f9ff; color:#0284c7; border-color:#bae6fd;">Mandiri</span>
       </a>
     @endif
   </div>

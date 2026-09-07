@@ -71,11 +71,16 @@ class RombelController extends Controller
 
     public function setActiveTahunAjaran($id)
     {
-        TahunAjaran::query()->update(['is_active' => false]);
         $ta = TahunAjaran::findOrFail($id);
+
+        if ($ta->isLampau()) {
+            return redirect()->back()->with('error', "Tahun ajaran {$ta->nama} sudah lampau dan berstatus Arsip / Histori. Demi menjaga integritas data presensi, buku induk, dan riwayat siswa, tahun lampau tidak dapat diaktifkan kembali.");
+        }
+
+        TahunAjaran::query()->update(['is_active' => false]);
         $ta->update(['is_active' => true]);
 
-        return redirect()->back()->with('success', "Tahun Ajaran {$ta->nama} diaktifkan.");
+        return redirect()->back()->with('success', "Tahun Ajaran {$ta->nama} berhasil diaktifkan.");
     }
 
     public function storeJurusan(Request $request)

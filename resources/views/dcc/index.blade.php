@@ -91,26 +91,14 @@
 
           <div class="kpi-row">
             <div class="kpi-item">
-              <span class="kpi-label">Pendidik &amp; Tendik (PTK)</span>
-              <span class="kpi-val">{{ $totalGuru }}</span>
-              <span class="kpi-sub">Guru &amp; Pegawai Aktif</span>
-            </div>
-            <div class="kpi-item">
               <span class="kpi-label">Peserta Didik (Siswa)</span>
               <span class="kpi-val">{{ $totalSiswa }}</span>
-              <span class="kpi-sub">Siswa Terdaftar Aktif</span>
+              <span class="kpi-sub">Siswa Aktif</span>
             </div>
-            <div class="kpi-item" style="margin-top:6px;">
-              <span class="kpi-label">Rombel &amp; Jurusan</span>
-              <span class="kpi-val">{{ $totalRombel }}</span>
-              <span class="kpi-sub">Kelas / 3 Jurusan</span>
-            </div>
-            <div class="kpi-item" style="margin-top:6px;">
-              <span class="kpi-label">Tahun Ajaran Aktif</span>
-              <span class="kpi-val" style="font-size:13px;">
-                {{ $tahunAjaranAktif ? $tahunAjaranAktif->nama : '2025/2026' }}
-              </span>
-              <span class="kpi-sub">{{ $tahunAjaranAktif ? ucfirst($tahunAjaranAktif->semester ?? 'Aktif') : 'Semester Berjalan' }}</span>
+            <div class="kpi-item">
+              <span class="kpi-label">Pendidik &amp; Tendik</span>
+              <span class="kpi-val">{{ $totalGuru }}</span>
+              <span class="kpi-sub">Guru &amp; Pegawai</span>
             </div>
           </div>
         </div>
@@ -147,16 +135,6 @@
             <div class="module-card-icon-halo">
               <i class="bi bi-fingerprint"></i>
             </div>
-            <div style="display:flex; align-items:center; gap:6px;">
-              @if($canAccessSirani)
-                <span class="access-badge allowed">Izin Aktif</span>
-              @else
-                <span class="access-badge locked">Akses Terbatas</span>
-              @endif
-              <span class="module-live-pill">
-                <span class="pulse-dot"></span> Aktif
-              </span>
-            </div>
           </div>
 
           <h3 class="module-card-name">SIRANI</h3>
@@ -164,23 +142,13 @@
 
           <div class="kpi-row">
             <div class="kpi-item">
-              <span class="kpi-label">Hadir Siswa Hari Ini</span>
+              <span class="kpi-label">Kehadiran Siswa</span>
               <span class="kpi-val">{{ $persenSiswaHadir }}%</span>
-              <span class="kpi-sub">{{ $siswaHadirToday }} / {{ $totalSiswa }} Siswa</span>
+              <span class="kpi-sub">{{ $siswaHadirToday }} / {{ $totalSiswa }} Hadir</span>
             </div>
             <div class="kpi-item">
-              <span class="kpi-label">Hadir Guru &amp; Pegawai</span>
-              <span class="kpi-val">{{ $guruHadirToday }}</span>
-              <span class="kpi-sub">Dari {{ $totalGuru }} Guru Aktif</span>
-            </div>
-            <div class="kpi-item" style="margin-top:6px;">
-              <span class="kpi-label">Kasus Disiplin Aktif</span>
-              <span class="kpi-val">{{ $kasusDisiplinAktif }}</span>
-              <span class="kpi-sub">Dalam Pembinaan</span>
-            </div>
-            <div class="kpi-item" style="margin-top:6px;">
               <span class="kpi-label">Smart Gate Gerbang</span>
-              <span class="kpi-val" style="font-size:14px;">
+              <span class="kpi-val" style="font-size:14px; color:{{ $isGerbangAktif ? '#10b981' : '#64748b' }};">
                 {{ $isGerbangAktif ? 'ONLINE' : 'STANDBY' }}
               </span>
               <span class="kpi-sub">{{ $isGerbangAktif ? 'Sesi Presensi Buka' : 'Di Luar Jam Sesi' }}</span>
@@ -213,22 +181,12 @@
         </div>
       </div>
 
-      {{-- Card 2: PPDB ONLINE 2026 --}}
+      {{-- Card 3: PPDB ONLINE 2026 --}}
       <div class="module-card card-ppdb {{ $canAccessPpdb ? '' : 'is-locked' }}">
         <div>
           <div class="module-card-top">
             <div class="module-card-icon-halo">
               <i class="bi bi-mortarboard"></i>
-            </div>
-            <div style="display:flex; align-items:center; gap:6px;">
-              @if($canAccessPpdb)
-                <span class="access-badge allowed">Izin Aktif</span>
-              @else
-                <span class="access-badge locked">Butuh Panitia</span>
-              @endif
-              <span class="module-live-pill">
-                <span class="pulse-dot"></span> Aktif 2026
-              </span>
             </div>
           </div>
 
@@ -242,19 +200,9 @@
               <span class="kpi-sub">+{{ $ppdbToday }} Pendaftar Hari Ini</span>
             </div>
             <div class="kpi-item">
-              <span class="kpi-label">Menunggu Verifikasi</span>
-              <span class="kpi-val">{{ $ppdbMenunggu }}</span>
-              <span class="kpi-sub">Perlu Dicek Panitia</span>
-            </div>
-            <div class="kpi-item" style="margin-top:6px;">
               <span class="kpi-label">Lolos / Diterima</span>
-              <span class="kpi-val">{{ $ppdbDiterima }}</span>
+              <span class="kpi-val" style="color:#10b981;">{{ $ppdbDiterima }}</span>
               <span class="kpi-sub">Calon Siswa Resmi</span>
-            </div>
-            <div class="kpi-item" style="margin-top:6px;">
-              <span class="kpi-label">Ditolak / Perbaikan</span>
-              <span class="kpi-val">{{ $ppdbDitolak }}</span>
-              <span class="kpi-sub">Berkas Tidak Sesuai</span>
             </div>
           </div>
         </div>
@@ -286,22 +234,12 @@
         </div>
       </div>
 
-      {{-- Card 3: WEB PROFIL & HUMAS --}}
+      {{-- Card 4: WEB PROFIL & HUMAS --}}
       <div class="module-card card-web {{ $canAccessWeb ? '' : 'is-locked' }}">
         <div>
           <div class="module-card-top">
             <div class="module-card-icon-halo">
               <i class="bi bi-globe"></i>
-            </div>
-            <div style="display:flex; align-items:center; gap:6px;">
-              @if($canAccessWeb)
-                <span class="access-badge allowed">Izin Aktif</span>
-              @else
-                <span class="access-badge locked">Butuh Humas</span>
-              @endif
-              <span class="module-live-pill">
-                <span class="pulse-dot"></span> Publik
-              </span>
             </div>
           </div>
 
@@ -310,7 +248,7 @@
 
           <div class="kpi-row">
             <div class="kpi-item">
-              <span class="kpi-label">Total Berita &amp; Rilis</span>
+              <span class="kpi-label">Total Berita</span>
               <span class="kpi-val">{{ $totalBerita }}</span>
               <span class="kpi-sub">Artikel Terpublikasi</span>
             </div>
@@ -318,13 +256,6 @@
               <span class="kpi-label">Pengunjung Web</span>
               <span class="kpi-val">{{ number_format($todayVisitors) }}</span>
               <span class="kpi-sub">{{ number_format($todayUniqueVisitors) }} Unik Hari Ini</span>
-            </div>
-            <div class="kpi-item" style="grid-column: span 2; margin-top:6px;">
-              <span class="kpi-label">Berita Terakhir</span>
-              <span style="font-size:12.5px; font-weight:800; color:#000000; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; display:block; margin-top:2px;">
-                {{ $beritaTerbaru ? $beritaTerbaru->judul : 'Belum ada rilis berita' }}
-              </span>
-              <span class="kpi-sub">{{ $beritaTerbaru ? \Carbon\Carbon::parse($beritaTerbaru->created_at)->diffForHumans() : '-' }}</span>
             </div>
           </div>
         </div>

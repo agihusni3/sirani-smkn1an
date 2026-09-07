@@ -76,18 +76,23 @@
         </div>
 
         <div class="ta-chip-container" style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
-          {{-- Tombol Periode Tahun Ajaran --}}
-          @foreach($tahunAjarans as $ta)
+          @foreach($tahunAjarans->sortByDesc('tahun_awal') as $ta)
             @if($ta->is_active)
-              <span class="btn" style="background:#000000; color:#FFFFFF; border:1.5px solid #000000; padding:5px 12px; font-size:11.5px; font-weight:800; font-family:var(--font-mono); border-radius:var(--r-sm); display:inline-flex; align-items:center; gap:5px; cursor:default;">
+              <span class="btn" style="background:#0f172a; color:#FFFFFF; border:1.5px solid #0f172a; padding:5px 12px; font-size:11.5px; font-weight:800; font-family:var(--font-mono); border-radius:var(--r-sm); display:inline-flex; align-items:center; gap:5px; cursor:default;" title="Tahun ajaran yang sedang berjalan saat ini">
                 <span style="background:#22C55E; width:6px; height:6px; border-radius:50%; display:inline-block;"></span>
                 {{ $ta->nama }} (Aktif)
               </span>
+            @elseif($ta->isLampau())
+              <span class="btn" style="background:#f1f5f9; color:#64748b; border:1px solid #cbd5e1; padding:5px 10px; font-size:11.5px; font-family:var(--font-mono); font-weight:700; border-radius:var(--r-sm); cursor:not-allowed; opacity:0.85;" title="Tahun ajaran ini sudah selesai dan tersimpan sebagai arsip histori (terkunci)">
+                <i class="bi bi-lock-fill" style="font-size:10px; color:#94a3b8;"></i>
+                {{ $ta->nama }} (Arsip)
+              </span>
             @else
-              <form action="/tahun-ajaran/{{ $ta->id }}/aktifkan" method="POST" style="margin:0; display:inline;" onsubmit="return confirm('Pindahkan tahun ajaran aktif ke {{ $ta->nama }}?')">
+              {{-- Tahun Ajaran Baru Mendatang (Bisa diaktifkan saat transisi) --}}
+              <form action="/tahun-ajaran/{{ $ta->id }}/aktifkan" method="POST" style="margin:0; display:inline;" onsubmit="return confirm('Pindahkan tahun ajaran aktif ke {{ $ta->nama }}? Pastikan kenaikan kelas dan kelulusan siswa sudah diproses.')">
                 @csrf
-                <button type="submit" class="btn btn-outline" style="padding:5px 10px; font-size:11.5px; font-family:var(--font-mono); font-weight:700; border-radius:var(--r-sm);" title="Klik untuk mengaktifkan tahun ajaran ini">
-                  {{ $ta->nama }}
+                <button type="submit" class="btn btn-outline" style="padding:5px 10px; font-size:11.5px; font-family:var(--font-mono); font-weight:800; border-radius:var(--r-sm); border-color:#0284c7; color:#0284c7;" title="Klik untuk mengaktifkan tahun ajaran baru ini">
+                  Aktifkan {{ $ta->nama }}
                 </button>
               </form>
             @endif

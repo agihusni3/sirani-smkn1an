@@ -460,19 +460,25 @@
           </tr>
         </thead>
         <tbody>
-          @forelse($tahunAjarans as $ta)
+          @forelse($tahunAjarans->sortByDesc('tahun_awal') as $ta)
             <tr>
-              <td style="font-weight:800; color:#000000;">{{ $ta->nama }}</td>
+              <td style="font-weight:800; color:#000000; font-family:var(--font-mono);">{{ $ta->nama }}</td>
               <td>
                 @if($ta->is_active)
-                  <span style="background:rgba(16,185,129,0.12); color:#065f46; border:1px solid #6ee7b7; font-size:11px; font-weight:800; padding:2px 8px; border-radius:10px;">Aktif</span>
+                  <span style="background:rgba(16,185,129,0.12); color:#065f46; border:1px solid #6ee7b7; font-size:11px; font-weight:800; padding:2px 8px; border-radius:10px;">Aktif (Berjalan)</span>
+                @elseif($ta->isLampau())
+                  <span style="background:#f1f5f9; color:#64748b; border:1px solid #cbd5e1; font-size:11px; font-weight:700; padding:2px 8px; border-radius:10px;">Arsip / Histori</span>
                 @else
-                  <span style="color:#64748b; font-size:11px; font-weight:700;">Tidak Aktif</span>
+                  <span style="background:rgba(2,132,199,0.1); color:#0284c7; border:1px solid #bae6fd; font-size:11px; font-weight:700; padding:2px 8px; border-radius:10px;">Mendatang</span>
                 @endif
               </td>
               <td style="text-align:right;">
-                @if(!$ta->is_active)
-                  <form action="/tahun-ajaran/{{ $ta->id }}/aktifkan" method="POST" style="display:inline;">
+                @if($ta->is_active)
+                  <span style="color:#10b981; font-size:11px; font-weight:800;"><i class="bi bi-check2"></i> Aktif</span>
+                @elseif($ta->isLampau())
+                  <span style="color:#94a3b8; font-size:11px; font-weight:600;" title="Terkunci sebagai arsip histori"><i class="bi bi-lock-fill"></i> Terkunci</span>
+                @else
+                  <form action="/tahun-ajaran/{{ $ta->id }}/aktifkan" method="POST" style="display:inline;" onsubmit="return confirm('Aktifkan tahun ajaran baru {{ $ta->nama }}?')">
                     @csrf
                     <button type="submit" class="situan-btn-outline" style="font-size:11px; height:28px; padding:0 8px;">Aktifkan</button>
                   </form>

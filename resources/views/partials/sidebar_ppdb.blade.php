@@ -6,12 +6,117 @@
   $jurusanQuery = request('jurusan_id');
 
   // Hitung jumlah pendaftar per status untuk badge
+  $countTotal = \App\Models\PpdbPendaftar::count();
   $countMenunggu = \App\Models\PpdbPendaftar::whereIn('status', ['menunggu', 'menunggu_verifikasi', 'draft'])->count();
   $countValid = \App\Models\PpdbPendaftar::whereIn('status', ['terverifikasi', 'berkas_valid'])->count();
   $countDiterima = \App\Models\PpdbPendaftar::where('status', 'diterima')->count();
   $countDitolak = \App\Models\PpdbPendaftar::where('status', 'ditolak')->count();
   $jurusansNav = \App\Models\Jurusan::all();
+
+  // Helper ikon modern per jurusan
+  $getJurusanIcon = function($kode, $nama) {
+      $str = strtoupper($kode . ' ' . $nama);
+      if (str_contains($str, 'RPL') || str_contains($str, 'PERANGKAT LUNAK') || str_contains($str, 'KOMPUTER')) {
+          return 'bi-code-square';
+      }
+      if (str_contains($str, 'APHP') || str_contains($str, 'PENGOLAHAN') || str_contains($str, 'PERTANIAN')) {
+          return 'bi-leaf';
+      }
+      if (str_contains($str, 'TSM') || str_contains($str, 'SEPEDA MOTOR') || str_contains($str, 'OTOMOTIF') || str_contains($str, 'MESIN')) {
+          return 'bi-gear-wide-connected';
+      }
+      return 'bi-tag';
+  };
 @endphp
+
+{{-- Scoped Styles for Modern Minimalist PPDB Sidebar --}}
+<style>
+  .sidebar-ppdb {
+    display: flex;
+    flex-direction: column;
+    background: #ffffff;
+    border-right: 1px solid #e2e8f0;
+  }
+  .sidebar-ppdb .nav-section {
+    margin-bottom: 14px;
+  }
+  .sidebar-ppdb .nav-section-title {
+    font-size: 10.5px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #94a3b8;
+    padding: 8px 12px 6px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .sidebar-ppdb .ppdb-nav-link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8.5px 12px;
+    border-radius: 8px;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: #334155;
+    text-decoration: none;
+    transition: all 0.15s ease;
+    margin-bottom: 2px;
+    border: 1px solid transparent;
+  }
+  .sidebar-ppdb .ppdb-nav-link:hover {
+    background: #f8fafc;
+    color: #0f172a;
+    border-color: #f1f5f9;
+  }
+  .sidebar-ppdb .ppdb-nav-link.active {
+    background: #f8fafc;
+    color: #0f172a !important;
+    font-weight: 800;
+    border-color: #e2e8f0;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+    position: relative;
+  }
+  .sidebar-ppdb .ppdb-nav-link.active::before {
+    content: '';
+    position: absolute;
+    left: -1px;
+    top: 6px;
+    bottom: 6px;
+    width: 3.5px;
+    background: #d97706;
+    border-radius: 4px;
+  }
+  .sidebar-ppdb .ppdb-nav-icon {
+    font-size: 15px;
+    color: #64748b;
+    margin-right: 10px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    transition: color 0.15s ease;
+  }
+  .sidebar-ppdb .ppdb-nav-link:hover .ppdb-nav-icon,
+  .sidebar-ppdb .ppdb-nav-link.active .ppdb-nav-icon {
+    color: #d97706;
+  }
+  .sidebar-ppdb .ppdb-badge {
+    font-size: 11px;
+    font-weight: 800;
+    padding: 1.5px 7px;
+    border-radius: 20px;
+    font-family: var(--font-mono, monospace);
+    line-height: 1.2;
+    border: 1px solid transparent;
+  }
+  .sidebar-ppdb .badge-muted { background: #f1f5f9; color: #64748b; border-color: #e2e8f0; }
+  .sidebar-ppdb .badge-amber { background: #fef3c7; color: #b45309; border-color: #fde68a; }
+  .sidebar-ppdb .badge-blue  { background: #eff6ff; color: #2563eb; border-color: #bfdbfe; }
+  .sidebar-ppdb .badge-emerald { background: #ecfdf5; color: #059669; border-color: #a7f3d0; }
+  .sidebar-ppdb .badge-gray { background: #f1f5f9; color: #64748b; border-color: #e2e8f0; }
+</style>
 
 {{-- Mobile Top Bar khusus Modul PPDB --}}
 <div class="mobile-topbar no-print">
@@ -36,15 +141,17 @@
 <div class="sidebar-backdrop" id="sidebarBackdrop" onclick="window.closeSmknSidebar()"></div>
 
 {{-- Sidebar Navigation: Khusus Workspace Modul PPDB 2026 --}}
-<aside class="sidebar" id="appSidebar">
-  <div class="brand" style="margin-bottom:16px; padding-bottom:14px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center;">
+<aside class="sidebar sidebar-ppdb" id="appSidebar">
+  
+  {{-- 1. BRAND HEADER --}}
+  <div class="brand" style="margin-bottom:14px; padding-bottom:12px; border-bottom:1px solid #f1f5f9; display:flex; justify-content:space-between; align-items:center;">
     <div class="brand-left" style="display:flex; align-items:center; gap:10px;">
-      <div style="width:36px; height:36px; border-radius:10px; background:linear-gradient(135deg, rgba(217,119,6,0.15), rgba(245,158,11,0.05)); border:1px solid rgba(217,119,6,0.25); display:flex; align-items:center; justify-content:center; padding:4px;">
+      <div style="width:36px; height:36px; border-radius:10px; background:linear-gradient(135deg, rgba(217,119,6,0.14), rgba(245,158,11,0.04)); border:1px solid rgba(217,119,6,0.22); display:flex; align-items:center; justify-content:center; padding:4px;">
         <i class="bi bi-mortarboard-fill" style="color:#d97706; font-size:18px;"></i>
       </div>
       <div class="brand-text">
-        <div style="font-weight:900; font-size:16.5px; letter-spacing:-0.02em; color:#d97706;">PPDB 2026</div>
-        <div style="font-size:11px; color:var(--text-3); font-weight:600;">Panitia Seleksi Calon Siswa</div>
+        <div style="font-weight:900; font-size:16px; letter-spacing:-0.02em; color:#0f172a;">PPDB 2026</div>
+        <div style="font-size:10.5px; color:#64748b; font-weight:600;">Panitia Seleksi Calon Siswa</div>
       </div>
     </div>
     <button type="button" class="sidebar-close-btn" id="sidebarCloseBtn" onclick="window.closeSmknSidebar()" aria-label="Tutup Menu">
@@ -52,124 +159,151 @@
     </button>
   </div>
 
-  {{-- Tombol Navigasi Kembali ke DCC SMKN 1 AN --}}
-  <div style="margin-bottom:16px;">
-    <a href="{{ route('admin.portal') }}" class="btn" style="width:100%; display:flex; align-items:center; justify-content:center; gap:8px; padding:8px 12px; font-size:11.5px; font-weight:800; background:linear-gradient(135deg, #1e293b 0%, #0f172a 100%); color:#ffffff; border:1px solid rgba(255,255,255,0.12); border-radius:var(--r-sm); text-decoration:none; box-shadow:0 3px 10px rgba(0,0,0,0.12); box-sizing:border-box;" title="Buka Digital Command Center SMKN 1 AN">
-      <i class="bi bi-command" style="color:#38bdf8; font-size:13.5px;"></i>
+  {{-- 2. QUICK SWITCHER KE DCC --}}
+  <div style="margin-bottom:14px;">
+    <a href="{{ route('admin.portal') }}" class="btn" style="width:100%; display:flex; align-items:center; justify-content:center; gap:8px; padding:8px 12px; font-size:11.5px; font-weight:800; background:#0f172a; color:#ffffff; border:1px solid #1e293b; border-radius:8px; text-decoration:none; box-shadow:0 2px 6px rgba(15,23,42,0.1); box-sizing:border-box;" title="Buka Digital Command Center SMKN 1 AN">
+      <i class="bi bi-command" style="color:#38bdf8; font-size:13px;"></i>
       <span>DCC SMKN 1 AN</span>
     </a>
   </div>
 
-  {{-- 1. MENU UTAMA PPDB --}}
-  <div class="nav-group">
-    <div class="nav-label">Navigasi PPDB</div>
-    
-    <a href="{{ route('admin.ppdb.index') }}" class="nav-item {{ (request()->is('admin/ppdb') && empty($statusQuery) && empty($jurusanQuery) && !request()->is('admin/ppdb/log*') && !request()->is('admin/ppdb/seleksi*')) ? 'active' : '' }}">
-      <div class="nav-left-part">
-        <i class="bi bi-speedometer2 nav-icon" style="color:#d97706;"></i>
-        <span class="nav-text">Dasbor &amp; Statistik</span>
+  {{-- 3. KELOMPOK 1: MENU UTAMA --}}
+  <div class="nav-section">
+    <div class="nav-section-title">Menu Utama</div>
+
+    {{-- Dasbor --}}
+    <a href="{{ route('admin.ppdb.index') }}" class="ppdb-nav-link {{ (request()->is('admin/ppdb') && empty($statusQuery) && empty($jurusanQuery) && !request()->is('admin/ppdb/log*') && !request()->is('admin/ppdb/seleksi*')) ? 'active' : '' }}">
+      <div style="display:flex; align-items:center;">
+        <i class="bi bi-grid-1x2 ppdb-nav-icon"></i>
+        <span>Dasbor &amp; Statistik</span>
       </div>
     </a>
 
-    <a href="{{ route('admin.ppdb.seleksi') }}" class="nav-item {{ request()->is('admin/ppdb/seleksi*') ? 'active' : '' }}" title="Seleksi Ujian Tertulis CBT &amp; Wawancara PPDB">
-      <div class="nav-left-part">
-        <i class="bi bi-laptop nav-icon" style="color:#2563eb;"></i>
-        <span class="nav-text">Seleksi &amp; Ujian CBT</span>
+    {{-- Seleksi & Ujian CBT --}}
+    <a href="{{ route('admin.ppdb.seleksi') }}" class="ppdb-nav-link {{ (request()->is('admin/ppdb/seleksi*') || request()->is('admin/ppdb/soal*')) ? 'active' : '' }}" title="Seleksi Ujian CBT &amp; Penilaian Wawancara">
+      <div style="display:flex; align-items:center;">
+        <i class="bi bi-laptop ppdb-nav-icon"></i>
+        <span>Seleksi &amp; Ujian CBT</span>
       </div>
-      <span class="nav-count-badge" style="background:#eff6ff; color:#2563eb; border-color:#bfdbfe; font-weight:800;">CBT</span>
+      <span class="ppdb-badge badge-blue">CBT</span>
     </a>
 
-    <a href="{{ route('admin.ppdb.log') }}" class="nav-item {{ request()->is('admin/ppdb/log*') ? 'active' : '' }}" title="Riwayat Verifikasi &amp; Log Aktivitas Panitia PPDB">
-      <div class="nav-left-part">
-        <i class="bi bi-journal-text nav-icon" style="color:#d97706;"></i>
-        <span class="nav-text">Log Riwayat PPDB</span>
+    {{-- Log Riwayat --}}
+    <a href="{{ route('admin.ppdb.log') }}" class="ppdb-nav-link {{ request()->is('admin/ppdb/log*') ? 'active' : '' }}" title="Audit Log &amp; Riwayat Aktivitas Panitia">
+      <div style="display:flex; align-items:center;">
+        <i class="bi bi-clock-history ppdb-nav-icon"></i>
+        <span>Log Aktivitas</span>
       </div>
     </a>
   </div>
 
-  {{-- 2. TAHAPAN VERIFIKASI & SELEKSI --}}
-  <div class="nav-group">
-    <div class="nav-label">Verifikasi &amp; Seleksi Berkas</div>
+  {{-- 4. KELOMPOK 2: TAHAPAN VERIFIKASI & SELEKSI BERKAS --}}
+  <div class="nav-section">
+    <div class="nav-section-title">
+      <span>Data Calon Siswa</span>
+      <span style="font-size:10px; font-weight:700; color:#cbd5e1;">{{ $countTotal }}</span>
+    </div>
 
-    <a href="{{ route('admin.ppdb.index', ['status' => 'menunggu']) }}" class="nav-item {{ $statusQuery === 'menunggu' ? 'active' : '' }}">
-      <div class="nav-left-part">
-        <i class="bi bi-clock-history nav-icon" style="color:#ef4444;"></i>
-        <span class="nav-text">Menunggu Cek</span>
+    {{-- Semua Pendaftar --}}
+    <a href="{{ route('admin.ppdb.index', ['status' => 'semua']) }}" class="ppdb-nav-link {{ $statusQuery === 'semua' ? 'active' : '' }}">
+      <div style="display:flex; align-items:center;">
+        <i class="bi bi-people ppdb-nav-icon"></i>
+        <span>Semua Pendaftar</span>
+      </div>
+      <span class="ppdb-badge badge-muted">{{ $countTotal }}</span>
+    </a>
+
+    {{-- Menunggu Verifikasi --}}
+    <a href="{{ route('admin.ppdb.index', ['status' => 'menunggu']) }}" class="ppdb-nav-link {{ $statusQuery === 'menunggu' ? 'active' : '' }}">
+      <div style="display:flex; align-items:center;">
+        <i class="bi bi-hourglass-split ppdb-nav-icon"></i>
+        <span>Menunggu Verifikasi</span>
       </div>
       @if($countMenunggu > 0)
-        <span class="nav-count-badge" style="background:#fee2e2; color:#ef4444; border-color:#fca5a5; font-weight:800;">{{ $countMenunggu }}</span>
+        <span class="ppdb-badge badge-amber">{{ $countMenunggu }}</span>
       @endif
     </a>
 
-    <a href="{{ route('admin.ppdb.index', ['status' => 'berkas_valid']) }}" class="nav-item {{ $statusQuery === 'berkas_valid' ? 'active' : '' }}">
-      <div class="nav-left-part">
-        <i class="bi bi-patch-check-fill nav-icon" style="color:#0284c7;"></i>
-        <span class="nav-text">Berkas Valid</span>
+    {{-- Berkas Valid / Siap Tes --}}
+    <a href="{{ route('admin.ppdb.index', ['status' => 'berkas_valid']) }}" class="ppdb-nav-link {{ $statusQuery === 'berkas_valid' ? 'active' : '' }}">
+      <div style="display:flex; align-items:center;">
+        <i class="bi bi-patch-check ppdb-nav-icon"></i>
+        <span>Berkas Valid</span>
       </div>
       @if($countValid > 0)
-        <span class="nav-count-badge" style="background:#e0f2fe; color:#0284c7; border-color:#bae6fd; font-weight:800;">{{ $countValid }}</span>
+        <span class="ppdb-badge badge-blue">{{ $countValid }}</span>
       @endif
     </a>
 
-    <a href="{{ route('admin.ppdb.index', ['status' => 'diterima']) }}" class="nav-item {{ $statusQuery === 'diterima' ? 'active' : '' }}">
-      <div class="nav-left-part">
-        <i class="bi bi-check-circle-fill nav-icon" style="color:#10b981;"></i>
-        <span class="nav-text">Calon Siswa Diterima</span>
+    {{-- Calon Siswa Diterima --}}
+    <a href="{{ route('admin.ppdb.index', ['status' => 'diterima']) }}" class="ppdb-nav-link {{ $statusQuery === 'diterima' ? 'active' : '' }}">
+      <div style="display:flex; align-items:center;">
+        <i class="bi bi-check2-circle ppdb-nav-icon"></i>
+        <span>Siswa Diterima</span>
       </div>
       @if($countDiterima > 0)
-        <span class="nav-count-badge" style="background:#ecfdf5; color:#10b981; border-color:#a7f3d0; font-weight:800;">{{ $countDiterima }}</span>
+        <span class="ppdb-badge badge-emerald">{{ $countDiterima }}</span>
       @endif
     </a>
 
-    <a href="{{ route('admin.ppdb.index', ['status' => 'ditolak']) }}" class="nav-item {{ $statusQuery === 'ditolak' ? 'active' : '' }}">
-      <div class="nav-left-part">
-        <i class="bi bi-x-circle-fill nav-icon" style="color:#64748b;"></i>
-        <span class="nav-text">Ditolak / Draf</span>
+    {{-- Ditolak / Tidak Lolos --}}
+    <a href="{{ route('admin.ppdb.index', ['status' => 'ditolak']) }}" class="ppdb-nav-link {{ $statusQuery === 'ditolak' ? 'active' : '' }}">
+      <div style="display:flex; align-items:center;">
+        <i class="bi bi-x-circle ppdb-nav-icon"></i>
+        <span>Ditolak / Draf</span>
       </div>
       @if($countDitolak > 0)
-        <span class="nav-count-badge" style="background:#f1f5f9; color:#64748b; border-color:#cbd5e1; font-weight:800;">{{ $countDitolak }}</span>
+        <span class="ppdb-badge badge-gray">{{ $countDitolak }}</span>
       @endif
     </a>
   </div>
 
-  {{-- 3. JURUSAN & PEMETAAN KUOTA --}}
-  <div class="nav-group">
-    <div class="nav-label">Peminatan Jurusan</div>
+  {{-- 5. KELOMPOK 3: PEMINATAN JURUSAN --}}
+  <div class="nav-section">
+    <div class="nav-section-title">Jurusan Pilihan</div>
+
     @foreach($jurusansNav as $j)
-      <a href="{{ route('admin.ppdb.index', ['jurusan_id' => $j->id]) }}" class="nav-item {{ $jurusanQuery == $j->id ? 'active' : '' }}">
-        <div class="nav-left-part">
-          <i class="bi bi-tag-fill nav-icon" style="color:var(--text-3);"></i>
-          <span class="nav-text">{{ $j->kode_jurusan }} — {{ $j->nama_jurusan }}</span>
+      @php
+        $jIcon = $getJurusanIcon($j->kode_jurusan, $j->nama_jurusan);
+        $isActive = ($jurusanQuery == $j->id);
+      @endphp
+      <a href="{{ route('admin.ppdb.index', ['jurusan_id' => $j->id]) }}" class="ppdb-nav-link {{ $isActive ? 'active' : '' }}" title="{{ $j->nama_jurusan }}">
+        <div style="display:flex; align-items:center; min-width:0; overflow:hidden;">
+          <i class="bi {{ $jIcon }} ppdb-nav-icon"></i>
+          <span style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+            <strong>{{ $j->kode_jurusan }}</strong> — {{ $j->nama_jurusan }}
+          </span>
         </div>
       </a>
     @endforeach
   </div>
 
-  {{-- 4. TAUTAN & PORTAL LUAR --}}
-  <div class="nav-group">
-    <div class="nav-label">Akses Publik &amp; Modul Lain</div>
+  {{-- 6. KELOMPOK 4: AKSES CEPAT PUBLIK & MODUL LAIN --}}
+  <div class="nav-section" style="margin-top:auto; padding-top:12px; border-top:1px dashed #e2e8f0;">
+    <div class="nav-section-title">Akses Cepat</div>
 
-    <a href="{{ route('ppdb.formulir') }}" target="_blank" class="nav-item">
-      <div class="nav-left-part">
-        <i class="bi bi-box-arrow-up-right nav-icon" style="color:#d97706;"></i>
-        <span class="nav-text">Form Pendaftaran Publik</span>
+    <a href="{{ route('ppdb.formulir') }}" target="_blank" class="ppdb-nav-link" title="Buka Formulir Pendaftaran Siswa Baru">
+      <div style="display:flex; align-items:center;">
+        <i class="bi bi-arrow-up-right-circle ppdb-nav-icon"></i>
+        <span>Formulir Publik</span>
       </div>
     </a>
 
-    <a href="{{ route('ppdb.index') }}" target="_blank" class="nav-item">
-      <div class="nav-left-part">
-        <i class="bi bi-globe nav-icon" style="color:#2563eb;"></i>
-        <span class="nav-text">Portal Informasi PPDB</span>
+    <a href="{{ route('ppdb.index') }}" target="_blank" class="ppdb-nav-link" title="Portal Informasi PPDB SMKN 1">
+      <div style="display:flex; align-items:center;">
+        <i class="bi bi-globe2 ppdb-nav-icon"></i>
+        <span>Portal PPDB</span>
       </div>
     </a>
 
-    <a href="/dashboard" class="nav-item">
-      <div class="nav-left-part">
-        <i class="bi bi-fingerprint nav-icon" style="color:#10b981;"></i>
-        <span class="nav-text">Buka Modul SIRANI</span>
+    <a href="/situan" class="ppdb-nav-link" title="Buka Modul Tata Usaha SITUAN">
+      <div style="display:flex; align-items:center;">
+        <i class="bi bi-building ppdb-nav-icon"></i>
+        <span>Modul SITUAN</span>
       </div>
     </a>
   </div>
+
 </aside>
 
 <script>

@@ -97,8 +97,35 @@ class PpdbUjianController extends Controller
             return $this->autoSelesai($pendaftar, $peserta, $setting);
         }
 
-        $jumlahPg = (int) ($setting->jumlah_soal_pg ?: 30);
-        $jumlahEsai = (int) ($setting->jumlah_soal_esai ?: 5);
+        // Ambil butir soal dari bank soal CBT
+        $soalPg = $setting->soalPg()->get()->all();
+        $soalEsai = $setting->soalEsai()->get()->all();
+
+        // Acak urutan soal per siswa secara deterministik berdasarkan ID peserta ujian
+        // (Urutan konsisten untuk siswa ini saat refresh, tapi berbeda dari siswa lain)
+        $seed = (int) $peserta->id + 31337;
+        mt_srand($seed);
+
+        $nPg = count($soalPg);
+        for ($i = $nPg - 1; $i > 0; $i--) {
+            $j = mt_rand(0, $i);
+            $tmp = $soalPg[$i];
+            $soalPg[$i] = $soalPg[$j];
+            $soalPg[$j] = $tmp;
+        }
+
+        $nEsai = count($soalEsai);
+        for ($i = $nEsai - 1; $i > 0; $i--) {
+            $j = mt_rand(0, $i);
+            $tmp = $soalEsai[$i];
+            $soalEsai[$i] = $soalEsai[$j];
+            $soalEsai[$j] = $tmp;
+        }
+
+        mt_srand(); // Kembalikan random seed ke sistem
+
+        $jumlahPg = count($soalPg);
+        $jumlahEsai = count($soalEsai);
 
         return view('ppdb.ujian.kerjakan', compact(
             'sekolah',
@@ -106,6 +133,8 @@ class PpdbUjianController extends Controller
             'setting',
             'peserta',
             'sisaDetik',
+            'soalPg',
+            'soalEsai',
             'jumlahPg',
             'jumlahEsai'
         ));

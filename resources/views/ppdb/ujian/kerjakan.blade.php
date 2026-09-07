@@ -6,11 +6,10 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Ujian CBT — {{ $pendaftar->nama_lengkap }} ({{ $pendaftar->no_pendaftaran }})</title>
 
-    <!-- Google Fonts & FontAwesome -->
+    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
     <style>
         :root {
@@ -24,7 +23,7 @@
             --text-dark: #0f172a;
             --text-body: #334155;
             --text-muted: #64748b;
-            --border: #cbd5e1;
+            --border: #e2e8f0;
             --bg-page: #f8fafc;
             --font-main: 'Plus Jakarta Sans', sans-serif;
             --font-mono: 'JetBrains Mono', monospace;
@@ -40,25 +39,25 @@
             font-family: var(--font-main);
             color: var(--text-dark);
             background: var(--bg-page);
-            height: 100vh;
+            min-height: 100vh;
             display: flex;
             flex-direction: column;
-            overflow: hidden;
             -webkit-user-select: none;
             user-select: none;
         }
 
         /* ══ TOPBAR ══ */
         .cbt-topbar {
+            position: sticky;
+            top: 0;
             height: 64px;
             background: #ffffff;
             border-bottom: 1px solid var(--border);
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 0 20px;
-            flex-shrink: 0;
-            z-index: 20;
+            padding: 0 24px;
+            z-index: 50;
             box-shadow: 0 1px 3px rgba(0,0,0,0.03);
         }
 
@@ -68,17 +67,14 @@
             gap: 12px;
         }
 
-        .cbt-logo-badge {
-            width: 40px;
-            height: 40px;
-            border-radius: 10px;
+        .cbt-badge {
+            padding: 6px 12px;
+            border-radius: 8px;
             background: var(--primary-subtle);
             color: var(--primary);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.25rem;
-            border: 1px solid rgba(37,99,235,0.2);
+            font-weight: 800;
+            font-size: 0.85rem;
+            letter-spacing: 0.02em;
         }
 
         .cbt-user-info {
@@ -89,11 +85,11 @@
         .cbt-user-name {
             font-weight: 800;
             font-size: 0.95rem;
-            color: #000000;
+            color: var(--text-dark);
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            max-width: 260px;
+            max-width: 280px;
         }
 
         .cbt-user-meta {
@@ -102,14 +98,14 @@
             font-weight: 600;
         }
 
-        /* TIMER BOX */
+        /* TIMER */
         .cbt-timer-box {
             display: flex;
             align-items: center;
             gap: 10px;
             background: #0f172a;
             color: #ffffff;
-            padding: 6px 16px;
+            padding: 6px 18px;
             border-radius: 10px;
             box-shadow: 0 2px 6px rgba(15,23,42,0.15);
         }
@@ -124,7 +120,7 @@
 
         .cbt-timer-display {
             font-family: var(--font-mono);
-            font-size: 1.25rem;
+            font-size: 1.2rem;
             font-weight: 800;
             letter-spacing: 0.05em;
             color: #38bdf8;
@@ -161,9 +157,6 @@
             font-size: 0.8rem;
             font-weight: 700;
             color: var(--text-muted);
-            display: flex;
-            align-items: center;
-            gap: 6px;
         }
 
         .btn-finish {
@@ -175,9 +168,6 @@
             font-weight: 800;
             font-size: 0.88rem;
             cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 8px;
             transition: all 0.2s;
         }
 
@@ -186,94 +176,235 @@
             transform: translateY(-1px);
         }
 
-        /* ══ SPLIT-SCREEN WORKSPACE ══ */
-        .cbt-workspace {
-            display: grid;
-            grid-template-columns: 50% 50%;
-            flex: 1;
-            height: calc(100vh - 64px);
-            overflow: hidden;
-        }
-
-        /* LEFT: PDF VIEWER */
-        .cbt-pdf-pane {
-            border-right: 2px solid var(--border);
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            background: #475569;
-            position: relative;
-        }
-
-        .cbt-pdf-header {
-            height: 38px;
-            background: #1e293b;
-            color: #ffffff;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 14px;
-            font-size: 0.8rem;
-            font-weight: 700;
-        }
-
-        .cbt-pdf-header a {
-            color: #38bdf8;
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 0.75rem;
-        }
-
-        .cbt-pdf-frame {
+        /* ══ MAIN LAYOUT ══ */
+        .cbt-container {
+            max-width: 1280px;
             width: 100%;
-            flex: 1;
-            border: none;
-            background: #ffffff;
+            margin: 0 auto;
+            padding: 24px 20px 80px 20px;
+            display: grid;
+            grid-template-columns: 1fr 310px;
+            gap: 24px;
+            align-items: start;
         }
 
-        /* RIGHT: ANSWER SHEET */
-        .cbt-answer-pane {
-            height: 100%;
-            overflow-y: auto;
-            background: #f8fafc;
+        /* SOAL STREAM */
+        .cbt-questions-col {
             display: flex;
             flex-direction: column;
-            padding: 20px 24px 60px 24px;
-            scroll-behavior: smooth;
+            gap: 20px;
         }
 
-        /* QUICK MAP */
-        .cbt-quickmap-card {
+        /* QUESTION CARD */
+        .question-card {
             background: #ffffff;
             border: 1px solid var(--border);
             border-radius: 12px;
-            padding: 16px;
-            margin-bottom: 24px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+            padding: 22px 24px;
+            scroll-margin-top: 84px;
+            transition: border-color 0.2s, box-shadow 0.2s;
         }
 
-        .cbt-quickmap-title {
-            font-size: 0.8rem;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            color: var(--text-muted);
-            margin-bottom: 12px;
+        .question-card:hover {
+            border-color: #cbd5e1;
+        }
+
+        .q-header {
             display: flex;
             align-items: center;
             justify-content: space-between;
+            margin-bottom: 14px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #f1f5f9;
         }
 
-        .cbt-map-grid {
+        .q-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .q-badge-num {
+            background: #0f172a;
+            color: #ffffff;
+            font-family: var(--font-mono);
+            font-weight: 800;
+            font-size: 0.85rem;
+            padding: 3px 10px;
+            border-radius: 6px;
+        }
+
+        .q-badge-type {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .q-text {
+            font-size: 1rem;
+            line-height: 1.6;
+            color: #1e293b;
+            font-weight: 600;
+            margin-bottom: 18px;
+            white-space: pre-line;
+        }
+
+        /* OPTIONS LIST */
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .opt-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 10px 14px;
+            border-radius: 8px;
+            border: 1.5px solid #e2e8f0;
+            background: #fdfdfe;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .opt-row:hover {
+            border-color: var(--primary);
+            background: var(--primary-subtle);
+        }
+
+        .opt-row input[type="radio"] {
+            margin-top: 3px;
+            width: 18px;
+            height: 18px;
+            accent-color: var(--primary);
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .opt-letter {
+            font-family: var(--font-mono);
+            font-weight: 800;
+            font-size: 0.95rem;
+            color: var(--text-dark);
+            width: 24px;
+            flex-shrink: 0;
+        }
+
+        .opt-text {
+            font-size: 0.92rem;
+            line-height: 1.5;
+            color: #334155;
+            font-weight: 500;
+            flex: 1;
+        }
+
+        .opt-row.selected {
+            background: #eff6ff;
+            border-color: var(--primary);
+        }
+
+        .opt-row.selected .opt-letter {
+            color: var(--primary);
+        }
+
+        .opt-row.selected .opt-text {
+            color: #1e3a8a;
+            font-weight: 600;
+        }
+
+        /* TEXTAREA ESAI */
+        .essay-textarea {
+            width: 100%;
+            min-height: 120px;
+            padding: 14px;
+            border: 1.5px solid #cbd5e1;
+            border-radius: 8px;
+            font-family: var(--font-main);
+            font-size: 0.92rem;
+            line-height: 1.6;
+            color: #0f172a;
+            background: #ffffff;
+            resize: vertical;
+            outline: none;
+            transition: border-color 0.15s;
+        }
+
+        .essay-textarea:focus {
+            border-color: var(--success);
+            box-shadow: 0 0 0 3px rgba(5,150,105,0.1);
+        }
+
+        .essay-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 8px;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        /* ══ SIDEBAR PETA SOAL ══ */
+        .cbt-sidebar {
+            position: sticky;
+            top: 84px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .map-card {
+            background: #ffffff;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 18px 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+        }
+
+        .map-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 14px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .map-card-title {
+            font-size: 0.85rem;
+            font-weight: 800;
+            color: #0f172a;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .map-progress {
+            font-family: var(--font-mono);
+            font-size: 0.82rem;
+            font-weight: 800;
+            color: var(--primary);
+        }
+
+        .map-section-label {
+            font-size: 0.72rem;
+            font-weight: 800;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin: 12px 0 6px;
+        }
+
+        .map-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(36px, 1fr));
+            grid-template-columns: repeat(5, 1fr);
             gap: 6px;
         }
 
         .map-btn {
-            height: 34px;
+            height: 38px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -281,12 +412,12 @@
             border: 1px solid #cbd5e1;
             border-radius: 6px;
             font-family: var(--font-mono);
-            font-size: 0.8rem;
+            font-size: 0.85rem;
             font-weight: 700;
-            color: var(--text-dark);
+            color: #1e293b;
             cursor: pointer;
-            transition: all 0.15s;
             text-decoration: none;
+            transition: all 0.15s;
         }
 
         .map-btn:hover {
@@ -307,179 +438,30 @@
         .map-btn.esai-btn.answered {
             background: var(--success);
             border-color: var(--success);
-        }
-
-        /* SECTION HEADERS */
-        .section-badge {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 16px;
-            padding-bottom: 8px;
-            border-bottom: 2px solid #e2e8f0;
-        }
-
-        .section-badge-icon {
-            width: 32px;
-            height: 32px;
-            border-radius: 8px;
-            background: var(--primary-subtle);
-            color: var(--primary);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.95rem;
-        }
-
-        .section-badge-title {
-            font-weight: 800;
-            font-size: 1.05rem;
-            color: #000000;
-        }
-
-        .section-badge-sub {
-            font-size: 0.8rem;
-            color: var(--text-muted);
-            margin-left: auto;
-            font-weight: 700;
-        }
-
-        /* QUESTION ROW */
-        .question-item {
-            background: #ffffff;
-            border: 1px solid #e2e8f0;
-            border-radius: 10px;
-            padding: 14px 18px;
-            margin-bottom: 14px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 16px;
-            transition: border-color 0.2s, box-shadow 0.2s;
-        }
-
-        .question-item:hover, .question-item:focus-within {
-            border-color: var(--primary);
-            box-shadow: 0 2px 8px rgba(37,99,235,0.06);
-        }
-
-        .q-number {
-            font-family: var(--font-mono);
-            font-weight: 800;
-            font-size: 0.95rem;
-            color: #000000;
-            width: 44px;
-            flex-shrink: 0;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .options-group {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-
-        .opt-label {
-            position: relative;
-            cursor: pointer;
-        }
-
-        .opt-label input[type="radio"] {
-            position: absolute;
-            opacity: 0;
-            cursor: pointer;
-        }
-
-        .opt-pill {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 38px;
-            height: 38px;
-            border-radius: 8px;
-            border: 1.5px solid #cbd5e1;
-            background: #ffffff;
-            font-family: var(--font-mono);
-            font-size: 0.95rem;
-            font-weight: 800;
-            color: #1e293b;
-            transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .opt-label:hover .opt-pill {
-            border-color: var(--primary);
-            background: var(--primary-subtle);
-            color: var(--primary);
-            transform: translateY(-1px);
-        }
-
-        .opt-label input[type="radio"]:checked + .opt-pill {
-            background: var(--primary);
-            border-color: var(--primary);
             color: #ffffff;
-            box-shadow: 0 3px 8px rgba(37,99,235,0.3);
-            transform: scale(1.05);
         }
 
-        /* ESSAY BOX */
-        .essay-item {
-            background: #ffffff;
-            border: 1px solid #e2e8f0;
-            border-radius: 12px;
-            padding: 18px 20px;
-            margin-bottom: 20px;
-            transition: border-color 0.2s, box-shadow 0.2s;
-        }
-
-        .essay-item:focus-within {
-            border-color: var(--success);
-            box-shadow: 0 2px 8px rgba(5,150,105,0.08);
-        }
-
-        .essay-header {
+        .map-legend {
             display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 10px;
-        }
-
-        .essay-title {
-            font-weight: 800;
-            font-size: 0.95rem;
-            color: #000000;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .essay-counter {
-            font-size: 0.75rem;
+            gap: 12px;
+            font-size: 0.72rem;
+            font-weight: 700;
             color: var(--text-muted);
-            font-weight: 600;
+            margin-top: 14px;
+            padding-top: 12px;
+            border-top: 1px solid #f1f5f9;
         }
 
-        .essay-textarea {
-            width: 100%;
-            min-height: 100px;
-            padding: 12px 14px;
-            border: 1px solid #cbd5e1;
-            border-radius: 8px;
-            font-family: var(--font-main);
-            font-size: 0.9rem;
-            color: #000000;
-            background: #fdfdfe;
-            resize: vertical;
-            line-height: 1.5;
-            outline: none;
-            transition: border-color 0.15s;
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
         }
 
-        .essay-textarea:focus {
-            border-color: var(--success);
-            background: #ffffff;
+        .legend-box {
+            width: 12px;
+            height: 12px;
+            border-radius: 3px;
         }
 
         /* ══ MODAL KONFIRMASI SELESAI ══ */
@@ -501,31 +483,27 @@
 
         .cbt-modal-card {
             background: #ffffff;
-            border-radius: 16px;
-            max-width: 480px;
+            border-radius: 14px;
+            max-width: 460px;
             width: 100%;
-            padding: 30px;
+            padding: 28px;
             text-align: center;
             box-shadow: 0 20px 40px rgba(0,0,0,0.2);
-            animation: modalPop 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            animation: modalPop 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
         @keyframes modalPop {
-            0% { transform: scale(0.9); opacity: 0; }
+            0% { transform: scale(0.92); opacity: 0; }
             100% { transform: scale(1); opacity: 1; }
         }
 
-        /* RESPONSIVE */
         @media (max-width: 992px) {
-            .cbt-workspace {
+            .cbt-container {
                 grid-template-columns: 1fr;
-                height: auto;
             }
-            .cbt-pdf-pane {
-                height: 50vh;
-            }
-            .cbt-answer-pane {
-                height: calc(50vh - 64px);
+            .cbt-sidebar {
+                position: static;
+                order: -1;
             }
         }
     </style>
@@ -535,12 +513,10 @@
     <!-- TOPBAR -->
     <header class="cbt-topbar">
         <div class="cbt-brand">
-            <div class="cbt-logo-badge">
-                <i class="fa-solid fa-graduation-cap"></i>
-            </div>
+            <div class="cbt-badge">CBT SMKN 1 AN</div>
             <div class="cbt-user-info">
                 <span class="cbt-user-name">{{ $pendaftar->nama_lengkap }}</span>
-                <span class="cbt-user-meta">No. Reg: {{ $pendaftar->no_pendaftaran }} | {{ $pendaftar->jurusanPilihan1->nama_jurusan ?? '-' }}</span>
+                <span class="cbt-user-meta">No. Reg: {{ $pendaftar->no_pendaftaran }} &bull; {{ $pendaftar->jurusanPilihan1->nama_jurusan ?? '-' }}</span>
             </div>
         </div>
 
@@ -553,208 +529,236 @@
         <!-- ACTIONS -->
         <div class="cbt-actions">
             <div id="saveStatus" class="cbt-save-indicator">
-                <i class="fa-solid fa-cloud-arrow-up text-muted"></i> Siap
+                Draft tersimpan
             </div>
             <button type="button" class="btn-finish" onclick="openFinishModal()">
-                <i class="fa-solid fa-circle-check"></i> Kumpulkan Ujian
+                Kumpulkan Ujian
             </button>
         </div>
     </header>
 
-    <!-- FORM UTAMA -->
-    <form id="ujianForm" action="{{ route('ppdb.ujian.selesai', $pendaftar->no_pendaftaran) }}" method="POST" style="flex: 1; display: flex; flex-direction: column; overflow: hidden;">
+    <!-- FORM UTAMA UJIAN -->
+    <form id="ujianForm" action="{{ route('ppdb.ujian.selesai', $pendaftar->no_pendaftaran) }}" method="POST">
         @csrf
 
-        <div class="cbt-workspace">
+        <div class="cbt-container">
             
-            <!-- LEFT PANE: NASKAH SOAL PDF -->
-            <div class="cbt-pdf-pane">
-                <div class="cbt-pdf-header">
-                    <span><i class="fa-regular fa-file-pdf me-1 text-danger"></i> Dokumen Naskah Soal Terpadu</span>
-                    @if($setting->file_pdf_soal)
-                        <a href="{{ asset('storage/' . $setting->file_pdf_soal) }}" target="_blank">
-                            <i class="fa-solid fa-arrow-up-right-from-square"></i> Buka Layar Penuh
-                        </a>
-                    @endif
-                </div>
-
-                @if($setting->file_pdf_soal)
-                    <iframe src="{{ asset('storage/' . $setting->file_pdf_soal) }}#toolbar=0&navpanes=0" class="cbt-pdf-frame" title="Naskah Soal Ujian"></iframe>
-                @else
-                    <div style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #ffffff; color: var(--text-muted); padding: 40px; text-align: center;">
-                        <i class="fa-solid fa-file-circle-question" style="font-size: 3.5rem; color: #cbd5e1; margin-bottom: 16px;"></i>
-                        <h3 style="font-size: 1.15rem; font-weight: 800; color: #000000; margin-bottom: 6px;">Naskah Soal Sedang Dipersiapkan</h3>
-                        <p style="font-size: 0.88rem; max-width: 400px; line-height: 1.5;">Panitia sedang mengunggah file naskah soal PDF resmi. Silakan hubungi pengawas jika naskah belum tampil.</p>
+            <!-- KOLOM DAFTAR SOAL -->
+            <div class="cbt-questions-col">
+                
+                @if(count($soalPg) === 0 && count($soalEsai) === 0)
+                    <div style="background: #ffffff; border: 1px solid var(--border); border-radius: 12px; padding: 40px; text-align: center; color: var(--text-muted);">
+                        <h3 style="font-size: 1.15rem; font-weight: 800; color: #0f172a; margin-bottom: 6px;">Soal Ujian Belum Tersedia</h3>
+                        <p style="font-size: 0.88rem; max-width: 440px; margin: 0 auto; line-height: 1.5;">
+                            Panitia belum menambahkan butir soal ke dalam bank soal CBT. Silakan laporkan kepada pengawas ujian.
+                        </p>
                     </div>
                 @endif
-            </div>
 
-            <!-- RIGHT PANE: LEMBAR JAWAB DIGITAL -->
-            <div class="cbt-answer-pane">
-                
-                <!-- QUICK NAVIGATOR MAP -->
-                <div class="cbt-quickmap-card">
-                    <div class="cbt-quickmap-title">
-                        <span>Peta Nomor Soal</span>
-                        <span id="progressText" style="color: var(--primary); font-family: var(--font-mono);">0 / {{ $jumlahPg + $jumlahEsai }} Terisi</span>
-                    </div>
-
-                    <!-- Grid 30 PG -->
-                    <div style="font-size: 0.72rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; margin-bottom: 6px;">
-                        Bagian I: Pilihan Ganda (1–{{ $jumlahPg }})
-                    </div>
-                    <div class="cbt-map-grid" style="margin-bottom: 14px;">
-                        @for($i = 1; $i <= $jumlahPg; $i++)
-                            @php
-                                $sudahJawabPg = !empty($peserta->jawaban_pg[(string)$i]);
-                            @endphp
-                            <a href="#q_pg_{{ $i }}" id="nav_pg_{{ $i }}" class="map-btn {{ $sudahJawabPg ? 'answered' : '' }}">
-                                {{ $i }}
-                            </a>
-                        @endfor
+                {{-- BAGIAN I: SOAL PILIHAN GANDA --}}
+                @if(count($soalPg) > 0)
+                    <div style="margin-bottom: 6px;">
+                        <h2 style="font-size: 1.1rem; font-weight: 800; color: #0f172a; margin: 0 0 4px;">
+                            Bagian I: Soal Pilihan Ganda ({{ count($soalPg) }} Butir)
+                        </h2>
+                        <div style="font-size: 0.82rem; color: var(--text-muted);">
+                            Pilihlah salah satu opsi jawaban yang paling tepat. Bobot: {{ $setting->bobot_pg }}%.
+                        </div>
                     </div>
 
-                    <!-- Grid 5 Esai -->
-                    <div style="font-size: 0.72rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; margin-bottom: 6px;">
-                        Bagian II: Esai / Uraian ({{ $jumlahPg + 1 }}–{{ $jumlahPg + $jumlahEsai }})
-                    </div>
-                    <div class="cbt-map-grid">
-                        @for($e = 1; $e <= $jumlahEsai; $e++)
-                            @php
-                                $nomorEsai = $jumlahPg + $e;
-                                $sudahJawabEsai = !empty($peserta->jawaban_esai[(string)$nomorEsai]);
-                            @endphp
-                            <a href="#q_esai_{{ $nomorEsai }}" id="nav_esai_{{ $nomorEsai }}" class="map-btn esai-btn {{ $sudahJawabEsai ? 'answered' : '' }}">
-                                {{ $nomorEsai }}
-                            </a>
-                        @endfor
-                    </div>
-                </div>
-
-                <!-- SECTION 1: 30 SOAL PILIHAN GANDA -->
-                <div class="section-badge">
-                    <div class="section-badge-icon">
-                        <i class="fa-solid fa-list-check"></i>
-                    </div>
-                    <div>
-                        <div class="section-badge-title">Bagian I: 30 Butir Pilihan Ganda</div>
-                        <div style="font-size: 0.78rem; color: var(--text-muted);">Pilihlah salah satu opsi A, B, C, D, atau E sesuai naskah soal</div>
-                    </div>
-                    <div class="section-badge-sub">Bobot: {{ $setting->bobot_pg }}%</div>
-                </div>
-
-                <div style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 32px;">
-                    @for($i = 1; $i <= $jumlahPg; $i++)
+                    @foreach($soalPg as $idx => $soal)
                         @php
-                            $currentJawab = $peserta->jawaban_pg[(string)$i] ?? null;
+                            $dispNum = $idx + 1;
+                            $savedAnswer = $peserta->jawaban_pg[$soal->id] ?? $peserta->jawaban_pg[$soal->nomor_urut] ?? null;
+                            $opsiArray = $soal->getOpsiArray();
                         @endphp
-                        <div class="question-item" id="q_pg_{{ $i }}">
-                            <div class="q-number">
-                                <span>{{ $i }}.</span>
+                        <div class="question-card" id="q_pg_{{ $dispNum }}">
+                            <div class="q-header">
+                                <div class="q-badge">
+                                    <span class="q-badge-num">{{ $dispNum }}</span>
+                                    <span class="q-badge-type">Pilihan Ganda</span>
+                                </div>
+                                <div style="font-size: 0.75rem; color: var(--text-muted); font-weight: 600;">
+                                    Soal {{ $dispNum }} dari {{ count($soalPg) }}
+                                </div>
                             </div>
-                            
-                            <div class="options-group">
-                                @foreach(['A', 'B', 'C', 'D', 'E'] as $opt)
-                                    <label class="opt-label">
-                                        <input type="radio" 
-                                               name="jawaban_pg[{{ $i }}]" 
-                                               value="{{ $opt }}" 
-                                               onchange="handlePgChange({{ $i }})"
-                                               {{ $currentJawab === $opt ? 'checked' : '' }}>
-                                        <span class="opt-pill">{{ $opt }}</span>
-                                    </label>
+
+                            <div class="q-text">{!! nl2br(e($soal->pertanyaan)) !!}</div>
+
+                            <div class="options-list">
+                                @foreach(['A', 'B', 'C', 'D', 'E'] as $optKey)
+                                    @if(isset($opsiArray[$optKey]))
+                                        @php
+                                            $isSelected = ($savedAnswer === $optKey);
+                                        @endphp
+                                        <label class="opt-row {{ $isSelected ? 'selected' : '' }}" id="row_opt_{{ $dispNum }}_{{ $optKey }}">
+                                            <input type="radio" 
+                                                   name="jawaban_pg[{{ $soal->id }}]" 
+                                                   value="{{ $optKey }}"
+                                                   data-disp="{{ $dispNum }}"
+                                                   {{ $isSelected ? 'checked' : '' }}
+                                                   onchange="handlePgSelect({{ $dispNum }}, '{{ $optKey }}')">
+                                            <span class="opt-letter">{{ $optKey }}.</span>
+                                            <span class="opt-text">{{ $opsiArray[$optKey] }}</span>
+                                        </label>
+                                    @endif
                                 @endforeach
                             </div>
                         </div>
-                    @endfor
-                </div>
+                    @endforeach
+                @endif
 
-                <!-- SECTION 2: 5 SOAL ESAI -->
-                <div class="section-badge">
-                    <div class="section-badge-icon" style="background: var(--success-subtle); color: var(--success);">
-                        <i class="fa-solid fa-pen-fancy"></i>
+                {{-- BAGIAN II: SOAL ESAI --}}
+                @if(count($soalEsai) > 0)
+                    <div style="margin-top: 16px; margin-bottom: 6px;">
+                        <h2 style="font-size: 1.1rem; font-weight: 800; color: #0f172a; margin: 0 0 4px;">
+                            Bagian II: Soal Esai / Uraian ({{ count($soalEsai) }} Butir)
+                        </h2>
+                        <div style="font-size: 0.82rem; color: var(--text-muted);">
+                            Ketikkan uraian jawaban Anda secara jelas dan lengkap. Bobot: {{ $setting->bobot_esai }}%.
+                        </div>
                     </div>
-                    <div>
-                        <div class="section-badge-title">Bagian II: 5 Butir Soal Esai / Uraian</div>
-                        <div style="font-size: 0.78rem; color: var(--text-muted);">Ketik uraian jawaban secara runut dan lengkap di kotak teks</div>
-                    </div>
-                    <div class="section-badge-sub" style="color: var(--success);">Bobot: {{ $setting->bobot_esai }}%</div>
-                </div>
 
-                <div style="display: flex; flex-direction: column; gap: 16px; margin-bottom: 40px;">
-                    @for($e = 1; $e <= $jumlahEsai; $e++)
+                    @foreach($soalEsai as $eIdx => $soal)
                         @php
-                            $nomorEsai = $jumlahPg + $e;
-                            $currentEsai = $peserta->jawaban_esai[(string)$nomorEsai] ?? '';
+                            $dispNumEsai = count($soalPg) + $eIdx + 1;
+                            $savedEsai = $peserta->jawaban_esai[$soal->id] ?? $peserta->jawaban_esai[$soal->nomor_urut] ?? '';
                         @endphp
-                        <div class="essay-item" id="q_esai_{{ $nomorEsai }}">
-                            <div class="essay-header">
-                                <span class="essay-title">
-                                    <span style="background: var(--success-subtle); color: var(--success); font-family: var(--font-mono); padding: 2px 8px; border-radius: 6px; font-size: 0.85rem;">
-                                        Soal No. {{ $nomorEsai }}
-                                    </span>
-                                    <span>Jawaban Esai {{ $e }}</span>
-                                </span>
-                                <span class="essay-counter" id="counter_{{ $nomorEsai }}">{{ strlen($currentEsai) }} Karakter</span>
+                        <div class="question-card" id="q_esai_{{ $dispNumEsai }}">
+                            <div class="q-header">
+                                <div class="q-badge">
+                                    <span class="q-badge-num">{{ $dispNumEsai }}</span>
+                                    <span class="q-badge-type">Esai / Uraian</span>
+                                </div>
+                                <div style="font-size: 0.75rem; color: var(--text-muted); font-weight: 600;">
+                                    Esai {{ $eIdx + 1 }} dari {{ count($soalEsai) }}
+                                </div>
                             </div>
 
-                            <textarea name="jawaban_esai[{{ $nomorEsai }}]" 
-                                      id="textarea_esai_{{ $nomorEsai }}"
-                                      class="essay-textarea" 
-                                      rows="4" 
-                                      placeholder="Ketik uraian jawaban Anda untuk Soal Nomor {{ $nomorEsai }} di sini..."
-                                      oninput="handleEsaiInput({{ $nomorEsai }})">{{ $currentEsai }}</textarea>
-                        </div>
-                    @endfor
-                </div>
+                            <div class="q-text">{!! nl2br(e($soal->pertanyaan)) !!}</div>
 
-                <!-- FOOTER SUBMIT CALLOUT -->
-                <div style="background: #ffffff; border: 1px solid var(--border); border-radius: 12px; padding: 24px; text-align: center;">
-                    <h4 style="font-size: 1rem; font-weight: 800; color: #000000; margin-bottom: 6px;">Sudah Selesai Memeriksa Semua Jawaban?</h4>
-                    <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 18px;">
-                        Pastikan seluruh 30 soal Pilihan Ganda dan 5 soal Esai telah terjawab sebelum mengirim.
-                    </p>
-                    <button type="button" class="btn-finish" style="margin: 0 auto; padding: 12px 28px; font-size: 1rem;" onclick="openFinishModal()">
-                        <i class="fa-solid fa-circle-check"></i> Kumpulkan & Selesaikan Ujian
-                    </button>
-                </div>
+                            <textarea name="jawaban_esai[{{ $soal->id }}]" 
+                                      id="textarea_esai_{{ $dispNumEsai }}"
+                                      class="essay-textarea" 
+                                      placeholder="Tuliskan uraian jawaban Anda di sini..."
+                                      oninput="handleEsaiInput({{ $dispNumEsai }})">{{ $savedEsai }}</textarea>
+
+                            <div class="essay-footer">
+                                <span id="counter_{{ $dispNumEsai }}">{{ strlen(trim($savedEsai)) }} Karakter</span>
+                                <span>Jawaban tersimpan otomatis</span>
+                            </div>
+                        </div>
+                    @endforeach
+                @endif
+
+                {{-- SUBMIT FOOTER --}}
+                @if(count($soalPg) > 0 || count($soalEsai) > 0)
+                    <div style="background: #ffffff; border: 1px solid var(--border); border-radius: 12px; padding: 24px; text-align: center; margin-top: 10px;">
+                        <h4 style="font-size: 1rem; font-weight: 800; color: #0f172a; margin-bottom: 6px;">Sudah Selesai Memeriksa Seluruh Jawaban?</h4>
+                        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 18px;">
+                            Pastikan Anda telah mengisi seluruh butir soal sebelum mengumpulkan ujian.
+                        </p>
+                        <button type="button" class="btn-finish" style="padding: 10px 24px; font-size: 0.95rem;" onclick="openFinishModal()">
+                            Kumpulkan &amp; Selesaikan Ujian
+                        </button>
+                    </div>
+                @endif
 
             </div>
 
-        </div>
+            <!-- SIDEBAR: PETA NOMOR SOAL (STICKY) -->
+            <div class="cbt-sidebar">
+                <div class="map-card">
+                    <div class="map-card-header">
+                        <span class="map-card-title">Peta Soal</span>
+                        <span id="progressText" class="map-progress">0 / {{ count($soalPg) + count($soalEsai) }}</span>
+                    </div>
 
+                    {{-- Map Pilihan Ganda --}}
+                    @if(count($soalPg) > 0)
+                        <div class="map-section-label">Pilihan Ganda</div>
+                        <div class="map-grid">
+                            @foreach($soalPg as $idx => $soal)
+                                @php
+                                    $dNum = $idx + 1;
+                                    $isAnswered = !empty($peserta->jawaban_pg[$soal->id] ?? $peserta->jawaban_pg[$soal->nomor_urut] ?? null);
+                                @endphp
+                                <a href="#q_pg_{{ $dNum }}" id="nav_btn_{{ $dNum }}" class="map-btn {{ $isAnswered ? 'answered' : '' }}">
+                                    {{ $dNum }}
+                                </a>
+                            @endforeach
+                        </div>
+                    @endif
+
+                    {{-- Map Esai --}}
+                    @if(count($soalEsai) > 0)
+                        <div class="map-section-label">Esai / Uraian</div>
+                        <div class="map-grid">
+                            @foreach($soalEsai as $eIdx => $soal)
+                                @php
+                                    $dNumEsai = count($soalPg) + $eIdx + 1;
+                                    $isAnswered = !empty(trim($peserta->jawaban_esai[$soal->id] ?? $peserta->jawaban_esai[$soal->nomor_urut] ?? ''));
+                                @endphp
+                                <a href="#q_esai_{{ $dNumEsai }}" id="nav_btn_{{ $dNumEsai }}" class="map-btn esai-btn {{ $isAnswered ? 'answered' : '' }}">
+                                    {{ $dNumEsai }}
+                                </a>
+                            @endforeach
+                        </div>
+                    @endif
+
+                    {{-- Legend --}}
+                    <div class="map-legend">
+                        <div class="legend-item">
+                            <div class="legend-box" style="background: var(--primary);"></div>
+                            <span>PG Terisi</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-box" style="background: var(--success);"></div>
+                            <span>Esai Terisi</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-box" style="background: #ffffff; border: 1px solid #cbd5e1;"></div>
+                            <span>Belum</span>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Petunjuk Singkat --}}
+                <div style="background: #ffffff; border: 1px solid var(--border); border-radius: 12px; padding: 16px; font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">
+                    <div style="font-weight: 800; color: #0f172a; margin-bottom: 4px;">Informasi Ujian:</div>
+                    Urutan soal teracak otomatis. Jawaban tersimpan otomatis ke server. Anda dapat berpindah soal dengan mengklik nomor di peta soal.
+                </div>
+            </div>
+
+        </div>
     </form>
 
     <!-- MODAL KONFIRMASI PENGIRIMAN -->
     <div id="finishModal" class="cbt-modal-backdrop">
         <div class="cbt-modal-card">
-            <div style="width: 60px; height: 60px; border-radius: 50%; background: var(--success-subtle); color: var(--success); font-size: 1.8rem; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px auto;">
-                <i class="fa-solid fa-cloud-arrow-up"></i>
-            </div>
-            
-            <h3 style="font-size: 1.3rem; font-weight: 800; color: #000000; margin-bottom: 8px;">Kumpulkan Lembar Jawaban Ujian?</h3>
+            <h3 style="font-size: 1.25rem; font-weight: 800; color: #0f172a; margin-bottom: 8px;">Kumpulkan Lembar Jawaban?</h3>
             <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 20px; line-height: 1.5;">
-                Apakah Anda yakin ingin menyelesaikan ujian ini? Setelah dikirim, jawaban tidak dapat diubah kembali.
+                Setelah dikirim, seluruh jawaban Anda akan terkunci dan langsung dinilai oleh sistem.
             </p>
 
             <!-- STAT REKAP -->
-            <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 14px; margin-bottom: 24px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; text-align: left; font-size: 0.85rem;">
+            <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 14px; margin-bottom: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; text-align: left; font-size: 0.85rem;">
                 <div>
                     <span style="color: var(--text-muted);">Pilihan Ganda:</span>
-                    <strong id="modalPgCount" style="display: block; color: var(--primary); font-size: 1.1rem;">0 / {{ $jumlahPg }}</strong>
+                    <strong id="modalPgCount" style="display: block; color: var(--primary); font-size: 1.1rem; margin-top: 2px;">0 / {{ count($soalPg) }}</strong>
                 </div>
                 <div>
                     <span style="color: var(--text-muted);">Soal Esai:</span>
-                    <strong id="modalEsaiCount" style="display: block; color: var(--success); font-size: 1.1rem;">0 / {{ $jumlahEsai }}</strong>
+                    <strong id="modalEsaiCount" style="display: block; color: var(--success); font-size: 1.1rem; margin-top: 2px;">0 / {{ count($soalEsai) }}</strong>
                 </div>
             </div>
 
             <div style="display: flex; gap: 10px; justify-content: center;">
-                <button type="button" onclick="closeFinishModal()" style="padding: 10px 20px; border: 1px solid #cbd5e1; background: #ffffff; color: #334155; border-radius: 8px; font-weight: 700; cursor: pointer;">
-                    Kembali Periksa
+                <button type="button" onclick="closeFinishModal()" style="padding: 10px 18px; border: 1px solid #cbd5e1; background: #ffffff; color: #334155; border-radius: 8px; font-weight: 700; cursor: pointer; font-size: 0.88rem;">
+                    Periksa Kembali
                 </button>
-                <button type="button" onclick="submitFinalForm()" style="padding: 10px 24px; border: none; background: var(--success); color: #ffffff; border-radius: 8px; font-weight: 800; cursor: pointer; display: flex; align-items: center; gap: 8px;">
-                    <i class="fa-solid fa-check"></i> Ya, Kumpulkan Sekarang
+                <button type="button" onclick="submitFinalForm()" style="padding: 10px 22px; border: none; background: var(--success); color: #ffffff; border-radius: 8px; font-weight: 800; cursor: pointer; font-size: 0.88rem;">
+                    Ya, Kumpulkan Sekarang
                 </button>
             </div>
         </div>
@@ -763,8 +767,8 @@
     <!-- JAVASCRIPT CBT ENGINE -->
     <script>
         const DRAFT_URL = "{{ route('ppdb.ujian.simpan_draft', $pendaftar->no_pendaftaran) }}";
-        const TOTAL_PG = {{ $jumlahPg }};
-        const TOTAL_ESAI = {{ $jumlahEsai }};
+        const TOTAL_PG = {{ count($soalPg) }};
+        const TOTAL_ESAI = {{ count($soalEsai) }};
         let sisaDetik = {{ $sisaDetik }};
         let autoSaveTimer = null;
         let isSubmitting = false;
@@ -786,9 +790,9 @@
             display.innerText = `${format(h)}:${format(m)}:${format(s)}`;
 
             // Visual Warnings
-            if (sisaDetik <= 180) { // Kurang dari 3 menit
+            if (sisaDetik <= 180) {
                 display.className = "cbt-timer-display danger";
-            } else if (sisaDetik <= 600) { // Kurang dari 10 menit
+            } else if (sisaDetik <= 600) {
                 display.className = "cbt-timer-display warning";
             }
 
@@ -805,20 +809,35 @@
             document.getElementById('ujianForm').submit();
         }
 
-        // ══ 2. INTERAKSI PG & ESAI ══
-        function handlePgChange(number) {
-            const navBtn = document.getElementById(`nav_pg_${number}`);
+        // ══ 2. INTERAKSI PG ══
+        function handlePgSelect(dispNum, optKey) {
+            // Update UI highlight
+            ['A', 'B', 'C', 'D', 'E'].forEach(letter => {
+                const row = document.getElementById(`row_opt_${dispNum}_${letter}`);
+                if (row) {
+                    if (letter === optKey) {
+                        row.classList.add('selected');
+                    } else {
+                        row.classList.remove('selected');
+                    }
+                }
+            });
+
+            // Update navigator button
+            const navBtn = document.getElementById(`nav_btn_${dispNum}`);
             if (navBtn) navBtn.classList.add('answered');
+
             updateProgress();
             triggerAutoSave();
         }
 
-        function handleEsaiInput(number) {
-            const textarea = document.getElementById(`textarea_esai_${number}`);
-            const counter = document.getElementById(`counter_${number}`);
-            const navBtn = document.getElementById(`nav_esai_${number}`);
+        // ══ 3. INTERAKSI ESAI ══
+        function handleEsaiInput(dispNum) {
+            const ta = document.getElementById(`textarea_esai_${dispNum}`);
+            const counter = document.getElementById(`counter_${dispNum}`);
+            const navBtn = document.getElementById(`nav_btn_${dispNum}`);
 
-            const len = textarea.value.trim().length;
+            const len = ta ? ta.value.trim().length : 0;
             if (counter) counter.innerText = `${len} Karakter`;
 
             if (navBtn) {
@@ -833,74 +852,87 @@
             debouncedAutoSave();
         }
 
+        // ══ 4. UPDATE PROGRESS ══
         function updateProgress() {
             let pgAnswered = 0;
-            for (let i = 1; i <= TOTAL_PG; i++) {
-                const checked = document.querySelector(`input[name="jawaban_pg[${i}]"]:checked`);
-                if (checked) pgAnswered++;
-            }
+            const pgInputs = document.querySelectorAll('input[type="radio"]:checked');
+            pgAnswered = pgInputs.length;
 
             let esaiAnswered = 0;
-            for (let e = 1; e <= TOTAL_ESAI; e++) {
-                const num = TOTAL_PG + e;
-                const ta = document.getElementById(`textarea_esai_${num}`);
-                if (ta && ta.value.trim().length > 0) esaiAnswered++;
+            for (let i = 1; i <= TOTAL_ESAI; i++) {
+                const dispNum = TOTAL_PG + i;
+                const ta = document.getElementById(`textarea_esai_${dispNum}`);
+                if (ta && ta.value.trim().length > 0) {
+                    esaiAnswered++;
+                }
             }
 
             const totalAnswered = pgAnswered + esaiAnswered;
-            const maxTotal = TOTAL_PG + TOTAL_ESAI;
+            const totalSoal = TOTAL_PG + TOTAL_ESAI;
 
-            const progressText = document.getElementById('progressText');
-            if (progressText) progressText.innerText = `${totalAnswered} / ${maxTotal} Terisi`;
+            const progressElem = document.getElementById('progressText');
+            if (progressElem) {
+                progressElem.innerText = `${totalAnswered} / ${totalSoal}`;
+            }
 
-            const modalPg = document.getElementById('modalPgCount');
-            if (modalPg) modalPg.innerText = `${pgAnswered} / ${TOTAL_PG}`;
+            const mPg = document.getElementById('modalPgCount');
+            if (mPg) mPg.innerText = `${pgAnswered} / ${TOTAL_PG}`;
 
-            const modalEsai = document.getElementById('modalEsaiCount');
-            if (modalEsai) modalEsai.innerText = `${esaiAnswered} / ${TOTAL_ESAI}`;
+            const mEsai = document.getElementById('modalEsaiCount');
+            if (mEsai) mEsai.innerText = `${esaiAnswered} / ${TOTAL_ESAI}`;
         }
 
-        // ══ 3. AUTO-SAVE VIA AJAX ══
+        // ══ 5. AUTO SAVE ENGINE ══
         function debouncedAutoSave() {
             clearTimeout(autoSaveTimer);
-            autoSaveTimer = setTimeout(triggerAutoSave, 1500);
+            autoSaveTimer = setTimeout(triggerAutoSave, 1200);
         }
 
         function triggerAutoSave() {
-            const saveIndicator = document.getElementById('saveStatus');
-            if (saveIndicator) {
-                saveIndicator.innerHTML = '<i class="fa-solid fa-arrows-rotate fa-spin text-primary"></i> Menyimpan...';
-            }
-
             const form = document.getElementById('ujianForm');
             const formData = new FormData(form);
+
+            // Serialize data
+            const payload = {
+                jawaban_pg: {},
+                jawaban_esai: {}
+            };
+
+            for (let [key, val] of formData.entries()) {
+                const matchPg = key.match(/^jawaban_pg\[(\d+)\]$/);
+                if (matchPg) {
+                    payload.jawaban_pg[matchPg[1]] = val;
+                }
+                const matchEsai = key.match(/^jawaban_esai\[(\d+)\]$/);
+                if (matchEsai) {
+                    payload.jawaban_esai[matchEsai[1]] = val;
+                }
+            }
+
+            const statusElem = document.getElementById('saveStatus');
+            if (statusElem) statusElem.innerText = "Menyimpan...";
 
             fetch(DRAFT_URL, {
                 method: 'POST',
                 headers: {
+                    'Content-Type': 'application/json',
                     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
                     'Accept': 'application/json'
                 },
-                body: formData
+                body: JSON.stringify(payload)
             })
             .then(res => res.json())
             .then(data => {
-                if (saveIndicator) {
-                    saveIndicator.innerHTML = `<i class="fa-solid fa-cloud-check text-success"></i> Draft ${data.timestamp || 'Tersimpan'}`;
+                if (statusElem) {
+                    statusElem.innerText = "Draft tersimpan (" + (data.timestamp || 'otomatis') + ")";
                 }
             })
-            .catch(err => {
-                console.warn('Auto-save error:', err);
-                if (saveIndicator) {
-                    saveIndicator.innerHTML = '<i class="fa-solid fa-circle-exclamation text-danger"></i> Offline';
-                }
+            .catch(() => {
+                if (statusElem) statusElem.innerText = "Gagal simpan (koneksi)";
             });
         }
 
-        // Periodic auto-save every 20 seconds
-        setInterval(triggerAutoSave, 20000);
-
-        // ══ 4. MODAL FINISH ══
+        // ══ 6. MODAL SELESAI ══
         function openFinishModal() {
             updateProgress();
             document.getElementById('finishModal').classList.add('active');
@@ -916,9 +948,8 @@
             document.getElementById('ujianForm').submit();
         }
 
-        // Initial progress calculation
+        // Jalankan initial progress count
         updateProgress();
     </script>
-
 </body>
 </html>

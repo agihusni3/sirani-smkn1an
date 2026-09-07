@@ -61,6 +61,19 @@
       border-color: #4338ca;
       box-shadow: 0 2px 8px rgba(67, 56, 202, 0.25);
     }
+    .bulk-action-bar {
+      display: none;
+      background: linear-gradient(135deg, #ecfdf5, #d1fae5);
+      border: 1px solid #6ee7b7;
+      border-radius: 10px;
+      padding: 12px 18px;
+      margin-bottom: 12px;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .bulk-action-bar.visible { display: flex; }
+    .cb-row:has(input[type=checkbox]:checked) { background: rgba(16,185,129,0.05); }
   </style>
 </head>
 <body>
@@ -72,9 +85,6 @@
     {{-- PPDB HERO HEADER --}}
     <div class="ppdb-hero-bar no-print">
       <div>
-        <div style="display:inline-flex; align-items:center; gap:6px; background:rgba(245,158,11,0.2); color:#fde68a; font-size:11px; font-weight:800; padding:3px 10px; border-radius:20px; margin-bottom:8px; border:1px solid rgba(245,158,11,0.35);">
-          <i class="bi bi-mortarboard-fill"></i> WORKSPACE RESMI PPDB 2026/2027
-        </div>
         <h1 style="margin:0 0 6px; font-size:22px; font-weight:900; letter-spacing:-0.02em;">
           Dasbor Seleksi Penerimaan Siswa Baru
         </h1>
@@ -195,6 +205,9 @@
         <a href="{{ route('admin.ppdb.index', ['status' => 'diterima']) }}" class="status-tab-btn {{ request('status') === 'diterima' ? 'active' : '' }}">
           <i class="bi bi-check-circle"></i> Diterima ({{ $counts['diterima'] }})
         </a>
+        <a href="{{ route('admin.ppdb.index', ['status' => 'cadangan']) }}" class="status-tab-btn {{ request('status') === 'cadangan' ? 'active' : '' }}">
+          <i class="bi bi-pause-circle"></i> Cadangan ({{ $counts['cadangan'] }})
+        </a>
         <a href="{{ route('admin.ppdb.index', ['status' => 'ditolak']) }}" class="status-tab-btn {{ request('status') === 'ditolak' ? 'active' : '' }}">
           <i class="bi bi-x-circle"></i> Ditolak ({{ $counts['ditolak'] }})
         </a>
@@ -230,91 +243,153 @@
     </div>
 
     {{-- TABEL DATA PENDAFTAR --}}
-    <div class="panel" style="background:var(--bg-2); border:1px solid var(--border); border-radius:12px; overflow:hidden;">
-      <div style="overflow-x:auto;">
-        <table class="table" style="width:100%; border-collapse:collapse; font-size:12px; margin:0;">
-          <thead>
-            <tr style="background:var(--surface); border-bottom:2px solid var(--border); text-align:left;">
-              <th style="padding:12px 14px;">No. Pendaftaran</th>
-              <th style="padding:12px 14px;">Calon Siswa</th>
-              <th style="padding:12px 14px;">Asal Sekolah</th>
-              <th style="padding:12px 14px;">Pilihan Jurusan</th>
-              <th style="padding:12px 14px; text-align:center;">Jalur</th>
-              <th style="padding:12px 14px; text-align:center;">Status Berkas</th>
-              <th style="padding:12px 14px; text-align:center;">Aksi</th>
-            </tr>
-          </thead>
-          <tbody>
-            @forelse($pendaftars as $p)
-              <tr style="border-bottom:1px solid var(--border); transition:background 0.1s ease;">
-                <td style="padding:12px 14px; font-family:var(--font-mono); font-weight:800; color:#4338ca;">
-                  {{ $p->no_pendaftaran ?? $p->nomor_pendaftaran }}
-                </td>
-                <td style="padding:12px 14px;">
-                  <div style="font-weight:800; font-size:13px; color:var(--text);">{{ $p->nama_lengkap }}</div>
-                  <div style="font-size:11px; color:var(--text-3); font-family:var(--font-mono); margin-top:2px;">
-                    NISN: {{ $p->nisn }} · {{ $p->jenis_kelamin == 'L' ? 'Laki-laki' : 'Perempuan' }}
-                  </div>
-                </td>
-                <td style="padding:12px 14px; color:var(--text-2);">
-                  {{ $p->asal_sekolah }}
-                </td>
-                <td style="padding:12px 14px;">
-                  <div style="font-weight:700; color:var(--text);">
-                    1. {{ $p->jurusanPilihan1 ? $p->jurusanPilihan1->kode_jurusan : '-' }}
-                  </div>
-                  @if($p->jurusanPilihan2)
-                    <div style="font-size:10.5px; color:var(--text-3); margin-top:1px;">
-                      2. {{ $p->jurusanPilihan2->kode_jurusan }}
-                    </div>
-                  @endif
-                </td>
-                <td style="padding:12px 14px; text-align:center;">
-                  <span style="font-size:10.5px; font-weight:800; padding:2px 8px; border-radius:6px; background:rgba(0,0,0,0.05); text-transform:uppercase;">
-                    {{ $p->jalur_pendaftaran ?? 'Reguler' }}
-                  </span>
-                </td>
-                <td style="padding:12px 14px; text-align:center;">
-                  @php
-                    $stBadge = match($p->status) {
-                      'menunggu', 'menunggu_verifikasi', 'draft' => ['bg' => '#fef3c7', 'color' => '#b45309', 'label' => 'Menunggu Cek'],
-                      'berkas_valid', 'terverifikasi'            => ['bg' => '#e0f2fe', 'color' => '#0369a1', 'label' => 'Berkas Valid'],
-                      'diterima'                                 => ['bg' => '#dcfce7', 'color' => '#15803d', 'label' => 'Diterima'],
-                      'ditolak'                                  => ['bg' => '#fee2e2', 'color' => '#b91c1c', 'label' => 'Ditolak'],
-                      default                                    => ['bg' => '#f1f5f9', 'color' => '#64748b', 'label' => $p->status],
-                    };
-                  @endphp
-                  <span style="display:inline-block; font-size:11px; font-weight:800; padding:3px 10px; border-radius:12px; background:{{ $stBadge['bg'] }}; color:{{ $stBadge['color'] }};">
-                    {{ $stBadge['label'] }}
-                  </span>
-                </td>
-                <td style="padding:12px 14px; text-align:center;">
-                  <a href="{{ route('admin.ppdb.show', $p->id) }}" class="btn btn-sm" style="background:#4338ca; color:#ffffff; font-weight:800; font-size:11px; padding:6px 12px; border-radius:6px; text-decoration:none; display:inline-flex; align-items:center; gap:5px;">
-                    <i class="bi bi-file-earmark-person"></i> Verifikasi Berkas
-                  </a>
-                </td>
-              </tr>
-            @empty
-              <tr>
-                <td colspan="7" style="text-align:center; padding:40px 16px; color:var(--text-3);">
-                  <i class="bi bi-inbox" style="font-size:32px; display:block; margin-bottom:8px; opacity:0.6;"></i>
-                  Tidak ada data calon siswa yang sesuai dengan filter.
-                </td>
-              </tr>
-            @endforelse
-          </tbody>
-        </table>
+    <form id="formMutasiMassal" method="POST" action="{{ route('admin.ppdb.mutasi_massal') }}"
+          onsubmit="return confirm('Yakin melakukan mutasi massal? Proses ini tidak bisa dibatalkan.')"
+    >
+      @csrf
+
+      {{-- PANEL AKSI MASSAL (muncul saat checkbox dipilih) --}}
+      <div class="bulk-action-bar" id="bulkActionBar">
+        <i class="bi bi-lightning-charge-fill" style="color:#10b981; font-size:18px;"></i>
+        <div style="flex:1;">
+          <div style="font-weight:900; font-size:13px; color:#065f46;"><span id="bulkCount">0</span> siswa dipilih untuk dimutasi massal</div>
+          <div style="font-size:11.5px; color:#047857;">Sistem akan otomatis memetakan ke rombel Kelas X sesuai jurusan masing-masing. Hanya siswa berstatus <strong>Diterima</strong> yang akan diproses.</div>
+        </div>
+        <button type="submit" class="btn" style="background:#10b981; color:#ffffff; font-weight:800; font-size:12.5px; padding:10px 20px; border:none; border-radius:8px; cursor:pointer; display:inline-flex; align-items:center; gap:6px;">
+          <i class="bi bi-people-fill"></i> Mutasi Massal ke Kelas X
+        </button>
+        <button type="button" onclick="clearSelection()" style="background:#f1f5f9; color:#475569; font-weight:700; font-size:12px; padding:10px 14px; border:1px solid #e2e8f0; border-radius:8px; cursor:pointer;">
+          Batal Pilih
+        </button>
       </div>
 
-      {{-- PAGINATION --}}
-      @if($pendaftars->hasPages())
-        <div style="padding:14px 18px; border-top:1px solid var(--border); display:flex; justify-content:center;">
-          {{ $pendaftars->links() }}
+      {{-- TABEL --}}
+      <div class="panel" style="background:var(--bg-2); border:1px solid var(--border); border-radius:12px; overflow:hidden;">
+        <div style="overflow-x:auto;">
+          <table class="table" style="width:100%; border-collapse:collapse; font-size:12px; margin:0;">
+            <thead>
+              <tr style="background:var(--surface); border-bottom:2px solid var(--border); text-align:left;">
+                <th style="padding:12px 14px; width:40px;">
+                  <input type="checkbox" id="checkAll" onchange="toggleAll(this)" title="Pilih semua yang diterima" style="width:15px; height:15px; accent-color:#10b981;">
+                </th>
+                <th style="padding:12px 14px;">No. Pendaftaran</th>
+                <th style="padding:12px 14px;">Calon Siswa</th>
+                <th style="padding:12px 14px;">Asal Sekolah</th>
+                <th style="padding:12px 14px;">Pilihan → Diterima di</th>
+                <th style="padding:12px 14px; text-align:center;">Jalur</th>
+                <th style="padding:12px 14px; text-align:center;">Status</th>
+                <th style="padding:12px 14px; text-align:center;">Aksi</th>
+              </tr>
+            </thead>
+            <tbody>
+              @forelse($pendaftars as $p)
+                <tr class="cb-row" style="border-bottom:1px solid var(--border); transition:background 0.1s ease;">
+                  <td style="padding:12px 14px;">
+                    @if($p->status === 'diterima' && !$p->siswa_id)
+                      <input type="checkbox" name="pendaftar_ids[]" value="{{ $p->id }}"
+                             class="bulk-cb" onchange="updateBulkBar()"
+                             style="width:15px; height:15px; accent-color:#10b981;">
+                    @elseif($p->siswa_id)
+                      <span title="Sudah dimutasi" style="color:#10b981; font-size:14px;"><i class="bi bi-check-circle-fill"></i></span>
+                    @else
+                      <span style="color:#cbd5e1; font-size:12px;">—</span>
+                    @endif
+                  </td>
+                  <td style="padding:12px 14px; font-family:var(--font-mono); font-weight:800; color:#4338ca;">
+                    {{ $p->no_pendaftaran ?? $p->nomor_pendaftaran }}
+                  </td>
+                  <td style="padding:12px 14px;">
+                    <div style="font-weight:800; font-size:13px; color:var(--text);">{{ $p->nama_lengkap }}</div>
+                    <div style="font-size:11px; color:var(--text-3); font-family:var(--font-mono); margin-top:2px;">
+                      NISN: {{ $p->nisn }} · {{ $p->jenis_kelamin == 'L' ? 'Laki-laki' : 'Perempuan' }}
+                    </div>
+                  </td>
+                  <td style="padding:12px 14px; color:var(--text-2);">
+                    {{ $p->asal_sekolah }}
+                  </td>
+                  <td style="padding:12px 14px;">
+                    <div style="font-size:11px; color:var(--text-3);">1. {{ $p->jurusanPilihan1 ? $p->jurusanPilihan1->kode_jurusan : '-' }}</div>
+                    @if($p->jurusanPilihan2)
+                      <div style="font-size:10.5px; color:var(--text-3);">2. {{ $p->jurusanPilihan2->kode_jurusan }}</div>
+                    @endif
+                    @if($p->jurusanDiterima)
+                      <div style="margin-top:4px; display:inline-flex; align-items:center; gap:4px; background:#dcfce7; color:#15803d; font-size:10.5px; font-weight:800; padding:2px 8px; border-radius:6px;">
+                        <i class="bi bi-check2"></i> {{ $p->jurusanDiterima->kode_jurusan }}
+                      </div>
+                    @endif
+                  </td>
+                  <td style="padding:12px 14px; text-align:center;">
+                    <span style="font-size:10.5px; font-weight:800; padding:2px 8px; border-radius:6px; background:rgba(0,0,0,0.05); text-transform:uppercase;">
+                      {{ $p->jalur_pendaftaran ?? 'Reguler' }}
+                    </span>
+                  </td>
+                  <td style="padding:12px 14px; text-align:center;">
+                    @php
+                      $stBadge = match($p->status) {
+                        'menunggu', 'menunggu_verifikasi', 'draft' => ['bg' => '#fef3c7', 'color' => '#b45309', 'label' => 'Menunggu Cek'],
+                        'berkas_valid', 'terverifikasi'            => ['bg' => '#e0f2fe', 'color' => '#0369a1', 'label' => 'Berkas Valid'],
+                        'diterima'                                 => ['bg' => '#dcfce7', 'color' => '#15803d', 'label' => 'Diterima'],
+                        'cadangan'                                 => ['bg' => '#ffedd5', 'color' => '#c2410c', 'label' => 'Cadangan'],
+                        'ditolak'                                  => ['bg' => '#fee2e2', 'color' => '#b91c1c', 'label' => 'Ditolak'],
+                        default                                    => ['bg' => '#f1f5f9', 'color' => '#64748b', 'label' => $p->status],
+                      };
+                    @endphp
+                    <span style="display:inline-block; font-size:11px; font-weight:800; padding:3px 10px; border-radius:12px; background:{{ $stBadge['bg'] }}; color:{{ $stBadge['color'] }};">
+                      {{ $stBadge['label'] }}
+                    </span>
+                    @if($p->siswa_id)
+                      <div style="font-size:10px; color:#10b981; font-weight:700; margin-top:3px;"><i class="bi bi-check-circle"></i> Sudah Dimutasi</div>
+                    @endif
+                  </td>
+                  <td style="padding:12px 14px; text-align:center;">
+                    <a href="{{ route('admin.ppdb.show', $p->id) }}" class="btn btn-sm" style="background:#4338ca; color:#ffffff; font-weight:800; font-size:11px; padding:6px 12px; border-radius:6px; text-decoration:none; display:inline-flex; align-items:center; gap:5px;">
+                      <i class="bi bi-file-earmark-person"></i> Detail
+                    </a>
+                  </td>
+                </tr>
+              @empty
+                <tr>
+                  <td colspan="8" style="text-align:center; padding:40px 16px; color:var(--text-3);">
+                    <i class="bi bi-inbox" style="font-size:32px; display:block; margin-bottom:8px; opacity:0.6;"></i>
+                    Tidak ada data calon siswa yang sesuai dengan filter.
+                  </td>
+                </tr>
+              @endforelse
+            </tbody>
+          </table>
         </div>
-      @endif
-    </div>
+
+        {{-- PAGINATION --}}
+        @if($pendaftars->hasPages())
+          <div style="padding:14px 18px; border-top:1px solid var(--border); display:flex; justify-content:center;">
+            {{ $pendaftars->links() }}
+          </div>
+        @endif
+      </div>
+    </form>
 
   </main>
 </div>
+
+<script>
+  function updateBulkBar() {
+    const cbs = document.querySelectorAll('.bulk-cb:checked');
+    const bar = document.getElementById('bulkActionBar');
+    document.getElementById('bulkCount').innerText = cbs.length;
+    if (cbs.length > 0) bar.classList.add('visible');
+    else bar.classList.remove('visible');
+  }
+
+  function toggleAll(src) {
+    document.querySelectorAll('.bulk-cb').forEach(cb => cb.checked = src.checked);
+    updateBulkBar();
+  }
+
+  function clearSelection() {
+    document.querySelectorAll('.bulk-cb').forEach(cb => cb.checked = false);
+    document.getElementById('checkAll').checked = false;
+    updateBulkBar();
+  }
+</script>
 </body>
 </html>

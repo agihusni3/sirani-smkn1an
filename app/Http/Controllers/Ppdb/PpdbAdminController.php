@@ -52,6 +52,7 @@ class PpdbAdminController extends Controller
             'menunggu' => PpdbPendaftar::whereIn('status', ['menunggu', 'menunggu_verifikasi', 'draft'])->count(),
             'berkas_valid' => PpdbPendaftar::whereIn('status', ['terverifikasi', 'berkas_valid'])->count(),
             'diterima' => PpdbPendaftar::where('status', 'diterima')->count(),
+            'cadangan' => PpdbPendaftar::where('status', 'cadangan')->count(),
             'ditolak' => PpdbPendaftar::where('status', 'ditolak')->count(),
         ];
 
@@ -85,7 +86,7 @@ class PpdbAdminController extends Controller
         $pendaftar = PpdbPendaftar::findOrFail($id);
 
         $validated = $request->validate([
-            'status_pendaftaran' => 'required|in:menunggu,berkas_valid,diterima,ditolak',
+            'status_pendaftaran' => 'required|in:menunggu,menunggu_verifikasi,berkas_valid,terverifikasi,diterima,cadangan,ditolak',
             'jurusan_diterima_id' => 'nullable|exists:jurusans,id',
             'catatan' => 'nullable|string',
         ]);
@@ -98,9 +99,14 @@ class PpdbAdminController extends Controller
         $jurusanLama = $pendaftar->jurusan_diterima_id;
 
         $pendaftar->status = $st;
-        if (!empty($validated['jurusan_diterima_id'])) {
+
+        // Jika diterima, pastikan jurusan_diterima_id terisi
+        if ($st === 'diterima') {
+            $pendaftar->jurusan_diterima_id = $validated['jurusan_diterima_id'] ?: ($pendaftar->jurusan_diterima_id ?: $pendaftar->jurusan_id_1);
+        } elseif (!empty($validated['jurusan_diterima_id'])) {
             $pendaftar->jurusan_diterima_id = $validated['jurusan_diterima_id'];
         }
+
         if (isset($validated['catatan'])) {
             $pendaftar->catatan_panitia = $validated['catatan'];
         }
@@ -225,12 +231,14 @@ class PpdbAdminController extends Controller
             ->get();
 
         $stats = [
-            'total_valid'      => PpdbPendaftar::whereIn('status', ['terverifikasi', 'berkas_valid', 'diterima', 'siap_tes'])->count(),
+            'total_valid'      => PpdbPendaftar::whereIn('status', ['terverifikasi', 'berkas_valid', 'diterima', 'cadangan', 'siap_tes'])->count(),
             'sudah_jadwal'     => PpdbPendaftar::whereNotNull('jadwal_tes_tanggal')->count(),
             'sudah_pg'         => PpdbUjianPeserta::whereNotNull('waktu_selesai')->count(),
             'menunggu_esai'    => PpdbUjianPeserta::where('status_pengerjaan', 'selesai_menunggu_koreksi')->count(),
             'sudah_wawancara'  => PpdbPendaftar::whereNotNull('nilai_wawancara_total')->count(),
             'siap_dirangking'  => PpdbPendaftar::whereNotNull('nilai_akhir')->count(),
+            'total_diterima'   => PpdbPendaftar::where('status', 'diterima')->count(),
+            'total_cadangan'   => PpdbPendaftar::where('status', 'cadangan')->count(),
         ];
 
         return view('ppdb.admin.seleksi', compact(
@@ -244,7 +252,7 @@ class PpdbAdminController extends Controller
     }
 
     /**
-     * Simpan Pengaturan Ujian CBT (File PDF Soal, Kunci Jawaban 30 PG, Bobot Esai)
+     * Simpan Pengaturan Sesi Ujian CBT PPDB
      */
     public function simpanSettingUjian(Request $request)
     {
@@ -254,8 +262,6 @@ class PpdbAdminController extends Controller
             'bobot_pg'         => 'required|numeric|min:10|max:90',
             'bobot_esai'       => 'required|numeric|min:10|max:90',
             'is_active'        => 'nullable|boolean',
-            'file_pdf_soal'    => 'nullable|file|mimes:pdf|max:20480',
-            'kunci'            => 'nullable|array',
             'petunjuk_ujian'   => 'nullable|string',
         ]);
 
@@ -271,31 +277,10 @@ class PpdbAdminController extends Controller
         $setting->is_active = $request->has('is_active');
         $setting->petunjuk_ujian = $validated['petunjuk_ujian'] ?? null;
         $setting->created_by = auth()->id();
-
-        // Upload PDF Soal jika ada
-        if ($request->hasFile('file_pdf_soal')) {
-            $file = $request->file('file_pdf_soal');
-            $setting->nama_file_asli = $file->getClientOriginalName();
-            $path = $file->store('ppdb/soal', 'public');
-            $setting->file_pdf_soal = $path;
-        }
-
-        // Susun kunci jawaban PG 1..30
-        $kunciInput = $request->input('kunci', []);
-        $kunciClean = [];
-        for ($i = 1; $i <= 30; $i++) {
-            $str = (string) $i;
-            if (isset($kunciInput[$str])) {
-                $kunciClean[$str] = strtoupper(trim($kunciInput[$str]));
-            }
-        }
-        $setting->kunci_jawaban_pg = $kunciClean;
-        $setting->jumlah_soal_pg = 30;
-        $setting->jumlah_soal_esai = 5;
         $setting->save();
 
         return redirect()->route('admin.ppdb.seleksi', ['tab' => 'pengaturan'])
-            ->with('success', 'Pengaturan Naskah Soal PDF dan Kunci Jawaban Ujian berhasil disimpan!');
+            ->with('success', 'Pengaturan sesi ujian CBT berhasil disimpan.');
     }
 
     /**
@@ -339,35 +324,34 @@ class PpdbAdminController extends Controller
             return back()->with('error', 'Peserta belum memulai atau mengumpulkan lembar jawaban ujian.');
         }
 
-        $validated = $request->validate([
-            'nilai_esai_31'       => 'required|numeric|min:0|max:10',
-            'nilai_esai_32'       => 'required|numeric|min:0|max:10',
-            'nilai_esai_33'       => 'required|numeric|min:0|max:10',
-            'nilai_esai_34'       => 'required|numeric|min:0|max:10',
-            'nilai_esai_35'       => 'required|numeric|min:0|max:10',
-            'catatan_koreksi_esai'=> 'nullable|string',
-        ]);
+        $rincianEsai = [];
+        $totalSkorEsai = 0;
 
-        $rincianEsai = [
-            '31' => (float) $validated['nilai_esai_31'],
-            '32' => (float) $validated['nilai_esai_32'],
-            '33' => (float) $validated['nilai_esai_33'],
-            '34' => (float) $validated['nilai_esai_34'],
-            '35' => (float) $validated['nilai_esai_35'],
-        ];
-
-        $totalSkorEsai = array_sum($rincianEsai);
+        if ($request->has('nilai_esai') && is_array($request->input('nilai_esai'))) {
+            $inputEsai = $request->input('nilai_esai');
+            foreach ($inputEsai as $k => $v) {
+                $numVal = min(10, max(0, (float) $v));
+                $rincianEsai[(string)$k] = $numVal;
+                $totalSkorEsai += $numVal;
+            }
+        } else {
+            for ($i = 31; $i <= 35; $i++) {
+                $numVal = min(10, max(0, (float) $request->input("nilai_esai_{$i}", 0)));
+                $rincianEsai[(string)$i] = $numVal;
+                $totalSkorEsai += $numVal;
+            }
+        }
 
         $peserta->nilai_per_nomor_esai = $rincianEsai;
         $peserta->nilai_esai = $totalSkorEsai;
-        $peserta->catatan_koreksi_esai = $validated['catatan_koreksi_esai'] ?? null;
+        $peserta->catatan_koreksi_esai = $request->input('catatan_koreksi_esai');
         $peserta->diperiksa_oleh = auth()->id();
         $peserta->diperiksa_pada = now();
         $peserta->status_pengerjaan = 'selesai_dinilai';
         $peserta->sinkronNilaiKePendaftar();
 
         return redirect()->route('admin.ppdb.seleksi', ['tab' => 'tertulis'])
-            ->with('success', "Koreksi 5 soal esai untuk {$pendaftar->nama_lengkap} berhasil disimpan! Total Nilai Tertulis: {$pendaftar->nilai_tes_tertulis}.");
+            ->with('success', "Koreksi soal esai untuk {$pendaftar->nama_lengkap} berhasil disimpan! Total Nilai Tertulis: {$pendaftar->nilai_tes_tertulis}.");
     }
 
     /**
@@ -402,35 +386,229 @@ class PpdbAdminController extends Controller
     }
 
     /**
-     * Perangkingan Otomatis & Kalkulasi Kelulusan Terbobot
+     * Perangkingan Otomatis & Kalkulasi Kelulusan Terbobot Berdasarkan Kuota
      */
     public function kalkulasiKelulusan(Request $request)
     {
-        $pendaftars = PpdbPendaftar::whereIn('status', ['terverifikasi', 'berkas_valid', 'diterima', 'siap_tes'])
+        $validated = $request->validate([
+            'kuota_per_rombel' => 'nullable|integer|min:1|max:100',
+            'passing_grade'    => 'nullable|numeric|min:0|max:100',
+        ]);
+
+        $kuotaPerRombel = (int) ($validated['kuota_per_rombel'] ?? 36);
+        $passingGrade   = (float) ($validated['passing_grade'] ?? 50.00);
+
+        // Ambil semua pendaftar dalam proses seleksi
+        $pendaftars = PpdbPendaftar::whereIn('status', ['terverifikasi', 'berkas_valid', 'diterima', 'cadangan', 'siap_tes'])
             ->get();
 
+        if ($pendaftars->isEmpty()) {
+            return redirect()->route('admin.ppdb.seleksi', ['tab' => 'leaderboard'])
+                ->with('warning', 'Tidak ada calon siswa dengan berkas terverifikasi yang siap diperingkatkan.');
+        }
+
+        // 1. Hitung nilai akhir untuk setiap calon siswa
         foreach ($pendaftars as $p) {
             $p->hitungNilaiWawancara();
             $p->hitungNilaiAkhir();
             $p->save();
         }
 
-        // Perangkingan per jurusan pilihan 1
+        // 2. Siapkan kuota per jurusan berdasarkan jumlah rombel Kelas X aktif
         $jurusans = Jurusan::all();
+        $kuotaJurusan = [];
+        $diterimaCount = [];
+
         foreach ($jurusans as $j) {
-            $ranked = PpdbPendaftar::where('jurusan_id_1', $j->id)
+            $rombelCount = Rombel::where(function ($q) {
+                $q->where('tingkat', '10')->orWhere('tingkat', 'X');
+            })->where('jurusan_id', $j->id)->count();
+
+            // Default minimal 1 rombel jika belum diset rombel spesifik
+            $totalKuota = max($rombelCount, 1) * $kuotaPerRombel;
+            $kuotaJurusan[$j->id] = $totalKuota;
+            $diterimaCount[$j->id] = 0;
+        }
+
+        // 3. TAHAP 1: Alokasi Jurusan Pilihan 1
+        $pendingPilihan2 = [];
+
+        foreach ($jurusans as $j) {
+            $pelamar = PpdbPendaftar::whereIn('id', $pendaftars->pluck('id'))
+                ->where('jurusan_id_1', $j->id)
                 ->whereNotNull('nilai_akhir')
                 ->orderBy('nilai_akhir', 'desc')
                 ->get();
 
             $rank = 1;
-            foreach ($ranked as $item) {
-                $item->peringkat_jurusan = $rank++;
-                $item->save();
+            foreach ($pelamar as $p) {
+                // Pertahankan siswa yang sudah resmi dimutasi ke rombel
+                if ($p->siswa_id) {
+                    $diterimaCount[$j->id]++;
+                    $p->peringkat_jurusan = $rank++;
+                    $p->status = 'diterima';
+                    $p->jurusan_diterima_id = $j->id;
+                    $p->save();
+                    continue;
+                }
+
+                $nilai = (float) $p->nilai_akhir;
+
+                // Lolos jika memenuhi passing grade dan kuota Pilihan 1 masih tersedia
+                if ($nilai >= $passingGrade && $diterimaCount[$j->id] < $kuotaJurusan[$j->id]) {
+                    $p->peringkat_jurusan = $rank++;
+                    $p->status = 'diterima';
+                    $p->jurusan_diterima_id = $j->id;
+                    $p->save();
+                    $diterimaCount[$j->id]++;
+                } else {
+                    // Masukkan ke antrean evaluasi Pilihan 2
+                    $pendingPilihan2[] = $p;
+                }
             }
         }
 
+        // 4. TAHAP 2: Alokasi Jurusan Pilihan 2 bagi peserta yang belum lolos Pilihan 1
+        usort($pendingPilihan2, function ($a, $b) {
+            return $b->nilai_akhir <=> $a->nilai_akhir;
+        });
+
+        foreach ($pendingPilihan2 as $p) {
+            if ($p->siswa_id) continue;
+
+            $jur2 = $p->jurusan_id_2;
+            $nilai = (float) $p->nilai_akhir;
+
+            if ($jur2 && isset($kuotaJurusan[$jur2]) && $diterimaCount[$jur2] < $kuotaJurusan[$jur2] && $nilai >= $passingGrade) {
+                // Diterima di Pilihan 2
+                $diterimaCount[$jur2]++;
+                $p->status = 'diterima';
+                $p->jurusan_diterima_id = $jur2;
+                $p->peringkat_jurusan = $diterimaCount[$jur2];
+                $p->save();
+            } elseif ($nilai >= $passingGrade) {
+                // Nilai memenuhi standar tapi kuota penuh -> CADANGAN
+                $p->status = 'cadangan';
+                $p->jurusan_diterima_id = null;
+                $p->save();
+            } else {
+                // Nilai di bawah passing grade -> TIDAK LOLOS
+                $p->status = 'ditolak';
+                $p->jurusan_diterima_id = null;
+                $p->save();
+            }
+        }
+
+        $totalDiterima = array_sum($diterimaCount);
+        AuditLog::catat(
+            'update',
+            'ppdb',
+            "Kalkulasi kelulusan PPDB: {$totalDiterima} siswa DITERIMA, kuota {$kuotaPerRombel}/rombel, passing grade {$passingGrade}",
+            null,
+            ['kuota_per_rombel' => $kuotaPerRombel, 'passing_grade' => $passingGrade, 'diterima_per_jurusan' => $diterimaCount]
+        );
+
         return redirect()->route('admin.ppdb.seleksi', ['tab' => 'leaderboard'])
-            ->with('success', 'Kalkulasi nilai akhir dan perangkingan kuota jurusan berhasil diperbarui secara otomatis!');
+            ->with('success', "Kalkulasi kelulusan selesai! Sebanyak {$totalDiterima} calon siswa resmi dinyatakan Lulus / Diterima sesuai kuota kejuruan.");
+    }
+
+    /**
+     * Mutasi Massal Calon Siswa Diterima ke Rombel Kelas X (Auto-mapping Jurusan)
+     */
+    public function mutasiMassal(Request $request, PpdbMutasiService $mutasiService)
+    {
+        $request->validate([
+            'pendaftar_ids'   => 'required|array|min:1',
+            'pendaftar_ids.*' => 'exists:ppdb_pendaftars,id',
+        ]);
+
+        $berhasil = 0;
+        $gagal    = 0;
+        $pesanGagal = [];
+
+        // Ambil semua rombel Kelas X yang punya relasi jurusan_id
+        $rombelKelasX = Rombel::where(function ($q) {
+            $q->where('tingkat', 'X')->orWhere('tingkat', '10');
+        })->get()->keyBy('jurusan_id'); // key = jurusan_id
+
+        foreach ($request->pendaftar_ids as $pid) {
+            $pendaftar = PpdbPendaftar::find($pid);
+            if (!$pendaftar) { $gagal++; continue; }
+
+            // Pastikan sudah diterima
+            if ($pendaftar->status !== 'diterima') {
+                $gagal++;
+                $pesanGagal[] = "{$pendaftar->nama_lengkap}: status bukan 'diterima'";
+                continue;
+            }
+
+            // Jika sudah dimutasi, skip
+            if ($pendaftar->siswa_id) {
+                $gagal++;
+                $pesanGagal[] = "{$pendaftar->nama_lengkap}: sudah dimutasi sebelumnya";
+                continue;
+            }
+
+            // Tentukan rombel berdasarkan jurusan_diterima_id
+            $jurusanId = $pendaftar->jurusan_diterima_id ?? $pendaftar->jurusan_id_1;
+            $rombel = $rombelKelasX->get($jurusanId);
+
+            if (!$rombel) {
+                $gagal++;
+                $pesanGagal[] = "{$pendaftar->nama_lengkap}: rombel Kelas X untuk jurusan tidak ditemukan";
+                continue;
+            }
+
+            try {
+                $siswa = $mutasiService->mutasiKeSiswa($pendaftar, $rombel->id);
+                AuditLog::catat(
+                    'create', 'ppdb',
+                    "[MASSAL] Mutasi {$pendaftar->nama_lengkap} ({$pendaftar->no_pendaftaran}) ke {$rombel->nama_rombel}",
+                    null,
+                    ['pendaftar_id' => $pendaftar->id, 'siswa_id' => $siswa->id, 'rombel_id' => $rombel->id],
+                    $pendaftar
+                );
+                $berhasil++;
+            } catch (\Exception $e) {
+                $gagal++;
+                $pesanGagal[] = "{$pendaftar->nama_lengkap}: " . $e->getMessage();
+            }
+        }
+
+        $msg = "Mutasi massal selesai: {$berhasil} siswa berhasil dimutasi ke Kelas X.";
+        if ($gagal > 0) {
+            $msg .= " {$gagal} gagal: " . implode('; ', array_slice($pesanGagal, 0, 3));
+            return back()->with('warning', $msg);
+        }
+
+        return back()->with('success', $msg);
+    }
+
+    /**
+     * Koreksi Jurusan Diterima (jika ada kesalahan input)
+     */
+    public function koreksiJurusan(Request $request, $id)
+    {
+        $pendaftar = PpdbPendaftar::findOrFail($id);
+
+        $validated = $request->validate([
+            'jurusan_diterima_id' => 'required|exists:jurusans,id',
+            'alasan_koreksi'      => 'nullable|string|max:300',
+        ]);
+
+        $jurusanLama = $pendaftar->jurusan_diterima_id;
+        $pendaftar->jurusan_diterima_id = $validated['jurusan_diterima_id'];
+        $pendaftar->save();
+
+        AuditLog::catat(
+            'update', 'ppdb',
+            "Koreksi jurusan diterima: {$pendaftar->nama_lengkap} ({$pendaftar->no_pendaftaran}) jurusan_diterima diubah",
+            ['jurusan_diterima_id' => $jurusanLama],
+            ['jurusan_diterima_id' => $pendaftar->jurusan_diterima_id, 'alasan' => $validated['alasan_koreksi'] ?? null],
+            $pendaftar
+        );
+
+        $jurusan = Jurusan::find($validated['jurusan_diterima_id']);
+        return back()->with('success', "Jurusan yang diterima untuk {$pendaftar->nama_lengkap} berhasil diperbarui menjadi {$jurusan->nama_jurusan}.");
     }
 }
