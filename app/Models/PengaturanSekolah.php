@@ -32,6 +32,63 @@ class PengaturanSekolah extends Model
         'template_piagam_config',
     ];
 
+    protected static function booted()
+    {
+        static::saved(function ($model) {
+            $model->syncGuruKepsek();
+        });
+    }
+
+    /**
+     * Sinkronisasi data Kepala Sekolah dua arah ke tabel Guru dan User.
+     */
+    public function syncGuruKepsek(): void
+    {
+        if (empty($this->nama_kepala_sekolah) && empty($this->nip_kepala_sekolah)) {
+            return;
+        }
+
+        $cleanNip = !empty($this->nip_kepala_sekolah) ? preg_replace('/[^0-9]/', '', $this->nip_kepala_sekolah) : null;
+
+        $guru = null;
+        if ($cleanNip) {
+            $guru = Guru::whereRaw("REPLACE(REPLACE(nip, ' ', ''), '-', '') = ?", [$cleanNip])->first();
+        }
+
+        if (!$guru && !empty($this->nama_kepala_sekolah)) {
+            $namaClean = trim(explode(',', $this->nama_kepala_sekolah)[0]);
+            $guru = Guru::where('nama', 'like', "%{$namaClean}%")->first();
+        }
+
+        if ($guru) {
+            if ($guru->jabatan !== 'Kepala Sekolah' || $guru->tugas_tambahan !== 'Kepala Sekolah') {
+                $guru->withoutEvents(function () use ($guru) {
+                    $guru->update([
+                        'jabatan'        => 'Kepala Sekolah',
+                        'tugas_tambahan' => 'Kepala Sekolah',
+                        'jenis_ptk'      => 'Kepala Sekolah',
+                    ]);
+                });
+            }
+
+            if ($guru->user && $guru->user->role !== 'kepala_sekolah') {
+                $guru->user->update(['role' => 'kepala_sekolah']);
+            }
+
+            // Demote Kepala Sekolah lain jika ada (karena kepsek aktif hanya 1 orang)
+            Guru::where('id', '!=', $guru->id)
+                ->where('jabatan', 'Kepala Sekolah')
+                ->each(function ($g) {
+                    $g->withoutEvents(function () use ($g) {
+                        $g->update([
+                            'jabatan'        => 'Guru Mata Pelajaran',
+                            'tugas_tambahan' => null,
+                        ]);
+                    });
+                });
+        }
+    }
+
     /**
      * Ambil pengaturan profil sekolah aktif (Singleton).
      */
@@ -44,17 +101,17 @@ class PengaturanSekolah extends Model
                 'nama_dinas'          => 'DINAS PENDIDIKAN DAN KEBUDAYAAN',
                 'nama_sekolah'        => 'SMK NEGERI 1 AIR NANINGAN',
                 'npsn'                => '70011825',
-                'alamat'              => 'Jl. Raya Air Naningan, Kec. Air Naningan',
+                'alamat'              => 'Jl. Makam Baturuguk, Pekon Karang Sari',
                 'desa_kelurahan'      => 'Air Naningan',
                 'kecamatan'           => 'Air Naningan',
                 'kabupaten'           => 'Kab. Tanggamus',
                 'provinsi'            => 'Lampung',
                 'kode_pos'            => '35379',
-                'telepon'             => '(0721) 123456',
+                'telepon'             => '(0721) 892110',
                 'email'               => 'smkn1airnaningan@gmail.com',
                 'website'             => 'smkn1airnaningan.sch.id',
-                'nama_kepala_sekolah' => 'Drs. H. Ahmad Sudrajat, M.Pd.',
-                'nip_kepala_sekolah'  => '19750510 200003 1 005',
+                'nama_kepala_sekolah' => 'Aprida, S.Si.',
+                'nip_kepala_sekolah'  => '197904172008012019',
             ]);
         }
         return $setting;

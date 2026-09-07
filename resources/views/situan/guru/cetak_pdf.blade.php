@@ -414,8 +414,8 @@
             Mengetahui,<br />
             Kepala SMK Negeri 1 Air Naningan
             <div class="ttd-space"></div>
-            <div class="ttd-name">{{ $sekolah->nama_kepala_sekolah ?? 'Drs. H. Ahmad Sudrajat, M.Pd.' }}</div>
-            <div>NIP. {{ $sekolah->nip_kepala_sekolah ?? '19750510 200003 1 005' }}</div>
+            <div class="ttd-name">{{ $sekolah->nama_kepala_sekolah ?? 'Aprida, S.Si.' }}</div>
+            <div>NIP. {{ $sekolah->nip_kepala_sekolah ?? '197904172008012019' }}</div>
           </td>
           <td>
             Air Naningan, {{ \Carbon\Carbon::now()->translatedFormat('d F Y') }}<br />

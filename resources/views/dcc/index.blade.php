@@ -72,7 +72,14 @@
       <h2 class="portal-section-title">
         <span>Modul Sistem Aktif</span>
       </h2>
-      <span class="portal-section-badge">4 Modul Ekosistem Terpadu</span>
+      <div style="display:flex; align-items:center; gap:8px;">
+        @if(auth()->user()?->isAdmin())
+          <a href="{{ route('admin.statistik.web') }}" class="portal-section-badge" style="text-decoration:none; cursor:pointer;" title="Pantau Lalu Lintas Pengunjung">
+            <i class="bi bi-graph-up me-1"></i> Grafik Pengunjung
+          </a>
+        @endif
+        <span class="portal-section-badge">4 Modul Ekosistem Terpadu</span>
+      </div>
     </div>
 
     <div class="portal-active-grid">

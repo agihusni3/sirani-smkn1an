@@ -42,7 +42,7 @@
                 <img src="{{ asset('images/web/kepala_sekolah.jpg') }}" alt="Kepala SMK Negeri 1 Air Naningan" class="leader-photo-img">
             </div>
             <span class="leader-role-tag">Kepala Sekolah</span>
-            <h3 class="leader-name">{{ $sekolah->nama_kepala_sekolah ?? 'Drs. H. Ahmad Sudrajat, M.Pd.' }}</h3>
+            <h3 class="leader-name">{{ $sekolah->nama_kepala_sekolah ?? 'Aprida, S.Si.' }}</h3>
             @if($sekolah->nip_kepala_sekolah)
                 <span class="leader-nip">NIP: {{ $sekolah->nip_kepala_sekolah }}</span>
             @endif

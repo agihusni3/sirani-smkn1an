@@ -438,10 +438,10 @@
           @endif
         </div>
         <div class="sign-name">
-          {{ $sekolah->nama_kepala_sekolah ?: 'Drs. H. PENDIDIKAN, M.Pd.' }}
+          {{ $sekolah->nama_kepala_sekolah ?: 'Aprida, S.Si.' }}
         </div>
         <div class="sign-nip">
-          NIP. {{ $sekolah->nip_kepala_sekolah ?: '19750101 200003 1 002' }}
+          NIP. {{ $sekolah->nip_kepala_sekolah ?: '197904172008012019' }}
         </div>
       </div>
     </div>

@@ -145,7 +145,7 @@ class SituanPelayananSuratController extends Controller
     public function cetakSurat($id)
     {
         $pelayanan = PelayananSurat::with(['siswa', 'suratKeluar', 'creator'])->findOrFail($id);
-        $sekolah = PengaturanSekolah::first();
+        $sekolah = PengaturanSekolah::getAktif();
 
         $verifyUrl = route('situan.verifikasi-surat', $pelayanan->kode_verifikasi_qr);
         $qrImage = null;
@@ -175,7 +175,7 @@ class SituanPelayananSuratController extends Controller
             ->where('kode_verifikasi_qr', $hash)
             ->first();
 
-        $sekolah = PengaturanSekolah::first();
+        $sekolah = PengaturanSekolah::getAktif();
 
         return view('situan.pelayanan.verifikasi_publik', compact('pelayanan', 'hash', 'sekolah'));
     }

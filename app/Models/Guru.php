@@ -26,6 +26,23 @@ class Guru extends Model
         static::deleted(function ($m) {
             AuditLog::catat('delete', 'guru', "Guru dihapus: {$m->nama}", $m->only(['nip','nama','jabatan','status']), null, $m);
         });
+        static::saved(function ($m) {
+            if (str_contains(strtolower($m->jabatan ?? ''), 'kepala sekolah') || str_contains(strtolower($m->tugas_tambahan ?? ''), 'kepala sekolah')) {
+                try {
+                    $sekolah = PengaturanSekolah::first();
+                    if ($sekolah) {
+                        $sekolah->withoutEvents(function () use ($sekolah, $m) {
+                            $sekolah->update([
+                                'nama_kepala_sekolah' => $m->nama_lengkap_gelar ?: $m->nama,
+                                'nip_kepala_sekolah'  => $m->nip,
+                            ]);
+                        });
+                    }
+                } catch (\Throwable $e) {
+                    \Log::warning('Gagal sinkron PengaturanSekolah dari Guru: ' . $e->getMessage());
+                }
+            }
+        });
     }
 
     protected $fillable = [

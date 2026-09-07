@@ -6,6 +6,7 @@ use App\Models\AuditLog;
 use App\Models\BukuSkKepsek;
 use App\Models\DisposisiSurat;
 use App\Models\KlasifikasiSurat;
+use App\Models\PengaturanSekolah;
 use App\Models\SuratKeluar;
 use App\Models\SuratMasuk;
 use App\Models\User;
@@ -161,7 +162,8 @@ class SituanPersuratanController extends Controller
     public function disposisiCetakLembar($id)
     {
         $surat = SuratMasuk::with(['disposisis.penerima', 'disposisis.pemberi'])->findOrFail($id);
-        return view('situan.persuratan.cetak_lembar_disposisi', compact('surat'));
+        $sekolah = PengaturanSekolah::getAktif();
+        return view('situan.persuratan.cetak_lembar_disposisi', compact('surat', 'sekolah'));
     }
 
     /**

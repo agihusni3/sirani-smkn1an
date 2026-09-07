@@ -215,10 +215,10 @@
   </table>
 
   <div class="ttd-wrap">
-    Air Naningan, {{ $surat->tanggal_diterima->translatedFormat('d F Y') }}<br>
+    Air Naningan, {{ $surat->tanggal_diterima ? $surat->tanggal_diterima->translatedFormat('d F Y') : now()->translatedFormat('d F Y') }}<br>
     Kepala SMKN 1 Air Naningan,<br><br><br><br>
-    <strong><u>{{ $disposisi?->pemberi?->name ?: 'Administrator Sistem' }}</u></strong><br>
-    NIP. 19850101 201001 1 001
+    <strong><u>{{ !empty($sekolah?->nama_kepala_sekolah) ? $sekolah->nama_kepala_sekolah : ($disposisi?->pemberi?->name ?: 'Kepala Sekolah') }}</u></strong><br>
+    NIP. {{ !empty($sekolah?->nip_kepala_sekolah) ? $sekolah->nip_kepala_sekolah : '-' }}
   </div>
 
 </body>

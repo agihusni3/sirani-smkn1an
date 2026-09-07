@@ -162,7 +162,7 @@
               <div class="row g-3 mb-4">
                 <div class="col-sm-6">
                   <div class="info-label">Penandatangan</div>
-                  <div class="info-value">{{ $sekolah->nama_kepala_sekolah ?: 'Kepala Sekolah SMKN 1 Air Naningan' }}</div>
+                  <div class="info-value">{{ $sekolah->nama_kepala_sekolah ?: 'Aprida, S.Si. (Kepala Sekolah)' }}</div>
                 </div>
                 <div class="col-sm-6">
                   <div class="info-label">Status Keabsahan</div>

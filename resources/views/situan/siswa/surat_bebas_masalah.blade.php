@@ -582,8 +582,8 @@
         <div class="sig-box" style="margin-top:10px;">
           <div>Mengetahui,<br />Kepala SMKN 1 Air Naningan</div>
           <div>
-            <div class="sig-name">{{ $sekolah->nama_kepala_sekolah ?: 'Dra. H. Maryono, M.Pd.' }}</div>
-            <div class="sig-nip">NIP. {{ $sekolah->nip_kepala_sekolah ?: '19700101 199501 1 001' }}</div>
+            <div class="sig-name">{{ $sekolah->nama_kepala_sekolah ?: 'Aprida, S.Si.' }}</div>
+            <div class="sig-nip">NIP. {{ $sekolah->nip_kepala_sekolah ?: '197904172008012019' }}</div>
           </div>
         </div>
       </div>

@@ -108,7 +108,7 @@ class SituanKepegawaianController extends Controller
     public function cetakPengantarKgb($id)
     {
         $guru = Guru::findOrFail($id);
-        $sekolah = PengaturanSekolah::first();
+        $sekolah = PengaturanSekolah::getAktif();
 
         // Ambil nomor surat keluar resmi
         $generator = SuratKeluar::generateNomorSurat('821.2');
