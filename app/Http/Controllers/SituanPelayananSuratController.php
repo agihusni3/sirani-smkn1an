@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\AuditLog;
+use App\Models\Guru;
 use App\Models\PelayananSurat;
 use App\Models\PengaturanSekolah;
 use App\Models\Siswa;
@@ -147,6 +148,18 @@ class SituanPelayananSuratController extends Controller
         $pelayanan = PelayananSurat::with(['siswa', 'suratKeluar', 'creator'])->findOrFail($id);
         $sekolah = PengaturanSekolah::getAktif();
 
+        // Cari data Kepala Sekolah langsung dari Data PTK (Tabel Guru)
+        $kepsek = Guru::where('jabatan', 'like', '%Kepala Sekolah%')
+            ->orWhere('tugas_tambahan', 'like', '%Kepala Sekolah%')
+            ->orWhere('nama', 'like', '%Aprida%')
+            ->first();
+
+        $namaKepsek = $kepsek ? ($kepsek->nama_lengkap_gelar ?: $kepsek->nama) : ($sekolah->nama_kepala_sekolah ?: 'Aprida, S.Si.');
+        $nipKepsek  = $kepsek && !empty($kepsek->nip) ? $kepsek->nip : ($sekolah->nip_kepala_sekolah ?: '197904172008012019');
+
+        $sekolah->nama_kepala_sekolah = $namaKepsek;
+        $sekolah->nip_kepala_sekolah  = $nipKepsek;
+
         $verifyUrl = route('situan.verifikasi-surat', $pelayanan->kode_verifikasi_qr);
         $qrImage = null;
         try {
@@ -162,7 +175,7 @@ class SituanPelayananSuratController extends Controller
             $qrImage = null;
         }
 
-        return view('situan.pelayanan.cetak_surat', compact('pelayanan', 'sekolah', 'verifyUrl', 'qrImage'));
+        return view('situan.pelayanan.cetak_surat', compact('pelayanan', 'sekolah', 'verifyUrl', 'qrImage', 'namaKepsek', 'nipKepsek'));
     }
 
     /**
@@ -177,6 +190,17 @@ class SituanPelayananSuratController extends Controller
 
         $sekolah = PengaturanSekolah::getAktif();
 
-        return view('situan.pelayanan.verifikasi_publik', compact('pelayanan', 'hash', 'sekolah'));
+        $kepsek = Guru::where('jabatan', 'like', '%Kepala Sekolah%')
+            ->orWhere('tugas_tambahan', 'like', '%Kepala Sekolah%')
+            ->orWhere('nama', 'like', '%Aprida%')
+            ->first();
+
+        $namaKepsek = $kepsek ? ($kepsek->nama_lengkap_gelar ?: $kepsek->nama) : ($sekolah->nama_kepala_sekolah ?: 'Aprida, S.Si.');
+        $nipKepsek  = $kepsek && !empty($kepsek->nip) ? $kepsek->nip : ($sekolah->nip_kepala_sekolah ?: '197904172008012019');
+
+        $sekolah->nama_kepala_sekolah = $namaKepsek;
+        $sekolah->nip_kepala_sekolah  = $nipKepsek;
+
+        return view('situan.pelayanan.verifikasi_publik', compact('pelayanan', 'hash', 'sekolah', 'namaKepsek', 'nipKepsek'));
     }
 }

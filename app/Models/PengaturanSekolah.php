@@ -118,6 +118,36 @@ class PengaturanSekolah extends Model
     }
 
     /**
+     * Dapatkan nama resmi Kepala Sekolah selalu bersumber dari Data PTK (Tabel Guru).
+     */
+    public function getNamaKepalaSekolahAttribute($val): string
+    {
+        $guru = Guru::where('jabatan', 'like', '%Kepala Sekolah%')
+            ->orWhere('tugas_tambahan', 'like', '%Kepala Sekolah%')
+            ->orWhere('nama', 'like', '%Aprida%')
+            ->first();
+        if ($guru) {
+            return $guru->nama_lengkap_gelar ?: $guru->nama;
+        }
+        return $val ?: 'Aprida, S.Si.';
+    }
+
+    /**
+     * Dapatkan NIP resmi Kepala Sekolah selalu bersumber dari Data PTK (Tabel Guru).
+     */
+    public function getNipKepalaSekolahAttribute($val): ?string
+    {
+        $guru = Guru::where('jabatan', 'like', '%Kepala Sekolah%')
+            ->orWhere('tugas_tambahan', 'like', '%Kepala Sekolah%')
+            ->orWhere('nama', 'like', '%Aprida%')
+            ->first();
+        if ($guru && !empty($guru->nip)) {
+            return $guru->nip;
+        }
+        return $val ?: '197904172008012019';
+    }
+
+    /**
      * Format alamat lengkap sekolah (termasuk Desa, Kecamatan, Kab, Provinsi, Kode Pos).
      */
     public function getAlamatLengkapAttribute(): string
