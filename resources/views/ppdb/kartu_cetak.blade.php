@@ -3,366 +3,699 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kartu Tanda Peserta PPDB - {{ $pendaftar->nomor_pendaftaran }}</title>
+    <title>KARTU BUKTI PENDAFTARAN & JADWAL SELEKSI — {{ $pendaftar->no_pendaftaran ?? $pendaftar->nomor_pendaftaran }}</title>
     <style>
+        /* Standar Halaman A4: 210mm x 297mm */
+        @page {
+            size: A4 portrait;
+            margin: 10mm 14mm 10mm 14mm;
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+
         body {
-            font-family: Arial, Helvetica, sans-serif;
+            font-family: 'Times New Roman', Times, serif;
             margin: 0;
-            padding: 20px;
-            background: #f1f5f9;
-            color: #000;
+            padding: 20px 0;
+            background: #e2e8f0;
+            color: #000000;
+            line-height: 1.35;
         }
 
-        .kartu-container {
-            max-width: 780px;
+        /* Lembar Kertas A4 */
+        .page-a4 {
+            width: 210mm;
+            min-height: 297mm;
             margin: 0 auto;
-            background: #fff;
-            padding: 30px 40px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            border: 2px solid #0f172a;
+            background: #ffffff;
+            padding: 14mm 16mm;
+            box-shadow: 0 4px 18px rgba(0,0,0,0.15);
+            position: relative;
         }
 
-        /* Kop Surat Resmi */
-        .kop {
+        /* Toolbar Layar (Tidak Tercetak) */
+        .screen-toolbar {
+            width: 210mm;
+            margin: 0 auto 16px auto;
             display: flex;
-            align-items: center;
             justify-content: space-between;
-            border-bottom: 3px double #000;
-            padding-bottom: 12px;
-            margin-bottom: 20px;
+            align-items: center;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+
+        .btn-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: #1e293b;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 13px;
+            background: #ffffff;
+            padding: 8px 16px;
+            border-radius: 6px;
+            border: 1px solid #cbd5e1;
+            transition: all 0.15s ease;
+        }
+
+        .btn-back:hover {
+            background: #f8fafc;
+            border-color: #94a3b8;
+        }
+
+        .btn-print {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 9px 24px;
+            background: #0284c7;
+            color: #ffffff;
+            border: 1px solid #0369a1;
+            border-radius: 6px;
+            font-weight: 700;
+            font-size: 13.5px;
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(2,132,199,0.3);
+            transition: all 0.15s ease;
+        }
+
+        .btn-print:hover {
+            background: #0369a1;
+        }
+
+        /* ─── KOP SURAT RESMI ─── */
+        .kop-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 0;
+        }
+
+        .kop-table td {
+            vertical-align: middle;
+            padding: 0;
+        }
+
+        .kop-logo-col {
+            width: 78px;
+            text-align: center;
         }
 
         .kop-logo {
-            width: 75px;
-            height: 75px;
+            width: 72px;
+            height: 72px;
             object-fit: contain;
+            display: block;
+            margin: 0 auto;
         }
 
-        .kop-text {
+        .kop-text-col {
             text-align: center;
-            flex: 1;
-            padding: 0 14px;
+            padding: 0 10px !important;
         }
 
-        .kop-text h2 {
-            margin: 0;
-            font-size: 15pt;
+        .kop-text-1 {
+            font-size: 11pt;
             font-weight: bold;
             text-transform: uppercase;
-        }
-
-        .kop-text h1 {
-            margin: 2px 0;
-            font-size: 17pt;
-            font-weight: 800;
-            text-transform: uppercase;
-        }
-
-        .kop-text p {
-            margin: 2px 0;
-            font-size: 8.5pt;
-            color: #333;
-        }
-
-        .judul-kartu {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-
-        .judul-kartu h3 {
+            letter-spacing: 0.5px;
             margin: 0;
-            font-size: 13pt;
+            line-height: 1.25;
+        }
+
+        .kop-text-2 {
+            font-size: 11pt;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin: 0;
+            line-height: 1.25;
+        }
+
+        .kop-nama-sekolah {
+            font-size: 15.5pt;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin: 2px 0;
+            line-height: 1.2;
+        }
+
+        .kop-alamat {
+            font-size: 8.5pt;
+            margin: 2px 0 0 0;
+            line-height: 1.35;
+        }
+
+        .kop-kontak {
+            font-size: 8pt;
+            margin: 1px 0 0 0;
+            letter-spacing: 0.2px;
+        }
+
+        /* Garis Ganda Pemisah Kop Surat */
+        .kop-double-line {
+            border-top: 2.5px solid #000000;
+            border-bottom: 0.75px solid #000000;
+            height: 2px;
+            margin: 7px 0 14px 0;
+        }
+
+        /* ─── JUDUL KARTU ─── */
+        .judul-area {
+            text-align: center;
+            margin-bottom: 12px;
+        }
+
+        .judul-teks {
+            font-size: 12.5pt;
+            font-weight: 900;
             text-transform: uppercase;
             text-decoration: underline;
+            margin: 0;
+            letter-spacing: 0.5px;
         }
 
-        .judul-kartu span {
-            font-size: 10pt;
+        .sub-judul-teks {
+            font-size: 9.5pt;
             font-weight: bold;
-            color: #444;
+            text-transform: uppercase;
+            margin: 2px 0 0 0;
+            letter-spacing: 0.3px;
         }
 
-        .grid-data {
+        /* ─── STATUS & NOMOR REGISTRASI BAR ─── */
+        .status-bar {
+            width: 100%;
+            border: 1.5px solid #000000;
+            background: #f8fafc;
+            border-collapse: collapse;
+            margin-bottom: 12px;
+            font-size: 9pt;
+        }
+
+        .status-bar td {
+            padding: 6px 10px;
+            vertical-align: middle;
+        }
+
+        .reg-number {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 12.5pt;
+            font-weight: 900;
+            color: #000000;
+            letter-spacing: 0.5px;
+        }
+
+        .status-pill {
+            display: inline-block;
+            padding: 2px 10px;
+            border: 1px solid #000000;
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 8.5pt;
+            background: #ffffff;
+        }
+
+        /* ─── PANEL JADWAL SELEKSI CBT & WAWANCARA ─── */
+        .jadwal-panel {
+            width: 100%;
+            border: 1.5px solid #000000;
+            margin-bottom: 12px;
+            border-collapse: collapse;
+            font-size: 8.5pt;
+            background: #fbfcfd;
+        }
+
+        .jadwal-panel-head {
+            background: #f1f5f9;
+            border-bottom: 1px solid #000000;
+            font-weight: 900;
+            font-size: 9pt;
+            padding: 5px 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+        }
+
+        .jadwal-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 8.5pt;
+        }
+
+        .jadwal-table td {
+            padding: 4px 8px;
+            vertical-align: top;
+        }
+
+        .jadwal-table td.label-col {
+            width: 110px;
+            color: #333333;
+        }
+
+        .jadwal-table td.val-col {
+            font-weight: bold;
+            color: #000000;
+        }
+
+        /* ─── BIODATA & FOTO AREA ─── */
+        .biodata-wrapper {
             display: flex;
-            gap: 24px;
-            margin-bottom: 24px;
+            gap: 16px;
+            margin-bottom: 12px;
         }
 
-        .foto-box {
-            width: 140px;
+        .side-col {
+            width: 130px;
+            flex-shrink: 0;
             text-align: center;
         }
 
-        .foto-frame {
-            width: 120px;
-            height: 160px;
-            border: 1px solid #999;
+        .pas-foto-box {
+            width: 30mm;
+            height: 40mm;
+            border: 1.5px solid #000000;
             background: #f8fafc;
             display: flex;
             align-items: center;
             justify-content: center;
             margin: 0 auto;
             overflow: hidden;
+            position: relative;
         }
 
-        .foto-frame img {
+        .pas-foto-box img {
             width: 100%;
             height: 100%;
             object-fit: cover;
+            display: block;
         }
 
-        .table-data {
-            flex: 1;
-            border-collapse: collapse;
-            font-size: 10pt;
-        }
-
-        .table-data td {
-            padding: 5px 8px;
-            vertical-align: top;
-        }
-
-        .table-data td:first-child {
-            width: 160px;
-            font-weight: 600;
-            color: #333;
-        }
-
-        .box-status {
-            border: 2px dashed #000;
-            padding: 10px 14px;
-            margin-bottom: 20px;
-            background: #fafafa;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 9.5pt;
-        }
-
-        .ttd-area {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 30px;
-            font-size: 9.5pt;
-        }
-
-        .ttd-box {
-            width: 220px;
+        .qr-verifikasi-box {
+            margin-top: 10px;
+            padding: 6px;
+            border: 1px dashed #64748b;
+            background: #ffffff;
+            display: inline-block;
             text-align: center;
         }
 
+        .qr-verifikasi-box img {
+            width: 78px;
+            height: 78px;
+            display: block;
+            margin: 0 auto;
+        }
+
+        .qr-caption {
+            font-size: 6.5pt;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            color: #475569;
+            margin-top: 3px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        /* Tabel Biodata Siswa */
+        .table-biodata {
+            flex: 1;
+            border-collapse: collapse;
+            font-size: 9pt;
+            width: 100%;
+        }
+
+        .table-biodata td {
+            padding: 3.5px 6px;
+            vertical-align: top;
+            line-height: 1.3;
+        }
+
+        .table-biodata td.lbl {
+            width: 160px;
+            color: #000000;
+        }
+
+        .table-biodata td.sep {
+            width: 10px;
+            text-align: center;
+        }
+
+        .table-biodata td.val {
+            font-weight: normal;
+        }
+
+        .table-biodata td.val strong {
+            font-weight: bold;
+        }
+
+        /* ─── TATA TERTIB & CATATAN ─── */
+        .catatan-box {
+            border: 1px solid #000000;
+            background: #fafafa;
+            padding: 6px 12px;
+            margin-bottom: 14px;
+            font-size: 8pt;
+            line-height: 1.35;
+        }
+
+        .catatan-box strong {
+            display: block;
+            font-size: 8.5pt;
+            margin-bottom: 2px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .catatan-box ol {
+            margin: 0;
+            padding-left: 16px;
+        }
+
+        .catatan-box li {
+            margin-bottom: 1.5px;
+        }
+
+        /* ─── TANDA TANGAN (PENGESAHAN) ─── */
+        .ttd-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 9pt;
+            margin-top: 4px;
+        }
+
+        .ttd-table td {
+            width: 50%;
+            text-align: center;
+            vertical-align: top;
+            padding: 0 20px;
+        }
+
         .ttd-space {
-            height: 60px;
+            height: 52px;
         }
 
-        .btn-print-box {
-            max-width: 780px;
-            margin: 0 auto 20px auto;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+        .ttd-nama {
+            font-weight: bold;
+            text-decoration: underline;
+            display: block;
         }
 
+        /* PRINT STYLES */
         @media print {
             body {
-                background: #fff;
+                background: #ffffff;
                 padding: 0;
+                margin: 0;
             }
-            .kartu-container {
+
+            .screen-toolbar {
+                display: none !important;
+            }
+
+            .page-a4 {
+                width: 100%;
+                min-height: auto;
+                margin: 0;
+                padding: 0;
                 box-shadow: none;
-                border: 2px solid #000;
-                padding: 20px 30px;
-            }
-            .btn-print-box {
-                display: none;
             }
         }
     </style>
 </head>
 <body>
 
-    <div class="btn-print-box">
-        <a href="{{ route('ppdb.status', ['keyword' => $pendaftar->nomor_pendaftaran]) }}" style="color: #2563eb; text-decoration: none; font-weight: bold; font-size: 14px;">
-            ← Kembali ke Status PPDB
+    {{-- TOOLBAR ATAS (HANYA MUNCUL DI LAYAR BROWSER) --}}
+    <div class="screen-toolbar">
+        <a href="{{ route('ppdb.status', ['keyword' => $pendaftar->no_pendaftaran ?? $pendaftar->nomor_pendaftaran]) }}" class="btn-back">
+            &larr; Kembali ke Status Pendaftaran
         </a>
-        <button onclick="window.print()" style="padding: 9px 20px; background: #2563eb; color: #fff; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 14px;">
-            🖨️ Cetak / Simpan PDF
-        </button>
+        <div style="display:flex; gap:10px; align-items:center;">
+            <span style="font-size: 12px; color: #64748b;">Ukuran: <strong>Kertas A4</strong> (Pas 1 Lembar)</span>
+            <button onclick="window.print()" class="btn-print">
+                <span style="font-size:16px;">🖨️</span>
+                <span>Cetak / Simpan PDF</span>
+            </button>
+        </div>
     </div>
 
-    <div class="kartu-container">
-        <!-- Kop Sekolah -->
-        <div class="kop">
-            <img src="{{ asset('logo_prov_lampung.png') }}" class="kop-logo" alt="Logo Lampung" onerror="this.src='{{ asset('img/logo_prov_lampung.png') }}'">
-            <div class="kop-text">
-                <h2>Pemerintah Provinsi Lampung</h2>
-                <h2>Dinas Pendidikan dan Kebudayaan</h2>
-                <h1>SMK NEGERI 1 AIR NANINGAN</h1>
-                <p>{{ $sekolah->alamat ?? 'Jl. Raya Air Naningan, Kec. Air Naningan, Kab. Tanggamus, Lampung 35379' }}</p>
-                <p>NPSN: {{ $sekolah->npsn ?? '70011825' }} | Email: {{ $sekolah->email ?? 'info@smkn1airnaningan.sch.id' }}</p>
-            </div>
-            <img src="{{ asset('logo.png') }}" class="kop-logo" alt="Logo SMKN 1" onerror="this.src='{{ asset('img/logo.png') }}'">
-        </div>
+    {{-- LEMBAR UTAMA KARTU A4 --}}
+    <div class="page-a4">
 
-        <!-- Judul -->
-        <div class="judul-kartu">
+        {{-- 1. KOP SURAT RESMI PEMERINTAH PROVINSI LAMPUNG & SEKOLAH --}}
+        <table class="kop-table">
+            <tr>
+                <td class="kop-logo-col">
+                    <img src="{{ asset('logo_prov_lampung.png') }}" class="kop-logo" alt="Logo Provinsi Lampung" onerror="this.src='{{ asset('img/logo_prov_lampung.png') }}'">
+                </td>
+                <td class="kop-text-col">
+                    <div class="kop-text-1">{{ $sekolah->nama_instansi_atas ?? 'PEMERINTAH PROVINSI LAMPUNG' }}</div>
+                    <div class="kop-text-2">{{ $sekolah->nama_dinas ?? 'DINAS PENDIDIKAN DAN KEBUDAYAAN' }}</div>
+                    <div class="kop-nama-sekolah">{{ $sekolah->nama_sekolah ?? 'SMK NEGERI 1 AIR NANINGAN' }}</div>
+                    <div class="kop-alamat">
+                        {{ $sekolah->alamat ?? 'Jl. Makam Baturuguk, Pekon Karang Sari' }}, Kec. {{ $sekolah->kecamatan ?? 'Air Naningan' }}, {{ $sekolah->kabupaten ?? 'Kab. Tanggamus' }}, {{ $sekolah->provinsi ?? 'Lampung' }} {{ $sekolah->kode_pos ?? '35379' }}
+                    </div>
+                    <div class="kop-kontak">
+                        Laman: https://{{ $sekolah->website ?? 'smkn1airnaningan.sch.id' }} &bull; Pos-el: {{ $sekolah->email ?? 'info@smkn1airnaningan.sch.id' }} &bull; NPSN: {{ $sekolah->npsn ?? '70011825' }}
+                    </div>
+                </td>
+                <td class="kop-logo-col">
+                    <img src="{{ asset('logo.png') }}" class="kop-logo" alt="Logo SMKN 1 Air Naningan" onerror="this.src='{{ asset('img/logo.png') }}'">
+                </td>
+            </tr>
+        </table>
+
+        {{-- Garis Pemisah Ganda Kop Surat --}}
+        <div class="kop-double-line"></div>
+
+        {{-- 2. JUDUL DOKUMEN --}}
+        <div class="judul-area">
             @if($pendaftar->status == 'diterima')
-                <h3>SURAT KETERANGAN LULUS SELEKSI &amp; BUKTI DITERIMA PPDB</h3>
-                <span>TAHUN PELAJARAN {{ $pendaftar->tahun_ajaran }}</span>
+                <h2 class="judul-teks">SURAT BUKTI KELULUSAN &amp; PENERIMAAN SISWA BARU</h2>
+                <div class="sub-judul-teks">PENERIMAAN PESERTA DIDIK BARU (PPDB) TAHUN PELAJARAN {{ $pendaftar->tahun_ajaran ?? '2026/2027' }}</div>
             @else
-                <h3>KARTU TANDA BUKTI PENDAFTARAN &amp; JADWAL SELEKSI</h3>
-                <span>TAHUN PELAJARAN {{ $pendaftar->tahun_ajaran }}</span>
+                <h2 class="judul-teks">KARTU TANDA BUKTI PENDAFTARAN &amp; JADWAL SELEKSI</h2>
+                <div class="sub-judul-teks">PENERIMAAN PESERTA DIDIK BARU (PPDB) TAHUN PELAJARAN {{ $pendaftar->tahun_ajaran ?? '2026/2027' }}</div>
             @endif
         </div>
 
-        <!-- Status Nomor Registrasi -->
-        <div class="box-status" style="{{ $pendaftar->status == 'diterima' ? 'background: #f0fdf4; border: 2px solid #16a34a;' : '' }}">
-            <div>
-                <strong>NOMOR PENDAFTARAN:</strong> 
-                <span style="font-size: 13pt; font-family: monospace; font-weight: bold; margin-left: 6px;">{{ $pendaftar->no_pendaftaran ?? $pendaftar->nomor_pendaftaran }}</span>
-            </div>
-            <div>
-                <strong>STATUS:</strong> 
-                <span style="font-weight: bold; {{ $pendaftar->status == 'diterima' ? 'color: #15803d;' : '' }}">
-                    @if($pendaftar->status == 'diterima')
-                        LULUS / DITERIMA
-                    @elseif($pendaftar->status == 'cadangan')
-                        CADANGAN
-                    @elseif($pendaftar->status == 'terverifikasi' || $pendaftar->status == 'berkas_valid')
-                        BERKAS VALID / SIAP UJIAN
-                    @elseif($pendaftar->status == 'ditolak')
-                        TIDAK LOLOS
-                    @else
-                        MENUNGGU VERIFIKASI
-                    @endif
-                </span>
-            </div>
-        </div>
+        {{-- 3. STATUS BAR & NOMOR PENDAFTARAN --}}
+        <table class="status-bar">
+            <tr>
+                <td style="width: 48%;">
+                    <span style="font-size: 8pt; color: #475569; display: block; text-transform: uppercase;">Nomor Pendaftaran:</span>
+                    <span class="reg-number">{{ $pendaftar->no_pendaftaran ?? $pendaftar->nomor_pendaftaran }}</span>
+                </td>
+                <td style="width: 26%;">
+                    <span style="font-size: 8pt; color: #475569; display: block; text-transform: uppercase;">Jalur Seleksi:</span>
+                    <strong style="font-size: 9.5pt; text-transform: uppercase;">Jalur {{ $pendaftar->jalur_pendaftaran }}</strong>
+                </td>
+                <td style="width: 26%; text-align: right;">
+                    <span style="font-size: 8pt; color: #475569; display: block; text-transform: uppercase;">Status Berkas:</span>
+                    <span class="status-pill">
+                        @if($pendaftar->status == 'diterima')
+                            RESMI DITERIMA
+                        @elseif($pendaftar->status == 'cadangan')
+                            CADANGAN
+                        @elseif(in_array($pendaftar->status, ['terverifikasi', 'berkas_valid', 'siap_tes']))
+                            TERVERIFIKASI
+                        @elseif($pendaftar->status == 'ditolak')
+                            DITOLAK
+                        @else
+                            MENUNGGU VERIFIKASI
+                        @endif
+                    </span>
+                </td>
+            </tr>
+        </table>
 
+        {{-- 4. PANEL KHUSUS: STATUS DITERIMA ATAU JADWAL UJIAN SELEKSI CBT --}}
         @if($pendaftar->status == 'diterima')
-            <!-- Panel Jurusan Diterima -->
-            <div style="background: #ecfdf5; border: 1.5px solid #a7f3d0; padding: 12px 18px; margin-bottom: 20px; border-radius: 4px;">
-                <div style="font-size: 9pt; color: #065f46; font-weight: bold; text-transform: uppercase;">Dinyatakan Diterima Pada:</div>
-                <div style="font-size: 13pt; font-weight: bold; color: #047857; margin: 2px 0;">
+            <div style="border: 1.5px solid #000000; background: #f0fdf4; padding: 7px 12px; margin-bottom: 12px; font-size: 8.5pt;">
+                <div style="font-size: 8pt; color: #047857; font-weight: bold; text-transform: uppercase;">Dinyatakan Lulus &amp; Diterima Pada Program Keahlian:</div>
+                <div style="font-size: 11.5pt; font-weight: 900; color: #065f46; margin: 1px 0;">
                     {{ strtoupper($pendaftar->jurusanDiterima->nama_jurusan ?? ($pendaftar->jurusanPilihan1->nama_jurusan ?? '-')) }}
                 </div>
-                <div style="font-size: 9pt; color: #065f46; margin-top: 4px;">
-                    Peringkat Kelulusan: <strong>#{{ $pendaftar->peringkat_jurusan ?: '1' }}</strong> &bull; 
-                    Nilai Akhir: <strong>{{ number_format($pendaftar->nilai_akhir ?? 0, 2) }}</strong> &bull; 
-                    Jalur: <strong>{{ strtoupper($pendaftar->jalur_pendaftaran) }}</strong>
+                <div style="font-size: 8pt; color: #047857;">
+                    Peringkat: <strong>#{{ $pendaftar->peringkat_jurusan ?: '1' }}</strong> &bull; 
+                    Total Nilai Akhir: <strong>{{ number_format($pendaftar->nilai_akhir ?? 0, 2) }}</strong> &bull; 
+                    Tanggal Registrasi: {{ \Carbon\Carbon::parse($pendaftar->created_at)->translatedFormat('d F Y') }}
                 </div>
             </div>
-        @elseif($pendaftar->jadwal_tes_tanggal)
-            <!-- Panel Jadwal Ujian CBT & Wawancara -->
-            <div style="background: #eff6ff; border: 1.5px solid #bfdbfe; padding: 10px 16px; margin-bottom: 20px; border-radius: 4px; font-size: 9.5pt;">
-                <strong style="color: #1e40af; display: block; margin-bottom: 4px;">JADWAL TES SELEKSI CBT &amp; WAWANCARA:</strong>
-                <table style="width: 100%; font-size: 9pt; border-collapse: collapse;">
+        @else
+            <div class="jadwal-panel">
+                <div class="jadwal-panel-head">
+                    Jadwal Pelaksanaan Tes Seleksi CBT &amp; Wawancara Kejuruan
+                </div>
+                <table class="jadwal-table">
                     <tr>
-                        <td style="width: 120px; color: #475569;">Hari / Tanggal:</td>
-                        <td style="font-weight: bold; color: #0f172a;">{{ \Carbon\Carbon::parse($pendaftar->jadwal_tes_tanggal)->translatedFormat('l, d F Y') }}</td>
-                        <td style="width: 100px; color: #475569;">Ruang Ujian:</td>
-                        <td style="font-weight: bold; color: #0f172a;">{{ $pendaftar->jadwal_tes_ruang ?: 'Lab Komputer SMKN 1' }}</td>
+                        <td class="label-col">Hari / Tanggal</td>
+                        <td style="width: 8px;">:</td>
+                        <td class="val-col">
+                            @if($pendaftar->jadwal_tes_tanggal)
+                                {{ \Carbon\Carbon::parse($pendaftar->jadwal_tes_tanggal)->translatedFormat('l, d F Y') }}
+                            @elseif($settingUjian && $settingUjian->tanggal_mulai)
+                                {{ \Carbon\Carbon::parse($settingUjian->tanggal_mulai)->translatedFormat('l, d F Y') }}
+                            @else
+                                Sesuai Jadwal Gelombang Panitia PPDB
+                            @endif
+                        </td>
+                        <td class="label-col">Ruang / Tempat</td>
+                        <td style="width: 8px;">:</td>
+                        <td class="val-col">
+                            {{ $pendaftar->jadwal_tes_ruang ?: 'Lab Komputer SMKN 1 Air Naningan' }}
+                        </td>
                     </tr>
                     <tr>
-                        <td style="color: #475569;">Sesi Waktu:</td>
-                        <td style="font-weight: bold; color: #0f172a;">{{ $pendaftar->jadwal_tes_sesi ?: 'Sesi 1' }}</td>
-                        <td style="color: #475569;">Materi Ujian:</td>
-                        <td style="font-weight: bold; color: #0f172a;">CBT Tertulis + Wawancara Kejuruan</td>
+                        <td class="label-col">Sesi Waktu</td>
+                        <td>:</td>
+                        <td class="val-col">
+                            @if($pendaftar->jadwal_tes_sesi)
+                                {{ $pendaftar->jadwal_tes_sesi }}
+                            @elseif($settingUjian && $settingUjian->durasi_menit)
+                                Sesi Ujian CBT (Durasi: {{ $settingUjian->durasi_menit }} Menit)
+                            @else
+                                Sesi 1 (Pukul 08.00 s.d 10.00 WIB)
+                            @endif
+                        </td>
+                        <td class="label-col">Bentuk Seleksi</td>
+                        <td>:</td>
+                        <td class="val-col">
+                            CBT Potensi Akademik (30 PG + 5 Esai) &amp; Wawancara Minat Bakat
+                        </td>
                     </tr>
                 </table>
             </div>
         @endif
 
-        <!-- Detail Siswa & Foto -->
-        <div class="grid-data">
-            <div class="foto-box">
-                <div class="foto-frame">
-                    @if($pendaftar->pas_foto)
-                        <img src="{{ asset('storage/' . $pendaftar->pas_foto) }}" alt="Foto">
+        {{-- 5. DETAIL BIODATA SISWA & PAS FOTO 3X4 --}}
+        <div class="biodata-wrapper">
+            {{-- Kolom Kiri: Pas Foto & QR Code --}}
+            <div class="side-col">
+                <div class="pas-foto-box">
+                    @if($pendaftar->pas_foto && file_exists(public_path('storage/' . $pendaftar->pas_foto)))
+                        <img src="{{ asset('storage/' . $pendaftar->pas_foto) }}" alt="Pas Foto">
                     @else
-                        <span style="color: #999; font-size: 9pt;">Pas Foto<br>3 x 4</span>
+                        <div style="text-align: center; color: #475569; font-size: 8pt; font-family: -apple-system, BlinkMacSystemFont, sans-serif;">
+                            <strong>PAS FOTO</strong><br>
+                            3 &times; 4 cm<br>
+                            <span style="font-size: 6.5pt; color: #64748b;">(Warna)</span>
+                        </div>
                     @endif
                 </div>
-                <p style="font-size: 8pt; margin-top: 6px; color: #555;">Tempel Pas Foto jika belum terunggah</p>
+
+                {{-- QR Code Verifikasi Berkas & Status --}}
+                <div class="qr-verifikasi-box">
+                    @if(!empty($qrCode))
+                        <img src="{{ $qrCode }}" alt="QR Verifikasi">
+                    @else
+                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data={{ urlencode($statusUrl ?? url('/ppdb/status?keyword=' . ($pendaftar->no_pendaftaran ?? $pendaftar->nomor_pendaftaran))) }}" alt="QR Verifikasi">
+                    @endif
+                    <div class="qr-caption">Scan Verifikasi Resmi</div>
+                </div>
             </div>
 
-            <table class="table-data">
+            {{-- Kolom Kanan: Rincian Data Pribadi --}}
+            <table class="table-biodata">
                 <tr>
-                    <td>Nomor Induk Siswa Nasional</td>
-                    <td>: <strong>{{ $pendaftar->nisn }}</strong></td>
+                    <td class="lbl">Nomor Induk Siswa Nasional (NISN)</td>
+                    <td class="sep">:</td>
+                    <td class="val"><strong>{{ $pendaftar->nisn }}</strong></td>
                 </tr>
                 <tr>
-                    <td>Nama Lengkap</td>
-                    <td>: <strong>{{ strtoupper($pendaftar->nama_lengkap) }}</strong></td>
+                    <td class="lbl">Nomor Induk Kependudukan (NIK)</td>
+                    <td class="sep">:</td>
+                    <td class="val">{{ $pendaftar->nik ?: '-' }}</td>
                 </tr>
                 <tr>
-                    <td>Jenis Kelamin</td>
-                    <td>: {{ $pendaftar->jenis_kelamin == 'L' ? 'Laki-laki' : 'Perempuan' }}</td>
+                    <td class="lbl">Nama Lengkap Calon Siswa</td>
+                    <td class="sep">:</td>
+                    <td class="val"><strong>{{ strtoupper($pendaftar->nama_lengkap) }}</strong></td>
                 </tr>
                 <tr>
-                    <td>Tempat, Tanggal Lahir</td>
-                    <td>: {{ $pendaftar->tempat_lahir }}, {{ \Carbon\Carbon::parse($pendaftar->tanggal_lahir)->translatedFormat('d F Y') }}</td>
+                    <td class="lbl">Jenis Kelamin</td>
+                    <td class="sep">:</td>
+                    <td class="val">{{ $pendaftar->jenis_kelamin == 'L' ? 'Laki-laki (L)' : 'Perempuan (P)' }}</td>
                 </tr>
                 <tr>
-                    <td>Asal Sekolah (SMP/MTs)</td>
-                    <td>: {{ $pendaftar->asal_sekolah }} (Lulus: {{ $pendaftar->tahun_lulus }})</td>
+                    <td class="lbl">Tempat, Tanggal Lahir</td>
+                    <td class="sep">:</td>
+                    <td class="val">{{ $pendaftar->tempat_lahir }}, {{ \Carbon\Carbon::parse($pendaftar->tanggal_lahir)->translatedFormat('d F Y') }}</td>
                 </tr>
                 <tr>
-                    <td>Jalur Masuk</td>
-                    <td>: <strong>JALUR {{ strtoupper($pendaftar->jalur_pendaftaran) }}</strong></td>
+                    <td class="lbl">Asal Sekolah (SMP / MTs)</td>
+                    <td class="sep">:</td>
+                    <td class="val">{{ $pendaftar->asal_sekolah }} (Tahun Lulus: {{ $pendaftar->tahun_lulus }})</td>
                 </tr>
                 <tr>
-                    <td>Pilihan Keahlian 1</td>
-                    <td>: <strong>{{ $pendaftar->jurusanPilihan1->nama_jurusan ?? '-' }} ({{ $pendaftar->jurusanPilihan1->kode ?? '' }})</strong></td>
+                    <td class="lbl">Pilihan Keahlian 1 (Utama)</td>
+                    <td class="sep">:</td>
+                    <td class="val"><strong>{{ $pendaftar->jurusanPilihan1->nama_jurusan ?? '-' }} ({{ $pendaftar->jurusanPilihan1->kode_jurusan ?? $pendaftar->jurusanPilihan1->kode ?? '' }})</strong></td>
                 </tr>
                 <tr>
-                    <td>Pilihan Keahlian 2</td>
-                    <td>: {{ $pendaftar->jurusanPilihan2->nama_jurusan ?? '-' }}</td>
+                    <td class="lbl">Pilihan Keahlian 2 (Alternatif)</td>
+                    <td class="sep">:</td>
+                    <td class="val">{{ $pendaftar->jurusanPilihan2->nama_jurusan ?? '-' }} ({{ $pendaftar->jurusanPilihan2->kode_jurusan ?? $pendaftar->jurusanPilihan2->kode ?? '' }})</td>
                 </tr>
                 <tr>
-                    <td>Nama Orang Tua / Wali</td>
-                    <td>: {{ $pendaftar->nama_ibu ?: ($pendaftar->nama_ayah ?: '-') }}</td>
+                    <td class="lbl">Nama Orang Tua / Wali</td>
+                    <td class="sep">:</td>
+                    <td class="val">Ibu: {{ $pendaftar->nama_ibu ?: '-' }} &bull; Ayah: {{ $pendaftar->nama_ayah ?: '-' }}</td>
                 </tr>
                 <tr>
-                    <td>Kontak Siswa / Orang Tua</td>
-                    <td>: <strong>{{ $pendaftar->no_hp_siswa ?: ($pendaftar->no_hp_ortu ?: '-') }}</strong></td>
+                    <td class="lbl">No. Kontak / WhatsApp</td>
+                    <td class="sep">:</td>
+                    <td class="val">{{ $pendaftar->no_hp_siswa ?: ($pendaftar->no_hp_ortu ?: '-') }}</td>
+                </tr>
+                <tr>
+                    <td class="lbl">Alamat Tempat Tinggal</td>
+                    <td class="sep">:</td>
+                    <td class="val">{{ $pendaftar->alamat_lengkap }}</td>
                 </tr>
             </table>
         </div>
 
-        <div style="font-size: 8.5pt; color: #333; line-height: 1.5; border-top: 1px dashed #999; padding-top: 10px; margin-bottom: 20px;">
+        {{-- 6. TATA TERTIB & PETUNJUK PESERTA --}}
+        <div class="catatan-box">
             @if($pendaftar->status == 'diterima')
-                <strong>Petunjuk Daftar Ulang Calon Siswa Diterima:</strong>
-                <ol style="margin: 4px 0 0 16px; padding: 0;">
-                    <li>Bawa Surat Keterangan Lulus ini ke Sekretariat PPDB SMKN 1 Air Naningan pada jadwal daftar ulang.</li>
-                    <li>Menyerahkan fotokopi legalisir: Ijazah/SKL (2 lbr), Kartu Keluarga (2 lbr), Akta Kelahiran (2 lbr).</li>
-                    <li>Menyerahkan Pas Foto berwarna terbaru 3x4 (4 lembar) dan menandatangani surat kesanggupan tata tertib sekolah.</li>
+                <strong>Ketentuan Daftar Ulang Calon Siswa Diterima:</strong>
+                <ol>
+                    <li>Bawa Surat Keterangan Lulus ini beserta kelengkapan berkas fisik ke Sekretariat PPDB SMKN 1 Air Naningan pada jadwal yang ditentukan.</li>
+                    <li>Menyerahkan fotokopi legalisir: Ijazah/SKL SMP (2 lbr), Kartu Keluarga (2 lbr), Akta Kelahiran (2 lbr), dan Pas Foto 3x4 (4 lembar).</li>
+                    <li>Mengisi dan menandatangani surat pernyataan kesanggupan mematuhi tata tertib dan disiplin sekolah bermaterai.</li>
                 </ol>
             @else
-                <strong>Catatan untuk Peserta:</strong>
-                <ol style="margin: 4px 0 0 16px; padding: 0;">
-                    <li>Bawa kartu bukti pendaftaran ini saat jadwal verifikasi fisik atau pelaksanaan tes di sekolah.</li>
-                    <li>Wajib hadir 30 menit sebelum sesi ujian CBT dan wawancara dimulai dengan mengenakan seragam sekolah asal.</li>
-                    <li>Pantau terus pengumuman resmi berkala di website resmi: <code>{{ url('/') }}</code></li>
+                <strong>Tata Tertib &amp; Petunjuk Pelaksanaan Ujian Seleksi:</strong>
+                <ol>
+                    <li>Kartu Tanda Peserta ini <strong>wajib dicetak pada kertas HVS A4</strong> dan dibawa saat verifikasi berkas dan pelaksanaan tes seleksi di sekolah.</li>
+                    <li>Peserta wajib hadir di lokasi <strong>30 menit sebelum sesi dimulai</strong> dengan mengenakan seragam sekolah asal rapi, lengkap, dan bersepatu.</li>
+                    <li>Bagi pelaksanaan ujian CBT online, peserta dapat mengakses menu <code>{{ url('/ppdb/ujian') }}</code> menggunakan Nomor Pendaftaran di atas.</li>
+                    <li>Hasil seleksi dan pemeringkatan kelulusan akan diumumkan secara resmi melalui laman: <code>{{ url('/ppdb/status') }}</code></li>
                 </ol>
             @endif
         </div>
 
-        <!-- Tanda Tangan -->
-        <div class="ttd-area">
-            <div class="ttd-box">
-                Calon Peserta Didik Baru,
-                <div class="ttd-space"></div>
-                <strong>( {{ $pendaftar->nama_lengkap }} )</strong>
-            </div>
+        {{-- 7. PENGESAHAN / TANDA TANGAN (2 KOLOM SEJAJAR) --}}
+        <table class="ttd-table">
+            <tr>
+                <td>
+                    Calon Peserta Didik Baru,
+                    <div class="ttd-space"></div>
+                    <span class="ttd-nama">{{ strtoupper($pendaftar->nama_lengkap) }}</span>
+                    <span style="font-size: 8pt; color: #333;">NISN. {{ $pendaftar->nisn }}</span>
+                </td>
+                <td>
+                    Air Naningan, {{ \Carbon\Carbon::now()->translatedFormat('d F Y') }}<br>
+                    Panitia PPDB SMKN 1 Air Naningan,
+                    <div class="ttd-space"></div>
+                    <span class="ttd-nama">( Tim Verifikator PPDB )</span>
+                    <span style="font-size: 8pt; color: #333;">NPSN: {{ $sekolah->npsn ?? '70011825' }}</span>
+                </td>
+            </tr>
+        </table>
 
-            <div class="ttd-box">
-                Air Naningan, {{ date('d F Y') }}<br>
-                Panitia PPDB SMKN 1 Air Naningan,
-                <div class="ttd-space"></div>
-                <strong>( Tim Panitia Penerimaan )</strong>
-            </div>
-        </div>
     </div>
 
 </body>
