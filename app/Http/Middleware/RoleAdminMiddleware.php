@@ -21,7 +21,7 @@ class RoleAdminMiddleware
         $user = Auth::user();
 
         if (!$user->isAdmin()) {
-            return redirect('/dashboard')
+            return redirect('/sirani')
                 ->with('error', 'Akses Ditolak: Halaman khusus Administrator.');
         }
 

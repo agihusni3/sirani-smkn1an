@@ -159,7 +159,7 @@
 
         <div class="module-actions">
           @if($canAccessSirani)
-            <a href="/dashboard" class="btn-launch-primary">
+            <a href="/sirani" class="btn-launch-primary">
               <span>Buka Modul SIRANI</span>
               <i class="bi bi-arrow-right-short" style="font-size: 16px;"></i>
             </a>

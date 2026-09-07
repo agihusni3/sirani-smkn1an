@@ -56,7 +56,7 @@ class WaliKelasOtomatisTest extends TestCase
         $this->assertEquals([$rombel->id], $user->getWaliRombelIds());
 
         // 3. Langsung dapat membuka dasbor utama dan melihat widget kelas binaan
-        $res = $this->actingAs($user)->get('/dashboard');
+        $res = $this->actingAs($user)->get('/sirani');
         $res->assertOk();
         $res->assertSee('Ringkasan Kelas Binaan Anda:');
         $res->assertSee('XII RPL 1');

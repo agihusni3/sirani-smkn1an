@@ -108,7 +108,7 @@ class AuthenticationTest extends TestCase
         ]);
 
         $routes = [
-            '/dashboard',
+            '/sirani',
             '/siswa',
             '/guru',
             '/rombel',
@@ -120,6 +120,8 @@ class AuthenticationTest extends TestCase
             '/pengaturan-sekolah',
             '/backup',
         ];
+
+        $this->actingAs($admin)->get('/dashboard')->assertRedirect('/sirani');
 
         foreach ($routes as $route) {
             $res = $this->actingAs($admin)->get($route);

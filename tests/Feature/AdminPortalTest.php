@@ -45,7 +45,8 @@ class AdminPortalTest extends TestCase
         ]);
 
         // Guru berhak ke SIRANI
-        $this->actingAs($guru)->get('/dashboard')->assertOk();
+        $this->actingAs($guru)->get('/dashboard')->assertRedirect('/sirani');
+        $this->actingAs($guru)->get('/sirani')->assertOk();
 
         // Guru biasa ditolak akses ke Modul PPDB Admin
         $this->actingAs($guru)->get('/admin/ppdb')->assertStatus(403);
@@ -268,7 +269,7 @@ class AdminPortalTest extends TestCase
             'password' => Hash::make('password'),
         ]);
 
-        $response = $this->actingAs($admin)->get('/dashboard');
+        $response = $this->actingAs($admin)->get('/sirani');
         $response->assertStatus(200);
         $response->assertSee('DCC SMKN 1 AN');
         $response->assertDontSee('app-launcher-wrap');
@@ -283,7 +284,7 @@ class AdminPortalTest extends TestCase
             'password' => Hash::make('password'),
         ]);
 
-        $response = $this->actingAs($admin)->get('/dashboard');
+        $response = $this->actingAs($admin)->get('/sirani');
         $response->assertStatus(200);
         // Memuat navigasi SIRANI
         $response->assertSee('SIRANI');

@@ -121,7 +121,7 @@
       </div>
     </a>
 
-    <a href="/dashboard" class="nav-item">
+    <a href="/sirani" class="nav-item">
       <div class="nav-left-part">
         <i class="bi bi-fingerprint nav-icon" style="color:#3368a0;"></i>
         <span class="nav-text" style="color:#000000; font-weight:700;">Buka Modul SIRANI</span>

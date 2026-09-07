@@ -141,10 +141,17 @@ Route::middleware('auth')->group(function () {
         Route::get('/admin/situan', [\App\Http\Controllers\SituanDashboardController::class, 'index']);
     });
 
-    // 1. Dashboard Utama Modul SIRANI (Presensi & Kedisiplinan)
-    Route::get('/dashboard', [DashboardController::class, 'index'])
-        ->name('dashboard')
+    // 1. Modul SIRANI (Sistem Informasi Responsif Absensi & Kedisiplinan)
+    Route::get('/sirani', [DashboardController::class, 'index'])
+        ->name('sirani.index')
         ->middleware('role:admin,kepala_sekolah,waka_kesiswaan,waka_kurikulum,waka_sarpras,waka_hubin,kaprog,kepala_bengkel,pustakawan,guru_bk,wali_kelas,guru_piket,staf_tu,guru');
+    Route::get('/sirani/dashboard', [DashboardController::class, 'index'])
+        ->middleware('role:admin,kepala_sekolah,waka_kesiswaan,waka_kurikulum,waka_sarpras,waka_hubin,kaprog,kepala_bengkel,pustakawan,guru_bk,wali_kelas,guru_piket,staf_tu,guru');
+
+    // Backward compatibility: redirect otomatis dari /dashboard ke /sirani
+    Route::get('/dashboard', function () {
+        return redirect()->route('sirani.index');
+    })->name('dashboard');
 
     // 2. Laporan & Rekapitulasi Presensi
     Route::middleware('role:admin,kepala_sekolah,waka_kesiswaan,waka_kurikulum,waka_sarpras,waka_hubin,kaprog,kepala_bengkel,pustakawan,guru_bk,wali_kelas,guru_piket,staf_tu,guru')->group(function () {
@@ -387,6 +394,15 @@ Route::middleware('auth')->group(function () {
             Route::get('/statistik-web', [WebsiteStatistikController::class, 'index'])->name('statistik.web');
         });
     });
+
+    // ══ Shortcut URL Modular Terpadu ══
+    Route::get('/humas', function () {
+        return redirect()->route('admin.berita.index');
+    })->name('humas.index');
+
+    Route::get('/ppdb/admin', function () {
+        return redirect()->route('admin.ppdb.index');
+    })->name('ppdb.admin.index');
 });
 
 // Format Cetak Surat Resmi Kesiswaan

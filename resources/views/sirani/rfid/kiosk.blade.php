@@ -65,7 +65,7 @@
     </button>
 
     <!-- Back to Dashboard -->
-    <a href="/dashboard" class="action-btn" title="Kembali ke Dasbor" style="text-decoration:none;">
+    <a href="/sirani" class="action-btn" title="Kembali ke Dasbor SIRANI" style="text-decoration:none;">
       <i class="bi bi-speedometer2"></i>
     </a>
   </div>

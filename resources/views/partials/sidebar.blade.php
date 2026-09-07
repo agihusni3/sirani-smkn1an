@@ -72,7 +72,7 @@
   {{-- 1. NAVIGASI UTAMA --}}
   <div class="nav-group">
     <div class="nav-label">Navigasi Utama</div>
-    <a href="/dashboard" class="nav-item {{ request()->is('dashboard') ? 'active' : '' }}">
+    <a href="/sirani" class="nav-item {{ (request()->is('sirani*') || request()->is('dashboard*')) ? 'active' : '' }}">
       <div class="nav-left-part">
         <i class="bi bi-grid-1x2-fill nav-icon"></i>
         <span class="nav-text">Dasbor Utama</span>
