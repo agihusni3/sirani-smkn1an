@@ -90,7 +90,7 @@
           <p class="module-card-subtitle">Sistem Informasi Tata Usaha SMKN 1 Air Naningan</p>
 
           <p class="module-card-desc">
-            Pusat tata kelola administrasi kelembagaan sekolah terpadu, pengelolaan data pokok kesiswaan &amp; Dapodik, master data PTK, administrasi e-persuratan resmi, dan loket pelayanan surat mandiri siswa.
+            Kelola administrasi kelembagaan, sinkronisasi Dapodik kesiswaan dan PTK, pengarsipan e-persuratan dinas, serta loket surat keterangan mandiri siswa.
           </p>
         </div>
 
@@ -98,7 +98,7 @@
           @if($canAccessSituan)
             <a href="{{ route('situan.index') }}" class="btn-launch-primary">
               <span>Buka Modul SITUAN</span>
-              <i class="bi bi-arrow-right-short" style="font-size: 16px;"></i>
+              <i class="bi bi-arrow-right-short" style="font-size: 18px;"></i>
             </a>
           @else
             <div class="btn-module-locked">
@@ -122,7 +122,7 @@
           <p class="module-card-subtitle">Sistem Informasi Responsif Absensi</p>
 
           <p class="module-card-desc">
-            Sistem presensi harian cerdas terintegrasi Smart Gate RFID dan pemindai barcode, pencatatan kehadiran real-time GTK &amp; siswa, monitoring ketidakhadiran, serta rekapitulasi laporan presensi.
+            Otomasi presensi cerdas gerbang Smart Gate RFID dan barcode, monitoring kehadiran real-time GTK &amp; siswa, serta rekapitulasi laporan absensi digital.
           </p>
         </div>
 
@@ -130,7 +130,7 @@
           @if($canAccessSirani)
             <a href="/sirani" class="btn-launch-primary">
               <span>Buka Modul SIRANI</span>
-              <i class="bi bi-arrow-right-short" style="font-size: 16px;"></i>
+              <i class="bi bi-arrow-right-short" style="font-size: 18px;"></i>
             </a>
           @else
             <div class="btn-module-locked">
@@ -154,7 +154,7 @@
           <p class="module-card-subtitle">Penerimaan Peserta Didik Baru Terpadu</p>
 
           <p class="module-card-desc">
-            Portal penerimaan peserta didik baru terpadu SMKN 1 Air Naningan, memfasilitasi pendaftaran calon siswa, verifikasi berkas, pelaksanaan tes seleksi CBT daring, hingga pengumuman kelulusan.
+            Portal terpadu pendaftaran calon siswa baru, verifikasi berkas formulir, pelaksanaan ujian seleksi CBT daring, hingga publikasi hasil kelulusan.
           </p>
         </div>
 
@@ -162,7 +162,7 @@
           @if($canAccessPpdb)
             <a href="/admin/ppdb" class="btn-launch-primary">
               <span>Buka Modul PPDB</span>
-              <i class="bi bi-arrow-right-short" style="font-size: 16px;"></i>
+              <i class="bi bi-arrow-right-short" style="font-size: 18px;"></i>
             </a>
           @else
             <div class="btn-module-locked">
@@ -186,7 +186,7 @@
           <p class="module-card-subtitle">Etalase Publik &amp; Manajemen Publikasi</p>
 
           <p class="module-card-desc">
-            Etalase representasi profil resmi institusi sekolah, pengelolaan publikasi rilis berita kegiatan, etalase prestasi siswa &amp; sekolah, galeri dokumentasi, profil jurusan, dan transparansi informasi publik.
+            Etalase representasi profil resmi sekolah, publikasi rilis berita dan agenda kegiatan, galeri prestasi siswa, serta keterbukaan informasi publik.
           </p>
         </div>
 
@@ -194,7 +194,7 @@
           @if($canAccessWeb)
             <a href="/admin/berita" class="btn-launch-primary">
               <span>Buka Modul Web &amp; Humas</span>
-              <i class="bi bi-arrow-right-short" style="font-size: 16px;"></i>
+              <i class="bi bi-arrow-right-short" style="font-size: 18px;"></i>
             </a>
           @else
             <a href="/" target="_blank" class="btn-launch-primary" title="Buka Portal Website Utama Sekolah">
