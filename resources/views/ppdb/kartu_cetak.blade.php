@@ -100,13 +100,15 @@
         }
 
         .kop-logo-col {
-            width: 78px;
+            width: 75px;
             text-align: center;
         }
 
         .kop-logo {
-            width: 72px;
-            height: 72px;
+            max-width: 68px;
+            max-height: 80px;
+            width: auto;
+            height: auto;
             object-fit: contain;
             display: block;
             margin: 0 auto;
@@ -448,7 +450,7 @@
         <table class="kop-table">
             <tr>
                 <td class="kop-logo-col">
-                    <img src="{{ asset('logo_prov_lampung.png') }}" class="kop-logo" alt="Logo Provinsi Lampung" onerror="this.src='{{ asset('img/logo_prov_lampung.png') }}'">
+                    <img src="{{ asset('img/logo_prov_lampung.png') }}" class="kop-logo" alt="Logo Provinsi Lampung" onerror="this.onerror=null; this.src='{{ asset('img/logo_prov_lampung.svg') }}'">
                 </td>
                 <td class="kop-text-col">
                     <div class="kop-text-1">{{ $sekolah->nama_instansi_atas ?? 'PEMERINTAH PROVINSI LAMPUNG' }}</div>
@@ -462,7 +464,11 @@
                     </div>
                 </td>
                 <td class="kop-logo-col">
-                    <img src="{{ asset('logo.png') }}" class="kop-logo" alt="Logo SMKN 1 Air Naningan" onerror="this.src='{{ asset('img/logo.png') }}'">
+                    @if(!empty($sekolah->logo_sekolah) && file_exists(public_path('storage/'.$sekolah->logo_sekolah)))
+                        <img src="{{ asset('storage/'.$sekolah->logo_sekolah) }}" class="kop-logo" alt="Logo Sekolah" onerror="this.onerror=null; this.src='{{ asset('img/logo.png') }}'">
+                    @else
+                        <img src="{{ asset('img/logo.png') }}" class="kop-logo" alt="Logo SMKN 1 Air Naningan" onerror="this.onerror=null; this.src='{{ asset('logo.png') }}'">
+                    @endif
                 </td>
             </tr>
         </table>
