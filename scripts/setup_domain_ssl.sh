@@ -82,8 +82,8 @@ cat > "${NGINX_CONF}" << EOF
 server {
     listen 80;
     listen [::]:80;
-    listen 443 ssl;
-    listen [::]:443 ssl;
+    listen 443 ssl http2;
+    listen [::]:443 ssl http2;
     server_name ${DOMAIN} ${DOMAIN_WWW} _;
     root ${APP_DIR}/public;
 
@@ -100,6 +100,14 @@ server {
     charset utf-8;
 
     client_max_body_size 50M;
+
+    # Akselerasi Kompresi Gzip (Pangkas Ukuran Transfer hingga 80%)
+    gzip on;
+    gzip_vary on;
+    gzip_proxied any;
+    gzip_comp_level 6;
+    gzip_min_length 256;
+    gzip_types text/plain text/css text/xml application/json application/javascript application/rss+xml application/atom+xml image/svg+xml font/woff2;
 
     # Akselerasi File Statis
     location ~* \.(css|js|jpg|jpeg|png|gif|ico|svg|woff|woff2|ttf|eot)$ {
