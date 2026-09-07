@@ -105,9 +105,9 @@
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 18px;">
                     <div>
                         <label style="display: block; font-size: 0.85rem; font-weight: 700; color: var(--text-dark); margin-bottom: 8px;">
-                            NISN (10 Digit Angka) <span style="color: #ef4444;">*</span>
+                            NISN (Nomor Induk Siswa Nasional) <span style="color: #ef4444;">*</span>
                         </label>
-                        <input type="text" name="nisn" maxlength="10" value="{{ old('nisn') }}" required placeholder="Contoh: 0071234567" style="width: 100%; padding: 11px 14px; font-size: 0.9rem;">
+                        <input type="text" name="nisn" maxlength="30" value="{{ old('nisn') }}" required placeholder="Masukkan NISN Anda..." style="width: 100%; padding: 11px 14px; font-size: 0.9rem;">
                     </div>
 
                     <div>

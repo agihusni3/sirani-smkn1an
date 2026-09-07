@@ -10,7 +10,7 @@
         <span class="section-tag">Layanan Mandiri Calon Siswa</span>
         <h1 class="section-title-large">Status Pendaftaran &amp; Hasil Seleksi</h1>
         <p style="color: var(--text-body); font-size: 1rem; margin-top: 8px;">
-            Masukkan Nomor Registrasi (contoh: <code>PPDB-2026-0001</code>) atau 10 digit NISN Anda untuk melihat status seleksi, jadwal ujian, dan pengumuman kelulusan.
+            Masukkan Nomor Registrasi (contoh: <code>PPDB-2026-0001</code>) atau NISN Anda untuk melihat status seleksi, jadwal ujian, dan pengumuman kelulusan.
         </p>
     </div>
 
@@ -209,7 +209,7 @@
             <div class="bento-card" style="text-align: center; padding: 48px 20px;">
                 <h3 style="font-size: 1.15rem; font-weight: 800; color: #0f172a; margin-bottom: 6px;">Data Pendaftaran Tidak Ditemukan</h3>
                 <p style="color: #64748b; font-size: 0.88rem; max-width: 420px; margin: 0 auto; line-height: 1.5;">
-                    Pastikan Anda memasukkan Nomor Registrasi resmi (contoh: <code>PPDB-2026-0001</code>) atau 10 digit NISN yang tepat saat mendaftar online.
+                    Pastikan Anda memasukkan Nomor Registrasi resmi (contoh: <code>PPDB-2026-0001</code>) atau NISN yang tepat saat mendaftar online.
                 </p>
             </div>
         @endif

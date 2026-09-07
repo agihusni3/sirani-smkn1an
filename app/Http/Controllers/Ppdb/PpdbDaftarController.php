@@ -42,7 +42,7 @@ class PpdbDaftarController extends Controller
     public function simpan(Request $request)
     {
         $validated = $request->validate([
-            'nisn' => 'required|string|size:10|unique:ppdb_pendaftars,nisn',
+            'nisn' => 'required|string|max:30|unique:ppdb_pendaftars,nisn',
             'nik' => 'nullable|string|max:20',
             'nama_lengkap' => 'required|string|max:150',
             'jenis_kelamin' => 'required|in:L,P',
@@ -75,8 +75,7 @@ class PpdbDaftarController extends Controller
             'scan_kip' => 'nullable|file|mimes:jpeg,png,jpg,pdf|max:3072',
             'scan_sktm' => 'nullable|file|mimes:jpeg,png,jpg,pdf|max:3072',
         ], [
-            'nisn.required' => 'NISN wajib diisi (10 digit).',
-            'nisn.size' => 'NISN harus tepat 10 digit angka.',
+            'nisn.required' => 'NISN wajib diisi.',
             'nisn.unique' => 'NISN ini sudah terdaftar dalam sistem PPDB. Silakan cek status pendaftaran Anda.',
             'nama_lengkap.required' => 'Nama lengkap calon siswa wajib diisi.',
             'nama_ibu.required' => 'Nama lengkap Ibu kandung wajib diisi.',

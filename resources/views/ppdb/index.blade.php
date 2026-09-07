@@ -99,7 +99,7 @@
                 <ul style="color: var(--text-body); font-size: 0.9rem; line-height: 1.8; list-style: none; display: flex; flex-direction: column; gap: 12px;">
                     <li style="display: flex; align-items: flex-start; gap: 12px;">
                         <i class="fa-solid fa-circle-check" style="color: var(--brand-emerald); margin-top: 5px; font-size: 0.95rem;"></i>
-                        <span>Nomor Induk Siswa Nasional (NISN) aktif 10 digit.</span>
+                        <span>Nomor Induk Siswa Nasional (NISN) aktif.</span>
                     </li>
                     <li style="display: flex; align-items: flex-start; gap: 12px;">
                         <i class="fa-solid fa-circle-check" style="color: var(--brand-emerald); margin-top: 5px; font-size: 0.95rem;"></i>

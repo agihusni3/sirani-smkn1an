@@ -149,9 +149,9 @@
           <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap:12px;">
             <div class="form-group" style="margin-bottom:0;">
               <label style="margin-bottom:4px; font-weight:700; font-size:11.5px; text-transform:uppercase; letter-spacing:0.3px; color:var(--text-2);">
-                NISN (10 Digit) <span style="color:var(--red);">*</span>
+                NISN <span style="color:var(--red);">*</span>
               </label>
-              <input type="text" name="nisn" maxlength="10" required placeholder="Contoh: 0071234567" style="width:100%; height:38px;" />
+              <input type="text" name="nisn" maxlength="30" required placeholder="Contoh: 0071234567" style="width:100%; height:38px;" />
             </div>
 
             <div class="form-group" style="margin-bottom:0;">
@@ -671,7 +671,7 @@
           <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap:10px;">
             <div>
               <label class="form-label" style="font-weight:700; font-size:11.5px; display:block; margin-bottom:4px;">NISN <span style="color:var(--red);">*</span></label>
-              <input type="text" id="edit_nisn" name="nisn" maxlength="10" required class="input-field" style="width:100%; height:38px;" />
+              <input type="text" id="edit_nisn" name="nisn" maxlength="30" required class="input-field" style="width:100%; height:38px;" />
             </div>
             <div>
               <label class="form-label" style="font-weight:700; font-size:11.5px; display:block; margin-bottom:4px;">NIK (KTP/KK)</label>
