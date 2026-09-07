@@ -336,11 +336,6 @@
         <span class="portal-footer-dot">&middot;</span>
         <span>Pusat Kontrol Data Ekosistem Terpadu</span>
       </div>
-      <div class="portal-footer-links">
-        <a href="/audit">Audit Trail Log</a>
-        <a href="/backup">Cadangan Database</a>
-        <a href="/pengaturan-sekolah">Profil Lembaga</a>
-      </div>
     </footer>
 
   </main>
