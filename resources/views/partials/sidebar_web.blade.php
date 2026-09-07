@@ -47,7 +47,7 @@
 
   {{-- Tombol Navigasi Kembali ke DCC SMKN 1 AN --}}
   <div style="margin-bottom:16px;">
-    <a href="{{ route('admin.portal') }}" class="btn" style="width:100%; display:flex; align-items:center; justify-content:center; gap:8px; padding:8px 12px; font-size:11.5px; font-weight:800; background:linear-gradient(135deg, #3368a0 0%, #1e293b 100%); color:#ffffff; border:1px solid #66a3bf; border-radius:var(--r-sm); text-decoration:none; box-shadow:0 3px 10px rgba(51,104,160,0.15); box-sizing:border-box;" title="Buka Digital Command Center SMKN 1 AN">
+    <a href="{{ route('admin.portal') }}" class="btn" style="width:100%; display:flex; align-items:center; justify-content:center; gap:8px; padding:8px 12px; font-size:11.5px; font-weight:800; background:linear-gradient(135deg, #3368a0 0%, #1e293b 100%); color:#ffffff; border:1px solid #66a3bf; border-radius:var(--r-sm); text-decoration:none; box-shadow:0 3px 10px rgba(51,104,160,0.15); box-sizing:border-box;" title="Buka Data Control Center (DCC) SMKN 1 AN">
       <i class="bi bi-command" style="color:#c8dfdb; font-size:13.5px;"></i>
       <span>DCC SMKN 1 AN</span>
     </a>

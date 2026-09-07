@@ -107,7 +107,7 @@ use App\Http\Controllers\AdminPortalController;
 
 // Rute Internal Terproteksi Dasbor Utama & Master Data (Hanya Staf/Admin Terautentikasi)
 Route::middleware('auth')->group(function () {
-    // 00. DCC - Digital Command Center (Pusat Kendali & Launchpad Terpadu Seluruh Pengguna Sekolah)
+    // 00. DCC - Data Control Center (Pusat Kontrol Data & Launchpad Terpadu Seluruh Pengguna Sekolah)
     Route::get('/portal', [AdminPortalController::class, 'index'])->name('admin.portal');
     Route::get('/hub', [AdminPortalController::class, 'index']);
     Route::get('/admin/portal', [AdminPortalController::class, 'index']);

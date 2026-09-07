@@ -70,7 +70,7 @@
       </div>
 
       <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-        <a href="{{ route('admin.portal') }}" class="btn btn-sm" style="background:rgba(255,255,255,0.18); color:#ffffff; font-weight:800; border-radius:8px; font-size:12px; padding:8px 14px; border:1px solid #c8dfdb; text-decoration:none; display:inline-flex; align-items:center; gap:6px;" title="Buka Digital Command Center SMKN 1 AN">
+        <a href="{{ route('admin.portal') }}" class="btn btn-sm" style="background:rgba(255,255,255,0.18); color:#ffffff; font-weight:800; border-radius:8px; font-size:12px; padding:8px 14px; border:1px solid #c8dfdb; text-decoration:none; display:inline-flex; align-items:center; gap:6px;" title="Buka Data Control Center (DCC) SMKN 1 AN">
           <i class="bi bi-command" style="color:#c8dfdb;"></i> DCC SMKN 1 AN
         </a>
         <a href="{{ route('admin.berita.create') }}" class="btn btn-sm" style="background:#f2efe7; color:#3368a0; font-weight:900; border-radius:8px; font-size:12px; padding:8px 16px; border:none; text-decoration:none; display:inline-flex; align-items:center; gap:6px; box-shadow:0 2px 8px rgba(0,0,0,0.12);">

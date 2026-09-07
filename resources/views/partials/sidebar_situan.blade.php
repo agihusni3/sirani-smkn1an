@@ -34,11 +34,11 @@
     </button>
   </div>
 
-  {{-- 2. Shortcut DCC Command Center --}}
-  <a href="{{ route('admin.portal') }}" class="situan-dcc-pill">
+  {{-- 2. Shortcut DCC (Data Control Center) --}}
+  <a href="{{ route('admin.portal') }}" class="situan-dcc-pill" title="Data Control Center (Pusat Kontrol Data)">
     <div style="display:flex; align-items:center; gap:8px;">
       <i class="bi bi-command"></i>
-      <span>Pusat Kendali DCC</span>
+      <span>Pusat Kontrol Data</span>
     </div>
     <i class="bi bi-chevron-right" style="font-size:10px; opacity:0.6;"></i>
   </a>

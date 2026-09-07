@@ -132,7 +132,7 @@
       <i class="bi bi-command"></i> Kembali ke DCC SMKN 1 AN
     </a>
     <div class="footer-note">
-      Digital Command Center · SMKN 1 Air Naningan
+      Data Control Center (Pusat Kontrol Data) · SMKN 1 Air Naningan
     </div>
   </div>
 </body>

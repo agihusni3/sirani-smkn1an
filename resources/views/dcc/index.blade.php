@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Digital Command Center — SMKN 1 AN</title>
+  <title>Data Control Center — SMKN 1 AN</title>
   @include('partials.styles')
   <link rel="stylesheet" href="{{ asset('css/admin-portal.css') }}?v={{ filemtime(public_path('css/admin-portal.css')) }}">
 </head>
@@ -21,7 +21,7 @@
         <div class="portal-brand-title">
           <span>DCC SMKN 1 AN</span>
         </div>
-        <div class="portal-brand-subtitle">Digital Command Center · SMKN 1 Air Naningan</div>
+        <div class="portal-brand-subtitle">Data Control Center (Pusat Kontrol Data) · SMKN 1 Air Naningan</div>
       </div>
     </a>
 
@@ -49,7 +49,7 @@
         </h1>
         
         <p class="cockpit-desc">
-          Pusat kendali ekosistem digital terpadu SMKN 1 Air Naningan. Akses data pokok kelembagaan, presensi gerbang, seleksi PPDB, dan publikasi institusi dalam satu sistem terintegrasi.
+          Pusat kontrol dan kendali data ekosistem digital SMKN 1 Air Naningan. Akses data pokok kelembagaan, presensi gerbang, seleksi PPDB, dan publikasi institusi dalam satu sistem terpadu.
         </p>
       </div>
 
@@ -61,7 +61,7 @@
             <span>STATUS SERVER NORMAL</span>
           </div>
           <div id="portalLiveClock" class="cockpit-live-clock">--:--:-- WIB</div>
-          <div class="cockpit-status-sub">Digital Command Center · Online</div>
+          <div class="cockpit-status-sub">Data Control Center · Online</div>
         </div>
       </div>
     </div>

@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="csrf-token" content="{{ csrf_token() }}" />
-  <title>Login DCC — Digital Command Center (SMKN 1 Air Naningan)</title>
+  <title>Login DCC — Data Control Center (SMKN 1 Air Naningan)</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
@@ -33,7 +33,7 @@
         <img src="/img/logo.png" alt="Logo SMKN 1 Air Naningan" style="width:100%; height:100%; object-fit:contain;" />
       </div>
       <h1 style="font-size:24px; font-weight:900; letter-spacing:-0.03em; color:var(--text); margin-bottom:4px;">DCC SMKN 1 AN</h1>
-      <p style="font-size:12px; font-weight:600; color:var(--text-3); line-height:1.4;">Pusat Komando &amp; Akses Layanan Terpadu Ekosistem Digital SMKN 1 Air Naningan</p>
+      <p style="font-size:12px; font-weight:600; color:var(--text-3); line-height:1.4;">Data Control Center (Pusat Kontrol Data) · Akses Layanan Terpadu SMKN 1 Air Naningan</p>
     </div>
 
     <!-- ALERTS -->

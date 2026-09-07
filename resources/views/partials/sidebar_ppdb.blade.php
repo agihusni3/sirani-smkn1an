@@ -161,7 +161,7 @@
 
   {{-- 2. QUICK SWITCHER KE DCC --}}
   <div style="margin-bottom:14px;">
-    <a href="{{ route('admin.portal') }}" class="btn" style="width:100%; display:flex; align-items:center; justify-content:center; gap:8px; padding:8px 12px; font-size:11.5px; font-weight:800; background:#0f172a; color:#ffffff; border:1px solid #1e293b; border-radius:8px; text-decoration:none; box-shadow:0 2px 6px rgba(15,23,42,0.1); box-sizing:border-box;" title="Buka Digital Command Center SMKN 1 AN">
+    <a href="{{ route('admin.portal') }}" class="btn" style="width:100%; display:flex; align-items:center; justify-content:center; gap:8px; padding:8px 12px; font-size:11.5px; font-weight:800; background:#0f172a; color:#ffffff; border:1px solid #1e293b; border-radius:8px; text-decoration:none; box-shadow:0 2px 6px rgba(15,23,42,0.1); box-sizing:border-box;" title="Buka Data Control Center (DCC) SMKN 1 AN">
       <i class="bi bi-command" style="color:#38bdf8; font-size:13px;"></i>
       <span>DCC SMKN 1 AN</span>
     </a>

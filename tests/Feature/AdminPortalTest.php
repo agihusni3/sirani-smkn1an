@@ -102,7 +102,7 @@ class AdminPortalTest extends TestCase
 
         $response->assertStatus(200);
         $response->assertSee('DCC SMKN 1 AN');
-        $response->assertSee('Digital Command Center');
+        $response->assertSee('Data Control Center');
         $response->assertSee('Selamat Bertugas, Super Administrator');
 
         // 4 Modul Aktif

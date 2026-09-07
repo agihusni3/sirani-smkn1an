@@ -281,7 +281,7 @@
                                 <span>DCC Portal</span>
                             </a>
                         @else
-                            <a href="{{ route('login') }}" class="btn-nav-login" title="Login ke Digital Command Center (DCC)">
+                            <a href="{{ route('login') }}" class="btn-nav-login" title="Login ke Data Control Center (DCC)">
                                 <i class="fa-solid fa-right-to-bracket" style="color: #38bdf8;"></i>
                                 <span>Login DCC</span>
                             </a>
