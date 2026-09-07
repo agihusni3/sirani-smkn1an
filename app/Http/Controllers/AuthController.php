@@ -16,7 +16,7 @@ class AuthController extends Controller
     public function showLogin()
     {
         if (Auth::check()) {
-            return redirect('/portal');
+            return redirect('/dcc');
         }
         return view('auth.login');
     }
@@ -89,7 +89,7 @@ class AuthController extends Controller
                 AuditLog::catat('login', 'auth', "Login berhasil: {$nama} ({$userIdentifier})", null, ['role' => $user->role ?? 'wali_kelas']);
 
                 // Seluruh pengguna diarahkan ke DCC (Digital Command Center) sebagai pintu gerbang utama ekosistem
-                return redirect('/portal')
+                return redirect('/dcc')
                     ->with('success', 'Selamat datang di DCC SMKN 1 Air Naningan, ' . $nama . '!');
             }
         }

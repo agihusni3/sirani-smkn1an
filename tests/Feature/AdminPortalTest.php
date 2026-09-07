@@ -16,8 +16,10 @@ class AdminPortalTest extends TestCase
 
     public function test_tamu_tidak_bisa_akses_portal_dialihkan_ke_login(): void
     {
-        $response = $this->get('/portal');
+        $response = $this->get('/dcc');
         $response->assertRedirect('/login');
+
+        $this->get('/portal')->assertRedirect('/login');
     }
 
     public function test_guru_biasa_bisa_mengakses_dcc_portal_dan_melihat_status_izin_modul(): void
@@ -29,7 +31,7 @@ class AdminPortalTest extends TestCase
             'password' => Hash::make('password'),
         ]);
 
-        $response = $this->actingAs($guru)->get('/portal');
+        $response = $this->actingAs($guru)->get('/dcc');
         $response->assertStatus(200);
         $response->assertSee('DCC SMKN 1 AN');
         $response->assertSee('Buka Modul SIRANI');
@@ -99,7 +101,7 @@ class AdminPortalTest extends TestCase
             'status' => 'menunggu',
         ]);
 
-        $response = $this->actingAs($admin)->get('/portal');
+        $response = $this->actingAs($admin)->get('/dcc');
 
         $response->assertStatus(200);
         $response->assertSee('DCC SMKN 1 AN');
@@ -131,7 +133,7 @@ class AdminPortalTest extends TestCase
             'password' => Hash::make('password'),
         ]);
 
-        $response = $this->actingAs($tu)->get('/portal');
+        $response = $this->actingAs($tu)->get('/dcc');
         $response->assertStatus(200);
         $response->assertSee('SITUAN');
         $response->assertSee('Buka Modul SITUAN');
@@ -242,7 +244,7 @@ class AdminPortalTest extends TestCase
             'password' => Hash::make('password'),
         ]);
 
-        $response = $this->actingAs($kepsek)->get('/portal');
+        $response = $this->actingAs($kepsek)->get('/dcc');
         $response->assertStatus(200);
         $response->assertSee('Selamat Bertugas, Bapak Kepala Sekolah');
     }
@@ -256,8 +258,10 @@ class AdminPortalTest extends TestCase
             'password' => Hash::make('password'),
         ]);
 
-        $this->actingAs($admin)->get('/admin/portal')->assertStatus(200);
-        $this->actingAs($admin)->get('/hub')->assertStatus(200);
+        $this->actingAs($admin)->get('/DCC')->assertStatus(200);
+        $this->actingAs($admin)->get('/portal')->assertRedirect('/dcc');
+        $this->actingAs($admin)->get('/admin/portal')->assertRedirect('/dcc');
+        $this->actingAs($admin)->get('/hub')->assertRedirect('/dcc');
     }
 
     public function test_sidebar_dan_header_actions_menyediakan_shortcut_pusat_kendali_untuk_admin(): void
@@ -381,7 +385,7 @@ class AdminPortalTest extends TestCase
             'password' => Hash::make('password'),
         ]);
 
-        $response = $this->actingAs($admin)->get('/portal');
+        $response = $this->actingAs($admin)->get('/dcc');
         $response->assertStatus(200);
         $response->assertSee('admin-portal.css');
 

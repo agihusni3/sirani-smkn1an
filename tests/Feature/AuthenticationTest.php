@@ -32,7 +32,7 @@ class AuthenticationTest extends TestCase
         ]);
 
         $this->assertAuthenticatedAs($admin);
-        $responseAdmin->assertRedirect('/portal');
+        $responseAdmin->assertRedirect('/dcc');
 
         $this->post('/logout');
 
@@ -49,7 +49,7 @@ class AuthenticationTest extends TestCase
         ]);
 
         $this->assertAuthenticatedAs($guru);
-        $responseGuru->assertRedirect('/portal');
+        $responseGuru->assertRedirect('/dcc');
     }
 
     public function test_login_gagal_menampilkan_pesan_error(): void

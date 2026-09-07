@@ -108,10 +108,18 @@ use App\Http\Controllers\AdminPortalController;
 
 // Rute Internal Terproteksi Dasbor Utama & Master Data (Hanya Staf/Admin Terautentikasi)
 Route::middleware('auth')->group(function () {
-    // 00. DCC - Data Control Center (Pusat Kontrol Data & Launchpad Terpadu Seluruh Pengguna Sekolah)
-    Route::get('/portal', [AdminPortalController::class, 'index'])->name('admin.portal');
-    Route::get('/hub', [AdminPortalController::class, 'index']);
-    Route::get('/admin/portal', [AdminPortalController::class, 'index']);
+    // 00. DCC - Digital Command Center (Pusat Kontrol Data & Launchpad Terpadu Seluruh Pengguna Sekolah)
+    Route::get('/dcc', [AdminPortalController::class, 'index'])->name('admin.portal');
+    Route::get('/DCC', [AdminPortalController::class, 'index']);
+    Route::get('/portal', function () {
+        return redirect()->route('admin.portal');
+    });
+    Route::get('/hub', function () {
+        return redirect()->route('admin.portal');
+    });
+    Route::get('/admin/portal', function () {
+        return redirect()->route('admin.portal');
+    });
 
     // 0a. Smart Gate Kiosk RFID & Barcode (Hanya Admin & Guru Piket)
     Route::middleware('role:admin,guru_piket')->group(function () {
