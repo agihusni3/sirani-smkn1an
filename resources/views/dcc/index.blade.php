@@ -106,7 +106,8 @@
         <div class="module-actions">
           @if($canAccessSituan)
             <a href="{{ route('situan.index') }}" class="btn-launch-primary">
-              Buka Modul SITUAN
+              <span>Buka Modul SITUAN</span>
+              <i class="bi bi-arrow-right-short" style="font-size: 16px;"></i>
             </a>
             <div class="btn-launch-secondary-row">
               <a href="/guru" class="btn-launch-secondary" title="Kelola Master Guru &amp; Pegawai">
@@ -117,12 +118,12 @@
               </a>
             </div>
           @else
-            <button type="button" class="btn-launch-primary btn-locked" disabled title="Akses ditolak: Hanya untuk Staf Tata Usaha, Pimpinan, dan Wali Kelas">
-              Akses Terbatas (Khusus Staf TU/Pimpinan)
-            </button>
-            <div class="btn-launch-secondary-row">
-              <span class="btn-launch-secondary btn-locked">Data PTK Terkunci</span>
-              <span class="btn-launch-secondary btn-locked">Data Siswa Terkunci</span>
+            <div class="btn-module-locked">
+              <i class="bi bi-lock-fill"></i>
+              <span>Akses Terbatas Modul TU</span>
+            </div>
+            <div class="locked-info-note">
+              <i class="bi bi-shield-lock"></i> Khusus Staf Tata Usaha &amp; Pimpinan
             </div>
           @endif
         </div>
@@ -159,7 +160,8 @@
         <div class="module-actions">
           @if($canAccessSirani)
             <a href="/dashboard" class="btn-launch-primary">
-              Buka Modul SIRANI
+              <span>Buka Modul SIRANI</span>
+              <i class="bi bi-arrow-right-short" style="font-size: 16px;"></i>
             </a>
             <div class="btn-launch-secondary-row">
               <a href="/smart-gate" target="_blank" class="btn-launch-secondary">
@@ -170,12 +172,12 @@
               </a>
             </div>
           @else
-            <button type="button" class="btn-launch-primary btn-locked" disabled title="Akses ditolak: Anda tidak memiliki wewenang untuk membuka Modul SIRANI">
-              Akses Terbatas (Khusus Pendidik/Staf)
-            </button>
-            <div class="btn-launch-secondary-row">
-              <span class="btn-launch-secondary btn-locked">Smart Gate Terkunci</span>
-              <span class="btn-launch-secondary btn-locked">Laporan Terkunci</span>
+            <div class="btn-module-locked">
+              <i class="bi bi-lock-fill"></i>
+              <span>Akses Terbatas Modul Presensi</span>
+            </div>
+            <div class="locked-info-note">
+              <i class="bi bi-shield-lock"></i> Khusus Pendidik &amp; Staf
             </div>
           @endif
         </div>
@@ -210,7 +212,8 @@
         <div class="module-actions">
           @if($canAccessPpdb)
             <a href="/admin/ppdb" class="btn-launch-primary">
-              Kelola PPDB 2026
+              <span>Kelola PPDB 2026</span>
+              <i class="bi bi-arrow-right-short" style="font-size: 16px;"></i>
             </a>
             <div class="btn-launch-secondary-row">
               <a href="/admin/ppdb?status=menunggu" class="btn-launch-secondary">
@@ -221,15 +224,13 @@
               </a>
             </div>
           @else
-            <button type="button" class="btn-launch-primary btn-locked" disabled title="Akses ditolak: Hanya untuk Panitia PPDB, Waka Kesiswaan, & Pimpinan">
-              Akses Terbatas (Khusus Panitia PPDB)
-            </button>
-            <div class="btn-launch-secondary-row">
-              <span class="btn-launch-secondary btn-locked">Verifikasi Terkunci</span>
-              <a href="/ppdb" target="_blank" class="btn-launch-secondary">
-                Form Publik
-              </a>
+            <div class="btn-module-locked">
+              <i class="bi bi-lock-fill"></i>
+              <span>Akses Khusus Panitia PPDB</span>
             </div>
+            <a href="/ppdb" target="_blank" class="btn-launch-public">
+              <i class="bi bi-box-arrow-up-right"></i> Form Pendaftaran Publik
+            </a>
           @endif
         </div>
       </div>
@@ -263,7 +264,8 @@
         <div class="module-actions">
           @if($canAccessWeb)
             <a href="/admin/berita" class="btn-launch-primary">
-              Kelola Berita &amp; Rilis
+              <span>Kelola Berita &amp; Rilis</span>
+              <i class="bi bi-arrow-right-short" style="font-size: 16px;"></i>
             </a>
             <div class="btn-launch-secondary-row">
               <a href="/admin/banner" class="btn-launch-secondary">
@@ -280,15 +282,13 @@
               @endif
             </div>
           @else
-            <button type="button" class="btn-launch-primary btn-locked" disabled title="Akses ditolak: Hanya untuk Tim Humas, Webmaster, & Pimpinan">
-              Akses Terbatas (Khusus Tim Humas)
-            </button>
-            <div class="btn-launch-secondary-row">
-              <span class="btn-launch-secondary btn-locked">Banner Terkunci</span>
-              <a href="/" target="_blank" class="btn-launch-secondary">
-                Lihat Website
-              </a>
+            <div class="btn-module-locked">
+              <i class="bi bi-lock-fill"></i>
+              <span>Akses Khusus Tim Humas</span>
             </div>
+            <a href="/" target="_blank" class="btn-launch-public">
+              <i class="bi bi-globe"></i> Kunjungi Website Utama
+            </a>
           @endif
         </div>
       </div>

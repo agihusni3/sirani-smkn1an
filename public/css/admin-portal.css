@@ -353,16 +353,24 @@ body {
 }
 
 .module-card.is-locked {
-  opacity: 0.75;
   background: #f8fafc;
-  border-style: dashed;
+  border-color: #e2e8f0;
+}
+
+[data-theme="dark"] .module-card.is-locked {
+  background: rgba(255, 255, 255, 0.02);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.module-card.is-locked .module-card-icon-halo {
+  opacity: 0.7;
 }
 
 .btn-launch-primary.btn-locked {
-  background: #e2e8f0 !important;
+  background: #f1f5f9 !important;
   color: #64748b !important;
   cursor: not-allowed !important;
-  border: 1px dashed #cbd5e1 !important;
+  border: 1px solid #e2e8f0 !important;
   box-shadow: none !important;
   transform: none !important;
 }
@@ -460,77 +468,77 @@ body {
   border-color: var(--dcc-color-primary);
 }
 .card-situan .btn-launch-primary {
-  background: var(--dcc-color-primary);
-  border: 1px solid #285483;
+  background: #2563eb;
+  border: 1px solid #1d4ed8;
   color: #ffffff !important;
 }
 .card-situan .btn-launch-primary:hover {
-  background: #295687;
-  border-color: #1f4268;
+  background: #1d4ed8;
+  border-color: #1e40af;
 }
 
-/* 2. SIRANI — Theme: Slate Blue (#66a3bf) */
+/* 2. SIRANI — Theme: Slate/Sky Blue */
 .card-sirani .module-card-icon-halo {
-  background: rgba(102, 163, 191, 0.15);
-  border: 1px solid var(--dcc-color-secondary);
-  color: var(--dcc-color-secondary);
+  background: rgba(2, 132, 199, 0.12);
+  border: 1px solid rgba(2, 132, 199, 0.3);
+  color: #0284c7;
 }
 .card-sirani:hover {
-  border-color: var(--dcc-color-secondary);
+  border-color: #0284c7;
 }
 .card-sirani .btn-launch-primary {
-  background: var(--dcc-color-secondary);
-  border: 1px solid #528ea9;
+  background: #0284c7;
+  border: 1px solid #0369a1;
   color: #ffffff !important;
 }
 .card-sirani .btn-launch-primary:hover {
-  background: #5793ae;
-  border-color: #447c96;
+  background: #0369a1;
+  border-color: #075985;
 }
 
-/* 3. PPDB ONLINE 2026 — Theme: Seafoam (#c8dfdb) */
+/* 3. PPDB ONLINE 2026 — Theme: Emerald */
 .card-ppdb .module-card-icon-halo {
-  background: rgba(200, 223, 219, 0.35);
-  border: 1px solid #a6cfc8;
-  color: #245049;
+  background: rgba(5, 150, 105, 0.12);
+  border: 1px solid rgba(5, 150, 105, 0.3);
+  color: #059669;
 }
 .card-ppdb:hover {
-  border-color: var(--dcc-color-secondary);
+  border-color: #059669;
 }
 .card-ppdb .btn-launch-primary {
-  background: var(--dcc-color-ice);
-  border: 1px solid #a6cfc8;
-  color: #000000 !important;
+  background: #059669;
+  border: 1px solid #047857;
+  color: #ffffff !important;
 }
 .card-ppdb .btn-launch-primary:hover {
-  background: #b8d7d2;
-  border-color: #97c2bb;
+  background: #047857;
+  border-color: #065f46;
 }
 
-/* 4. WEB PROFIL & HUMAS — Theme: Warm Sand (#f2efe7) */
+/* 4. WEB PROFIL & HUMAS — Theme: Slate */
 .card-web .module-card-icon-halo {
-  background: rgba(242, 239, 231, 0.75);
-  border: 1px solid var(--dcc-color-ice);
+  background: rgba(71, 85, 105, 0.12);
+  border: 1px solid rgba(71, 85, 105, 0.3);
   color: #334155;
 }
 .card-web:hover {
-  border-color: var(--dcc-color-primary);
+  border-color: #475569;
 }
 .card-web .btn-launch-primary {
-  background: var(--dcc-color-cream);
-  border: 1px solid #d5cebf;
-  color: #000000 !important;
+  background: #334155;
+  border: 1px solid #1e293b;
+  color: #ffffff !important;
 }
 .card-web .btn-launch-primary:hover {
-  background: #e7e3d8;
-  border-color: #97c2bb;
+  background: #1e293b;
+  border-color: #0f172a;
 }
 
 /* Actions Deck */
 .module-actions {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 7px;
   margin-top: auto;
 }
 
@@ -538,19 +546,22 @@ body {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  gap: 6px;
   width: 100%;
-  height: 35px;
+  height: 38px;
   border-radius: 8px;
-  font-size: 12px;
-  font-weight: 800;
+  font-size: 12.5px;
+  font-weight: 700;
   text-decoration: none;
   cursor: pointer;
   transition: all 0.15s ease;
   box-sizing: border-box;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
 }
 
 .btn-launch-primary:hover {
   transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
 }
 
 .btn-launch-secondary-row {
@@ -563,21 +574,121 @@ body {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  height: 28px;
+  gap: 5px;
+  height: 32px;
   border-radius: 6px;
-  font-size: 10.5px;
-  font-weight: 700;
+  font-size: 11px;
+  font-weight: 600;
   text-decoration: none;
   background: #ffffff;
-  border: 1px solid #e2e8f0;
-  color: #000000 !important;
+  border: 1px solid #cbd5e1;
+  color: #334155 !important;
   transition: all 0.15s ease;
   box-sizing: border-box;
 }
 
 .btn-launch-secondary:hover {
+  background: #f8fafc;
+  border-color: #94a3b8;
+  color: #0f172a !important;
+}
+
+[data-theme="dark"] .btn-launch-secondary {
+  background: rgba(255, 255, 255, 0.03);
+  border-color: rgba(255, 255, 255, 0.1);
+  color: #cbd5e1 !important;
+}
+
+[data-theme="dark"] .btn-launch-secondary:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff !important;
+}
+
+/* Clean Locked State Badge & Info */
+.btn-module-locked {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  height: 38px;
   background: #f1f5f9;
-  border-color: #cbd5e1;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  color: #475569;
+  font-size: 11.5px;
+  font-weight: 700;
+  box-sizing: border-box;
+  user-select: none;
+}
+
+.btn-module-locked i {
+  font-size: 12px;
+  color: #64748b;
+}
+
+[data-theme="dark"] .btn-module-locked {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.08);
+  color: #94a3b8;
+}
+
+.locked-info-note {
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  font-size: 10.5px;
+  font-weight: 600;
+  color: #64748b;
+  background: transparent;
+  user-select: none;
+}
+
+.locked-info-note i {
+  font-size: 11.5px;
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .locked-info-note {
+  color: #64748b;
+}
+
+.btn-launch-public {
+  width: 100%;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  text-decoration: none;
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  color: #1e293b !important;
+  transition: all 0.15s ease;
+  box-sizing: border-box;
+}
+
+.btn-launch-public:hover {
+  background: #f8fafc;
+  border-color: #94a3b8;
+  color: #0284c7 !important;
+}
+
+[data-theme="dark"] .btn-launch-public {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.1);
+  color: #cbd5e1 !important;
+}
+
+[data-theme="dark"] .btn-launch-public:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.2);
+  color: #ffffff !important;
 }
 
 /* ─── Future Roadmap Blueprint Cards ─── */
