@@ -7,9 +7,9 @@
 # Jalankan skrip ini CUKUP SEKALI di Ubuntu Server dengan:
 #   sudo bash scripts/setup_auto_sync.sh
 #
-# Setelah ini, Anda TIDAK PERLU lagi membuka terminal Ubuntu!
-# Setiap kali Anda mengetik 'push' di laptop, server Ubuntu akan otomatis
-# menarik pembaruan GitHub dalam waktu < 1 menit secara hening di latar belakang.
+# Setelah ini aktif:
+# Setiap kali ada perintah 'push' dari laptop ke GitHub, server Ubuntu otomatis
+# menarik pembaruan GitHub dalam waktu < 60 detik tanpa perlu login terminal.
 # ==============================================================================
 
 set -e
@@ -69,7 +69,7 @@ LOCAL=$(git rev-parse HEAD 2>/dev/null)
 REMOTE=$(git rev-parse origin/main 2>/dev/null)
 
 if [ -n "$LOCAL" ] && [ -n "$REMOTE" ] && [ "$LOCAL" != "$REMOTE" ]; then
-    echo "[$(date '+%Y-%m-%d %H:%M:%S')] Perubahan terdeteksi ($LOCAL -> $REMOTE). Menjalankan update otomatis..." >> /var/log/sirani-autoupdate.log
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] Perubahan baru terdeteksi ($LOCAL -> $REMOTE). Menjalankan update otomatis..." >> /var/log/sirani-autoupdate.log
     bash "$APP_DIR/scripts/update_ubuntu.sh" >> /var/log/sirani-autoupdate.log 2>&1
     echo "[$(date '+%Y-%m-%d %H:%M:%S')] Auto-update SIRANI sukses diselesaikan!" >> /var/log/sirani-autoupdate.log
 fi
@@ -89,6 +89,5 @@ echo -e "\n${YELLOW}Menjalankan sinkronisasi pertama kali...${NC}"
 echo -e "\n${GREEN}==============================================================${NC}"
 echo -e "${GREEN}✔ AUTO-SYNC BERHASIL DIAKTIFKAN SECARA PERMANEN!${NC}"
 echo -e "${BLUE}Server Ubuntu sekarang otomatis memantau GitHub setiap 60 detik.${NC}"
-echo -e "${YELLOW}Mulai sekarang Anda TIDAK PERLU membuka terminal Ubuntu lagi.${NC}"
-echo -e "Cukup ketik 'push' di laptop, server otomatis update sendiri!"
+echo -e "${YELLOW}Setiap kali push ke GitHub, server akan otomatis ter-update sendiri!${NC}"
 echo -e "${GREEN}==============================================================${NC}"
