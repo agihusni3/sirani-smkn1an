@@ -327,32 +327,21 @@
       @endforeach
     </div>
 
-    {{-- Section 3: System Status & Quick Links --}}
-    <div class="system-strip">
-      <div class="system-strip-left">
-        <div style="display:inline-flex; align-items:center; gap:7px; font-weight:800; color:#000000;">
-          <span class="pulse-dot" style="background:#10b981;"></span> Infrastruktur Stabil
-        </div>
-        <div style="opacity:0.4;">|</div>
-        <div>Core Engine: <strong>Laravel v{{ app()->version() }}</strong></div>
-        <div style="opacity:0.4;">|</div>
-        <div>Runtime: <strong>PHP v{{ PHP_VERSION }}</strong></div>
-        <div style="opacity:0.4;">|</div>
-        <div>Zona Waktu: <strong>Asia/Jakarta (WIB)</strong></div>
+    {{-- Clean Minimalist Institutional Footer --}}
+    <footer class="portal-footer">
+      <div class="portal-footer-text">
+        <span>&copy; {{ date('Y') }} SMKN 1 Air Naningan</span>
+        <span class="portal-footer-dot">&middot;</span>
+        <span>Data Control Center (DCC)</span>
+        <span class="portal-footer-dot">&middot;</span>
+        <span>Pusat Kontrol Data Ekosistem Terpadu</span>
       </div>
-
-      <div class="system-strip-links">
-        <a href="/audit" class="system-strip-link" title="Audit Trail Log Keamanan">
-          Audit Log
-        </a>
-        <a href="/backup" class="system-strip-link" title="Manajemen Backup Database">
-          Backup DB
-        </a>
-        <a href="/pengaturan-sekolah" class="system-strip-link" title="Profil Identitas Sekolah">
-          Profil SMKN 1
-        </a>
+      <div class="portal-footer-links">
+        <a href="/audit">Audit Trail Log</a>
+        <a href="/backup">Cadangan Database</a>
+        <a href="/pengaturan-sekolah">Profil Lembaga</a>
       </div>
-    </div>
+    </footer>
 
   </main>
 
