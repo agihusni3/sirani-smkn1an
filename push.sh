@@ -51,30 +51,19 @@ fi
 echo -e "\n${YELLOW}[3/4] Mendorong pembaruan ke GitHub (origin)...${NC}"
 
 if [ "$CURRENT_BRANCH" != "main" ]; then
-    # Push branch aktif terlebih dahulu
-    echo -e "Mendorong ke origin/${CURRENT_BRANCH}..."
-    git push origin "$CURRENT_BRANCH"
-
-    # Sinkronkan dan push ke branch main agar server produksi selalu dapat commit terbaru
-    echo -e "Menyelaraskan dengan branch main..."
-    git checkout main
-    git merge "$CURRENT_BRANCH" -m "merge: selaraskan $CURRENT_BRANCH ke main" 2>/dev/null || git merge "$CURRENT_BRANCH" --no-edit
-    git push origin main
-    
-    # Kembali ke branch awal
-    git checkout "$CURRENT_BRANCH"
+    # Selaraskan pointer branch main lokal
+    git branch -f main "$CURRENT_BRANCH" 2>/dev/null || true
+    echo -e "Mendorong serentak ke origin/${CURRENT_BRANCH} dan origin/main..."
+    git push origin "HEAD:${CURRENT_BRANCH}" "HEAD:main"
 else
-    # Jika saat ini di branch main
-    echo -e "Mendorong ke origin/main..."
-    git push origin main
-
-    # Selaraskan juga ke feature/website-smk jika ada
+    # Jika saat ini di branch main, selaraskan pointer feature/website-smk
     if git show-ref --verify --quiet refs/heads/feature/website-smk; then
-        echo -e "Menyelaraskan ke branch feature/website-smk..."
-        git checkout feature/website-smk
-        git merge main -m "merge: selaraskan main ke feature/website-smk" 2>/dev/null || git merge main --no-edit
-        git push origin feature/website-smk 2>/dev/null || true
-        git checkout main
+        git branch -f feature/website-smk main 2>/dev/null || true
+        echo -e "Mendorong serentak ke origin/main dan origin/feature/website-smk..."
+        git push origin "HEAD:main" "HEAD:feature/website-smk"
+    else
+        echo -e "Mendorong ke origin/main..."
+        git push origin main
     fi
 fi
 
