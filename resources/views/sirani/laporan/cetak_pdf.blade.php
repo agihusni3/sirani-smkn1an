@@ -387,24 +387,7 @@
     <div class="a4-sheet">
 
     {{-- KOP SURAT DINAS --}}
-    <div class="kop-container">
-      <div class="kop-logo-left">
-        <img src="{{ $sekolah->logo_provinsi_url }}" alt="Logo Provinsi Lampung" />
-      </div>
-      <div class="kop-text">
-        <div class="kop-instansi">{{ $sekolah->nama_instansi_atas ?? 'PEMERINTAH PROVINSI LAMPUNG' }}</div>
-        <div class="kop-dinas">{{ $sekolah->nama_dinas ?? 'DINAS PENDIDIKAN DAN KEBUDAYAAN' }}</div>
-        <div class="kop-sekolah">{{ $sekolah->nama_sekolah ?? 'SMK NEGERI 1 AIR NANINGAN' }}</div>
-        <div class="kop-alamat">
-          {{ $sekolah->alamat_lengkap ?? $sekolah->alamat ?? 'Jl. Makam Baturuguk, Pekon Karang Sari, Kec. Air Naningan, Kab. Tanggamus' }}<br />
-          Email: {{ $sekolah->email ?? 'smkn1airnaningan@gmail.com' }} · Website: {{ $sekolah->website ?? 'smkn1airnaningan.sch.id' }}
-        </div>
-      </div>
-      <div class="kop-logo-right">
-        <img src="{{ $sekolah->logo_sekolah_url }}" alt="Logo SMK" />
-      </div>
-    </div>
-    <div class="kop-border"></div>
+    @include('partials.kop_surat')
 
     {{-- JUDUL LAPORAN --}}
     <div class="judul-laporan">

@@ -447,30 +447,7 @@
     <div class="page-a4">
 
         {{-- 1. KOP SURAT RESMI PEMERINTAH PROVINSI LAMPUNG & SEKOLAH --}}
-        <table class="kop-table">
-            <tr>
-                <td class="kop-logo-col">
-                    <img src="{{ $sekolah->logo_provinsi_url }}" class="kop-logo" alt="Logo Pemerintah Provinsi Lampung">
-                </td>
-                <td class="kop-text-col">
-                    <div class="kop-text-1">{{ $sekolah->nama_instansi_atas ?? 'PEMERINTAH PROVINSI LAMPUNG' }}</div>
-                    <div class="kop-text-2">{{ $sekolah->nama_dinas ?? 'DINAS PENDIDIKAN DAN KEBUDAYAAN' }}</div>
-                    <div class="kop-nama-sekolah">{{ $sekolah->nama_sekolah ?? 'SMK NEGERI 1 AIR NANINGAN' }}</div>
-                    <div class="kop-alamat">
-                        {{ $sekolah->alamat ?? 'Jl. Makam Baturuguk, Pekon Karang Sari' }}, Kec. {{ $sekolah->kecamatan ?? 'Air Naningan' }}, {{ $sekolah->kabupaten ?? 'Kab. Tanggamus' }}, {{ $sekolah->provinsi ?? 'Lampung' }} {{ $sekolah->kode_pos ?? '35379' }}
-                    </div>
-                    <div class="kop-kontak">
-                        Laman: https://{{ $sekolah->website ?? 'smkn1airnaningan.sch.id' }} &bull; Pos-el: {{ $sekolah->email ?? 'info@smkn1airnaningan.sch.id' }} &bull; NPSN: {{ $sekolah->npsn ?? '70011825' }}
-                    </div>
-                </td>
-                <td class="kop-logo-col">
-                    <img src="{{ $sekolah->logo_sekolah_url }}" class="kop-logo" alt="Logo SMK">
-                </td>
-            </tr>
-        </table>
-
-        {{-- Garis Pemisah Ganda Kop Surat --}}
-        <div class="kop-double-line"></div>
+        @include('partials.kop_surat')
 
         {{-- 2. JUDUL DOKUMEN --}}
         <div class="judul-area">

@@ -584,29 +584,7 @@
   <div class="page-sheet" id="sheetSurat">
 
     {{-- KOP SURAT RESMI DINAS (KIRI: LOGO PROVINSI LAMPUNG, KANAN: LOGO SMK) --}}
-    <div class="kop-wrapper">
-      {{-- LOGO KIRI: PROVINSI LAMPUNG --}}
-      <div class="kop-logo-left">
-        <img src="{{ $sekolah->logo_provinsi_url }}" alt="Logo Provinsi Lampung" />
-      </div>
-
-      {{-- TEKS KOP DINAS --}}
-      <div class="kop-text">
-        <div class="kop-instansi">{{ $sekolah->nama_instansi_atas ?? 'PEMERINTAH PROVINSI LAMPUNG' }}</div>
-        <div class="kop-dinas">{{ $sekolah->nama_dinas ?? 'DINAS PENDIDIKAN DAN KEBUDAYAAN' }}</div>
-        <div class="kop-sekolah">{{ $sekolah->nama_sekolah ?? 'SMK NEGERI 1 AIR NANINGAN' }}</div>
-        <div class="kop-alamat">
-          {{ $sekolah->alamat_lengkap ?? $sekolah->alamat ?? 'Jl. Makam Baturuguk, Pekon Karang Sari, Kec. Air Naningan, Kab. Tanggamus' }}<br />
-          Email: {{ $sekolah->email ?? 'smkn1airnaningan@gmail.com' }} · Website: {{ $sekolah->website ?? 'smkn1airnaningan.sch.id' }}
-        </div>
-      </div>
-
-      {{-- LOGO KANAN: SMKN 1 AIR NANINGAN --}}
-      <div class="kop-logo-right">
-        <img src="{{ $sekolah->logo_sekolah_url }}" alt="Logo SMKN 1 Air Naningan" />
-      </div>
-    </div>
-    <div class="kop-border"></div>
+    @include('partials.kop_surat')
 
     @if($kategori === 'berita_acara')
       {{-- ======================================================
