@@ -116,23 +116,60 @@
               </td>
               <td class="px-3">
                 <div class="fw-semibold mb-1" style="color:var(--text);">{{ $item->perihal }}</div>
-                <div>
+                <div class="d-flex flex-wrap gap-1 align-items-center">
                   <span class="badge bg-info-subtle text-info border border-info-subtle px-2 py-0" style="font-size:10px;">
                     Kode: {{ $item->kode_klasifikasi }}
                   </span>
-                  @if($item->jenis_surat === 'suket_siswa')
-                    <span class="badge bg-success-subtle text-success border border-success-subtle ms-1 px-2 py-0" style="font-size:10px;">
+
+                  @if($item->sumber_modul === 'sirani_kesiswaan')
+                    <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle px-2 py-0" style="font-size:10px;">
+                      <i class="bi bi-shield-exclamation me-1"></i>SIRANI Kesiswaan
+                    </span>
+                  @elseif($item->sumber_modul === 'sirani_bk')
+                    <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-2 py-0" style="font-size:10px;">
+                      <i class="bi bi-chat-heart-fill me-1"></i>SIRANI BK
+                    </span>
+                  @elseif($item->sumber_modul === 'sirani_disiplin')
+                    <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-0" style="font-size:10px;">
+                      <i class="bi bi-journal-check me-1"></i>SIRANI Disiplin
+                    </span>
+                  @elseif($item->sumber_modul === 'situan_kepegawaian')
+                    <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle px-2 py-0" style="font-size:10px;">
+                      <i class="bi bi-briefcase-fill me-1"></i>SITUAN Kepegawaian
+                    </span>
+                  @elseif($item->sumber_modul === 'situan_pelayanan')
+                    <span class="badge bg-info-subtle text-info border border-info-subtle px-2 py-0" style="font-size:10px;">
+                      <i class="bi bi-qr-code me-1"></i>SITUAN Pelayanan
+                    </span>
+                  @endif
+
+                  @if($item->kategori_surat)
+                    <span class="badge bg-light text-dark border px-2 py-0" style="font-size:10px;">
+                      {{ $item->kategori_surat }}
+                    </span>
+                  @elseif($item->jenis_surat === 'suket_siswa')
+                    <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-0" style="font-size:10px;">
                       <i class="bi bi-person-check-fill me-1"></i>Suket Siswa
+                    </span>
+                  @elseif($item->jenis_surat === 'sk_kepsek')
+                    <span class="badge bg-purple-subtle text-purple border border-purple-subtle px-2 py-0" style="font-size:10px; background:rgba(147,51,234,0.1); color:#9333ea; border-color:rgba(147,51,234,0.3);">
+                      <i class="bi bi-file-earmark-ruled me-1"></i>SK Kepsek
                     </span>
                   @endif
                 </div>
               </td>
-              <td class="text-center px-3">
-                @if($item->file_arsip)
-                  <a href="{{ asset('storage/' . $item->file_arsip) }}" target="_blank" class="btn btn-sm btn-outline-primary" title="Buka Dokumen Hasil Scan/PDF">
-                    <i class="bi bi-file-earmark-pdf-fill"></i> Unduh
+              <td class="text-center px-3" style="white-space:nowrap;">
+                @if($item->link_cetak)
+                  <a href="{{ $item->link_cetak }}" target="_blank" class="btn btn-sm btn-outline-primary py-1 px-2" style="font-size:11.5px;" title="Buka Lembar Cetak Dokumen A4 Resmi">
+                    <i class="bi bi-printer-fill me-1"></i> Cetak
                   </a>
-                @else
+                @endif
+                @if($item->file_arsip)
+                  <a href="{{ asset('storage/' . $item->file_arsip) }}" target="_blank" class="btn btn-sm btn-outline-secondary py-1 px-2" style="font-size:11.5px;" title="Buka Dokumen Hasil Scan/PDF">
+                    <i class="bi bi-file-earmark-pdf-fill me-1"></i> Arsip
+                  </a>
+                @endif
+                @if(!$item->link_cetak && !$item->file_arsip)
                   <span class="text-muted small" style="font-size:11px;">-</span>
                 @endif
               </td>

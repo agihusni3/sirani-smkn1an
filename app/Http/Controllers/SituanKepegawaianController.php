@@ -110,10 +110,15 @@ class SituanKepegawaianController extends Controller
         $guru = Guru::findOrFail($id);
         $sekolah = PengaturanSekolah::getAktif();
 
-        // Ambil nomor surat keluar resmi
-        $generator = SuratKeluar::generateNomorSurat('821.2');
+        // Ambil dan sinkronisasi ke buku agenda surat keluar resmi SITUAN
+        $suratKeluar = SuratKeluar::syncPengantarKgb($guru, now());
+        $generator = [
+            'nomor_agenda'        => $suratKeluar->nomor_agenda,
+            'tahun_agenda'        => $suratKeluar->tahun_agenda,
+            'nomor_surat_lengkap' => $suratKeluar->nomor_surat_lengkap,
+        ];
 
-        return view('situan.kepegawaian.cetak_pengantar_kgb', compact('guru', 'sekolah', 'generator'));
+        return view('situan.kepegawaian.cetak_pengantar_kgb', compact('guru', 'sekolah', 'generator', 'suratKeluar'));
     }
 
     /**

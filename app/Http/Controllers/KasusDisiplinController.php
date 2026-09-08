@@ -700,6 +700,11 @@ class KasusDisiplinController extends Controller
         $totalBolos = Absensi::where('pemilik_type', 'siswa')->where('pemilik_id', $siswa->id)->where('status', 'bolos')->count();
         $totalTerlambat = Absensi::where('pemilik_type', 'siswa')->where('pemilik_id', $siswa->id)->where('status', 'terlambat')->count();
 
+        // Sinkronisasi otomatis ke Buku Register SK Kepsek dan Buku Agenda Surat Keluar SITUAN
+        $syncSk = \App\Models\SuratKeluar::syncSkKasusDisiplin($kasus, \Carbon\Carbon::today());
+        $nomorSk = $syncSk['nomor_sk'];
+        $bukuSk = $syncSk['buku_sk'];
+
         return view('sirani.disiplin.cetak_sk', compact(
             'kasus',
             'siswa',
@@ -708,7 +713,9 @@ class KasusDisiplinController extends Controller
             'wali',
             'totalAlpha',
             'totalBolos',
-            'totalTerlambat'
+            'totalTerlambat',
+            'nomorSk',
+            'bukuSk'
         ));
     }
 

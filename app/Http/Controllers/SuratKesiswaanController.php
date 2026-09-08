@@ -6,6 +6,7 @@ use App\Models\Absensi;
 use App\Models\NotifikasiOrtu;
 use App\Models\PengaturanSekolah;
 use App\Models\Siswa;
+use App\Models\SuratKeluar;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
@@ -96,9 +97,11 @@ class SuratKesiswaanController extends Controller
         $nomorSurat = $request->get('nomor_surat');
         if (!$nomorSurat) {
             if ($kategori === 'berita_acara') {
-                $nomorSurat = 'BA-BK/' . str_pad($siswa->id, 3, '0', STR_PAD_LEFT) . '/' . ($rombel->nama_rombel ?? 'SMK') . '/' . $bln . '/' . Carbon::today()->year;
+                $suratKeluar = SuratKeluar::syncBeritaAcaraBk($siswa, $notifikasi, $rombel?->nama_rombel, Carbon::today());
+                $nomorSurat = $suratKeluar->nomor_surat_lengkap;
             } else {
-                $nomorSurat = '421.5/' . str_pad($siswa->id, 3, '0', STR_PAD_LEFT) . '/SMKN1-AN/KESISWAAN/' . $bln . '/' . Carbon::today()->year;
+                $suratKeluar = SuratKeluar::syncSuratPanggilanOrtu($siswa, $notifikasi, $rombel?->nama_rombel, Carbon::today());
+                $nomorSurat = $suratKeluar->nomor_surat_lengkap;
             }
         }
 
@@ -229,7 +232,8 @@ class SuratKesiswaanController extends Controller
         $totalKasusSelesai = $kasusList->where('status_tahap', 'selesai_pembinaan')->count();
         $isBebasMasalah = ($kasusAktif === 0);
 
-        $nomorSurat = '421.5/' . sprintf('%03d', $siswa->id) . '/SMKN1AN/SKKB/' . date('Y');
+        $suratKeluar = SuratKeluar::syncSuratBebasMasalah($siswa, Carbon::today());
+        $nomorSurat = $suratKeluar->nomor_surat_lengkap;
         $tanggalSurat = Carbon::now()->translatedFormat('d F Y');
 
         return view('situan.siswa.surat_bebas_masalah', compact(

@@ -14,6 +14,7 @@ class NotifikasiOrtu extends Model
 
     protected $fillable = [
         'siswa_id',
+        'surat_keluar_id',
         'kategori',
         'tanggal',
         'no_tujuan',
@@ -65,6 +66,11 @@ class NotifikasiOrtu extends Model
     public function siswa(): BelongsTo
     {
         return $this->belongsTo(Siswa::class, 'siswa_id');
+    }
+
+    public function suratKeluar(): BelongsTo
+    {
+        return $this->belongsTo(SuratKeluar::class, 'surat_keluar_id');
     }
 
     public function scopePending($query)

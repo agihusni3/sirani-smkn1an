@@ -30,6 +30,8 @@ class KasusDisiplin extends Model
         'tanggal_sidang_wakasis',
         'keputusan_kepsek',
         'tanggal_keputusan_kepsek',
+        'buku_sk_id',
+        'surat_keluar_id',
         'diverifikasi_oleh',
         'is_active',
     ];
@@ -93,6 +95,16 @@ class KasusDisiplin extends Model
     public function dokumens(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(KasusDisiplinDokumen::class, 'kasus_disiplin_id')->latest();
+    }
+
+    public function bukuSk(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(BukuSkKepsek::class, 'buku_sk_id');
+    }
+
+    public function suratKeluar(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(SuratKeluar::class, 'surat_keluar_id');
     }
 
     /**

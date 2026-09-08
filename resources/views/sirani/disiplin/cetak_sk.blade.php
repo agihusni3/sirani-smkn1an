@@ -209,7 +209,7 @@
 {{-- JUDUL SURAT KEPUTUSAN --}}
 <div class="judul-doc">
   <h4>KEPUTUSAN KEPALA SMK NEGERI 1 AIR NANINGAN</h4>
-  <span class="nomor-sk">Nomor: 421.5 / {{ str_pad($kasus->id, 3, '0', STR_PAD_LEFT) }} / SK-DISIPLIN / SMKN1-AN / {{ \Carbon\Carbon::today()->format('m/Y') }}</span>
+  <span class="nomor-sk">Nomor: {{ $nomorSk ?? ('421.5 / ' . str_pad($kasus->id, 3, '0', STR_PAD_LEFT) . ' / SK-DISIPLIN / SMKN1-AN / ' . \Carbon\Carbon::today()->format('m/Y')) }}</span>
   <span class="tentang-sk">TENTANG<br>PENETAPAN SANKSI DAN PEMBINAAN KHUSUS KEDISIPLINAN SISWA</span>
 </div>
 
