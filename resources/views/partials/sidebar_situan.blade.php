@@ -152,12 +152,20 @@
           <span class="situan-nav-badge" style="background:#eff6ff; color:#2563eb; border-color:#bfdbfe;">Berkala</span>
         </a>
 
-        <a href="/guru" class="situan-nav-link {{ request()->is('guru*') ? 'active' : '' }}">
+        <a href="/guru" class="situan-nav-link {{ request()->is('guru*') ? 'active' : '' }}" title="Master Data Pendidik &amp; Tenaga Kependidikan">
           <div class="situan-nav-link-left">
             <i class="bi bi-person-badge-fill"></i>
-            <span>Data PTK &amp; E-Arsip</span>
+            <span>Data Pokok PTK</span>
           </div>
           <span class="situan-nav-badge">{{ $countGuru }}</span>
+        </a>
+
+        <a href="{{ route('situan.ekabinet.index') }}" class="situan-nav-link {{ request()->is('situan/ekabinet*') ? 'active' : '' }}" title="Sentral Lemari Berkas Digital PTK, Dokumen Sekolah &amp; MoU Industri">
+          <div class="situan-nav-link-left">
+            <i class="bi bi-archive-fill"></i>
+            <span>E-Kabinet &amp; Arsip</span>
+          </div>
+          <span class="situan-nav-badge" style="background:#f0fdf4; color:#16a34a; border-color:#bbf7d0;">Sentral</span>
         </a>
       </div>
     @endif

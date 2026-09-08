@@ -183,6 +183,9 @@
           <a href="/guru/cetak-pdf" target="_blank" class="situan-btn-outline" title="Cetak Format A4 Kop Dinas">
             <i class="bi bi-file-earmark-pdf-fill" style="color:#ef4444;"></i> Cetak PDF
           </a>
+          <a href="{{ route('situan.ekabinet.index') }}" class="situan-btn-outline" title="Buka Sentral Lemari Berkas E-Kabinet">
+            <i class="bi bi-archive-fill" style="color:#0284c7;"></i> E-Kabinet
+          </a>
           @include('partials.header_actions')
         </div>
       </div>

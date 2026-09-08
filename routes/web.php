@@ -39,6 +39,7 @@ use App\Http\Controllers\Admin\WebsiteStatistikController;
 use App\Http\Controllers\SituanPersuratanController;
 use App\Http\Controllers\SituanPelayananSuratController;
 use App\Http\Controllers\SituanKepegawaianController;
+use App\Http\Controllers\SituanEKabinetController;
 
 // ══ 1. Website Resmi Publik SMKN 1 Air Naningan (Dilindungi Pelacak Kunjungan Otomatis) ══
 Route::middleware('track.visitor')->group(function () {
@@ -173,6 +174,13 @@ Route::middleware('auth')->group(function () {
         Route::get('/situan/arsip-ptk/{guruId}', [SituanKepegawaianController::class, 'arsipPtkIndex'])->name('situan.arsip-ptk.index');
         Route::post('/situan/arsip-ptk/{guruId}', [SituanKepegawaianController::class, 'arsipPtkStore'])->name('situan.arsip-ptk.store');
         Route::delete('/situan/arsip-ptk/{id}', [SituanKepegawaianController::class, 'arsipPtkDestroy'])->name('situan.arsip-ptk.destroy');
+
+        // E-Kabinet & E-Arsip Digital Terpusat (Sentral Dokumen PTK, Lembaga & MoU)
+        Route::get('/situan/ekabinet', [SituanEKabinetController::class, 'index'])->name('situan.ekabinet.index');
+        Route::post('/situan/ekabinet/ptk', [SituanEKabinetController::class, 'storePtk'])->name('situan.ekabinet.ptk.store');
+        Route::delete('/situan/ekabinet/ptk/{id}', [SituanEKabinetController::class, 'destroyPtk'])->name('situan.ekabinet.ptk.destroy');
+        Route::post('/situan/ekabinet/lembaga', [SituanEKabinetController::class, 'storeLembaga'])->name('situan.ekabinet.lembaga.store');
+        Route::delete('/situan/ekabinet/lembaga/{id}', [SituanEKabinetController::class, 'destroyLembaga'])->name('situan.ekabinet.lembaga.destroy');
     });
 
     // 1. Modul SIRANI (Sistem Informasi Responsif Absensi & Kedisiplinan)
