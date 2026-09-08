@@ -216,47 +216,178 @@ class SituanPersuratanController extends Controller
     public function suratKeluarStore(Request $request)
     {
         $request->validate([
-            'kode_klasifikasi' => 'required|string|max:30',
-            'tujuan_surat'     => 'required|string|max:200',
-            'perihal'          => 'required|string|max:255',
-            'tanggal_surat'    => 'required|date',
-            'penandatangan'    => 'required|string|max:150',
-            'jenis_surat'      => 'required|in:umum,suket_siswa,surat_tugas,rekomendasi_mutasi,sk_kepsek,lainnya',
-            'file_arsip'       => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:10240',
+            'kode_klasifikasi'       => 'required|string|max:30',
+            'tujuan_surat'           => 'required|string|max:200',
+            'perihal'                => 'required|string|max:255',
+            'tanggal_surat'          => 'required|date',
+            'penandatangan'          => 'required|string|max:150',
+            'jabatan_penandatangan'  => 'nullable|string|max:100',
+            'nip_penandatangan'      => 'nullable|string|max:50',
+            'sifat_surat'            => 'nullable|string|max:30',
+            'lampiran'               => 'nullable|string|max:100',
+            'isi_surat'              => 'nullable|string',
+            'tembusan'               => 'nullable|string',
+            'jenis_surat'            => 'required|in:umum,suket_siswa,surat_tugas,rekomendasi_mutasi,sk_kepsek,lainnya',
+            'file_arsip'             => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:10240',
+            'mode_penomoran'         => 'nullable|in:otomatis,manual',
+            'nomor_surat_manual'     => 'nullable|string|max:150',
+            'nomor_agenda_manual'    => 'nullable|integer|min:1',
+        ]);
+
+        $klasifikasi = KlasifikasiSurat::where('kode', $request->kode_klasifikasi)->first();
+        $tanggal = Carbon::parse($request->tanggal_surat);
+        $year = (int) $tanggal->format('Y');
+
+        $isManual = ($request->mode_penomoran === 'manual' && $request->filled('nomor_surat_manual'));
+
+        if ($isManual) {
+            $nomorSuratLengkap = trim($request->nomor_surat_manual);
+            $nomorAgenda = $request->filled('nomor_agenda_manual')
+                ? (int) $request->nomor_agenda_manual
+                : ((SuratKeluar::where('tahun_agenda', $year)->max('nomor_agenda') ?: 0) + 1);
+        } else {
+            $generator = SuratKeluar::generateNomorSurat($request->kode_klasifikasi, $tanggal);
+            $nomorAgenda = $generator['nomor_agenda'];
+            $nomorSuratLengkap = $generator['nomor_surat_lengkap'];
+        }
+
+        $filePath = null;
+        if ($request->hasFile('file_arsip')) {
+            $file = $request->file('file_arsip');
+            $fileName = 'surat_keluar_' . $year . '_' . $nomorAgenda . '_' . time() . '.' . $file->getClientOriginalExtension();
+            $filePath = $file->storeAs('arsip_surat/keluar', $fileName, 'public');
+        }
+
+        $surat = SuratKeluar::create([
+            'nomor_agenda'          => $nomorAgenda,
+            'tahun_agenda'          => $year,
+            'klasifikasi_id'        => $klasifikasi?->id,
+            'kode_klasifikasi'      => $request->kode_klasifikasi,
+            'nomor_surat_lengkap'   => $nomorSuratLengkap,
+            'tujuan_surat'          => $request->tujuan_surat,
+            'perihal'               => $request->perihal,
+            'sifat_surat'           => $request->sifat_surat ?: 'Biasa',
+            'lampiran'              => $request->lampiran ?: '-',
+            'isi_surat'             => $request->isi_surat,
+            'tembusan'              => $request->tembusan,
+            'tanggal_surat'         => $request->tanggal_surat,
+            'penandatangan'         => $request->penandatangan,
+            'jabatan_penandatangan' => $request->jabatan_penandatangan ?: 'Kepala Sekolah',
+            'nip_penandatangan'     => $request->nip_penandatangan,
+            'jenis_surat'           => $request->jenis_surat,
+            'sumber_modul'          => 'situan_tu',
+            'kategori_surat'        => $request->filled('isi_surat') ? 'Surat Dinas Bebas' : 'Surat Keluar TU',
+            'is_nomor_manual'       => $isManual,
+            'file_arsip'            => $filePath,
+            'created_by'            => auth()->id(),
+        ]);
+
+        if ($request->filled('isi_surat')) {
+            $surat->update(['link_cetak' => route('situan.surat-keluar.cetak', $surat->id)]);
+        }
+
+        AuditLog::catat('create', 'situan_surat_keluar', "Menerbitkan Surat Keluar: {$surat->nomor_surat_lengkap} ke {$surat->tujuan_surat}");
+
+        return redirect()->route('situan.surat-keluar.index')
+            ->with('success', "Nomor Surat Keluar Resmi berhasil diterbitkan: {$surat->nomor_surat_lengkap}");
+    }
+
+    /**
+     * Update / Koreksi Data Surat Keluar (Perihal, Nomor Manual, Tujuan, Isi, File).
+     */
+    public function suratKeluarUpdate(Request $request, $id)
+    {
+        $surat = SuratKeluar::findOrFail($id);
+
+        $request->validate([
+            'nomor_surat_lengkap'   => 'required|string|max:150|unique:surat_keluars,nomor_surat_lengkap,' . $surat->id,
+            'nomor_agenda'          => 'required|integer|min:1',
+            'kode_klasifikasi'      => 'required|string|max:30',
+            'tujuan_surat'          => 'required|string|max:200',
+            'perihal'               => 'required|string|max:255',
+            'tanggal_surat'         => 'required|date',
+            'penandatangan'         => 'required|string|max:150',
+            'jabatan_penandatangan' => 'nullable|string|max:100',
+            'nip_penandatangan'     => 'nullable|string|max:50',
+            'sifat_surat'           => 'nullable|string|max:30',
+            'lampiran'              => 'nullable|string|max:100',
+            'isi_surat'             => 'nullable|string',
+            'tembusan'              => 'nullable|string',
+            'jenis_surat'           => 'required|in:umum,suket_siswa,surat_tugas,rekomendasi_mutasi,sk_kepsek,lainnya',
+            'file_arsip'            => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:10240',
         ]);
 
         $klasifikasi = KlasifikasiSurat::where('kode', $request->kode_klasifikasi)->first();
         $tanggal = Carbon::parse($request->tanggal_surat);
 
-        // Generate nomor surat berstandar
-        $generator = SuratKeluar::generateNomorSurat($request->kode_klasifikasi, $tanggal);
-
-        $filePath = null;
+        $filePath = $surat->file_arsip;
         if ($request->hasFile('file_arsip')) {
             $file = $request->file('file_arsip');
-            $fileName = 'surat_keluar_' . $generator['tahun_agenda'] . '_' . $generator['nomor_agenda'] . '_' . time() . '.' . $file->getClientOriginalExtension();
+            $fileName = 'surat_keluar_' . $tanggal->year . '_' . $request->nomor_agenda . '_' . time() . '.' . $file->getClientOriginalExtension();
             $filePath = $file->storeAs('arsip_surat/keluar', $fileName, 'public');
         }
 
-        $surat = SuratKeluar::create([
-            'nomor_agenda'        => $generator['nomor_agenda'],
-            'tahun_agenda'        => $generator['tahun_agenda'],
-            'klasifikasi_id'      => $klasifikasi?->id,
-            'kode_klasifikasi'    => $request->kode_klasifikasi,
-            'nomor_surat_lengkap' => $generator['nomor_surat_lengkap'],
-            'tujuan_surat'        => $request->tujuan_surat,
-            'perihal'             => $request->perihal,
-            'tanggal_surat'       => $request->tanggal_surat,
-            'penandatangan'       => $request->penandatangan,
-            'jenis_surat'         => $request->jenis_surat,
-            'file_arsip'          => $filePath,
-            'created_by'          => auth()->id(),
+        $linkCetak = $surat->link_cetak;
+        if ($request->filled('isi_surat') && !$linkCetak) {
+            $linkCetak = route('situan.surat-keluar.cetak', $surat->id);
+        }
+
+        $surat->update([
+            'nomor_agenda'          => $request->nomor_agenda,
+            'tahun_agenda'          => $tanggal->year,
+            'klasifikasi_id'        => $klasifikasi?->id,
+            'kode_klasifikasi'      => $request->kode_klasifikasi,
+            'nomor_surat_lengkap'   => $request->nomor_surat_lengkap,
+            'tujuan_surat'          => $request->tujuan_surat,
+            'perihal'               => $request->perihal,
+            'sifat_surat'           => $request->sifat_surat ?: 'Biasa',
+            'lampiran'              => $request->lampiran ?: '-',
+            'isi_surat'             => $request->isi_surat,
+            'tembusan'              => $request->tembusan,
+            'tanggal_surat'         => $request->tanggal_surat,
+            'penandatangan'         => $request->penandatangan,
+            'jabatan_penandatangan' => $request->jabatan_penandatangan ?: 'Kepala Sekolah',
+            'nip_penandatangan'     => $request->nip_penandatangan,
+            'jenis_surat'           => $request->jenis_surat,
+            'link_cetak'            => $linkCetak,
+            'file_arsip'            => $filePath,
         ]);
 
-        AuditLog::catat('create', 'situan_surat_keluar', "Menerbitkan Nomor Surat Keluar: {$surat->nomor_surat_lengkap} ke {$surat->tujuan_surat}");
+        AuditLog::catat('update', 'situan_surat_keluar', "Memperbarui Data Surat Keluar: {$surat->nomor_surat_lengkap}");
 
         return redirect()->route('situan.surat-keluar.index')
-            ->with('success', "Nomor Surat Keluar Resmi berhasil diterbitkan: {$surat->nomor_surat_lengkap}");
+            ->with('success', "Data Surat Keluar {$surat->nomor_surat_lengkap} berhasil diperbarui.");
+    }
+
+    /**
+     * Hapus Data Surat Keluar dari Buku Agenda.
+     */
+    public function suratKeluarDestroy($id)
+    {
+        $surat = SuratKeluar::findOrFail($id);
+        $nomor = $surat->nomor_surat_lengkap;
+
+        if ($surat->file_arsip) {
+            Storage::disk('public')->delete($surat->file_arsip);
+        }
+
+        $surat->delete();
+
+        AuditLog::catat('delete', 'situan_surat_keluar', "Menghapus Nomor Surat Keluar: {$nomor}");
+
+        return redirect()->route('situan.surat-keluar.index')
+            ->with('success', "Surat Keluar nomor {$nomor} berhasil dihapus dari buku agenda.");
+    }
+
+    /**
+     * Cetak Lembar Dokumen A4 Resmi Surat Dinas Bebas / Ad-Hoc.
+     */
+    public function suratKeluarCetak($id)
+    {
+        $surat = SuratKeluar::findOrFail($id);
+        $sekolah = PengaturanSekolah::getAktif();
+
+        return view('situan.persuratan.cetak_surat_bebas', compact('surat', 'sekolah'));
     }
 
     /**

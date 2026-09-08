@@ -159,6 +159,9 @@ Route::middleware('auth')->group(function () {
         Route::get('/situan/surat-masuk/{id}/cetak-disposisi', [SituanPersuratanController::class, 'disposisiCetakLembar'])->name('situan.surat-masuk.cetak-disposisi');
         Route::get('/situan/surat-keluar', [SituanPersuratanController::class, 'suratKeluarIndex'])->name('situan.surat-keluar.index');
         Route::post('/situan/surat-keluar', [SituanPersuratanController::class, 'suratKeluarStore'])->name('situan.surat-keluar.store');
+        Route::put('/situan/surat-keluar/{id}', [SituanPersuratanController::class, 'suratKeluarUpdate'])->name('situan.surat-keluar.update');
+        Route::delete('/situan/surat-keluar/{id}', [SituanPersuratanController::class, 'suratKeluarDestroy'])->name('situan.surat-keluar.destroy');
+        Route::get('/situan/surat-keluar/{id}/cetak', [SituanPersuratanController::class, 'suratKeluarCetak'])->name('situan.surat-keluar.cetak');
         Route::get('/situan/buku-sk', [SituanPersuratanController::class, 'bukuSkIndex'])->name('situan.buku-sk.index');
         Route::post('/situan/buku-sk', [SituanPersuratanController::class, 'bukuSkStore'])->name('situan.buku-sk.store');
 

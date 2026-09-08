@@ -19,16 +19,24 @@ class SuratKeluar extends Model
         'perihal',
         'tanggal_surat',
         'penandatangan',
+        'jabatan_penandatangan',
+        'nip_penandatangan',
         'jenis_surat',
+        'sifat_surat',
+        'lampiran',
+        'isi_surat',
+        'tembusan',
         'sumber_modul',
         'kategori_surat',
         'link_cetak',
+        'is_nomor_manual',
         'file_arsip',
         'created_by',
     ];
 
     protected $casts = [
-        'tanggal_surat' => 'date',
+        'tanggal_surat'   => 'date',
+        'is_nomor_manual' => 'boolean',
     ];
 
     public function klasifikasi()
