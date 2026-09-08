@@ -30,4 +30,9 @@ class BukuSkKepsek extends Model
         $max = static::where('tahun_sk', $year)->max('nomor_urut_sk');
         return ($max ? (int) $max : 0) + 1;
     }
+
+    public function distribusiPtks()
+    {
+        return $this->hasMany(ArsipDokumenPtk::class, 'buku_sk_id');
+    }
 }

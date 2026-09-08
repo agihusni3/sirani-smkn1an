@@ -10,6 +10,8 @@ use App\Models\PengaturanSekolah;
 use App\Models\SuratKeluar;
 use App\Models\SuratMasuk;
 use App\Models\User;
+use App\Models\Guru;
+use App\Models\ArsipDokumenPtk;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -263,7 +265,7 @@ class SituanPersuratanController extends Controller
     public function bukuSkIndex(Request $request)
     {
         $thisYear = (int) date('Y');
-        $query = BukuSkKepsek::latest('tanggal_ditetapkan');
+        $query = BukuSkKepsek::withCount('distribusiPtks')->latest('tanggal_ditetapkan');
 
         if ($request->filled('q')) {
             $q = $request->q;
@@ -277,12 +279,13 @@ class SituanPersuratanController extends Controller
         $bukuSks = $query->paginate(15)->withQueryString();
         $totalSk = BukuSkKepsek::where('tahun_sk', $thisYear)->count();
         $nextUrut = BukuSkKepsek::nextNomorUrut($thisYear);
+        $gurus = Guru::where('status', 'aktif')->orderBy('nama')->get(['id', 'nama', 'nip', 'jabatan']);
 
-        return view('situan.persuratan.sk_index', compact('bukuSks', 'totalSk', 'nextUrut', 'thisYear'));
+        return view('situan.persuratan.sk_index', compact('bukuSks', 'totalSk', 'nextUrut', 'thisYear', 'gurus'));
     }
 
     /**
-     * Catat SK Kepala Sekolah Baru.
+     * Catat SK Kepala Sekolah Baru & Distribusikan Otomatis ke E-Kabinet PTK.
      */
     public function bukuSkStore(Request $request)
     {
@@ -291,6 +294,9 @@ class SituanPersuratanController extends Controller
             'tanggal_ditetapkan' => 'required|date',
             'kategori_sk'        => 'required|string|max:80',
             'file_dokumen'       => 'nullable|file|mimes:pdf|max:15360',
+            'distribusi_target'  => 'nullable|in:semua_guru,pilih_guru,tidak_distribusi',
+            'guru_ids'           => 'nullable|array',
+            'guru_ids.*'         => 'exists:gurus,id',
         ]);
 
         $tgl = Carbon::parse($request->tanggal_ditetapkan);
@@ -320,9 +326,34 @@ class SituanPersuratanController extends Controller
             'is_active'          => true,
         ]);
 
-        AuditLog::catat('create', 'situan_sk', "Menerbitkan SK Kepala Sekolah No: {$nomorSkLengkap} tentang {$sk->tentang_sk}");
+        // Distribusi Otomatis ke E-Kabinet Guru Penerima (Smart One-to-Many Linking)
+        $targetGuruIds = [];
+        $distribusi = $request->distribusi_target ?? 'tidak_distribusi';
+
+        if ($filePath && $distribusi === 'semua_guru') {
+            $targetGuruIds = Guru::where('status', 'aktif')->pluck('id')->toArray();
+        } elseif ($filePath && $distribusi === 'pilih_guru' && !empty($request->guru_ids)) {
+            $targetGuruIds = $request->guru_ids;
+        }
+
+        if (!empty($targetGuruIds)) {
+            foreach ($targetGuruIds as $gId) {
+                ArsipDokumenPtk::create([
+                    'guru_id'         => $gId,
+                    'buku_sk_id'      => $sk->id,
+                    'kategori_berkas' => 'sk_penugasan_sekolah',
+                    'nama_dokumen'    => '[SK Kolektif] ' . $sk->tentang_sk,
+                    'nomor_dokumen'   => $nomorSkLengkap,
+                    'tanggal_dokumen' => $request->tanggal_ditetapkan,
+                    'file_path'       => $filePath,
+                ]);
+            }
+        }
+
+        $distribusiInfo = count($targetGuruIds) > 0 ? " dan otomatis didistribusikan ke " . count($targetGuruIds) . " guru." : ".";
+        AuditLog::catat('create', 'situan_sk', "Menerbitkan SK Kepala Sekolah No: {$nomorSkLengkap} tentang {$sk->tentang_sk}{$distribusiInfo}");
 
         return redirect()->route('situan.buku-sk.index')
-            ->with('success', "SK Kepala Sekolah berhasil didaftarkan: {$nomorSkLengkap}");
+            ->with('success', "SK Kepala Sekolah berhasil didaftarkan: {$nomorSkLengkap}{$distribusiInfo}");
     }
 }

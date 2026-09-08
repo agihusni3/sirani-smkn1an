@@ -70,6 +70,7 @@
               $badgeCat = match($arsip->kategori_berkas) {
                 'sk_pangkat_terakhir', 'sk_kgb_terakhir' => 'bg-danger-subtle text-danger border border-danger-subtle',
                 'sk_cpns', 'sk_pns', 'sk_pppk' => 'bg-primary-subtle text-primary border border-primary-subtle',
+                'sk_penugasan_sekolah' => 'bg-info-subtle text-dark border border-info-subtle',
                 'ijazah', 'transkrip', 'sertifikat_pendidik' => 'bg-success-subtle text-success border border-success-subtle',
                 'ktp', 'kk', 'kartu_pegawai' => 'bg-info-subtle text-info border border-info-subtle',
                 default => 'bg-secondary-subtle text-secondary',
@@ -80,6 +81,7 @@
                 'sk_cpns'             => 'SK CPNS',
                 'sk_pns'              => 'SK PNS Definitif',
                 'sk_pppk'             => 'SK PPPK',
+                'sk_penugasan_sekolah'=> 'SK Kolektif Sekolah',
                 'ijazah'              => 'Ijazah Pendidikan',
                 'transkrip'           => 'Transkrip Nilai',
                 'sertifikat_pendidik' => 'Sertifikat Pendidik (Serdik)',
@@ -97,6 +99,11 @@
               </td>
               <td class="px-3">
                 <div class="fw-bold text-dark">{{ $arsip->nama_dokumen }}</div>
+                @if($arsip->buku_sk_id)
+                  <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-2 py-0 rounded-pill mt-1" style="font-size:10px;">
+                    <i class="bi bi-link-45deg"></i> Terdistribusi Otomatis dari Buku SK
+                  </span>
+                @endif
               </td>
               <td class="px-3">
                 <div class="font-monospace text-secondary">{{ $arsip->nomor_dokumen ?: '-' }}</div>

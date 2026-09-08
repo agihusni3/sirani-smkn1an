@@ -126,6 +126,13 @@
               </td>
               <td class="px-3">
                 <div class="fw-semibold text-dark">{{ $sk->tentang_sk }}</div>
+                @if($sk->distribusi_ptks_count > 0)
+                  <div class="mt-1">
+                    <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1 rounded-pill" style="font-size:11px;" title="SK ini otomatis terarsip di lemari berkas guru penerima">
+                      <i class="bi bi-link-45deg me-1"></i> Terdistribusi ke {{ $sk->distribusi_ptks_count }} Guru
+                    </span>
+                  </div>
+                @endif
               </td>
               <td class="text-center px-3">
                 @if($sk->file_dokumen)
@@ -160,7 +167,7 @@
 
 {{-- Modal Registrasi SK Baru --}}
 <div class="modal fade" id="modalTambahSk" tabindex="-1" aria-labelledby="modalTambahSkLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
     <div class="modal-content border-0 shadow">
       <form action="{{ route('situan.buku-sk.store') }}" method="POST" enctype="multipart/form-data">
         @csrf
@@ -177,7 +184,7 @@
 
           <div class="mb-3">
             <label class="form-label small fw-bold">Tentang / Perihal SK <span class="text-danger">*</span></label>
-            <textarea name="tentang_sk" rows="3" class="form-control form-control-sm" placeholder="Contoh: Pembagian Tugas Guru dalam Proses Belajar Mengajar dan Bimbingan Konseling Semester Ganjil TA 2026/2027" required></textarea>
+            <textarea name="tentang_sk" rows="2" class="form-control form-control-sm" placeholder="Contoh: Pembagian Tugas Guru dalam Proses Belajar Mengajar dan Bimbingan Konseling Semester Ganjil TA 2026/2027" required></textarea>
           </div>
 
           <div class="row g-3 mb-3">
@@ -201,10 +208,65 @@
           </div>
 
           <div class="mb-3">
-            <label class="form-label small fw-bold">Unggah Dokumen PDF SK Asli (Opsional)</label>
+            <label class="form-label small fw-bold">Unggah Dokumen PDF SK Asli Bertandatangan</label>
             <input type="file" name="file_dokumen" accept=".pdf" class="form-control form-control-sm" />
             <div class="form-text" style="font-size:11px;">Maksimal 15 MB format PDF bertandatangan/stempel basah.</div>
           </div>
+
+          {{-- Opsi Distribusi Otomatis ke E-Kabinet Guru (Smart One-to-Many) --}}
+          <div class="card bg-light border-0 rounded-3 p-3 mb-2">
+            <label class="form-label small fw-bold text-dark d-flex align-items-center gap-1 mb-1">
+              <i class="bi bi-share-fill text-primary"></i> Distribusi Otomatis ke E-Kabinet Guru (One-to-Many)
+            </label>
+            <div class="text-muted mb-2" style="font-size:11.5px;">
+              SK ini akan otomatis ditautkan ke lemari berkas digital guru yang bersangkutan tanpa perlu mengunggah ulang satu per satu.
+            </div>
+
+            <div class="form-check mb-1">
+              <input class="form-check-input" type="radio" name="distribusi_target" id="distribusiSemua" value="semua_guru" checked onchange="togglePilihGuru(false)">
+              <label class="form-check-label small fw-bold text-dark" for="distribusiSemua">
+                Distribusikan ke Seluruh Guru Aktif ({{ $gurus->count() }} Guru)
+                <span class="text-muted fw-normal d-block" style="font-size:11px;">Sangat cocok untuk SK Pembagian Tugas Mengajar (PBM), Panitia Ujian, &amp; SK Sekolah umum.</span>
+              </label>
+            </div>
+
+            <div class="form-check mb-1">
+              <input class="form-check-input" type="radio" name="distribusi_target" id="distribusiPilih" value="pilih_guru" onchange="togglePilihGuru(true)">
+              <label class="form-check-label small fw-bold text-dark" for="distribusiPilih">
+                Pilih Guru Penerima Tertentu
+                <span class="text-muted fw-normal d-block" style="font-size:11px;">Khusus SK Wali Kelas, Kaprog, Pembina Ekstra, atau panitia terpilih.</span>
+              </label>
+            </div>
+
+            <div class="form-check mb-2">
+              <input class="form-check-input" type="radio" name="distribusi_target" id="distribusiTidak" value="tidak_distribusi" onchange="togglePilihGuru(false)">
+              <label class="form-check-label small text-muted" for="distribusiTidak">
+                Hanya Arsip Sekolah (Tidak didistribusikan ke lemari guru)
+              </label>
+            </div>
+
+            {{-- Box Checkbox Daftar Guru --}}
+            <div id="boxPilihGuru" style="display:none; max-height:160px; overflow-y:auto; background:#fff; border:1px solid #cbd5e1; border-radius:6px; padding:8px 12px;">
+              <div class="small fw-bold text-muted mb-2 pb-1 border-bottom d-flex justify-content-between">
+                <span>Centang Guru yang Diberikan SK:</span>
+                <span class="badge bg-light text-dark border">Pilih di bawah</span>
+              </div>
+              <div class="row g-2">
+                @foreach($gurus as $g)
+                  <div class="col-md-6 col-12">
+                    <div class="form-check py-1">
+                      <input class="form-check-input" type="checkbox" name="guru_ids[]" value="{{ $g->id }}" id="guruCheck{{ $g->id }}">
+                      <label class="form-check-label small" for="guruCheck{{ $g->id }}">
+                        <strong class="text-dark">{{ $g->nama }}</strong>
+                        <span class="text-muted d-block" style="font-size:10.5px;">{{ $g->jabatan ?: 'Guru Mata Pelajaran' }}</span>
+                      </label>
+                    </div>
+                  </div>
+                @endforeach
+              </div>
+            </div>
+          </div>
+
         </div>
         <div class="modal-footer border-top px-4 py-2">
           <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Batal</button>
@@ -216,4 +278,11 @@
     </div>
   </div>
 </div>
+
+<script>
+  function togglePilihGuru(show) {
+    const box = document.getElementById('boxPilihGuru');
+    if (box) box.style.display = show ? 'block' : 'none';
+  }
+</script>
 @endsection

@@ -115,6 +115,7 @@
               <option value="ijazah" {{ request('kategori_ptk') == 'ijazah' ? 'selected' : '' }}>Ijazah Pendidikan</option>
               <option value="transkrip" {{ request('kategori_ptk') == 'transkrip' ? 'selected' : '' }}>Transkrip Nilai</option>
               <option value="sertifikat_pendidik" {{ request('kategori_ptk') == 'sertifikat_pendidik' ? 'selected' : '' }}>Sertifikat Pendidik (Serdik)</option>
+              <option value="sk_penugasan_sekolah" {{ request('kategori_ptk') == 'sk_penugasan_sekolah' ? 'selected' : '' }}>SK Penugasan / Kolektif Sekolah</option>
               <option value="kartu_pegawai" {{ request('kategori_ptk') == 'kartu_pegawai' ? 'selected' : '' }}>Karpeg / KPE</option>
               <option value="ktp" {{ request('kategori_ptk') == 'ktp' ? 'selected' : '' }}>KTP Elektronik</option>
               <option value="kk" {{ request('kategori_ptk') == 'kk' ? 'selected' : '' }}>Kartu Keluarga</option>
@@ -146,6 +147,7 @@
                 $badgeCat = match($arsip->kategori_berkas) {
                   'sk_pangkat_terakhir', 'sk_kgb_terakhir' => 'bg-danger-subtle text-danger border border-danger-subtle',
                   'sk_cpns', 'sk_pns', 'sk_pppk' => 'bg-primary-subtle text-primary border border-primary-subtle',
+                  'sk_penugasan_sekolah' => 'bg-info-subtle text-dark border border-info-subtle',
                   'ijazah', 'transkrip', 'sertifikat_pendidik' => 'bg-success-subtle text-success border border-success-subtle',
                   'ktp', 'kk', 'kartu_pegawai' => 'bg-info-subtle text-info border border-info-subtle',
                   default => 'bg-secondary-subtle text-secondary',
@@ -156,6 +158,7 @@
                   'sk_cpns'             => 'SK CPNS',
                   'sk_pns'              => 'SK PNS Definitif',
                   'sk_pppk'             => 'SK PPPK',
+                  'sk_penugasan_sekolah'=> 'SK Kolektif Sekolah',
                   'ijazah'              => 'Ijazah Pendidikan',
                   'transkrip'           => 'Transkrip Nilai',
                   'sertifikat_pendidik' => 'Sertifikat Pendidik (Serdik)',
@@ -177,7 +180,14 @@
                 </td>
                 <td class="px-3">
                   <div class="fw-bold text-dark">{{ $arsip->nama_dokumen }}</div>
-                  <div class="text-muted" style="font-size:11px;">Diunggah: {{ $arsip->created_at->format('d/m/Y H:i') }}</div>
+                  <div class="d-flex align-items-center gap-1 mt-1 flex-wrap">
+                    @if($arsip->buku_sk_id)
+                      <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-2 py-0 rounded-pill" style="font-size:10px;">
+                        <i class="bi bi-link-45deg"></i> SK Kolektif Kepsek
+                      </span>
+                    @endif
+                    <span class="text-muted" style="font-size:11px;">Diunggah: {{ $arsip->created_at->format('d/m/Y H:i') }}</span>
+                  </div>
                 </td>
                 <td class="px-3 text-muted">
                   {{ $arsip->nomor_dokumen ?: '-' }}

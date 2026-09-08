@@ -261,4 +261,86 @@ class SituanAdministrationTest extends TestCase
             'tentang_sk'    => 'Pembagian Tugas Mengajar Semester Ganjil TA 2026/2027',
         ]);
     }
+
+    public function test_buku_sk_kepsek_dapat_mendistribusikan_sk_otomatis_ke_semua_guru(): void
+    {
+        Storage::fake('public');
+
+        $guru2 = Guru::create([
+            'nama'               => 'Siti Rahmawati, S.Pd.',
+            'nip'                => '199002152015022001',
+            'status'             => 'aktif',
+            'jenis_ptk'          => 'Guru Mapel',
+        ]);
+
+        $file = UploadedFile::fake()->create('sk_pbm_ganjil.pdf', 800, 'application/pdf');
+
+        $response = $this->actingAs($this->admin)->post(route('situan.buku-sk.store'), [
+            'tentang_sk'         => 'Pembagian Tugas PBM Semester Ganjil 2026/2027',
+            'tanggal_ditetapkan' => date('Y-m-d'),
+            'kategori_sk'        => 'Pembagian Tugas PBM',
+            'file_dokumen'       => $file,
+            'distribusi_target'  => 'semua_guru',
+        ]);
+
+        $response->assertRedirect(route('situan.buku-sk.index'));
+
+        // Kedua guru aktif otomatis memiliki record arsip SK kolektif ini
+        $this->assertDatabaseHas('arsip_dokumen_ptks', [
+            'guru_id'         => $this->guru->id,
+            'kategori_berkas' => 'sk_penugasan_sekolah',
+            'nama_dokumen'    => '[SK Kolektif] Pembagian Tugas PBM Semester Ganjil 2026/2027',
+        ]);
+
+        $this->assertDatabaseHas('arsip_dokumen_ptks', [
+            'guru_id'         => $guru2->id,
+            'kategori_berkas' => 'sk_penugasan_sekolah',
+            'nama_dokumen'    => '[SK Kolektif] Pembagian Tugas PBM Semester Ganjil 2026/2027',
+        ]);
+    }
+
+    public function test_buku_sk_kepsek_dapat_mendistribusikan_sk_ke_guru_terpilih(): void
+    {
+        Storage::fake('public');
+
+        $guruTerpilih = Guru::create([
+            'nama'               => 'Ahmad Fauzi, M.T.',
+            'nip'                => '198801012014031002',
+            'status'             => 'aktif',
+            'jenis_ptk'          => 'Guru Produktif',
+        ]);
+
+        $guruBukanTarget = Guru::create([
+            'nama'               => 'Rina Marlina, S.Pd.',
+            'nip'                => '199507122019012005',
+            'status'             => 'aktif',
+            'jenis_ptk'          => 'Guru BK',
+        ]);
+
+        $file = UploadedFile::fake()->create('sk_kaprog_rpl.pdf', 600, 'application/pdf');
+
+        $response = $this->actingAs($this->admin)->post(route('situan.buku-sk.store'), [
+            'tentang_sk'         => 'Pengangkatan Kepala Program Keahlian RPL TA 2026/2027',
+            'tanggal_ditetapkan' => date('Y-m-d'),
+            'kategori_sk'        => 'Tugas Tambahan',
+            'file_dokumen'       => $file,
+            'distribusi_target'  => 'pilih_guru',
+            'guru_ids'           => [$guruTerpilih->id],
+        ]);
+
+        $response->assertRedirect(route('situan.buku-sk.index'));
+
+        // Guru terpilih menerima arsip
+        $this->assertDatabaseHas('arsip_dokumen_ptks', [
+            'guru_id'         => $guruTerpilih->id,
+            'kategori_berkas' => 'sk_penugasan_sekolah',
+            'nama_dokumen'    => '[SK Kolektif] Pengangkatan Kepala Program Keahlian RPL TA 2026/2027',
+        ]);
+
+        // Guru bukan target TIDAK menerima arsip
+        $this->assertDatabaseMissing('arsip_dokumen_ptks', [
+            'guru_id'         => $guruBukanTarget->id,
+            'nama_dokumen'    => '[SK Kolektif] Pengangkatan Kepala Program Keahlian RPL TA 2026/2027',
+        ]);
+    }
 }

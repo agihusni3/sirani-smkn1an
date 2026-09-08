@@ -11,6 +11,7 @@ class ArsipDokumenPtk extends Model
 
     protected $fillable = [
         'guru_id',
+        'buku_sk_id',
         'kategori_berkas',
         'nama_dokumen',
         'nomor_dokumen',
@@ -25,5 +26,10 @@ class ArsipDokumenPtk extends Model
     public function guru()
     {
         return $this->belongsTo(Guru::class, 'guru_id');
+    }
+
+    public function bukuSk()
+    {
+        return $this->belongsTo(BukuSkKepsek::class, 'buku_sk_id');
     }
 }
