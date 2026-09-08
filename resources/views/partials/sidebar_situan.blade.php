@@ -46,21 +46,92 @@
   {{-- 3. Navigation Sections --}}
   <div class="situan-nav-body">
 
-    {{-- Nav Section: Pusat Kendali --}}
+    {{-- 1. Operasional & Loket Pelayanan --}}
     <div class="situan-nav-group">
-      <div class="situan-nav-group-title">Pusat Kendali</div>
+      <div class="situan-nav-group-title">Operasional &amp; Loket</div>
       
-      <a href="{{ route('situan.index') }}" class="situan-nav-link {{ (request()->is('situan') || request()->is('situan/dashboard')) ? 'active' : '' }}">
+      <a href="{{ route('situan.index') }}" class="situan-nav-link {{ (request()->is('situan') || request()->is('situan/dashboard')) ? 'active' : '' }}" title="Dasbor Utama Statistik &amp; Pantauan Tata Usaha">
         <div class="situan-nav-link-left">
           <i class="bi bi-grid-1x2-fill"></i>
           <span>Dasbor Tata Usaha</span>
         </div>
       </a>
+
+      <a href="{{ route('situan.pelayanan.index') }}" class="situan-nav-link {{ request()->is('situan/pelayanan*') ? 'active' : '' }}" title="Loket Cetak Surat Keterangan Siswa Aktif, Mutasi, dan SKL Ber-QR Code">
+        <div class="situan-nav-link-left">
+          <i class="bi bi-file-earmark-check-fill"></i>
+          <span>Loket Surat Siswa</span>
+        </div>
+        <span class="situan-nav-badge" style="background:#f0fdf4; color:#16a34a; border-color:#bbf7d0;">QR Valid</span>
+      </a>
     </div>
 
-    {{-- Nav Section: Master Kesiswaan & Kelas --}}
+    {{-- 2. Persuratan & Disposisi Dinas --}}
     <div class="situan-nav-group">
-      <div class="situan-nav-group-title">Data Induk Kesiswaan</div>
+      <div class="situan-nav-group-title">Persuratan &amp; Disposisi</div>
+
+      <a href="{{ route('situan.surat-masuk.index') }}" class="situan-nav-link {{ request()->is('situan/surat-masuk*') ? 'active' : '' }}" title="Buku Agenda Surat Masuk &amp; Lembar Disposisi Kepala Sekolah">
+        <div class="situan-nav-link-left">
+          <i class="bi bi-inbox-fill"></i>
+          <span>Surat Masuk</span>
+        </div>
+        @php
+          $menungguDisposisiCount = \App\Models\SuratMasuk::where('status_disposisi', 'menunggu')->count();
+        @endphp
+        @if($menungguDisposisiCount > 0)
+          <span class="situan-nav-badge" style="background:#fef2f2; color:#ef4444; border-color:#fecaca;">{{ $menungguDisposisiCount }}</span>
+        @endif
+      </a>
+
+      <a href="{{ route('situan.surat-keluar.index') }}" class="situan-nav-link {{ request()->is('situan/surat-keluar*') ? 'active' : '' }}" title="Buku Agenda Surat Keluar &amp; Generator Nomor Surat">
+        <div class="situan-nav-link-left">
+          <i class="bi bi-send-fill"></i>
+          <span>Surat Keluar &amp; No. Agenda</span>
+        </div>
+      </a>
+
+      <a href="{{ route('situan.buku-sk.index') }}" class="situan-nav-link {{ request()->is('situan/buku-sk*') ? 'active' : '' }}" title="Buku Register Surat Keputusan (SK) Kepala Sekolah">
+        <div class="situan-nav-link-left">
+          <i class="bi bi-journal-check"></i>
+          <span>Buku Register SK</span>
+        </div>
+      </a>
+    </div>
+
+    {{-- 3. Kepegawaian & Kearsipan Sentral --}}
+    @if($isAdmin || $isKepsek || $isStafTu || $isWakaKurikulum || $isWakasis || ($user && in_array($user->role, ['waka_sarpras', 'waka_hubin'])))
+      <div class="situan-nav-group">
+        <div class="situan-nav-group-title">Kepegawaian &amp; Arsip</div>
+
+        <a href="{{ route('situan.ekabinet.index') }}" class="situan-nav-link {{ request()->is('situan/ekabinet*') ? 'active' : '' }}" title="Sentral Lemari Berkas Digital PTK, Dokumen Sekolah &amp; MoU Industri">
+          <div class="situan-nav-link-left">
+            <i class="bi bi-archive-fill"></i>
+            <span>E-Kabinet &amp; Arsip</span>
+          </div>
+          <span class="situan-nav-badge" style="background:#f0fdf4; color:#16a34a; border-color:#bbf7d0;">Sentral</span>
+        </a>
+
+        <a href="{{ route('situan.radar-kgb.index') }}" class="situan-nav-link {{ request()->is('situan/radar-kgb*') ? 'active' : '' }}" title="Radar Kenaikan Gaji Berkala (KGB) &amp; Pangkat Guru/Pegawai">
+          <div class="situan-nav-link-left">
+            <i class="bi bi-radar"></i>
+            <span>Radar KGB &amp; Pangkat</span>
+          </div>
+          <span class="situan-nav-badge" style="background:#eff6ff; color:#2563eb; border-color:#bfdbfe;">Berkala</span>
+        </a>
+
+        <a href="/guru" class="situan-nav-link {{ request()->is('guru*') ? 'active' : '' }}" title="Master Data Pendidik &amp; Tenaga Kependidikan">
+          <div class="situan-nav-link-left">
+            <i class="bi bi-person-badge-fill"></i>
+            <span>Data Pokok PTK</span>
+          </div>
+          <span class="situan-nav-badge">{{ $countGuru }}</span>
+        </a>
+      </div>
+    @endif
+
+    {{-- 4. Administrasi Kesiswaan & Kelas --}}
+    <div class="situan-nav-group">
+      <div class="situan-nav-group-title">Kesiswaan &amp; Kelas</div>
 
       <a href="/siswa" class="situan-nav-link {{ request()->is('siswa*') ? 'active' : '' }}">
         <div class="situan-nav-link-left">
@@ -92,99 +163,18 @@
           </div>
         </a>
       @endif
-    </div>
 
-    {{-- Nav Section: E-Persuratan & Tata Naskah Dinas --}}
-    <div class="situan-nav-group">
-      <div class="situan-nav-group-title">E-Persuratan &amp; Disposisi</div>
-
-      <a href="{{ route('situan.surat-masuk.index') }}" class="situan-nav-link {{ request()->is('situan/surat-masuk*') ? 'active' : '' }}" title="Buku Agenda Surat Masuk &amp; Lembar Disposisi Kepala Sekolah">
-        <div class="situan-nav-link-left">
-          <i class="bi bi-inbox-fill"></i>
-          <span>Surat Masuk</span>
-        </div>
-        @php
-          $menungguDisposisiCount = \App\Models\SuratMasuk::where('status_disposisi', 'menunggu')->count();
-        @endphp
-        @if($menungguDisposisiCount > 0)
-          <span class="situan-nav-badge" style="background:#fef2f2; color:#ef4444; border-color:#fecaca;">{{ $menungguDisposisiCount }}</span>
-        @endif
-      </a>
-
-      <a href="{{ route('situan.surat-keluar.index') }}" class="situan-nav-link {{ request()->is('situan/surat-keluar*') ? 'active' : '' }}" title="Buku Agenda Surat Keluar &amp; Generator Nomor Surat">
-        <div class="situan-nav-link-left">
-          <i class="bi bi-send-fill"></i>
-          <span>Surat Keluar &amp; No. Agenda</span>
-        </div>
-      </a>
-
-      <a href="{{ route('situan.buku-sk.index') }}" class="situan-nav-link {{ request()->is('situan/buku-sk*') ? 'active' : '' }}" title="Buku Register Surat Keputusan (SK) Kepala Sekolah">
-        <div class="situan-nav-link-left">
-          <i class="bi bi-journal-check"></i>
-          <span>Buku Register SK</span>
-        </div>
-      </a>
-    </div>
-
-    {{-- Nav Section: Loket Pelayanan Mandiri --}}
-    <div class="situan-nav-group">
-      <div class="situan-nav-group-title">Loket Pelayanan Mandiri</div>
-
-      <a href="{{ route('situan.pelayanan.index') }}" class="situan-nav-link {{ request()->is('situan/pelayanan*') ? 'active' : '' }}" title="Cetak Surat Keterangan Siswa Aktif, Mutasi, dan SKL Ber-QR Code">
-        <div class="situan-nav-link-left">
-          <i class="bi bi-file-earmark-check-fill"></i>
-          <span>Cetak Surat Kesiswaan</span>
-        </div>
-        <span class="situan-nav-badge" style="background:#f0fdf4; color:#16a34a; border-color:#bbf7d0;">QR Valid</span>
-      </a>
-    </div>
-
-    {{-- Nav Section: Kepegawaian & Radar KGB --}}
-    @if($isAdmin || $isKepsek || $isStafTu || $isWakaKurikulum || $isWakasis || ($user && in_array($user->role, ['waka_sarpras', 'waka_hubin'])))
-      <div class="situan-nav-group">
-        <div class="situan-nav-group-title">Kepegawaian &amp; PTK</div>
-
-        <a href="{{ route('situan.radar-kgb.index') }}" class="situan-nav-link {{ request()->is('situan/radar-kgb*') ? 'active' : '' }}" title="Radar Kenaikan Gaji Berkala (KGB) &amp; Pangkat Guru/Pegawai">
-          <div class="situan-nav-link-left">
-            <i class="bi bi-radar"></i>
-            <span>Radar KGB &amp; Pangkat</span>
-          </div>
-          <span class="situan-nav-badge" style="background:#eff6ff; color:#2563eb; border-color:#bfdbfe;">Berkala</span>
-        </a>
-
-        <a href="/guru" class="situan-nav-link {{ request()->is('guru*') ? 'active' : '' }}" title="Master Data Pendidik &amp; Tenaga Kependidikan">
-          <div class="situan-nav-link-left">
-            <i class="bi bi-person-badge-fill"></i>
-            <span>Data Pokok PTK</span>
-          </div>
-          <span class="situan-nav-badge">{{ $countGuru }}</span>
-        </a>
-
-        <a href="{{ route('situan.ekabinet.index') }}" class="situan-nav-link {{ request()->is('situan/ekabinet*') ? 'active' : '' }}" title="Sentral Lemari Berkas Digital PTK, Dokumen Sekolah &amp; MoU Industri">
-          <div class="situan-nav-link-left">
-            <i class="bi bi-archive-fill"></i>
-            <span>E-Kabinet &amp; Arsip</span>
-          </div>
-          <span class="situan-nav-badge" style="background:#f0fdf4; color:#16a34a; border-color:#bbf7d0;">Sentral</span>
-        </a>
-      </div>
-    @endif
-
-    {{-- Nav Section: Kartu Identitas & RFID --}}
-    @if($isAdmin || $isStafTu)
-      <div class="situan-nav-group">
-        <div class="situan-nav-group-title">Identitas &amp; Kartu</div>
-
+      @if($isAdmin || $isStafTu)
         <a href="/kartu-rfid" class="situan-nav-link {{ request()->is('kartu-rfid*') || request()->is('manajemen-rfid*') ? 'active' : '' }}">
           <div class="situan-nav-link-left">
             <i class="bi bi-person-vcard-fill"></i>
             <span>Kartu &amp; Identitas</span>
           </div>
         </a>
-      </div>
-    @endif
+      @endif
+    </div>
 
-    {{-- Nav Section: Legalitas & Audit Data --}}
+    {{-- 5. Tata Usaha & Audit --}}
     @if($isAdmin || $isKepsek || $isStafTu)
       <div class="situan-nav-group">
         <div class="situan-nav-group-title">Tata Usaha &amp; Audit</div>

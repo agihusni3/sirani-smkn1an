@@ -190,34 +190,39 @@ body.situan-body {
   padding: 12px 14px;
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 12px;
 }
 
 .situan-nav-group {
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 2px;
+  position: relative;
+}
+
+.situan-nav-group:not(:first-child) {
+  padding-top: 8px;
+  border-top: 1px dashed rgba(203, 213, 225, 0.7);
 }
 
 .situan-nav-group-title {
-  font-size: 10px;
-  font-weight: 900;
-  color: #000000;
+  font-size: 9.5px;
+  font-weight: 800;
+  color: #64748b;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  padding: 4px 10px 6px;
-  opacity: 0.85;
+  padding: 2px 10px 4px;
 }
 
 .situan-nav-link {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 8px 12px;
+  padding: 7.5px 12px;
   border-radius: var(--situan-radius-sm);
   text-decoration: none;
-  color: #000000;
-  font-size: 12.5px;
+  color: #1e293b;
+  font-size: 12px;
   font-weight: 700;
   transition: all 0.15s ease;
   position: relative;
@@ -243,9 +248,9 @@ body.situan-body {
 }
 
 .situan-nav-link-left i {
-  font-size: 16px;
-  color: #475569;
-  width: 20px;
+  font-size: 15px;
+  color: #64748b;
+  width: 18px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -260,7 +265,7 @@ body.situan-body {
 }
 
 .situan-nav-link:hover {
-  background: rgba(2, 132, 199, 0.08);
+  background: #f1f5f9;
   color: #0284c7;
 }
 
@@ -270,9 +275,10 @@ body.situan-body {
 
 /* Active State with crisp clean rounded badge & background */
 .situan-nav-link.active {
-  background: rgba(2, 132, 199, 0.12);
+  background: #e0f2fe;
   color: #0284c7;
-  font-weight: 900;
+  font-weight: 800;
+  box-shadow: inset 3px 0 0 #0284c7;
 }
 
 .situan-nav-link.active .situan-nav-link-left i {
