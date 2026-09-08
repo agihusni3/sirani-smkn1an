@@ -450,7 +450,7 @@
         <table class="kop-table">
             <tr>
                 <td class="kop-logo-col">
-                    <img src="{{ asset('img/logo_prov_lampung.png') }}" class="kop-logo" alt="Logo Provinsi Lampung" onerror="this.onerror=null; this.src='{{ asset('img/logo_prov_lampung.svg') }}'">
+                    <img src="{{ $sekolah->logo_provinsi_url }}" class="kop-logo" alt="Logo Pemerintah Provinsi Lampung">
                 </td>
                 <td class="kop-text-col">
                     <div class="kop-text-1">{{ $sekolah->nama_instansi_atas ?? 'PEMERINTAH PROVINSI LAMPUNG' }}</div>
@@ -464,11 +464,7 @@
                     </div>
                 </td>
                 <td class="kop-logo-col">
-                    @if(!empty($sekolah->logo_sekolah) && file_exists(public_path('storage/'.$sekolah->logo_sekolah)))
-                        <img src="{{ asset('storage/'.$sekolah->logo_sekolah) }}" class="kop-logo" alt="Logo Sekolah" onerror="this.onerror=null; this.src='{{ asset('img/logo.png') }}'">
-                    @else
-                        <img src="{{ asset('img/logo.png') }}" class="kop-logo" alt="Logo SMKN 1 Air Naningan" onerror="this.onerror=null; this.src='{{ asset('logo.png') }}'">
-                    @endif
+                    <img src="{{ $sekolah->logo_sekolah_url }}" class="kop-logo" alt="Logo SMK">
                 </td>
             </tr>
         </table>

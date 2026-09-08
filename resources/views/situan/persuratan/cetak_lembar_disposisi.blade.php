@@ -126,10 +126,15 @@
   </div>
 
   <div class="kop">
-    <img src="/img/logo.png" alt="Logo" class="kop-logo" />
-    <div class="kop-instansi">Pemerintah Provinsi Lampung · Dinas Pendidikan dan Kebudayaan</div>
-    <div class="kop-nama-sekolah">SMK NEGERI 1 AIR NANINGAN</div>
-    <div class="kop-alamat">Jalan Raya Air Naningan, Kec. Air Naningan, Kab. Tanggamus, Lampung 35379 · NPSN: 69947077 · Email: info@smkn1airnaningan.sch.id</div>
+    <div style="display:flex; align-items:center; justify-content:space-between; gap:10px;">
+      <img src="{{ $sekolah->logo_provinsi_url }}" alt="Logo Provinsi Lampung" style="width:48px; height:48px; object-fit:contain; flex-shrink:0;" />
+      <div style="flex:1; text-align:center;">
+        <div class="kop-instansi">{{ $sekolah->nama_instansi_atas ?: 'PEMERINTAH PROVINSI LAMPUNG' }} &bull; {{ $sekolah->nama_dinas ?: 'DINAS PENDIDIKAN DAN KEBUDAYAAN' }}</div>
+        <div class="kop-nama-sekolah">{{ $sekolah->nama_sekolah ?: 'SMK NEGERI 1 AIR NANINGAN' }}</div>
+        <div class="kop-alamat">{{ $sekolah->alamat_lengkap ?: 'Jl. Makam Baturuguk, Pekon Karang Sari, Kec. Air Naningan, Kab. Tanggamus' }} &bull; @if($sekolah->npsn)NPSN: {{ $sekolah->npsn }} &bull; @endif Email: {{ $sekolah->email }}</div>
+      </div>
+      <img src="{{ $sekolah->logo_sekolah_url }}" alt="Logo Sekolah" style="width:48px; height:48px; object-fit:contain; flex-shrink:0;" />
+    </div>
   </div>
 
   <div class="judul-lembar">LEMBAR DISPOSISI KEPALA SEKOLAH</div>

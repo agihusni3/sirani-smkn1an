@@ -348,32 +348,23 @@
     <!-- KOP RESMI -->
     <div class="kop-surat">
       <div class="kop-logo-left">
-        <img src="{{ asset('img/logo_prov_lampung.png') }}" 
+        <img src="{{ $sekolah->logo_provinsi_url }}" 
              alt="Logo Provinsi Lampung" 
-             class="kop-logo" 
-             onerror="this.onerror=null; this.src='{{ asset('logo_prov_lampung.png') }}';">
+             class="kop-logo">
       </div>
       <div class="kop-teks">
         <div class="kop-instansi-atas">{{ $sekolah->nama_instansi_atas ?? 'PEMERINTAH PROVINSI LAMPUNG' }}</div>
         <div class="kop-dinas">{{ $sekolah->nama_dinas ?? 'DINAS PENDIDIKAN DAN KEBUDAYAAN' }}</div>
         <div class="kop-sekolah">{{ $sekolah->nama_sekolah ?? 'SMK NEGERI 1 AIR NANINGAN' }}</div>
         <div class="kop-alamat">
-          {{ $sekolah->alamat_lengkap ?? 'Jl. Raya Air Naningan, Kec. Air Naningan, Kab. Tanggamus, Lampung 35379' }}<br>
+          {{ $sekolah->alamat_lengkap ?? 'Jl. Makam Baturuguk, Pekon Karang Sari, Kec. Air Naningan, Kab. Tanggamus' }}<br>
           Website: {{ $sekolah->website ?? 'smkn1airnaningan.sch.id' }} | Email: {{ $sekolah->email ?? 'smkn1airnaningan@gmail.com' }}
         </div>
       </div>
       <div class="kop-logo-right">
-        @if(!empty($sekolah->logo_sekolah) && file_exists(public_path('storage/' . $sekolah->logo_sekolah)))
-          <img src="{{ asset('storage/' . $sekolah->logo_sekolah) }}" 
-               alt="Logo SMK" 
-               class="kop-logo" 
-               onerror="this.onerror=null; this.src='{{ asset('img/logo.png') }}';">
-        @else
-          <img src="{{ asset('img/logo.png') }}" 
-               alt="Logo SMK" 
-               class="kop-logo" 
-               onerror="this.onerror=null; this.src='{{ asset('logo.png') }}';">
-        @endif
+        <img src="{{ $sekolah->logo_sekolah_url }}" 
+             alt="Logo SMK" 
+             class="kop-logo">
       </div>
     </div>
 

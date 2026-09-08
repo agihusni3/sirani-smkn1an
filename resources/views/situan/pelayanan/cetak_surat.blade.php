@@ -347,16 +347,17 @@
     <div class="doc-main-content">
       {{-- 1. KOP DINAS RESMI --}}
       <div class="kop-container">
-        <img src="{{ $sekolah->logo_url ?: '/img/logo.png' }}" alt="Logo Sekolah" class="kop-logo" />
+        <img src="{{ $sekolah->logo_provinsi_url }}" alt="Logo Provinsi Lampung" class="kop-logo" />
         <div class="kop-text">
           <div class="kop-instansi-1">{{ $sekolah->nama_instansi_atas ?: 'PEMERINTAH PROVINSI LAMPUNG' }}</div>
           <div class="kop-instansi-2">{{ $sekolah->nama_dinas ?: 'DINAS PENDIDIKAN DAN KEBUDAYAAN' }}</div>
           <div class="kop-sekolah">{{ $sekolah->nama_sekolah ?: 'SMK NEGERI 1 AIR NANINGAN' }}</div>
           <div class="kop-alamat">
             {{ $sekolah->alamat_lengkap ?: 'Jl. Makam Baturuguk, Pekon Karang Sari, Kec. Air Naningan, Kab. Tanggamus, Lampung 35379' }}<br>
-            NPSN: {{ $sekolah->npsn ?: '70011825' }} &bull; Website: {{ $sekolah->website ?: 'smkn1airnaningan.sch.id' }} &bull; Email: {{ $sekolah->email ?: 'smkn1airnaningan@gmail.com' }}
+            @if($sekolah->npsn)NPSN: {{ $sekolah->npsn }} &bull; @endif Website: {{ $sekolah->website ?: 'smkn1airnaningan.sch.id' }} &bull; Email: {{ $sekolah->email ?: 'smkn1airnaningan@gmail.com' }}
           </div>
         </div>
+        <img src="{{ $sekolah->logo_sekolah_url }}" alt="Logo Sekolah" class="kop-logo" />
       </div>
       <hr class="kop-divider">
 

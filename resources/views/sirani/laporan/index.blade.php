@@ -71,17 +71,17 @@
     <div class="print-only">
       <div class="kop-container">
         <div class="kop-logo-left">
-          <img src="/img/logo_prov_lampung.png" alt="Logo Provinsi" onerror="this.onerror=null; this.src='/img/logo_prov_lampung.svg'" />
+          <img src="{{ $sekolah->logo_provinsi_url }}" alt="Logo Provinsi" />
         </div>
         <div class="kop-text">
           <h2>{{ $sekolah->nama_instansi_atas ?? 'PEMERINTAH PROVINSI LAMPUNG' }}</h2>
           <h3>{{ $sekolah->nama_dinas ?? 'DINAS PENDIDIKAN DAN KEBUDAYAAN' }}</h3>
           <h1>{{ $sekolah->nama_sekolah ?? 'SMK NEGERI 1 AIR NANINGAN' }}</h1>
-          <p>{{ $sekolah->alamat_lengkap ?? $sekolah->alamat ?? 'Jl. Raya Air Naningan, Kec. Air Naningan, Kab. Tanggamus, Lampung 35379' }}</p>
-          <p>Email: {{ $sekolah->email ?? 'info@smkn1airnaningan.sch.id' }} · Website: {{ $sekolah->website ?? 'smkn1airnaningan.sch.id' }}</p>
+          <p>{{ $sekolah->alamat_lengkap ?? $sekolah->alamat ?? 'Jl. Makam Baturuguk, Pekon Karang Sari, Kec. Air Naningan, Kab. Tanggamus' }}</p>
+          <p>Email: {{ $sekolah->email ?? 'smkn1airnaningan@gmail.com' }} · Website: {{ $sekolah->website ?? 'smkn1airnaningan.sch.id' }}</p>
         </div>
         <div class="kop-logo-right">
-          <img src="/img/logo.png" alt="Logo Sekolah" onerror="this.onerror=null; this.src='/logo.png'" />
+          <img src="{{ $sekolah->logo_sekolah_url }}" alt="Logo Sekolah" />
         </div>
       </div>
       <div class="kop-line-double"></div>

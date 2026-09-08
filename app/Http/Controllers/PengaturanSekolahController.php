@@ -38,11 +38,19 @@ class PengaturanSekolahController extends Controller
             'website'            => 'nullable|string|max:100',
             'nama_kepala_sekolah'=> 'nullable|string|max:255',
             'nip_kepala_sekolah' => 'nullable|string|max:100',
-            'logo_sekolah'       => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'logo_provinsi'      => 'nullable|image|mimes:jpg,jpeg,png,webp,svg|max:4096',
+            'logo_sekolah'       => 'nullable|image|mimes:jpg,jpeg,png,webp,svg|max:4096',
         ]);
 
         $sekolah = PengaturanSekolah::getAktif();
-        $data = $request->except(['logo_sekolah', '_token']);
+        $data = $request->except(['logo_provinsi', 'logo_sekolah', '_token']);
+
+        if ($request->hasFile('logo_provinsi')) {
+            if ($sekolah->logo_provinsi && Storage::disk('public')->exists($sekolah->logo_provinsi)) {
+                Storage::disk('public')->delete($sekolah->logo_provinsi);
+            }
+            $data['logo_provinsi'] = $request->file('logo_provinsi')->store('sekolah', 'public');
+        }
 
         if ($request->hasFile('logo_sekolah')) {
             if ($sekolah->logo_sekolah && Storage::disk('public')->exists($sekolah->logo_sekolah)) {

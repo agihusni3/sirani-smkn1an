@@ -65,6 +65,10 @@ class SuratDanBackupTest extends TestCase
         $response->assertSee('Pengaturan Profil Sekolah');
         $response->assertSee('SMK NEGERI 1 AIR NANINGAN');
 
+        \Illuminate\Support\Facades\Storage::fake('public');
+        $logoProv = \Illuminate\Http\UploadedFile::fake()->image('prov.png', 200, 200);
+        $logoSekolah = \Illuminate\Http\UploadedFile::fake()->image('smk.png', 200, 200);
+
         $updateResponse = $this->actingAs($this->admin)->post('/pengaturan-sekolah', [
             'nama_instansi_atas' => 'PEMERINTAH PROVINSI LAMPUNG',
             'nama_dinas'         => 'DINAS PENDIDIKAN DAN KEBUDAYAAN',
@@ -77,14 +81,22 @@ class SuratDanBackupTest extends TestCase
             'kode_pos'           => '35379',
             'email'              => 'info@smkn1airnaningan.sch.id',
             'website'            => 'smkn1airnaningan.sch.id',
-            'nama_kepala_sekolah'=> 'Drs. H. Ahmad Sudrajat, M.Pd.',
-            'nip_kepala_sekolah' => '19750510 200003 1 005',
+            'nama_kepala_sekolah'=> 'Aprida, S.Si.',
+            'nip_kepala_sekolah' => '197904172008012019',
+            'logo_provinsi'      => $logoProv,
+            'logo_sekolah'       => $logoSekolah,
         ]);
 
         $updateResponse->assertRedirect(route('admin.pengaturan-sekolah.index'));
         $this->assertDatabaseHas('pengaturan_sekolahs', [
             'nama_sekolah' => 'SMK NEGERI 1 AIR NANINGAN HEBAT',
         ]);
+
+        $sekolah = PengaturanSekolah::getAktif();
+        $this->assertNotNull($sekolah->logo_provinsi);
+        $this->assertNotNull($sekolah->logo_sekolah);
+        $this->assertStringContainsString('/storage/', $sekolah->logo_provinsi_url);
+        $this->assertStringContainsString('/storage/', $sekolah->logo_sekolah_url);
     }
 
     public function test_cetak_surat_panggilan_ortu_merender_data_siswa_dan_kop_dinas()

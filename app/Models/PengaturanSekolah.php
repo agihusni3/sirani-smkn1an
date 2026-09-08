@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 
 class PengaturanSekolah extends Model
 {
@@ -27,6 +28,7 @@ class PengaturanSekolah extends Model
         'website',
         'nama_kepala_sekolah',
         'nip_kepala_sekolah',
+        'logo_provinsi',
         'logo_sekolah',
         'template_piagam',
         'template_piagam_config',
@@ -172,5 +174,35 @@ class PengaturanSekolah extends Model
         }
 
         return $alamatStr;
+    }
+
+    /**
+     * URL Logo Resmi Pemerintah Provinsi (Kiri Kop Surat).
+     */
+    public function getLogoProvinsiUrlAttribute(): string
+    {
+        if (!empty($this->logo_provinsi) && Storage::disk('public')->exists($this->logo_provinsi)) {
+            return asset('storage/' . $this->logo_provinsi);
+        }
+        return asset('img/logo_prov_lampung.png');
+    }
+
+    /**
+     * URL Logo Resmi Sekolah SMKN 1 Air Naningan (Kanan Kop Surat).
+     */
+    public function getLogoSekolahUrlAttribute(): string
+    {
+        if (!empty($this->logo_sekolah) && Storage::disk('public')->exists($this->logo_sekolah)) {
+            return asset('storage/' . $this->logo_sekolah);
+        }
+        return asset('img/logo.png');
+    }
+
+    /**
+     * Alias logo_url untuk kompatibilitas template lama.
+     */
+    public function getLogoUrlAttribute(): string
+    {
+        return $this->logo_sekolah_url;
     }
 }
