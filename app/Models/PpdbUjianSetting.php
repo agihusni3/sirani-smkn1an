@@ -46,6 +46,11 @@ class PpdbUjianSetting extends Model
         return $this->hasMany(PpdbUjianPeserta::class, 'ppdb_ujian_setting_id');
     }
 
+    public function absensiUjians()
+    {
+        return $this->hasMany(PpdbAbsensiUjian::class, 'ppdb_ujian_setting_id');
+    }
+
     public function soals()
     {
         return $this->hasMany(PpdbSoalUjian::class, 'ppdb_ujian_setting_id')->orderBy('nomor_urut');

@@ -565,14 +565,11 @@
                     @endif
                 </div>
 
-                {{-- QR Code Verifikasi Berkas & Status --}}
-                <div class="qr-verifikasi-box">
-                    @if(!empty($qrCode))
-                        <img src="{{ $qrCode }}" alt="QR Verifikasi">
-                    @else
-                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data={{ urlencode($statusUrl ?? url('/ppdb/status?keyword=' . ($pendaftar->no_pendaftaran ?? $pendaftar->nomor_pendaftaran))) }}" alt="QR Verifikasi">
-                    @endif
-                    <div class="qr-caption">Scan Verifikasi Resmi</div>
+                {{-- 2D Barcode (QR Code) Resmi Presensi Ujian CBT & Verifikasi --}}
+                <div class="qr-verifikasi-box" style="border: 1.5px solid #000000; padding: 6px; background: #ffffff; border-radius: 4px; display: inline-block; text-align: center;">
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data={{ urlencode($pendaftar->no_pendaftaran ?? $pendaftar->nomor_pendaftaran) }}" alt="2D Barcode Presensi" style="width: 86px; height: 86px; display: block; margin: 0 auto;">
+                    <div class="qr-caption" style="font-weight: 900; font-size: 7pt; color: #000000; margin-top: 4px; letter-spacing: 0.5px;">2D BARCODE UJIAN</div>
+                    <div style="font-size: 6.5pt; font-weight: bold; color: #1e293b; font-family: 'Courier New', monospace;">{{ $pendaftar->no_pendaftaran ?? $pendaftar->nomor_pendaftaran }}</div>
                 </div>
             </div>
 

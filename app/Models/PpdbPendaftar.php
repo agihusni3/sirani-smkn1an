@@ -129,6 +129,25 @@ class PpdbPendaftar extends Model
         return $this->hasOne(PpdbUjianPeserta::class, 'ppdb_pendaftar_id');
     }
 
+    public function absensiUjian()
+    {
+        return $this->hasOne(PpdbAbsensiUjian::class, 'ppdb_pendaftar_id')->latestOfMany('waktu_hadir');
+    }
+
+    public function absensiUjians()
+    {
+        return $this->hasMany(PpdbAbsensiUjian::class, 'ppdb_pendaftar_id');
+    }
+
+    public function isSudahAbsenUjian($tanggal = null): bool
+    {
+        $query = $this->absensiUjians();
+        if ($tanggal) {
+            $query->whereDate('jadwal_tanggal', $tanggal);
+        }
+        return $query->exists();
+    }
+
     public function siswa()
     {
         return $this->belongsTo(Siswa::class, 'siswa_id');

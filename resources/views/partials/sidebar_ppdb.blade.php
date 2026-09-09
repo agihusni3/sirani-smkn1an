@@ -188,6 +188,15 @@
       <span class="ppdb-badge badge-blue">CBT</span>
     </a>
 
+    {{-- Presensi Ujian Barcode --}}
+    <a href="{{ route('admin.ppdb.presensi.kios') }}" class="ppdb-nav-link {{ request()->is('admin/ppdb/presensi-ujian*') ? 'active' : '' }}" title="Kios Presensi Barcode 2D / QR Ujian PPDB">
+      <div style="display:flex; align-items:center;">
+        <i class="bi bi-qr-code-scan ppdb-nav-icon"></i>
+        <span>Presensi Ujian Barcode</span>
+      </div>
+      <span class="ppdb-badge badge-amber">Scan</span>
+    </a>
+
     {{-- Log Riwayat --}}
     <a href="{{ route('admin.ppdb.log') }}" class="ppdb-nav-link {{ request()->is('admin/ppdb/log*') ? 'active' : '' }}" title="Audit Log &amp; Riwayat Aktivitas Panitia">
       <div style="display:flex; align-items:center;">

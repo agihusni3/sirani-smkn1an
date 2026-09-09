@@ -99,7 +99,10 @@ class PpdbUjianController extends Controller
             return redirect()->route('ppdb.ujian.selesai', ['nomor' => $pendaftar->no_pendaftaran]);
         }
 
-        return view('ppdb.ujian.konfirmasi', compact('sekolah', 'pendaftar', 'setting', 'peserta'));
+        // Cek status presensi ujian fisik
+        $absensi = $pendaftar->absensiUjian;
+
+        return view('ppdb.ujian.konfirmasi', compact('sekolah', 'pendaftar', 'setting', 'peserta', 'absensi'));
     }
 
     /**
@@ -116,6 +119,13 @@ class PpdbUjianController extends Controller
         if (!$statusValid) {
             return redirect()->route('ppdb.status', ['keyword' => $pendaftar->no_pendaftaran])
                 ->with('error', 'Akses ditolak: Berkas Anda belum terverifikasi.');
+        }
+
+        // PRASYARAT MUTLAK: Calon siswa WAJIB telah presensi fisik di ruang ujian via pemindaian 2D Barcode / QR
+        $sudahAbsen = $pendaftar->absensiUjians()->exists();
+        if (!$sudahAbsen) {
+            return redirect()->route('ppdb.ujian.konfirmasi', ['nomor' => $pendaftar->no_pendaftaran])
+                ->with('error', 'Akses Ujian Ditolak: Anda belum melakukan presensi fisik di ruang ujian. Silakan tunjukkan Kartu Ujian (2D Barcode / QR) Anda kepada Panitia/Pengawas Ujian di lokasi tes untuk dipindai terlebih dahulu.');
         }
 
         $setting = PpdbUjianSetting::getAktif();

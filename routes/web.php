@@ -33,6 +33,7 @@ use App\Http\Controllers\Ppdb\PpdbDaftarController;
 use App\Http\Controllers\Ppdb\PpdbAdminController;
 use App\Http\Controllers\Ppdb\PpdbUjianController;
 use App\Http\Controllers\Ppdb\PpdbSoalController;
+use App\Http\Controllers\Ppdb\PpdbPresensiUjianController;
 use App\Http\Controllers\Admin\BeritaAdminController;
 use App\Http\Controllers\Admin\WebsiteBannerController;
 use App\Http\Controllers\Admin\WebsiteStatistikController;
@@ -417,6 +418,13 @@ Route::middleware('auth')->group(function () {
             Route::post('/ppdb/seleksi/nilai-esai/{id}', [PpdbAdminController::class, 'simpanNilaiEsai'])->name('ppdb.seleksi.nilai_esai');
             Route::post('/ppdb/seleksi/nilai-wawancara/{id}', [PpdbAdminController::class, 'simpanNilaiWawancara'])->name('ppdb.seleksi.nilai_wawancara');
             Route::post('/ppdb/seleksi/kalkulasi', [PpdbAdminController::class, 'kalkulasiKelulusan'])->name('ppdb.seleksi.kalkulasi');
+
+            // Presensi Ujian Tulis/CBT PPDB Berbasis Barcode 2D / QR & Kios Scanner
+            Route::get('/ppdb/presensi-ujian', [PpdbPresensiUjianController::class, 'kios'])->name('ppdb.presensi.kios');
+            Route::post('/ppdb/presensi-ujian/scan', [PpdbPresensiUjianController::class, 'scan'])->name('ppdb.presensi.scan');
+            Route::post('/ppdb/presensi-ujian/{id}/manual', [PpdbPresensiUjianController::class, 'manualHadir'])->name('ppdb.presensi.manual');
+            Route::delete('/ppdb/presensi-ujian/{id}', [PpdbPresensiUjianController::class, 'batalHadir'])->name('ppdb.presensi.batal');
+            Route::get('/ppdb/presensi-ujian/cetak', [PpdbPresensiUjianController::class, 'cetakDaftarHadir'])->name('ppdb.presensi.cetak');
 
             Route::get('/ppdb/{id}', [PpdbAdminController::class, 'show'])->name('ppdb.show');
             Route::put('/ppdb/{id}/status', [PpdbAdminController::class, 'updateStatus'])->name('ppdb.update_status');

@@ -53,6 +53,20 @@
                         ({{ $pendaftar->jadwal_tes_ruang ?? 'Lab Komputer' }})
                     </div>
                 </div>
+                <div>
+                    <div style="color: #64748b; font-size: 0.78rem; font-weight: 700; text-transform: uppercase;">Status Presensi Fisik:</div>
+                    <div style="margin-top: 3px;">
+                        @if($absensi)
+                            <span style="display: inline-flex; align-items: center; gap: 5px; background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; padding: 3px 10px; border-radius: 20px; font-size: 0.8rem; font-weight: 800;">
+                                <i class="fa-solid fa-circle-check"></i> HADIR ({{ $absensi->waktu_hadir->format('H:i') }} WIB)
+                            </span>
+                        @else
+                            <span style="display: inline-flex; align-items: center; gap: 5px; background: #fffbeb; color: #b45309; border: 1px solid #fde68a; padding: 3px 10px; border-radius: 20px; font-size: 0.8rem; font-weight: 800;">
+                                <i class="fa-solid fa-clock"></i> BELUM SCAN KARTU
+                            </span>
+                        @endif
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -102,12 +116,41 @@
             </ol>
         </div>
 
-        <!-- Tombol Aksi Mulai -->
+        <!-- Tombol Aksi Mulai / Status Presensi Gatekeeper -->
         <div style="text-align: center; display: flex; flex-direction: column; align-items: center; gap: 14px;">
-            <a href="{{ route('ppdb.ujian.kerjakan', $pendaftar->no_pendaftaran) }}" class="btn-shine" style="padding: 16px 40px; font-size: 1.1rem; font-weight: 800; border-radius: 12px; display: inline-flex; align-items: center; gap: 12px; text-decoration: none; box-shadow: 0 8px 20px rgba(37,99,235,0.25);">
-                <span>MULAI MENGERJAKAN UJIAN</span>
-                <i class="fa-solid fa-arrow-right"></i>
-            </a>
+            @if($absensi)
+                <a href="{{ route('ppdb.ujian.kerjakan', $pendaftar->no_pendaftaran) }}" class="btn-shine" style="padding: 16px 40px; font-size: 1.1rem; font-weight: 800; border-radius: 12px; display: inline-flex; align-items: center; gap: 12px; text-decoration: none; box-shadow: 0 8px 20px rgba(37,99,235,0.25);">
+                    <span>MULAI MENGERJAKAN UJIAN</span>
+                    <i class="fa-solid fa-arrow-right"></i>
+                </a>
+            @else
+                <div style="background: #fffbeb; border: 1.5px solid #fde68a; border-radius: 12px; padding: 18px 20px; max-width: 600px; text-align: left; margin-bottom: 8px;">
+                    <div style="display: flex; gap: 12px; align-items: flex-start;">
+                        <i class="fa-solid fa-id-card-clip" style="font-size: 1.6rem; color: #d97706; margin-top: 2px;"></i>
+                        <div>
+                            <div style="font-weight: 800; font-size: 1rem; color: #92400e; margin-bottom: 4px;">
+                                Akses Soal Ujian Terkunci (Belum Presensi Fisik)
+                            </div>
+                            <div style="font-size: 0.88rem; color: #78350f; line-height: 1.5;">
+                                Untuk membuka soal ujian seleksi CBT ini, Anda wajib melakukan presensi fisik terlebih dahulu dengan menunjukkan <strong>Kartu Peserta (2D Barcode / QR)</strong> kepada Pengawas Ujian di ruang tes untuk dipindai.
+                            </div>
+                            <div style="margin-top: 12px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                                <a href="{{ route('ppdb.cetak', ['nomor' => $pendaftar->no_pendaftaran]) }}" target="_blank" style="display: inline-flex; align-items: center; gap: 6px; background: #d97706; color: #fff; padding: 7px 14px; border-radius: 8px; font-weight: 700; font-size: 0.82rem; text-decoration: none;">
+                                    <i class="fa-solid fa-qrcode"></i> Buka Kartu Ujian (2D Barcode)
+                                </a>
+                                <button type="button" onclick="window.location.reload()" style="display: inline-flex; align-items: center; gap: 6px; background: #ffffff; color: #92400e; border: 1px solid #fde68a; padding: 7px 14px; border-radius: 8px; font-weight: 700; font-size: 0.82rem; cursor: pointer;">
+                                    <i class="fa-solid fa-rotate-right"></i> Refresh Halaman
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="button" disabled style="padding: 16px 36px; font-size: 1rem; font-weight: 800; border-radius: 12px; background: #e2e8f0; color: #94a3b8; border: 1px solid #cbd5e1; cursor: not-allowed; display: inline-flex; align-items: center; gap: 10px;">
+                    <i class="fa-solid fa-lock"></i>
+                    <span>MENUNGGU PRESENSI PENGAWAS RUANG</span>
+                </button>
+            @endif
 
             <a href="{{ route('ppdb.status', ['keyword' => $pendaftar->no_pendaftaran]) }}" style="color: #64748b; font-size: 0.88rem; font-weight: 700; text-decoration: none;">
                 <i class="fa-solid fa-arrow-left me-1"></i> Kembali ke Status Pendaftaran
