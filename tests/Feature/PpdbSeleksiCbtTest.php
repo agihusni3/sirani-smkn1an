@@ -370,5 +370,22 @@ class PpdbSeleksiCbtTest extends TestCase
         $this->assertEquals('10.30 - 12.30 WIB', $pendaftar->jadwal_tes_sesi);
         $this->assertEquals('Lab Komputer 2', $pendaftar->jadwal_tes_ruang);
     }
+
+    public function test_admin_bisa_mengakses_cetak_instrumen_rubrik_wawancara()
+    {
+        $pendaftar = $this->buatPendaftar('PPDB-WCR-01', '1122334499', 'Peserta Rubrik Wawancara', 'terverifikasi');
+
+        // 1. Akses format cetak single peserta
+        $resSingle = $this->actingAs($this->admin)->get(route('admin.ppdb.seleksi.cetak_wawancara', $pendaftar->id));
+        $resSingle->assertOk();
+        $resSingle->assertSee('Instrumen &amp; Rubrik Wawancara Minat Kejuruan PPDB 2026', false);
+        $resSingle->assertSee($pendaftar->nama_lengkap);
+
+        // 2. Akses format cetak blank / template panitia
+        $resBlank = $this->actingAs($this->admin)->get(route('admin.ppdb.seleksi.cetak_wawancara'));
+        $resBlank->assertOk();
+        $resBlank->assertSee('Instrumen &amp; Rubrik Wawancara Minat Kejuruan PPDB 2026', false);
+        $resBlank->assertSee('Ketua Panitia PPDB 2026');
+    }
 }
 

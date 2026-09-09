@@ -226,7 +226,8 @@ class PpdbAdminController extends Controller
         }
 
         // Peserta untuk jadwal dan rekapitulasi
-        $pesertaUjian = (clone $query)->whereIn('status', ['terverifikasi', 'berkas_valid', 'diterima', 'siap_tes'])
+        $pesertaUjian = (clone $query)->with(['jurusan1', 'jurusan2', 'pewawancara'])
+            ->whereIn('status', ['terverifikasi', 'berkas_valid', 'diterima', 'siap_tes'])
             ->orderBy('no_pendaftaran', 'asc')
             ->get();
 
@@ -466,6 +467,22 @@ class PpdbAdminController extends Controller
 
         return redirect()->route('admin.ppdb.seleksi', ['tab' => 'wawancara'])
             ->with('success', "Penilaian wawancara untuk {$pendaftar->nama_lengkap} berhasil disimpan! Skor Wawancara: {$pendaftar->nilai_wawancara_total} (Skor Akhir: {$pendaftar->nilai_akhir}).");
+    }
+
+    /**
+     * Cetak Lembar Format / Hasil Instrumen Wawancara PPDB Berbasis Rubrik (A4)
+     */
+    public function cetakInstrumenWawancara($id = null)
+    {
+        $pendaftar = $id ? PpdbPendaftar::with(['jurusan1', 'jurusan2', 'pewawancara'])->findOrFail($id) : null;
+        $jurusans = \App\Models\Jurusan::all();
+        $setting = PpdbUjianSetting::getAktif();
+
+        return view('ppdb.admin.cetak_instrumen_wawancara', compact(
+            'pendaftar',
+            'jurusans',
+            'setting'
+        ));
     }
 
     /**

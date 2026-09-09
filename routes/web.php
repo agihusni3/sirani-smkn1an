@@ -419,6 +419,7 @@ Route::middleware('auth')->group(function () {
             Route::post('/ppdb/seleksi/jadwalkan-single/{id}', [PpdbAdminController::class, 'jadwalkanSingle'])->name('ppdb.seleksi.jadwalkan_single');
             Route::post('/ppdb/seleksi/nilai-esai/{id}', [PpdbAdminController::class, 'simpanNilaiEsai'])->name('ppdb.seleksi.nilai_esai');
             Route::post('/ppdb/seleksi/nilai-wawancara/{id}', [PpdbAdminController::class, 'simpanNilaiWawancara'])->name('ppdb.seleksi.nilai_wawancara');
+            Route::get('/ppdb/seleksi/cetak-wawancara/{id?}', [PpdbAdminController::class, 'cetakInstrumenWawancara'])->name('ppdb.seleksi.cetak_wawancara');
             Route::post('/ppdb/seleksi/kalkulasi', [PpdbAdminController::class, 'kalkulasiKelulusan'])->name('ppdb.seleksi.kalkulasi');
 
             // Presensi Ujian Tulis/CBT PPDB Berbasis Barcode 2D / QR & Kios Scanner

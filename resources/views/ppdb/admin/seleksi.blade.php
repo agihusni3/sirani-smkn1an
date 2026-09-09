@@ -592,9 +592,16 @@
     {{-- ══════════════════════════════════════════════════════════════ --}}
     <div id="tab-wawancara" class="tab-content-pane {{ $curTab === 'wawancara' ? 'active' : '' }}">
       <div style="background:var(--surface); border:1px solid var(--border); border-radius:12px; overflow:hidden;">
-        <div style="padding:16px 20px; background:#f8fafc; border-bottom:1px solid var(--border);">
-          <h3 style="font-size:15px; font-weight:900; margin:0; color:var(--text-1);">Penilaian Wawancara, Fisik &amp; Minat Kejuruan</h3>
-          <div style="font-size:12px; color:var(--text-3);">Input skor wawancara motivasi, kesiapan kejuruan, dan komitmen orang tua calon siswa</div>
+        <div style="padding:16px 20px; background:#f8fafc; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+          <div>
+            <h3 style="font-size:15px; font-weight:900; margin:0 0 2px; color:var(--text-1);">Penilaian Wawancara, Fisik &amp; Minat Kejuruan</h3>
+            <div style="font-size:12px; color:var(--text-3);">Form wawancara terstruktur berbasis rubrik pemandu agar standar penilaian setiap guru penguji seragam dan terarah.</div>
+          </div>
+          <div style="display:flex; align-items:center; gap:8px;">
+            <a href="{{ route('admin.ppdb.seleksi.cetak_wawancara') }}" target="_blank" class="btn btn-sm" style="background:#ffffff; border:1px solid #cbd5e1; color:#0f172a; font-weight:700; padding:7px 14px; border-radius:8px; display:inline-flex; align-items:center; gap:6px; font-size:12px; text-decoration:none; box-shadow:0 1px 2px rgba(0,0,0,0.05);" title="Cetak format instrumen dan rubrik kosong untuk dibagikan ke meja penguji">
+              <i class="bi bi-printer text-primary"></i> Cetak Format Rubrik Kosong (A4)
+            </a>
+          </div>
         </div>
 
         <table class="table" style="width:100%; margin:0; border-collapse:collapse; font-size:12.5px;">
@@ -610,13 +617,36 @@
           </thead>
           <tbody>
             @forelse($pesertaUjian as $p)
+              @php
+                $pPayload = [
+                  'id' => $p->id,
+                  'nama_lengkap' => $p->nama_lengkap,
+                  'no_pendaftaran' => $p->no_pendaftaran,
+                  'asal_sekolah' => $p->asal_sekolah ?? '-',
+                  'jurusan1_nama' => $p->jurusan1->nama_jurusan ?? ($p->jurusanPilihan1->nama_jurusan ?? '-'),
+                  'jurusan1_kode' => $p->jurusan1->kode_jurusan ?? ($p->jurusanPilihan1->kode_jurusan ?? ''),
+                  'jurusan2_nama' => $p->jurusan2->nama_jurusan ?? ($p->jurusanPilihan2->nama_jurusan ?? '-'),
+                  'jurusan2_kode' => $p->jurusan2->kode_jurusan ?? ($p->jurusanPilihan2->kode_jurusan ?? ''),
+                  'nilai_wawancara_motivasi' => $p->nilai_wawancara_motivasi,
+                  'nilai_wawancara_karakter' => $p->nilai_wawancara_karakter,
+                  'nilai_wawancara_kejuruan' => $p->nilai_wawancara_kejuruan,
+                  'nilai_wawancara_ortu' => $p->nilai_wawancara_ortu,
+                  'nilai_wawancara_total' => $p->nilai_wawancara_total,
+                  'catatan_wawancara' => $p->catatan_wawancara,
+                  'pewawancara_nama' => $p->pewawancara->name ?? null,
+                  'diwawancara_pada' => $p->diwawancara_pada ? $p->diwawancara_pada->format('d/m/Y H:i') : null,
+                ];
+              @endphp
               <tr style="border-bottom:1px solid var(--border);">
                 <td style="padding:12px 16px;">
                   <strong style="color:var(--text-1); font-size:13px; display:block;">{{ $p->nama_lengkap }}</strong>
                   <span style="font-family:monospace; color:#2563eb; font-weight:700;">{{ $p->no_pendaftaran }}</span>
                 </td>
                 <td style="padding:12px 16px;">
-                  <span style="font-weight:700; color:var(--text-1);">{{ $p->jurusan1->nama_jurusan ?? ($p->jurusanPilihan1->nama_jurusan ?? '-') }}</span>
+                  <span style="font-weight:700; color:var(--text-1);">{{ $pPayload['jurusan1_nama'] }}</span>
+                  @if(!empty($pPayload['jurusan2_nama']) && $pPayload['jurusan2_nama'] !== '-')
+                    <div style="font-size:11px; color:var(--text-3);">Pil 2: {{ $pPayload['jurusan2_nama'] }}</div>
+                  @endif
                 </td>
                 <td style="padding:12px 16px; text-align:center;">
                   @if($p->nilai_wawancara_total !== null)
@@ -635,10 +665,13 @@
                 <td style="padding:12px 16px; color:#475569; font-size:11.5px;">
                   {{ $p->pewawancara->name ?? '-' }}
                 </td>
-                <td style="padding:12px 16px; text-align:center;">
-                  <button type="button" class="btn btn-sm" onclick="bukaModalWawancara({{ json_encode($p) }})" style="background:#0284c7; color:#ffffff; font-weight:800; font-size:11.5px; border-radius:6px; border:none; padding:5px 12px; cursor:pointer;">
-                    <i class="bi bi-mic-fill me-1"></i> Form Wawancara
+                <td style="padding:12px 16px; text-align:center; white-space:nowrap;">
+                  <button type="button" class="btn btn-sm" onclick="bukaModalWawancara({{ json_encode($pPayload) }})" style="background:#0284c7; color:#ffffff; font-weight:800; font-size:11.5px; border-radius:6px; border:none; padding:6px 12px; cursor:pointer; display:inline-flex; align-items:center; gap:5px; box-shadow:0 2px 4px rgba(2,132,199,0.2);">
+                    <i class="bi bi-mic-fill"></i> Form Wawancara
                   </button>
+                  <a href="{{ route('admin.ppdb.seleksi.cetak_wawancara', $p->id) }}" target="_blank" class="btn btn-sm" style="background:#f1f5f9; color:#475569; border:1px solid #cbd5e1; font-weight:700; font-size:11.5px; border-radius:6px; padding:5px 9px; text-decoration:none; display:inline-flex; align-items:center; gap:3px; margin-left:4px;" title="Cetak Lembar Hasil Wawancara Siswa Ini (A4)">
+                    <i class="bi bi-printer"></i>
+                  </a>
                 </td>
               </tr>
             @empty
@@ -804,53 +837,293 @@
 </div>
 
 {{-- ══════════════════════════════════════════════════════════════ --}}
-{{-- MODAL INTERAKTIF FORM WAWANCARA --}}
+{{-- MODAL INTERAKTIF FORM INSTRUMEN WAWANCARA PPDB TERSTRUKTUR --}}
 {{-- ══════════════════════════════════════════════════════════════ --}}
-<div id="modalWawancara" style="display:none; position:fixed; inset:0; background:rgba(15,23,42,0.6); backdrop-filter:blur(4px); z-index:1000; align-items:center; justify-content:center; padding:20px;">
-  <div style="background:#ffffff; border-radius:16px; max-width:640px; width:100%; max-height:90vh; overflow-y:auto; padding:24px; box-shadow:0 20px 40px rgba(0,0,0,0.25);">
-    <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #e2e8f0; padding-bottom:14px; margin-bottom:16px;">
-      <div>
-        <h3 style="font-size:17px; font-weight:900; margin:0; color:#000000;">Rubrik Penilaian Wawancara Kejuruan</h3>
-        <div id="wawancaraPesertaMeta" style="font-size:12px; color:#64748b;"></div>
+<div id="modalWawancara" style="display:none; position:fixed; inset:0; background:rgba(15,23,42,0.65); backdrop-filter:blur(5px); z-index:1000; align-items:center; justify-content:center; padding:16px;">
+  <div style="background:#ffffff; border-radius:16px; max-width:820px; width:100%; max-height:92vh; display:flex; flex-direction:column; box-shadow:0 25px 50px -12px rgba(0,0,0,0.3); overflow:hidden;">
+    
+    {{-- MODAL HEADER --}}
+    <div style="padding:18px 24px; background:linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color:#ffffff; display:flex; justify-content:space-between; align-items:center; flex-shrink:0;">
+      <div style="display:flex; align-items:center; gap:12px;">
+        <div style="width:40px; height:40px; border-radius:10px; background:rgba(56,189,248,0.15); border:1px solid rgba(56,189,248,0.3); display:flex; align-items:center; justify-content:center; color:#38bdf8; font-size:20px;">
+          <i class="bi bi-mic-fill"></i>
+        </div>
+        <div>
+          <h3 style="font-size:16px; font-weight:900; margin:0; letter-spacing:-0.01em;">
+            Instrumen &amp; Rubrik Wawancara Kejuruan
+          </h3>
+          <div style="font-size:11.5px; color:#94a3b8; margin-top:2px;">
+            Pedoman pertanyaan pemandu &amp; rubrik skor objektif PPDB SMKN 1 Air Naningan
+          </div>
+        </div>
       </div>
-      <button type="button" onclick="document.getElementById('modalWawancara').style.display='none'" style="border:none; background:none; font-size:20px; cursor:pointer; color:#94a3b8;">&times;</button>
+      <button type="button" onclick="document.getElementById('modalWawancara').style.display='none'" style="border:none; background:transparent; font-size:24px; cursor:pointer; color:#94a3b8; line-height:1;">&times;</button>
     </div>
 
-    <form id="formWawancara" method="POST">
+    {{-- KARTU RINGKASAN IDENTITAS SISWA --}}
+    <div style="background:#f8fafc; border-bottom:1px solid #e2e8f0; padding:14px 24px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; flex-shrink:0;">
+      <div>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span id="w_nama_peserta" style="font-size:15px; font-weight:800; color:#0f172a;">Nama Calon Siswa</span>
+          <span id="w_no_daftar" style="font-family:monospace; font-size:11.5px; font-weight:700; background:#e0f2fe; color:#0369a1; padding:2px 8px; border-radius:4px;">NO-REG</span>
+        </div>
+        <div style="font-size:11.5px; color:#64748b; margin-top:3px; display:flex; gap:12px; flex-wrap:wrap;">
+          <span>Asal Sekolah: <strong id="w_asal_sekolah" style="color:#334155;">-</strong></span>
+          <span>Pilihan 1: <strong id="w_jurusan_1" style="color:#2563eb;">-</strong></span>
+          <span id="w_wadah_jurusan_2" style="display:none;">Pilihan 2: <strong id="w_jurusan_2" style="color:#475569;">-</strong></span>
+        </div>
+      </div>
+
+      <div style="display:flex; align-items:center; gap:8px;">
+        <a id="w_link_cetak_single" href="#" target="_blank" class="btn btn-sm" style="background:#ffffff; border:1px solid #cbd5e1; color:#1e293b; font-weight:700; font-size:11.5px; padding:6px 12px; border-radius:6px; text-decoration:none; display:inline-flex; align-items:center; gap:5px;" title="Cetak lembar instrumen ini ke format kertas A4">
+          <i class="bi bi-printer text-primary"></i> Cetak Lembar A4
+        </a>
+      </div>
+    </div>
+
+    {{-- SCROLLABLE FORM BODY --}}
+    <form id="formWawancara" method="POST" style="overflow-y:auto; padding:20px 24px; flex:1;">
       @csrf
-      
-      <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:16px;">
-        <div>
-          <label style="display:block; font-size:12px; font-weight:800; margin-bottom:4px;">Motivasi &amp; Minat (0-100):</label>
-          <input type="number" id="w_motivasi" name="nilai_wawancara_motivasi" class="form-control" min="0" max="100" required oninput="hitungTotalWawancara()">
+
+      {{-- 1. KRITERIA: MOTIVASI & MINAT BELAJAR (25%) --}}
+      <div style="background:#ffffff; border:1px solid #e2e8f0; border-radius:12px; padding:16px; margin-bottom:18px; box-shadow:0 1px 3px rgba(0,0,0,0.02);">
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:10px; gap:10px; flex-wrap:wrap;">
+          <div>
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span style="width:24px; height:24px; border-radius:6px; background:#eff6ff; color:#2563eb; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:800;">1</span>
+              <strong style="font-size:13.5px; color:#0f172a;">Motivasi, Minat &amp; Orientasi Masa Depan</strong>
+              <span style="font-size:11px; font-weight:800; background:#dbeafe; color:#1d4ed8; padding:2px 8px; border-radius:12px;">Bobot 25%</span>
+            </div>
+            <div style="font-size:11.5px; color:#64748b; margin-top:2px;">
+              Menilai kemauan murni belajar di SMK dan kejelasan target karir setelah lulus.
+            </div>
+          </div>
+
+          <div style="display:flex; align-items:center; gap:8px;">
+            <label style="font-size:11.5px; font-weight:800; color:#334155; margin:0;">Nilai Skor (0-100):</label>
+            <input type="number" id="w_motivasi" name="nilai_wawancara_motivasi" class="form-control" min="0" max="100" required oninput="hitungTotalWawancara()" style="width:85px; font-weight:900; font-size:14px; text-align:center; color:#2563eb; border:2px solid #bfdbfe;">
+          </div>
         </div>
-        <div>
-          <label style="display:block; font-size:12px; font-weight:800; margin-bottom:4px;">Karakter, Sikap &amp; Disiplin (0-100):</label>
-          <input type="number" id="w_karakter" name="nilai_wawancara_karakter" class="form-control" min="0" max="100" required oninput="hitungTotalWawancara()">
+
+        {{-- Pertanyaan Pemandu --}}
+        <div style="background:#f0f9ff; border-left:3px solid #0284c7; padding:9px 12px; border-radius:0 6px 6px 0; margin-bottom:10px; font-size:12px; color:#0369a1; line-height:1.45;">
+          <strong>Pertanyaan Pemandu (Pewawancara):</strong><br>
+          &bull; <em>"Mengapa Anda memilih SMKN 1 Air Naningan? Apakah ini murni pilihan dan kemauan Anda sendiri?"</em><br>
+          &bull; <em>"Apa rencana Anda setelah lulus nanti? Ingin langsung bekerja di industri, berwirausaha mandiri, atau kuliah?"</em>
         </div>
-        <div>
-          <label style="display:block; font-size:12px; font-weight:800; margin-bottom:4px;">Kesiapan Kejuruan/Fisik (0-100):</label>
-          <input type="number" id="w_kejuruan" name="nilai_wawancara_kejuruan" class="form-control" min="0" max="100" required oninput="hitungTotalWawancara()">
-        </div>
-        <div>
-          <label style="display:block; font-size:12px; font-weight:800; margin-bottom:4px;">Dukungan Orang Tua (0-100):</label>
-          <input type="number" id="w_ortu" name="nilai_wawancara_ortu" class="form-control" min="0" max="100" required oninput="hitungTotalWawancara()">
+
+        {{-- Panduan Rubrik & Quick Badges --}}
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; font-size:11px; color:#64748b;">
+          <div>
+            <strong>Pedoman Rubrik:</strong> <strong>85-100</strong> (Tujuan karir jelas, kemauan sendiri) &bull; <strong>70-84</strong> (Minat baik, rencana umum) &bull; <strong>&lt;70</strong> (Ikut-ikutan teman/terpaksa).
+          </div>
+          <div style="display:flex; gap:4px;">
+            <button type="button" onclick="isiSkor('w_motivasi', 70)" style="border:1px solid #cbd5e1; background:#f8fafc; border-radius:4px; font-size:10.5px; font-weight:700; padding:2px 6px; cursor:pointer;">70</button>
+            <button type="button" onclick="isiSkor('w_motivasi', 75)" style="border:1px solid #cbd5e1; background:#f8fafc; border-radius:4px; font-size:10.5px; font-weight:700; padding:2px 6px; cursor:pointer;">75</button>
+            <button type="button" onclick="isiSkor('w_motivasi', 80)" style="border:1px solid #cbd5e1; background:#f8fafc; border-radius:4px; font-size:10.5px; font-weight:700; padding:2px 6px; cursor:pointer;">80</button>
+            <button type="button" onclick="isiSkor('w_motivasi', 85)" style="border:1px solid #bfdbfe; background:#eff6ff; color:#1d4ed8; border-radius:4px; font-size:10.5px; font-weight:800; padding:2px 6px; cursor:pointer;">85</button>
+            <button type="button" onclick="isiSkor('w_motivasi', 90)" style="border:1px solid #bfdbfe; background:#eff6ff; color:#1d4ed8; border-radius:4px; font-size:10.5px; font-weight:800; padding:2px 6px; cursor:pointer;">90</button>
+            <button type="button" onclick="isiSkor('w_motivasi', 95)" style="border:1px solid #bfdbfe; background:#eff6ff; color:#1d4ed8; border-radius:4px; font-size:10.5px; font-weight:800; padding:2px 6px; cursor:pointer;">95</button>
+          </div>
         </div>
       </div>
 
-      <div style="background:#eff6ff; border:1px solid #bfdbfe; border-radius:10px; padding:12px 16px; margin-bottom:16px; display:flex; justify-content:space-between; align-items:center;">
-        <span style="font-size:13px; font-weight:700; color:#1e40af;">Estimasi Skor Wawancara Terbobot:</span>
-        <strong id="w_preview_total" style="font-size:18px; font-weight:900; color:#1d4ed8; font-family:monospace;">0.00</strong>
+      {{-- 2. KRITERIA: KARAKTER, SIKAP & DISIPLIN (25%) --}}
+      <div style="background:#ffffff; border:1px solid #e2e8f0; border-radius:12px; padding:16px; margin-bottom:18px; box-shadow:0 1px 3px rgba(0,0,0,0.02);">
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:10px; gap:10px; flex-wrap:wrap;">
+          <div>
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span style="width:24px; height:24px; border-radius:6px; background:#ecfdf5; color:#059669; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:800;">2</span>
+              <strong style="font-size:13.5px; color:#0f172a;">Karakter, Sikap, Integritas &amp; Disiplin</strong>
+              <span style="font-size:11px; font-weight:800; background:#d1fae5; color:#047857; padding:2px 8px; border-radius:12px;">Bobot 25%</span>
+            </div>
+            <div style="font-size:11.5px; color:#64748b; margin-top:2px;">
+              Menilai sopan santun, kejujuran, komitmen jam masuk 07.00 WIB, dan kepatuhan tata tertib sekolah.
+            </div>
+          </div>
+
+          <div style="display:flex; align-items:center; gap:8px;">
+            <label style="font-size:11.5px; font-weight:800; color:#334155; margin:0;">Nilai Skor (0-100):</label>
+            <input type="number" id="w_karakter" name="nilai_wawancara_karakter" class="form-control" min="0" max="100" required oninput="hitungTotalWawancara()" style="width:85px; font-weight:900; font-size:14px; text-align:center; color:#059669; border:2px solid #a7f3d0;">
+          </div>
+        </div>
+
+        {{-- Pertanyaan Pemandu --}}
+        <div style="background:#f0fdf4; border-left:3px solid #16a34a; padding:9px 12px; border-radius:0 6px 6px 0; margin-bottom:10px; font-size:12px; color:#166534; line-height:1.45;">
+          <strong>Pertanyaan Pemandu (Pewawancara):</strong><br>
+          &bull; <em>"Apakah Anda siap mematuhi aturan disiplin: masuk pukul 07.00 WIB, rambut rapi (putra), dan larangan merokok/vape baik di dalam maupun luar sekolah?"</em><br>
+          &bull; <em>"Bagaimana respon Anda jika sewaktu-waktu ditegur atau dibimbing guru atas suatu kekhilafan?"</em>
+        </div>
+
+        {{-- Panduan Rubrik & Quick Badges --}}
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; font-size:11px; color:#64748b;">
+          <div>
+            <strong>Pedoman Rubrik:</strong> <strong>85-100</strong> (Sopan santun luar biasa, jujur, komitmen tinggi) &bull; <strong>70-84</strong> (Sikap wajar, siap dibina) &bull; <strong>&lt;70</strong> (Defensif, acuh).
+          </div>
+          <div style="display:flex; gap:4px;">
+            <button type="button" onclick="isiSkor('w_karakter', 70)" style="border:1px solid #cbd5e1; background:#f8fafc; border-radius:4px; font-size:10.5px; font-weight:700; padding:2px 6px; cursor:pointer;">70</button>
+            <button type="button" onclick="isiSkor('w_karakter', 75)" style="border:1px solid #cbd5e1; background:#f8fafc; border-radius:4px; font-size:10.5px; font-weight:700; padding:2px 6px; cursor:pointer;">75</button>
+            <button type="button" onclick="isiSkor('w_karakter', 80)" style="border:1px solid #cbd5e1; background:#f8fafc; border-radius:4px; font-size:10.5px; font-weight:700; padding:2px 6px; cursor:pointer;">80</button>
+            <button type="button" onclick="isiSkor('w_karakter', 85)" style="border:1px solid #a7f3d0; background:#ecfdf5; color:#047857; border-radius:4px; font-size:10.5px; font-weight:800; padding:2px 6px; cursor:pointer;">85</button>
+            <button type="button" onclick="isiSkor('w_karakter', 90)" style="border:1px solid #a7f3d0; background:#ecfdf5; color:#047857; border-radius:4px; font-size:10.5px; font-weight:800; padding:2px 6px; cursor:pointer;">90</button>
+            <button type="button" onclick="isiSkor('w_karakter', 95)" style="border:1px solid #a7f3d0; background:#ecfdf5; color:#047857; border-radius:4px; font-size:10.5px; font-weight:800; padding:2px 6px; cursor:pointer;">95</button>
+          </div>
+        </div>
       </div>
 
-      <div style="margin-bottom:20px;">
-        <label style="display:block; font-size:12px; font-weight:800; margin-bottom:4px;">Catatan Observasi Khusus:</label>
-        <textarea id="w_catatan" name="catatan_wawancara" class="form-control" rows="2" placeholder="Catatan fisik (buta warna, tindik, tato), komitmen kehadiran, dll."></textarea>
+      {{-- 3. KRITERIA: KESIAPAN KEJURUAN, MINAT TEKNIS & UJI FISIK (30%) --}}
+      <div style="background:#ffffff; border:1px solid #e2e8f0; border-radius:12px; padding:16px; margin-bottom:18px; box-shadow:0 1px 3px rgba(0,0,0,0.02);">
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:10px; gap:10px; flex-wrap:wrap;">
+          <div>
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span style="width:24px; height:24px; border-radius:6px; background:#fdf4ff; color:#a21caf; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:800;">3</span>
+              <strong style="font-size:13.5px; color:#0f172a;">Kesiapan Kejuruan, Minat Teknis &amp; Uji Fisik</strong>
+              <span style="font-size:11px; font-weight:800; background:#f5d0fe; color:#86198f; padding:2px 8px; border-radius:12px;">Bobot 30%</span>
+            </div>
+            <div style="font-size:11.5px; color:#64748b; margin-top:2px;">
+              Panduan disesuaikan otomatis dengan kompetensi jurusan pilihan siswa (<span id="w_label_jurusan_aktif" style="font-weight:700; color:#0f172a;">RPL / APHP / TSM</span>).
+            </div>
+          </div>
+
+          <div style="display:flex; align-items:center; gap:8px;">
+            <label style="font-size:11.5px; font-weight:800; color:#334155; margin:0;">Nilai Skor (0-100):</label>
+            <input type="number" id="w_kejuruan" name="nilai_wawancara_kejuruan" class="form-control" min="0" max="100" required oninput="hitungTotalWawancara()" style="width:85px; font-weight:900; font-size:14px; text-align:center; color:#a21caf; border:2px solid #e879f9;">
+          </div>
+        </div>
+
+        {{-- BOX PANDUAN KHUSUS PER JURUSAN (DINAMIS VIA JS) --}}
+        <div id="w_guide_rpl" style="display:none; background:#f8fafc; border-left:3px solid #2563eb; padding:10px 12px; border-radius:0 6px 6px 0; margin-bottom:10px; font-size:12px; color:#1e293b; line-height:1.45;">
+          <div style="font-weight:800; color:#1e40af; margin-bottom:4px; display:flex; align-items:center; gap:6px;">
+            <i class="bi bi-code-square"></i> PANDUAN KHUSUS JURUSAN RPL (REKAYASA PERANGKAT LUNAK):
+          </div>
+          &bull; <strong>Cek Persepsi Fisik:</strong> Bebas Buta Warna (krusial untuk desain web UI/UX dan sintaks kode warna).<br>
+          &bull; <strong>Pertanyaan Pemandu:</strong> <em>"Apakah Anda siap duduk berkonsentrasi berjam-jam memecahkan logika kode komputer? Pernahkah memakai PC/laptop atau siap disiplin menggunakan lab sekolah?"</em><br>
+          &bull; <strong>Rubrik Nilai:</strong> <strong>85-100</strong> (Logika baik, antusias coding, bebas buta warna) &bull; <strong>70-84</strong> (Siap belajar walau awam komputer) &bull; <strong>&lt;70</strong> (Hanya ingin main game, buta warna total).
+        </div>
+
+        <div id="w_guide_aphp" style="display:none; background:#f8fafc; border-left:3px solid #059669; padding:10px 12px; border-radius:0 6px 6px 0; margin-bottom:10px; font-size:12px; color:#1e293b; line-height:1.45;">
+          <div style="font-weight:800; color:#065f46; margin-bottom:4px; display:flex; align-items:center; gap:6px;">
+            <i class="bi bi-flower1"></i> PANDUAN KHUSUS JURUSAN APHP (AGRIBISNIS PENGOLAHAN HASIL PERTANIAN):
+          </div>
+          &bull; <strong>Cek Kebersihan &amp; Fisik:</strong> Kebersihan kuku/tangan (higienitas makanan), riwayat alergi bahan pangan/kimia, bebas buta warna (untuk sortasi mutu hasil panen).<br>
+          &bull; <strong>Pertanyaan Pemandu:</strong> <em>"Apakah Anda siap beraktivitas aktif di lab pengolahan/dapur produksi yang bersuhu hangat dan mencuci peralatan olahan? Tertarikkah mengolah komoditas lokal (kopi, pisang, rempah) menjadi produk kuliner bernilai jual?"</em><br>
+          &bull; <strong>Rubrik Nilai:</strong> <strong>85-100</strong> (Higienis, antusias industri olahan pangan/kuliner) &bull; <strong>70-84</strong> (Siap belajar) &bull; <strong>&lt;70</strong> (Jijik/enggan kotor dengan bahan pangan mentah).
+        </div>
+
+        <div id="w_guide_tsm" style="display:none; background:#f8fafc; border-left:3px solid #d97706; padding:10px 12px; border-radius:0 6px 6px 0; margin-bottom:10px; font-size:12px; color:#1e293b; line-height:1.45;">
+          <div style="font-weight:800; color:#b45309; margin-bottom:4px; display:flex; align-items:center; gap:6px;">
+            <i class="bi bi-gear-wide-connected"></i> PANDUAN KHUSUS JURUSAN TSM (TEKNIK &amp; BISNIS SEPEDA MOTOR):
+          </div>
+          &bull; <strong>Cek Fisik &amp; Persepsi:</strong> Bebas Buta Warna (MUTLAK untuk membedakan jalur kabel kelistrikan motor), kekuatan gerak fisik.<br>
+          &bull; <strong>Pertanyaan Pemandu:</strong> <em>"Apakah Anda siap menghadapi oli, debu, dan kotoran saat membongkar mesin di bengkel? Siapkah mematuhi SOP Keselamatan Kerja (K3) bengkel secara ketat?"</em><br>
+          &bull; <strong>Rubrik Nilai:</strong> <strong>85-100</strong> (Bebas buta warna, minat mekanik tinggi, fisik prima) &bull; <strong>70-84</strong> (Siap dibina dari nol) &bull; <strong>&lt;70</strong> (Buta warna total berisiko fatal korsleting, atau takut kotor oli).
+        </div>
+
+        <div id="w_guide_general" style="background:#f8fafc; border-left:3px solid #64748b; padding:10px 12px; border-radius:0 6px 6px 0; margin-bottom:10px; font-size:12px; color:#1e293b; line-height:1.45;">
+          <strong>Panduan Umum Kejuruan:</strong> Tanyakan minat teknis spesifik kejuruan yang dipilih, kesiapan praktikum fisik di bengkel/lab, dan lakukan pemeriksaan dasar buta warna.
+        </div>
+
+        {{-- Quick Badges --}}
+        <div style="display:flex; justify-content:flex-end; gap:4px;">
+          <button type="button" onclick="isiSkor('w_kejuruan', 70)" style="border:1px solid #cbd5e1; background:#f8fafc; border-radius:4px; font-size:10.5px; font-weight:700; padding:2px 6px; cursor:pointer;">70</button>
+          <button type="button" onclick="isiSkor('w_kejuruan', 75)" style="border:1px solid #cbd5e1; background:#f8fafc; border-radius:4px; font-size:10.5px; font-weight:700; padding:2px 6px; cursor:pointer;">75</button>
+          <button type="button" onclick="isiSkor('w_kejuruan', 80)" style="border:1px solid #cbd5e1; background:#f8fafc; border-radius:4px; font-size:10.5px; font-weight:700; padding:2px 6px; cursor:pointer;">80</button>
+          <button type="button" onclick="isiSkor('w_kejuruan', 85)" style="border:1px solid #f5d0fe; background:#fdf4ff; color:#86198f; border-radius:4px; font-size:10.5px; font-weight:800; padding:2px 6px; cursor:pointer;">85</button>
+          <button type="button" onclick="isiSkor('w_kejuruan', 90)" style="border:1px solid #f5d0fe; background:#fdf4ff; color:#86198f; border-radius:4px; font-size:10.5px; font-weight:800; padding:2px 6px; cursor:pointer;">90</button>
+          <button type="button" onclick="isiSkor('w_kejuruan', 95)" style="border:1px solid #f5d0fe; background:#fdf4ff; color:#86198f; border-radius:4px; font-size:10.5px; font-weight:800; padding:2px 6px; cursor:pointer;">95</button>
+        </div>
       </div>
 
-      <div style="display:flex; justify-content:flex-end; gap:10px; border-top:1px solid #e2e8f0; padding-top:14px;">
-        <button type="button" onclick="document.getElementById('modalWawancara').style.display='none'" class="btn" style="background:#f1f5f9; color:#475569; font-weight:700;">Tutup</button>
-        <button type="submit" class="btn" style="background:#0284c7; color:#ffffff; font-weight:800;">Simpan Nilai Wawancara</button>
+      {{-- 4. KRITERIA: DUKUNGAN & KOMITMEN ORANG TUA (20%) --}}
+      <div style="background:#ffffff; border:1px solid #e2e8f0; border-radius:12px; padding:16px; margin-bottom:18px; box-shadow:0 1px 3px rgba(0,0,0,0.02);">
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:10px; gap:10px; flex-wrap:wrap;">
+          <div>
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span style="width:24px; height:24px; border-radius:6px; background:#fffbeb; color:#d97706; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:800;">4</span>
+              <strong style="font-size:13.5px; color:#0f172a;">Dukungan &amp; Komitmen Orang Tua / Wali</strong>
+              <span style="font-size:11px; font-weight:800; background:#fef3c7; color:#b45309; padding:2px 8px; border-radius:12px;">Bobot 20%</span>
+            </div>
+            <div style="font-size:11.5px; color:#64748b; margin-top:2px;">
+              Menilai kesiapan orang tua mendampingi siswa, hadir rapat sekolah, serta pembiayaan magang PKL industri 6 bulan.
+            </div>
+          </div>
+
+          <div style="display:flex; align-items:center; gap:8px;">
+            <label style="font-size:11.5px; font-weight:800; color:#334155; margin:0;">Nilai Skor (0-100):</label>
+            <input type="number" id="w_ortu" name="nilai_wawancara_ortu" class="form-control" min="0" max="100" required oninput="hitungTotalWawancara()" style="width:85px; font-weight:900; font-size:14px; text-align:center; color:#d97706; border:2px solid #fde68a;">
+          </div>
+        </div>
+
+        {{-- Pertanyaan Pemandu --}}
+        <div style="background:#fffbeb; border-left:3px solid #d97706; padding:9px 12px; border-radius:0 6px 6px 0; margin-bottom:10px; font-size:12px; color:#92400e; line-height:1.45;">
+          <strong>Pertanyaan Pemandu (Pewawancara):</strong><br>
+          &bull; <em>"Apakah orang tua/wali sepenuhnya menyetujui jurusan ini dan bersedia hadir bila diundang pihak sekolah?"</em><br>
+          &bull; <em>"Apakah orang tua siap mendukung kebutuhan praktik dan pelaksanaan Magang / PKL industri 6 bulan di luar sekolah?"</em>
+        </div>
+
+        {{-- Panduan Rubrik & Quick Badges --}}
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; font-size:11px; color:#64748b;">
+          <div>
+            <strong>Pedoman Rubrik:</strong> <strong>85-100</strong> (Orang tua mendukung penuh moral &amp; material) &bull; <strong>70-84</strong> (Mendukung wajar) &bull; <strong>&lt;70</strong> (Orang tua lepas tangan/menolak).
+          </div>
+          <div style="display:flex; gap:4px;">
+            <button type="button" onclick="isiSkor('w_ortu', 70)" style="border:1px solid #cbd5e1; background:#f8fafc; border-radius:4px; font-size:10.5px; font-weight:700; padding:2px 6px; cursor:pointer;">70</button>
+            <button type="button" onclick="isiSkor('w_ortu', 75)" style="border:1px solid #cbd5e1; background:#f8fafc; border-radius:4px; font-size:10.5px; font-weight:700; padding:2px 6px; cursor:pointer;">75</button>
+            <button type="button" onclick="isiSkor('w_ortu', 80)" style="border:1px solid #cbd5e1; background:#f8fafc; border-radius:4px; font-size:10.5px; font-weight:700; padding:2px 6px; cursor:pointer;">80</button>
+            <button type="button" onclick="isiSkor('w_ortu', 85)" style="border:1px solid #fde68a; background:#fef3c7; color:#b45309; border-radius:4px; font-size:10.5px; font-weight:800; padding:2px 6px; cursor:pointer;">85</button>
+            <button type="button" onclick="isiSkor('w_ortu', 90)" style="border:1px solid #fde68a; background:#fef3c7; color:#b45309; border-radius:4px; font-size:10.5px; font-weight:800; padding:2px 6px; cursor:pointer;">90</button>
+            <button type="button" onclick="isiSkor('w_ortu', 95)" style="border:1px solid #fde68a; background:#fef3c7; color:#b45309; border-radius:4px; font-size:10.5px; font-weight:800; padding:2px 6px; cursor:pointer;">95</button>
+          </div>
+        </div>
+      </div>
+
+      {{-- 5. CATATAN OBSERVASI KHUSUS & CEK FISIK CEPAT --}}
+      <div style="background:#ffffff; border:1px solid #e2e8f0; border-radius:12px; padding:16px; margin-bottom:18px;">
+        <label style="display:block; font-size:12.5px; font-weight:800; color:#0f172a; margin-bottom:6px;">
+          Catatan Observasi Khusus &amp; Pemeriksaan Fisik:
+        </label>
+        
+        <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:8px;">
+          <button type="button" onclick="tambahCatatanCepat('Lolos tes Ishihara (Bebas Buta Warna). ')" style="background:#f1f5f9; border:1px solid #cbd5e1; border-radius:20px; font-size:11px; font-weight:700; color:#334155; padding:3px 10px; cursor:pointer;">+ Bebas Buta Warna</button>
+          <button type="button" onclick="tambahCatatanCepat('Tidak ada tato dan tidak ada tindik. ')" style="background:#f1f5f9; border:1px solid #cbd5e1; border-radius:20px; font-size:11px; font-weight:700; color:#334155; padding:3px 10px; cursor:pointer;">+ Bebas Tato &amp; Tindik</button>
+          <button type="button" onclick="tambahCatatanCepat('Kondisi fisik prima dan sehat siap praktik kejuruan. ')" style="background:#f1f5f9; border:1px solid #cbd5e1; border-radius:20px; font-size:11px; font-weight:700; color:#334155; padding:3px 10px; cursor:pointer;">+ Fisik Prima &amp; Sehat</button>
+          <button type="button" onclick="tambahCatatanCepat('Orang tua hadir mendampingi saat tes wawancara. ')" style="background:#f1f5f9; border:1px solid #cbd5e1; border-radius:20px; font-size:11px; font-weight:700; color:#334155; padding:3px 10px; cursor:pointer;">+ Didampingi Orang Tua</button>
+        </div>
+
+        <textarea id="w_catatan" name="catatan_wawancara" class="form-control" rows="2" placeholder="Tuliskan catatan observasi lainnya bila ada (misal: potensi minat coding, bakat olahan kuliner, kesiapan perlengkapan, dll.)" style="font-size:12.5px;"></textarea>
+      </div>
+
+      {{-- REALTIME WEIGHTED SCORE BANNER --}}
+      <div style="background:linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); border:1.5px solid #bfdbfe; border-radius:12px; padding:16px 20px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:14px;">
+        <div>
+          <div style="font-size:11.5px; font-weight:800; color:#1e40af; text-transform:uppercase; letter-spacing:0.04em;">
+            Kalkulasi Skor Wawancara Terbobot:
+          </div>
+          <div style="font-size:11.5px; color:#3b82f6; margin-top:2px;">
+            (Motivasi &times; 25%) + (Karakter &times; 25%) + (Kejuruan &times; 30%) + (Ortu &times; 20%)
+          </div>
+        </div>
+
+        <div style="display:flex; align-items:center; gap:12px;">
+          <div style="text-align:right;">
+            <div id="w_preview_predikat" style="font-size:11px; font-weight:800; padding:2px 10px; border-radius:12px; background:#dcfce7; color:#15803d; display:inline-block;">
+              Sangat Direkomendasikan
+            </div>
+            <div id="w_preview_total" style="font-size:24px; font-weight:900; color:#1d4ed8; font-family:monospace; line-height:1.1; margin-top:2px;">
+              80.00
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {{-- MODAL ACTIONS --}}
+      <div style="display:flex; justify-content:flex-end; gap:10px; border-top:1px solid #e2e8f0; padding-top:16px; margin-top:18px;">
+        <button type="button" onclick="document.getElementById('modalWawancara').style.display='none'" class="btn" style="background:#f1f5f9; color:#475569; font-weight:700; padding:8px 18px; border-radius:8px; font-size:13px; cursor:pointer;">
+          Tutup
+        </button>
+        <button type="submit" class="btn" style="background:#0284c7; color:#ffffff; font-weight:800; padding:8px 22px; border-radius:8px; font-size:13px; cursor:pointer; display:inline-flex; align-items:center; gap:6px; box-shadow:0 4px 12px rgba(2,132,199,0.3);">
+          <i class="bi bi-check2-circle"></i> Simpan Nilai Wawancara
+        </button>
       </div>
     </form>
   </div>
@@ -1019,17 +1292,71 @@
 
   // Wawancara Popup Fill
   function bukaModalWawancara(pendaftar) {
-    document.getElementById('wawancaraPesertaMeta').innerText = `${pendaftar.nama_lengkap} (${pendaftar.no_pendaftaran})`;
+    document.getElementById('w_nama_peserta').innerText = pendaftar.nama_lengkap;
+    document.getElementById('w_no_daftar').innerText = pendaftar.no_pendaftaran;
+    document.getElementById('w_asal_sekolah').innerText = pendaftar.asal_sekolah || '-';
+    document.getElementById('w_jurusan_1').innerText = pendaftar.jurusan1_nama || '-';
+    
+    if (pendaftar.jurusan2_nama && pendaftar.jurusan2_nama !== '-') {
+      document.getElementById('w_jurusan_2').innerText = pendaftar.jurusan2_nama;
+      document.getElementById('w_wadah_jurusan_2').style.display = 'inline';
+    } else {
+      document.getElementById('w_wadah_jurusan_2').style.display = 'none';
+    }
+
+    document.getElementById('w_link_cetak_single').href = `/admin/ppdb/seleksi/cetak-wawancara/${pendaftar.id}`;
     document.getElementById('formWawancara').action = `/admin/ppdb/seleksi/nilai-wawancara/${pendaftar.id}`;
     
+    // Set default or existing values
     document.getElementById('w_motivasi').value = pendaftar.nilai_wawancara_motivasi !== null ? pendaftar.nilai_wawancara_motivasi : 80;
     document.getElementById('w_karakter').value = pendaftar.nilai_wawancara_karakter !== null ? pendaftar.nilai_wawancara_karakter : 80;
     document.getElementById('w_kejuruan').value = pendaftar.nilai_wawancara_kejuruan !== null ? pendaftar.nilai_wawancara_kejuruan : 80;
     document.getElementById('w_ortu').value = pendaftar.nilai_wawancara_ortu !== null ? pendaftar.nilai_wawancara_ortu : 80;
     document.getElementById('w_catatan').value = pendaftar.catatan_wawancara || '';
-    hitungTotalWawancara();
 
+    // Switch dynamic jurusan guide
+    const kode1 = (pendaftar.jurusan1_kode || '').toUpperCase();
+    const nama1 = (pendaftar.jurusan1_nama || '').toUpperCase();
+    const strJurusan = kode1 + ' ' + nama1;
+
+    document.getElementById('w_guide_rpl').style.display = 'none';
+    document.getElementById('w_guide_aphp').style.display = 'none';
+    document.getElementById('w_guide_tsm').style.display = 'none';
+    document.getElementById('w_guide_general').style.display = 'none';
+
+    if (strJurusan.includes('RPL') || strJurusan.includes('PERANGKAT LUNAK') || strJurusan.includes('KOMPUTER')) {
+      document.getElementById('w_guide_rpl').style.display = 'block';
+      document.getElementById('w_label_jurusan_aktif').innerText = 'RPL — Rekayasa Perangkat Lunak';
+    } else if (strJurusan.includes('APHP') || strJurusan.includes('PENGOLAHAN') || strJurusan.includes('PERTANIAN')) {
+      document.getElementById('w_guide_aphp').style.display = 'block';
+      document.getElementById('w_label_jurusan_aktif').innerText = 'APHP — Agribisnis Pengolahan Hasil Pertanian';
+    } else if (strJurusan.includes('TSM') || strJurusan.includes('SEPEDA MOTOR') || strJurusan.includes('OTOMOTIF')) {
+      document.getElementById('w_guide_tsm').style.display = 'block';
+      document.getElementById('w_label_jurusan_aktif').innerText = 'TSM — Teknik & Bisnis Sepeda Motor';
+    } else {
+      document.getElementById('w_guide_general').style.display = 'block';
+      document.getElementById('w_label_jurusan_aktif').innerText = pendaftar.jurusan1_nama || 'Umum Kejuruan';
+    }
+
+    hitungTotalWawancara();
     document.getElementById('modalWawancara').style.display = 'flex';
+  }
+
+  function isiSkor(fieldId, val) {
+    const input = document.getElementById(fieldId);
+    if (input) {
+      input.value = val;
+      hitungTotalWawancara();
+    }
+  }
+
+  function tambahCatatanCepat(teks) {
+    const catatan = document.getElementById('w_catatan');
+    if (catatan) {
+      if (!catatan.value.includes(teks.trim())) {
+        catatan.value = (catatan.value ? catatan.value.trim() + ' ' : '') + teks;
+      }
+    }
   }
 
   function hitungTotalWawancara() {
@@ -1040,6 +1367,25 @@
 
     const total = (m * 0.25) + (k * 0.25) + (j * 0.30) + (o * 0.20);
     document.getElementById('w_preview_total').innerText = total.toFixed(2);
+
+    const predikatEl = document.getElementById('w_preview_predikat');
+    if (total >= 85) {
+      predikatEl.innerText = 'Sangat Direkomendasikan (A)';
+      predikatEl.style.background = '#dcfce7';
+      predikatEl.style.color = '#15803d';
+    } else if (total >= 70) {
+      predikatEl.innerText = 'Direkomendasikan (B)';
+      predikatEl.style.background = '#dbeafe';
+      predikatEl.style.color = '#1d4ed8';
+    } else if (total >= 50) {
+      predikatEl.innerText = 'Dipertimbangkan (C)';
+      predikatEl.style.background = '#fef3c7';
+      predikatEl.style.color = '#b45309';
+    } else {
+      predikatEl.innerText = 'Kurang Direkomendasikan (D)';
+      predikatEl.style.background = '#fee2e2';
+      predikatEl.style.color = '#b91c1c';
+    }
   }
 
   // Edit Jadwal Single Siswa Modal
