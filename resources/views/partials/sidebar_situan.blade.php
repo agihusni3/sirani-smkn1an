@@ -172,7 +172,18 @@
           </div>
         </a>
       @endif
-    </div>
+    {{-- Ruang Pribadi PTK --}}
+    @if($user && ($user->guru_id || $isAdmin || $user->isGuru()))
+      <div class="situan-nav-group">
+        <div class="situan-nav-group-title">Ruang Pribadi PTK</div>
+        <a href="{{ route('ptk.profil-saya') }}" class="situan-nav-link {{ request()->is('ptk*') ? 'active' : '' }}" title="Biodata &amp; Lemari Berkas Digital Saya">
+          <div class="situan-nav-link-left">
+            <i class="bi bi-person-vcard-fill" style="color:#2563EB;"></i>
+            <span>Biodata &amp; Berkas Saya</span>
+          </div>
+        </a>
+      </div>
+    @endif
 
     {{-- 5. Tata Usaha & Audit --}}
     @if($isAdmin || $isKepsek || $isStafTu)

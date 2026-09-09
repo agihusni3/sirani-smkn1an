@@ -262,6 +262,18 @@
         </div>
       </a>
     </div>
+  {{-- 6b. PORTAL MANDIRI PTK (Biodata & Berkas Saya) --}}
+  @if($user && ($user->guru_id || $isAdmin || $isGuru))
+    <div class="nav-group">
+      <div class="nav-label">Ruang Pribadi PTK</div>
+      <a href="{{ route('ptk.profil-saya') }}" class="nav-item {{ request()->is('ptk*') ? 'active' : '' }}" title="Biodata &amp; Lemari Berkas Digital Saya">
+        <div class="nav-left-part">
+          <i class="bi bi-person-vcard-fill nav-icon" style="color:#2563EB;"></i>
+          <span class="nav-text">Biodata &amp; Berkas Saya</span>
+        </div>
+        <span class="nav-count-badge" style="background:#eff6ff; color:#2563eb; border-color:#bfdbfe; font-size:10px;">E-Arsip</span>
+      </a>
+    </div>
   @endif
 
   {{-- 7. PINTASAN KE MODUL SITUAN (Tata Usaha & Data Pokok) --}}

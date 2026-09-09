@@ -142,6 +142,11 @@ Route::middleware('auth')->group(function () {
     // 0c. Pengaturan Profil & Ganti Password Mandiri (Semua Pengguna Terautentikasi)
     Route::post('/profil/update', [AuthController::class, 'updateProfil'])->name('profil.update');
 
+    // 0c-2. Portal Mandiri PTK (Biodata & Lemari Berkas Digital Pribadi)
+    Route::get('/ptk/profil-saya', [\App\Http\Controllers\PtkProfilMandiriController::class, 'index'])->name('ptk.profil-saya');
+    Route::post('/ptk/profil-saya/unggah-berkas', [\App\Http\Controllers\PtkProfilMandiriController::class, 'unggahBerkasMandiri'])->name('ptk.unggah-berkas');
+    Route::delete('/ptk/profil-saya/berkas/{id}', [\App\Http\Controllers\PtkProfilMandiriController::class, 'hapusBerkasMandiri'])->name('ptk.hapus-berkas');
+
     // 0d. Role Switcher Mode (Multi-Role Switching)
     Route::post('/switch-role', [AuthController::class, 'switchRole'])->name('switch-role');
 
