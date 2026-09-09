@@ -20,6 +20,10 @@ class PpdbUjianSetting extends Model
         'bobot_pg',
         'bobot_esai',
         'durasi_menit',
+        'tanggal_pelaksanaan',
+        'sesi_default',
+        'ruang_default',
+        'gelombang_label',
         'is_active',
         'petunjuk_ujian',
         'buka_pada',
@@ -28,12 +32,13 @@ class PpdbUjianSetting extends Model
     ];
 
     protected $casts = [
-        'kunci_jawaban_pg' => 'array',
-        'bobot_pg'         => 'decimal:2',
-        'bobot_esai'       => 'decimal:2',
-        'is_active'        => 'boolean',
-        'buka_pada'        => 'datetime',
-        'tutup_pada'       => 'datetime',
+        'tanggal_pelaksanaan' => 'date',
+        'kunci_jawaban_pg'    => 'array',
+        'bobot_pg'            => 'decimal:2',
+        'bobot_esai'          => 'decimal:2',
+        'is_active'           => 'boolean',
+        'buka_pada'           => 'datetime',
+        'tutup_pada'          => 'datetime',
     ];
 
     public function creator()

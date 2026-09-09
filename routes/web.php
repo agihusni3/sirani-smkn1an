@@ -415,6 +415,7 @@ Route::middleware('auth')->group(function () {
             Route::get('/ppdb/seleksi', [PpdbAdminController::class, 'seleksi'])->name('ppdb.seleksi');
             Route::post('/ppdb/seleksi/setting', [PpdbAdminController::class, 'simpanSettingUjian'])->name('ppdb.seleksi.setting');
             Route::post('/ppdb/seleksi/jadwalkan', [PpdbAdminController::class, 'jadwalkanMassal'])->name('ppdb.seleksi.jadwalkan');
+            Route::post('/ppdb/seleksi/jadwalkan-serentak', [PpdbAdminController::class, 'jadwalkanJuknisSerentak'])->name('ppdb.seleksi.jadwalkan_serentak');
             Route::post('/ppdb/seleksi/nilai-esai/{id}', [PpdbAdminController::class, 'simpanNilaiEsai'])->name('ppdb.seleksi.nilai_esai');
             Route::post('/ppdb/seleksi/nilai-wawancara/{id}', [PpdbAdminController::class, 'simpanNilaiWawancara'])->name('ppdb.seleksi.nilai_wawancara');
             Route::post('/ppdb/seleksi/kalkulasi', [PpdbAdminController::class, 'kalkulasiKelulusan'])->name('ppdb.seleksi.kalkulasi');

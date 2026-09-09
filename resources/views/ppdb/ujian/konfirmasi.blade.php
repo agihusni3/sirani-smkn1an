@@ -49,8 +49,8 @@
                 <div>
                     <div style="color: #64748b; font-size: 0.78rem; font-weight: 700; text-transform: uppercase;">Jadwal / Ruang Sesi:</div>
                     <div style="color: #000000; font-weight: 700; margin-top: 2px;">
-                        {{ $pendaftar->jadwal_tes_tanggal ? \Carbon\Carbon::parse($pendaftar->jadwal_tes_tanggal)->translatedFormat('d M Y') : 'Sesi Terbuka' }} 
-                        ({{ $pendaftar->jadwal_tes_ruang ?? 'Lab Komputer' }})
+                        {{ \Carbon\Carbon::parse($pendaftar->jadwal_tanggal_resmi)->translatedFormat('d M Y') }} 
+                        ({{ $pendaftar->jadwal_ruang_resmi }})
                     </div>
                 </div>
                 <div>

@@ -293,6 +293,33 @@
             </div>
           </div>
 
+          <!-- JADWAL RESMI JUKNIS (1 GELOMBANG) -->
+          <div style="background:linear-gradient(135deg, rgba(37,99,235,0.05), rgba(79,70,229,0.02)); border:1.5px solid #bfdbfe; border-radius:12px; padding:18px; margin-bottom:20px;">
+            <div style="font-size:13px; font-weight:800; color:#1e40af; margin-bottom:12px; display:flex; align-items:center; gap:8px;">
+              <i class="bi bi-calendar-check-fill text-primary"></i> Jadwal Resmi Ujian Seleksi Sesuai Juknis (1x Gelombang)
+            </div>
+            
+            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:16px;">
+              <div>
+                <label style="display:block; font-size:11.5px; font-weight:700; color:#475569; margin-bottom:5px;">Tanggal Pelaksanaan Ujian:</label>
+                <input type="date" name="tanggal_pelaksanaan" class="form-control" value="{{ old('tanggal_pelaksanaan', $setting->tanggal_pelaksanaan ? $setting->tanggal_pelaksanaan->format('Y-m-d') : now()->format('Y-m-d')) }}" style="font-weight:700;">
+                <div style="font-size:11px; color:#64748b; margin-top:3px;">Tanggal resmi yang tercetak di kartu &amp; sistem</div>
+              </div>
+
+              <div>
+                <label style="display:block; font-size:11.5px; font-weight:700; color:#475569; margin-bottom:5px;">Sesi Waktu Pelaksanaan:</label>
+                <input type="text" name="sesi_default" class="form-control" value="{{ old('sesi_default', $setting->sesi_default ?? 'Sesi 1 (08.00 - 10.00 WIB)') }}" style="font-weight:700;">
+                <div style="font-size:11px; color:#64748b; margin-top:3px;">Contoh: Sesi 1 (08.00 - 10.00 WIB)</div>
+              </div>
+
+              <div>
+                <label style="display:block; font-size:11.5px; font-weight:700; color:#475569; margin-bottom:5px;">Ruang Ujian Default:</label>
+                <input type="text" name="ruang_default" class="form-control" value="{{ old('ruang_default', $setting->ruang_default ?? 'Lab Komputer SMKN 1 Air Naningan') }}" style="font-weight:700;">
+                <div style="font-size:11px; color:#64748b; margin-top:3px;">Lokasi ujian CBT &amp; pos presensi barcode</div>
+              </div>
+            </div>
+          </div>
+
           <!-- Bobot Nilai -->
           <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr)); gap:18px; margin-bottom:20px; padding:16px; background:#f8fafc; border-radius:10px; border:1px solid #e2e8f0;">
             <div>
@@ -327,36 +354,58 @@
     {{-- TAB 2: PENJADWALAN SESI RUANG LAB --}}
     {{-- ══════════════════════════════════════════════════════════════ --}}
     <div id="tab-jadwal" class="tab-content-pane {{ $curTab === 'penjadwalan' ? 'active' : '' }}">
+      
+      {{-- Banner Quick Action: Tetapkan Jadwal Serentak (1x Gelombang) --}}
+      <div style="background:#f0fdf4; border:1.5px solid #86efac; border-radius:12px; padding:16px 20px; margin-bottom:20px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:14px;">
+        <div>
+          <div style="font-size:13.5px; font-weight:900; color:#15803d; display:flex; align-items:center; gap:8px;">
+            <i class="bi bi-patch-check-fill text-emerald-600"></i> Penetapan Jadwal Ujian Serentak (1x Gelombang Juknis)
+          </div>
+          <div style="font-size:12px; color:#166534; margin-top:2px;">
+            Jadwal Pasti: <strong>{{ $setting->tanggal_pelaksanaan ? \Carbon\Carbon::parse($setting->tanggal_pelaksanaan)->translatedFormat('l, d F Y') : \Carbon\Carbon::today()->translatedFormat('l, d F Y') }}</strong> &bull; 
+            {{ $setting->sesi_default ?? 'Sesi 1 (08.00 - 10.00 WIB)' }} &bull; {{ $setting->ruang_default ?? 'Lab Komputer SMKN 1' }}
+          </div>
+        </div>
+
+        <form action="{{ route('admin.ppdb.seleksi.jadwalkan_serentak') }}" method="POST" onsubmit="return confirm('Tetapkan jadwal ujian resmi serentak ini untuk seluruh calon siswa yang berstatus terverifikasi/siap tes?')">
+          @csrf
+          <button type="submit" class="btn" style="background:#15803d; color:#ffffff; font-weight:800; font-size:12.5px; border-radius:8px; padding:9px 18px; border:none; cursor:pointer; display:inline-flex; align-items:center; gap:8px; box-shadow:0 2px 6px rgba(21,128,61,0.2);">
+            <i class="bi bi-lightning-charge-fill text-yellow-300"></i>
+            <span>Tetapkan Serentak Semua Peserta</span>
+          </button>
+        </form>
+      </div>
+
       <form action="{{ route('admin.ppdb.seleksi.jadwalkan') }}" method="POST">
         @csrf
 
-        {{-- Toolbar Penjadwalan Massal --}}
+        {{-- Toolbar Penjadwalan Massal Tercentang --}}
         <div style="background:#f8fafc; border:1px solid #cbd5e1; border-radius:12px; padding:18px 20px; margin-bottom:20px; display:flex; align-items:center; gap:14px; flex-wrap:wrap;">
           <div style="font-weight:900; font-size:13px; color:var(--text-1); display:flex; align-items:center; gap:6px;">
-            <i class="bi bi-check2-square text-primary" style="font-size:18px;"></i> Aksi Massal:
+            <i class="bi bi-check2-square text-primary" style="font-size:18px;"></i> Jadwalkan Tercentang:
           </div>
 
           <div style="display:flex; align-items:center; gap:8px;">
             <label style="font-size:12px; font-weight:700;">Tanggal:</label>
-            <input type="date" name="jadwal_tes_tanggal" class="form-control form-control-sm" required style="width:145px; font-weight:700;">
+            <input type="date" name="jadwal_tes_tanggal" class="form-control form-control-sm" value="{{ $setting->tanggal_pelaksanaan ? $setting->tanggal_pelaksanaan->format('Y-m-d') : now()->format('Y-m-d') }}" required style="width:145px; font-weight:700;">
           </div>
 
           <div style="display:flex; align-items:center; gap:8px;">
             <label style="font-size:12px; font-weight:700;">Sesi:</label>
             <select name="jadwal_tes_sesi" class="form-control form-control-sm" style="width:160px; font-weight:700;">
-              <option value="Sesi 1 (08.00 - 09.30)">Sesi 1 (08.00 - 09.30)</option>
-              <option value="Sesi 2 (10.00 - 11.30)">Sesi 2 (10.00 - 11.30)</option>
-              <option value="Sesi 3 (13.00 - 14.30)">Sesi 3 (13.00 - 14.30)</option>
+              <option value="Sesi 1 (08.00 - 10.00 WIB)">Sesi 1 (08.00 - 10.00 WIB)</option>
+              <option value="Sesi 2 (10.30 - 12.30 WIB)">Sesi 2 (10.30 - 12.30 WIB)</option>
+              <option value="Sesi 3 (13.30 - 15.30 WIB)">Sesi 3 (13.30 - 15.30 WIB)</option>
             </select>
           </div>
 
           <div style="display:flex; align-items:center; gap:8px;">
             <label style="font-size:12px; font-weight:700;">Ruangan:</label>
-            <input type="text" name="jadwal_tes_ruang" class="form-control form-control-sm" value="Lab Komputer 1" required style="width:140px; font-weight:700;">
+            <input type="text" name="jadwal_tes_ruang" class="form-control form-control-sm" value="{{ $setting->ruang_default ?? 'Lab Komputer 1' }}" required style="width:140px; font-weight:700;">
           </div>
 
           <button type="submit" class="btn btn-sm" style="background:#2563eb; color:#ffffff; font-weight:800; border-radius:6px; border:none; padding:7px 16px; cursor:pointer;">
-            <i class="bi bi-calendar-plus-fill me-1"></i> Jadwalkan Peserta Tercentang
+            <i class="bi bi-calendar-plus-fill me-1"></i> Simpan Pilihan
           </button>
         </div>
 

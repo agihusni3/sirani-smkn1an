@@ -114,6 +114,11 @@ class PpdbAdminController extends Controller
         $pendaftar->diverifikasi_pada = now();
         $pendaftar->save();
 
+        // Otomatis pastikan jadwal ujian resmi Juknis (1 Gelombang) terisi jika berkas valid/terverifikasi
+        if (in_array($pendaftar->status, ['terverifikasi', 'berkas_valid', 'diterima'])) {
+            $pendaftar->pastikanJadwalJuknis();
+        }
+
         // Audit Trail PPDB
         AuditLog::catat(
             'update',
@@ -257,12 +262,16 @@ class PpdbAdminController extends Controller
     public function simpanSettingUjian(Request $request)
     {
         $validated = $request->validate([
-            'judul_ujian'      => 'required|string|max:255',
-            'durasi_menit'     => 'required|integer|min:15|max:180',
-            'bobot_pg'         => 'required|numeric|min:10|max:90',
-            'bobot_esai'       => 'required|numeric|min:10|max:90',
-            'is_active'        => 'nullable|boolean',
-            'petunjuk_ujian'   => 'nullable|string',
+            'judul_ujian'          => 'required|string|max:255',
+            'durasi_menit'         => 'required|integer|min:15|max:180',
+            'tanggal_pelaksanaan'  => 'nullable|date',
+            'sesi_default'         => 'nullable|string|max:100',
+            'ruang_default'        => 'nullable|string|max:150',
+            'gelombang_label'      => 'nullable|string|max:150',
+            'bobot_pg'             => 'required|numeric|min:10|max:90',
+            'bobot_esai'           => 'required|numeric|min:10|max:90',
+            'is_active'            => 'nullable|boolean',
+            'petunjuk_ujian'       => 'nullable|string',
         ]);
 
         $setting = PpdbUjianSetting::getAktif();
@@ -272,6 +281,10 @@ class PpdbAdminController extends Controller
 
         $setting->judul_ujian = $validated['judul_ujian'];
         $setting->durasi_menit = $validated['durasi_menit'];
+        $setting->tanggal_pelaksanaan = $validated['tanggal_pelaksanaan'] ?? ($setting->tanggal_pelaksanaan ?: now()->toDateString());
+        $setting->sesi_default = $validated['sesi_default'] ?? ($setting->sesi_default ?: 'Sesi 1 (08.00 - 10.00 WIB)');
+        $setting->ruang_default = $validated['ruang_default'] ?? ($setting->ruang_default ?: 'Lab Komputer SMKN 1 Air Naningan');
+        $setting->gelombang_label = $validated['gelombang_label'] ?? ($setting->gelombang_label ?: '1x Gelombang (Sesuai Juknis Resmi)');
         $setting->bobot_pg = $validated['bobot_pg'];
         $setting->bobot_esai = $validated['bobot_esai'];
         $setting->is_active = $request->has('is_active');
@@ -280,7 +293,31 @@ class PpdbAdminController extends Controller
         $setting->save();
 
         return redirect()->route('admin.ppdb.seleksi', ['tab' => 'pengaturan'])
-            ->with('success', 'Pengaturan sesi ujian CBT berhasil disimpan.');
+            ->with('success', 'Pengaturan sesi ujian CBT dan jadwal resmi Juknis berhasil disimpan.');
+    }
+
+    /**
+     * Tetapkan Jadwal Ujian Serentak (1 Gelombang Sesuai Juknis Resmi)
+     */
+    public function jadwalkanJuknisSerentak(Request $request)
+    {
+        $setting = PpdbUjianSetting::getAktif();
+        $tanggal = $setting?->tanggal_pelaksanaan ?: ($request->input('jadwal_tes_tanggal') ?: now()->toDateString());
+        $sesi = $setting?->sesi_default ?: ($request->input('jadwal_tes_sesi') ?: 'Sesi 1 (08.00 - 10.00 WIB)');
+        $ruang = $setting?->ruang_default ?: ($request->input('jadwal_tes_ruang') ?: 'Lab Komputer SMKN 1 Air Naningan');
+
+        $pendaftars = PpdbPendaftar::whereIn('status', ['terverifikasi', 'berkas_valid', 'siap_tes', 'diterima'])->get();
+        $count = 0;
+        foreach ($pendaftars as $p) {
+            $p->jadwal_tes_tanggal = $tanggal;
+            $p->jadwal_tes_sesi = $sesi;
+            $p->jadwal_tes_ruang = $ruang;
+            $p->save();
+            $count++;
+        }
+
+        return redirect()->route('admin.ppdb.seleksi', ['tab' => 'penjadwalan'])
+            ->with('success', "Sukses menetapkan jadwal ujian pasti (1 Gelombang Sesuai Juknis) untuk {$count} calon peserta!");
     }
 
     /**

@@ -282,4 +282,48 @@ class PpdbSeleksiCbtTest extends TestCase
         $this->assertEquals(1, $p1->peringkat_jurusan);
         $this->assertEquals(2, $p2->peringkat_jurusan);
     }
+
+    public function test_admin_bisa_menetapkan_jadwal_juknis_serentak_1_gelombang()
+    {
+        $setting = PpdbUjianSetting::updateOrCreate(['id' => 1], [
+            'judul_ujian'          => 'Ujian CBT PPDB 2026',
+            'durasi_menit'         => 60,
+            'is_active'            => true,
+            'tanggal_pelaksanaan'  => '2026-09-15',
+            'sesi_default'         => 'Sesi 1 (08.00 - 10.00 WIB)',
+            'ruang_default'        => 'Lab Komputer SMKN 1',
+            'gelombang_label'      => '1x Gelombang (Sesuai Juknis Resmi)',
+        ]);
+
+        $p1 = $this->buatPendaftar('PPDB-JUKNIS-01', '1122334455', 'Peserta Juknis 1', 'terverifikasi');
+        $p2 = $this->buatPendaftar('PPDB-JUKNIS-02', '1122334456', 'Peserta Juknis 2', 'berkas_valid');
+
+        $this->assertNull($p1->jadwal_tes_tanggal);
+        $this->assertNull($p2->jadwal_tes_tanggal);
+
+        $response = $this->actingAs($this->admin)->post(route('admin.ppdb.seleksi.jadwalkan_serentak'));
+        $response->assertRedirect(route('admin.ppdb.seleksi', ['tab' => 'penjadwalan']));
+        $response->assertSessionHas('success');
+
+        $p1->refresh();
+        $p2->refresh();
+
+        $this->assertEquals('2026-09-15', $p1->jadwal_tes_tanggal->toDateString());
+        $this->assertEquals('Sesi 1 (08.00 - 10.00 WIB)', $p1->jadwal_tes_sesi);
+        $this->assertEquals('Lab Komputer SMKN 1', $p1->jadwal_tes_ruang);
+
+        $this->assertEquals('2026-09-15', $p2->jadwal_tes_tanggal->toDateString());
+    }
+
+    public function test_kartu_cetak_menampilkan_jadwal_pasti_1x_gelombang_juknis()
+    {
+        $pendaftar = $this->buatPendaftar('PPDB-JUKNIS-03', '1122334457', 'Peserta Kartu Pasti', 'terverifikasi');
+        $pendaftar->pastikanJadwalJuknis();
+
+        $response = $this->get(route('ppdb.cetak', ['nomor' => $pendaftar->no_pendaftaran]));
+        $response->assertStatus(200);
+        $response->assertSee('1x Gelombang (Sesuai Juknis Resmi PPDB)');
+        $response->assertDontSee('Sesuai Jadwal Gelombang Panitia PPDB');
+    }
 }
+

@@ -127,21 +127,27 @@
 
                         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; background: #ffffff; border: 1px solid #cbd5e1; border-radius: 8px; padding: 14px 16px; margin-bottom: 18px;">
                             <div>
-                                <div style="font-size: 0.72rem; color: #64748b; font-weight: 700; text-transform: uppercase;">Tanggal Ujian</div>
+                                <div style="font-size: 0.72rem; color: #64748b; font-weight: 700; text-transform: uppercase;">Tanggal Ujian (Juknis)</div>
                                 <div style="font-weight: 800; font-size: 0.92rem; color: #0f172a; margin-top: 2px;">
-                                    {{ $pendaftar->jadwal_tes_tanggal ? \Carbon\Carbon::parse($pendaftar->jadwal_tes_tanggal)->translatedFormat('l, d F Y') : 'Menunggu Penetapan' }}
+                                    {{ \Carbon\Carbon::parse($pendaftar->jadwal_tanggal_resmi)->translatedFormat('l, d F Y') }}
                                 </div>
                             </div>
                             <div>
                                 <div style="font-size: 0.72rem; color: #64748b; font-weight: 700; text-transform: uppercase;">Sesi Waktu</div>
                                 <div style="font-weight: 800; font-size: 0.92rem; color: #0f172a; margin-top: 2px;">
-                                    {{ $pendaftar->jadwal_tes_sesi ?: 'Sesi Menunggu Jadwal' }}
+                                    {{ $pendaftar->jadwal_sesi_resmi }}
                                 </div>
                             </div>
                             <div>
                                 <div style="font-size: 0.72rem; color: #64748b; font-weight: 700; text-transform: uppercase;">Ruang Lab Komputer</div>
                                 <div style="font-weight: 800; font-size: 0.92rem; color: #0f172a; margin-top: 2px;">
-                                    {{ $pendaftar->jadwal_tes_ruang ?: 'Lab Komputer SMKN 1' }}
+                                    {{ $pendaftar->jadwal_ruang_resmi }}
+                                </div>
+                            </div>
+                            <div>
+                                <div style="font-size: 0.72rem; color: #64748b; font-weight: 700; text-transform: uppercase;">Format Seleksi</div>
+                                <div style="font-weight: 800; font-size: 0.92rem; color: #059669; margin-top: 2px;">
+                                    1x Gelombang (Sesuai Juknis)
                                 </div>
                             </div>
                         </div>

@@ -148,6 +148,47 @@ class PpdbPendaftar extends Model
         return $query->exists();
     }
 
+    public function getJadwalTanggalResmiAttribute()
+    {
+        if ($this->jadwal_tes_tanggal) {
+            return $this->jadwal_tes_tanggal;
+        }
+        $setting = PpdbUjianSetting::getAktif();
+        return ($setting && $setting->tanggal_pelaksanaan) ? $setting->tanggal_pelaksanaan : now()->toDateString();
+    }
+
+    public function getJadwalSesiResmiAttribute(): string
+    {
+        if ($this->jadwal_tes_sesi) {
+            return $this->jadwal_tes_sesi;
+        }
+        $setting = PpdbUjianSetting::getAktif();
+        return ($setting && $setting->sesi_default) ? $setting->sesi_default : 'Sesi 1 (08.00 - 10.00 WIB)';
+    }
+
+    public function getJadwalRuangResmiAttribute(): string
+    {
+        if ($this->jadwal_tes_ruang) {
+            return $this->jadwal_tes_ruang;
+        }
+        $setting = PpdbUjianSetting::getAktif();
+        return ($setting && $setting->ruang_default) ? $setting->ruang_default : 'Lab Komputer SMKN 1 Air Naningan';
+    }
+
+    /**
+     * Pastikan calon siswa terdaftar jadwal resmi ujian juknis (1 Gelombang)
+     */
+    public function pastikanJadwalJuknis(): void
+    {
+        if (!$this->jadwal_tes_tanggal) {
+            $setting = PpdbUjianSetting::getAktif();
+            $this->jadwal_tes_tanggal = ($setting && $setting->tanggal_pelaksanaan) ? $setting->tanggal_pelaksanaan : now()->toDateString();
+            $this->jadwal_tes_sesi = ($setting && $setting->sesi_default) ? $setting->sesi_default : 'Sesi 1 (08.00 - 10.00 WIB)';
+            $this->jadwal_tes_ruang = ($setting && $setting->ruang_default) ? $setting->ruang_default : 'Lab Komputer SMKN 1 Air Naningan';
+            $this->save();
+        }
+    }
+
     public function siswa()
     {
         return $this->belongsTo(Siswa::class, 'siswa_id');

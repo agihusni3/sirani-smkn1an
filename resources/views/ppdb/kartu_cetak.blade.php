@@ -513,36 +513,24 @@
                         <td class="label-col">Hari / Tanggal</td>
                         <td style="width: 8px;">:</td>
                         <td class="val-col">
-                            @if($pendaftar->jadwal_tes_tanggal)
-                                {{ \Carbon\Carbon::parse($pendaftar->jadwal_tes_tanggal)->translatedFormat('l, d F Y') }}
-                            @elseif($settingUjian && $settingUjian->tanggal_mulai)
-                                {{ \Carbon\Carbon::parse($settingUjian->tanggal_mulai)->translatedFormat('l, d F Y') }}
-                            @else
-                                Sesuai Jadwal Gelombang Panitia PPDB
-                            @endif
+                            {{ \Carbon\Carbon::parse($pendaftar->jadwal_tanggal_resmi)->translatedFormat('l, d F Y') }}
                         </td>
                         <td class="label-col">Ruang / Tempat</td>
                         <td style="width: 8px;">:</td>
                         <td class="val-col">
-                            {{ $pendaftar->jadwal_tes_ruang ?: 'Lab Komputer SMKN 1 Air Naningan' }}
+                            {{ $pendaftar->jadwal_ruang_resmi }}
                         </td>
                     </tr>
                     <tr>
                         <td class="label-col">Sesi Waktu</td>
                         <td>:</td>
                         <td class="val-col">
-                            @if($pendaftar->jadwal_tes_sesi)
-                                {{ $pendaftar->jadwal_tes_sesi }}
-                            @elseif($settingUjian && $settingUjian->durasi_menit)
-                                Sesi Ujian CBT (Durasi: {{ $settingUjian->durasi_menit }} Menit)
-                            @else
-                                Sesi 1 (Pukul 08.00 s.d 10.00 WIB)
-                            @endif
+                            {{ $pendaftar->jadwal_sesi_resmi }}
                         </td>
-                        <td class="label-col">Bentuk Seleksi</td>
+                        <td class="label-col">Pelaksanaan</td>
                         <td>:</td>
                         <td class="val-col">
-                            CBT Potensi Akademik (30 PG + 5 Esai) &amp; Wawancara Minat Bakat
+                            1x Gelombang (Sesuai Juknis Resmi PPDB)
                         </td>
                     </tr>
                 </table>
