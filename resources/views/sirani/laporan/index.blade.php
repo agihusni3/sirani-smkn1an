@@ -69,22 +69,7 @@
     <!-- KOP SURAT DINAS RESMI (PRINT / PDF ONLY) -->
     <!-- ═══════════════════════════════════════════════════════════════════ -->
     <div class="print-only">
-      <div class="kop-container">
-        <div class="kop-logo-left">
-          <img src="{{ $sekolah->logo_provinsi_url }}" alt="Logo Provinsi" />
-        </div>
-        <div class="kop-text">
-          <h2>{{ $sekolah->nama_instansi_atas ?? 'PEMERINTAH PROVINSI LAMPUNG' }}</h2>
-          <h3>{{ $sekolah->nama_dinas ?? 'DINAS PENDIDIKAN DAN KEBUDAYAAN' }}</h3>
-          <h1>{{ $sekolah->nama_sekolah ?? 'SMK NEGERI 1 AIR NANINGAN' }}</h1>
-          <p>{{ $sekolah->alamat_lengkap ?? $sekolah->alamat ?? 'Jl. Makam Baturuguk, Pekon Karang Sari, Kec. Air Naningan, Kab. Tanggamus' }}</p>
-          <p>Email: {{ $sekolah->email ?? 'smkn1airnaningan@gmail.com' }} · Website: {{ $sekolah->website ?? 'smkn1airnaningan.sch.id' }}</p>
-        </div>
-        <div class="kop-logo-right">
-          <img src="{{ $sekolah->logo_sekolah_url }}" alt="Logo Sekolah" />
-        </div>
-      </div>
-      <div class="kop-line-double"></div>
+      @include('partials.kop_surat')
 
       <div class="doc-title-box">
         <h4>LAPORAN REKAPITULASI KEHADIRAN {{ strtoupper($kategori) }}</h4>

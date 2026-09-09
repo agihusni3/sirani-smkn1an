@@ -257,14 +257,15 @@ class LaporanFilterTest extends TestCase
 
     public function test_role_tidak_berwenang_ditolak_akses_laporan(): void
     {
-        $guruBiasa = User::create([
-            'name' => 'Guru Biasa',
-            'email' => 'guru_biasa@test.com',
+        $siswaUser = User::create([
+            'name'     => 'Siswa User',
+            'username' => 'siswa_user',
+            'email'    => 'siswa_user@test.com',
             'password' => bcrypt('password'),
-            'role' => 'guru',
+            'role'     => 'siswa',
         ]);
 
-        $this->actingAs($guruBiasa);
+        $this->actingAs($siswaUser);
         $res = $this->get('/laporan');
         $res->assertStatus(403);
     }

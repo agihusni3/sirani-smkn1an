@@ -7,6 +7,7 @@ use App\Models\Guru;
 use App\Models\IzinSiswa;
 use App\Models\KasusDisiplin;
 use App\Models\NotifikasiOrtu;
+use App\Models\PengaturanSekolah;
 use App\Models\Rombel;
 use App\Models\Siswa;
 use Illuminate\Http\Request;
@@ -345,6 +346,7 @@ class LaporanController extends Controller
         $gurus = $canAccessGuru ? Guru::where('status', 'aktif')->orderBy('nama')->get() : collect();
 
         $rombel = $rombelId ? Rombel::find($rombelId) : null;
+        $sekolah = PengaturanSekolah::getAktif();
 
         return view('sirani.laporan.index', compact(
             'laporans',
@@ -378,7 +380,8 @@ class LaporanController extends Controller
             'isWaliKelas',
             'waliRombelId',
             'waliRombelNama',
-            'status'
+            'status',
+            'sekolah'
         ));
     }
 
