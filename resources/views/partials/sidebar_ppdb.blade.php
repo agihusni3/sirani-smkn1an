@@ -20,7 +20,7 @@
           return 'bi-code-square';
       }
       if (str_contains($str, 'APHP') || str_contains($str, 'PENGOLAHAN') || str_contains($str, 'PERTANIAN')) {
-          return 'bi-leaf';
+          return 'bi-flower1';
       }
       if (str_contains($str, 'TSM') || str_contains($str, 'SEPEDA MOTOR') || str_contains($str, 'OTOMOTIF') || str_contains($str, 'MESIN')) {
           return 'bi-gear-wide-connected';
@@ -116,6 +116,7 @@
   .sidebar-ppdb .badge-blue  { background: #eff6ff; color: #2563eb; border-color: #bfdbfe; }
   .sidebar-ppdb .badge-emerald { background: #ecfdf5; color: #059669; border-color: #a7f3d0; }
   .sidebar-ppdb .badge-gray { background: #f1f5f9; color: #64748b; border-color: #e2e8f0; }
+  .sidebar-ppdb .bi-leaf::before { content: "\f3cd"; }
 </style>
 
 {{-- Mobile Top Bar khusus Modul PPDB --}}
