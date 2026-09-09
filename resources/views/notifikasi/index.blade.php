@@ -31,10 +31,19 @@
           @if(auth()->check() && (auth()->user()->isAdmin() || auth()->user()->isGuruPiket() || auth()->user()->isPiketHariIni()))
             <form action="{{ route('notifikasi.bersihkan-kadaluarsa') }}" method="POST" onsubmit="return confirm('Bersihkan semua draf notifikasi yang sudah lewat hari atau kehadiran normal (masuk/pulang) dari antrean?');" style="display:inline; margin:0;">
               @csrf
-              <button type="submit" class="btn btn-sm btn-outline" style="height:32px; padding:0 10px; font-size:11px; font-weight:700; color:var(--text-2); border:1px solid var(--border-2); background:var(--bg-2); display:inline-flex; align-items:center; gap:4px; border-radius:6px; cursor:pointer;" title="Batalkan otomatis draf usang atau rutin masuk/pulang agar antrean tetap bersih">
+              <button type="submit" class="btn btn-sm btn-outline" style="height:32px; padding:0 10px; font-size:11px; font-weight:700; color:var(--text-2); border:1px solid var(--border-2); background:var(--bg-2); display:inline-flex; align-items:center; gap:4px; border-radius:6px; cursor:pointer;" title="Batalkan otomatis draf usang hari kemarin atau rutin masuk/pulang">
                 <i class="bi bi-stars"></i> Bersihkan Draf Usang
               </button>
             </form>
+
+            <form action="{{ route('notifikasi.bersihkan-kadaluarsa') }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin membatalkan dan mengosongkan SELURUH antrean pending saat ini (termasuk draf Alpha & Panggilan hari ini)?\n\nPesan tidak akan dikirim ke WhatsApp orang tua.');" style="display:inline; margin:0;">
+              @csrf
+              <input type="hidden" name="semua_pending" value="1" />
+              <button type="submit" class="btn btn-sm btn-outline" style="height:32px; padding:0 10px; font-size:11px; font-weight:700; color:#DC2626; border:1px solid rgba(220,38,38,0.3); background:var(--bg-2); display:inline-flex; align-items:center; gap:4px; border-radius:6px; cursor:pointer;" title="Batalkan seluruh draf antrean pending saat ini">
+                <i class="bi bi-trash3"></i> Kosongkan Antrean
+              </button>
+            </form>
+
             <button type="button" class="btn btn-sm btn-outline" onclick="openModal('modalPengaturan')" style="height:32px; padding:0 12px; font-size:11.5px; font-weight:800; color:#000000; border:1px solid var(--border-2); background:var(--bg-2); display:inline-flex; align-items:center; gap:4px; border-radius:6px; cursor:pointer;">
               <i class="bi bi-gear-fill"></i> Pengaturan Gateway
             </button>

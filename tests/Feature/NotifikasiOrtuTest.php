@@ -13,6 +13,7 @@ use App\Models\SiswaRombel;
 use App\Models\TahunAjaran;
 use App\Models\User;
 use App\Services\NotifikasiDraftService;
+use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -255,5 +256,52 @@ class NotifikasiOrtuTest extends TestCase
             'template_wali_kelas'        => 'Template Wali',
         ])->assertRedirect();
         $this->assertEquals('token_piket_123', PengaturanNotifikasi::first()->wa_api_token);
+    }
+
+    public function test_petugas_bisa_membersihkan_antrean_pending()
+    {
+        $admin = User::factory()->create(['role' => 'admin']);
+        $siswa = Siswa::create([
+            'nis'            => '12345678',
+            'nama'           => 'Siswa Test Bersih',
+            'nomor_hp_ortu'  => '08123456789',
+            'nama_wali'      => 'Wali Test',
+            'status'         => 'aktif',
+        ]);
+
+        // 1. Draf hari kemarin (usang)
+        $nUsang = NotifikasiOrtu::create([
+            'siswa_id'    => $siswa->id,
+            'kategori'    => 'alpha',
+            'tanggal'     => Carbon::yesterday()->toDateString(),
+            'no_tujuan'   => '08123456789',
+            'nama_ortu'   => 'Ortu',
+            'judul'       => 'Alpha Kemarin',
+            'pesan'       => 'Pesan',
+            'status'      => 'pending',
+            'dibuat_oleh' => 'sistem_cron',
+        ]);
+
+        // 2. Draf hari ini
+        $nHariIni = NotifikasiOrtu::create([
+            'siswa_id'    => $siswa->id,
+            'kategori'    => 'alpha',
+            'tanggal'     => Carbon::today()->toDateString(),
+            'no_tujuan'   => '08123456789',
+            'nama_ortu'   => 'Ortu',
+            'judul'       => 'Alpha Hari Ini',
+            'pesan'       => 'Pesan',
+            'status'      => 'pending',
+            'dibuat_oleh' => 'sistem_cron',
+        ]);
+
+        // Test mode default (hanya draf usang)
+        $this->actingAs($admin)->post(route('notifikasi.bersihkan-kadaluarsa'))->assertRedirect();
+        $this->assertEquals('dibatalkan', $nUsang->fresh()->status);
+        $this->assertEquals('pending', $nHariIni->fresh()->status);
+
+        // Test mode semua_pending=1 (termasuk draf hari ini)
+        $this->actingAs($admin)->post(route('notifikasi.bersihkan-kadaluarsa'), ['semua_pending' => 1])->assertRedirect();
+        $this->assertEquals('dibatalkan', $nHariIni->fresh()->status);
     }
 }

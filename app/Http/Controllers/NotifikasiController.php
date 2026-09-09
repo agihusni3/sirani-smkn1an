@@ -264,22 +264,27 @@ class NotifikasiController extends Controller
     {
         $today = Carbon::today()->toDateString();
         $petugas = $this->getPetugasNama();
+        $hapusSemua = $request->boolean('semua_pending') || $request->input('mode') === 'semua_pending';
 
-        // 1. Batalkan semua draf pending yang kategorinya 'masuk' atau 'pulang' normal
-        // 2. Batalkan semua draf pending yang tanggalnya sudah lewat (< today)
-        $affected = NotifikasiOrtu::where('status', 'pending')
-            ->where(function ($q) use ($today) {
+        $query = NotifikasiOrtu::where('status', 'pending');
+
+        if (!$hapusSemua) {
+            // 1. Batalkan semua draf pending yang kategorinya 'masuk' atau 'pulang' normal
+            // 2. Batalkan semua draf pending yang tanggalnya sudah lewat (< today)
+            $query->where(function ($q) use ($today) {
                 $q->whereIn('kategori', ['masuk', 'pulang'])
                   ->orWhereDate('tanggal', '<', $today);
-            })
-            ->update([
-                'status'            => 'dibatalkan',
-                'diverifikasi_oleh' => $petugas,
-                'waktu_verifikasi'  => now(),
-                'catatan_error'     => 'Dibersihkan otomatis: draf kadaluarsa / kategori kehadiran rutin',
-            ]);
+            });
+        }
 
-        return back()->with('success', "Berhasil membersihkan {$affected} draf notifikasi usang/kadaluarsa dari antrean!");
+        $affected = $query->update([
+            'status'            => 'dibatalkan',
+            'diverifikasi_oleh' => $petugas,
+            'waktu_verifikasi'  => now(),
+            'catatan_error'     => $hapusSemua ? 'Dibatalkan massal oleh petugas / admin' : 'Dibersihkan otomatis: draf kadaluarsa / kategori kehadiran rutin',
+        ]);
+
+        return back()->with('success', "Berhasil membersihkan {$affected} draf notifikasi dari antrean!");
     }
 
     /**
