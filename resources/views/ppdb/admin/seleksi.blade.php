@@ -900,12 +900,53 @@
 </div>
 
 <script>
-  function switchTab(tabId, el) {
+  window.switchTab = function(tabId, el) {
     document.querySelectorAll('.tab-content-pane').forEach(p => p.classList.remove('active'));
     document.querySelectorAll('.seleksi-tab-link').forEach(l => l.classList.remove('active'));
-    document.getElementById(tabId).classList.add('active');
-    el.classList.add('active');
-  }
+    
+    const target = document.getElementById(tabId);
+    if (target) {
+      target.classList.add('active');
+    }
+
+    if (el) {
+      el.classList.add('active');
+    } else {
+      const matchingLink = document.querySelector(`.seleksi-tab-link[onclick*="${tabId}"]`);
+      if (matchingLink) matchingLink.classList.add('active');
+    }
+
+    const tabMap = {
+      'tab-pengaturan': 'pengaturan',
+      'tab-jadwal': 'penjadwalan',
+      'tab-koreksi': 'tertulis',
+      'tab-wawancara': 'wawancara',
+      'tab-leaderboard': 'leaderboard'
+    };
+    if (tabMap[tabId]) {
+      const url = new URL(window.location);
+      url.searchParams.set('tab', tabMap[tabId]);
+      window.history.replaceState({}, '', url);
+    }
+  };
+
+  document.addEventListener('DOMContentLoaded', function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const tabParam = urlParams.get('tab');
+    if (tabParam) {
+      const mapParamToId = {
+        'pengaturan': 'tab-pengaturan',
+        'penjadwalan': 'tab-jadwal',
+        'tertulis': 'tab-koreksi',
+        'wawancara': 'tab-wawancara',
+        'leaderboard': 'tab-leaderboard'
+      };
+      const targetId = mapParamToId[tabParam];
+      if (targetId) {
+        window.switchTab(targetId);
+      }
+    }
+  });
 
   function toggleAllCheckboxes(source) {
     const cbs = document.querySelectorAll('.peserta-cb');
@@ -1001,42 +1042,6 @@
     document.getElementById('w_preview_total').innerText = total.toFixed(2);
   }
 
-  // Manajemen Multi-Sesi Ujian Fleksibel Admin
-  function tambahBarisSesi() {
-    const container = document.getElementById('container-daftar-sesi');
-    const count = container.querySelectorAll('.baris-sesi').length + 1;
-    const namaDefault = `Sesi ${count}`;
-    const waktuDefault = `14.00 - 16.00 WIB`;
-    const labelDefault = `${namaDefault} (${waktuDefault})`;
-
-    const html = `
-      <div class="baris-sesi" style="display:flex; align-items:center; gap:10px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:10px 14px; flex-wrap:wrap;">
-        <div style="flex:1; min-width:130px;">
-          <label style="font-size:10.5px; font-weight:700; color:#64748b; margin-bottom:3px; display:block;">Nama Sesi:</label>
-          <input type="text" name="sesi_nama[]" class="form-control form-control-sm input-sesi-nama" value="${namaDefault}" required placeholder="Contoh: Sesi ${count}" oninput="syncLabelSesi(this)" style="font-weight:700; font-size:12px;">
-        </div>
-        <div style="flex:1.8; min-width:170px;">
-          <label style="font-size:10.5px; font-weight:700; color:#64748b; margin-bottom:3px; display:block;">Rentang Waktu:</label>
-          <input type="text" name="sesi_waktu[]" class="form-control form-control-sm input-sesi-waktu" value="${waktuDefault}" required placeholder="Contoh: 08.00 - 10.00 WIB" oninput="syncLabelSesi(this)" style="font-weight:700; font-size:12px;">
-        </div>
-        <div style="min-width:135px; text-align:center;">
-          <label style="font-size:10.5px; font-weight:700; color:#64748b; margin-bottom:3px; display:block;">Default Baru:</label>
-          <div style="display:flex; align-items:center; justify-content:center; gap:6px; margin-top:4px;">
-            <input type="radio" name="sesi_default" value="${labelDefault}" class="radio-sesi-default" style="cursor:pointer; accent-color:#2563eb;">
-            <span style="font-size:11px; font-weight:700; color:#334155;">Jadikan Default</span>
-          </div>
-        </div>
-        <div style="padding-top:16px;">
-          <button type="button" class="btn btn-sm btn-outline-danger" onclick="hapusBarisSesi(this)" title="Hapus Sesi" style="border:none; color:#ef4444; background:transparent; font-size:16px; cursor:pointer; padding:4px 8px;">
-            <i class="bi bi-trash3-fill"></i>
-          </button>
-        </div>
-      </div>
-    `;
-    container.insertAdjacentHTML('beforeend', html);
-  }
-
-  function syncLabelSesi(inputEl) {
   // Edit Jadwal Single Siswa Modal
   function bukaModalEditSesi(id, nama, tanggal, waktu, ruang) {
     document.getElementById('editSesiNamaPeserta').innerText = nama;
