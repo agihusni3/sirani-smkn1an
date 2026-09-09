@@ -21,6 +21,8 @@ class PpdbUjianSetting extends Model
         'bobot_esai',
         'durasi_menit',
         'tanggal_pelaksanaan',
+        'jam_mulai',
+        'jam_selesai',
         'sesi_default',
         'daftar_sesi',
         'ruang_default',
@@ -42,6 +44,16 @@ class PpdbUjianSetting extends Model
         'buka_pada'           => 'datetime',
         'tutup_pada'          => 'datetime',
     ];
+
+    /**
+     * Mengambil format rentang jam pelaksanaan ujian (Jam Mulai - Selesai)
+     */
+    public function getWaktuPelaksanaanAttribute(): string
+    {
+        $mulai = $this->jam_mulai ? str_replace(':', '.', substr($this->jam_mulai, 0, 5)) : '08.00';
+        $selesai = $this->jam_selesai ? str_replace(':', '.', substr($this->jam_selesai, 0, 5)) : '10.00';
+        return "{$mulai} - {$selesai} WIB";
+    }
 
     /**
      * Mengambil daftar sesi ujian yang telah dikonfigurasi admin

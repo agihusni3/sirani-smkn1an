@@ -222,9 +222,9 @@
         </div>
 
         <div>
-          <label style="font-size:11.5px; font-weight:800; color:#475569; display:block; margin-bottom:5px;">Sesi Ujian:</label>
+          <label style="font-size:11.5px; font-weight:800; color:#475569; display:block; margin-bottom:5px;">Waktu Ujian:</label>
           <select name="sesi" class="form-select" style="font-size:12.5px; padding:7px 12px; border-radius:8px; border:1px solid #cbd5e1; font-weight:600;" onchange="this.form.submit()">
-            <option value="">Semua Sesi Ujian</option>
+            <option value="">Semua Waktu Ujian</option>
             @foreach($daftarSesi as $s)
               <option value="{{ $s }}" {{ $sesiFilter == $s ? 'selected' : '' }}>{{ $s }}</option>
             @endforeach
@@ -375,7 +375,7 @@
               <th style="padding:10px 14px; font-weight:800; color:#475569;">No. Pendaftaran / NISN</th>
               <th style="padding:10px 14px; font-weight:800; color:#475569;">Nama Lengkap Siswa</th>
               <th style="padding:10px 14px; font-weight:800; color:#475569;">Pilihan Jurusan</th>
-              <th style="padding:10px 14px; font-weight:800; color:#475569;">Ruang &amp; Sesi</th>
+              <th style="padding:10px 14px; font-weight:800; color:#475569;">Ruang &amp; Waktu</th>
               <th style="padding:10px 14px; font-weight:800; color:#475569; text-align:center;">Status Kehadiran</th>
               <th style="padding:10px 14px; font-weight:800; color:#475569; text-align:center; width:130px;">Aksi Panitia</th>
             </tr>
@@ -401,7 +401,7 @@
                 </td>
                 <td style="padding:10px 14px;">
                   <div style="font-weight:700; color:#334155;">{{ $peserta->jadwal_tes_ruang ?: 'Lab Komputer' }}</div>
-                  <div style="font-size:11px; color:#64748b;">{{ $peserta->jadwal_tes_sesi ?: 'Sesi 1' }}</div>
+                  <div style="font-size:11px; color:#64748b;">{{ $peserta->jadwal_sesi_resmi }}</div>
                 </td>
                 <td style="padding:10px 14px; text-align:center;">
                   @if($isHadir)
@@ -499,7 +499,7 @@
           <strong style="color:#0f172a;" id="modalCandidateRoom">-</strong>
         </div>
         <div>
-          <span style="color:#64748b; font-weight:700; display:block; font-size:10.5px; text-transform:uppercase;">Sesi Ujian:</span>
+          <span style="color:#64748b; font-weight:700; display:block; font-size:10.5px; text-transform:uppercase;">Waktu Ujian:</span>
           <strong style="color:#0f172a;" id="modalCandidateSession">-</strong>
         </div>
       </div>
@@ -682,7 +682,7 @@ function showPresensiModal(pendaftar, status, message) {
   document.getElementById('modalCandidateMajor').innerText = pendaftar.jurusan_kode + ' — ' + pendaftar.jurusan_1;
   document.getElementById('modalCandidateTime').innerText = pendaftar.waktu_hadir + ' WIB';
   document.getElementById('modalCandidateRoom').innerText = pendaftar.ruang || 'Lab Komputer';
-  document.getElementById('modalCandidateSession').innerText = pendaftar.sesi || 'Sesi 1';
+  document.getElementById('modalCandidateSession').innerText = pendaftar.sesi || '08.00 - 10.00 WIB';
 
   const photoImg = document.getElementById('modalCandidatePhoto');
   const photoFallback = document.getElementById('modalCandidateIconFallback');

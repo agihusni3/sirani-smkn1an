@@ -215,9 +215,9 @@
                 <td style="font-weight: bold;">{{ $ruangFilter ?: 'Semua Ruang Lab Komputer' }}</td>
             </tr>
             <tr>
-                <td>Sesi Ujian</td>
+                <td>Waktu Ujian</td>
                 <td>:</td>
-                <td style="font-weight: bold;">{{ $sesiFilter ?: 'Semua Sesi Ujian' }}</td>
+                <td style="font-weight: bold;">{{ $sesiFilter ?: ($setting->waktu_pelaksanaan ?? '08.00 - 10.00 WIB') }}</td>
                 <td>Rekap Kehadiran</td>
                 <td>:</td>
                 <td>

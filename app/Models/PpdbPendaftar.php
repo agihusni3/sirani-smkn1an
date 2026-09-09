@@ -160,10 +160,17 @@ class PpdbPendaftar extends Model
     public function getJadwalSesiResmiAttribute(): string
     {
         if ($this->jadwal_tes_sesi) {
-            return $this->jadwal_tes_sesi;
+            $s = trim($this->jadwal_tes_sesi);
+            // Ekstrak rentang jam jika ada format seperti "Sesi 1 (08.00 - 10.00 WIB)"
+            if (preg_match('/\((.*?)\)/', $s, $matches)) {
+                return trim($matches[1]);
+            }
+            // Hapus prefix "Sesi X" jika ada
+            $cleaned = preg_replace('/^Sesi\s*\d+\s*[-:]*\s*/i', '', $s);
+            return trim($cleaned) ?: $s;
         }
         $setting = PpdbUjianSetting::getAktif();
-        return ($setting && $setting->sesi_default) ? $setting->sesi_default : 'Sesi 1 (08.00 - 10.00 WIB)';
+        return $setting ? $setting->waktu_pelaksanaan : '08.00 - 10.00 WIB';
     }
 
     public function getJadwalRuangResmiAttribute(): string
@@ -183,7 +190,7 @@ class PpdbPendaftar extends Model
         if (!$this->jadwal_tes_tanggal) {
             $setting = PpdbUjianSetting::getAktif();
             $this->jadwal_tes_tanggal = ($setting && $setting->tanggal_pelaksanaan) ? $setting->tanggal_pelaksanaan : now()->toDateString();
-            $this->jadwal_tes_sesi = ($setting && $setting->sesi_default) ? $setting->sesi_default : 'Sesi 1 (08.00 - 10.00 WIB)';
+            $this->jadwal_tes_sesi = $setting ? $setting->waktu_pelaksanaan : '08.00 - 10.00 WIB';
             $this->jadwal_tes_ruang = ($setting && $setting->ruang_default) ? $setting->ruang_default : 'Lab Komputer SMKN 1 Air Naningan';
             $this->save();
         }

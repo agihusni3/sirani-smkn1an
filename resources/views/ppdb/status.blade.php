@@ -133,7 +133,7 @@
                                 </div>
                             </div>
                             <div>
-                                <div style="font-size: 0.72rem; color: #64748b; font-weight: 700; text-transform: uppercase;">Sesi Waktu</div>
+                                <div style="font-size: 0.72rem; color: #64748b; font-weight: 700; text-transform: uppercase;">Waktu Ujian</div>
                                 <div style="font-weight: 800; font-size: 0.92rem; color: #0f172a; margin-top: 2px;">
                                     {{ $pendaftar->jadwal_sesi_resmi }}
                                 </div>

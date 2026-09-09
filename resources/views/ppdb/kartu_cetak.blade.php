@@ -522,7 +522,7 @@
                         </td>
                     </tr>
                     <tr>
-                        <td class="label-col">Sesi Waktu</td>
+                        <td class="label-col">Waktu Ujian</td>
                         <td>:</td>
                         <td class="val-col">
                             {{ $pendaftar->jadwal_sesi_resmi }}
@@ -634,7 +634,7 @@
                 <strong>Tata Tertib &amp; Petunjuk Pelaksanaan Ujian Seleksi:</strong>
                 <ol>
                     <li>Kartu Tanda Peserta ini <strong>wajib dicetak pada kertas HVS A4</strong> dan dibawa saat verifikasi berkas dan pelaksanaan tes seleksi di sekolah.</li>
-                    <li>Peserta wajib hadir di lokasi <strong>30 menit sebelum sesi dimulai</strong> dengan mengenakan seragam sekolah asal rapi, lengkap, dan bersepatu.</li>
+                    <li>Peserta wajib hadir di lokasi <strong>30 menit sebelum ujian dimulai</strong> dengan mengenakan seragam sekolah asal rapi, lengkap, dan bersepatu.</li>
                     <li>Bagi pelaksanaan ujian CBT online, peserta dapat mengakses menu <code>{{ url('/ppdb/ujian') }}</code> menggunakan Nomor Pendaftaran di atas.</li>
                     <li>Hasil seleksi dan pemeringkatan kelulusan akan diumumkan secara resmi melalui laman: <code>{{ url('/ppdb/status') }}</code></li>
                 </ol>

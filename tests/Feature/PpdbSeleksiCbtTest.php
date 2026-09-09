@@ -309,7 +309,7 @@ class PpdbSeleksiCbtTest extends TestCase
         $p2->refresh();
 
         $this->assertEquals('2026-09-15', $p1->jadwal_tes_tanggal->toDateString());
-        $this->assertEquals('Sesi 1 (08.00 - 10.00 WIB)', $p1->jadwal_tes_sesi);
+        $this->assertEquals('08.00 - 10.00 WIB', $p1->jadwal_tes_sesi);
         $this->assertEquals('Lab Komputer SMKN 1', $p1->jadwal_tes_ruang);
 
         $this->assertEquals('2026-09-15', $p2->jadwal_tes_tanggal->toDateString());
@@ -324,20 +324,21 @@ class PpdbSeleksiCbtTest extends TestCase
         $response->assertStatus(200);
         $response->assertSee('1x Gelombang (Sesuai Juknis Resmi PPDB)');
         $response->assertDontSee('Sesuai Jadwal Gelombang Panitia PPDB');
+        $response->assertSee('Waktu Ujian');
+        $response->assertDontSee('Sesi Waktu');
     }
 
-    public function test_admin_bisa_mengatur_multi_sesi_ujian_secara_fleksibel()
+    public function test_admin_bisa_mengatur_jam_pelaksanaan_ujian_secara_fleksibel()
     {
         $payload = [
-            'judul_ujian'          => 'Tes PPDB Multi Sesi 2026',
+            'judul_ujian'          => 'Tes PPDB 2026',
             'durasi_menit'         => 60,
             'tanggal_pelaksanaan'  => '2026-09-20',
+            'jam_mulai'            => '07:30',
+            'jam_selesai'          => '09:30',
             'ruang_default'        => 'Lab Komputer Utama',
             'bobot_pg'             => 70,
             'bobot_esai'           => 30,
-            'sesi_nama'            => ['Sesi Pagi A', 'Sesi Siang B', 'Sesi Sore C'],
-            'sesi_waktu'           => ['07.30 - 09.30 WIB', '10.00 - 12.00 WIB', '13.30 - 15.30 WIB'],
-            'sesi_default'         => 'Sesi Pagi A (07.30 - 09.30 WIB)',
         ];
 
         $response = $this->actingAs($this->admin)->post(route('admin.ppdb.seleksi.setting'), $payload);
@@ -345,18 +346,18 @@ class PpdbSeleksiCbtTest extends TestCase
         $response->assertSessionHas('success');
 
         $setting = PpdbUjianSetting::getAktif();
-        $this->assertEquals('Sesi Pagi A (07.30 - 09.30 WIB)', $setting->sesi_default);
-        $this->assertCount(3, $setting->daftar_sesi);
-        $this->assertContains('Sesi Siang B (10.00 - 12.00 WIB)', $setting->sesi_options);
+        $this->assertEquals('07:30', $setting->jam_mulai);
+        $this->assertEquals('09:30', $setting->jam_selesai);
+        $this->assertEquals('07.30 - 09.30 WIB', $setting->waktu_pelaksanaan);
     }
 
-    public function test_admin_bisa_mengubah_jadwal_sesi_siswa_secara_single()
+    public function test_admin_bisa_mengubah_jadwal_siswa_secara_single()
     {
         $pendaftar = $this->buatPendaftar('PPDB-SESI-01', '1122334458', 'Peserta Single Sesi', 'terverifikasi');
 
         $payload = [
             'jadwal_tes_tanggal' => '2026-09-25',
-            'jadwal_tes_sesi'    => 'Sesi 2 (10.30 - 12.30 WIB)',
+            'jadwal_tes_sesi'    => '10.30 - 12.30 WIB',
             'jadwal_tes_ruang'   => 'Lab Komputer 2',
         ];
 
@@ -366,7 +367,7 @@ class PpdbSeleksiCbtTest extends TestCase
 
         $pendaftar->refresh();
         $this->assertEquals('2026-09-25', $pendaftar->jadwal_tes_tanggal->toDateString());
-        $this->assertEquals('Sesi 2 (10.30 - 12.30 WIB)', $pendaftar->jadwal_tes_sesi);
+        $this->assertEquals('10.30 - 12.30 WIB', $pendaftar->jadwal_tes_sesi);
         $this->assertEquals('Lab Komputer 2', $pendaftar->jadwal_tes_ruang);
     }
 }

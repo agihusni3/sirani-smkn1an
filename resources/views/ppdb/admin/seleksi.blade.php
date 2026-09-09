@@ -157,7 +157,7 @@
           <i class="bi bi-calendar2-check-fill"></i>
         </div>
         <div>
-          <div style="font-size:11px; font-weight:800; color:var(--text-3); text-transform:uppercase;">Terjadwal Sesi Ujian</div>
+          <div style="font-size:11px; font-weight:800; color:var(--text-3); text-transform:uppercase;">Terjadwal Ujian</div>
           <div style="font-size:20px; font-weight:900; color:var(--text-1);">{{ $stats['sudah_jadwal'] ?? 0 }}</div>
         </div>
       </div>
@@ -202,7 +202,7 @@
         1. Pengaturan &amp; Bank Soal
       </a>
       <a href="javascript:void(0)" class="seleksi-tab-link {{ $curTab === 'penjadwalan' ? 'active' : '' }}" onclick="switchTab('tab-jadwal', this)">
-        2. Penjadwalan Sesi Lab
+        2. Penjadwalan Peserta &amp; Ruang
       </a>
       <a href="javascript:void(0)" class="seleksi-tab-link {{ $curTab === 'tertulis' ? 'active' : '' }}" onclick="switchTab('tab-koreksi', this)">
         3. Koreksi Esai &amp; CBT
@@ -293,17 +293,29 @@
             </div>
           </div>
 
-          <!-- JADWAL RESMI JUKNIS & MANAJEMEN MULTI-SESI -->
+          <!-- JADWAL RESMI JUKNIS (JAM MULAI - SELESAI) -->
           <div style="background:linear-gradient(135deg, rgba(37,99,235,0.05), rgba(79,70,229,0.02)); border:1.5px solid #bfdbfe; border-radius:12px; padding:18px; margin-bottom:20px;">
             <div style="font-size:13px; font-weight:800; color:#1e40af; margin-bottom:14px; display:flex; align-items:center; gap:8px;">
-              <i class="bi bi-calendar-check-fill text-primary"></i> Jadwal Resmi Ujian Seleksi Sesuai Juknis (1x Gelombang)
+              <i class="bi bi-calendar-check-fill text-primary"></i> Jadwal Resmi Pelaksanaan Ujian (1x Gelombang Sesuai Juknis)
             </div>
             
-            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:16px; margin-bottom:18px;">
+            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:16px;">
               <div>
                 <label style="display:block; font-size:11.5px; font-weight:700; color:#475569; margin-bottom:5px;">Tanggal Pelaksanaan Ujian:</label>
                 <input type="date" name="tanggal_pelaksanaan" class="form-control" value="{{ old('tanggal_pelaksanaan', $setting->tanggal_pelaksanaan ? $setting->tanggal_pelaksanaan->format('Y-m-d') : now()->format('Y-m-d')) }}" style="font-weight:700;">
-                <div style="font-size:11px; color:#64748b; margin-top:3px;">Tanggal resmi yang tercetak di kartu &amp; sistem</div>
+                <div style="font-size:11px; color:#64748b; margin-top:3px;">Tanggal resmi yang tercetak di kartu peserta</div>
+              </div>
+
+              <div>
+                <label style="display:block; font-size:11.5px; font-weight:700; color:#475569; margin-bottom:5px;">Jam Mulai:</label>
+                <input type="time" name="jam_mulai" class="form-control" value="{{ old('jam_mulai', $setting->jam_mulai ?? '08:00') }}" required style="font-weight:700;">
+                <div style="font-size:11px; color:#64748b; margin-top:3px;">Contoh: 08:00 WIB</div>
+              </div>
+
+              <div>
+                <label style="display:block; font-size:11.5px; font-weight:700; color:#475569; margin-bottom:5px;">Jam Selesai:</label>
+                <input type="time" name="jam_selesai" class="form-control" value="{{ old('jam_selesai', $setting->jam_selesai ?? '10:00') }}" required style="font-weight:700;">
+                <div style="font-size:11px; color:#64748b; margin-top:3px;">Contoh: 10:00 WIB</div>
               </div>
 
               <div>
@@ -313,60 +325,9 @@
               </div>
             </div>
 
-            <!-- MANAJEMEN DAFTAR SESI UJIAN (FLEKSIBEL ADMIN) -->
-            <div style="background:#ffffff; border:1px solid #cbd5e1; border-radius:10px; padding:16px;">
-              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:8px;">
-                <div>
-                  <div style="font-size:12.5px; font-weight:800; color:var(--text-1); display:flex; align-items:center; gap:6px;">
-                    <i class="bi bi-clock-history text-primary"></i> Daftar Sesi Ujian (Fleksibel Admin)
-                  </div>
-                  <div style="font-size:11px; color:#64748b;">Admin bebas menambah, mengubah jam/waktu, dan menghapus sesi sesuai kuota kapasitas lab.</div>
-                </div>
-                <button type="button" class="btn btn-sm" onclick="tambahBarisSesi()" style="background:#eff6ff; color:#2563eb; border:1px solid #bfdbfe; font-weight:800; font-size:11.5px; border-radius:6px; padding:6px 14px; cursor:pointer; display:inline-flex; align-items:center; gap:6px;">
-                  <i class="bi bi-plus-circle-fill"></i> Tambah Sesi Ujian
-                </button>
-              </div>
-
-              <div id="container-daftar-sesi" style="display:flex; flex-direction:column; gap:10px;">
-                @php
-                  $daftarSesi = $setting ? $setting->daftar_sesi_list : [
-                    ['nama' => 'Sesi 1', 'waktu' => '08.00 - 10.00 WIB', 'label' => 'Sesi 1 (08.00 - 10.00 WIB)'],
-                    ['nama' => 'Sesi 2', 'waktu' => '10.30 - 12.30 WIB', 'label' => 'Sesi 2 (10.30 - 12.30 WIB)'],
-                    ['nama' => 'Sesi 3', 'waktu' => '13.30 - 15.30 WIB', 'label' => 'Sesi 3 (13.30 - 15.30 WIB)'],
-                  ];
-                  $sesiDefault = $setting->sesi_default ?? ($daftarSesi[0]['label'] ?? 'Sesi 1 (08.00 - 10.00 WIB)');
-                @endphp
-
-                @foreach($daftarSesi as $idx => $s)
-                  @php
-                    $sNama = is_array($s) ? ($s['nama'] ?? 'Sesi ' . ($idx+1)) : 'Sesi ' . ($idx+1);
-                    $sWaktu = is_array($s) ? ($s['waktu'] ?? '') : '';
-                    $sLabel = is_array($s) ? ($s['label'] ?? "{$sNama} ({$sWaktu})") : (string)$s;
-                  @endphp
-                  <div class="baris-sesi" style="display:flex; align-items:center; gap:10px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:10px 14px; flex-wrap:wrap;">
-                    <div style="flex:1; min-width:130px;">
-                      <label style="font-size:10.5px; font-weight:700; color:#64748b; margin-bottom:3px; display:block;">Nama Sesi:</label>
-                      <input type="text" name="sesi_nama[]" class="form-control form-control-sm input-sesi-nama" value="{{ $sNama }}" required placeholder="Contoh: Sesi 1" oninput="syncLabelSesi(this)" style="font-weight:700; font-size:12px;">
-                    </div>
-                    <div style="flex:1.8; min-width:170px;">
-                      <label style="font-size:10.5px; font-weight:700; color:#64748b; margin-bottom:3px; display:block;">Rentang Waktu:</label>
-                      <input type="text" name="sesi_waktu[]" class="form-control form-control-sm input-sesi-waktu" value="{{ $sWaktu }}" required placeholder="Contoh: 08.00 - 10.00 WIB" oninput="syncLabelSesi(this)" style="font-weight:700; font-size:12px;">
-                    </div>
-                    <div style="min-width:135px; text-align:center;">
-                      <label style="font-size:10.5px; font-weight:700; color:#64748b; margin-bottom:3px; display:block;">Default Baru:</label>
-                      <div style="display:flex; align-items:center; justify-content:center; gap:6px; margin-top:4px;">
-                        <input type="radio" name="sesi_default" value="{{ $sLabel }}" {{ $sesiDefault === $sLabel ? 'checked' : '' }} class="radio-sesi-default" style="cursor:pointer; accent-color:#2563eb;">
-                        <span style="font-size:11px; font-weight:700; color:#334155;">Jadikan Default</span>
-                      </div>
-                    </div>
-                    <div style="padding-top:16px;">
-                      <button type="button" class="btn btn-sm btn-outline-danger" onclick="hapusBarisSesi(this)" title="Hapus Sesi" style="border:none; color:#ef4444; background:transparent; font-size:16px; cursor:pointer; padding:4px 8px;">
-                        <i class="bi bi-trash3-fill"></i>
-                      </button>
-                    </div>
-                  </div>
-                @endforeach
-              </div>
+            <div style="margin-top:14px; background:#eff6ff; border:1px solid #bfdbfe; border-radius:8px; padding:10px 14px; display:flex; align-items:center; gap:8px;">
+              <i class="bi bi-clock text-primary" style="font-size:16px;"></i>
+              <span style="font-size:12px; color:#1e40af;">Waktu Ujian Terjadwal: <strong>{{ $setting->waktu_pelaksanaan }}</strong> (Otomatis tercetak pada kartu peserta &amp; portal pengumuman)</span>
             </div>
           </div>
 
@@ -392,7 +353,7 @@
 
           <div style="margin-top:20px; text-align:right;">
             <button type="submit" class="btn" style="background:#2563eb; color:#ffffff; font-weight:700; padding:10px 24px; border-radius:8px; border:none; cursor:pointer; font-size:13px;">
-              Simpan Pengaturan Sesi Ujian
+              Simpan Pengaturan Ujian
             </button>
           </div>
 
@@ -401,42 +362,35 @@
     </div>
 
     {{-- ══════════════════════════════════════════════════════════════ --}}
-    {{-- TAB 2: PENJADWALAN SESI RUANG LAB --}}
+    {{-- TAB 2: PENJADWALAN PESERTA & RUANG LAB --}}
     {{-- ══════════════════════════════════════════════════════════════ --}}
     <div id="tab-jadwal" class="tab-content-pane {{ $curTab === 'penjadwalan' ? 'active' : '' }}">
       
-      {{-- Banner Quick Action: Tetapkan Jadwal Serentak (Fleksibel Sesi) --}}
+      {{-- Banner Quick Action: Tetapkan Jadwal Serentak (1x Gelombang Juknis) --}}
       <div style="background:#f0fdf4; border:1.5px solid #86efac; border-radius:12px; padding:16px 20px; margin-bottom:20px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:14px;">
         <div>
           <div style="font-size:13.5px; font-weight:900; color:#15803d; display:flex; align-items:center; gap:8px;">
             <i class="bi bi-patch-check-fill text-emerald-600"></i> Penetapan Jadwal Ujian Serentak (1x Gelombang Juknis)
           </div>
           <div style="font-size:12px; color:#166534; margin-top:2px;">
-            Jadwal: <strong>{{ $setting->tanggal_pelaksanaan ? \Carbon\Carbon::parse($setting->tanggal_pelaksanaan)->translatedFormat('l, d F Y') : \Carbon\Carbon::today()->translatedFormat('l, d F Y') }}</strong> &bull; 
-            Default: <strong>{{ $setting->sesi_default ?? 'Sesi 1 (08.00 - 10.00 WIB)' }}</strong> &bull; {{ $setting->ruang_default ?? 'Lab Komputer SMKN 1' }}
+            Tanggal: <strong>{{ $setting->tanggal_pelaksanaan ? \Carbon\Carbon::parse($setting->tanggal_pelaksanaan)->translatedFormat('l, d F Y') : \Carbon\Carbon::today()->translatedFormat('l, d F Y') }}</strong> &bull; 
+            Waktu: <strong>{{ $setting->waktu_pelaksanaan }}</strong> &bull; Ruang: <strong>{{ $setting->ruang_default ?? 'Lab Komputer SMKN 1' }}</strong>
           </div>
         </div>
 
-        <form action="{{ route('admin.ppdb.seleksi.jadwalkan_serentak') }}" method="POST" style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+        <form action="{{ route('admin.ppdb.seleksi.jadwalkan_serentak') }}" method="POST" onsubmit="return confirm('Tetapkan jadwal ujian serentak resmi ({{ $setting->waktu_pelaksanaan }}) untuk seluruh calon siswa terverifikasi?')">
           @csrf
-          <select name="sesi_pilihan" class="form-control form-control-sm" style="width:230px; font-weight:700; font-size:12px; background:#ffffff; border-color:#86efac;">
-            <option value="default">Sesi Default ({{ Str::limit($setting->sesi_default ?? 'Sesi 1', 20) }})</option>
-            <option value="bagi_rata">⚡ Bagi Rata Otomatis ke Seluruh Sesi</option>
-            @foreach($setting->sesi_options as $opt)
-              <option value="{{ $opt }}">{{ $opt }}</option>
-            @endforeach
-          </select>
-          <button type="submit" class="btn" onclick="return confirm('Terapkan jadwal serentak ini untuk seluruh calon siswa terverifikasi/siap tes?')" style="background:#15803d; color:#ffffff; font-weight:800; font-size:12.5px; border-radius:8px; padding:8px 16px; border:none; cursor:pointer; display:inline-flex; align-items:center; gap:8px; box-shadow:0 2px 6px rgba(21,128,61,0.2);">
+          <button type="submit" class="btn" style="background:#15803d; color:#ffffff; font-weight:800; font-size:12.5px; border-radius:8px; padding:9px 18px; border:none; cursor:pointer; display:inline-flex; align-items:center; gap:8px; box-shadow:0 2px 6px rgba(21,128,61,0.2);">
             <i class="bi bi-lightning-charge-fill text-yellow-300"></i>
-            <span>Terapkan Serentak</span>
+            <span>Tetapkan Serentak Semua Peserta</span>
           </button>
         </form>
       </div>
 
-      <form action="{{ route('admin.ppdb.seleksi.jadwalkan') }}" method="POST" onsubmit="return handleFormJadwalMassalSubmit(this)">
+      <form action="{{ route('admin.ppdb.seleksi.jadwalkan') }}" method="POST">
         @csrf
 
-        {{-- Toolbar Penjadwalan Massal Tercentang (Fleksibel Multi-Sesi) --}}
+        {{-- Toolbar Penjadwalan Massal Tercentang --}}
         <div style="background:#f8fafc; border:1px solid #cbd5e1; border-radius:12px; padding:18px 20px; margin-bottom:20px; display:flex; align-items:center; gap:14px; flex-wrap:wrap;">
           <div style="font-weight:900; font-size:13px; color:var(--text-1); display:flex; align-items:center; gap:6px;">
             <i class="bi bi-check2-square text-primary" style="font-size:18px;"></i> Jadwalkan Tercentang:
@@ -448,14 +402,8 @@
           </div>
 
           <div style="display:flex; align-items:center; gap:8px;">
-            <label style="font-size:12px; font-weight:700;">Sesi:</label>
-            <select name="jadwal_tes_sesi" id="selectSesiMassal" onchange="handleSelectSesiMassalChange(this)" class="form-control form-control-sm" style="min-width:210px; font-weight:700;">
-              @foreach($setting->sesi_options as $opt)
-                <option value="{{ $opt }}">{{ $opt }}</option>
-              @endforeach
-              <option value="__custom__">➕ Input Sesi Lainnya...</option>
-            </select>
-            <input type="text" id="inputCustomSesiMassal" placeholder="Ketik nama & jam sesi..." style="display:none; width:190px; font-size:12px; font-weight:700;" class="form-control form-control-sm">
+            <label style="font-size:12px; font-weight:700;">Waktu / Jam:</label>
+            <input type="text" name="jadwal_tes_sesi" class="form-control form-control-sm" value="{{ $setting->waktu_pelaksanaan }}" required placeholder="08.00 - 10.00 WIB" style="width:160px; font-weight:700;">
           </div>
 
           <div style="display:flex; align-items:center; gap:8px;">
@@ -478,7 +426,7 @@
                 </th>
                 <th style="padding:12px 16px;">No. Registrasi &amp; Calon Siswa</th>
                 <th style="padding:12px 16px;">Pilihan Jurusan</th>
-                <th style="padding:12px 16px;">Jadwal Tanggal &amp; Sesi</th>
+                <th style="padding:12px 16px;">Jadwal Tanggal &amp; Waktu</th>
                 <th style="padding:12px 16px;">Ruang Lab</th>
                 <th style="padding:12px 16px; text-align:center;">Kartu Ujian</th>
               </tr>
@@ -504,11 +452,11 @@
                       </div>
                       <div style="margin-top:4px; display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
                         <span style="background:#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe; font-size:11px; font-weight:700; padding:2px 8px; border-radius:4px;">
-                          {{ $peserta->jadwal_tes_sesi ?: 'Sesi 1' }}
+                          <i class="bi bi-clock me-1"></i> {{ $peserta->jadwal_sesi_resmi }}
                         </span>
                         <button type="button" class="btn btn-sm" 
-                          onclick="bukaModalEditSesi('{{ $peserta->id }}', '{{ addslashes($peserta->nama_lengkap) }}', '{{ $peserta->jadwal_tes_tanggal ? \Carbon\Carbon::parse($peserta->jadwal_tes_tanggal)->format('Y-m-d') : '' }}', '{{ addslashes($peserta->jadwal_tes_sesi ?? '') }}', '{{ addslashes($peserta->jadwal_tes_ruang ?? '') }}')" 
-                          title="Ubah Jadwal/Sesi Siswa Ini" 
+                          onclick="bukaModalEditSesi('{{ $peserta->id }}', '{{ addslashes($peserta->nama_lengkap) }}', '{{ $peserta->jadwal_tes_tanggal ? \Carbon\Carbon::parse($peserta->jadwal_tes_tanggal)->format('Y-m-d') : '' }}', '{{ addslashes($peserta->jadwal_sesi_resmi ?? '') }}', '{{ addslashes($peserta->jadwal_tes_ruang ?? '') }}')" 
+                          title="Ubah Jadwal Siswa Ini" 
                           style="background:#f1f5f9; border:1px solid #cbd5e1; color:#475569; padding:2px 6px; font-size:10.5px; font-weight:700; border-radius:4px; cursor:pointer;">
                           <i class="bi bi-pencil-square"></i> Ubah
                         </button>
@@ -1089,48 +1037,12 @@
   }
 
   function syncLabelSesi(inputEl) {
-    const row = inputEl.closest('.baris-sesi');
-    const nama = row.querySelector('.input-sesi-nama').value.trim();
-    const waktu = row.querySelector('.input-sesi-waktu').value.trim();
-    const radio = row.querySelector('.radio-sesi-default');
-    const label = waktu ? `${nama} (${waktu})` : nama;
-    radio.value = label;
-  }
-
-  function hapusBarisSesi(btn) {
-    const container = document.getElementById('container-daftar-sesi');
-    if (container.querySelectorAll('.baris-sesi').length <= 1) {
-      alert('Minimal harus ada 1 sesi ujian yang aktif.');
-      return;
-    }
-    const row = btn.closest('.baris-sesi');
-    const isChecked = row.querySelector('.radio-sesi-default').checked;
-    row.remove();
-    if (isChecked) {
-      const firstRadio = container.querySelector('.radio-sesi-default');
-      if (firstRadio) firstRadio.checked = true;
-    }
-  }
-
-  // Edit Sesi Single Siswa Modal
-  function bukaModalEditSesi(id, nama, tanggal, sesi, ruang) {
+  // Edit Jadwal Single Siswa Modal
+  function bukaModalEditSesi(id, nama, tanggal, waktu, ruang) {
     document.getElementById('editSesiNamaPeserta').innerText = nama;
     document.getElementById('editSesiTanggal').value = tanggal;
+    document.getElementById('editSesiInput').value = waktu || '{{ $setting->waktu_pelaksanaan }}';
     document.getElementById('editSesiRuang').value = ruang || 'Lab Komputer SMKN 1 Air Naningan';
-
-    const select = document.getElementById('editSesiSelect');
-    let found = false;
-    for (let i = 0; i < select.options.length; i++) {
-      if (select.options[i].value === sesi) {
-        select.selectedIndex = i;
-        found = true;
-        break;
-      }
-    }
-    if (!found && sesi) {
-      const opt = new Option(sesi, sesi, true, true);
-      select.add(opt);
-    }
 
     document.getElementById('formEditSesiSingle').action = `/admin/ppdb/seleksi/jadwalkan-single/${id}`;
     document.getElementById('modalEditSesiSingle').style.display = 'flex';
@@ -1139,45 +1051,15 @@
   function tutupModalEditSesi() {
     document.getElementById('modalEditSesiSingle').style.display = 'none';
   }
-
-  // Handle Dynamic Sesi Toolbar
-  function handleSelectSesiMassalChange(selectEl) {
-    const customInput = document.getElementById('inputCustomSesiMassal');
-    if (selectEl.value === '__custom__') {
-      customInput.style.display = 'inline-block';
-      customInput.required = true;
-      customInput.focus();
-    } else {
-      customInput.style.display = 'none';
-      customInput.required = false;
-    }
-  }
-
-  function handleFormJadwalMassalSubmit(form) {
-    const select = document.getElementById('selectSesiMassal');
-    const customInput = document.getElementById('inputCustomSesiMassal');
-    if (select.value === '__custom__') {
-      const val = customInput.value.trim();
-      if (!val) {
-        alert('Silakan masukkan nama & jam sesi kustom');
-        customInput.focus();
-        return false;
-      }
-      const opt = new Option(val, val, true, true);
-      select.add(opt);
-      select.value = val;
-    }
-    return true;
-  }
 </script>
 
-<!-- Modal Ubah Jadwal & Sesi Calon Siswa (Single) -->
+<!-- Modal Ubah Jadwal & Waktu Calon Siswa (Single) -->
 <div id="modalEditSesiSingle" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:9999; align-items:center; justify-content:center; padding:16px;">
   <div style="background:#ffffff; border-radius:14px; width:100%; max-width:480px; box-shadow:0 25px 50px -12px rgba(0,0,0,0.25); overflow:hidden;">
     <div style="padding:16px 20px; background:#0f172a; color:#ffffff; display:flex; justify-content:space-between; align-items:center;">
       <div>
         <h4 style="font-size:14px; font-weight:800; margin:0; display:flex; align-items:center; gap:6px;">
-          <i class="bi bi-calendar-check text-primary"></i> Ubah Jadwal &amp; Sesi Ujian
+          <i class="bi bi-calendar-check text-primary"></i> Ubah Jadwal &amp; Waktu Ujian
         </h4>
         <div id="editSesiNamaPeserta" style="font-size:12px; color:#94a3b8; margin-top:2px;">Nama Calon Siswa</div>
       </div>
@@ -1191,12 +1073,9 @@
       </div>
 
       <div style="margin-bottom:14px;">
-        <label style="display:block; font-size:12px; font-weight:700; color:#334155; margin-bottom:5px;">Pilih Sesi Ujian:</label>
-        <select name="jadwal_tes_sesi" id="editSesiSelect" class="form-control" required style="font-weight:700;">
-          @foreach($setting->sesi_options as $opt)
-            <option value="{{ $opt }}">{{ $opt }}</option>
-          @endforeach
-        </select>
+        <label style="display:block; font-size:12px; font-weight:700; color:#334155; margin-bottom:5px;">Waktu / Jam Ujian (Mulai - Selesai):</label>
+        <input type="text" name="jadwal_tes_sesi" id="editSesiInput" class="form-control" required style="font-weight:700;" placeholder="Contoh: 08.00 - 10.00 WIB">
+        <div style="font-size:11px; color:#64748b; margin-top:3px;">Format: Jam Mulai - Selesai (contoh: 08.00 - 10.00 WIB)</div>
       </div>
 
       <div style="margin-bottom:20px;">
