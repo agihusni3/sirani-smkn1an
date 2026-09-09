@@ -257,7 +257,7 @@ class PpdbAdminController extends Controller
     }
 
     /**
-     * Simpan Pengaturan Sesi Ujian CBT PPDB
+     * Simpan Pengaturan Sesi Ujian CBT PPDB & Manajemen Multi-Sesi
      */
     public function simpanSettingUjian(Request $request)
     {
@@ -265,7 +265,7 @@ class PpdbAdminController extends Controller
             'judul_ujian'          => 'required|string|max:255',
             'durasi_menit'         => 'required|integer|min:15|max:180',
             'tanggal_pelaksanaan'  => 'nullable|date',
-            'sesi_default'         => 'nullable|string|max:100',
+            'sesi_default'         => 'nullable|string|max:150',
             'ruang_default'        => 'nullable|string|max:150',
             'gelombang_label'      => 'nullable|string|max:150',
             'bobot_pg'             => 'required|numeric|min:10|max:90',
@@ -279,10 +279,38 @@ class PpdbAdminController extends Controller
             $setting = new PpdbUjianSetting();
         }
 
+        // Parsing multi-sesi fleksibel yang dikonfigurasi admin
+        $daftarSesi = [];
+        if ($request->has('sesi_nama') && is_array($request->input('sesi_nama'))) {
+            $namas = $request->input('sesi_nama');
+            $waktus = $request->input('sesi_waktu', []);
+            foreach ($namas as $idx => $nama) {
+                $namaClean = trim($nama);
+                $waktuClean = trim($waktus[$idx] ?? '');
+                if ($namaClean !== '') {
+                    $label = $waktuClean !== '' ? "{$namaClean} ({$waktuClean})" : $namaClean;
+                    $daftarSesi[] = [
+                        'nama'  => $namaClean,
+                        'waktu' => $waktuClean,
+                        'label' => $label,
+                    ];
+                }
+            }
+        }
+
+        if (!empty($daftarSesi)) {
+            $setting->daftar_sesi = $daftarSesi;
+        }
+
+        $defaultSesiCandidate = $validated['sesi_default'] ?? null;
+        if (!$defaultSesiCandidate && !empty($daftarSesi)) {
+            $defaultSesiCandidate = $daftarSesi[0]['label'];
+        }
+
         $setting->judul_ujian = $validated['judul_ujian'];
         $setting->durasi_menit = $validated['durasi_menit'];
         $setting->tanggal_pelaksanaan = $validated['tanggal_pelaksanaan'] ?? ($setting->tanggal_pelaksanaan ?: now()->toDateString());
-        $setting->sesi_default = $validated['sesi_default'] ?? ($setting->sesi_default ?: 'Sesi 1 (08.00 - 10.00 WIB)');
+        $setting->sesi_default = $defaultSesiCandidate ?: ($setting->sesi_default ?: 'Sesi 1 (08.00 - 10.00 WIB)');
         $setting->ruang_default = $validated['ruang_default'] ?? ($setting->ruang_default ?: 'Lab Komputer SMKN 1 Air Naningan');
         $setting->gelombang_label = $validated['gelombang_label'] ?? ($setting->gelombang_label ?: '1x Gelombang (Sesuai Juknis Resmi)');
         $setting->bobot_pg = $validated['bobot_pg'];
@@ -293,35 +321,47 @@ class PpdbAdminController extends Controller
         $setting->save();
 
         return redirect()->route('admin.ppdb.seleksi', ['tab' => 'pengaturan'])
-            ->with('success', 'Pengaturan sesi ujian CBT dan jadwal resmi Juknis berhasil disimpan.');
+            ->with('success', 'Pengaturan sesi ujian CBT dan daftar sesi berhasil disimpan.');
     }
 
     /**
-     * Tetapkan Jadwal Ujian Serentak (1 Gelombang Sesuai Juknis Resmi)
+     * Tetapkan Jadwal Ujian Serentak (Fleksibel Pilih Sesi atau Bagi Rata)
      */
     public function jadwalkanJuknisSerentak(Request $request)
     {
         $setting = PpdbUjianSetting::getAktif();
-        $tanggal = $setting?->tanggal_pelaksanaan ?: ($request->input('jadwal_tes_tanggal') ?: now()->toDateString());
-        $sesi = $setting?->sesi_default ?: ($request->input('jadwal_tes_sesi') ?: 'Sesi 1 (08.00 - 10.00 WIB)');
-        $ruang = $setting?->ruang_default ?: ($request->input('jadwal_tes_ruang') ?: 'Lab Komputer SMKN 1 Air Naningan');
+        $tanggal = $request->input('jadwal_tes_tanggal') ?: ($setting?->tanggal_pelaksanaan ? $setting->tanggal_pelaksanaan->format('Y-m-d') : now()->toDateString());
+        $ruang = $request->input('jadwal_tes_ruang') ?: ($setting?->ruang_default ?: 'Lab Komputer SMKN 1 Air Naningan');
+        $sesiPilihan = $request->input('sesi_pilihan', 'default');
 
-        $pendaftars = PpdbPendaftar::whereIn('status', ['terverifikasi', 'berkas_valid', 'siap_tes', 'diterima'])->get();
+        $pendaftars = PpdbPendaftar::whereIn('status', ['terverifikasi', 'berkas_valid', 'siap_tes', 'diterima'])->orderBy('id')->get();
+        $sesiOptions = $setting ? $setting->sesi_options : ['Sesi 1 (08.00 - 10.00 WIB)'];
         $count = 0;
-        foreach ($pendaftars as $p) {
+
+        foreach ($pendaftars as $index => $p) {
             $p->jadwal_tes_tanggal = $tanggal;
-            $p->jadwal_tes_sesi = $sesi;
             $p->jadwal_tes_ruang = $ruang;
+
+            if ($sesiPilihan === 'bagi_rata' && count($sesiOptions) > 1) {
+                // Distribusi peserta secara merata ke semua sesi yang tersedia
+                $sesiIdx = $index % count($sesiOptions);
+                $p->jadwal_tes_sesi = $sesiOptions[$sesiIdx];
+            } elseif ($sesiPilihan !== 'default' && !empty($sesiPilihan)) {
+                $p->jadwal_tes_sesi = $sesiPilihan;
+            } else {
+                $p->jadwal_tes_sesi = $setting?->sesi_default ?: ($sesiOptions[0] ?? 'Sesi 1 (08.00 - 10.00 WIB)');
+            }
+
             $p->save();
             $count++;
         }
 
         return redirect()->route('admin.ppdb.seleksi', ['tab' => 'penjadwalan'])
-            ->with('success', "Sukses menetapkan jadwal ujian pasti (1 Gelombang Sesuai Juknis) untuk {$count} calon peserta!");
+            ->with('success', "Sukses menetapkan jadwal ujian untuk {$count} calon peserta!");
     }
 
     /**
-     * Jadwalkan Sesi, Ruang, dan Tanggal Ujian Massal
+     * Jadwalkan Sesi, Ruang, dan Tanggal Ujian Massal Tercentang
      */
     public function jadwalkanMassal(Request $request)
     {
@@ -329,7 +369,7 @@ class PpdbAdminController extends Controller
             'pendaftar_ids'        => 'required|array',
             'pendaftar_ids.*'      => 'exists:ppdb_pendaftars,id',
             'jadwal_tes_tanggal'   => 'required|date',
-            'jadwal_tes_sesi'      => 'required|string|max:100',
+            'jadwal_tes_sesi'      => 'required|string|max:150',
             'jadwal_tes_ruang'     => 'required|string|max:150',
         ]);
 
@@ -347,6 +387,27 @@ class PpdbAdminController extends Controller
 
         return redirect()->route('admin.ppdb.seleksi', ['tab' => 'penjadwalan'])
             ->with('success', "Berhasil menjadwalkan {$count} calon peserta ujian seleksi!");
+    }
+
+    /**
+     * Jadwalkan Sesi, Ruang, dan Tanggal untuk 1 Calon Siswa (Single Edit)
+     */
+    public function jadwalkanSingle(Request $request, $id)
+    {
+        $validated = $request->validate([
+            'jadwal_tes_tanggal' => 'required|date',
+            'jadwal_tes_sesi'    => 'required|string|max:150',
+            'jadwal_tes_ruang'   => 'required|string|max:150',
+        ]);
+
+        $peserta = PpdbPendaftar::findOrFail($id);
+        $peserta->jadwal_tes_tanggal = $validated['jadwal_tes_tanggal'];
+        $peserta->jadwal_tes_sesi = $validated['jadwal_tes_sesi'];
+        $peserta->jadwal_tes_ruang = $validated['jadwal_tes_ruang'];
+        $peserta->save();
+
+        return redirect()->route('admin.ppdb.seleksi', ['tab' => 'penjadwalan'])
+            ->with('success', "Jadwal untuk {$peserta->nama_lengkap} berhasil diperbarui ({$peserta->jadwal_tes_sesi})!");
     }
 
     /**

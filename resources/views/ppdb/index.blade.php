@@ -14,7 +14,7 @@
                 PORTAL PENDAFTARAN ONLINE TP {{ $tahunAjaran }}
             </div>
             <h1 style="font-size: clamp(2rem, 3.5vw, 2.8rem); font-weight: 800; color: #ffffff; letter-spacing: -0.03em; line-height: 1.15; margin-bottom: 14px;">
-                Pintu Masuk Calon Ahli Madya &amp; Teknisi Industri
+                Pintu Masuk Calon SMKN 1 Air Naningan
             </h1>
             <p style="font-size: 1.05rem; color: #cbd5e1; line-height: 1.65; margin-bottom: 26px;">
                 SMKN 1 Air Naningan membuka penerimaan calon peserta didik baru untuk Program Keahlian Rekayasa Perangkat Lunak, Agro-Teknologi Pangan, dan Teknik Sepeda Motor tanpa dipungut biaya pendaftaran.

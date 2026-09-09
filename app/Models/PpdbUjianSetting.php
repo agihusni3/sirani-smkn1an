@@ -22,6 +22,7 @@ class PpdbUjianSetting extends Model
         'durasi_menit',
         'tanggal_pelaksanaan',
         'sesi_default',
+        'daftar_sesi',
         'ruang_default',
         'gelombang_label',
         'is_active',
@@ -33,6 +34,7 @@ class PpdbUjianSetting extends Model
 
     protected $casts = [
         'tanggal_pelaksanaan' => 'date',
+        'daftar_sesi'         => 'array',
         'kunci_jawaban_pg'    => 'array',
         'bobot_pg'            => 'decimal:2',
         'bobot_esai'          => 'decimal:2',
@@ -40,6 +42,36 @@ class PpdbUjianSetting extends Model
         'buka_pada'           => 'datetime',
         'tutup_pada'          => 'datetime',
     ];
+
+    /**
+     * Mengambil daftar sesi ujian yang telah dikonfigurasi admin
+     */
+    public function getDaftarSesiListAttribute(): array
+    {
+        if (!empty($this->daftar_sesi) && is_array($this->daftar_sesi)) {
+            return $this->daftar_sesi;
+        }
+
+        return [
+            ['nama' => 'Sesi 1', 'waktu' => '08.00 - 10.00 WIB', 'label' => 'Sesi 1 (08.00 - 10.00 WIB)'],
+            ['nama' => 'Sesi 2', 'waktu' => '10.30 - 12.30 WIB', 'label' => 'Sesi 2 (10.30 - 12.30 WIB)'],
+            ['nama' => 'Sesi 3', 'waktu' => '13.30 - 15.30 WIB', 'label' => 'Sesi 3 (13.30 - 15.30 WIB)'],
+        ];
+    }
+
+    /**
+     * Mengambil array string label sesi untuk dropdown pilihan
+     */
+    public function getSesiOptionsAttribute(): array
+    {
+        $list = $this->daftar_sesi_list;
+        $options = [];
+        foreach ($list as $s) {
+            $label = is_array($s) ? ($s['label'] ?? ($s['nama'] . ' (' . ($s['waktu'] ?? '') . ')')) : (string) $s;
+            $options[] = trim($label);
+        }
+        return array_values(array_unique(array_filter($options)));
+    }
 
     public function creator()
     {
