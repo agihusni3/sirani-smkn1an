@@ -306,12 +306,20 @@ class PpdbAdminController extends Controller
         $setting->created_by = auth()->id();
         $setting->save();
 
+        // Singkronkan jadwal seluruh peserta seleksi aktif dengan jadwal resmi panitia yang baru disimpan
+        $updatedCount = PpdbPendaftar::whereIn('status', ['terverifikasi', 'berkas_valid', 'siap_tes', 'diterima'])
+            ->update([
+                'jadwal_tes_tanggal' => $setting->tanggal_pelaksanaan,
+                'jadwal_tes_sesi'    => $waktuLabel,
+                'jadwal_tes_ruang'   => $setting->ruang_default,
+            ]);
+
         return redirect()->route('admin.ppdb.seleksi', ['tab' => 'pengaturan'])
-            ->with('success', 'Pengaturan jadwal pelaksanaan ujian CBT (Tanggal & Jam ' . $waktuLabel . ') berhasil disimpan.');
+            ->with('success', 'Pengaturan jadwal ujian (' . $waktuLabel . ') berhasil disimpan dan disingkronkan ke ' . $updatedCount . ' peserta.');
     }
 
     /**
-     * Tetapkan Jadwal Ujian Serentak (Sesuai Tanggal & Jam Mulai-Selesai Juknis)
+     * Tetapkan / Singkronkan Jadwal Ujian Serentak (Sesuai Tanggal & Jam Mulai-Selesai Juknis)
      */
     public function jadwalkanJuknisSerentak(Request $request)
     {
@@ -331,8 +339,8 @@ class PpdbAdminController extends Controller
             $count++;
         }
 
-        return redirect()->route('admin.ppdb.seleksi', ['tab' => 'penjadwalan'])
-            ->with('success', "Sukses menetapkan jadwal ujian ({$waktu}) untuk {$count} calon peserta!");
+        return redirect()->back(fallback: route('admin.ppdb.seleksi', ['tab' => 'penjadwalan']))
+            ->with('success', "Sukses menyinkronkan jadwal ujian resmi ({$waktu}) untuk {$count} calon peserta!");
     }
 
     /**

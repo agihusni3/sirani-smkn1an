@@ -215,38 +215,49 @@
 
     {{-- 3. FILTER SESI, RUANGAN & TANGGAL --}}
     <div style="background:#ffffff; border:1px solid #e2e8f0; border-radius:14px; padding:16px 20px; margin-bottom:24px; box-shadow:0 1px 3px rgba(0,0,0,0.03);">
-      <form method="GET" action="{{ route('admin.ppdb.presensi.kios') }}" style="display:flex; gap:14px; align-items:flex-end; flex-wrap:wrap;">
-        <div>
-          <label style="font-size:11.5px; font-weight:800; color:#475569; display:block; margin-bottom:5px;">Tanggal Ujian:</label>
-          <input type="date" name="tanggal" value="{{ $tanggal }}" class="form-control" style="font-size:12.5px; padding:7px 12px; border-radius:8px; border:1px solid #cbd5e1; font-weight:600;" onchange="this.form.submit()">
-        </div>
+      <div style="display:flex; justify-content:space-between; align-items:flex-end; flex-wrap:wrap; gap:14px;">
+        <form method="GET" action="{{ route('admin.ppdb.presensi.kios') }}" style="display:flex; gap:14px; align-items:flex-end; flex-wrap:wrap; flex:1;">
+          <div>
+            <label style="font-size:11.5px; font-weight:800; color:#475569; display:block; margin-bottom:5px;">Tanggal Ujian:</label>
+            <input type="date" name="tanggal" value="{{ $tanggal }}" class="form-control" style="font-size:12.5px; padding:7px 12px; border-radius:8px; border:1px solid #cbd5e1; font-weight:600;" onchange="this.form.submit()">
+          </div>
 
-        <div>
-          <label style="font-size:11.5px; font-weight:800; color:#475569; display:block; margin-bottom:5px;">Waktu Ujian:</label>
-          <select name="sesi" class="form-select" style="font-size:12.5px; padding:7px 12px; border-radius:8px; border:1px solid #cbd5e1; font-weight:600;" onchange="this.form.submit()">
-            <option value="">Semua Waktu Ujian</option>
-            @foreach($daftarSesi as $s)
-              <option value="{{ $s }}" {{ $sesiFilter == $s ? 'selected' : '' }}>{{ $s }}</option>
-            @endforeach
-          </select>
-        </div>
+          <div>
+            <label style="font-size:11.5px; font-weight:800; color:#475569; display:block; margin-bottom:5px;">Waktu Ujian:</label>
+            <select name="sesi" class="form-select" style="font-size:12.5px; padding:7px 12px; border-radius:8px; border:1px solid #cbd5e1; font-weight:600;" onchange="this.form.submit()">
+              <option value="">Semua Waktu Ujian</option>
+              @foreach($daftarSesi as $s)
+                <option value="{{ $s }}" {{ $sesiFilter == $s ? 'selected' : '' }}>{{ $s }}</option>
+              @endforeach
+            </select>
+          </div>
 
-        <div>
-          <label style="font-size:11.5px; font-weight:800; color:#475569; display:block; margin-bottom:5px;">Ruang Ujian:</label>
-          <select name="ruang" class="form-select" style="font-size:12.5px; padding:7px 12px; border-radius:8px; border:1px solid #cbd5e1; font-weight:600;" onchange="this.form.submit()">
-            <option value="">Semua Ruangan</option>
-            @foreach($daftarRuang as $r)
-              <option value="{{ $r }}" {{ $ruangFilter == $r ? 'selected' : '' }}>{{ $r }}</option>
-            @endforeach
-          </select>
-        </div>
+          <div>
+            <label style="font-size:11.5px; font-weight:800; color:#475569; display:block; margin-bottom:5px;">Ruang Ujian:</label>
+            <select name="ruang" class="form-select" style="font-size:12.5px; padding:7px 12px; border-radius:8px; border:1px solid #cbd5e1; font-weight:600;" onchange="this.form.submit()">
+              <option value="">Semua Ruangan</option>
+              @foreach($daftarRuang as $r)
+                <option value="{{ $r }}" {{ $ruangFilter == $r ? 'selected' : '' }}>{{ $r }}</option>
+              @endforeach
+            </select>
+          </div>
 
-        @if($sesiFilter || $ruangFilter || $tanggal != \Carbon\Carbon::today()->toDateString())
-          <a href="{{ route('admin.ppdb.presensi.kios') }}" class="btn" style="background:#f1f5f9; color:#475569; font-weight:700; font-size:12.5px; border-radius:8px; padding:7px 14px; text-decoration:none;">
-            Reset Filter
-          </a>
-        @endif
-      </form>
+          @if($sesiFilter || $ruangFilter || $tanggal != ($setting?->tanggal_pelaksanaan ? \Carbon\Carbon::parse($setting->tanggal_pelaksanaan)->format('Y-m-d') : \Carbon\Carbon::today()->toDateString()))
+            <a href="{{ route('admin.ppdb.presensi.kios') }}" class="btn" style="background:#f1f5f9; color:#475569; font-weight:700; font-size:12.5px; border-radius:8px; padding:7px 14px; text-decoration:none;">
+              Reset Filter
+            </a>
+          @endif
+        </form>
+
+        <div style="display:flex; align-items:center; gap:8px;">
+          <form action="{{ route('admin.ppdb.seleksi.jadwalkan_serentak') }}" method="POST" onsubmit="return confirm('Singkronkan jadwal seluruh peserta ujian dengan waktu resmi panitia ({{ $setting?->waktu_pelaksanaan }})?')">
+            @csrf
+            <button type="submit" class="btn btn-sm" style="background:#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe; font-size:12px; font-weight:800; border-radius:8px; padding:8px 14px; cursor:pointer; display:inline-flex; align-items:center; gap:6px;">
+              <i class="bi bi-arrow-repeat"></i> Singkronkan dengan Jadwal Panitia
+            </button>
+          </form>
+        </div>
+      </div>
     </div>
 
     {{-- 4. DUAL SCANNER INTERFACE & LIVE FEED --}}
@@ -400,8 +411,8 @@
                   <div style="font-size:11px; color:#64748b;">{{ $peserta->jurusanPilihan1->nama_jurusan ?? '' }}</div>
                 </td>
                 <td style="padding:10px 14px;">
-                  <div style="font-weight:700; color:#334155;">{{ $peserta->jadwal_tes_ruang ?: 'Lab Komputer' }}</div>
-                  <div style="font-size:11px; color:#64748b;">{{ $peserta->jadwal_sesi_resmi }}</div>
+                  <div style="font-weight:700; color:#334155;">{{ $peserta->jadwal_ruang_resmi }}</div>
+                  <div style="font-size:11px; color:#2563eb; font-weight:700;">{{ $peserta->jadwal_sesi_resmi }}</div>
                 </td>
                 <td style="padding:10px 14px; text-align:center;">
                   @if($isHadir)

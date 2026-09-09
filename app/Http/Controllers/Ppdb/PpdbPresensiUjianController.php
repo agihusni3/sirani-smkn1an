@@ -20,20 +20,41 @@ class PpdbPresensiUjianController extends Controller
         $sekolah = PengaturanSekolah::getAktif();
         $setting = PpdbUjianSetting::getAktif();
 
-        $tanggal = $request->input('tanggal', Carbon::today()->toDateString());
+        $tanggal = $request->input('tanggal', $setting?->tanggal_pelaksanaan ? \Carbon\Carbon::parse($setting->tanggal_pelaksanaan)->format('Y-m-d') : Carbon::today()->toDateString());
         $sesiFilter = $request->input('sesi');
         $ruangFilter = $request->input('ruang');
 
-        // Daftar opsi sesi & ruang yang terdaftar
+        // Daftar opsi sesi & ruang yang terdaftar, selalu sinkron dengan waktu resmi panitia
         $daftarSesi = PpdbPendaftar::whereNotNull('jadwal_tes_sesi')
             ->where('jadwal_tes_sesi', '!=', '')
             ->distinct()
-            ->pluck('jadwal_tes_sesi');
+            ->pluck('jadwal_tes_sesi')
+            ->map(function($s) {
+                if (preg_match('/\((.*?)\)/', $s, $m)) return trim($m[1]);
+                return trim(preg_replace('/^Sesi\s*\d+\s*[-:]*\s*/i', '', $s));
+            })
+            ->filter(fn($s) => !empty($s) && $s !== '08.00 - 09.30')
+            ->unique()
+            ->values()
+            ->toArray();
+
+        if ($setting && $setting->waktu_pelaksanaan && !in_array($setting->waktu_pelaksanaan, $daftarSesi)) {
+            array_unshift($daftarSesi, $setting->waktu_pelaksanaan);
+        }
+        if (empty($daftarSesi) && $setting) {
+            $daftarSesi = [$setting->waktu_pelaksanaan];
+        }
 
         $daftarRuang = PpdbPendaftar::whereNotNull('jadwal_tes_ruang')
             ->where('jadwal_tes_ruang', '!=', '')
+            ->where('jadwal_tes_ruang', '!=', 'Lab Komputer 1')
             ->distinct()
-            ->pluck('jadwal_tes_ruang');
+            ->pluck('jadwal_tes_ruang')
+            ->toArray();
+
+        if ($setting && $setting->ruang_default && !in_array($setting->ruang_default, $daftarRuang)) {
+            array_unshift($daftarRuang, $setting->ruang_default);
+        }
 
         // Query dasar pendaftar yang siap ujian / berjadwal
         $pendaftarQuery = PpdbPendaftar::with(['jurusanPilihan1', 'absensiUjian' => function($q) use ($tanggal) {
@@ -160,8 +181,8 @@ class PpdbPresensiUjianController extends Controller
         }
 
         // 5. Rekam Presensi Ujian Baru
-        $sesi = $pendaftar->jadwal_tes_sesi ?: ($setting ? 'Sesi Ujian CBT' : 'Sesi 1');
-        $ruang = $pendaftar->jadwal_tes_ruang ?: 'Lab Komputer SMKN 1 Air Naningan';
+        $sesi = $pendaftar->jadwal_sesi_resmi ?: ($setting ? $setting->waktu_pelaksanaan : '08.00 - 10.00 WIB');
+        $ruang = $pendaftar->jadwal_ruang_resmi ?: ($setting ? $setting->ruang_default : 'Lab Komputer SMKN 1 Air Naningan');
 
         $absensi = PpdbAbsensiUjian::create([
             'ppdb_pendaftar_id'     => $pendaftar->id,
@@ -202,8 +223,8 @@ class PpdbPresensiUjianController extends Controller
             [
                 'ppdb_ujian_setting_id' => $setting?->id,
                 'no_pendaftaran'        => $pendaftar->no_pendaftaran,
-                'sesi_ujian'            => $pendaftar->jadwal_tes_sesi ?: 'Sesi 1',
-                'ruang_ujian'           => $pendaftar->jadwal_tes_ruang ?: 'Lab Komputer',
+                'sesi_ujian'            => $pendaftar->jadwal_sesi_resmi ?: ($setting ? $setting->waktu_pelaksanaan : '08.00 - 10.00 WIB'),
+                'ruang_ujian'           => $pendaftar->jadwal_ruang_resmi ?: ($setting ? $setting->ruang_default : 'Lab Komputer SMKN 1 Air Naningan'),
                 'waktu_hadir'           => now(),
                 'status_kehadiran'      => 'hadir',
                 'metode_presensi'       => 'manual_panitia',
