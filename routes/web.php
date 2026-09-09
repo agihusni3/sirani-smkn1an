@@ -312,6 +312,8 @@ Route::middleware('auth')->group(function () {
         Route::get('/izin-siswa/cetak-pdf', [\App\Http\Controllers\IzinSiswaController::class, 'cetakPdf'])->name('izin.cetak-pdf');
         Route::post('/izin-siswa', [\App\Http\Controllers\IzinSiswaController::class, 'store'])->name('izin.store');
         Route::post('/izin-siswa/store', [\App\Http\Controllers\IzinSiswaController::class, 'store'])->name('izin-siswa.store');
+        Route::delete('/izin-siswa/{id}', [\App\Http\Controllers\IzinSiswaController::class, 'destroy'])->name('izin-siswa.destroy');
+        Route::delete('/izin-guru/{id}', [\App\Http\Controllers\IzinSiswaController::class, 'destroyGuru'])->name('izin-guru.destroy');
     });
 
     // 10. Guru Piket Operasional Meja Piket (Admin, Wakasis & Guru Piket)
