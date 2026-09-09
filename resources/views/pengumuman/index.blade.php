@@ -535,7 +535,7 @@
       kategori: "kegiatan",
       target_penerima_wa: "keduanya",
       target_tipe: "semua",
-      isi_pesan: "Diberitahukan kepada seluruh siswa/i SMK Negeri 1 Air Naningan bahwa pada hari Senin, [Tanggal Upacara], akan dilaksanakan Upacara Bendera rutin.\n\nKetentuan Pelaksanaan:\n1. Hadir di sekolah paling lambat pukul 06.45 WIB untuk presensi Face ID di Smart Gate gerbang.\n2. Mengenakan seragam OSIS Putih Abu-abu lengkap (Dasi, Topi Sekolah, Sabuk Hitam, Kaos Kaki Putih, dan Sepatu Hitam).\n3. Rambut dan kuku wajib rapi sesuai ketentuan tata tertib sekolah.\n\nMohon kerja sama Bapak/Ibu Wali Murid untuk memantau keberangkatan ananda tepat waktu. Terima kasih."
+      isi_pesan: "Diberitahukan kepada seluruh siswa/i SMK Negeri 1 Air Naningan bahwa pada hari Senin, [Tanggal Upacara], akan dilaksanakan Upacara Bendera rutin.\n\nKetentuan Pelaksanaan:\n1. Hadir di sekolah paling lambat pukul 06.45 WIB untuk presensi di Smart Gate gerbang.\n2. Mengenakan seragam OSIS Putih Abu-abu lengkap (Dasi, Topi Sekolah, Sabuk Hitam, Kaos Kaki Putih, dan Sepatu Hitam).\n3. Rambut dan kuku wajib rapi sesuai ketentuan tata tertib sekolah.\n\nMohon kerja sama Bapak/Ibu Wali Murid untuk memantau keberangkatan ananda tepat waktu. Terima kasih."
     },
     ujian: {
       judul: "Pemberitahuan Pelaksanaan Asesmen / Penilaian Akhir Semester",

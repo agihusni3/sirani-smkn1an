@@ -162,7 +162,7 @@
           <!-- 4. KETERANGAN -->
           <div class="form-group">
             <label>Keterangan / Alasan <span style="color:var(--red);">*</span></label>
-            <input type="text" name="keterangan" id="inputKeterangan" value="Terkendala Face ID / Verifikasi Manual" placeholder="Alasan presensi manual..." required style="width:100%; height:42px;" />
+            <input type="text" name="keterangan" id="inputKeterangan" value="Presensi Manual / Verifikasi Petugas Piket" placeholder="Alasan presensi manual..." required style="width:100%; height:42px;" />
           </div>
 
         </div>

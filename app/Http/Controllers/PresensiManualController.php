@@ -71,7 +71,7 @@ class PresensiManualController extends Controller
         $kategori  = $request->input('kategori');
         $pemilikId = $request->input('pemilik_id');
         $sesi      = $request->input('sesi');
-        $keterangan = $request->input('keterangan') ?? 'Presensi Manual / Terkendala Face ID';
+        $keterangan = $request->input('keterangan') ?? 'Presensi Manual / Verifikasi Petugas Piket';
         $today     = Carbon::today()->toDateString();
         $now       = Carbon::now();
 

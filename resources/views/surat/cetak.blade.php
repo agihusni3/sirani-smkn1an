@@ -955,7 +955,27 @@
               @endif
             </td>
             <td style="font-size:8.5pt; color:#334155;">
-              {{ $abs->catatan ?: ($abs->status === 'alpha' ? 'Tidak ada catatan hadir di Smart Gate Face ID' : 'Terekam Smart Gate Face ID') }}
+              @php
+                $ket = $abs->keterangan ?: $abs->catatan;
+                if (!$ket) {
+                    if ($abs->status === 'alpha') {
+                        $ket = 'Tidak ada rekaman hadir di Smart Gate';
+                    } elseif ($abs->status === 'terlambat') {
+                        $ket = 'Terekam Smart Gate Presensi (Terlambat)';
+                    } elseif ($abs->status === 'hadir') {
+                        $ket = 'Terekam Smart Gate Presensi';
+                    } elseif ($abs->status === 'izin') {
+                        $ket = 'Izin (Tercatat Petugas Piket)';
+                    } elseif ($abs->status === 'sakit') {
+                        $ket = 'Sakit (Surat Keterangan Dokter/Ortu)';
+                    } elseif ($abs->status === 'bolos') {
+                        $ket = 'Meninggalkan KBM / Tidak Berada di Kelas';
+                    } else {
+                        $ket = 'Terekam Smart Gate Presensi';
+                    }
+                }
+              @endphp
+              {{ $ket }}
             </td>
           </tr>
         @empty

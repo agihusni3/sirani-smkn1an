@@ -53,7 +53,7 @@ class Absensi extends Model
             'manual_izin_piket'       => 'Izin Petugas Piket',
             'rfid', 'kios_rfid'       => 'Smart Gate RFID',
             'barcode', 'scan_barcode' => 'Scan Barcode',
-            'kios_wajah', 'face_kiosk'=> 'Face ID Kiosk',
+            'kios_wajah', 'face_kiosk'=> 'Smart Gate Presensi',
             'evaluasi_sore_alpha'     => 'Evaluasi Sore (17:00)',
             default                   => !empty($this->sumber_absen) ? ucwords(str_replace('_', ' ', $this->sumber_absen)) : 'Smart Gate',
         };
