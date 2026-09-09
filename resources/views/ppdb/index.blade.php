@@ -8,38 +8,27 @@
 
     <!-- PPDB Hero -->
     <div class="bento-card" style="background: var(--brand-navy); color: #ffffff; border-color: transparent; margin-bottom: 36px; padding: clamp(28px, 4vw, 44px);">
-        <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 28px;">
-            <div style="max-width: 700px;">
-                <div style="display: inline-flex; align-items: center; gap: 8px; padding: 6px 14px; background: rgba(37, 99, 235, 0.25); border: 1px solid rgba(147, 197, 253, 0.3); border-radius: 30px; font-family: var(--font-tech); font-size: 0.78rem; font-weight: 700; color: #93c5fd; margin-bottom: 16px;">
-                    <span style="display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #34d399;"></span>
-                    PORTAL PENDAFTARAN ONLINE TP {{ $tahunAjaran }}
-                </div>
-                <h1 style="font-size: clamp(2rem, 3.5vw, 2.8rem); font-weight: 800; color: #ffffff; letter-spacing: -0.03em; line-height: 1.15; margin-bottom: 14px;">
-                    Pintu Masuk Calon Ahli Madya &amp; Teknisi Industri
-                </h1>
-                <p style="font-size: 1.05rem; color: #cbd5e1; line-height: 1.65; margin-bottom: 26px;">
-                    SMKN 1 Air Naningan membuka penerimaan calon peserta didik baru untuk Program Keahlian Rekayasa Perangkat Lunak, Agro-Teknologi Pangan, dan Teknik Sepeda Motor tanpa dipungut biaya pendaftaran.
-                </p>
-                <div style="display: flex; flex-wrap: wrap; gap: 14px;">
-                    <a href="{{ route('ppdb.formulir') }}" class="btn-industrial btn-industrial-primary" style="padding: 12px 24px; font-size: 0.92rem;">
-                        <i class="fa-solid fa-file-signature"></i> Isi Formulir Pendaftaran
-                    </a>
-                    <a href="{{ route('ppdb.ujian.portal') }}" class="btn-industrial" style="background: #0284c7; color: #ffffff; border: 1px solid #0369a1; padding: 12px 24px; font-size: 0.92rem; font-weight: 700; box-shadow: 0 4px 14px rgba(2, 132, 199, 0.35);">
-                        <i class="fa-solid fa-laptop-code"></i> Masuk Ujian CBT
-                    </a>
-                    <a href="{{ route('ppdb.status') }}" class="btn-industrial" style="background: rgba(255,255,255,0.1); color: #ffffff; border: 1px solid rgba(255,255,255,0.2); font-size: 0.92rem;">
-                        <i class="fa-solid fa-id-badge" style="color: #fbbf24;"></i> Cek Status
-                    </a>
-                </div>
+        <div style="max-width: 820px;">
+            <div style="display: inline-flex; align-items: center; gap: 8px; padding: 6px 14px; background: rgba(37, 99, 235, 0.25); border: 1px solid rgba(147, 197, 253, 0.3); border-radius: 30px; font-family: var(--font-tech); font-size: 0.78rem; font-weight: 700; color: #93c5fd; margin-bottom: 16px;">
+                <span style="display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #34d399;"></span>
+                PORTAL PENDAFTARAN ONLINE TP {{ $tahunAjaran }}
             </div>
-
-            <!-- Stats Pendaftar Widget -->
-            <div style="background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.12); border-radius: var(--radius-md); padding: 28px 36px; min-width: 240px; text-align: center;">
-                <div style="font-family: var(--font-tech); font-size: 0.75rem; font-weight: 700; color: #94a3b8; text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.05em;">Total Pendaftar Masuk</div>
-                <div style="font-family: var(--font-tech); font-size: 3.4rem; font-weight: 800; color: #ffffff; line-height: 1;">{{ $totalPendaftar }}</div>
-                <div style="font-size: 0.78rem; color: #34d399; margin-top: 10px; font-weight: 700;">
-                    <i class="fa-solid fa-circle-check"></i> Server Aktif 24 Jam
-                </div>
+            <h1 style="font-size: clamp(2rem, 3.5vw, 2.8rem); font-weight: 800; color: #ffffff; letter-spacing: -0.03em; line-height: 1.15; margin-bottom: 14px;">
+                Pintu Masuk Calon Ahli Madya &amp; Teknisi Industri
+            </h1>
+            <p style="font-size: 1.05rem; color: #cbd5e1; line-height: 1.65; margin-bottom: 26px;">
+                SMKN 1 Air Naningan membuka penerimaan calon peserta didik baru untuk Program Keahlian Rekayasa Perangkat Lunak, Agro-Teknologi Pangan, dan Teknik Sepeda Motor tanpa dipungut biaya pendaftaran.
+            </p>
+            <div style="display: flex; flex-wrap: wrap; gap: 14px;">
+                <a href="{{ route('ppdb.formulir') }}" class="btn-industrial btn-industrial-primary" style="padding: 12px 24px; font-size: 0.92rem;">
+                    <i class="fa-solid fa-file-signature"></i> Isi Formulir Pendaftaran
+                </a>
+                <a href="{{ route('ppdb.ujian.portal') }}" class="btn-industrial" style="background: #0284c7; color: #ffffff; border: 1px solid #0369a1; padding: 12px 24px; font-size: 0.92rem; font-weight: 700; box-shadow: 0 4px 14px rgba(2, 132, 199, 0.35);">
+                    <i class="fa-solid fa-laptop-code"></i> Masuk Ujian CBT
+                </a>
+                <a href="{{ route('ppdb.status') }}" class="btn-industrial" style="background: rgba(255,255,255,0.1); color: #ffffff; border: 1px solid rgba(255,255,255,0.2); font-size: 0.92rem;">
+                    <i class="fa-solid fa-id-badge" style="color: #fbbf24;"></i> Cek Status
+                </a>
             </div>
         </div>
     </div>
