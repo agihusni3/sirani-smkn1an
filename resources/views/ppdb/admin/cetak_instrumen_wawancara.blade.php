@@ -232,9 +232,18 @@
 <body>
 
     <div class="screen-toolbar">
-        <a href="{{ route('admin.ppdb.seleksi', ['tab' => 'wawancara']) }}" class="btn-back">
-            &larr; Kembali ke Tab Wawancara
-        </a>
+        <div style="display: flex; gap: 8px;">
+            <a href="{{ route('admin.ppdb.seleksi', ['tab' => 'wawancara']) }}" class="btn-back">
+                &larr; Kembali ke Tab Wawancara
+            </a>
+            <a href="{{ route('admin.ppdb.seleksi.tes_buta_warna') }}" target="_blank" class="btn-back" style="color: #2563eb; border-color: #bfdbfe; background: #eff6ff;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16" style="vertical-align:middle; margin-right:4px;">
+                    <path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0z"/>
+                    <path d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8zm8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z"/>
+                </svg>
+                Buka Piringan Ishihara (Uji Buta Warna)
+            </a>
+        </div>
         <div style="display: flex; gap: 10px;">
             <button type="button" onclick="window.print()" class="btn-print">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" style="vertical-align:middle;">
@@ -293,6 +302,11 @@
             </tr>
         </table>
 
+        @php
+            $mw = $setting ? $setting->materi_wawancara_aktif : \App\Models\PpdbUjianSetting::getDefaultMateriWawancara();
+            $kodeJurusan = strtoupper($pendaftar->jurusan1->kode_jurusan ?? '');
+        @endphp
+
         {{-- TABEL RUBRIK 4 KRITERIA --}}
         <table class="table-rubrik">
             <thead>
@@ -307,22 +321,21 @@
                 {{-- 1. MOTIVASI --}}
                 <tr>
                     <td>
-                        <strong>1. Motivasi &amp; Minat Belajar</strong><br>
-                        <span style="font-size: 7.5pt; color: #334155;">Bobot: <strong>25%</strong></span>
+                        <strong>1. {{ $mw['motivasi']['judul'] ?? 'Motivasi & Minat Belajar' }}</strong><br>
+                        <span style="font-size: 7.5pt; color: #334155;">Bobot: <strong>{{ $mw['motivasi']['bobot'] ?? 25 }}%</strong></span>
                         <div style="font-size: 7.5pt; color: #475569; margin-top: 3px;">
-                            Menilai kemauan murni, kesungguhan belajar di SMK, serta kejelasan orientasi masa depan.
+                            {{ $mw['motivasi']['tujuan'] ?? 'Menilai kemauan murni belajar dan target karir.' }}
                         </div>
                     </td>
                     <td>
-                        &bull; <em>"Mengapa memilih SMKN 1 Air Naningan? Apakah ini murni pilihan dan kemauan sendiri?"</em><br>
-                        &bull; <em>"Apa cita-cita atau rencana setelah lulus nanti? Ingin langsung bekerja di industri, wirausaha mandiri, atau kuliah?"</em><br>
-                        &bull; <em>"Sejauh mana Anda mengetahui kompetensi dari jurusan yang dipilih?"</em>
+                        @foreach((array)($mw['motivasi']['pertanyaan'] ?? []) as $q)
+                            &bull; <em>"{{ $q }}"</em><br>
+                        @endforeach
                     </td>
                     <td style="font-size: 7.5pt;">
-                        <strong>85-100</strong>: Kemauan sendiri, sangat antusias, tujuan karir matang &amp; realistis.<br>
-                        <strong>70-84</strong>: Minat wajar, namun wawasan karir masih umum.<br>
-                        <strong>50-69</strong>: Ikut-ikutan teman, pasif.<br>
-                        <strong>&lt;50</strong>: Terpaksa karena dorongan orang lain, tidak berminat.
+                        @foreach((array)($mw['motivasi']['rubrik'] ?? []) as $k => $v)
+                            <strong>{{ $k }}</strong>: {{ $v }}<br>
+                        @endforeach
                     </td>
                     <td class="score-box">
                         {{ $pendaftar && $pendaftar->nilai_wawancara_motivasi !== null ? number_format($pendaftar->nilai_wawancara_motivasi, 0) : '' }}
@@ -332,22 +345,21 @@
                 {{-- 2. KARAKTER & DISIPLIN --}}
                 <tr>
                     <td>
-                        <strong>2. Karakter, Sikap &amp; Disiplin</strong><br>
-                        <span style="font-size: 7.5pt; color: #334155;">Bobot: <strong>25%</strong></span>
+                        <strong>2. {{ $mw['karakter']['judul'] ?? 'Karakter, Sikap & Disiplin' }}</strong><br>
+                        <span style="font-size: 7.5pt; color: #334155;">Bobot: <strong>{{ $mw['karakter']['bobot'] ?? 25 }}%</strong></span>
                         <div style="font-size: 7.5pt; color: #475569; margin-top: 3px;">
-                            Menilai tata krama, integritas, kejujuran, dan kesiapan mematuhi tata tertib sekolah.
+                            {{ $mw['karakter']['tujuan'] ?? 'Menilai etika, disiplin jam 07.00 WIB, dan tata tertib.' }}
                         </div>
                     </td>
                     <td>
-                        &bull; <em>"Siapkah mematuhi tata tertib sekolah: jam masuk 07.00 WIB, seragam rapi, rambut pendek (putra), larangan merokok/vape di lingkungan sekolah?"</em><br>
-                        &bull; <em>"Bagaimana respon Anda jika ditegur atau dibimbing guru atas suatu kesalahan?"</em><br>
-                        &bull; <em>"Bagaimana riwayat absensi dan pergaulan Anda selama di SMP/MTs?"</em>
+                        @foreach((array)($mw['karakter']['pertanyaan'] ?? []) as $q)
+                            &bull; <em>"{{ $q }}"</em><br>
+                        @endforeach
                     </td>
                     <td style="font-size: 7.5pt;">
-                        <strong>85-100</strong>: Tutur kata santun, gestur sopan, kontak mata baik, jujur, komitmen disiplin tinggi.<br>
-                        <strong>70-84</strong>: Sikap wajar, terbuka untuk dibina.<br>
-                        <strong>50-69</strong>: Kurang fokus, pernah ada catatan indispliner ringan.<br>
-                        <strong>&lt;50</strong>: Bersikap defensif/acuh, menolak aturan sekolah.
+                        @foreach((array)($mw['karakter']['rubrik'] ?? []) as $k => $v)
+                            <strong>{{ $k }}</strong>: {{ $v }}<br>
+                        @endforeach
                     </td>
                     <td class="score-box">
                         {{ $pendaftar && $pendaftar->nilai_wawancara_karakter !== null ? number_format($pendaftar->nilai_wawancara_karakter, 0) : '' }}
@@ -365,25 +377,54 @@
                         </div>
                     </td>
                     <td>
-                        @php
-                            $kode = strtoupper($pendaftar->jurusan1->kode_jurusan ?? '');
-                        @endphp
-                        @if(str_contains($kode, 'RPL'))
-                            <strong>[RPL]</strong>: <em>"Siapkah duduk berjam-jam berkonsentrasi memecahkan logika kode pemrograman? Pernahkah memakai PC/laptop atau siap memanfaatkan fasilitas lab sekolah secara disiplin?"</em>
-                        @elseif(str_contains($kode, 'APHP'))
-                            <strong>[APHP]</strong>: <em>"Siapkah berkegiatan di dapur/lab pengolahan pangan yang hangat &amp; mencuci peralatan? Tertarikkah mengolah hasil tani lokal (kopi, pisang, rempah) menjadi produk bernilai jual?"</em>
-                        @elseif(str_contains($kode, 'TSM'))
-                            <strong>[TSM]</strong>: <em>"Siapkah menghadapi oli, kotoran bengkel, dan disiplin tinggi dalam SOP K3 bengkel motor? Minatkah mendalami mesin injeksi dan kelistrikan motor?"</em>
+                        @if(str_contains($kodeJurusan, 'RPL'))
+                            <strong>[RPL]</strong>:<br>
+                            @foreach((array)($mw['kejuruan_rpl']['pertanyaan'] ?? []) as $q)
+                                &bull; <em>"{{ $q }}"</em><br>
+                            @endforeach
+                            <div style="font-size: 7.5pt; color: #1e40af; margin-top:2px;">
+                                <strong>Uji Fisik:</strong> {{ $mw['kejuruan_rpl']['uji_fisik'] ?? 'Cek Ishihara Bebas Buta Warna' }}
+                            </div>
+                        @elseif(str_contains($kodeJurusan, 'APHP'))
+                            <strong>[APHP]</strong>:<br>
+                            @foreach((array)($mw['kejuruan_aphp']['pertanyaan'] ?? []) as $q)
+                                &bull; <em>"{{ $q }}"</em><br>
+                            @endforeach
+                            <div style="font-size: 7.5pt; color: #065f46; margin-top:2px;">
+                                <strong>Uji Fisik:</strong> {{ $mw['kejuruan_aphp']['uji_fisik'] ?? 'Kebersihan kuku, alergi pangan, bebas buta warna' }}
+                            </div>
+                        @elseif(str_contains($kodeJurusan, 'TSM'))
+                            <strong>[TSM]</strong>:<br>
+                            @foreach((array)($mw['kejuruan_tsm']['pertanyaan'] ?? []) as $q)
+                                &bull; <em>"{{ $q }}"</em><br>
+                            @endforeach
+                            <div style="font-size: 7.5pt; color: #b45309; margin-top:2px;">
+                                <strong>Uji Fisik:</strong> {{ $mw['kejuruan_tsm']['uji_fisik'] ?? 'Cek Buta Warna MUTLAK kabel kelistrikan motor' }}
+                            </div>
                         @else
-                            &bull; <strong>RPL</strong>: Logika coding, kesiapan di depan monitor, pemikiran analitis.<br>
-                            &bull; <strong>APHP</strong>: Kebersihan diri, minat agro-kuliner, kesiapan kerja lab pangan.<br>
-                            &bull; <strong>TSM</strong>: Minat mekanik bengkel, tidak takut kotor oli, ketahanan fisik.
+                            &bull; <strong>RPL:</strong> {{ implode(' ', (array)($mw['kejuruan_rpl']['pertanyaan'] ?? [])) }}<br>
+                            &bull; <strong>APHP:</strong> {{ implode(' ', (array)($mw['kejuruan_aphp']['pertanyaan'] ?? [])) }}<br>
+                            &bull; <strong>TSM:</strong> {{ implode(' ', (array)($mw['kejuruan_tsm']['pertanyaan'] ?? [])) }}
                         @endif
                     </td>
                     <td style="font-size: 7.5pt;">
-                        <strong>85-100</strong>: Bebas buta warna, antusias tinggi pada bidang teknis kejuruan, kesiapan fisik prima.<br>
-                        <strong>70-84</strong>: Bebas buta warna, siap belajar dari dasar.<br>
-                        <strong>&lt;70</strong>: Buta warna total (berisiko pada instalasi kabel/desain), atau enggan menjalani praktik kejuruan.
+                        @if(str_contains($kodeJurusan, 'RPL'))
+                            @foreach((array)($mw['kejuruan_rpl']['rubrik'] ?? []) as $k => $v)
+                                <strong>{{ $k }}</strong>: {{ $v }}<br>
+                            @endforeach
+                        @elseif(str_contains($kodeJurusan, 'APHP'))
+                            @foreach((array)($mw['kejuruan_aphp']['rubrik'] ?? []) as $k => $v)
+                                <strong>{{ $k }}</strong>: {{ $v }}<br>
+                            @endforeach
+                        @elseif(str_contains($kodeJurusan, 'TSM'))
+                            @foreach((array)($mw['kejuruan_tsm']['rubrik'] ?? []) as $k => $v)
+                                <strong>{{ $k }}</strong>: {{ $v }}<br>
+                            @endforeach
+                        @else
+                            <strong>85-100</strong>: Bebas buta warna, antusias tinggi kejuruan.<br>
+                            <strong>70-84</strong>: Bebas buta warna, siap belajar.<br>
+                            <strong>&lt;70</strong>: Buta warna total, ragu-ragu.
+                        @endif
                     </td>
                     <td class="score-box">
                         {{ $pendaftar && $pendaftar->nilai_wawancara_kejuruan !== null ? number_format($pendaftar->nilai_wawancara_kejuruan, 0) : '' }}
@@ -393,20 +434,21 @@
                 {{-- 4. DUKUNGAN ORANG TUA --}}
                 <tr>
                     <td>
-                        <strong>4. Dukungan Orang Tua / Wali</strong><br>
-                        <span style="font-size: 7.5pt; color: #334155;">Bobot: <strong>20%</strong></span>
+                        <strong>4. {{ $mw['ortu']['judul'] ?? 'Dukungan & Komitmen Orang Tua' }}</strong><br>
+                        <span style="font-size: 7.5pt; color: #334155;">Bobot: <strong>{{ $mw['ortu']['bobot'] ?? 20 }}%</strong></span>
                         <div style="font-size: 7.5pt; color: #475569; margin-top: 3px;">
-                            Menilai komitmen keluarga dalam mendukung pembelajaran dan magang PKL industri.
+                            {{ $mw['ortu']['tujuan'] ?? 'Menilai komitmen keluarga dalam mendukung pembelajaran dan magang PKL industri.' }}
                         </div>
                     </td>
                     <td>
-                        &bull; <em>"Apakah orang tua/wali merestui jurusan ini dan bersedia hadir jika diundang sekolah?"</em><br>
-                        &bull; <em>"Apakah orang tua siap mendukung pembiayaan perlengkapan praktik dan pelaksanaan PKL industri selama 6 bulan di luar sekolah?"</em>
+                        @foreach((array)($mw['ortu']['pertanyaan'] ?? []) as $q)
+                            &bull; <em>"{{ $q }}"</em><br>
+                        @endforeach
                     </td>
                     <td style="font-size: 7.5pt;">
-                        <strong>85-100</strong>: Orang tua mendukung penuh moral &amp; material, menyetujui program PKL industri.<br>
-                        <strong>70-84</strong>: Orang tua mendukung wajar &amp; siap bekerja sama.<br>
-                        <strong>&lt;70</strong>: Orang tua menolak jurusan / lepas tangan.
+                        @foreach((array)($mw['ortu']['rubrik'] ?? []) as $k => $v)
+                            <strong>{{ $k }}</strong>: {{ $v }}<br>
+                        @endforeach
                     </td>
                     <td class="score-box">
                         {{ $pendaftar && $pendaftar->nilai_wawancara_ortu !== null ? number_format($pendaftar->nilai_wawancara_ortu, 0) : '' }}

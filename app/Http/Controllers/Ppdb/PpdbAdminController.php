@@ -247,13 +247,16 @@ class PpdbAdminController extends Controller
             'total_cadangan'   => PpdbPendaftar::where('status', 'cadangan')->count(),
         ];
 
+        $ishiharaPlates = self::getDaftarPlateIshihara();
+
         return view('ppdb.admin.seleksi', compact(
             'setting',
             'jurusans',
             'pesertaUjian',
             'leaderboard',
             'stats',
-            'tabAktif'
+            'tabAktif',
+            'ishiharaPlates'
         ));
     }
 
@@ -483,6 +486,142 @@ class PpdbAdminController extends Controller
             'jurusans',
             'setting'
         ));
+    }
+
+    /**
+     * Simpan Kustomisasi Materi & Rubrik Wawancara oleh Admin
+     */
+    public function simpanMateriWawancara(Request $request)
+    {
+        $setting = PpdbUjianSetting::getAktif();
+        if (!$setting) {
+            $setting = new PpdbUjianSetting();
+            $setting->judul_ujian = 'Ujian Seleksi PPDB 2026';
+            $setting->save();
+        }
+
+        $materi = $request->input('materi_wawancara', []);
+
+        // Ubah pertanyaan_text dari textarea menjadi array pertanyaan
+        foreach ($materi as $key => &$sec) {
+            if (isset($sec['pertanyaan_text'])) {
+                $lines = array_filter(array_map('trim', explode("\n", str_replace("\r", "", $sec['pertanyaan_text']))));
+                $sec['pertanyaan'] = array_values($lines);
+                unset($sec['pertanyaan_text']);
+            }
+        }
+        unset($sec);
+
+        $setting->materi_wawancara = $materi;
+        $setting->save();
+
+        return redirect()->route('admin.ppdb.seleksi', ['tab' => 'wawancara'])
+            ->with('success', 'Materi pertanyaan pemandu dan rubrik wawancara berhasil disimpan secara fleksibel!');
+    }
+
+    /**
+     * Reset Materi Wawancara ke Template Standar Sekolah
+     */
+    public function resetMateriWawancara()
+    {
+        $setting = PpdbUjianSetting::getAktif();
+        if ($setting) {
+            $setting->materi_wawancara = null;
+            $setting->save();
+        }
+
+        return redirect()->route('admin.ppdb.seleksi', ['tab' => 'wawancara'])
+            ->with('success', 'Materi dan rubrik wawancara berhasil di-reset kembali ke template standar juknis sekolah.');
+    }
+
+    /**
+     * Halaman / Format Cetak Uji Tes Buta Warna (Ishihara Plates) Standar PPDB
+     */
+    public function tesButaWarna()
+    {
+        $plates = self::getDaftarPlateIshihara();
+        return view('ppdb.admin.tes_buta_warna', compact('plates'));
+    }
+
+    /**
+     * Data master 8 Piringan Ishihara Terstandar
+     */
+    public static function getDaftarPlateIshihara(): array
+    {
+        return [
+            [
+                'nomor'        => 1,
+                'angka_normal' => '12',
+                'tipe'         => 'Plat Demonstrasi / Kontrol',
+                'penjelasan'   => 'Harus terbaca angka "12" oleh semua orang baik penglihatan normal maupun buta warna.',
+                'jawaban_normal' => '12',
+                'jawaban_parsial'=> '12',
+                'jawaban_total'  => '12',
+            ],
+            [
+                'nomor'        => 2,
+                'angka_normal' => '8',
+                'tipe'         => 'Plat Transformasi Merah-Hijau',
+                'penjelasan'   => 'Orang normal melihat angka "8". Buta warna merah-hijau melihat angka "3".',
+                'jawaban_normal' => '8',
+                'jawaban_parsial'=> '3',
+                'jawaban_total'  => 'Tidak Terlihat',
+            ],
+            [
+                'nomor'        => 3,
+                'angka_normal' => '6',
+                'tipe'         => 'Plat Transformasi Merah-Hijau',
+                'penjelasan'   => 'Orang normal melihat angka "6". Buta warna merah-hijau melihat angka "5".',
+                'jawaban_normal' => '6',
+                'jawaban_parsial'=> '5',
+                'jawaban_total'  => 'Tidak Terlihat',
+            ],
+            [
+                'nomor'        => 4,
+                'angka_normal' => '29',
+                'tipe'         => 'Plat Transformasi Merah-Hijau',
+                'penjelasan'   => 'Orang normal melihat angka "29". Buta warna merah-hijau melihat angka "70".',
+                'jawaban_normal' => '29',
+                'jawaban_parsial'=> '70',
+                'jawaban_total'  => 'Tidak Terlihat',
+            ],
+            [
+                'nomor'        => 5,
+                'angka_normal' => '57',
+                'tipe'         => 'Plat Penyamaran (Vanishing)',
+                'penjelasan'   => 'Orang normal melihat angka "57". Buta warna sebagian melihat "35" atau tidak terbaca.',
+                'jawaban_normal' => '57',
+                'jawaban_parsial'=> '35 / Buram',
+                'jawaban_total'  => 'Tidak Terlihat',
+            ],
+            [
+                'nomor'        => 6,
+                'angka_normal' => '5',
+                'tipe'         => 'Plat Transformasi Merah-Hijau',
+                'penjelasan'   => 'Orang normal melihat angka "5". Buta warna merah-hijau melihat angka "2".',
+                'jawaban_normal' => '5',
+                'jawaban_parsial'=> '2',
+                'jawaban_total'  => 'Tidak Terlihat',
+            ],
+            [
+                'nomor'        => 7,
+                'angka_normal' => '3',
+                'tipe'         => 'Plat Transformasi Merah-Hijau',
+                'penjelasan'   => 'Orang normal melihat angka "3". Buta warna merah-hijau melihat angka "5".',
+                'jawaban_normal' => '3',
+                'jawaban_parsial'=> '5',
+                'jawaban_total'  => 'Tidak Terlihat',
+            ],
+            [
+                'nomor'        => 8,
+                'angka_normal' => '74',
+                'tipe'         => 'Plat Transformasi Merah-Hijau',
+                'penjelasan'   => 'Orang normal melihat angka "74". Buta warna merah-hijau melihat angka "21".',
+                'jawaban_normal' => '74',
+                'jawaban_parsial'=> '21',
+                'jawaban_total'  => 'Tidak Terlihat',
+            ],
+        ];
     }
 
     /**

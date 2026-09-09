@@ -387,5 +387,63 @@ class PpdbSeleksiCbtTest extends TestCase
         $resBlank->assertSee('Instrumen &amp; Rubrik Wawancara Minat Kejuruan PPDB 2026', false);
         $resBlank->assertSee('Ketua Panitia PPDB 2026');
     }
+
+    public function test_admin_bisa_mengatur_dan_mereset_materi_wawancara_secara_fleksibel()
+    {
+        // 1. Simpan kustomisasi materi wawancara
+        $payload = [
+            'materi_wawancara' => [
+                'motivasi' => [
+                    'pertanyaan_text' => "Pertanyaan Kustom 1\nPertanyaan Kustom 2",
+                    'rubrik' => [
+                        '85 - 100' => 'Kriteria kustom luar biasa',
+                        '70 - 84'  => 'Kriteria kustom sedang',
+                        '< 70'     => 'Kriteria kustom kurang',
+                    ],
+                ],
+                'kejuruan_rpl' => [
+                    'uji_fisik' => 'Uji buta warna piringan 1-8 dan uji logika coding sederhana',
+                    'pertanyaan_text' => "Apakah pernah belajar HTML/CSS?",
+                    'rubrik' => [
+                        '85 - 100' => 'Paham konsep kustom',
+                        '70 - 84'  => 'Biasa saja',
+                        '< 70'     => 'Belum tahu sama sekali',
+                    ],
+                ],
+            ],
+        ];
+
+        $resSave = $this->actingAs($this->admin)->post(route('admin.ppdb.seleksi.materi_wawancara'), $payload);
+        $resSave->assertRedirect(route('admin.ppdb.seleksi', ['tab' => 'wawancara']));
+        $resSave->assertSessionHas('success');
+
+        $setting = PpdbUjianSetting::getAktif();
+        $mw = $setting->materi_wawancara_aktif;
+        $this->assertCount(2, $mw['motivasi']['pertanyaan']);
+        $this->assertEquals('Pertanyaan Kustom 1', $mw['motivasi']['pertanyaan'][0]);
+        $this->assertEquals('Kriteria kustom luar biasa', $mw['motivasi']['rubrik']['85 - 100']);
+        $this->assertEquals('Uji buta warna piringan 1-8 dan uji logika coding sederhana', $mw['kejuruan_rpl']['uji_fisik']);
+
+        // 2. Reset materi wawancara ke template juknis standar
+        $resReset = $this->actingAs($this->admin)->post(route('admin.ppdb.seleksi.reset_materi_wawancara'));
+        $resReset->assertRedirect(route('admin.ppdb.seleksi', ['tab' => 'wawancara']));
+        $resReset->assertSessionHas('success');
+
+        $setting->refresh();
+        $this->assertNull($setting->materi_wawancara);
+        // Accessor tetap mengembalikan default
+        $mwDefault = $setting->materi_wawancara_aktif;
+        $this->assertNotEmpty($mwDefault['motivasi']['pertanyaan']);
+    }
+
+    public function test_admin_bisa_mengakses_halaman_uji_tes_buta_warna_ishihara()
+    {
+        $response = $this->actingAs($this->admin)->get(route('admin.ppdb.seleksi.tes_buta_warna'));
+        $response->assertOk();
+        $response->assertSee('PIRINGAN UJI PERSEPSI WARNA ISHIHARA PPDB 2026');
+        $response->assertSee('Plat #1');
+        $response->assertSee('Plat #8');
+        $response->assertSee('Bebas Buta Warna');
+    }
 }
 

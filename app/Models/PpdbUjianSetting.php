@@ -29,6 +29,7 @@ class PpdbUjianSetting extends Model
         'gelombang_label',
         'is_active',
         'petunjuk_ujian',
+        'materi_wawancara',
         'buka_pada',
         'tutup_pada',
         'created_by',
@@ -38,12 +39,140 @@ class PpdbUjianSetting extends Model
         'tanggal_pelaksanaan' => 'date',
         'daftar_sesi'         => 'array',
         'kunci_jawaban_pg'    => 'array',
+        'materi_wawancara'    => 'array',
         'bobot_pg'            => 'decimal:2',
         'bobot_esai'          => 'decimal:2',
         'is_active'           => 'boolean',
         'buka_pada'           => 'datetime',
         'tutup_pada'          => 'datetime',
     ];
+
+    /**
+     * Default template materi & rubrik wawancara PPDB
+     */
+    public static function getDefaultMateriWawancara(): array
+    {
+        return [
+            'motivasi' => [
+                'judul'      => 'Motivasi, Minat & Orientasi Masa Depan',
+                'bobot'      => 25,
+                'tujuan'     => 'Menilai kemauan murni belajar di SMK dan kejelasan target karir setelah lulus.',
+                'pertanyaan' => [
+                    'Mengapa Anda memilih SMKN 1 Air Naningan? Apakah ini murni pilihan dan kemauan Anda sendiri?',
+                    'Apa rencana Anda setelah lulus nanti? Ingin langsung bekerja di industri, berwirausaha mandiri, atau kuliah?',
+                    'Sejauh mana Anda mengetahui peluang kerja atau kompetensi dari jurusan yang dipilih?',
+                ],
+                'rubrik'     => [
+                    '85 - 100' => 'Tujuan karir jelas, kemauan sendiri, pemahaman jurusan matang.',
+                    '70 - 84'  => 'Minat baik, namun rencana masa depan masih bersifat umum.',
+                    '< 70'     => 'Pasif, ikut-ikutan teman, atau terpaksa atas dorongan pihak lain.',
+                ],
+            ],
+            'karakter' => [
+                'judul'      => 'Karakter, Sikap, Integritas & Disiplin',
+                'bobot'      => 25,
+                'tujuan'     => 'Menilai sopan santun, kejujuran, komitmen jam masuk 07.00 WIB, dan kepatuhan tata tertib sekolah.',
+                'pertanyaan' => [
+                    'Apakah Anda siap mematuhi aturan disiplin: masuk pukul 07.00 WIB, seragam rapi, rambut pendek (putra), dan larangan merokok/vape baik di dalam maupun luar sekolah?',
+                    'Bagaimana respon Anda jika sewaktu-waktu ditegur atau dibimbing guru atas suatu kekhilafan?',
+                    'Bagaimana riwayat kedisiplinan dan absensi Anda selama di SMP/MTs?',
+                ],
+                'rubrik'     => [
+                    '85 - 100' => 'Sopan santun luar biasa, jujur, komitmen disiplin sangat kuat.',
+                    '70 - 84'  => 'Sikap wajar, terbuka untuk dibimbing dan mematuhi tata tertib.',
+                    '< 70'     => 'Defensif, acuh tak acuh, atau ada catatan indisipliner berat.',
+                ],
+            ],
+            'kejuruan_rpl' => [
+                'judul'      => 'Kesiapan Kejuruan RPL (Rekayasa Perangkat Lunak)',
+                'pertanyaan' => [
+                    'Apakah Anda siap duduk berkonsentrasi berjam-jam memecahkan logika kode komputer?',
+                    'Pernahkah memakai PC/laptop atau siap disiplin memanfaatkan lab komputer sekolah?',
+                ],
+                'uji_fisik'  => 'Cek Bebas Buta Warna (Ishihara) untuk membedakan desain UI/UX dan kode warna sintaks pemrograman.',
+                'rubrik'     => [
+                    '85 - 100' => 'Logika analitis baik, antusias coding, bebas buta warna.',
+                    '70 - 84'  => 'Siap belajar walau belum memiliki pengalaman memakai komputer.',
+                    '< 70'     => 'Hanya ingin bermain game, buta warna total.',
+                ],
+            ],
+            'kejuruan_aphp' => [
+                'judul'      => 'Kesiapan Kejuruan APHP (Agribisnis Pengolahan Hasil Pertanian)',
+                'pertanyaan' => [
+                    'Apakah Anda siap beraktivitas aktif di lab pengolahan/dapur produksi yang bersuhu hangat dan mencuci peralatan olahan pangan?',
+                    'Tertarikkah mengolah komoditas lokal (kopi, pisang, rempah Lampung) menjadi produk kuliner bernilai jual?',
+                ],
+                'uji_fisik'  => 'Kebersihan kuku & tangan (personal hygiene pangan), riwayat alergi bahan baku, bebas buta warna sortasi mutu panen.',
+                'rubrik'     => [
+                    '85 - 100' => 'Higienis, antusias industri olahan pangan/kuliner, fisik prima.',
+                    '70 - 84'  => 'Siap belajar dan mengikuti seluruh praktik dapur pengolahan.',
+                    '< 70'     => 'Jijik/enggan kotor dengan bahan pangan mentah, menolak kerja dapur.',
+                ],
+            ],
+            'kejuruan_tsm' => [
+                'judul'      => 'Kesiapan Kejuruan TSM (Teknik & Bisnis Sepeda Motor)',
+                'pertanyaan' => [
+                    'Apakah Anda siap menghadapi oli, debu, dan kotoran saat membongkar mesin di bengkel?',
+                    'Siapkah mematuhi SOP Keselamatan Kerja (K3) bengkel secara ketat (wearpack, sepatu safety)?',
+                ],
+                'uji_fisik'  => 'Cek Bebas Buta Warna MUTLAK (diagram warna kabel kelistrikan motor) dan ketahanan fisik gerak mekanik.',
+                'rubrik'     => [
+                    '85 - 100' => 'Bebas buta warna, minat mekanik tinggi, fisik prima dan siap kerja bengkel.',
+                    '70 - 84'  => 'Bebas buta warna, fisik sehat, siap dibina dari nol.',
+                    '< 70'     => 'Mengalami buta warna total (berisiko fatal korsleting), atau takut kotor terkena oli mesin.',
+                ],
+            ],
+            'ortu' => [
+                'judul'      => 'Dukungan & Komitmen Orang Tua / Wali',
+                'bobot'      => 20,
+                'tujuan'     => 'Menilai kesiapan orang tua mendampingi siswa, hadir rapat sekolah, serta pembiayaan magang PKL industri 6 bulan.',
+                'pertanyaan' => [
+                    'Apakah orang tua/wali sepenuhnya menyetujui jurusan ini dan bersedia hadir bila diundang pihak sekolah?',
+                    'Apakah orang tua siap mendukung kebutuhan praktik dan pelaksanaan Magang / PKL industri 6 bulan di luar sekolah?',
+                ],
+                'rubrik'     => [
+                    '85 - 100' => 'Orang tua mendukung penuh moral & material, menyetujui program PKL industri.',
+                    '70 - 84'  => 'Orang tua mendukung wajar dan siap bekerja sama dengan sekolah.',
+                    '< 70'     => 'Orang tua lepas tangan atau menentang jurusan pilihan anak.',
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * Mengambil materi wawancara aktif (digabung dengan default bila ada kriteria kosong)
+     */
+    public function getMateriWawancaraAktifAttribute(): array
+    {
+        $default = self::getDefaultMateriWawancara();
+        $custom = (array) ($this->materi_wawancara ?? []);
+        if (empty($custom)) {
+            return $default;
+        }
+
+        $result = $default;
+        foreach ($custom as $secKey => $secVal) {
+            if (!is_array($secVal)) {
+                $result[$secKey] = $secVal;
+                continue;
+            }
+            if (!isset($result[$secKey])) {
+                $result[$secKey] = $secVal;
+                continue;
+            }
+            foreach ($secVal as $k => $v) {
+                if ($k === 'pertanyaan' && is_array($v)) {
+                    // Timpa penuh daftar pertanyaan kustom
+                    $result[$secKey]['pertanyaan'] = $v;
+                } elseif ($k === 'rubrik' && is_array($v)) {
+                    $result[$secKey]['rubrik'] = array_merge($result[$secKey]['rubrik'] ?? [], $v);
+                } else {
+                    $result[$secKey][$k] = $v;
+                }
+            }
+        }
+        return $result;
+    }
 
     /**
      * Mengambil format rentang jam pelaksanaan ujian (Jam Mulai - Selesai)

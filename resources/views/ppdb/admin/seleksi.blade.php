@@ -597,7 +597,13 @@
             <h3 style="font-size:15px; font-weight:900; margin:0 0 2px; color:var(--text-1);">Penilaian Wawancara, Fisik &amp; Minat Kejuruan</h3>
             <div style="font-size:12px; color:var(--text-3);">Form wawancara terstruktur berbasis rubrik pemandu agar standar penilaian setiap guru penguji seragam dan terarah.</div>
           </div>
-          <div style="display:flex; align-items:center; gap:8px;">
+          <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+            <button type="button" onclick="bukaModalEditMateri()" class="btn btn-sm" style="background:#f8fafc; border:1px solid #cbd5e1; color:#0f172a; font-weight:800; padding:7px 14px; border-radius:8px; display:inline-flex; align-items:center; gap:6px; font-size:12px; cursor:pointer;" title="Ubah pertanyaan pemandu dan rubrik penilaian wawancara">
+              <i class="bi bi-sliders text-indigo-600"></i> Kelola Materi Wawancara
+            </button>
+            <a href="{{ route('admin.ppdb.seleksi.tes_buta_warna') }}" target="_blank" class="btn btn-sm" style="background:#ffffff; border:1px solid #cbd5e1; color:#0f172a; font-weight:700; padding:7px 14px; border-radius:8px; display:inline-flex; align-items:center; gap:6px; font-size:12px; text-decoration:none;" title="Buka lembar piringan Ishihara untuk tes buta warna peserta">
+              <i class="bi bi-eye text-emerald-600"></i> Piringan Ishihara (Buta Warna)
+            </a>
             <a href="{{ route('admin.ppdb.seleksi.cetak_wawancara') }}" target="_blank" class="btn btn-sm" style="background:#ffffff; border:1px solid #cbd5e1; color:#0f172a; font-weight:700; padding:7px 14px; border-radius:8px; display:inline-flex; align-items:center; gap:6px; font-size:12px; text-decoration:none; box-shadow:0 1px 2px rgba(0,0,0,0.05);" title="Cetak format instrumen dan rubrik kosong untuk dibagikan ke meja penguji">
               <i class="bi bi-printer text-primary"></i> Cetak Format Rubrik Kosong (A4)
             </a>
@@ -885,17 +891,21 @@
     <form id="formWawancara" method="POST" style="overflow-y:auto; padding:20px 24px; flex:1;">
       @csrf
 
+      @php
+        $mw = $setting->materi_wawancara_aktif ?? (new \App\Models\PpdbUjianSetting())->getDefaultMateriWawancara();
+      @endphp
+
       {{-- 1. KRITERIA: MOTIVASI & MINAT BELAJAR (25%) --}}
       <div style="background:#ffffff; border:1px solid #e2e8f0; border-radius:12px; padding:16px; margin-bottom:18px; box-shadow:0 1px 3px rgba(0,0,0,0.02);">
         <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:10px; gap:10px; flex-wrap:wrap;">
           <div>
             <div style="display:flex; align-items:center; gap:8px;">
               <span style="width:24px; height:24px; border-radius:6px; background:#eff6ff; color:#2563eb; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:800;">1</span>
-              <strong style="font-size:13.5px; color:#0f172a;">Motivasi, Minat &amp; Orientasi Masa Depan</strong>
-              <span style="font-size:11px; font-weight:800; background:#dbeafe; color:#1d4ed8; padding:2px 8px; border-radius:12px;">Bobot 25%</span>
+              <strong style="font-size:13.5px; color:#0f172a;">{{ $mw['motivasi']['judul'] ?? 'Motivasi, Minat & Orientasi Masa Depan' }}</strong>
+              <span style="font-size:11px; font-weight:800; background:#dbeafe; color:#1d4ed8; padding:2px 8px; border-radius:12px;">Bobot {{ $mw['motivasi']['bobot'] ?? 25 }}%</span>
             </div>
             <div style="font-size:11.5px; color:#64748b; margin-top:2px;">
-              Menilai kemauan murni belajar di SMK dan kejelasan target karir setelah lulus.
+              {{ $mw['motivasi']['tujuan'] ?? 'Menilai kemauan murni belajar di SMK dan kejelasan target karir setelah lulus.' }}
             </div>
           </div>
 
@@ -908,14 +918,18 @@
         {{-- Pertanyaan Pemandu --}}
         <div style="background:#f0f9ff; border-left:3px solid #0284c7; padding:9px 12px; border-radius:0 6px 6px 0; margin-bottom:10px; font-size:12px; color:#0369a1; line-height:1.45;">
           <strong>Pertanyaan Pemandu (Pewawancara):</strong><br>
-          &bull; <em>"Mengapa Anda memilih SMKN 1 Air Naningan? Apakah ini murni pilihan dan kemauan Anda sendiri?"</em><br>
-          &bull; <em>"Apa rencana Anda setelah lulus nanti? Ingin langsung bekerja di industri, berwirausaha mandiri, atau kuliah?"</em>
+          @foreach($mw['motivasi']['pertanyaan'] ?? [] as $tanya)
+            &bull; <em>"{{ $tanya }}"</em><br>
+          @endforeach
         </div>
 
         {{-- Panduan Rubrik & Quick Badges --}}
         <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; font-size:11px; color:#64748b;">
           <div>
-            <strong>Pedoman Rubrik:</strong> <strong>85-100</strong> (Tujuan karir jelas, kemauan sendiri) &bull; <strong>70-84</strong> (Minat baik, rencana umum) &bull; <strong>&lt;70</strong> (Ikut-ikutan teman/terpaksa).
+            <strong>Pedoman Rubrik:</strong> 
+            @foreach($mw['motivasi']['rubrik'] ?? [] as $rentang => $ket)
+              <strong>{{ $rentang }}</strong> ({{ $ket }}) @if(!$loop->last) &bull; @endif
+            @endforeach
           </div>
           <div style="display:flex; gap:4px;">
             <button type="button" onclick="isiSkor('w_motivasi', 70)" style="border:1px solid #cbd5e1; background:#f8fafc; border-radius:4px; font-size:10.5px; font-weight:700; padding:2px 6px; cursor:pointer;">70</button>
@@ -934,11 +948,11 @@
           <div>
             <div style="display:flex; align-items:center; gap:8px;">
               <span style="width:24px; height:24px; border-radius:6px; background:#ecfdf5; color:#059669; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:800;">2</span>
-              <strong style="font-size:13.5px; color:#0f172a;">Karakter, Sikap, Integritas &amp; Disiplin</strong>
-              <span style="font-size:11px; font-weight:800; background:#d1fae5; color:#047857; padding:2px 8px; border-radius:12px;">Bobot 25%</span>
+              <strong style="font-size:13.5px; color:#0f172a;">{{ $mw['karakter']['judul'] ?? 'Karakter, Sikap, Integritas & Disiplin' }}</strong>
+              <span style="font-size:11px; font-weight:800; background:#d1fae5; color:#047857; padding:2px 8px; border-radius:12px;">Bobot {{ $mw['karakter']['bobot'] ?? 25 }}%</span>
             </div>
             <div style="font-size:11.5px; color:#64748b; margin-top:2px;">
-              Menilai sopan santun, kejujuran, komitmen jam masuk 07.00 WIB, dan kepatuhan tata tertib sekolah.
+              {{ $mw['karakter']['tujuan'] ?? 'Menilai sopan santun, kejujuran, komitmen jam masuk 07.00 WIB, dan kepatuhan tata tertib sekolah.' }}
             </div>
           </div>
 
@@ -951,14 +965,18 @@
         {{-- Pertanyaan Pemandu --}}
         <div style="background:#f0fdf4; border-left:3px solid #16a34a; padding:9px 12px; border-radius:0 6px 6px 0; margin-bottom:10px; font-size:12px; color:#166534; line-height:1.45;">
           <strong>Pertanyaan Pemandu (Pewawancara):</strong><br>
-          &bull; <em>"Apakah Anda siap mematuhi aturan disiplin: masuk pukul 07.00 WIB, rambut rapi (putra), dan larangan merokok/vape baik di dalam maupun luar sekolah?"</em><br>
-          &bull; <em>"Bagaimana respon Anda jika sewaktu-waktu ditegur atau dibimbing guru atas suatu kekhilafan?"</em>
+          @foreach($mw['karakter']['pertanyaan'] ?? [] as $tanya)
+            &bull; <em>"{{ $tanya }}"</em><br>
+          @endforeach
         </div>
 
         {{-- Panduan Rubrik & Quick Badges --}}
         <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; font-size:11px; color:#64748b;">
           <div>
-            <strong>Pedoman Rubrik:</strong> <strong>85-100</strong> (Sopan santun luar biasa, jujur, komitmen tinggi) &bull; <strong>70-84</strong> (Sikap wajar, siap dibina) &bull; <strong>&lt;70</strong> (Defensif, acuh).
+            <strong>Pedoman Rubrik:</strong>
+            @foreach($mw['karakter']['rubrik'] ?? [] as $rentang => $ket)
+              <strong>{{ $rentang }}</strong> ({{ $ket }}) @if(!$loop->last) &bull; @endif
+            @endforeach
           </div>
           <div style="display:flex; gap:4px;">
             <button type="button" onclick="isiSkor('w_karakter', 70)" style="border:1px solid #cbd5e1; background:#f8fafc; border-radius:4px; font-size:10.5px; font-weight:700; padding:2px 6px; cursor:pointer;">70</button>
@@ -996,31 +1014,49 @@
           <div style="font-weight:800; color:#1e40af; margin-bottom:4px; display:flex; align-items:center; gap:6px;">
             <i class="bi bi-code-square"></i> PANDUAN KHUSUS JURUSAN RPL (REKAYASA PERANGKAT LUNAK):
           </div>
-          &bull; <strong>Cek Persepsi Fisik:</strong> Bebas Buta Warna (krusial untuk desain web UI/UX dan sintaks kode warna).<br>
-          &bull; <strong>Pertanyaan Pemandu:</strong> <em>"Apakah Anda siap duduk berkonsentrasi berjam-jam memecahkan logika kode komputer? Pernahkah memakai PC/laptop atau siap disiplin menggunakan lab sekolah?"</em><br>
-          &bull; <strong>Rubrik Nilai:</strong> <strong>85-100</strong> (Logika baik, antusias coding, bebas buta warna) &bull; <strong>70-84</strong> (Siap belajar walau awam komputer) &bull; <strong>&lt;70</strong> (Hanya ingin main game, buta warna total).
+          &bull; <strong>Cek Persepsi Fisik:</strong> {{ $mw['kejuruan_rpl']['uji_fisik'] ?? 'Bebas Buta Warna (Ishihara)' }}<br>
+          &bull; <strong>Pertanyaan Pemandu:</strong><br>
+          @foreach($mw['kejuruan_rpl']['pertanyaan'] ?? [] as $tanya)
+            &nbsp;&nbsp;&bull; <em>"{{ $tanya }}"</em><br>
+          @endforeach
+          &bull; <strong>Rubrik Nilai:</strong>
+          @foreach($mw['kejuruan_rpl']['rubrik'] ?? [] as $rentang => $ket)
+            <strong>{{ $rentang }}</strong> ({{ $ket }}) @if(!$loop->last) &bull; @endif
+          @endforeach
         </div>
 
         <div id="w_guide_aphp" style="display:none; background:#f8fafc; border-left:3px solid #059669; padding:10px 12px; border-radius:0 6px 6px 0; margin-bottom:10px; font-size:12px; color:#1e293b; line-height:1.45;">
           <div style="font-weight:800; color:#065f46; margin-bottom:4px; display:flex; align-items:center; gap:6px;">
             <i class="bi bi-flower1"></i> PANDUAN KHUSUS JURUSAN APHP (AGRIBISNIS PENGOLAHAN HASIL PERTANIAN):
           </div>
-          &bull; <strong>Cek Kebersihan &amp; Fisik:</strong> Kebersihan kuku/tangan (higienitas makanan), riwayat alergi bahan pangan/kimia, bebas buta warna (untuk sortasi mutu hasil panen).<br>
-          &bull; <strong>Pertanyaan Pemandu:</strong> <em>"Apakah Anda siap beraktivitas aktif di lab pengolahan/dapur produksi yang bersuhu hangat dan mencuci peralatan olahan? Tertarikkah mengolah komoditas lokal (kopi, pisang, rempah) menjadi produk kuliner bernilai jual?"</em><br>
-          &bull; <strong>Rubrik Nilai:</strong> <strong>85-100</strong> (Higienis, antusias industri olahan pangan/kuliner) &bull; <strong>70-84</strong> (Siap belajar) &bull; <strong>&lt;70</strong> (Jijik/enggan kotor dengan bahan pangan mentah).
+          &bull; <strong>Cek Kebersihan &amp; Fisik:</strong> {{ $mw['kejuruan_aphp']['uji_fisik'] ?? 'Higienitas kuku & bebas buta warna' }}<br>
+          &bull; <strong>Pertanyaan Pemandu:</strong><br>
+          @foreach($mw['kejuruan_aphp']['pertanyaan'] ?? [] as $tanya)
+            &nbsp;&nbsp;&bull; <em>"{{ $tanya }}"</em><br>
+          @endforeach
+          &bull; <strong>Rubrik Nilai:</strong>
+          @foreach($mw['kejuruan_aphp']['rubrik'] ?? [] as $rentang => $ket)
+            <strong>{{ $rentang }}</strong> ({{ $ket }}) @if(!$loop->last) &bull; @endif
+          @endforeach
         </div>
 
         <div id="w_guide_tsm" style="display:none; background:#f8fafc; border-left:3px solid #d97706; padding:10px 12px; border-radius:0 6px 6px 0; margin-bottom:10px; font-size:12px; color:#1e293b; line-height:1.45;">
           <div style="font-weight:800; color:#b45309; margin-bottom:4px; display:flex; align-items:center; gap:6px;">
             <i class="bi bi-gear-wide-connected"></i> PANDUAN KHUSUS JURUSAN TSM (TEKNIK &amp; BISNIS SEPEDA MOTOR):
           </div>
-          &bull; <strong>Cek Fisik &amp; Persepsi:</strong> Bebas Buta Warna (MUTLAK untuk membedakan jalur kabel kelistrikan motor), kekuatan gerak fisik.<br>
-          &bull; <strong>Pertanyaan Pemandu:</strong> <em>"Apakah Anda siap menghadapi oli, debu, dan kotoran saat membongkar mesin di bengkel? Siapkah mematuhi SOP Keselamatan Kerja (K3) bengkel secara ketat?"</em><br>
-          &bull; <strong>Rubrik Nilai:</strong> <strong>85-100</strong> (Bebas buta warna, minat mekanik tinggi, fisik prima) &bull; <strong>70-84</strong> (Siap dibina dari nol) &bull; <strong>&lt;70</strong> (Buta warna total berisiko fatal korsleting, atau takut kotor oli).
+          &bull; <strong>Cek Fisik &amp; Persepsi:</strong> {{ $mw['kejuruan_tsm']['uji_fisik'] ?? 'Bebas Buta Warna MUTLAK' }}<br>
+          &bull; <strong>Pertanyaan Pemandu:</strong><br>
+          @foreach($mw['kejuruan_tsm']['pertanyaan'] ?? [] as $tanya)
+            &nbsp;&nbsp;&bull; <em>"{{ $tanya }}"</em><br>
+          @endforeach
+          &bull; <strong>Rubrik Nilai:</strong>
+          @foreach($mw['kejuruan_tsm']['rubrik'] ?? [] as $rentang => $ket)
+            <strong>{{ $rentang }}</strong> ({{ $ket }}) @if(!$loop->last) &bull; @endif
+          @endforeach
         </div>
 
         <div id="w_guide_general" style="background:#f8fafc; border-left:3px solid #64748b; padding:10px 12px; border-radius:0 6px 6px 0; margin-bottom:10px; font-size:12px; color:#1e293b; line-height:1.45;">
-          <strong>Panduan Umum Kejuruan:</strong> Tanyakan minat teknis spesifik kejuruan yang dipilih, kesiapan praktikum fisik di bengkel/lab, dan lakukan pemeriksaan dasar buta warna.
+          <strong>Panduan Umum Kejuruan:</strong> {{ $mw['kejuruan_umum']['panduan'] ?? 'Tanyakan minat teknis spesifik kejuruan yang dipilih, kesiapan praktikum fisik di bengkel/lab, dan lakukan pemeriksaan dasar buta warna.' }}
         </div>
 
         {{-- Quick Badges --}}
@@ -1040,11 +1076,11 @@
           <div>
             <div style="display:flex; align-items:center; gap:8px;">
               <span style="width:24px; height:24px; border-radius:6px; background:#fffbeb; color:#d97706; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:800;">4</span>
-              <strong style="font-size:13.5px; color:#0f172a;">Dukungan &amp; Komitmen Orang Tua / Wali</strong>
-              <span style="font-size:11px; font-weight:800; background:#fef3c7; color:#b45309; padding:2px 8px; border-radius:12px;">Bobot 20%</span>
+              <strong style="font-size:13.5px; color:#0f172a;">{{ $mw['ortu']['judul'] ?? 'Dukungan & Komitmen Orang Tua / Wali' }}</strong>
+              <span style="font-size:11px; font-weight:800; background:#fef3c7; color:#b45309; padding:2px 8px; border-radius:12px;">Bobot {{ $mw['ortu']['bobot'] ?? 20 }}%</span>
             </div>
             <div style="font-size:11.5px; color:#64748b; margin-top:2px;">
-              Menilai kesiapan orang tua mendampingi siswa, hadir rapat sekolah, serta pembiayaan magang PKL industri 6 bulan.
+              {{ $mw['ortu']['tujuan'] ?? 'Menilai kesiapan orang tua mendampingi siswa, hadir rapat sekolah, serta pembiayaan magang PKL industri 6 bulan.' }}
             </div>
           </div>
 
@@ -1057,14 +1093,18 @@
         {{-- Pertanyaan Pemandu --}}
         <div style="background:#fffbeb; border-left:3px solid #d97706; padding:9px 12px; border-radius:0 6px 6px 0; margin-bottom:10px; font-size:12px; color:#92400e; line-height:1.45;">
           <strong>Pertanyaan Pemandu (Pewawancara):</strong><br>
-          &bull; <em>"Apakah orang tua/wali sepenuhnya menyetujui jurusan ini dan bersedia hadir bila diundang pihak sekolah?"</em><br>
-          &bull; <em>"Apakah orang tua siap mendukung kebutuhan praktik dan pelaksanaan Magang / PKL industri 6 bulan di luar sekolah?"</em>
+          @foreach($mw['ortu']['pertanyaan'] ?? [] as $tanya)
+            &bull; <em>"{{ $tanya }}"</em><br>
+          @endforeach
         </div>
 
         {{-- Panduan Rubrik & Quick Badges --}}
         <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; font-size:11px; color:#64748b;">
           <div>
-            <strong>Pedoman Rubrik:</strong> <strong>85-100</strong> (Orang tua mendukung penuh moral &amp; material) &bull; <strong>70-84</strong> (Mendukung wajar) &bull; <strong>&lt;70</strong> (Orang tua lepas tangan/menolak).
+            <strong>Pedoman Rubrik:</strong>
+            @foreach($mw['ortu']['rubrik'] ?? [] as $rentang => $ket)
+              <strong>{{ $rentang }}</strong> ({{ $ket }}) @if(!$loop->last) &bull; @endif
+            @endforeach
           </div>
           <div style="display:flex; gap:4px;">
             <button type="button" onclick="isiSkor('w_ortu', 70)" style="border:1px solid #cbd5e1; background:#f8fafc; border-radius:4px; font-size:10.5px; font-weight:700; padding:2px 6px; cursor:pointer;">70</button>
@@ -1079,9 +1119,14 @@
 
       {{-- 5. CATATAN OBSERVASI KHUSUS & CEK FISIK CEPAT --}}
       <div style="background:#ffffff; border:1px solid #e2e8f0; border-radius:12px; padding:16px; margin-bottom:18px;">
-        <label style="display:block; font-size:12.5px; font-weight:800; color:#0f172a; margin-bottom:6px;">
-          Catatan Observasi Khusus &amp; Pemeriksaan Fisik:
-        </label>
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:8px;">
+          <label style="font-size:12.5px; font-weight:800; color:#0f172a; margin:0;">
+            Catatan Observasi Khusus &amp; Pemeriksaan Fisik:
+          </label>
+          <button type="button" onclick="bukaModalTesIshihara()" class="btn btn-sm" style="background:#ecfdf5; border:1.5px solid #10b981; color:#047857; font-weight:800; font-size:11.5px; padding:4px 12px; border-radius:20px; cursor:pointer; display:inline-flex; align-items:center; gap:5px; box-shadow:0 1px 2px rgba(16,185,129,0.15);">
+            <i class="bi bi-eye-fill"></i> Uji Buta Warna (Ishihara) On-Screen
+          </button>
+        </div>
         
         <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:8px;">
           <button type="button" onclick="tambahCatatanCepat('Lolos tes Ishihara (Bebas Buta Warna). ')" style="background:#f1f5f9; border:1px solid #cbd5e1; border-radius:20px; font-size:11px; font-weight:700; color:#334155; padding:3px 10px; cursor:pointer;">+ Bebas Buta Warna</button>
@@ -1126,6 +1171,373 @@
         </button>
       </div>
     </form>
+  </div>
+</div>
+
+{{-- ══════════════════════════════════════════════════════════════ --}}
+{{-- MODAL EDIT MATERI WAWANCARA & RUBRIK (FLEKSIBEL OLEH ADMIN) --}}
+{{-- ══════════════════════════════════════════════════════════════ --}}
+<div id="modalEditMateriWawancara" style="display:none; position:fixed; inset:0; background:rgba(15,23,42,0.7); backdrop-filter:blur(5px); z-index:1050; align-items:center; justify-content:center; padding:16px;">
+  <div style="background:#ffffff; border-radius:16px; max-width:860px; width:100%; max-height:92vh; display:flex; flex-direction:column; overflow:hidden; box-shadow:0 25px 50px -12px rgba(0,0,0,0.35);">
+    
+    {{-- MODAL HEADER --}}
+    <div style="padding:18px 24px; background:#0f172a; color:#ffffff; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #334155;">
+      <div>
+        <h3 style="font-size:16px; font-weight:900; margin:0 0 3px; display:flex; align-items:center; gap:8px;">
+          <i class="bi bi-sliders text-indigo-400"></i> Kelola Materi Pertanyaan &amp; Rubrik Wawancara
+        </h3>
+        <div style="font-size:12px; color:#94a3b8;">
+          Admin dapat fleksibel menyesuaikan instrumen pertanyaan dan rentang nilai pemandu untuk guru pewawancara.
+        </div>
+      </div>
+      <button type="button" onclick="tutupModalEditMateri()" style="border:none; background:transparent; font-size:24px; cursor:pointer; color:#94a3b8; line-height:1;">&times;</button>
+    </div>
+
+    {{-- SCROLLABLE FORM BODY --}}
+    <form action="{{ route('admin.ppdb.seleksi.materi_wawancara') }}" method="POST" style="overflow-y:auto; padding:20px 24px; flex:1;">
+      @csrf
+
+      <div style="margin-bottom:18px; background:#f0f9ff; border:1px solid #bae6fd; border-radius:10px; padding:12px 16px; font-size:12px; color:#0369a1; display:flex; align-items:flex-start; gap:10px;">
+        <i class="bi bi-info-circle-fill" style="font-size:16px; margin-top:1px;"></i>
+        <div>
+          Materi wawancara ini akan otomatis muncul sebagai panduan di popup <strong>Form Wawancara</strong> masing-masing calon siswa dan juga tercetak pada format lembar rubrik kertas A4.
+        </div>
+      </div>
+
+      {{-- 1. DIMENSI MOTIVASI --}}
+      <div style="background:#ffffff; border:1px solid #e2e8f0; border-radius:12px; padding:16px; margin-bottom:16px;">
+        <div style="font-weight:900; font-size:13.5px; color:#1e40af; margin-bottom:10px; display:flex; align-items:center; gap:6px;">
+          <span style="width:22px; height:22px; border-radius:5px; background:#eff6ff; color:#2563eb; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:800;">1</span>
+          Dimensi Motivasi, Minat &amp; Orientasi Masa Depan (Bobot 25%)
+        </div>
+        <div style="margin-bottom:12px;">
+          <label style="display:block; font-size:12px; font-weight:700; color:#334155; margin-bottom:4px;">Pertanyaan Pemandu (Gunakan baris baru untuk setiap pertanyaan):</label>
+          <textarea name="materi_wawancara[motivasi][pertanyaan_text]" class="form-control" rows="3" style="font-size:12px;">{{ implode("\n", $mw['motivasi']['pertanyaan'] ?? []) }}</textarea>
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px;">
+          <div>
+            <label style="font-size:11px; font-weight:700; color:#15803d;">Rubrik Skor 85 - 100:</label>
+            <input type="text" name="materi_wawancara[motivasi][rubrik][85 - 100]" value="{{ $mw['motivasi']['rubrik']['85 - 100'] ?? '' }}" class="form-control" style="font-size:11.5px;">
+          </div>
+          <div>
+            <label style="font-size:11px; font-weight:700; color:#1d4ed8;">Rubrik Skor 70 - 84:</label>
+            <input type="text" name="materi_wawancara[motivasi][rubrik][70 - 84]" value="{{ $mw['motivasi']['rubrik']['70 - 84'] ?? '' }}" class="form-control" style="font-size:11.5px;">
+          </div>
+          <div>
+            <label style="font-size:11px; font-weight:700; color:#b91c1c;">Rubrik Skor &lt; 70:</label>
+            <input type="text" name="materi_wawancara[motivasi][rubrik][< 70]" value="{{ $mw['motivasi']['rubrik']['< 70'] ?? '' }}" class="form-control" style="font-size:11.5px;">
+          </div>
+        </div>
+      </div>
+
+      {{-- 2. DIMENSI KARAKTER --}}
+      <div style="background:#ffffff; border:1px solid #e2e8f0; border-radius:12px; padding:16px; margin-bottom:16px;">
+        <div style="font-weight:900; font-size:13.5px; color:#065f46; margin-bottom:10px; display:flex; align-items:center; gap:6px;">
+          <span style="width:22px; height:22px; border-radius:5px; background:#ecfdf5; color:#059669; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:800;">2</span>
+          Dimensi Karakter, Sikap, Integritas &amp; Disiplin (Bobot 25%)
+        </div>
+        <div style="margin-bottom:12px;">
+          <label style="display:block; font-size:12px; font-weight:700; color:#334155; margin-bottom:4px;">Pertanyaan Pemandu (Gunakan baris baru untuk setiap pertanyaan):</label>
+          <textarea name="materi_wawancara[karakter][pertanyaan_text]" class="form-control" rows="3" style="font-size:12px;">{{ implode("\n", $mw['karakter']['pertanyaan'] ?? []) }}</textarea>
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px;">
+          <div>
+            <label style="font-size:11px; font-weight:700; color:#15803d;">Rubrik Skor 85 - 100:</label>
+            <input type="text" name="materi_wawancara[karakter][rubrik][85 - 100]" value="{{ $mw['karakter']['rubrik']['85 - 100'] ?? '' }}" class="form-control" style="font-size:11.5px;">
+          </div>
+          <div>
+            <label style="font-size:11px; font-weight:700; color:#1d4ed8;">Rubrik Skor 70 - 84:</label>
+            <input type="text" name="materi_wawancara[karakter][rubrik][70 - 84]" value="{{ $mw['karakter']['rubrik']['70 - 84'] ?? '' }}" class="form-control" style="font-size:11.5px;">
+          </div>
+          <div>
+            <label style="font-size:11px; font-weight:700; color:#b91c1c;">Rubrik Skor &lt; 70:</label>
+            <input type="text" name="materi_wawancara[karakter][rubrik][< 70]" value="{{ $mw['karakter']['rubrik']['< 70'] ?? '' }}" class="form-control" style="font-size:11.5px;">
+          </div>
+        </div>
+      </div>
+
+      {{-- 3. DIMENSI KEJURUAN: RPL --}}
+      <div style="background:#f8fafc; border:1px solid #cbd5e1; border-left:4px solid #2563eb; border-radius:10px; padding:16px; margin-bottom:14px;">
+        <div style="font-weight:900; font-size:13px; color:#1e40af; margin-bottom:8px; display:flex; align-items:center; gap:6px;">
+          <i class="bi bi-code-square"></i> Pemandu Kejuruan RPL (Rekayasa Perangkat Lunak)
+        </div>
+        <div style="margin-bottom:10px;">
+          <label style="display:block; font-size:11.5px; font-weight:700; color:#334155; margin-bottom:3px;">Fokus Uji Fisik / Persepsi:</label>
+          <input type="text" name="materi_wawancara[kejuruan_rpl][uji_fisik]" value="{{ $mw['kejuruan_rpl']['uji_fisik'] ?? '' }}" class="form-control" style="font-size:12px;">
+        </div>
+        <div style="margin-bottom:10px;">
+          <label style="display:block; font-size:11.5px; font-weight:700; color:#334155; margin-bottom:3px;">Pertanyaan Pemandu RPL:</label>
+          <textarea name="materi_wawancara[kejuruan_rpl][pertanyaan_text]" class="form-control" rows="2" style="font-size:12px;">{{ implode("\n", $mw['kejuruan_rpl']['pertanyaan'] ?? []) }}</textarea>
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px;">
+          <div>
+            <label style="font-size:10.5px; font-weight:700; color:#15803d;">85 - 100:</label>
+            <input type="text" name="materi_wawancara[kejuruan_rpl][rubrik][85 - 100]" value="{{ $mw['kejuruan_rpl']['rubrik']['85 - 100'] ?? '' }}" class="form-control" style="font-size:11px;">
+          </div>
+          <div>
+            <label style="font-size:10.5px; font-weight:700; color:#1d4ed8;">70 - 84:</label>
+            <input type="text" name="materi_wawancara[kejuruan_rpl][rubrik][70 - 84]" value="{{ $mw['kejuruan_rpl']['rubrik']['70 - 84'] ?? '' }}" class="form-control" style="font-size:11px;">
+          </div>
+          <div>
+            <label style="font-size:10.5px; font-weight:700; color:#b91c1c;">&lt; 70:</label>
+            <input type="text" name="materi_wawancara[kejuruan_rpl][rubrik][< 70]" value="{{ $mw['kejuruan_rpl']['rubrik']['< 70'] ?? '' }}" class="form-control" style="font-size:11px;">
+          </div>
+        </div>
+      </div>
+
+      {{-- 3. DIMENSI KEJURUAN: APHP --}}
+      <div style="background:#f8fafc; border:1px solid #cbd5e1; border-left:4px solid #059669; border-radius:10px; padding:16px; margin-bottom:14px;">
+        <div style="font-weight:900; font-size:13px; color:#065f46; margin-bottom:8px; display:flex; align-items:center; gap:6px;">
+          <i class="bi bi-flower1"></i> Pemandu Kejuruan APHP (Pengolahan Hasil Pertanian)
+        </div>
+        <div style="margin-bottom:10px;">
+          <label style="display:block; font-size:11.5px; font-weight:700; color:#334155; margin-bottom:3px;">Fokus Uji Fisik / Kebersihan:</label>
+          <input type="text" name="materi_wawancara[kejuruan_aphp][uji_fisik]" value="{{ $mw['kejuruan_aphp']['uji_fisik'] ?? '' }}" class="form-control" style="font-size:12px;">
+        </div>
+        <div style="margin-bottom:10px;">
+          <label style="display:block; font-size:11.5px; font-weight:700; color:#334155; margin-bottom:3px;">Pertanyaan Pemandu APHP:</label>
+          <textarea name="materi_wawancara[kejuruan_aphp][pertanyaan_text]" class="form-control" rows="2" style="font-size:12px;">{{ implode("\n", $mw['kejuruan_aphp']['pertanyaan'] ?? []) }}</textarea>
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px;">
+          <div>
+            <label style="font-size:10.5px; font-weight:700; color:#15803d;">85 - 100:</label>
+            <input type="text" name="materi_wawancara[kejuruan_aphp][rubrik][85 - 100]" value="{{ $mw['kejuruan_aphp']['rubrik']['85 - 100'] ?? '' }}" class="form-control" style="font-size:11px;">
+          </div>
+          <div>
+            <label style="font-size:10.5px; font-weight:700; color:#1d4ed8;">70 - 84:</label>
+            <input type="text" name="materi_wawancara[kejuruan_aphp][rubrik][70 - 84]" value="{{ $mw['kejuruan_aphp']['rubrik']['70 - 84'] ?? '' }}" class="form-control" style="font-size:11px;">
+          </div>
+          <div>
+            <label style="font-size:10.5px; font-weight:700; color:#b91c1c;">&lt; 70:</label>
+            <input type="text" name="materi_wawancara[kejuruan_aphp][rubrik][< 70]" value="{{ $mw['kejuruan_aphp']['rubrik']['< 70'] ?? '' }}" class="form-control" style="font-size:11px;">
+          </div>
+        </div>
+      </div>
+
+      {{-- 3. DIMENSI KEJURUAN: TSM --}}
+      <div style="background:#f8fafc; border:1px solid #cbd5e1; border-left:4px solid #d97706; border-radius:10px; padding:16px; margin-bottom:14px;">
+        <div style="font-weight:900; font-size:13px; color:#b45309; margin-bottom:8px; display:flex; align-items:center; gap:6px;">
+          <i class="bi bi-gear-wide-connected"></i> Pemandu Kejuruan TSM (Teknik Sepeda Motor)
+        </div>
+        <div style="margin-bottom:10px;">
+          <label style="display:block; font-size:11.5px; font-weight:700; color:#334155; margin-bottom:3px;">Fokus Uji Fisik &amp; K3:</label>
+          <input type="text" name="materi_wawancara[kejuruan_tsm][uji_fisik]" value="{{ $mw['kejuruan_tsm']['uji_fisik'] ?? '' }}" class="form-control" style="font-size:12px;">
+        </div>
+        <div style="margin-bottom:10px;">
+          <label style="display:block; font-size:11.5px; font-weight:700; color:#334155; margin-bottom:3px;">Pertanyaan Pemandu TSM:</label>
+          <textarea name="materi_wawancara[kejuruan_tsm][pertanyaan_text]" class="form-control" rows="2" style="font-size:12px;">{{ implode("\n", $mw['kejuruan_tsm']['pertanyaan'] ?? []) }}</textarea>
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px;">
+          <div>
+            <label style="font-size:10.5px; font-weight:700; color:#15803d;">85 - 100:</label>
+            <input type="text" name="materi_wawancara[kejuruan_tsm][rubrik][85 - 100]" value="{{ $mw['kejuruan_tsm']['rubrik']['85 - 100'] ?? '' }}" class="form-control" style="font-size:11px;">
+          </div>
+          <div>
+            <label style="font-size:10.5px; font-weight:700; color:#1d4ed8;">70 - 84:</label>
+            <input type="text" name="materi_wawancara[kejuruan_tsm][rubrik][70 - 84]" value="{{ $mw['kejuruan_tsm']['rubrik']['70 - 84'] ?? '' }}" class="form-control" style="font-size:11px;">
+          </div>
+          <div>
+            <label style="font-size:10.5px; font-weight:700; color:#b91c1c;">&lt; 70:</label>
+            <input type="text" name="materi_wawancara[kejuruan_tsm][rubrik][< 70]" value="{{ $mw['kejuruan_tsm']['rubrik']['< 70'] ?? '' }}" class="form-control" style="font-size:11px;">
+          </div>
+        </div>
+      </div>
+
+      {{-- 4. DIMENSI ORANG TUA --}}
+      <div style="background:#ffffff; border:1px solid #e2e8f0; border-radius:12px; padding:16px; margin-bottom:16px;">
+        <div style="font-weight:900; font-size:13.5px; color:#b45309; margin-bottom:10px; display:flex; align-items:center; gap:6px;">
+          <span style="width:22px; height:22px; border-radius:5px; background:#fef3c7; color:#b45309; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:800;">4</span>
+          Dimensi Komitmen &amp; Dukungan Orang Tua / Wali (Bobot 20%)
+        </div>
+        <div style="margin-bottom:12px;">
+          <label style="display:block; font-size:12px; font-weight:700; color:#334155; margin-bottom:4px;">Pertanyaan Pemandu (Gunakan baris baru untuk setiap pertanyaan):</label>
+          <textarea name="materi_wawancara[ortu][pertanyaan_text]" class="form-control" rows="3" style="font-size:12px;">{{ implode("\n", $mw['ortu']['pertanyaan'] ?? []) }}</textarea>
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px;">
+          <div>
+            <label style="font-size:11px; font-weight:700; color:#15803d;">Rubrik Skor 85 - 100:</label>
+            <input type="text" name="materi_wawancara[ortu][rubrik][85 - 100]" value="{{ $mw['ortu']['rubrik']['85 - 100'] ?? '' }}" class="form-control" style="font-size:11.5px;">
+          </div>
+          <div>
+            <label style="font-size:11px; font-weight:700; color:#1d4ed8;">Rubrik Skor 70 - 84:</label>
+            <input type="text" name="materi_wawancara[ortu][rubrik][70 - 84]" value="{{ $mw['ortu']['rubrik']['70 - 84'] ?? '' }}" class="form-control" style="font-size:11.5px;">
+          </div>
+          <div>
+            <label style="font-size:11px; font-weight:700; color:#b91c1c;">Rubrik Skor &lt; 70:</label>
+            <input type="text" name="materi_wawancara[ortu][rubrik][< 70]" value="{{ $mw['ortu']['rubrik']['< 70'] ?? '' }}" class="form-control" style="font-size:11.5px;">
+          </div>
+        </div>
+      </div>
+
+      {{-- MODAL FOOTER --}}
+      <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid #e2e8f0; padding-top:16px; margin-top:10px; flex-wrap:wrap; gap:10px;">
+        <button type="button" onclick="konfirmasiResetMateri()" class="btn btn-sm" style="background:#fee2e2; color:#b91c1c; border:1px solid #fca5a5; font-weight:800; padding:8px 14px; border-radius:8px; font-size:12px; cursor:pointer;">
+          <i class="bi bi-arrow-counterclockwise"></i> Reset ke Template Standar
+        </button>
+
+        <div style="display:flex; gap:10px;">
+          <button type="button" onclick="tutupModalEditMateri()" class="btn btn-sm" style="background:#f1f5f9; color:#475569; font-weight:700; padding:8px 18px; border-radius:8px; font-size:13px; cursor:pointer;">
+            Batal
+          </button>
+          <button type="submit" class="btn btn-sm" style="background:#2563eb; color:#ffffff; font-weight:800; padding:8px 22px; border-radius:8px; font-size:13px; cursor:pointer; display:inline-flex; align-items:center; gap:6px; box-shadow:0 4px 12px rgba(37,99,235,0.3);">
+            <i class="bi bi-check2-circle"></i> Simpan Materi Wawancara
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<form id="formResetMateri" action="{{ route('admin.ppdb.seleksi.reset_materi_wawancara') }}" method="POST" style="display:none;">
+  @csrf
+</form>
+
+{{-- ══════════════════════════════════════════════════════════════ --}}
+{{-- MODAL TES BUTA WARNA ISHIHARA ON-SCREEN --}}
+{{-- ══════════════════════════════════════════════════════════════ --}}
+<div id="modalTesIshihara" style="display:none; position:fixed; inset:0; background:rgba(15,23,42,0.8); backdrop-filter:blur(6px); z-index:1100; align-items:center; justify-content:center; padding:16px;">
+  <div style="background:#ffffff; border-radius:16px; max-width:980px; width:100%; max-height:92vh; display:flex; flex-direction:column; overflow:hidden; box-shadow:0 25px 50px -12px rgba(0,0,0,0.45);">
+    
+    {{-- HEADER --}}
+    <div style="padding:16px 22px; background:#0f172a; color:#ffffff; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #334155;">
+      <div>
+        <h3 style="font-size:16px; font-weight:900; margin:0 0 2px; display:flex; align-items:center; gap:8px;">
+          <i class="bi bi-eye-fill text-emerald-400"></i> Uji Persepsi Buta Warna Ishihara (8 Piringan Standar)
+        </h3>
+        <div style="font-size:12px; color:#94a3b8;">
+          Calon siswa melihat piringan pada layar dalam jarak ~75 cm. Pilih respon bacaan siswa pada setiap piringan.
+        </div>
+      </div>
+      <button type="button" onclick="tutupModalTesIshihara()" style="border:none; background:transparent; font-size:24px; cursor:pointer; color:#94a3b8; line-height:1;">&times;</button>
+    </div>
+
+    {{-- QUICK ACTION & STATUS BAR --}}
+    <div style="padding:12px 22px; background:#f8fafc; border-bottom:1px solid #e2e8f0; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+      <div style="display:flex; align-items:center; gap:8px;">
+        <button type="button" onclick="setSemuaIshiharaNormal()" class="btn btn-sm" style="background:#ecfdf5; border:1.5px solid #10b981; color:#047857; font-weight:800; font-size:11.5px; padding:5px 12px; border-radius:6px; cursor:pointer;">
+          <i class="bi bi-lightning-charge-fill text-amber-500"></i> Set Semua Normal (Bebas Buta Warna)
+        </button>
+        <button type="button" onclick="resetTesIshihara()" class="btn btn-sm" style="background:#ffffff; border:1px solid #cbd5e1; color:#475569; font-weight:700; font-size:11.5px; padding:5px 12px; border-radius:6px; cursor:pointer;">
+          <i class="bi bi-arrow-counterclockwise"></i> Reset
+        </button>
+      </div>
+
+      <div style="display:flex; align-items:center; gap:10px;">
+        <div style="font-size:12px; color:#475569;">
+          Skor: <strong id="live_ishihara_skor" style="font-size:14px; font-family:monospace; color:#059669;">8 / 8</strong>
+        </div>
+        <span id="live_ishihara_diagnosa" style="background:#ecfdf5; color:#059669; font-weight:900; font-size:12px; padding:4px 12px; border-radius:20px; border:1px solid #a7f3d0;">
+          <i class="bi bi-check-circle-fill"></i> Bebas Buta Warna (Normal)
+        </span>
+      </div>
+    </div>
+
+    {{-- GRID 8 PIRINGAN --}}
+    <div style="padding:16px 20px; overflow-y:auto; flex:1; background:#f1f5f9; display:grid; grid-template-columns:repeat(auto-fill, minmax(210px, 1fr)); gap:14px;">
+      @php
+        $platesData = [
+          ['no' => 1, 'num' => '12', 'tipe' => 'Demonstrasi / Kontrol', 'norm' => '12', 'pars' => '12', 'tot' => '12', 'fg' => ['#e05238', '#eb6244', '#cf4128', '#d9472e'], 'bg' => ['#689f63', '#7ba977', '#8bb487', '#5f965a', '#54874f']],
+          ['no' => 2, 'num' => '8', 'tipe' => 'Transformasi Merah-Hijau', 'norm' => '8', 'pars' => '3', 'tot' => 'Tidak Ada', 'fg' => ['#d9534f', '#c9302c', '#d43f3a', '#b92c28'], 'bg' => ['#5cb85c', '#4cae4c', '#6ec06e', '#7ec87e', '#419641']],
+          ['no' => 3, 'num' => '6', 'tipe' => 'Transformasi Merah-Hijau', 'norm' => '6', 'pars' => '5', 'tot' => 'Tidak Ada', 'fg' => ['#d9534f', '#c9302c', '#e74c3c', '#c0392b'], 'bg' => ['#5cb85c', '#4cae4c', '#27ae60', '#2ecc71', '#419641']],
+          ['no' => 4, 'num' => '29', 'tipe' => 'Transformasi Merah-Hijau', 'norm' => '29', 'pars' => '70', 'tot' => 'Tidak Ada', 'fg' => ['#d9534f', '#c0392b', '#e67e22', '#d35400'], 'bg' => ['#27ae60', '#2ecc71', '#5cb85c', '#4cae4c', '#16a085']],
+          ['no' => 5, 'num' => '57', 'tipe' => 'Penyamaran Merah-Hijau', 'norm' => '57', 'pars' => '35', 'tot' => 'Tidak Ada', 'fg' => ['#e67e22', '#d35400', '#f39c12', '#e74c3c'], 'bg' => ['#27ae60', '#2ecc71', '#5cb85c', '#1abc9c', '#16a085']],
+          ['no' => 6, 'num' => '5', 'tipe' => 'Transformasi Merah-Hijau', 'norm' => '5', 'pars' => '2', 'tot' => 'Tidak Ada', 'fg' => ['#27ae60', '#2ecc71', '#1abc9c', '#16a085'], 'bg' => ['#d9534f', '#e67e22', '#f39c12', '#c0392b', '#d35400']],
+          ['no' => 7, 'num' => '3', 'tipe' => 'Transformasi Merah-Hijau', 'norm' => '3', 'pars' => '5', 'tot' => 'Tidak Ada', 'fg' => ['#27ae60', '#2ecc71', '#5cb85c', '#4cae4c'], 'bg' => ['#d9534f', '#c0392b', '#e74c3c', '#e67e22', '#d35400']],
+          ['no' => 8, 'num' => '74', 'tipe' => 'Transformasi Merah-Hijau', 'norm' => '74', 'pars' => '21', 'tot' => 'Tidak Ada', 'fg' => ['#27ae60', '#2ecc71', '#16a085', '#5cb85c'], 'bg' => ['#d9534f', '#c0392b', '#d35400', '#e74c3c', '#f39c12']],
+        ];
+      @endphp
+
+      @foreach($platesData as $p)
+        <div class="plate-tester-card" id="plate-card-{{ $p['no'] }}" style="background:#ffffff; border:1.5px solid #e2e8f0; border-radius:12px; padding:12px; text-align:center; box-shadow:0 1px 3px rgba(0,0,0,0.05); display:flex; flex-direction:column; align-items:center;">
+          {{-- SVG PLATE --}}
+          <div style="width:115px; height:115px; margin-bottom:8px; filter:drop-shadow(0 2px 4px rgba(0,0,0,0.1));">
+            <svg viewBox="0 0 200 200" width="115" height="115" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <clipPath id="circle-modal-{{ $p['no'] }}">
+                  <circle cx="100" cy="100" r="94"/>
+                </clipPath>
+                <mask id="mask-modal-{{ $p['no'] }}">
+                  <rect width="200" height="200" fill="black" />
+                  <text x="100" y="{{ strlen($p['num']) > 1 ? '128' : '136' }}" font-family="Arial, Helvetica, sans-serif" font-weight="900" font-size="{{ strlen($p['num']) > 1 ? '86' : '108' }}" text-anchor="middle" fill="white" letter-spacing="-2">{{ $p['num'] }}</text>
+                </mask>
+              </defs>
+              <circle cx="100" cy="100" r="98" fill="#f8fafc" stroke="#e2e8f0" stroke-width="2"/>
+              <g clip-path="url(#circle-modal-{{ $p['no'] }})">
+                @php
+                  $bgCols = $p['bg'];
+                  $fgCols = $p['fg'];
+                  $step = 12;
+                  $dots = [];
+                  for ($x = 10; $x <= 190; $x += $step) {
+                    for ($y = 10; $y <= 190; $y += $step) {
+                      $dx = $x - 100;
+                      $dy = $y - 100;
+                      if (($dx*$dx + $dy*$dy) < (92 * 92)) {
+                        $jitterX = $x + (($x * 7 + $y * 13 + $p['no']) % 7) - 3;
+                        $jitterY = $y + (($x * 11 + $y * 5 + $p['no']) % 7) - 3;
+                        $radius = 3.5 + (($x * 3 + $y * 7) % 4);
+                        $cIdx = ($x + $y + $p['no']) % count($bgCols);
+                        $dots[] = ['x' => $jitterX, 'y' => $jitterY, 'r' => $radius, 'c' => $bgCols[$cIdx]];
+                      }
+                    }
+                  }
+                @endphp
+                @foreach($dots as $d)
+                  <circle cx="{{ $d['x'] }}" cy="{{ $d['y'] }}" r="{{ $d['r'] }}" fill="{{ $d['c'] }}" opacity="0.95"/>
+                @endforeach
+                <g mask="url(#mask-modal-{{ $p['no'] }})">
+                  <circle cx="100" cy="100" r="95" fill="{{ $fgCols[0] }}"/>
+                  @foreach($dots as $d)
+                    @php $fgIdx = ($d['x'] * 3 + $d['y'] * 5 + $p['no']) % count($fgCols); @endphp
+                    <circle cx="{{ $d['x'] }}" cy="{{ $d['y'] }}" r="{{ $d['r'] + 0.5 }}" fill="{{ $fgCols[$fgIdx] }}"/>
+                  @endforeach
+                </g>
+              </g>
+              <circle cx="100" cy="100" r="94" fill="none" stroke="rgba(0,0,0,0.12)" stroke-width="1.5"/>
+            </svg>
+          </div>
+
+          {{-- LABEL --}}
+          <div style="font-size:11.5px; font-weight:800; color:#0f172a; margin-bottom:2px;">
+            Piringan #{{ $p['no'] }}
+          </div>
+          <div style="font-size:10px; color:#64748b; margin-bottom:8px;">
+            {{ $p['tipe'] }}
+          </div>
+
+          {{-- PILIHAN RESPON PESERTA --}}
+          <div style="display:flex; flex-direction:column; gap:4px; width:100%;">
+            <button type="button" id="btn-p{{ $p['no'] }}-norm" class="btn-ish-opt is-active" onclick="pilihIshiharaPlate({{ $p['no'] }}, 'norm', '{{ $p['norm'] }}')" style="border:1.5px solid #10b981; background:#ecfdf5; color:#065f46; font-size:11px; font-weight:800; padding:5px 8px; border-radius:6px; cursor:pointer; text-align:center;">
+              ✓ Angka {{ $p['norm'] }} (Normal)
+            </button>
+            @if($p['no'] > 1)
+              <button type="button" id="btn-p{{ $p['no'] }}-pars" class="btn-ish-opt" onclick="pilihIshiharaPlate({{ $p['no'] }}, 'pars', '{{ $p['pars'] }}')" style="border:1px solid #cbd5e1; background:#f8fafc; color:#334155; font-size:11px; font-weight:700; padding:5px 8px; border-radius:6px; cursor:pointer; text-align:center;">
+                Angka {{ $p['pars'] }} (Parsial)
+              </button>
+            @endif
+            <button type="button" id="btn-p{{ $p['no'] }}-salah" class="btn-ish-opt" onclick="pilihIshiharaPlate({{ $p['no'] }}, 'salah', 'Tidak Terbaca')" style="border:1px solid #cbd5e1; background:#f8fafc; color:#334155; font-size:11px; font-weight:700; padding:5px 8px; border-radius:6px; cursor:pointer; text-align:center;">
+              ✗ Tidak Terbaca / Salah
+            </button>
+          </div>
+        </div>
+      @endforeach
+    </div>
+
+    {{-- FOOTER ACTION --}}
+    <div style="padding:14px 22px; background:#ffffff; border-top:1px solid #e2e8f0; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+      <div style="font-size:12px; color:#64748b;">
+        Standar: Normal (7-8 benar) &bull; Parsial (merah-hijau) &bull; Total (&le;1 benar).
+      </div>
+
+      <div style="display:flex; gap:10px;">
+        <button type="button" onclick="tutupModalTesIshihara()" class="btn btn-sm" style="background:#f1f5f9; color:#475569; font-weight:700; padding:8px 18px; border-radius:8px; font-size:13px; cursor:pointer;">
+          Tutup
+        </button>
+        <button type="button" onclick="terapkanHasilIshihara()" class="btn btn-sm" style="background:#059669; color:#ffffff; font-weight:800; padding:8px 22px; border-radius:8px; font-size:13px; cursor:pointer; display:inline-flex; align-items:center; gap:6px; box-shadow:0 4px 12px rgba(5,150,105,0.3);">
+          <i class="bi bi-check2-circle"></i> Terapkan ke Form Wawancara
+        </button>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -1401,6 +1813,160 @@
 
   function tutupModalEditSesi() {
     document.getElementById('modalEditSesiSingle').style.display = 'none';
+  }
+
+  // ── Modal Kelola Materi Wawancara ──
+  function bukaModalEditMateri() {
+    document.getElementById('modalEditMateriWawancara').style.display = 'flex';
+  }
+
+  function tutupModalEditMateri() {
+    document.getElementById('modalEditMateriWawancara').style.display = 'none';
+  }
+
+  function konfirmasiResetMateri() {
+    if (confirm('Apakah Anda yakin ingin mengembalikan materi pertanyaan & rubrik wawancara ke template standar juknis sekolah? Perubahan khusus yang telah dibuat akan dihapus.')) {
+      document.getElementById('formResetMateri').submit();
+    }
+  }
+
+  // ── Modal Tes Buta Warna Ishihara Live ──
+  const ishiharaState = {
+    1: 'norm',
+    2: 'norm',
+    3: 'norm',
+    4: 'norm',
+    5: 'norm',
+    6: 'norm',
+    7: 'norm',
+    8: 'norm'
+  };
+
+  function bukaModalTesIshihara() {
+    document.getElementById('modalTesIshihara').style.display = 'flex';
+    hitungHasilIshihara();
+  }
+
+  function tutupModalTesIshihara() {
+    document.getElementById('modalTesIshihara').style.display = 'none';
+  }
+
+  function pilihIshiharaPlate(plateNo, tipe, val) {
+    ishiharaState[plateNo] = tipe;
+    
+    // Update button visual styles for this plate
+    const btnNorm = document.getElementById(`btn-p${plateNo}-norm`);
+    const btnPars = document.getElementById(`btn-p${plateNo}-pars`);
+    const btnSalah = document.getElementById(`btn-p${plateNo}-salah`);
+
+    const resetStyle = (btn) => {
+      if (!btn) return;
+      btn.style.border = '1px solid #cbd5e1';
+      btn.style.background = '#f8fafc';
+      btn.style.color = '#334155';
+      btn.style.fontWeight = '700';
+    };
+
+    resetStyle(btnNorm);
+    resetStyle(btnPars);
+    resetStyle(btnSalah);
+
+    if (tipe === 'norm' && btnNorm) {
+      btnNorm.style.border = '1.5px solid #10b981';
+      btnNorm.style.background = '#ecfdf5';
+      btnNorm.style.color = '#065f46';
+      btnNorm.style.fontWeight = '800';
+    } else if (tipe === 'pars' && btnPars) {
+      btnPars.style.border = '1.5px solid #f59e0b';
+      btnPars.style.background = '#fffbeb';
+      btnPars.style.color = '#b45309';
+      btnPars.style.fontWeight = '800';
+    } else if (tipe === 'salah' && btnSalah) {
+      btnSalah.style.border = '1.5px solid #ef4444';
+      btnSalah.style.background = '#fef2f2';
+      btnSalah.style.color = '#b91c1c';
+      btnSalah.style.fontWeight = '800';
+    }
+
+    hitungHasilIshihara();
+  }
+
+  function setSemuaIshiharaNormal() {
+    for (let i = 1; i <= 8; i++) {
+      pilihIshiharaPlate(i, 'norm', '');
+    }
+  }
+
+  function resetTesIshihara() {
+    for (let i = 1; i <= 8; i++) {
+      pilihIshiharaPlate(i, 'salah', '');
+    }
+  }
+
+  function hitungHasilIshihara() {
+    let benar = 0;
+    let parsial = 0;
+    let salah = 0;
+
+    for (let i = 1; i <= 8; i++) {
+      if (ishiharaState[i] === 'norm') benar++;
+      else if (ishiharaState[i] === 'pars') parsial++;
+      else salah++;
+    }
+
+    const skorEl = document.getElementById('live_ishihara_skor');
+    const diagEl = document.getElementById('live_ishihara_diagnosa');
+
+    if (skorEl) skorEl.innerText = `${benar} / 8`;
+
+    if (!diagEl) return;
+
+    if (benar >= 7) {
+      diagEl.innerHTML = '<i class="bi bi-check-circle-fill"></i> Bebas Buta Warna (Normal)';
+      diagEl.style.background = '#ecfdf5';
+      diagEl.style.color = '#059669';
+      diagEl.style.borderColor = '#a7f3d0';
+    } else if (parsial > 0 || (benar >= 2 && benar <= 6)) {
+      diagEl.innerHTML = '<i class="bi bi-exclamation-triangle-fill"></i> Terindikasi Buta Warna Parsial (Merah-Hijau)';
+      diagEl.style.background = '#fffbeb';
+      diagEl.style.color = '#b45309';
+      diagEl.style.borderColor = '#fde68a';
+    } else {
+      diagEl.innerHTML = '<i class="bi bi-x-circle-fill"></i> Terindikasi Buta Warna Total';
+      diagEl.style.background = '#fef2f2';
+      diagEl.style.color = '#b91c1c';
+      diagEl.style.borderColor = '#fca5a5';
+    }
+  }
+
+  function terapkanHasilIshihara() {
+    let benar = 0;
+    let parsial = 0;
+    for (let i = 1; i <= 8; i++) {
+      if (ishiharaState[i] === 'norm') benar++;
+      else if (ishiharaState[i] === 'pars') parsial++;
+    }
+
+    let kesimpulan = '';
+    if (benar >= 7) {
+      kesimpulan = `Lolos tes Ishihara: Bebas Buta Warna (${benar}/8 piringan terbaca normal). `;
+    } else if (parsial > 0 || (benar >= 2 && benar <= 6)) {
+      kesimpulan = `Perhatian: Terindikasi Buta Warna Parsial Merah-Hijau (${benar}/8 piringan normal, ${parsial} piringan parsial). `;
+    } else {
+      kesimpulan = `Perhatian: Terindikasi Buta Warna Total (${benar}/8 piringan terbaca). `;
+    }
+
+    tambahCatatanCepat(kesimpulan);
+
+    // Auto boost kejuruan score if normal and currently default
+    const kejuruanInput = document.getElementById('w_kejuruan');
+    if (kejuruanInput && benar >= 7 && (kejuruanInput.value === '80' || !kejuruanInput.value)) {
+      kejuruanInput.value = '85';
+      hitungTotalWawancara();
+    }
+
+    tutupModalTesIshihara();
+    alert('Hasil tes buta warna Ishihara berhasil disematkan ke formulir wawancara!');
   }
 </script>
 
