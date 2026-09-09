@@ -262,6 +262,8 @@
         </div>
       </a>
     </div>
+  @endif
+
   {{-- 6b. PORTAL MANDIRI PTK (Biodata & Berkas Saya) --}}
   @if($user && ($user->guru_id || $isAdmin || $isGuru))
     <div class="nav-group">
