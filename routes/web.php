@@ -148,6 +148,11 @@ Route::middleware('auth')->group(function () {
     Route::post('/ptk/profil-saya/unggah-berkas', [\App\Http\Controllers\PtkProfilMandiriController::class, 'unggahBerkasMandiri'])->name('ptk.unggah-berkas');
     Route::delete('/ptk/profil-saya/berkas/{id}', [\App\Http\Controllers\PtkProfilMandiriController::class, 'hapusBerkasMandiri'])->name('ptk.hapus-berkas');
 
+    // 0c-3. Pintasan ke Modul PPDB — Meja Wawancara 2026
+    Route::get('/guru/ppdb/wawancara', fn() => redirect()->route('admin.ppdb.wawancara'))->name('guru.ppdb.wawancara');
+    Route::post('/guru/ppdb/wawancara/nilai/{id}', [\App\Http\Controllers\Ppdb\PpdbGuruWawancaraController::class, 'simpanNilai'])->name('guru.ppdb.wawancara.simpan');
+    Route::get('/guru/ppdb/wawancara/cetak/{id}', [\App\Http\Controllers\Ppdb\PpdbGuruWawancaraController::class, 'cetak'])->name('guru.ppdb.wawancara.cetak');
+
     // 0d. Role Switcher Mode (Multi-Role Switching)
     Route::post('/switch-role', [AuthController::class, 'switchRole'])->name('switch-role');
 
@@ -406,6 +411,13 @@ Route::middleware('auth')->group(function () {
 
     // ══ 16. Modul Terpadu: Panitia PPDB 2026 & Manajemen Konten Web ══
     Route::prefix('admin')->name('admin.')->group(function () {
+        // Meja Wawancara PPDB (Akses: Admin, Kepsek, Panitia PPDB, Waka Kesiswaan, dan Guru Penguji)
+        Route::middleware('role:admin,kepala_sekolah,panitia_ppdb,waka_kesiswaan,guru')->group(function () {
+            Route::get('/ppdb/wawancara', [\App\Http\Controllers\Ppdb\PpdbGuruWawancaraController::class, 'index'])->name('ppdb.wawancara');
+            Route::post('/ppdb/wawancara/nilai/{id}', [\App\Http\Controllers\Ppdb\PpdbGuruWawancaraController::class, 'simpanNilai'])->name('ppdb.wawancara.simpan');
+            Route::get('/ppdb/wawancara/cetak/{id}', [\App\Http\Controllers\Ppdb\PpdbGuruWawancaraController::class, 'cetak'])->name('ppdb.wawancara.cetak');
+        });
+
         // Panitia PPDB Online (Admin, Kepsek, Panitia PPDB, Waka Kesiswaan)
         Route::middleware('role:admin,kepala_sekolah,panitia_ppdb,waka_kesiswaan')->group(function () {
             Route::get('/ppdb', [PpdbAdminController::class, 'index'])->name('ppdb.index');
@@ -419,6 +431,8 @@ Route::middleware('auth')->group(function () {
             Route::post('/ppdb/seleksi/jadwalkan-single/{id}', [PpdbAdminController::class, 'jadwalkanSingle'])->name('ppdb.seleksi.jadwalkan_single');
             Route::post('/ppdb/seleksi/nilai-esai/{id}', [PpdbAdminController::class, 'simpanNilaiEsai'])->name('ppdb.seleksi.nilai_esai');
             Route::post('/ppdb/seleksi/nilai-wawancara/{id}', [PpdbAdminController::class, 'simpanNilaiWawancara'])->name('ppdb.seleksi.nilai_wawancara');
+            Route::post('/ppdb/seleksi/plot-wawancara', [PpdbAdminController::class, 'plotPewawancaraMassal'])->name('ppdb.seleksi.plot_wawancara');
+            Route::post('/ppdb/seleksi/plot-wawancara-single/{id}', [PpdbAdminController::class, 'plotPewawancaraSingle'])->name('ppdb.seleksi.plot_wawancara_single');
             Route::get('/ppdb/seleksi/cetak-wawancara/{id?}', [PpdbAdminController::class, 'cetakInstrumenWawancara'])->name('ppdb.seleksi.cetak_wawancara');
             Route::post('/ppdb/seleksi/materi-wawancara', [PpdbAdminController::class, 'simpanMateriWawancara'])->name('ppdb.seleksi.materi_wawancara');
             Route::post('/ppdb/seleksi/reset-materi-wawancara', [PpdbAdminController::class, 'resetMateriWawancara'])->name('ppdb.seleksi.reset_materi_wawancara');

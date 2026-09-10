@@ -617,12 +617,12 @@
       {{-- Card Header: Kop 3 Tingkat Resmi --}}
       <div class="card-header {{ $isSiswa ? 'card-header-siswa' : 'card-header-guru' }}">
         <div class="card-logo-wrap">
-          <img src="{{ !empty($sekolah->logo_sekolah) ? asset('storage/'.$sekolah->logo_sekolah) : '/img/logo.png' }}" alt="Logo" class="card-logo" onerror="this.src='/img/logo.png';" />
+          <img src="{{ $sekolah->logo_sekolah_url }}" alt="Logo" class="card-logo" onerror="this.src='/img/logo.png';" />
         </div>
         <div class="card-header-text">
-          <div class="card-instansi">PEMERINTAH PROVINSI LAMPUNG</div>
-          <div class="card-dinas">{{ $sekolah->nama_dinas ?? 'DINAS PENDIDIKAN DAN KEBUDAYAAN' }}</div>
-          <div class="card-school-name">{{ $sekolah->nama_sekolah ?? 'SMK NEGERI 1 AIR NANINGAN' }}</div>
+          <div class="card-instansi">{{ $sekolah->nama_instansi_atas ?: 'PEMERINTAH PROVINSI LAMPUNG' }}</div>
+          <div class="card-dinas">{{ $sekolah->nama_dinas ?: 'DINAS PENDIDIKAN DAN KEBUDAYAAN' }}</div>
+          <div class="card-school-name">{{ $sekolah->nama_sekolah ?: 'SMK NEGERI 1 AIR NANINGAN' }}</div>
           <div class="card-badge-wrap">
             <span class="card-title-badge {{ $isSiswa ? 'card-title-badge-siswa' : '' }}">{{ $cardCategory }}</span>
           </div>

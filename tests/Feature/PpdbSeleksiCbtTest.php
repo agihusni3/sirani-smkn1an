@@ -445,5 +445,107 @@ class PpdbSeleksiCbtTest extends TestCase
         $response->assertSee('Plat #8');
         $response->assertSee('Bebas Buta Warna');
     }
+
+    public function test_admin_bisa_mem_plotting_guru_penguji_pra_tes()
+    {
+        $guru = User::create([
+            'name' => 'Budi Santoso, S.Kom.',
+            'email' => 'budi.guru@smkn1airnaningan.sch.id',
+            'role' => 'guru',
+            'password' => \Illuminate\Support\Facades\Hash::make('password'),
+        ]);
+
+        $p1 = $this->buatPendaftar('PPDB2026-001', '1234567891', 'Siswa RPL 1');
+        $p2 = $this->buatPendaftar('PPDB2026-002', '1234567892', 'Siswa RPL 2');
+
+        // Admin plot massal per jurusan RPL sebelum tanggal tes
+        $res = $this->actingAs($this->admin)->post(route('admin.ppdb.seleksi.plot_wawancara'), [
+            'jurusan_id' => $this->jurusan->id,
+            'pewawancara_id' => $guru->id,
+        ]);
+
+        $res->assertRedirect(route('admin.ppdb.seleksi', ['tab' => 'wawancara']));
+        $res->assertSessionHas('success');
+
+        $p1->refresh();
+        $p2->refresh();
+        $this->assertEquals($guru->id, $p1->pewawancara_id);
+        $this->assertEquals($guru->id, $p2->pewawancara_id);
+
+        // Admin ganti guru penguji single
+        $guru2 = User::create([
+            'name' => 'Dewi Lestari, S.Pd.',
+            'email' => 'dewi.guru@smkn1airnaningan.sch.id',
+            'role' => 'guru',
+            'password' => \Illuminate\Support\Facades\Hash::make('password'),
+        ]);
+
+        $resSingle = $this->actingAs($this->admin)->post(route('admin.ppdb.seleksi.plot_wawancara_single', $p1->id), [
+            'pewawancara_id' => $guru2->id,
+        ]);
+
+        $resSingle->assertRedirect(route('admin.ppdb.seleksi', ['tab' => 'wawancara']));
+        $p1->refresh();
+        $this->assertEquals($guru2->id, $p1->pewawancara_id);
+    }
+
+    public function test_guru_penguji_bisa_mengakses_portal_wawancara_dan_menginput_nilai()
+    {
+        $guru = User::create([
+            'name' => 'Budi Santoso, S.Kom.',
+            'email' => 'budi.penguji@smkn1airnaningan.sch.id',
+            'role' => 'guru',
+            'password' => \Illuminate\Support\Facades\Hash::make('password'),
+        ]);
+
+        $p = $this->buatPendaftar('PPDB2026-003', '1234567893', 'Calon Siswa Binaan');
+        $p->pewawancara_id = $guru->id;
+        $p->save();
+
+        // Akses via redirect legacy guru.ppdb.wawancara
+        $resLegacy = $this->actingAs($guru)->get(route('guru.ppdb.wawancara'));
+        $resLegacy->assertRedirect(route('admin.ppdb.wawancara'));
+
+        // Guru membuka portal wawancara di modul PPDB
+        $resPortal = $this->actingAs($guru)->get(route('admin.ppdb.wawancara'));
+        $resPortal->assertOk();
+        $resPortal->assertSee('Meja Penilaian Wawancara');
+        $resPortal->assertSee('Calon Siswa Binaan');
+
+        // Guru menginput nilai wawancara
+        $resNilai = $this->actingAs($guru)->post(route('admin.ppdb.wawancara.simpan', $p->id), [
+            'nilai_wawancara_motivasi' => 90,
+            'nilai_wawancara_karakter' => 88,
+            'nilai_wawancara_kejuruan' => 92,
+            'nilai_wawancara_ortu'     => 85,
+            'catatan_wawancara'        => 'Bebas buta warna, motivasi sangat tinggi.',
+        ]);
+
+        $resNilai->assertRedirect();
+        $resNilai->assertSessionHas('success');
+
+        $p->refresh();
+        $this->assertNotNull($p->nilai_wawancara_total);
+        $this->assertEquals($guru->id, $p->pewawancara_id);
+        $this->assertNotNull($p->diwawancara_pada);
+        $this->assertEquals('Bebas buta warna, motivasi sangat tinggi.', $p->catatan_wawancara);
+    }
+
+    public function test_cetak_instrumen_dan_tes_buta_warna_merender_kop_dinas_2_logo_provinsi_lampung()
+    {
+        $resWawancara = $this->actingAs($this->admin)->get(route('admin.ppdb.seleksi.cetak_wawancara'));
+        $resWawancara->assertOk();
+        $resWawancara->assertSee('alt="Logo Provinsi Lampung"', false);
+        $resWawancara->assertSee('alt="Logo Sekolah"', false);
+        $resWawancara->assertSee('PEMERINTAH PROVINSI LAMPUNG');
+        $resWawancara->assertSee('DINAS PENDIDIKAN DAN KEBUDAYAAN');
+
+        $resButaWarna = $this->actingAs($this->admin)->get(route('admin.ppdb.seleksi.tes_buta_warna'));
+        $resButaWarna->assertOk();
+        $resButaWarna->assertSee('alt="Logo Provinsi Lampung"', false);
+        $resButaWarna->assertSee('alt="Logo Sekolah"', false);
+        $resButaWarna->assertSee('PEMERINTAH PROVINSI LAMPUNG');
+        $resButaWarna->assertSee('DINAS PENDIDIKAN DAN KEBUDAYAAN');
+    }
 }
 

@@ -860,7 +860,7 @@
       @csrf
       <div style="margin-bottom:18px;">
         <label class="form-label" style="font-weight:700; font-size:12px; display:block; margin-bottom:6px;">Pilih File CSV / Excel (.csv) <span style="color:var(--red);">*</span></label>
-        <input type="file" name="file" accept=".csv,text/csv,text/plain" required class="input-field" style="width:100%; height:40px; padding:6px 10px; font-size:12.5px; background:var(--bg-3); border:1px solid var(--border-2); border-radius:var(--r-sm); color:var(--text);" />
+        <input type="file" name="file" accept=".csv,text/csv,text/plain" required class="form-control" />
       </div>
 
       <div style="display:flex; justify-content:flex-end; gap:8px;">

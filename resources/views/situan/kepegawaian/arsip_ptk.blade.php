@@ -18,12 +18,12 @@
       <p class="text-muted mb-0 small">Penyimpanan cloud dokumen kedinasan (SK, Ijazah, Serdik, KTP, KK, Sertifikat) untuk kemudahan usulan KGB, Pangkat, &amp; Dupak.</p>
     </div>
 
-    <div class="d-flex gap-2">
-      <a href="{{ route('situan.radar-kgb.index') }}" class="btn btn-outline-secondary btn-sm" style="font-weight:600;">
-        <i class="bi bi-arrow-left me-1"></i> Kembali ke Radar
+    <div class="d-flex gap-2 align-items-center">
+      <a href="{{ route('situan.radar-kgb.index') }}" class="btn btn-outline-secondary btn-sm px-3 d-inline-flex align-items-center" style="font-weight:700; height:36px;">
+        <i class="bi bi-arrow-left me-1.5"></i> Kembali ke Radar
       </a>
-      <button type="button" class="btn btn-primary btn-sm px-3" data-bs-toggle="modal" data-bs-target="#modalUploadArsip" style="font-weight:700;">
-        <i class="bi bi-cloud-arrow-up-fill me-1"></i> Unggah Berkas Baru
+      <button type="button" class="btn btn-primary btn-sm px-3 d-inline-flex align-items-center" data-bs-toggle="modal" data-bs-target="#modalUploadArsip" style="font-weight:700; height:36px;">
+        <i class="bi bi-cloud-arrow-up-fill me-1.5"></i> Unggah Berkas Baru
       </button>
     </div>
   </div>
@@ -151,7 +151,7 @@
     <div class="modal-content border-0 shadow">
       <form action="{{ route('situan.arsip-ptk.store', $guru->id) }}" method="POST" enctype="multipart/form-data">
         @csrf
-        <div class="modal-header border-bottom py-3 px-4">
+        <div class="modal-header bg-light border-bottom px-4 py-3">
           <h5 class="modal-title fw-bold" id="modalUploadArsipLabel">
             <i class="bi bi-cloud-arrow-up-fill text-primary me-2"></i>Unggah Arsip Digital PTK
           </h5>
@@ -198,9 +198,9 @@
             <div class="form-text" style="font-size:11px;">Maksimal 10 MB (Format: PDF, JPG, PNG).</div>
           </div>
         </div>
-        <div class="modal-footer border-top px-4 py-2">
-          <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Batal</button>
-          <button type="submit" class="btn btn-sm btn-primary fw-bold">
+        <div class="modal-footer px-4 py-3 bg-light d-flex justify-content-end gap-2 border-top">
+          <button type="button" class="btn btn-sm btn-outline-secondary px-3" data-bs-dismiss="modal" style="font-weight:600; border-radius:8px;">Batal</button>
+          <button type="submit" class="btn btn-sm btn-primary fw-bold px-3" style="border-radius:8px;">
             <i class="bi bi-upload me-1"></i> Unggah &amp; Simpan ke Arsip
           </button>
         </div>

@@ -228,8 +228,8 @@
         <div style="min-width:300px; width:100%; max-width:400px;">
           <form action="{{ route('admin.backup.restore') }}" method="POST" enctype="multipart/form-data" onsubmit="return confirm('PERINGATAN KRUSIAL:\nApakah Anda yakin ingin memulihkan database dari file yang diunggah?')">
             @csrf
-            <div style="margin-bottom:10px;">
-              <input type="file" name="backup_file" required accept=".sqlite,.db,.sql" class="input-field" style="width:100%; height:38px; padding:6px 10px; font-size:12px; background:var(--surface);" />
+            <div style="margin-bottom:12px;">
+              <input type="file" name="backup_file" required accept=".sqlite,.db,.sql" class="form-control" />
             </div>
             <button type="submit" class="btn" style="width:100%; height:38px; font-weight:800; display:inline-flex; align-items:center; justify-content:center; gap:8px; font-size:12.5px; background:var(--surface); color:#000000; border:1.5px solid #000000; border-radius:var(--r-sm); cursor:pointer;">
               <i class="bi bi-cloud-arrow-up-fill" style="font-size:15px; color:#000000;"></i>

@@ -18,15 +18,15 @@
       <p class="text-muted mb-0 small">Penyimpanan cloud terpadu berkas PTK, regulasi kedinasan, akreditasi, dan naskah kerjasama (MoU) industri.</p>
     </div>
 
-    <div class="d-flex gap-2 flex-wrap">
-      <a href="{{ route('situan.index') }}" class="btn btn-outline-secondary btn-sm" style="font-weight:600;">
-        <i class="bi bi-arrow-left me-1"></i> Dasbor SITUAN
+    <div class="d-flex gap-2 flex-wrap align-items-center">
+      <a href="{{ route('situan.index') }}" class="btn btn-outline-secondary btn-sm px-3 d-inline-flex align-items-center" style="font-weight:700; height:36px;">
+        <i class="bi bi-arrow-left me-1.5"></i> Dasbor SITUAN
       </a>
-      <button type="button" class="btn btn-primary btn-sm px-3" data-bs-toggle="modal" data-bs-target="#modalUploadArsipPtk" style="font-weight:700;">
-        <i class="bi bi-person-badge-fill me-1"></i> Unggah Berkas PTK
+      <button type="button" class="btn btn-primary btn-sm px-3 d-inline-flex align-items-center" data-bs-toggle="modal" data-bs-target="#modalUploadArsipPtk" style="font-weight:700; height:36px;">
+        <i class="bi bi-person-badge-fill me-1.5"></i> Unggah Berkas PTK
       </button>
-      <button type="button" class="btn btn-dark btn-sm px-3" data-bs-toggle="modal" data-bs-target="#modalUploadArsipLembaga" style="font-weight:700;">
-        <i class="bi bi-building-fill-add me-1"></i> Unggah Dokumen Lembaga / MoU
+      <button type="button" class="btn btn-dark btn-sm px-3 d-inline-flex align-items-center" data-bs-toggle="modal" data-bs-target="#modalUploadArsipLembaga" style="font-weight:700; height:36px;">
+        <i class="bi bi-building-fill-add me-1.5"></i> Unggah Dokumen Lembaga / MoU
       </button>
     </div>
   </div>
@@ -457,7 +457,7 @@
 <div class="modal fade" id="modalUploadArsipPtk" tabindex="-1" aria-labelledby="modalUploadArsipPtkLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content border-0 shadow">
-      <div class="modal-header bg-primary text-white">
+      <div class="modal-header bg-primary text-white px-4 py-3">
         <h5 class="modal-title fw-bold" id="modalUploadArsipPtkLabel">
           <i class="bi bi-cloud-arrow-up-fill me-1"></i> Unggah Berkas PTK ke E-Kabinet
         </h5>
@@ -518,9 +518,11 @@
             <div class="form-text">Pastikan file hasil scan jelas terbaca untuk kelancaran administrasi dinas.</div>
           </div>
         </div>
-        <div class="modal-footer bg-light py-2">
-          <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Batal</button>
-          <button type="submit" class="btn btn-primary btn-sm px-3 fw-bold">Simpan ke E-Kabinet</button>
+        <div class="modal-footer px-4 py-3 bg-light d-flex justify-content-end gap-2 border-top">
+          <button type="button" class="btn btn-sm btn-outline-secondary px-3" data-bs-dismiss="modal" style="font-weight:600; border-radius:8px;">Batal</button>
+          <button type="submit" class="btn btn-sm btn-primary px-3 fw-bold" style="border-radius:8px;">
+            <i class="bi bi-cloud-arrow-up-fill me-1"></i> Simpan ke E-Kabinet
+          </button>
         </div>
       </form>
     </div>
@@ -531,7 +533,7 @@
 <div class="modal fade" id="modalUploadArsipLembaga" tabindex="-1" aria-labelledby="modalUploadArsipLembagaLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content border-0 shadow">
-      <div class="modal-header bg-dark text-white">
+      <div class="modal-header bg-dark text-white px-4 py-3">
         <h5 class="modal-title fw-bold" id="modalUploadArsipLembagaLabel">
           <i class="bi bi-building-fill-add me-1"></i> Unggah Dokumen Lembaga / MoU
         </h5>
@@ -591,9 +593,11 @@
             <textarea name="keterangan" class="form-control" rows="2" placeholder="Catatan bidang keahlian, ruang lingkup MoU, atau lokasi penyimpanan fisik..."></textarea>
           </div>
         </div>
-        <div class="modal-footer bg-light py-2">
-          <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Batal</button>
-          <button type="submit" class="btn btn-dark btn-sm px-3 fw-bold">Simpan Dokumen Lembaga</button>
+        <div class="modal-footer px-4 py-3 bg-light d-flex justify-content-end gap-2 border-top">
+          <button type="button" class="btn btn-sm btn-outline-secondary px-3" data-bs-dismiss="modal" style="font-weight:600; border-radius:8px;">Batal</button>
+          <button type="submit" class="btn btn-sm btn-dark px-3 fw-bold" style="border-radius:8px;">
+            <i class="bi bi-building-fill-add me-1"></i> Simpan Dokumen Lembaga
+          </button>
         </div>
       </form>
     </div>

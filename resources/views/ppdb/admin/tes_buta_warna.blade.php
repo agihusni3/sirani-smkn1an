@@ -238,23 +238,8 @@
     </div>
 
     <div class="page-a4">
-        {{-- KOP SURAT RESMI --}}
-        <table class="kop-table">
-            <tr>
-                <td class="kop-logo">
-                    <img src="/img/logo.png" alt="Logo" onerror="this.style.display='none'">
-                </td>
-                <td class="kop-text">
-                    <div class="kop-prov">Pemerintah Provinsi Lampung</div>
-                    <div class="kop-dinas">Dinas Pendidikan dan Kebudayaan</div>
-                    <div class="kop-sekolah">SMK Negeri 1 Air Naningan</div>
-                    <div class="kop-alamat">
-                        Jalan Raya Air Naningan, Kec. Air Naningan, Kab. Tanggamus, Lampung 35379<br>
-                        Laman: smkn1airnaningan.sch.id &bull; Pos-el: smkn1airnaningan@gmail.com
-                    </div>
-                </td>
-            </tr>
-        </table>
+        {{-- KOP SURAT RESMI DINAS PEMERINTAH PROVINSI LAMPUNG & SEKOLAH --}}
+        @include('partials.kop_surat')
 
         <div class="doc-title">
             <h2>PIRINGAN UJI PERSEPSI WARNA ISHIHARA PPDB 2026</h2>

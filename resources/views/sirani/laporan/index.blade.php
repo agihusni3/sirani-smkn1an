@@ -996,7 +996,7 @@
         <i class="bi bi-pencil-square" style="color: #000000; font-size: 18px;"></i>
         <strong style="font-size: 15px; color: var(--text);">Koreksi Catatan Presensi</strong>
       </div>
-      <button type="button" onclick="closeKoreksiModal()" class="btn-close" style="width: 32px; height: 32px; border-radius: var(--r-sm); border: 1px solid var(--border); background: var(--surface); color: var(--text-2); display: flex; align-items: center; justify-content: center; cursor: pointer;" data-tooltip="Tutup Modal" title="Tutup Modal">
+      <button type="button" onclick="closeKoreksiModal()" class="btn btn-sm btn-outline" style="width: 32px; height: 32px; padding: 0; display: inline-flex; align-items: center; justify-content: center; border-radius: 8px; cursor: pointer;" title="Tutup Modal">
         <i class="bi bi-x-lg"></i>
       </button>
     </div>

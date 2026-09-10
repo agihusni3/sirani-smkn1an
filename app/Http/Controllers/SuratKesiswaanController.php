@@ -163,6 +163,8 @@ class SuratKesiswaanController extends Controller
             'persen'    => $persen,
         ];
 
+        $sekolah = PengaturanSekolah::getAktif();
+
         return view('surat.cetak', compact(
             'sekolah',
             'siswa',

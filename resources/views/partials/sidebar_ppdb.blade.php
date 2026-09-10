@@ -181,12 +181,33 @@
     </a>
 
     {{-- Seleksi & Ujian CBT --}}
-    <a href="{{ route('admin.ppdb.seleksi') }}" class="ppdb-nav-link {{ (request()->is('admin/ppdb/seleksi*') || request()->is('admin/ppdb/soal*')) ? 'active' : '' }}" title="Seleksi Ujian CBT &amp; Penilaian Wawancara">
+    <a href="{{ route('admin.ppdb.seleksi') }}" class="ppdb-nav-link {{ (request()->is('admin/ppdb/seleksi*') || request()->is('admin/ppdb/soal*')) ? 'active' : '' }}" title="Seleksi Ujian CBT &amp; Pengaturan Soal">
       <div style="display:flex; align-items:center;">
         <i class="bi bi-laptop ppdb-nav-icon"></i>
         <span>Seleksi &amp; Ujian CBT</span>
       </div>
       <span class="ppdb-badge badge-blue">CBT</span>
+    </a>
+
+    {{-- Meja Wawancara Kejuruan --}}
+    <a href="{{ route('admin.ppdb.wawancara') }}" class="ppdb-nav-link {{ request()->is('admin/ppdb/wawancara*') ? 'active' : '' }}" title="Meja Penilaian Wawancara &amp; Minat Kejuruan">
+      <div style="display:flex; align-items:center;">
+        <i class="bi bi-mic ppdb-nav-icon"></i>
+        <span>Meja Wawancara</span>
+      </div>
+      @php
+        $antreanWawancaraNav = \App\Models\PpdbPendaftar::whereIn('status', ['terverifikasi', 'berkas_valid', 'siap_tes', 'diterima'])
+          ->when(auth()->user()?->isGuru() && !auth()->user()?->isAdmin() && auth()->user()?->role !== 'panitia_ppdb', function($q) {
+              $q->where('pewawancara_id', auth()->id());
+          })
+          ->whereNull('nilai_wawancara_total')
+          ->count();
+      @endphp
+      @if($antreanWawancaraNav > 0)
+        <span class="ppdb-badge badge-amber">{{ $antreanWawancaraNav }}</span>
+      @else
+        <span class="ppdb-badge badge-blue">Uji</span>
+      @endif
     </a>
 
     {{-- Presensi Ujian Barcode --}}

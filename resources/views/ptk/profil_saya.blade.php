@@ -267,11 +267,11 @@
                 </div>
               @endif
 
-              <div class="d-flex flex-wrap gap-2 justify-content-center justify-content-lg-end">
-                <a href="{{ route('kartu.digital.guru', $guru->id) }}" target="_blank" class="btn btn-sm btn-outline-secondary px-3 py-2 fw-bold d-inline-flex align-items-center gap-1.5" style="border-radius:10px;">
+              <div class="d-flex flex-wrap gap-2 justify-content-center justify-content-lg-end align-items-center">
+                <a href="{{ route('kartu.digital.guru', $guru->id) }}" target="_blank" class="btn btn-sm btn-outline-secondary px-3 fw-bold d-inline-flex align-items-center gap-1.5" style="border-radius:10px; height:38px;">
                   <i class="bi bi-qr-code"></i> Kartu Digital Barcode
                 </a>
-                <button type="button" class="btn btn-sm btn-primary px-3 py-2 fw-bold d-inline-flex align-items-center gap-1.5 shadow-sm" data-bs-toggle="modal" data-bs-target="#modalUnggahBerkas" style="border-radius:10px; background:#2563EB; border-color:#2563EB;">
+                <button type="button" class="btn btn-sm btn-primary px-3 fw-bold d-inline-flex align-items-center gap-1.5 shadow-sm" data-bs-toggle="modal" data-bs-target="#modalUnggahBerkas" style="border-radius:10px; background:#2563EB; border-color:#2563EB; height:38px;">
                   <i class="bi bi-cloud-arrow-up-fill"></i> Unggah Berkas Baru
                 </button>
               </div>

@@ -9,6 +9,7 @@ use App\Models\PpdbPendaftar;
 use App\Models\PpdbUjianPeserta;
 use App\Models\PpdbUjianSetting;
 use App\Models\Rombel;
+use App\Models\User;
 use App\Services\PpdbMutasiService;
 use Illuminate\Http\Request;
 
@@ -249,6 +250,26 @@ class PpdbAdminController extends Controller
 
         $ishiharaPlates = self::getDaftarPlateIshihara();
 
+        // Daftar Guru Penguji yang dapat ditugaskan (User yang berstatus Guru / GTK / Panitia PPDB)
+        $daftarGuru = User::whereNotNull('guru_id')
+            ->orWhere('role', 'guru')
+            ->orWhere('role', 'panitia_ppdb')
+            ->with('guru')
+            ->orderBy('name')
+            ->get();
+
+        // Rekap beban plotting penguji wawancara
+        $rekapPenguji = PpdbPendaftar::whereIn('status', ['terverifikasi', 'berkas_valid', 'siap_tes', 'diterima'])
+            ->whereNotNull('pewawancara_id')
+            ->selectRaw('pewawancara_id, count(*) as total, count(nilai_wawancara_total) as sudah_diuji')
+            ->groupBy('pewawancara_id')
+            ->with('pewawancara')
+            ->get();
+
+        $belumPlotCount = PpdbPendaftar::whereIn('status', ['terverifikasi', 'berkas_valid', 'siap_tes', 'diterima'])
+            ->whereNull('pewawancara_id')
+            ->count();
+
         return view('ppdb.admin.seleksi', compact(
             'setting',
             'jurusans',
@@ -256,7 +277,10 @@ class PpdbAdminController extends Controller
             'leaderboard',
             'stats',
             'tabAktif',
-            'ishiharaPlates'
+            'ishiharaPlates',
+            'daftarGuru',
+            'rekapPenguji',
+            'belumPlotCount'
         ));
     }
 
@@ -481,6 +505,70 @@ class PpdbAdminController extends Controller
     }
 
     /**
+     * Plotting Guru Pewawancara Secara Massal (Bisa dilakukan pra-ujian / sebelum tes)
+     */
+    public function plotPewawancaraMassal(Request $request)
+    {
+        $validated = $request->validate([
+            'pewawancara_id'   => 'required|exists:users,id',
+            'jurusan_id'       => 'nullable|exists:jurusans,id',
+            'pendaftar_ids'    => 'nullable|array',
+            'pendaftar_ids.*'  => 'exists:ppdb_pendaftars,id',
+            'timpa_yang_sudah' => 'nullable',
+        ]);
+
+        $pewawancara = User::findOrFail($validated['pewawancara_id']);
+        $query = PpdbPendaftar::whereIn('status', ['terverifikasi', 'berkas_valid', 'siap_tes', 'diterima']);
+
+        // Filter berdasarkan IDs spesifik atau Jurusan pilihan 1
+        if (!empty($validated['pendaftar_ids'])) {
+            $query->whereIn('id', $validated['pendaftar_ids']);
+        } elseif (!empty($validated['jurusan_id'])) {
+            $query->where(function ($q) use ($validated) {
+                $q->where('jurusan_id_1', $validated['jurusan_id'])
+                  ->orWhere('jurusan_diterima_id', $validated['jurusan_id']);
+            });
+        }
+
+        // Jangan timpa siswa yang sudah punya penguji kecuali dicentang timpa_yang_sudah
+        if (empty($request->timpa_yang_sudah)) {
+            $query->whereNull('pewawancara_id');
+        }
+
+        $count = $query->update(['pewawancara_id' => $pewawancara->id]);
+
+        return redirect()->route('admin.ppdb.seleksi', ['tab' => 'wawancara'])
+            ->with('success', "Plotting pra-ujian berhasil! Sebanyak {$count} calon siswa telah ditugaskan kepada Penguji: {$pewawancara->name}.");
+    }
+
+    /**
+     * Plotting / Ganti Guru Pewawancara untuk 1 Calon Siswa
+     */
+    public function plotPewawancaraSingle(Request $request, $id)
+    {
+        $pendaftar = PpdbPendaftar::findOrFail($id);
+        $validated = $request->validate([
+            'pewawancara_id' => 'nullable|exists:users,id',
+        ]);
+
+        $pendaftar->pewawancara_id = $validated['pewawancara_id'] ?? null;
+        $pendaftar->save();
+
+        $namaPewawancara = $pendaftar->pewawancara ? $pendaftar->pewawancara->name : 'Belum Ditunjuk';
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => "Guru penguji untuk {$pendaftar->nama_lengkap} diatur ke: {$namaPewawancara}",
+                'pewawancara_nama' => $namaPewawancara,
+            ]);
+        }
+
+        return redirect()->route('admin.ppdb.seleksi', ['tab' => 'wawancara'])
+            ->with('success', "Guru penguji untuk {$pendaftar->nama_lengkap} diatur ke: {$namaPewawancara}.");
+    }
+
+    /**
      * Cetak Lembar Format / Hasil Instrumen Wawancara PPDB Berbasis Rubrik (A4)
      */
     public function cetakInstrumenWawancara($id = null)
@@ -489,10 +577,13 @@ class PpdbAdminController extends Controller
         $jurusans = \App\Models\Jurusan::all();
         $setting = PpdbUjianSetting::getAktif();
 
+        $sekolah = \App\Models\PengaturanSekolah::getAktif();
+
         return view('ppdb.admin.cetak_instrumen_wawancara', compact(
             'pendaftar',
             'jurusans',
-            'setting'
+            'setting',
+            'sekolah'
         ));
     }
 
@@ -548,7 +639,8 @@ class PpdbAdminController extends Controller
     public function tesButaWarna()
     {
         $plates = self::getDaftarPlateIshihara();
-        return view('ppdb.admin.tes_buta_warna', compact('plates'));
+        $sekolah = \App\Models\PengaturanSekolah::getAktif();
+        return view('ppdb.admin.tes_buta_warna', compact('plates', 'sekolah'));
     }
 
     /**

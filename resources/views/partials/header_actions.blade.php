@@ -56,9 +56,12 @@
           <i class="bi bi-command" style="font-size:14px; color:#0284c7;"></i> DCC SMKN 1 AN
         </a>
 
-        @if(auth()->user()?->guru_id || auth()->user()?->isAdmin() || auth()->user()?->isGuru())
+        @if(auth()->user()?->guru_id || auth()->user()?->isAdmin() || auth()->user()?->isGuru() || auth()->user()?->role === 'panitia_ppdb')
         <a href="{{ route('ptk.profil-saya') }}" class="acct-dropdown-item" style="width:100%; text-align:left; padding:9px 12px; font-size:12px; font-weight:700; color:var(--text); text-decoration:none; display:flex; align-items:center; gap:8px; white-space:nowrap; box-sizing:border-box;">
           <i class="bi bi-person-vcard-fill" style="font-size:14.5px; color:#2563EB;"></i> Biodata &amp; Berkas Saya
+        </a>
+        <a href="{{ route('guru.ppdb.wawancara') }}" class="acct-dropdown-item" style="width:100%; text-align:left; padding:9px 12px; font-size:12px; font-weight:700; color:var(--text); text-decoration:none; display:flex; align-items:center; gap:8px; white-space:nowrap; box-sizing:border-box;" title="Portal Penguji Wawancara Calon Siswa PPDB 2026">
+          <i class="bi bi-mic-fill" style="font-size:14.5px; color:#D97706;"></i> Wawancara PPDB 2026
         </a>
         @endif
 

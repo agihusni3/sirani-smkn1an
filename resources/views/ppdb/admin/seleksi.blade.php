@@ -598,6 +598,9 @@
             <div style="font-size:12px; color:var(--text-3);">Form wawancara terstruktur berbasis rubrik pemandu agar standar penilaian setiap guru penguji seragam dan terarah.</div>
           </div>
           <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+            <button type="button" onclick="bukaModalPlottingMassal()" class="btn btn-sm" style="background:#2563eb; color:#ffffff; font-weight:800; padding:7px 14px; border-radius:8px; display:inline-flex; align-items:center; gap:6px; font-size:12px; cursor:pointer; border:none; box-shadow:0 2px 4px rgba(37,99,235,0.25);" title="Plotting penugasan guru pewawancara sebelum pelaksanaan ujian">
+              <i class="bi bi-person-check-fill"></i> Plotting Penguji (Pra-Tes)
+            </button>
             <button type="button" onclick="bukaModalEditMateri()" class="btn btn-sm" style="background:#f8fafc; border:1px solid #cbd5e1; color:#0f172a; font-weight:800; padding:7px 14px; border-radius:8px; display:inline-flex; align-items:center; gap:6px; font-size:12px; cursor:pointer;" title="Ubah pertanyaan pemandu dan rubrik penilaian wawancara">
               <i class="bi bi-sliders text-indigo-600"></i> Kelola Materi Wawancara
             </button>
@@ -610,6 +613,28 @@
           </div>
         </div>
 
+        {{-- STATUS REKAP BEBAN PLOTTING PRA-TES --}}
+        <div style="padding:12px 20px; background:#f0fdf4; border-bottom:1px solid #bbf7d0; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; font-size:12px;">
+          <div style="display:flex; align-items:center; gap:16px; flex-wrap:wrap;">
+            <div>
+              <span style="color:#15803d; font-weight:800;">Status Plotting Penguji (Pra-Tes):</span>
+              <span style="font-weight:700; color:#0f172a; margin-left:4px;">{{ $pesertaUjian->count() - ($belumPlotCount ?? 0) }} dari {{ $pesertaUjian->count() }} siswa sudah ditugaskan</span>
+            </div>
+            @if(($belumPlotCount ?? 0) > 0)
+              <span style="background:#fee2e2; color:#b91c1c; font-weight:800; padding:2px 8px; border-radius:6px; border:1px solid #fca5a5;">
+                <i class="bi bi-exclamation-circle-fill"></i> {{ $belumPlotCount }} siswa belum di-plot
+              </span>
+            @else
+              <span style="background:#dcfce7; color:#15803d; font-weight:800; padding:2px 8px; border-radius:6px; border:1px solid #86efac;">
+                <i class="bi bi-check-circle-fill"></i> 100% Ter-Plotting
+              </span>
+            @endif
+          </div>
+          <div style="color:#475569; font-size:11.5px;">
+            <i class="bi bi-info-circle text-primary"></i> Guru yang ditunjuk dapat login ke akun SITUAN &gt; menu <strong>Wawancara PPDB</strong> untuk melihat antrean &amp; menguji.
+          </div>
+        </div>
+
         <table class="table" style="width:100%; margin:0; border-collapse:collapse; font-size:12.5px;">
           <thead style="background:#f1f5f9; border-bottom:1px solid #cbd5e1; font-weight:800; color:var(--text-2);">
             <tr>
@@ -617,7 +642,7 @@
               <th style="padding:12px 16px;">Pilihan Kejuruan</th>
               <th style="padding:12px 16px; text-align:center;">Status Wawancara</th>
               <th style="padding:12px 16px; text-align:center;">Skor Wawancara</th>
-              <th style="padding:12px 16px;">Pewawancara</th>
+              <th style="padding:12px 16px; min-width:200px;">Pewawancara</th>
               <th style="padding:12px 16px; text-align:center;">Aksi Penilaian</th>
             </tr>
           </thead>
@@ -640,6 +665,7 @@
                   'nilai_wawancara_total' => $p->nilai_wawancara_total,
                   'catatan_wawancara' => $p->catatan_wawancara,
                   'pewawancara_nama' => $p->pewawancara->name ?? null,
+                  'pewawancara_id' => $p->pewawancara_id ?? null,
                   'diwawancara_pada' => $p->diwawancara_pada ? $p->diwawancara_pada->format('d/m/Y H:i') : null,
                 ];
               @endphp
@@ -668,8 +694,45 @@
                 <td style="padding:12px 16px; text-align:center; font-family:monospace; font-weight:900; font-size:14px; color:#059669;">
                   {{ $p->nilai_wawancara_total !== null ? number_format($p->nilai_wawancara_total, 1) : '-' }}
                 </td>
-                <td style="padding:12px 16px; color:#475569; font-size:11.5px;">
-                  {{ $p->pewawancara->name ?? '-' }}
+                <td style="padding:12px 16px;">
+                  @if($p->pewawancara)
+                    @if($p->nilai_wawancara_total !== null)
+                      <div style="display:flex; align-items:center; justify-content:space-between; gap:6px;">
+                        <div>
+                          <strong style="color:#059669; font-size:12px; display:block;">
+                            <i class="bi bi-check-circle-fill" style="font-size:11px;"></i> {{ $p->pewawancara->name }}
+                          </strong>
+                          <span style="font-size:10px; color:#64748b;">Diuji: {{ $p->diwawancara_pada ? $p->diwawancara_pada->format('d/m/Y H:i') : '-' }}</span>
+                        </div>
+                        <button type="button" onclick="bukaModalPlotSingle({{ $p->id }}, '{{ addslashes($p->nama_lengkap) }}', {{ $p->pewawancara_id }})" class="btn btn-sm" style="background:#f8fafc; border:1px solid #cbd5e1; padding:3px 7px; border-radius:5px; font-size:10.5px; color:#475569; cursor:pointer;" title="Ganti Guru Penguji">
+                          <i class="bi bi-pencil"></i>
+                        </button>
+                      </div>
+                    @else
+                      <div style="display:flex; align-items:center; justify-content:space-between; gap:6px;">
+                        <div>
+                          <strong style="color:#1d4ed8; font-size:12px; display:block;">
+                            <i class="bi bi-person-badge-fill" style="font-size:11px;"></i> {{ $p->pewawancara->name }}
+                          </strong>
+                          <span style="background:#eff6ff; color:#1d4ed8; font-size:10px; font-weight:700; padding:1px 6px; border-radius:4px; border:1px solid #bfdbfe;">
+                            Ditunjuk (Pra-Tes)
+                          </span>
+                        </div>
+                        <button type="button" onclick="bukaModalPlotSingle({{ $p->id }}, '{{ addslashes($p->nama_lengkap) }}', {{ $p->pewawancara_id }})" class="btn btn-sm" style="background:#eff6ff; border:1px solid #bfdbfe; padding:3px 7px; border-radius:5px; font-size:10.5px; color:#1d4ed8; cursor:pointer;" title="Ganti Guru Penguji">
+                          <i class="bi bi-arrow-repeat"></i>
+                        </button>
+                      </div>
+                    @endif
+                  @else
+                    <div style="display:flex; align-items:center; justify-content:space-between; gap:6px;">
+                      <span style="background:#fef2f2; color:#b91c1c; font-size:11px; padding:2px 8px; border-radius:6px; font-weight:700; border:1px solid #fecaca;">
+                        Belum Ditunjuk
+                      </span>
+                      <button type="button" onclick="bukaModalPlotSingle({{ $p->id }}, '{{ addslashes($p->nama_lengkap) }}', null)" class="btn btn-sm" style="background:#2563eb; color:#ffffff; padding:3px 8px; border-radius:5px; font-size:10.5px; font-weight:800; border:none; cursor:pointer; box-shadow:0 1px 2px rgba(37,99,235,0.2);" title="Tunjuk Guru Penguji Sekarang">
+                        + Tunjuk
+                      </button>
+                    </div>
+                  @endif
                 </td>
                 <td style="padding:12px 16px; text-align:center; white-space:nowrap;">
                   <button type="button" class="btn btn-sm" onclick="bukaModalWawancara({{ json_encode($pPayload) }})" style="background:#0284c7; color:#ffffff; font-weight:800; font-size:11.5px; border-radius:6px; border:none; padding:6px 12px; cursor:pointer; display:inline-flex; align-items:center; gap:5px; box-shadow:0 2px 4px rgba(2,132,199,0.2);">
@@ -2007,6 +2070,139 @@
     </form>
   </div>
 </div>
+
+<!-- Modal Plotting Guru Penguji Massal (Pra-Tes) -->
+<div id="modalPlottingMassal" style="display:none; position:fixed; inset:0; background:rgba(15,23,42,0.7); backdrop-filter:blur(4px); z-index:9999; align-items:center; justify-content:center; padding:16px;">
+  <div style="background:#ffffff; border-radius:16px; width:100%; max-width:540px; box-shadow:0 25px 50px -12px rgba(0,0,0,0.3); overflow:hidden;">
+    <div style="padding:18px 22px; background:#0f172a; color:#ffffff; display:flex; justify-content:space-between; align-items:center;">
+      <div>
+        <h4 style="font-size:15px; font-weight:900; margin:0; display:flex; align-items:center; gap:8px;">
+          <i class="bi bi-person-check-fill text-primary"></i> Plotting Guru Penguji (Pra-Tes)
+        </h4>
+        <div style="font-size:11.5px; color:#94a3b8; margin-top:2px;">Tentukan guru penguji sebelum hari pelaksanaan ujian</div>
+      </div>
+      <button type="button" onclick="tutupModalPlottingMassal()" style="background:transparent; border:none; color:#94a3b8; font-size:22px; cursor:pointer; line-height:1;">&times;</button>
+    </div>
+    
+    <form action="{{ route('admin.ppdb.seleksi.plot_wawancara') }}" method="POST" style="padding:22px;">
+      @csrf
+      
+      <div style="background:#eff6ff; border:1px solid #bfdbfe; border-radius:10px; padding:12px 14px; font-size:12px; color:#1e40af; margin-bottom:18px; display:flex; align-items:flex-start; gap:10px;">
+        <i class="bi bi-info-circle-fill" style="font-size:16px; margin-top:1px;"></i>
+        <div>
+          Panitia dapat mem-plotting guru penguji jauh-jauh hari sebelum tanggal ujian. Saat guru penguji login ke sistem, siswa yang ditugaskan akan langsung muncul di antrean wawancara mereka.
+        </div>
+      </div>
+
+      <div style="margin-bottom:16px;">
+        <label style="display:block; font-size:12px; font-weight:700; color:#334155; margin-bottom:6px;">Pilih Jurusan Sasaran:</label>
+        <select name="jurusan_id" class="form-control" style="font-size:13px; font-weight:700;">
+          <option value="">-- Semua Jurusan (Seluruh Calon Siswa) --</option>
+          @foreach($jurusans as $j)
+            <option value="{{ $j->id }}">{{ $j->kode_jurusan }} - {{ $j->nama_jurusan }}</option>
+          @endforeach
+        </select>
+        <div style="font-size:11px; color:#64748b; margin-top:4px;">Contoh: Pilih RPL jika ingin menugaskan guru penguji khusus untuk jurusan RPL.</div>
+      </div>
+
+      <div style="margin-bottom:16px;">
+        <label style="display:block; font-size:12px; font-weight:700; color:#334155; margin-bottom:6px;">Tunjuk Guru Penguji / Pewawancara:</label>
+        <select name="pewawancara_id" class="form-control" required style="font-size:13px; font-weight:700;">
+          <option value="">-- Pilih Guru Penguji --</option>
+          @foreach($daftarGuru as $g)
+            @php
+              $nipGuru = $g->nip ?: ($g->guru?->nip ?: null);
+              $jabatanGuru = $g->guru?->jabatan ?: ($g->role === 'panitia_ppdb' ? 'Panitia PPDB' : 'Guru');
+            @endphp
+            <option value="{{ $g->id }}">{{ $g->name }} ({{ $jabatanGuru }}{{ $nipGuru ? ' - NIP: '.$nipGuru : '' }})</option>
+          @endforeach
+        </select>
+      </div>
+
+      <div style="margin-bottom:20px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:10px 14px;">
+        <label style="display:flex; align-items:center; gap:8px; font-size:12px; color:#334155; font-weight:600; cursor:pointer; margin:0;">
+          <input type="checkbox" name="timpa_yang_sudah" value="1" style="width:16px; height:16px; accent-color:#2563eb;">
+          <span>Timpa siswa yang sebelumnya sudah ditugaskan ke guru lain</span>
+        </label>
+        <div style="font-size:11px; color:#94a3b8; margin-left:24px; margin-top:2px;">Secara default, plotting hanya diterapkan pada siswa yang <em>Belum Ditunjuk</em>.</div>
+      </div>
+
+      <div style="display:flex; justify-content:flex-end; gap:10px;">
+        <button type="button" onclick="tutupModalPlottingMassal()" class="btn btn-sm" style="background:#f1f5f9; color:#475569; font-weight:700; border:none; padding:9px 18px; border-radius:8px; cursor:pointer;">Batal</button>
+        <button type="submit" class="btn btn-sm" style="background:#2563eb; color:#ffffff; font-weight:800; border:none; padding:9px 24px; border-radius:8px; cursor:pointer; display:inline-flex; align-items:center; gap:6px; box-shadow:0 4px 10px rgba(37,99,235,0.25);">
+          <i class="bi bi-check2-circle"></i> Terapkan Plotting
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal Ganti Guru Penguji Satuan (Single) -->
+<div id="modalPlotSingle" style="display:none; position:fixed; inset:0; background:rgba(15,23,42,0.65); backdrop-filter:blur(4px); z-index:9999; align-items:center; justify-content:center; padding:16px;">
+  <div style="background:#ffffff; border-radius:14px; width:100%; max-width:460px; box-shadow:0 25px 50px -12px rgba(0,0,0,0.3); overflow:hidden;">
+    <div style="padding:16px 20px; background:#0f172a; color:#ffffff; display:flex; justify-content:space-between; align-items:center;">
+      <div>
+        <h4 style="font-size:14px; font-weight:800; margin:0; display:flex; align-items:center; gap:6px;">
+          <i class="bi bi-person-badge-fill text-primary"></i> Atur Guru Penguji Wawancara
+        </h4>
+        <div id="plotSingleNamaPeserta" style="font-size:12px; color:#94a3b8; margin-top:2px;">Nama Calon Siswa</div>
+      </div>
+      <button type="button" onclick="tutupModalPlotSingle()" style="background:transparent; border:none; color:#94a3b8; font-size:20px; cursor:pointer; line-height:1;">&times;</button>
+    </div>
+    <form id="formPlotSingle" method="POST" style="padding:20px;">
+      @csrf
+      <div style="margin-bottom:16px;">
+        <label style="display:block; font-size:12px; font-weight:700; color:#334155; margin-bottom:6px;">Pilih Guru Penguji:</label>
+        <select name="pewawancara_id" id="plotSingleSelectGuru" class="form-control" style="font-size:12.5px; font-weight:700;">
+          <option value="">-- Kosongkan (Belum Ditunjuk / Batalkan) --</option>
+          @foreach($daftarGuru as $g)
+            @php
+              $nipGuru = $g->nip ?: ($g->guru?->nip ?: null);
+              $jabatanGuru = $g->guru?->jabatan ?: ($g->role === 'panitia_ppdb' ? 'Panitia' : 'Guru');
+            @endphp
+            <option value="{{ $g->id }}">{{ $g->name }} ({{ $jabatanGuru }}{{ $nipGuru ? ' - NIP: '.$nipGuru : '' }})</option>
+          @endforeach
+        </select>
+        <div style="font-size:11px; color:#64748b; margin-top:4px;">Pilih guru yang akan ditugaskan mewawancarai siswa ini.</div>
+      </div>
+
+      <div style="display:flex; justify-content:flex-end; gap:10px;">
+        <button type="button" onclick="tutupModalPlotSingle()" class="btn btn-sm" style="background:#f1f5f9; color:#475569; font-weight:700; border:none; padding:8px 16px; border-radius:6px; cursor:pointer;">Batal</button>
+        <button type="submit" class="btn btn-sm" style="background:#2563eb; color:#ffffff; font-weight:800; border:none; padding:8px 20px; border-radius:6px; cursor:pointer;">Simpan Penguji</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  function bukaModalPlottingMassal() {
+    const m = document.getElementById('modalPlottingMassal');
+    if (m) m.style.display = 'flex';
+  }
+
+  function tutupModalPlottingMassal() {
+    const m = document.getElementById('modalPlottingMassal');
+    if (m) m.style.display = 'none';
+  }
+
+  function bukaModalPlotSingle(id, nama, currentPewawancaraId) {
+    const m = document.getElementById('modalPlotSingle');
+    const labelNama = document.getElementById('plotSingleNamaPeserta');
+    const selectGuru = document.getElementById('plotSingleSelectGuru');
+    const form = document.getElementById('formPlotSingle');
+
+    if (labelNama) labelNama.innerText = nama;
+    if (selectGuru) selectGuru.value = currentPewawancaraId ? String(currentPewawancaraId) : '';
+    if (form) form.action = `/admin/ppdb/seleksi/plot-wawancara-single/${id}`;
+
+    if (m) m.style.display = 'flex';
+  }
+
+  function tutupModalPlotSingle() {
+    const m = document.getElementById('modalPlotSingle');
+    if (m) m.style.display = 'none';
+  }
+</script>
 
 </body>
 </html>

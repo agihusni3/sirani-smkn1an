@@ -97,6 +97,19 @@ class SuratDanBackupTest extends TestCase
         $this->assertNotNull($sekolah->logo_sekolah);
         $this->assertStringContainsString('/storage/', $sekolah->logo_provinsi_url);
         $this->assertStringContainsString('/storage/', $sekolah->logo_sekolah_url);
+
+        // Uji pembaruan dengan field opsional kosong (seperti kode_pos, desa, dll)
+        $emptyFieldsResponse = $this->actingAs($this->admin)->post('/pengaturan-sekolah', [
+            'nama_instansi_atas' => 'PEMERINTAH PROVINSI LAMPUNG',
+            'nama_dinas'         => 'DINAS PENDIDIKAN DAN KEBUDAYAAN',
+            'nama_sekolah'       => 'SMK NEGERI 1 AIR NANINGAN HEBAT',
+            'kode_pos'           => null,
+            'desa_kelurahan'     => null,
+            'kecamatan'          => null,
+            'kabupaten'          => null,
+            'provinsi'           => null,
+        ]);
+        $emptyFieldsResponse->assertRedirect(route('admin.pengaturan-sekolah.index'));
     }
 
     public function test_cetak_surat_panggilan_ortu_merender_data_siswa_dan_kop_dinas()

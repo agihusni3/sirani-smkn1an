@@ -68,7 +68,7 @@
 
         <div style="margin-bottom:14px;">
           <label style="display:block; font-size:12px; font-weight:800; color:#000000; margin-bottom:5px;">Gambar Sampul (Opsional)</label>
-          <input type="file" name="gambar_sampul" accept="image/*" style="font-size:12px; color:#000000;">
+          <input type="file" name="gambar_sampul" accept="image/*" class="form-control" />
         </div>
 
         <div style="margin-bottom:18px;">

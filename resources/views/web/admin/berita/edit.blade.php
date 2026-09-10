@@ -74,7 +74,7 @@
               <img src="{{ asset('storage/' . $berita->gambar_sampul) }}" alt="Sampul" style="max-height:120px; border-radius:6px; border:1px solid #c8dfdb;">
             </div>
           @endif
-          <input type="file" name="gambar_sampul" accept="image/*" style="font-size:12px; color:#000000;">
+          <input type="file" name="gambar_sampul" accept="image/*" class="form-control" />
         </div>
 
         <div style="margin-bottom:18px;">

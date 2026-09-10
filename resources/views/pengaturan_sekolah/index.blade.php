@@ -49,36 +49,8 @@
         <i class="bi bi-eye-fill"></i> Pratinjau Kop Surat Resmi Instansi (Sumber Acuan Seluruh Dokumen)
       </div>
       
-      <div style="border:1.5px dashed var(--border); border-radius:12px; padding:24px 20px; background:#ffffff; box-shadow:0 2px 8px rgba(0,0,0,0.04);">
-        <div style="display:flex; align-items:center; justify-content:space-between; gap:16px; text-align:center;">
-          {{-- LOGO KIRI: PROVINSI LAMPUNG --}}
-          <div style="width:75px; height:75px; flex-shrink:0; display:flex; align-items:center; justify-content:center;">
-            <img src="{{ $sekolah->logo_provinsi_url }}" alt="Logo Provinsi Lampung" style="max-width:75px; max-height:75px; object-fit:contain;" />
-          </div>
-
-          {{-- TEKS KOP DINAS --}}
-          <div style="flex:1; text-align:center; padding:0 8px;">
-            <div style="font-size:13px; font-weight:800; letter-spacing:0.5px; color:#000000; text-transform:uppercase; line-height:1.25;">
-              {{ $sekolah->nama_instansi_atas ?: 'PEMERINTAH PROVINSI LAMPUNG' }}
-            </div>
-            <div style="font-size:14px; font-weight:900; letter-spacing:0.5px; color:#000000; text-transform:uppercase; line-height:1.25;">
-              {{ $sekolah->nama_dinas ?: 'DINAS PENDIDIKAN DAN KEBUDAYAAN' }}
-            </div>
-            <div style="font-size:17px; font-weight:900; letter-spacing:0.5px; color:#000000; text-transform:uppercase; margin:2px 0; line-height:1.25;">
-              {{ $sekolah->nama_sekolah ?: 'SMK NEGERI 1 AIR NANINGAN' }}
-            </div>
-            <div style="font-size:11.5px; color:#334155; line-height:1.35; margin-top:3px;">
-              {{ $sekolah->alamat_lengkap ?? $sekolah->alamat }}<br />
-              @if($sekolah->npsn)NPSN: {{ $sekolah->npsn }} &bull; @endif Email: {{ $sekolah->email }} · Website: {{ $sekolah->website }}
-            </div>
-          </div>
-
-          {{-- LOGO KANAN: SMKN 1 AIR NANINGAN --}}
-          <div style="width:75px; height:75px; flex-shrink:0; display:flex; align-items:center; justify-content:center;">
-            <img src="{{ $sekolah->logo_sekolah_url }}" alt="Logo Sekolah" style="max-width:75px; max-height:75px; object-fit:contain;" />
-          </div>
-        </div>
-        <div style="border-bottom:3px solid #000000; border-top:1px solid #000000; height:3px; margin-top:12px;"></div>
+      <div style="border:1.5px dashed var(--border); border-radius:12px; padding:20px 20px 8px 20px; background:#ffffff; box-shadow:0 2px 8px rgba(0,0,0,0.04);">
+        @include('partials.kop_surat', ['sekolah' => $sekolah])
       </div>
     </div>
 
@@ -155,10 +127,10 @@
         </div>
 
         <h3 style="font-size:15px; font-weight:800; margin:24px 0 18px; color:var(--text); border-bottom:1px solid var(--border); padding-bottom:10px;">
-          <i class="bi bi-person-badge-fill" style="color:#000000; margin-right:6px;"></i> 3. Pimpinan Sekolah &amp; Logo Instansi
+          <i class="bi bi-person-badge-fill" style="color:#000000; margin-right:6px;"></i> 3. Pimpinan Sekolah
         </h3>
 
-        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:16px; margin-bottom:20px;">
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:16px; margin-bottom:24px;">
           <div>
             <label style="display:block; font-size:12px; font-weight:800; color:var(--text-2); margin-bottom:6px;">Nama Kepala Sekolah (Lengkap Gelar)</label>
             <input type="text" name="nama_kepala_sekolah" class="form-control" value="{{ old('nama_kepala_sekolah', $sekolah->nama_kepala_sekolah) }}" style="width:100%; padding:9px 12px; border-radius:8px; border:1px solid var(--border); background:var(--bg); color:var(--text); font-size:13px; font-weight:700;" placeholder="Aprida, S.Si." />
@@ -168,40 +140,69 @@
             <label style="display:block; font-size:12px; font-weight:800; color:var(--text-2); margin-bottom:6px;">NIP Kepala Sekolah</label>
             <input type="text" name="nip_kepala_sekolah" class="form-control" value="{{ old('nip_kepala_sekolah', $sekolah->nip_kepala_sekolah) }}" style="width:100%; padding:9px 12px; border-radius:8px; border:1px solid var(--border); background:var(--bg); color:var(--text); font-size:13px; font-family:var(--font-mono);" placeholder="197904172008012019" />
           </div>
+        </div>
 
-          {{-- LOGO 1: PROVINSI LAMPUNG (KIRI KOP) --}}
-          <div>
-            <label style="display:flex; justify-content:space-between; font-size:12px; font-weight:800; color:var(--text-2); margin-bottom:6px;">
-              <span>Logo Pemerintah Provinsi (Kiri Kop)</span>
-              <span style="color:#0284c7; font-size:11px; font-weight:800;"><i class="bi bi-shield-fill-check"></i> Lambang Siger</span>
-            </label>
-            <div style="display:flex; align-items:center; gap:12px;">
-              <div id="logo_prov_preview_wrap" style="width:52px; height:52px; border-radius:10px; border:1.5px solid rgba(0,0,0,0.15); background:#ffffff; display:flex; align-items:center; justify-content:center; overflow:hidden; flex-shrink:0; padding:4px;">
-                <img id="logo_prov_preview_img" src="{{ $sekolah->logo_provinsi_url }}" style="width:100%; height:100%; object-fit:contain;" />
+        <h3 style="font-size:15px; font-weight:800; margin:24px 0 18px; color:var(--text); border-bottom:1px solid var(--border); padding-bottom:10px;">
+          <i class="bi bi-images" style="color:#000000; margin-right:6px;"></i> 4. Logo Resmi Kop Surat Kedinasan
+        </h3>
+
+        {{-- GRID SIMETRIS 2 LOGO (KIRI: PROVINSI LAMPUNG, KANAN: SMKN 1 AIR NANINGAN) --}}
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(320px, 1fr)); gap:20px; margin-bottom:24px;">
+          
+          {{-- KARTU LOGO 1: PROVINSI LAMPUNG (KIRI KOP) --}}
+          <div style="background:var(--bg-2); border:1.5px solid var(--border-2); border-radius:14px; padding:18px; display:flex; flex-direction:column; justify-content:space-between; box-shadow:0 2px 8px rgba(0,0,0,0.03);">
+            <div>
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                <span style="font-size:12.5px; font-weight:800; color:var(--text);">Logo Pemprov Lampung (Kiri Kop)</span>
+                <span style="background:#e0f2fe; color:#0369a1; border:1px solid #bae6fd; font-size:11px; font-weight:800; padding:3px 10px; border-radius:6px; display:inline-flex; align-items:center; gap:4px;">
+                  <i class="bi bi-shield-fill-check"></i> Sisi Kiri
+                </span>
               </div>
-              <div style="flex:1;">
-                <input type="file" name="logo_provinsi" id="inputLogoProvinsi" accept="image/png,image/jpeg,image/webp,image/svg+xml" style="font-size:12.5px; color:var(--text-2); width:100%;" />
-                <div style="font-size:11px; color:var(--text-3); margin-top:3px;">Format PNG transparan/SVG resmi Provinsi Lampung (maks. 4 MB).</div>
+
+              <div style="display:flex; align-items:center; gap:16px;">
+                <div id="logo_prov_preview_wrap" style="width:72px; height:72px; border-radius:12px; border:1.5px solid rgba(0,0,0,0.12); background:#ffffff; display:flex; align-items:center; justify-content:center; overflow:hidden; flex-shrink:0; padding:6px; box-shadow:0 2px 6px rgba(0,0,0,0.05);">
+                  <img id="logo_prov_preview_img" src="{{ $sekolah->logo_provinsi_url }}" alt="Logo Provinsi" style="max-width:100%; max-height:100%; object-fit:contain;" onerror="if(!this.dataset.fallback){this.dataset.fallback=1;this.src='/img/logo_prov_lampung.png';}else{this.src='/lampung.png';}" />
+                </div>
+                <div style="flex:1; min-width:0;">
+                  <input type="file" name="logo_provinsi" id="inputLogoProvinsi" accept="image/png,image/jpeg,image/webp,image/svg+xml" style="display:none;" onchange="handleLogoPreview(this, 'logo_prov_preview_img', 'nama_file_prov')" />
+                  <label for="inputLogoProvinsi" class="btn btn-sm" style="background:#0284c7; color:#ffffff; font-weight:800; font-size:12px; padding:8px 16px; border-radius:8px; border:none; display:inline-flex; align-items:center; gap:7px; cursor:pointer; box-shadow:0 2px 6px rgba(2,132,199,0.25); transition:all 0.15s ease;">
+                    <i class="bi bi-cloud-arrow-up-fill" style="font-size:14px;"></i> Unggah Logo Provinsi
+                  </label>
+                  <div id="nama_file_prov" style="font-size:11px; color:var(--text-3); margin-top:6px; line-height:1.4;">
+                    Format PNG transparan / SVG resmi (Maks. 4 MB).
+                  </div>
+                </div>
               </div>
             </div>
           </div>
 
-          {{-- LOGO 2: SMKN 1 AIR NANINGAN (KANAN KOP) --}}
-          <div>
-            <label style="display:flex; justify-content:space-between; font-size:12px; font-weight:800; color:var(--text-2); margin-bottom:6px;">
-              <span>Logo Sekolah SMKN 1 Air Naningan (Kanan Kop)</span>
-              <span style="color:#10b981; font-size:11px; font-weight:800;"><i class="bi bi-patch-check-fill"></i> Logo Sekolah</span>
-            </label>
-            <div style="display:flex; align-items:center; gap:12px;">
-              <div id="logo_preview_wrap" style="width:52px; height:52px; border-radius:10px; border:1.5px solid rgba(0,0,0,0.15); background:#ffffff; display:flex; align-items:center; justify-content:center; overflow:hidden; flex-shrink:0; padding:4px;">
-                <img id="logo_preview_img" src="{{ $sekolah->logo_sekolah_url }}" style="width:100%; height:100%; object-fit:contain;" />
+          {{-- KARTU LOGO 2: SMKN 1 AIR NANINGAN (KANAN KOP) --}}
+          <div style="background:var(--bg-2); border:1.5px solid var(--border-2); border-radius:14px; padding:18px; display:flex; flex-direction:column; justify-content:space-between; box-shadow:0 2px 8px rgba(0,0,0,0.03);">
+            <div>
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                <span style="font-size:12.5px; font-weight:800; color:var(--text);">Logo SMKN 1 Air Naningan (Kanan Kop)</span>
+                <span style="background:#ecfdf5; color:#047857; border:1px solid #a7f3d0; font-size:11px; font-weight:800; padding:3px 10px; border-radius:6px; display:inline-flex; align-items:center; gap:4px;">
+                  <i class="bi bi-patch-check-fill"></i> Sisi Kanan
+                </span>
               </div>
-              <div style="flex:1;">
-                <input type="file" name="logo_sekolah" id="inputLogoSekolah" accept="image/png,image/jpeg,image/webp" style="font-size:12.5px; color:var(--text-2); width:100%;" />
-                <div style="font-size:11px; color:var(--text-3); margin-top:3px;">Format PNG transparan rasio 1:1 sekolah (maks. 4 MB).</div>
+
+              <div style="display:flex; align-items:center; gap:16px;">
+                <div id="logo_preview_wrap" style="width:72px; height:72px; border-radius:12px; border:1.5px solid rgba(0,0,0,0.12); background:#ffffff; display:flex; align-items:center; justify-content:center; overflow:hidden; flex-shrink:0; padding:6px; box-shadow:0 2px 6px rgba(0,0,0,0.05);">
+                  <img id="logo_preview_img" src="{{ $sekolah->logo_sekolah_url }}" alt="Logo Sekolah" style="max-width:100%; max-height:100%; object-fit:contain;" onerror="this.src='/img/logo.png';" />
+                </div>
+                <div style="flex:1; min-width:0;">
+                  <input type="file" name="logo_sekolah" id="inputLogoSekolah" accept="image/png,image/jpeg,image/webp" style="display:none;" onchange="handleLogoPreview(this, 'logo_preview_img', 'nama_file_sekolah')" />
+                  <label for="inputLogoSekolah" class="btn btn-sm" style="background:#10b981; color:#ffffff; font-weight:800; font-size:12px; padding:8px 16px; border-radius:8px; border:none; display:inline-flex; align-items:center; gap:7px; cursor:pointer; box-shadow:0 2px 6px rgba(16,185,129,0.25); transition:all 0.15s ease;">
+                    <i class="bi bi-cloud-arrow-up-fill" style="font-size:14px;"></i> Unggah Logo Sekolah
+                  </label>
+                  <div id="nama_file_sekolah" style="font-size:11px; color:var(--text-3); margin-top:6px; line-height:1.4;">
+                    Format PNG transparan rasio 1:1 sekolah (Maks. 4 MB).
+                  </div>
+                </div>
               </div>
             </div>
           </div>
+
         </div>
 
         <div style="display:flex; justify-content:flex-end; padding-top:16px; border-top:1px solid var(--border);">
@@ -216,6 +217,24 @@
 </div>
 
 @include('partials.crop_modal')
+
+<script>
+  function handleLogoPreview(input, previewImgId, labelInfoId) {
+    if (input.files && input.files[0]) {
+      const file = input.files[0];
+      const labelEl = document.getElementById(labelInfoId);
+      if (labelEl) {
+        labelEl.innerHTML = `<span style="color:#16a34a; font-weight:700;"><i class="bi bi-check-circle-fill"></i> Terpilih:</span> ` + file.name + ` (${(file.size / 1024).toFixed(1)} KB)`;
+      }
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        const img = document.getElementById(previewImgId);
+        if (img) img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+  }
+</script>
 
 </body>
 </html>

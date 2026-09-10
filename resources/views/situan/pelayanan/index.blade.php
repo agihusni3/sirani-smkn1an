@@ -198,7 +198,7 @@
     <div class="modal-content border-0 shadow">
       <form action="{{ route('situan.pelayanan.buat') }}" method="POST">
         @csrf
-        <div class="modal-header border-bottom py-3 px-4">
+        <div class="modal-header bg-light border-bottom px-4 py-3">
           <h5 class="modal-title fw-bold" id="modalBuatSuratSiswaLabel">
             <i class="bi bi-magic text-primary me-2"></i>One-Click Generator Surat Kesiswaan
           </h5>
@@ -265,9 +265,9 @@
 
           </div>
         </div>
-        <div class="modal-footer border-top px-4 py-2">
-          <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Batal</button>
-          <button type="submit" class="btn btn-sm btn-primary fw-bold">
+        <div class="modal-footer px-4 py-3 bg-light d-flex justify-content-end gap-2 border-top">
+          <button type="button" class="btn btn-sm btn-outline-secondary px-3" data-bs-dismiss="modal" style="font-weight:600; border-radius:8px;">Batal</button>
+          <button type="submit" class="btn btn-sm btn-primary fw-bold px-3" style="border-radius:8px;">
             <i class="bi bi-printer me-1"></i> Terbitkan &amp; Siapkan Cetak
           </button>
         </div>

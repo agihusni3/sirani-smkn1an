@@ -265,7 +265,7 @@
   @endif
 
   {{-- 6b. PORTAL MANDIRI PTK (Biodata & Berkas Saya) --}}
-  @if($user && ($user->guru_id || $isAdmin || $isGuru))
+  @if($user && ($user->guru_id || $isAdmin || $isGuru || $user->role === 'panitia_ppdb'))
     <div class="nav-group">
       <div class="nav-label">Ruang Pribadi PTK</div>
       <a href="{{ route('ptk.profil-saya') }}" class="nav-item {{ request()->is('ptk*') ? 'active' : '' }}" title="Biodata &amp; Lemari Berkas Digital Saya">
@@ -274,6 +274,25 @@
           <span class="nav-text">Biodata &amp; Berkas Saya</span>
         </div>
         <span class="nav-count-badge" style="background:#eff6ff; color:#2563eb; border-color:#bfdbfe; font-size:10px;">E-Arsip</span>
+      </a>
+      <a href="{{ route('admin.ppdb.wawancara') }}" class="nav-item {{ (request()->is('admin/ppdb/wawancara*') || request()->is('guru/ppdb/wawancara*')) ? 'active' : '' }}" title="Buka Meja Wawancara di Modul PPDB 2026">
+        <div class="nav-left-part">
+          <i class="bi bi-mic-fill nav-icon" style="color:#d97706;"></i>
+          <span class="nav-text">Wawancara PPDB</span>
+        </div>
+        @php
+          $antreanGuruNav = \App\Models\PpdbPendaftar::whereIn('status', ['terverifikasi', 'berkas_valid', 'siap_tes', 'diterima'])
+            ->when($user->isGuru() && !$user->isAdmin() && $user->role !== 'panitia_ppdb', function($q) use ($user) {
+                $q->where('pewawancara_id', $user->id);
+            })
+            ->whereNull('nilai_wawancara_total')
+            ->count();
+        @endphp
+        @if($antreanGuruNav > 0)
+          <span class="nav-count-badge" style="background:#fef3c7; color:#b45309; border-color:#fde68a; font-size:10px;">{{ $antreanGuruNav }}</span>
+        @else
+          <span class="nav-count-badge" style="background:#eff6ff; color:#2563eb; border-color:#bfdbfe; font-size:10px;">PPDB</span>
+        @endif
       </a>
     </div>
   @endif

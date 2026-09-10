@@ -45,6 +45,15 @@ class PengaturanSekolahController extends Controller
         $sekolah = PengaturanSekolah::getAktif();
         $data = $request->except(['logo_provinsi', 'logo_sekolah', '_token']);
 
+        $data['npsn']           = $data['npsn'] ?? '';
+        $data['desa_kelurahan'] = $data['desa_kelurahan'] ?? '';
+        $data['kecamatan']      = $data['kecamatan'] ?? '';
+        $data['kabupaten']      = $data['kabupaten'] ?? '';
+        $data['provinsi']       = $data['provinsi'] ?? '';
+        $data['kode_pos']       = $data['kode_pos'] ?? '';
+        $data['email']          = $data['email'] ?? '';
+        $data['website']        = $data['website'] ?? '';
+
         if ($request->hasFile('logo_provinsi')) {
             if ($sekolah->logo_provinsi && Storage::disk('public')->exists($sekolah->logo_provinsi)) {
                 Storage::disk('public')->delete($sekolah->logo_provinsi);

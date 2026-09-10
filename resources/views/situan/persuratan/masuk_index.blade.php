@@ -205,16 +205,16 @@
                       <div class="modal-content border-0 shadow">
                         <form method="POST" action="{{ route('situan.surat-masuk.disposisi', $item->id) }}">
                           @csrf
-                          <div class="modal-header bg-light">
+                          <div class="modal-header bg-light px-4 py-3 border-bottom">
                             <h5 class="modal-title fw-bold fs-6">
                               <i class="bi bi-pencil-square text-primary me-1"></i> Lembar Disposisi Kepala Sekolah
                             </h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                           </div>
-                          <div class="modal-body p-3">
-                            <div class="p-2 mb-3 bg-light rounded border" style="font-size:12px;">
-                              <div><strong>No. Surat:</strong> {{ $item->nomor_surat_asal }}</div>
-                              <div><strong>Pengirim:</strong> {{ $item->pengirim }}</div>
+                          <div class="modal-body p-4">
+                            <div class="p-3 mb-3 bg-light rounded-3 border" style="font-size:12px;">
+                              <div class="mb-1"><strong>No. Surat:</strong> <span class="font-monospace text-primary">{{ $item->nomor_surat_asal }}</span></div>
+                              <div class="mb-1"><strong>Pengirim:</strong> {{ $item->pengirim }}</div>
                               <div><strong>Perihal:</strong> {{ $item->perihal }}</div>
                             </div>
 
@@ -280,9 +280,11 @@
                               <input type="date" name="batas_waktu" class="form-control form-control-sm" />
                             </div>
                           </div>
-                          <div class="modal-footer bg-light p-2">
-                            <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Batal</button>
-                            <button type="submit" class="btn btn-sm btn-primary fw-bold">Simpan &amp; Teruskan Disposisi</button>
+                          <div class="modal-footer px-4 py-3 bg-light d-flex justify-content-end gap-2 border-top">
+                            <button type="button" class="btn btn-sm btn-outline-secondary px-3" data-bs-dismiss="modal" style="font-weight:600; border-radius:8px;">Batal</button>
+                            <button type="submit" class="btn btn-sm btn-primary px-3 fw-bold" style="border-radius:8px;">
+                              <i class="bi bi-send-fill me-1"></i> Simpan &amp; Teruskan Disposisi
+                            </button>
                           </div>
                         </form>
                       </div>
@@ -318,7 +320,7 @@
     <div class="modal-content border-0 shadow">
       <form method="POST" action="{{ route('situan.surat-masuk.store') }}" enctype="multipart/form-data">
         @csrf
-        <div class="modal-header bg-primary text-white">
+        <div class="modal-header bg-primary text-white px-4 py-3">
           <h5 class="modal-title fw-bold fs-6">
             <i class="bi bi-plus-circle me-1"></i> Catat Surat Masuk Baru (No. Agenda: #{{ str_pad((string)$nextAgenda, 3, '0', STR_PAD_LEFT) }}/{{ $thisYear }})
           </h5>
@@ -368,9 +370,9 @@
             </div>
           </div>
         </div>
-        <div class="modal-footer bg-light p-2">
-          <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Batal</button>
-          <button type="submit" class="btn btn-sm btn-primary fw-bold px-3">
+        <div class="modal-footer px-4 py-3 bg-light d-flex justify-content-end gap-2 border-top">
+          <button type="button" class="btn btn-sm btn-outline-secondary px-3" data-bs-dismiss="modal" style="font-weight:600; border-radius:8px;">Batal</button>
+          <button type="submit" class="btn btn-sm btn-primary fw-bold px-3" style="border-radius:8px;">
             <i class="bi bi-save me-1"></i> Simpan ke Buku Agenda
           </button>
         </div>

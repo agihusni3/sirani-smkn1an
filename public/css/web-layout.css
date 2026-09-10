@@ -1074,4 +1074,64 @@
             .brand-titles p { display: none; }
             .brand-titles h1 { font-size: 0.78rem; }
         }
-    
+
+        /* ── Universal Symmetrical File Input ── */
+        input[type="file"] {
+            display: block !important;
+            width: 100% !important;
+            height: 40px !important;
+            min-height: 40px !important;
+            max-height: 40px !important;
+            padding: 4px 6px !important;
+            font-size: 12.5px !important;
+            line-height: 30px !important;
+            font-family: 'Plus Jakarta Sans', sans-serif !important;
+            color: var(--text-body, #334155) !important;
+            background: #ffffff !important;
+            border: 1.5px solid var(--border-main, #cbd5e1) !important;
+            border-radius: var(--radius-sm, 8px) !important;
+            box-sizing: border-box !important;
+            outline: none !important;
+            cursor: pointer !important;
+            overflow: hidden !important;
+            vertical-align: middle !important;
+            transition: border-color .15s ease, box-shadow .15s ease !important;
+        }
+
+        input[type="file"]:hover,
+        input[type="file"]:focus {
+            border-color: var(--brand-blue, #0284c7) !important;
+            box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15) !important;
+        }
+
+        input[type="file"]::file-selector-button,
+        input[type="file"]::-webkit-file-upload-button {
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            height: 28px !important;
+            max-height: 28px !important;
+            line-height: 28px !important;
+            padding: 0 14px !important;
+            margin: 0 12px 0 0 !important;
+            background: #0f172a !important;
+            color: #ffffff !important;
+            font-family: 'Plus Jakarta Sans', sans-serif !important;
+            font-size: 11.5px !important;
+            font-weight: 700 !important;
+            letter-spacing: 0.2px !important;
+            border: none !important;
+            border-radius: 6px !important;
+            cursor: pointer !important;
+            vertical-align: middle !important;
+            float: left !important;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.12) !important;
+            transition: all .2s ease !important;
+        }
+
+        input[type="file"]:hover::file-selector-button,
+        input[type="file"]:hover::-webkit-file-upload-button {
+            background: var(--brand-blue, #0284c7) !important;
+            color: #ffffff !important;
+            box-shadow: 0 2px 6px rgba(2, 132, 199, 0.25) !important;
+        }

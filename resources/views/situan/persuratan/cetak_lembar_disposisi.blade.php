@@ -16,37 +16,6 @@
       margin: 0;
       padding: 10px;
     }
-    .kop {
-      text-align: center;
-      border-bottom: 2.5px solid #000;
-      padding-bottom: 6px;
-      margin-bottom: 12px;
-      position: relative;
-    }
-    .kop-logo {
-      position: absolute;
-      left: 10px;
-      top: 0;
-      width: 55px;
-      height: 55px;
-    }
-    .kop-instansi {
-      font-size: 11pt;
-      font-weight: bold;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      margin: 0;
-    }
-    .kop-nama-sekolah {
-      font-size: 13pt;
-      font-weight: bold;
-      text-transform: uppercase;
-      margin: 2px 0;
-    }
-    .kop-alamat {
-      font-size: 8pt;
-      margin: 0;
-      font-style: italic;
     }
     .judul-lembar {
       text-align: center;
@@ -125,17 +94,8 @@
     </div>
   </div>
 
-  <div class="kop">
-    <div style="display:flex; align-items:center; justify-content:space-between; gap:10px;">
-      <img src="{{ $sekolah->logo_provinsi_url }}" alt="Logo Provinsi Lampung" style="width:48px; height:48px; object-fit:contain; flex-shrink:0;" />
-      <div style="flex:1; text-align:center;">
-        <div class="kop-instansi">{{ $sekolah->nama_instansi_atas ?: 'PEMERINTAH PROVINSI LAMPUNG' }} &bull; {{ $sekolah->nama_dinas ?: 'DINAS PENDIDIKAN DAN KEBUDAYAAN' }}</div>
-        <div class="kop-nama-sekolah">{{ $sekolah->nama_sekolah ?: 'SMK NEGERI 1 AIR NANINGAN' }}</div>
-        <div class="kop-alamat">{{ $sekolah->alamat_lengkap ?: 'Jl. Makam Baturuguk, Pekon Karang Sari, Kec. Air Naningan, Kab. Tanggamus' }} &bull; @if($sekolah->npsn)NPSN: {{ $sekolah->npsn }} &bull; @endif Email: {{ $sekolah->email }}</div>
-      </div>
-      <img src="{{ $sekolah->logo_sekolah_url }}" alt="Logo Sekolah" style="width:48px; height:48px; object-fit:contain; flex-shrink:0;" />
-    </div>
-  </div>
+  {{-- KOP SURAT RESMI STANDAR --}}
+  @include('partials.kop_surat', ['compact' => true, 'sekolah' => $sekolah])
 
   <div class="judul-lembar">LEMBAR DISPOSISI KEPALA SEKOLAH</div>
 

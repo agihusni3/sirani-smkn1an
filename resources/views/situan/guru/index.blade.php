@@ -861,7 +861,7 @@
             </div>
             <div>
               <label style="display:block; font-size:11.5px; font-weight:700; color:var(--text-2); margin-bottom:4px;">Unggah File Dokumen (PDF/JPG)</label>
-              <input type="file" name="file_sertifikat" accept=".pdf,image/*" style="width:100%; height:34px; font-size:11.5px;" />
+              <input type="file" name="file_sertifikat" class="form-control form-control-sm" accept=".pdf,image/*" />
             </div>
           </div>
           <div style="display:flex; justify-content:flex-end;">
@@ -1345,7 +1345,7 @@
       @csrf
       <div style="margin-bottom:16px;">
         <label class="form-label" style="font-weight:700; font-size:12px; display:block; margin-bottom:6px;">Pilih File CSV / Excel (.csv) <span style="color:var(--red);">*</span></label>
-        <input type="file" name="file" accept=".csv,text/csv,text/plain" required class="input-field" style="width:100%;" />
+        <input type="file" name="file" accept=".csv,text/csv,text/plain" required class="form-control" />
       </div>
 
       <div style="display:flex; justify-content:flex-end; gap:8px;">

@@ -198,13 +198,22 @@
       align-items: center;
       justify-content: center;
       gap: 16px;
-      border-bottom: 2px double #CBD5E1;
+      border-bottom: 2px solid #000;
+      box-shadow: 0 1px 0 0 #000;
       padding-bottom: 8px;
     }
     .cert-logo {
-      width: 50px;
-      height: 50px;
       object-fit: contain;
+    }
+    .cert-logo-prov {
+      height: 54px;
+      width: auto;
+      max-width: 50px;
+    }
+    .cert-logo-sek {
+      height: 50px;
+      width: auto;
+      max-width: 50px;
     }
     .cert-kop-text {
       text-align: center;
@@ -515,13 +524,18 @@
 
   <!-- Text & Elements Content Layer -->
   <div class="cert-content-layer">
-    <!-- Header Instansi Kop -->
-    <div class="cert-kop-block" id="certKopBlock" style="{{ $showKop ? 'display:flex;' : 'display:none;' }}">
-      <img src="/img/logo.png" alt="Logo Sekolah" class="cert-logo" />
-      <div class="cert-kop-text">
-        <h3>PEMERINTAH PROVINSI LAMPUNG · DINAS PENDIDIKAN DAN KEBUDAYAAN</h3>
-        <h2>{{ $sekolah->nama_sekolah ?? 'SMK NEGERI 1 AIR NANINGAN' }}</h2>
-        <p>{{ $sekolah->alamat ?? 'Air Naningan, Kabupaten Tanggamus, Lampung' }} · NPSN: {{ $sekolah->npsn ?? '69888998' }}</p>
+    <!-- Header Instansi Kop 2 Logo Resmi -->
+    <div class="cert-kop-block" id="certKopBlock" style="{{ $showKop ? 'display:flex;' : 'display:none;' }}; justify-content:space-between; align-items:center; width:100%; padding:0 24px 8px 24px; box-sizing:border-box;">
+      <div style="width:52px; height:56px; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+        <img src="{{ $sekolah->logo_provinsi_url ?? '/img/logo_prov_lampung.png' }}" alt="Logo Provinsi Lampung" class="cert-logo cert-logo-prov" onerror="if(!this.dataset.fallback){this.dataset.fallback=1;this.src='/img/logo_prov_lampung.png';}else if(this.dataset.fallback==1){this.dataset.fallback=2;this.src='/lampung.png';}" />
+      </div>
+      <div class="cert-kop-text" style="flex:1;">
+        <h3>{{ $sekolah->nama_instansi_atas ?: 'PEMERINTAH PROVINSI LAMPUNG' }} &bull; {{ $sekolah->nama_dinas ?: 'DINAS PENDIDIKAN DAN KEBUDAYAAN' }}</h3>
+        <h2>{{ $sekolah->nama_sekolah ?: 'SMK NEGERI 1 AIR NANINGAN' }}</h2>
+        <p>{{ $sekolah->alamat_lengkap ?: 'Jl. Makam Baturuguk, Pekon Karang Sari, Kec. Air Naningan' }} &bull; NPSN: {{ $sekolah->npsn ?: '69888998' }}</p>
+      </div>
+      <div style="width:52px; height:56px; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+        <img src="{{ $sekolah->logo_sekolah_url ?? '/img/logo.png' }}" alt="Logo Sekolah" class="cert-logo cert-logo-sek" onerror="if(!this.dataset.fallback){this.dataset.fallback=1;this.src='/img/logo.png';}else if(this.dataset.fallback==1){this.dataset.fallback=2;this.src='/logo.png';}" />
       </div>
     </div>
 

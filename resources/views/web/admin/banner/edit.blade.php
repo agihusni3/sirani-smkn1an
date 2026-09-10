@@ -143,7 +143,7 @@
               <img id="previewImage" src="{{ $banner->gambar_url }}" alt="{{ $banner->judul }}" style="width:100%; height:100%; object-fit:cover;">
             </div>
             <div style="flex:1; min-width:260px;">
-              <input type="file" name="gambar" id="gambarInput" accept="image/jpeg,image/png,image/webp" style="width:100%; padding:8px 0; font-size:12.5px; color:var(--text);">
+              <input type="file" name="gambar" id="gambarInput" accept="image/jpeg,image/png,image/webp" class="form-control" style="width:100%; font-size:12.5px;">
               <div style="font-size:11.5px; color:var(--text-3); line-height:1.5; margin-top:4px;">
                 Biarkan kosong jika tidak ingin mengganti foto saat ini.<br>
                 Format: <strong>JPG, PNG, WebP</strong> (Maksimal 5MB). Rekomendasi rasio <strong>16:9</strong> atau <strong>4:3</strong>.

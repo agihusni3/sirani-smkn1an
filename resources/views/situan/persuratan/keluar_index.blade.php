@@ -206,7 +206,7 @@
                   <form method="POST" action="{{ route('situan.surat-keluar.update', $item->id) }}" enctype="multipart/form-data">
                     @csrf
                     @method('PUT')
-                    <div class="modal-header bg-warning text-dark">
+                    <div class="modal-header bg-warning text-dark px-4 py-3">
                       <h5 class="modal-title fw-bold fs-6">
                         <i class="bi bi-pencil-square me-1"></i> Edit &amp; Sesuaikan Surat Keluar #{{ $item->nomor_agenda }}
                       </h5>
@@ -300,9 +300,9 @@
                         </div>
                       </div>
                     </div>
-                    <div class="modal-footer bg-light p-2">
-                      <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Batal</button>
-                      <button type="submit" class="btn btn-sm btn-warning fw-bold px-3">
+                    <div class="modal-footer px-4 py-3 bg-light d-flex justify-content-end gap-2 border-top">
+                      <button type="button" class="btn btn-sm btn-outline-secondary px-3" data-bs-dismiss="modal" style="font-weight:600; border-radius:8px;">Batal</button>
+                      <button type="submit" class="btn btn-sm btn-warning fw-bold px-3" style="border-radius:8px;">
                         <i class="bi bi-check-circle-fill me-1"></i> Simpan Perubahan
                       </button>
                     </div>
@@ -471,9 +471,9 @@
             </div>
           </div>
         </div>
-        <div class="modal-footer bg-light p-2">
-          <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Batal</button>
-          <button type="submit" class="btn btn-sm btn-success fw-bold px-3">
+        <div class="modal-footer px-4 py-3 bg-light d-flex justify-content-end gap-2 border-top">
+          <button type="button" class="btn btn-sm btn-outline-secondary px-3" data-bs-dismiss="modal" style="font-weight:600; border-radius:8px;">Batal</button>
+          <button type="submit" class="btn btn-sm btn-success fw-bold px-3" style="border-radius:8px;">
             <i class="bi bi-check-circle-fill me-1"></i> Terbitkan &amp; Simpan Surat Keluar
           </button>
         </div>
