@@ -1412,7 +1412,8 @@
       </div>
 
       <!-- FORM OUTPUT -->
-      <form id="formOutputDinamisGtk" method="GET" action="/guru/cetak-pdf">
+      <form id="formOutputDinamisGtk" method="POST" action="/guru/cetak-pdf">
+        @csrf
         
         <!-- PILIHAN KOLOM DATA -->
         <div style="margin-bottom:16px;">
@@ -1936,9 +1937,11 @@
     }
 
     if (type === 'export') {
+      form.method = 'POST';
       form.action = '/guru/export';
       form.target = '_self';
     } else {
+      form.method = 'POST';
       form.action = '/guru/cetak-pdf';
       form.target = '_blank';
     }

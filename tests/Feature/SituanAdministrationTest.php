@@ -367,6 +367,18 @@ class SituanAdministrationTest extends TestCase
         $response->assertSee('Alamat Rumah / Domisili');
         $response->assertSee('Jl. Raya Air Naningan No. 45');
         $response->assertSee('Penata Muda / III-a');
+        $response->assertSee('Keterangan Data: SITUAN SMKN 1 Air Naningan');
+        $response->assertDontSee('Dicetak otomatis dari SIRANI');
+
+        // Test juga via POST (bebas parameter query URL)
+        $postResponse = $this->actingAs($this->admin)->post('/guru/cetak-pdf', [
+            'kolom'         => ['nip', 'nama', 'golongan', 'alamat'],
+            'judul_laporan' => 'DAFTAR NAMA, NIP, GOLONGAN & ALAMAT GTK',
+            'with_kop'      => '1',
+            'orientasi'     => 'portrait',
+        ]);
+        $postResponse->assertStatus(200);
+        $postResponse->assertSee('Keterangan Data: SITUAN SMKN 1 Air Naningan');
     }
 
     public function test_tu_dapat_mengunduh_csv_dengan_kolom_kustom_nama_nip_alamat_golongan(): void

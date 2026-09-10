@@ -3,21 +3,24 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Daftar Tenaga Pendidik & Kependidikan - SMKN 1 Air Naningan</title>
+  <title>{{ $judulLaporan ?? 'Daftar Pendidik & Tenaga Kependidikan - SMKN 1 Air Naningan' }}</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
   
   <style>
+    /* STANDAR CETAK DINAS A4 BEBAS HEADER/FOOTER URL BROWSER */
     @page {
       size: A4 {{ $orientasi ?? 'portrait' }};
-      margin: 12mm 15mm 15mm 15mm;
+      margin: 0;
     }
     *, *::before, *::after {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
     }
     body {
       background-color: #334155;
@@ -305,18 +308,30 @@
     }
 
     @media print {
-      body {
-        background: transparent;
-        padding: 0;
+      html, body {
+        background: #FFFFFF !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        width: 100% !important;
+        height: auto !important;
       }
       .no-print, .print-actions-bar {
         display: none !important;
       }
+      .print-sheet-wrapper {
+        padding: 0 !important;
+        margin: 0 !important;
+        display: block !important;
+        width: 100% !important;
+      }
       .a4-sheet {
-        box-shadow: none;
-        padding: 0;
-        width: 100%;
-        min-width: 100%;
+        box-shadow: none !important;
+        margin: 0 auto !important;
+        padding: 12mm 15mm 15mm 15mm !important;
+        width: 100% !important;
+        min-width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
       }
     }
   </style>
@@ -332,6 +347,9 @@
       @if(!($withKop ?? true))
         <span class="badge-a4" style="background:rgba(59,130,246,0.2); color:#93C5FD; border-color:rgba(59,130,246,0.4);">Tanpa Kop (Kertas Pre-Printed)</span>
       @endif
+      <span style="font-size:11px; font-weight:normal; color:#94A3B8; margin-left:8px;">
+        <i class="bi bi-info-circle"></i> Hilangkan centang <em>"Headers and footers"</em> di opsi cetak browser agar URL tidak tercetak.
+      </span>
     </div>
     <div class="btn-action-group">
       <a href="{{ url('/guru') }}" class="btn-back">
@@ -411,8 +429,8 @@
       </tbody>
     </table>
 
-    <div style="font-size:8.5pt; color:#444; margin-bottom:10px;">
-      <em>* Total Data: {{ $gurus->count() }} Orang. Dicetak otomatis dari SIRANI (Sistem Informasi Responsif Absensi &amp; Penegakan Disiplin) SMKN 1 Air Naningan pada {{ \Carbon\Carbon::now()->translatedFormat('d F Y, H:i') }} WIB.</em>
+    <div style="font-size:8.5pt; color:#333; margin-bottom:12px;">
+      <em>* Total Data: {{ $gurus->count() }} Orang &middot; Keterangan Data: SITUAN SMKN 1 Air Naningan</em>
     </div>
 
     {{-- TANDA TANGAN --}}

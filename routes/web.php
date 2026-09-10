@@ -352,9 +352,9 @@ Route::middleware('auth')->group(function () {
     // 13. Master Guru & RFID (Admin, Kepala Sekolah, Waka Kesiswaan, Waka Kurikulum & Staf TU)
     Route::middleware('role:admin,kepala_sekolah,waka_kesiswaan,waka_kurikulum,waka_sarpras,waka_hubin,staf_tu')->group(function () {
         Route::get('/guru', [GuruController::class, 'index'])->name('guru.index');
-        Route::get('/guru/export', [GuruController::class, 'export'])->name('guru.export');
+        Route::match(['get', 'post'], '/guru/export', [GuruController::class, 'export'])->name('guru.export');
         Route::get('/guru/template-csv', [GuruController::class, 'downloadTemplate'])->name('guru.template-csv');
-        Route::get('/guru/cetak-pdf', [GuruController::class, 'cetakPdf'])->name('guru.cetak-pdf');
+        Route::match(['get', 'post'], '/guru/cetak-pdf', [GuruController::class, 'cetakPdf'])->name('guru.cetak-pdf');
         Route::get('/guru/{id}/biodata', [GuruController::class, 'cetakBiodata'])->name('guru.biodata.cetak');
         Route::post('/guru', [GuruController::class, 'store'])->name('guru.store')->middleware('role:admin,staf_tu');
         Route::post('/guru/import', [GuruController::class, 'import'])->name('guru.import')->middleware('role:admin,staf_tu');
