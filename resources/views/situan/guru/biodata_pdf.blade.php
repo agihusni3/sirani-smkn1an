@@ -411,7 +411,7 @@
           <tr>
             <td class="td-label">8. Status Keaktifan</td>
             <td class="td-colon">:</td>
-            <td class="td-value" style="color:{{ $guru->status === 'aktif' ? '#059669' : '#dc2626' }};">
+            <td class="td-value" style="color:#000000;">
               {{ strtoupper($guru->status ?: 'AKTIF') }}
             </td>
           </tr>
@@ -430,37 +430,42 @@
       <tr>
         <td class="td-label">1. Nomor Induk Pegawai (NIP / NI PPPK)</td>
         <td class="td-colon">:</td>
-        <td class="td-value">{{ $guru->nip ?: 'Belum Ada / Non-ASN' }}</td>
+        <td class="td-value" style="color:#000000;">{{ $guru->nip ?: 'Belum Ada / Non-ASN' }}</td>
       </tr>
       <tr>
         <td class="td-label">2. NUPTK (Pendidik)</td>
         <td class="td-colon">:</td>
-        <td class="td-value">{{ $guru->nuptk ?: 'Belum Memiliki NUPTK' }}</td>
+        <td class="td-value" style="color:#000000;">{{ $guru->nuptk ?: 'Belum Memiliki NUPTK' }}</td>
       </tr>
       <tr>
         <td class="td-label">3. Status Kepegawaian</td>
         <td class="td-colon">:</td>
-        <td class="td-value">{{ $guru->label_kepegawaian }}</td>
+        <td class="td-value" style="color:#000000;">{{ $guru->label_kepegawaian }}</td>
       </tr>
       <tr>
-        <td class="td-label">4. Pangkat / Golongan Ruang</td>
+        @php
+          $isPppk = str_contains(strtoupper($guru->status_kepegawaian ?: ($guru->label_kepegawaian ?? '')), 'PPPK');
+          $isPns  = str_contains(strtoupper($guru->status_kepegawaian ?: ($guru->label_kepegawaian ?? '')), 'PNS');
+          $labelPangkat = $isPppk ? '4. Jabatan Fungsional / Golongan' : ($isPns ? '4. Pangkat / Golongan Ruang' : '4. Pangkat / Golongan');
+        @endphp
+        <td class="td-label">{{ $labelPangkat }}</td>
         <td class="td-colon">:</td>
-        <td class="td-value">{{ $guru->golongan_pangkat ?: '-' }}</td>
+        <td class="td-value" style="color:#000000;">{{ $guru->golongan_pangkat ?: '-' }}</td>
       </tr>
       <tr>
         <td class="td-label">5. Nomor SK Pengangkatan</td>
         <td class="td-colon">:</td>
-        <td class="td-value">{{ $guru->nomor_sk_pengangkatan ?: '-' }}</td>
+        <td class="td-value" style="color:#000000;">{{ $guru->nomor_sk_pengangkatan ?: '-' }}</td>
       </tr>
       <tr>
         <td class="td-label">6. Terhitung Mulai Tanggal (TMT) Kerja</td>
         <td class="td-colon">:</td>
-        <td class="td-value">{{ $guru->tmt_kerja ? \Carbon\Carbon::parse($guru->tmt_kerja)->translatedFormat('d F Y') : '-' }}</td>
+        <td class="td-value" style="color:#000000;">{{ $guru->tmt_kerja ? \Carbon\Carbon::parse($guru->tmt_kerja)->translatedFormat('d F Y') : '-' }}</td>
       </tr>
       <tr>
         <td class="td-label">7. Lembaga Pengangkat</td>
         <td class="td-colon">:</td>
-        <td class="td-value">{{ $guru->lembaga_pengangkat ?: 'Pemerintah Provinsi Lampung / Dinas Pendidikan' }}</td>
+        <td class="td-value" style="color:#000000;">{{ $guru->lembaga_pengangkat ?: 'Pemerintah Provinsi Lampung / Dinas Pendidikan' }}</td>
       </tr>
     </table>
 
@@ -470,31 +475,31 @@
       <tr>
         <td class="td-label">1. Pendidikan Terakhir</td>
         <td class="td-colon">:</td>
-        <td class="td-value">{{ $guru->pendidikan_terakhir ?: 'S1' }}</td>
+        <td class="td-value" style="color:#000000;">{{ $guru->pendidikan_terakhir ?: 'S1' }}</td>
       </tr>
       <tr>
         <td class="td-label">2. Program Studi / Jurusan Kuliah</td>
         <td class="td-colon">:</td>
-        <td class="td-value">{{ $guru->jurusan_kuliah ?: '-' }}</td>
+        <td class="td-value" style="color:#000000;">{{ $guru->jurusan_kuliah ?: '-' }}</td>
       </tr>
       <tr>
         <td class="td-label">3. Nama Perguruan Tinggi / Kampus</td>
         <td class="td-colon">:</td>
-        <td class="td-value">{{ $guru->kampus ?: '-' }}</td>
+        <td class="td-value" style="color:#000000;">{{ $guru->kampus ?: '-' }}</td>
       </tr>
       <tr>
         <td class="td-label">4. Tahun Kelulusan</td>
         <td class="td-colon">:</td>
-        <td class="td-value">{{ $guru->tahun_lulus ?: '-' }}</td>
+        <td class="td-value" style="color:#000000;">{{ $guru->tahun_lulus ?: '-' }}</td>
       </tr>
       <tr>
         <td class="td-label">5. Status Sertifikasi Pendidik</td>
         <td class="td-colon">:</td>
-        <td class="td-value">
+        <td class="td-value" style="color:#000000;">
           @if($guru->status_sertifikasi === 'sudah')
-            <span style="color:#059669;">SUDAH BERSERTIFIKASI PENDIDIK</span>
+            <span style="color:#000000;">SUDAH BERSERTIFIKASI PENDIDIK</span>
           @else
-            <span>BELUM SERTIFIKASI</span>
+            <span style="color:#000000;">BELUM SERTIFIKASI</span>
           @endif
         </td>
       </tr>

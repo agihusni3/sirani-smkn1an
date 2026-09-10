@@ -145,9 +145,12 @@
         <td class="bio-val">{{ $guru->nuptk ?: '-' }}</td>
       </tr>
       <tr>
-        <td class="bio-label">Pangkat / Golongan Ruang</td>
+        @php
+          $isPppkKgb = str_contains(strtoupper($guru->status_kepegawaian ?: ($guru->label_kepegawaian ?? '')), 'PPPK');
+        @endphp
+        <td class="bio-label">{{ $isPppkKgb ? 'Jabatan / Golongan' : 'Pangkat / Golongan Ruang' }}</td>
         <td class="bio-sep">:</td>
-        <td class="bio-val">{{ $guru->golongan_ruang ?: 'Penata Muda, III/a' }}</td>
+        <td class="bio-val">{{ $guru->golongan_ruang ?: ($guru->golongan_pangkat ?: 'Penata Muda, III/a') }}</td>
       </tr>
       <tr>
         <td class="bio-label">Jabatan / Tugas</td>
