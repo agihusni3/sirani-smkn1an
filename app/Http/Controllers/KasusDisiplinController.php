@@ -704,6 +704,8 @@ class KasusDisiplinController extends Controller
         $syncSk = \App\Models\SuratKeluar::syncSkKasusDisiplin($kasus, \Carbon\Carbon::today());
         $nomorSk = $syncSk['nomor_sk'];
         $bukuSk = $syncSk['buku_sk'];
+        $suratKeluar = $syncSk['surat_keluar'] ?? null;
+        $verifyUrl = $suratKeluar ? route('situan.verifikasi-surat', $suratKeluar->ensureKodeVerifikasi()) : null;
 
         return view('sirani.disiplin.cetak_sk', compact(
             'kasus',
@@ -715,7 +717,9 @@ class KasusDisiplinController extends Controller
             'totalBolos',
             'totalTerlambat',
             'nomorSk',
-            'bukuSk'
+            'bukuSk',
+            'suratKeluar',
+            'verifyUrl'
         ));
     }
 

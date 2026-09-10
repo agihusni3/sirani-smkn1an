@@ -362,7 +362,7 @@
 
     {{-- DIGITAL: QR-Code TTE --}}
     <div class="ttd-digital-only" style="display:flex; justify-content:center; align-items:center; margin:6px auto 6px 0; width:68px; height:68px;">
-      <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data={{ urlencode(url()->current()) }}" alt="QR Keabsahan SK" style="width:68px; height:68px; display:block;" />
+      <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data={{ urlencode($verifyUrl ?? ($suratKeluar ? route('situan.verifikasi-surat', $suratKeluar->ensureKodeVerifikasi()) : url()->current())) }}" alt="QR Keabsahan SK" style="width:68px; height:68px; display:block;" />
     </div>
 
     {{-- BASAH: Ruang TTD Fisik --}}

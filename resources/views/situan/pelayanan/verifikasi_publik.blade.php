@@ -179,6 +179,84 @@
               </div>
             </div>
           </div>
+        @elseif($suratKeluar)
+          {{-- VALID SURAT KELUAR / SURAT DINAS STATE --}}
+          <div class="verify-card">
+            <div class="p-4 p-md-5 text-center badge-valid">
+              <div class="rounded-circle bg-white d-inline-flex p-3 mb-3 shadow-sm text-success">
+                <i class="bi bi-shield-fill-check fs-1"></i>
+              </div>
+              <h2 class="h4 fw-bold text-white mb-1">DOKUMEN RESMI TERVERIFIKASI</h2>
+              <p class="text-white-50 mb-0 small">Naskah dinas ini terdaftar sah secara elektronik dalam Buku Agenda Surat Keluar SITUAN SMK Negeri 1 Air Naningan.</p>
+            </div>
+
+            <div class="p-4 p-md-5">
+              @php
+                $namaJenis = match($suratKeluar->kategori_surat) {
+                  'Pengantar KGB'        => 'Surat Pengantar Kenaikan Gaji Berkala (KGB)',
+                  'SK Penetapan Sanksi'  => 'Surat Keputusan (SK) Kepala Sekolah - Pembinaan Kedisiplinan',
+                  'Panggilan Orang Tua'  => 'Surat Panggilan Orang Tua / Wali Siswa',
+                  'Berita Acara BK'      => 'Berita Acara Musyawarah & Pembinaan BK',
+                  'Suket Bebas Masalah'  => 'Surat Keterangan Bebas Masalah Kesiswaan',
+                  default                => $suratKeluar->perihal ?: 'Surat Dinas Resmi',
+                };
+              @endphp
+
+              <div class="mb-4 pb-3 border-bottom">
+                <div class="info-label">Kategori Dokumen</div>
+                <div class="h5 fw-bold text-primary mb-0">{{ $namaJenis }}</div>
+              </div>
+
+              <div class="row g-3 mb-4">
+                <div class="col-sm-6">
+                  <div class="info-label">Nomor Surat Resmi</div>
+                  <div class="info-value font-monospace text-primary">{{ $suratKeluar->nomor_surat_lengkap }}</div>
+                </div>
+                <div class="col-sm-6">
+                  <div class="info-label">Tanggal Diterbitkan</div>
+                  <div class="info-value">
+                    <i class="bi bi-calendar-check me-1 text-secondary"></i>
+                    {{ $suratKeluar->tanggal_surat ? \Carbon\Carbon::parse($suratKeluar->tanggal_surat)->translatedFormat('d F Y') : '-' }}
+                  </div>
+                </div>
+              </div>
+
+              <div class="p-3 bg-light rounded-3 border mb-4">
+                <div class="fw-bold small text-dark mb-2 text-uppercase" style="letter-spacing:0.5px;">
+                  <i class="bi bi-envelope-paper text-secondary me-1"></i> Detail Perihal &amp; Tujuan Surat
+                </div>
+                <div class="mb-2">
+                  <div class="info-label">Tujuan / Penerima</div>
+                  <div class="info-value">{{ $suratKeluar->tujuan_surat }}</div>
+                </div>
+                <div>
+                  <div class="info-label">Perihal</div>
+                  <div class="info-value">{{ $suratKeluar->perihal }}</div>
+                </div>
+              </div>
+
+              <div class="row g-3 mb-4">
+                <div class="col-sm-6">
+                  <div class="info-label">Penandatangan Resmi</div>
+                  <div class="info-value">{{ $suratKeluar->penandatangan ?: ($sekolah->nama_kepala_sekolah ?: 'Aprida, S.Si.') }}</div>
+                  <div class="small text-muted">NIP. {{ $sekolah->nip_kepala_sekolah ?: '197904172008012019' }}</div>
+                </div>
+                <div class="col-sm-6">
+                  <div class="info-label">Status Keabsahan</div>
+                  <div class="info-value text-success"><i class="bi bi-patch-check-fill me-1"></i> Sah &amp; Tercatat di Buku Agenda</div>
+                  <div class="small text-muted">Nomor Agenda: {{ $suratKeluar->nomor_agenda }} / {{ $suratKeluar->tahun_agenda }}</div>
+                </div>
+              </div>
+
+              <div class="pt-3 border-top">
+                <div class="info-label mb-1">Kode Enkripsi Verifikasi Dokumen</div>
+                <div class="mono-hash">{{ $suratKeluar->kode_verifikasi_qr }}</div>
+                <div class="text-muted mt-2" style="font-size:11.5px;">
+                  <i class="bi bi-info-circle me-1"></i> Naskah dinas ini diterbitkan oleh Tata Usaha SMKN 1 Air Naningan melalui Sistem Informasi Tata Usaha &amp; Administrasi Terpadu (SITUAN).
+                </div>
+              </div>
+            </div>
+          </div>
         @else
           {{-- INVALID OR NOT FOUND STATE --}}
           <div class="verify-card">

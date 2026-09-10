@@ -95,15 +95,16 @@ class SuratKesiswaanController extends Controller
         $bln = $bulanRomawi[Carbon::today()->month] ?? 'VIII';
 
         $nomorSurat = $request->get('nomor_surat');
-        if (!$nomorSurat) {
-            if ($kategori === 'berita_acara') {
-                $suratKeluar = SuratKeluar::syncBeritaAcaraBk($siswa, $notifikasi, $rombel?->nama_rombel, Carbon::today());
-                $nomorSurat = $suratKeluar->nomor_surat_lengkap;
-            } else {
-                $suratKeluar = SuratKeluar::syncSuratPanggilanOrtu($siswa, $notifikasi, $rombel?->nama_rombel, Carbon::today());
-                $nomorSurat = $suratKeluar->nomor_surat_lengkap;
-            }
+        $suratKeluar = null;
+        if ($kategori === 'berita_acara') {
+            $suratKeluar = SuratKeluar::syncBeritaAcaraBk($siswa, $notifikasi, $rombel?->nama_rombel, Carbon::today());
+        } else {
+            $suratKeluar = SuratKeluar::syncSuratPanggilanOrtu($siswa, $notifikasi, $rombel?->nama_rombel, Carbon::today());
         }
+        if (!$nomorSurat && $suratKeluar) {
+            $nomorSurat = $suratKeluar->nomor_surat_lengkap;
+        }
+        $verifyUrl = $suratKeluar ? route('situan.verifikasi-surat', $suratKeluar->ensureKodeVerifikasi()) : null;
 
         $hariTanggal = $request->get('hari_tanggal', Carbon::today()->translatedFormat('l, d F Y'));
         $waktu = $request->get('waktu', '08:30 WIB s.d. Selesai');
@@ -186,7 +187,8 @@ class SuratKesiswaanController extends Controller
             'statusPembinaan',
             'absensis',
             'stats',
-            'periodeTeks'
+            'periodeTeks',
+            'verifyUrl'
         ));
     }
 
@@ -198,7 +200,6 @@ class SuratKesiswaanController extends Controller
         $siswa = Siswa::with([
             'siswaRombels.rombel.waliKelas',
             'siswaRombels.rombel.jurusan',
-            'siswaRombels.tahunAjaran'
         ])->findOrFail($siswaId);
 
         $sekolah = PengaturanSekolah::getAktif();
@@ -206,8 +207,11 @@ class SuratKesiswaanController extends Controller
             ?? $siswa->siswaRombels->last()?->rombel;
         $waliKelas = $rombelAktif?->waliKelas;
 
-        // Ambil semua histori presensi kumulatif
-        $absensis = Absensi::where('siswa_id', $siswa->id)->orderBy('tanggal', 'desc')->get();
+        // Ambil riwayat presensi kumulatif
+        $absensis = Absensi::where('pemilik_type', 'siswa')
+            ->where('pemilik_id', $siswa->id)
+            ->get();
+
         $hadir = $absensis->where('status', 'hadir')->count();
         $terlambat = $absensis->where('status', 'terlambat')->count();
         $izin = $absensis->where('status', 'izin')->count();
@@ -235,6 +239,8 @@ class SuratKesiswaanController extends Controller
         $isBebasMasalah = ($kasusAktif === 0);
 
         $suratKeluar = SuratKeluar::syncSuratBebasMasalah($siswa, Carbon::today());
+        $suratKeluar->ensureKodeVerifikasi();
+        $verifyUrl = route('situan.verifikasi-surat', $suratKeluar->kode_verifikasi_qr);
         $nomorSurat = $suratKeluar->nomor_surat_lengkap;
         $tanggalSurat = Carbon::now()->translatedFormat('d F Y');
 
@@ -249,7 +255,8 @@ class SuratKesiswaanController extends Controller
             'totalKasusSelesai',
             'isBebasMasalah',
             'nomorSurat',
-            'tanggalSurat'
+            'tanggalSurat',
+            'verifyUrl'
         ));
     }
 }

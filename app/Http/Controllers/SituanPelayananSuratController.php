@@ -188,6 +188,15 @@ class SituanPelayananSuratController extends Controller
             ->where('kode_verifikasi_qr', $hash)
             ->first();
 
+        $suratKeluar = null;
+        if ($pelayanan) {
+            $suratKeluar = $pelayanan->suratKeluar;
+        } else {
+            $suratKeluar = SuratKeluar::with(['creator', 'pelayanans.siswa'])
+                ->where('kode_verifikasi_qr', $hash)
+                ->first();
+        }
+
         $sekolah = PengaturanSekolah::getAktif();
 
         $kepsek = Guru::where('jabatan', 'like', '%Kepala Sekolah%')
@@ -201,6 +210,6 @@ class SituanPelayananSuratController extends Controller
         $sekolah->nama_kepala_sekolah = $namaKepsek;
         $sekolah->nip_kepala_sekolah  = $nipKepsek;
 
-        return view('situan.pelayanan.verifikasi_publik', compact('pelayanan', 'hash', 'sekolah', 'namaKepsek', 'nipKepsek'));
+        return view('situan.pelayanan.verifikasi_publik', compact('pelayanan', 'suratKeluar', 'hash', 'sekolah', 'namaKepsek', 'nipKepsek'));
     }
 }

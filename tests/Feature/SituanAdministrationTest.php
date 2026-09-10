@@ -222,6 +222,27 @@ class SituanAdministrationTest extends TestCase
         $cetakPengantar->assertSee('19850510 201001 1 015');
     }
 
+    public function test_qr_code_pengantar_kgb_dapat_diverifikasi_publik_tanpa_login(): void
+    {
+        $cetakPengantar = $this->actingAs($this->admin)->get(route('situan.radar-kgb.cetak-pengantar', $this->guru->id));
+        $cetakPengantar->assertOk();
+
+        $suratKeluar = SuratKeluar::where('tujuan_surat', 'like', "%{$this->guru->nama}%")->latest()->first();
+        $this->assertNotNull($suratKeluar);
+        $this->assertNotNull($suratKeluar->kode_verifikasi_qr);
+
+        $verifyUrl = route('situan.verifikasi-surat', $suratKeluar->kode_verifikasi_qr);
+        $cetakPengantar->assertSee(urlencode($verifyUrl));
+
+        // Scan publik via HP tanpa login sama sekali
+        $publicScan = $this->get($verifyUrl);
+        $publicScan->assertOk();
+        $publicScan->assertSee('DOKUMEN RESMI TERVERIFIKASI');
+        $publicScan->assertSee('Surat Pengantar Kenaikan Gaji Berkala (KGB)');
+        $publicScan->assertSee($this->guru->nama);
+        $publicScan->assertSee($suratKeluar->nomor_surat_lengkap);
+    }
+
     public function test_lemari_arsip_digital_ptk_dapat_mengunggah_berkas(): void
     {
         Storage::fake('public');

@@ -203,7 +203,7 @@
 
       {{-- MODE DIGITAL: QR-Code TTE Kepegawaian --}}
       <div class="ttd-digital-only" style="display:flex; justify-content:center; align-items:center; margin:6px auto 6px auto; width:72px; height:72px;">
-        <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data={{ urlencode(url()->current()) }}" alt="QR Keabsahan KGB" style="width:72px; height:72px; display:block;" />
+        <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data={{ urlencode($verifyUrl ?? route('situan.verifikasi-surat', $suratKeluar->ensureKodeVerifikasi())) }}" alt="QR Keabsahan KGB" style="width:72px; height:72px; display:block;" />
       </div>
 
       {{-- MODE BASAH: Ruang Tanda Tangan & Cap Fisik --}}

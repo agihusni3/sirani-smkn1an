@@ -15,6 +15,7 @@ class SuratKeluar extends Model
         'klasifikasi_id',
         'kode_klasifikasi',
         'nomor_surat_lengkap',
+        'kode_verifikasi_qr',
         'tujuan_surat',
         'perihal',
         'tanggal_surat',
@@ -33,6 +34,24 @@ class SuratKeluar extends Model
         'file_arsip',
         'created_by',
     ];
+
+    protected static function booted()
+    {
+        static::creating(function ($model) {
+            if (empty($model->kode_verifikasi_qr)) {
+                $model->kode_verifikasi_qr = 'SK-' . strtoupper(substr(hash('sha256', uniqid('sk_', true) . microtime()), 0, 24));
+            }
+        });
+    }
+
+    public function ensureKodeVerifikasi(): string
+    {
+        if (empty($this->kode_verifikasi_qr)) {
+            $this->kode_verifikasi_qr = 'SK-' . strtoupper(substr(hash('sha256', uniqid('sk_' . $this->id . '_', true) . microtime()), 0, 24));
+            $this->saveQuietly();
+        }
+        return $this->kode_verifikasi_qr;
+    }
 
     protected $casts = [
         'tanggal_surat'   => 'date',

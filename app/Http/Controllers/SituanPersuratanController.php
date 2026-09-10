@@ -385,9 +385,11 @@ class SituanPersuratanController extends Controller
     public function suratKeluarCetak($id)
     {
         $surat = SuratKeluar::findOrFail($id);
+        $surat->ensureKodeVerifikasi();
+        $verifyUrl = route('situan.verifikasi-surat', $surat->kode_verifikasi_qr);
         $sekolah = PengaturanSekolah::getAktif();
 
-        return view('situan.persuratan.cetak_surat_bebas', compact('surat', 'sekolah'));
+        return view('situan.persuratan.cetak_surat_bebas', compact('surat', 'sekolah', 'verifyUrl'));
     }
 
     /**

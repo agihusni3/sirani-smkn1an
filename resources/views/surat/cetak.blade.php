@@ -712,7 +712,7 @@
             <td style="width:50%;">
               Wali Kelas {{ $rombel->nama_rombel ?? '' }},
               <div class="ttd-digital-only" style="display:flex; justify-content:center; align-items:center; margin:4px auto; width:52px; height:52px;">
-                <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data={{ urlencode(url()->current()) }}" alt="QR Keabsahan" style="width:52px; height:52px;" />
+                <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data={{ urlencode($verifyUrl ?? url()->current()) }}" alt="QR Keabsahan" style="width:52px; height:52px;" />
               </div>
               <div class="ttd-basah-only ttd-space" style="height:48px; display:none;"></div>
               <div class="ttd-name">{{ $waliKelas ? $waliKelas->nama : ($rombel?->waliKelas?->nama ?? '-') }}</div>
@@ -722,7 +722,7 @@
               Mengetahui,<br />
               <strong>Kepala Sekolah</strong>
               <div class="ttd-digital-only" style="display:flex; justify-content:center; align-items:center; margin:4px auto; width:52px; height:52px;">
-                <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data={{ urlencode(url()->current()) }}" alt="QR Keabsahan" style="width:52px; height:52px;" />
+                <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data={{ urlencode($verifyUrl ?? url()->current()) }}" alt="QR Keabsahan" style="width:52px; height:52px;" />
               </div>
               <div class="ttd-basah-only ttd-space" style="height:48px; display:none;"></div>
               <div class="ttd-name">{{ $sekolah->nama_kepala_sekolah ?: ($sekolah->nama_kepsek ?: 'Drs. H. Ahmad Sudrajat, M.Pd.') }}</div>
@@ -852,7 +852,7 @@
               Mengetahui,<br />
               <strong>Kepala Sekolah</strong>
               <div class="ttd-digital-only" style="display:flex; justify-content:center; align-items:center; margin:4px auto; width:52px; height:52px;">
-                <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data={{ urlencode(url()->current()) }}" alt="QR Keabsahan" style="width:52px; height:52px;" />
+                <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data={{ urlencode($verifyUrl ?? url()->current()) }}" alt="QR Keabsahan" style="width:52px; height:52px;" />
               </div>
               <div class="ttd-basah-only ttd-space" style="display:none;"></div>
               <div class="ttd-name">{{ $sekolah->nama_kepala_sekolah ?: ($sekolah->nama_kepsek ?: 'Drs. H. Ahmad Sudrajat, M.Pd.') }}</div>
@@ -862,7 +862,7 @@
               {{ $sekolah->kecamatan ?? 'Air Naningan' }}, {{ \Carbon\Carbon::today()->translatedFormat('d F Y') }}<br />
               <strong>Wali Kelas {{ $rombel->nama_rombel ?? '' }}</strong>
               <div class="ttd-digital-only" style="display:flex; justify-content:center; align-items:center; margin:4px auto; width:52px; height:52px;">
-                <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data={{ urlencode(url()->current()) }}" alt="QR Keabsahan" style="width:52px; height:52px;" />
+                <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data={{ urlencode($verifyUrl ?? url()->current()) }}" alt="QR Keabsahan" style="width:52px; height:52px;" />
               </div>
               <div class="ttd-basah-only ttd-space" style="display:none;"></div>
               <div class="ttd-name">{{ $waliKelas ? $waliKelas->nama : ($rombel?->waliKelas?->nama ?? '-') }}</div>
@@ -1041,7 +1041,7 @@
             Mengetahui,<br />
             <strong>Guru Bimbingan &amp; Konseling (BK)</strong>
             <div class="ttd-digital-only" style="display:flex; justify-content:center; align-items:center; margin:4px auto; width:48px; height:48px;">
-              <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data={{ urlencode(url()->current()) }}" alt="QR Keabsahan" style="width:48px; height:48px;" />
+              <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data={{ urlencode($verifyUrl ?? url()->current()) }}" alt="QR Keabsahan" style="width:48px; height:48px;" />
             </div>
             <div class="ttd-basah-only ttd-space" style="height:48px; display:none;"></div>
             <div class="ttd-name">{{ $guruBk ? $guruBk->nama : 'Ari Apriansah,S.Pd.' }}</div>
@@ -1051,7 +1051,7 @@
             {{ $sekolah->kecamatan ?? 'Air Naningan' }}, {{ \Carbon\Carbon::today()->translatedFormat('d F Y') }}<br />
             <strong>Wali Kelas {{ $rombel->nama_rombel ?? '' }}</strong>
             <div class="ttd-digital-only" style="display:flex; justify-content:center; align-items:center; margin:4px auto; width:48px; height:48px;">
-              <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data={{ urlencode(url()->current()) }}" alt="QR Keabsahan" style="width:48px; height:48px;" />
+              <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data={{ urlencode($verifyUrl ?? url()->current()) }}" alt="QR Keabsahan" style="width:48px; height:48px;" />
             </div>
             <div class="ttd-basah-only ttd-space" style="height:48px; display:none;"></div>
             <div class="ttd-name">{{ $waliKelas ? $waliKelas->nama : ($rombel?->waliKelas?->nama ?? '-') }}</div>
