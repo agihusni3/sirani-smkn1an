@@ -185,6 +185,11 @@
       .no-print-bar { display: none !important; }
       body { padding: 12mm 18mm 15mm 18mm !important; }
     }
+
+    body.mode-ttd-digital .ttd-digital-only { display: flex !important; }
+    body.mode-ttd-digital .ttd-basah-only { display: none !important; }
+    body.mode-ttd-basah .ttd-digital-only { display: none !important; }
+    body.mode-ttd-basah .ttd-basah-only { display: block !important; }
   </style>
 </head>
 <body>
@@ -193,7 +198,16 @@
   <div style="font-size:13px; font-weight:bold;">
     Surat Keputusan (SK) Kepala Sekolah — Format Dokumen Dinas Resmi (A4)
   </div>
-  <div style="display:flex; gap:8px;">
+  <div style="display:flex; gap:8px; align-items:center;">
+    <div style="display:flex; align-items:center; gap:4px; background:rgba(255,255,255,0.08); padding:3px 6px; border-radius:6px;">
+      <span style="font-size:11px; color:#cbd5e1; font-weight:bold;">Pengesahan:</span>
+      <button type="button" id="btnTtdDigital" onclick="switchTtdMode('digital')" style="background:#0284c7; color:#fff; border:none; padding:4px 8px; border-radius:4px; font-weight:bold; font-size:11px; cursor:pointer;">
+        TTD Digital (QR)
+      </button>
+      <button type="button" id="btnTtdBasah" onclick="switchTtdMode('basah')" style="background:transparent; color:#94a3b8; border:none; padding:4px 8px; border-radius:4px; font-weight:bold; font-size:11px; cursor:pointer;">
+        TTD Basah (Manual)
+      </button>
+    </div>
     <button type="button" onclick="window.print()" style="background:#000000; color:#fff; border:1px solid #fff; padding:6px 14px; border-radius:6px; font-weight:bold; cursor:pointer; font-size:12px;">
       Cetak SK Resmi
     </button>
@@ -345,7 +359,15 @@
     <div>Ditetapkan di : Air Naningan</div>
     <div>Pada tanggal : {{ \Carbon\Carbon::parse($kasus->tanggal_keputusan_kepsek ?: \Carbon\Carbon::today())->translatedFormat('d F Y') }}</div>
     <div style="font-weight:bold; margin-top:4px;">Kepala SMK Negeri 1 Air Naningan,</div>
-    <div class="signature-space"></div>
+
+    {{-- DIGITAL: QR-Code TTE --}}
+    <div class="ttd-digital-only" style="display:flex; justify-content:center; align-items:center; margin:6px auto 6px 0; width:68px; height:68px;">
+      <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data={{ urlencode(url()->current()) }}" alt="QR Keabsahan SK" style="width:68px; height:68px; display:block;" />
+    </div>
+
+    {{-- BASAH: Ruang TTD Fisik --}}
+    <div class="ttd-basah-only signature-space" style="display:none;"></div>
+
     <div style="font-weight:bold; text-decoration:underline;">{{ $sekolah->nama_kepsek ?? '..................................' }}</div>
     <div>NIP. {{ $sekolah->nip_kepsek ?? '..................................' }}</div>
   </div>
@@ -370,6 +392,32 @@
   <span>Dokumen Penegakan Kedisiplinan Siswa · <strong>SIRANI (Sistem Informasi Responsif Absensi &amp; Penegakan Disiplin) SMKN 1 Air Naningan</strong></span>
   <span>Dicetak: {{ \Carbon\Carbon::now()->translatedFormat('d F Y, H:i') }} WIB</span>
 </div>
+
+<script>
+  function switchTtdMode(mode) {
+    const btnDig = document.getElementById('btnTtdDigital');
+    const btnBas = document.getElementById('btnTtdBasah');
+    if (mode === 'basah') {
+      document.body.classList.remove('mode-ttd-digital');
+      document.body.classList.add('mode-ttd-basah');
+      if (btnBas) { btnBas.style.background = '#0284c7'; btnBas.style.color = '#fff'; }
+      if (btnDig) { btnDig.style.background = 'transparent'; btnDig.style.color = '#94a3b8'; }
+      localStorage.setItem('dcc_doc_ttd_mode', 'basah');
+    } else {
+      document.body.classList.remove('mode-ttd-basah');
+      document.body.classList.add('mode-ttd-digital');
+      if (btnDig) { btnDig.style.background = '#0284c7'; btnDig.style.color = '#fff'; }
+      if (btnBas) { btnBas.style.background = 'transparent'; btnBas.style.color = '#94a3b8'; }
+      localStorage.setItem('dcc_doc_ttd_mode', 'digital');
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const savedMode = urlParams.get('mode_ttd') || localStorage.getItem('dcc_doc_ttd_mode') || 'digital';
+    switchTtdMode(savedMode);
+  });
+</script>
 
 </body>
 </html>

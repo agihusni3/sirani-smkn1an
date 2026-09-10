@@ -240,13 +240,18 @@
       <div class="sign-title">
         Kepala Sekolah,
       </div>
-      <div class="sign-qr-wrap">
+      {{-- MODE DIGITAL: QR Code Keabsahan & TTE --}}
+      <div class="sign-qr-wrap ttd-digital-only">
         @if($qrImage)
           <img src="{{ $qrImage }}" alt="QR Code Keabsahan Surat" />
         @else
           <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data={{ urlencode($verifyUrl ?? '#') }}" alt="QR Keabsahan" />
         @endif
       </div>
+
+      {{-- MODE BASAH: Ruang Tanda Tangan & Cap Fisik --}}
+      <div class="ttd-basah-only" style="height: 58px; display: none;"></div>
+
       <div class="sign-name">
         {{ $namaKepsek }}
       </div>
@@ -258,8 +263,8 @@
 @endsection
 
 @section('footer')
-  {{-- FOOTER KEABSAHAN ELEKTRONIK --}}
-  <div class="security-footer">
+  {{-- FOOTER KEABSAHAN ELEKTRONIK (MODE DIGITAL) --}}
+  <div class="security-footer ttd-digital-only">
     <div class="security-qr-small">
       <i class="bi bi-shield-fill-check" style="font-size:26px; color:#0284c7;"></i>
     </div>
@@ -267,6 +272,14 @@
       <strong>DOKUMEN RESMI TATA NASKAH DINAS ELEKTRONIK (SITUAN SMKN 1 AIR NANINGAN)</strong><br>
       Keaslian dokumen ini dilindungi kode verifikasi kriptografi: <span style="font-family:monospace; color:#0f172a; font-weight:700;">{{ $pelayanan->kode_verifikasi_qr }}</span>.<br>
       Pindai QR-Code di atas atau akses tautan <em>{{ $verifyUrl ?? route('situan.verifikasi-surat', $pelayanan->kode_verifikasi_qr) }}</em> untuk membuktikan keabsahan langsung pada pangkalan data sekolah.
+    </div>
+  </div>
+
+  {{-- FOOTER PENGESAHAN FISIK (MODE BASAH) --}}
+  <div class="ttd-basah-only" style="display:none; font-family:'Plus Jakarta Sans', sans-serif; font-size:8pt; color:#64748b;">
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+      <span>Dokumen Resmi Tata Usaha · <strong>SITUAN (Sistem Informasi Tata Usaha &amp; Administrasi Terpadu) SMKN 1 Air Naningan</strong></span>
+      <span>No. Reg: {{ $pelayanan->suratKeluar?->nomor_surat_lengkap ?? '-' }} · Verifikasi TTD Fisik</span>
     </div>
   </div>
 @endsection

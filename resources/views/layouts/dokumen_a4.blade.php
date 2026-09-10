@@ -134,6 +134,78 @@
     }
 
     /* ═══════════════════════════════════════════════════════════════════
+       SWITCHER MODE TANDA TANGAN (DIGITAL / TTE vs BASAH / MANUAL)
+       ═══════════════════════════════════════════════════════════════════ */
+    .ttd-mode-switcher {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(0, 0, 0, 0.35);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 8px;
+      padding: 3px 8px;
+    }
+    .ttd-mode-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: #cbd5e1;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      white-space: nowrap;
+    }
+    .btn-segmented {
+      display: flex;
+      gap: 2px;
+      background: #0f172a;
+      border-radius: 6px;
+      padding: 2px;
+    }
+    .btn-seg {
+      background: transparent;
+      border: none;
+      color: #94a3b8;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 5px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      transition: all .15s ease;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+    .btn-seg:hover {
+      color: #ffffff;
+    }
+    .btn-seg.active {
+      background: #0284c7;
+      color: #ffffff;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
+    }
+
+    /* KONTROL VISIBILITAS MODE TTD */
+    body.mode-ttd-digital .ttd-digital-only {
+      display: flex !important;
+    }
+    body.mode-ttd-digital .ttd-basah-only {
+      display: none !important;
+    }
+    body.mode-ttd-basah .ttd-digital-only {
+      display: none !important;
+    }
+    body.mode-ttd-basah .ttd-basah-only {
+      display: block !important;
+    }
+    body.mode-ttd-basah .ttd-basah-only-inline {
+      display: inline-block !important;
+    }
+    body.mode-ttd-digital .ttd-basah-only-inline {
+      display: none !important;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════════
        LEMBAR KERTAS A4 (CANVAS DOKUMEN RESMI)
        ═══════════════════════════════════════════════════════════════════ */
     .sheet-a4-wrapper {
@@ -204,6 +276,19 @@
     <div class="toolbar-actions">
       @yield('toolbar_actions')
 
+      {{-- SWITCHER FORMAT TTD: DIGITAL (QR) VS BASAH (MANUAL) --}}
+      <div class="ttd-mode-switcher" title="Pilih format pengesahan tanda tangan pada dokumen">
+        <span class="ttd-mode-label"><i class="bi bi-shield-check"></i> Pengesahan:</span>
+        <div class="btn-segmented">
+          <button type="button" class="btn-seg active" id="btnModeDigital" onclick="switchTtdMode('digital')">
+            <i class="bi bi-qr-code"></i> TTD Digital / TTE
+          </button>
+          <button type="button" class="btn-seg" id="btnModeBasah" onclick="switchTtdMode('basah')">
+            <i class="bi bi-pen-fill"></i> TTD Basah / Fisik
+          </button>
+        </div>
+      </div>
+
       @if(isset($backUrl) || !empty($backUrl))
         <a href="{{ $backUrl }}" class="btn-tool-back">
           <i class="bi bi-arrow-left"></i> {{ $backLabel ?? 'Kembali' }}
@@ -250,6 +335,30 @@
 
     </div>
   </div>
+
+  <script>
+    function switchTtdMode(mode) {
+      if (mode === 'basah') {
+        document.body.classList.remove('mode-ttd-digital');
+        document.body.classList.add('mode-ttd-basah');
+        document.getElementById('btnModeBasah')?.classList.add('active');
+        document.getElementById('btnModeDigital')?.classList.remove('active');
+        localStorage.setItem('dcc_doc_ttd_mode', 'basah');
+      } else {
+        document.body.classList.remove('mode-ttd-basah');
+        document.body.classList.add('mode-ttd-digital');
+        document.getElementById('btnModeDigital')?.classList.add('active');
+        document.getElementById('btnModeBasah')?.classList.remove('active');
+        localStorage.setItem('dcc_doc_ttd_mode', 'digital');
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const savedMode = urlParams.get('mode_ttd') || localStorage.getItem('dcc_doc_ttd_mode') || 'digital';
+      switchTtdMode(savedMode);
+    });
+  </script>
 
   @stack('scripts')
 </body>

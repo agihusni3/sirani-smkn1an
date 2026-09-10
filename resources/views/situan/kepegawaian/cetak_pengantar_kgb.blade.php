@@ -200,7 +200,15 @@
   <div class="signature-container">
     <div class="signature-box">
       <div>Kepala Sekolah,</div>
-      <div class="sign-space"></div>
+
+      {{-- MODE DIGITAL: QR-Code TTE Kepegawaian --}}
+      <div class="ttd-digital-only" style="display:flex; justify-content:center; align-items:center; margin:6px auto 6px auto; width:72px; height:72px;">
+        <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data={{ urlencode(url()->current()) }}" alt="QR Keabsahan KGB" style="width:72px; height:72px; display:block;" />
+      </div>
+
+      {{-- MODE BASAH: Ruang Tanda Tangan & Cap Fisik --}}
+      <div class="ttd-basah-only sign-space" style="height:55px; display:none;"></div>
+
       <div class="sign-name">{{ $sekolah->nama_kepala_sekolah ?: 'Aprida, S.Si.' }}</div>
       <div>NIP. {{ $sekolah->nip_kepala_sekolah ?: '197904172008012019' }}</div>
     </div>
@@ -210,7 +218,8 @@
 @section('footer')
   <div style="display:flex; justify-content:space-between; align-items:center; font-size:8pt; color:#64748b; font-family:'Plus Jakarta Sans', sans-serif;">
     <span>Dokumen Resmi Kepegawaian &amp; Tata Usaha · <strong>SITUAN (Sistem Informasi Tata Usaha &amp; Administrasi Terpadu) SMKN 1 Air Naningan</strong></span>
-    <span>Dicetak: {{ \Carbon\Carbon::now()->translatedFormat('d F Y, H:i') }} WIB</span>
+    <span class="ttd-digital-only">Tersertifikasi Elektronik (TTE) · {{ \Carbon\Carbon::now()->translatedFormat('d F Y, H:i') }} WIB</span>
+    <span class="ttd-basah-only" style="display:none;">Verifikasi Fisik Asli</span>
   </div>
 @endsection
 

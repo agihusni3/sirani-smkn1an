@@ -60,7 +60,15 @@
 @section('ttd')
   <div class="ttd-box">
     <div>{{ $surat->jabatan_penandatangan ?: 'Kepala Sekolah' }},</div>
-    <div class="ttd-space"></div>
+
+    {{-- MODE DIGITAL: QR-Code TTE Persuratan --}}
+    <div class="ttd-digital-only" style="display:flex; justify-content:center; align-items:center; margin:6px auto 6px auto; width:72px; height:72px;">
+      <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data={{ urlencode(url()->current()) }}" alt="QR Keabsahan Surat" style="width:72px; height:72px; display:block;" />
+    </div>
+
+    {{-- MODE BASAH: Ruang Tanda Tangan & Cap Fisik --}}
+    <div class="ttd-basah-only ttd-space" style="height:55px; display:none;"></div>
+
     <div class="ttd-nama">{{ $surat->penandatangan ?: ($sekolah->nama_kepala_sekolah ?? 'Kepala Sekolah') }}</div>
     <div class="ttd-nip">
       @if($surat->nip_penandatangan || $sekolah->nip_kepala_sekolah)
@@ -81,6 +89,7 @@
   @endif
   <div style="display:flex; justify-content:space-between; align-items:center; font-size:8pt; color:#64748b; border-top:1px solid #e2e8f0; padding-top:4px; font-family:'Plus Jakarta Sans', sans-serif;">
     <span>Dokumen Resmi Tata Usaha · <strong>SITUAN (Sistem Informasi Tata Usaha &amp; Administrasi Terpadu) SMKN 1 Air Naningan</strong></span>
-    <span>No. Reg: {{ $surat->nomor_surat_lengkap }}</span>
+    <span class="ttd-digital-only">Tersertifikasi Elektronik (TTE) · No. Reg: {{ $surat->nomor_surat_lengkap }}</span>
+    <span class="ttd-basah-only" style="display:none;">No. Reg: {{ $surat->nomor_surat_lengkap }} (Verifikasi Fisik)</span>
   </div>
 @endsection

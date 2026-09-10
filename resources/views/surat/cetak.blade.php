@@ -519,6 +519,20 @@
         display: none !important;
       }
     }
+
+    /* KONTROL VISIBILITAS MODE TTD (DIGITAL VS BASAH) */
+    body.mode-ttd-digital .ttd-digital-only {
+      display: flex !important;
+    }
+    body.mode-ttd-digital .ttd-basah-only {
+      display: none !important;
+    }
+    body.mode-ttd-basah .ttd-digital-only {
+      display: none !important;
+    }
+    body.mode-ttd-basah .ttd-basah-only {
+      display: block !important;
+    }
   </style>
 </head>
 <body>
@@ -565,6 +579,19 @@
       <div class="input-field-wrap">
         <label for="inputTempat"><i class="bi bi-geo-alt"></i> Tempat / Ruang:</label>
         <input type="text" id="inputTempat" value="{{ $tempat }}" placeholder="Ruang BK / Wali Kelas..." oninput="syncFromInput('tempat', this.value)" />
+      </div>
+
+      {{-- MODE PENGESAHAN: DIGITAL (TTE) VS BASAH (MANUAL) --}}
+      <div class="input-field-wrap">
+        <label><i class="bi bi-shield-check"></i> Mode Pengesahan:</label>
+        <div style="display:flex; gap:4px;">
+          <button type="button" id="btnTtdDigital" onclick="switchTtdMode('digital')" class="btn-ttd-opt active" style="flex:1; padding:6px 8px; border-radius:6px; border:1px solid #0284c7; background:#0284c7; color:#fff; font-weight:700; font-size:11px; cursor:pointer;">
+            <i class="bi bi-qr-code"></i> TTD Digital
+          </button>
+          <button type="button" id="btnTtdBasah" onclick="switchTtdMode('basah')" class="btn-ttd-opt" style="flex:1; padding:6px 8px; border-radius:6px; border:1px solid #334155; background:#0f172a; color:#94a3b8; font-weight:700; font-size:11px; cursor:pointer;">
+            <i class="bi bi-pen-fill"></i> TTD Basah
+          </button>
+        </div>
       </div>
 
       {{-- TOGGLE LAMPIRAN HALAMAN 2 --}}
@@ -684,14 +711,20 @@
           <tr>
             <td style="width:50%;">
               Wali Kelas {{ $rombel->nama_rombel ?? '' }},
-              <div class="ttd-space" style="height:48px;"></div>
+              <div class="ttd-digital-only" style="display:flex; justify-content:center; align-items:center; margin:4px auto; width:52px; height:52px;">
+                <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data={{ urlencode(url()->current()) }}" alt="QR Keabsahan" style="width:52px; height:52px;" />
+              </div>
+              <div class="ttd-basah-only ttd-space" style="height:48px; display:none;"></div>
               <div class="ttd-name">{{ $waliKelas ? $waliKelas->nama : ($rombel?->waliKelas?->nama ?? '-') }}</div>
               <div class="ttd-nip">{{ $waliKelas && $waliKelas->nip ? 'NIP. '.$waliKelas->nip : ($rombel?->waliKelas?->nip ? 'NIP. '.$rombel->waliKelas->nip : 'NIP. -') }}</div>
             </td>
             <td style="width:50%;">
               Mengetahui,<br />
               <strong>Kepala Sekolah</strong>
-              <div class="ttd-space" style="height:48px;"></div>
+              <div class="ttd-digital-only" style="display:flex; justify-content:center; align-items:center; margin:4px auto; width:52px; height:52px;">
+                <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data={{ urlencode(url()->current()) }}" alt="QR Keabsahan" style="width:52px; height:52px;" />
+              </div>
+              <div class="ttd-basah-only ttd-space" style="height:48px; display:none;"></div>
               <div class="ttd-name">{{ $sekolah->nama_kepala_sekolah ?: ($sekolah->nama_kepsek ?: 'Drs. H. Ahmad Sudrajat, M.Pd.') }}</div>
               <div class="ttd-nip">NIP. {{ $sekolah->nip_kepala_sekolah ?: ($sekolah->nip_kepsek ?: '19750510 200003 1 005') }}</div>
             </td>
@@ -818,14 +851,20 @@
             <td>
               Mengetahui,<br />
               <strong>Kepala Sekolah</strong>
-              <div class="ttd-space"></div>
+              <div class="ttd-digital-only" style="display:flex; justify-content:center; align-items:center; margin:4px auto; width:52px; height:52px;">
+                <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data={{ urlencode(url()->current()) }}" alt="QR Keabsahan" style="width:52px; height:52px;" />
+              </div>
+              <div class="ttd-basah-only ttd-space" style="display:none;"></div>
               <div class="ttd-name">{{ $sekolah->nama_kepala_sekolah ?: ($sekolah->nama_kepsek ?: 'Drs. H. Ahmad Sudrajat, M.Pd.') }}</div>
               <div class="ttd-nip">NIP. {{ $sekolah->nip_kepala_sekolah ?: ($sekolah->nip_kepsek ?: '19750510 200003 1 005') }}</div>
             </td>
             <td>
               {{ $sekolah->kecamatan ?? 'Air Naningan' }}, {{ \Carbon\Carbon::today()->translatedFormat('d F Y') }}<br />
               <strong>Wali Kelas {{ $rombel->nama_rombel ?? '' }}</strong>
-              <div class="ttd-space"></div>
+              <div class="ttd-digital-only" style="display:flex; justify-content:center; align-items:center; margin:4px auto; width:52px; height:52px;">
+                <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data={{ urlencode(url()->current()) }}" alt="QR Keabsahan" style="width:52px; height:52px;" />
+              </div>
+              <div class="ttd-basah-only ttd-space" style="display:none;"></div>
               <div class="ttd-name">{{ $waliKelas ? $waliKelas->nama : ($rombel?->waliKelas?->nama ?? '-') }}</div>
               <div class="ttd-nip">{{ $waliKelas && $waliKelas->nip ? 'NIP. '.$waliKelas->nip : ($rombel?->waliKelas?->nip ? 'NIP. '.$rombel->waliKelas->nip : 'NIP. -') }}</div>
             </td>
@@ -1001,14 +1040,20 @@
           <td>
             Mengetahui,<br />
             <strong>Guru Bimbingan &amp; Konseling (BK)</strong>
-            <div class="ttd-space" style="height:48px;"></div>
+            <div class="ttd-digital-only" style="display:flex; justify-content:center; align-items:center; margin:4px auto; width:48px; height:48px;">
+              <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data={{ urlencode(url()->current()) }}" alt="QR Keabsahan" style="width:48px; height:48px;" />
+            </div>
+            <div class="ttd-basah-only ttd-space" style="height:48px; display:none;"></div>
             <div class="ttd-name">{{ $guruBk ? $guruBk->nama : 'Ari Apriansah,S.Pd.' }}</div>
             <div class="ttd-nip">NIP. {{ $guruBk && $guruBk->nip ? $guruBk->nip : '198704222024211008' }}</div>
           </td>
           <td>
             {{ $sekolah->kecamatan ?? 'Air Naningan' }}, {{ \Carbon\Carbon::today()->translatedFormat('d F Y') }}<br />
             <strong>Wali Kelas {{ $rombel->nama_rombel ?? '' }}</strong>
-            <div class="ttd-space" style="height:48px;"></div>
+            <div class="ttd-digital-only" style="display:flex; justify-content:center; align-items:center; margin:4px auto; width:48px; height:48px;">
+              <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data={{ urlencode(url()->current()) }}" alt="QR Keabsahan" style="width:48px; height:48px;" />
+            </div>
+            <div class="ttd-basah-only ttd-space" style="height:48px; display:none;"></div>
             <div class="ttd-name">{{ $waliKelas ? $waliKelas->nama : ($rombel?->waliKelas?->nama ?? '-') }}</div>
             <div class="ttd-nip">{{ $waliKelas && $waliKelas->nip ? 'NIP. '.$waliKelas->nip : ($rombel?->waliKelas?->nip ? 'NIP. '.$rombel->waliKelas->nip : 'NIP. -') }}</div>
           </td>
@@ -1073,6 +1118,47 @@
         }
       }
     }
+
+    function switchTtdMode(mode) {
+      const btnDig = document.getElementById('btnTtdDigital');
+      const btnBas = document.getElementById('btnTtdBasah');
+
+      if (mode === 'basah') {
+        document.body.classList.remove('mode-ttd-digital');
+        document.body.classList.add('mode-ttd-basah');
+        if (btnBas) {
+          btnBas.style.background = '#0284c7';
+          btnBas.style.borderColor = '#0284c7';
+          btnBas.style.color = '#fff';
+        }
+        if (btnDig) {
+          btnDig.style.background = '#0f172a';
+          btnDig.style.borderColor = '#334155';
+          btnDig.style.color = '#94a3b8';
+        }
+        localStorage.setItem('dcc_doc_ttd_mode', 'basah');
+      } else {
+        document.body.classList.remove('mode-ttd-basah');
+        document.body.classList.add('mode-ttd-digital');
+        if (btnDig) {
+          btnDig.style.background = '#0284c7';
+          btnDig.style.borderColor = '#0284c7';
+          btnDig.style.color = '#fff';
+        }
+        if (btnBas) {
+          btnBas.style.background = '#0f172a';
+          btnBas.style.borderColor = '#334155';
+          btnBas.style.color = '#94a3b8';
+        }
+        localStorage.setItem('dcc_doc_ttd_mode', 'digital');
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const savedMode = urlParams.get('mode_ttd') || localStorage.getItem('dcc_doc_ttd_mode') || 'digital';
+      switchTtdMode(savedMode);
+    });
   </script>
 
 </body>
