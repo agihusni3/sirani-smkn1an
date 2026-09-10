@@ -79,24 +79,24 @@
   </div>
 
   {{-- Agenda Surat Keluar Table --}}
-  <div class="card border-0 shadow-sm rounded-3" style="background:var(--surface); border:1px solid var(--border)!important;">
+  <div class="situan-table-card shadow-sm border rounded-4 overflow-hidden mb-4" style="background:var(--surface); border:1px solid var(--border)!important;">
     <div class="table-responsive">
       <table class="table table-hover align-middle mb-0" style="font-size:12.5px;">
-        <thead class="table-light" style="border-bottom:1.5px solid var(--border);">
+        <thead style="background:#f8fafc; border-bottom:1.5px solid var(--border);">
           <tr>
-            <th class="py-3 px-3 text-center" style="width:75px;">No. Agenda</th>
-            <th class="py-3 px-3" style="width:230px;">Nomor Surat Resmi</th>
-            <th class="py-3 px-3" style="width:130px;">Tanggal Terbit</th>
-            <th class="py-3 px-3" style="width:200px;">Tujuan Surat</th>
-            <th class="py-3 px-3">Perihal &amp; Klasifikasi</th>
-            <th class="py-3 px-3 text-center" style="width:170px;">Aksi &amp; Dokumen</th>
+            <th class="py-3 px-3 text-center" style="width:85px; font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:0.05em; color:#475569;">No. Agenda</th>
+            <th class="py-3 px-3" style="width:235px; font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:0.05em; color:#475569;">Nomor Surat Resmi</th>
+            <th class="py-3 px-3" style="width:130px; font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:0.05em; color:#475569;">Tanggal Terbit</th>
+            <th class="py-3 px-3" style="width:200px; font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:0.05em; color:#475569;">Tujuan Surat</th>
+            <th class="py-3 px-3" style="font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:0.05em; color:#475569;">Perihal &amp; Klasifikasi</th>
+            <th class="py-3 px-3 text-center" style="width:150px; font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:0.05em; color:#475569;">Aksi &amp; Dokumen</th>
           </tr>
         </thead>
         <tbody>
           @forelse($suratKeluars as $item)
             <tr>
               <td class="text-center px-3">
-                <span class="badge bg-secondary-subtle text-secondary px-2 py-1 fw-bold" style="font-size:12px; font-family:var(--font-mono, monospace);">
+                <span class="situan-agenda-badge">
                   #{{ str_pad((string)$item->nomor_agenda, 3, '0', STR_PAD_LEFT) }}
                 </span>
                 @if($item->is_nomor_manual)
@@ -106,88 +106,102 @@
                 @endif
               </td>
               <td class="px-3">
-                <div class="fw-bold text-primary font-monospace" style="font-size:12.5px;">
-                  {{ $item->nomor_surat_lengkap }}
+                <div>
+                  <span class="situan-nomor-badge">
+                    {{ $item->nomor_surat_lengkap }}
+                  </span>
                 </div>
-                <div class="text-muted" style="font-size:11px;">
-                  Penandatangan: <strong>{{ $item->penandatangan }}</strong>
+                <div class="text-muted d-flex align-items-center gap-1 mt-1" style="font-size:11px;">
+                  <i class="bi bi-pen text-secondary" style="font-size:10px;"></i>
+                  <span>Penandatangan: <strong>{{ $item->penandatangan }}</strong></span>
                 </div>
               </td>
               <td class="px-3">
-                <div class="fw-semibold" style="color:var(--text);">{{ $item->tanggal_surat->translatedFormat('d M Y') }}</div>
+                <div class="fw-bold" style="color:var(--text); font-size:12.5px;">{{ $item->tanggal_surat->translatedFormat('d M Y') }}</div>
+                <div class="text-muted" style="font-size:10.5px;">{{ $item->tanggal_surat->diffForHumans() }}</div>
               </td>
               <td class="px-3">
-                <div class="fw-bold" style="color:var(--text);">{{ $item->tujuan_surat }}</div>
+                <div class="fw-bold" style="color:var(--text); line-height:1.4;">{{ $item->tujuan_surat }}</div>
               </td>
               <td class="px-3">
-                <div class="fw-semibold mb-1" style="color:var(--text);">{{ $item->perihal }}</div>
+                <div class="fw-semibold mb-1" style="color:var(--text); line-height:1.45;">{{ $item->perihal }}</div>
                 <div class="d-flex flex-wrap gap-1 align-items-center">
-                  <span class="badge bg-info-subtle text-info border border-info-subtle px-2 py-0" style="font-size:10px;">
-                    Kode: {{ $item->kode_klasifikasi }}
+                  <span class="situan-tag-badge kode">
+                    <i class="bi bi-tag-fill"></i>Kode: {{ $item->kode_klasifikasi }}
                   </span>
 
                   @if($item->sumber_modul === 'sirani_kesiswaan')
-                    <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle px-2 py-0" style="font-size:10px;">
-                      <i class="bi bi-shield-exclamation me-1"></i>SIRANI Kesiswaan
+                    <span class="situan-tag-badge kesiswaan">
+                      <i class="bi bi-shield-exclamation"></i>SIRANI Kesiswaan
                     </span>
                   @elseif($item->sumber_modul === 'sirani_bk')
-                    <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-2 py-0" style="font-size:10px;">
-                      <i class="bi bi-chat-heart-fill me-1"></i>SIRANI BK
+                    <span class="situan-tag-badge bk">
+                      <i class="bi bi-chat-heart-fill"></i>SIRANI BK
                     </span>
                   @elseif($item->sumber_modul === 'sirani_disiplin')
-                    <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-0" style="font-size:10px;">
-                      <i class="bi bi-journal-check me-1"></i>SIRANI Disiplin
+                    <span class="situan-tag-badge disiplin">
+                      <i class="bi bi-journal-check"></i>SIRANI Disiplin
                     </span>
                   @elseif($item->sumber_modul === 'situan_kepegawaian')
-                    <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle px-2 py-0" style="font-size:10px;">
-                      <i class="bi bi-briefcase-fill me-1"></i>SITUAN Kepegawaian
+                    <span class="situan-tag-badge kepegawaian">
+                      <i class="bi bi-briefcase-fill"></i>SITUAN Kepegawaian
                     </span>
                   @elseif($item->sumber_modul === 'situan_pelayanan')
-                    <span class="badge bg-info-subtle text-info border border-info-subtle px-2 py-0" style="font-size:10px;">
-                      <i class="bi bi-qr-code me-1"></i>SITUAN Pelayanan
+                    <span class="situan-tag-badge pelayanan">
+                      <i class="bi bi-qr-code"></i>SITUAN Pelayanan
                     </span>
                   @else
-                    <span class="badge bg-light text-secondary border px-2 py-0" style="font-size:10px;">
-                      <i class="bi bi-building me-1"></i>SITUAN TU
+                    <span class="situan-tag-badge tu">
+                      <i class="bi bi-building"></i>SITUAN TU
                     </span>
                   @endif
 
                   @if($item->kategori_surat)
-                    <span class="badge bg-light text-dark border px-2 py-0" style="font-size:10px;">
+                    <span class="situan-tag-badge tu">
                       {{ $item->kategori_surat }}
                     </span>
                   @elseif($item->jenis_surat === 'suket_siswa')
-                    <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-0" style="font-size:10px;">
-                      <i class="bi bi-person-check-fill me-1"></i>Suket Siswa
+                    <span class="situan-tag-badge suket">
+                      <i class="bi bi-person-check-fill"></i>Suket Siswa
                     </span>
                   @elseif($item->jenis_surat === 'sk_kepsek')
-                    <span class="badge bg-purple-subtle text-purple border border-purple-subtle px-2 py-0" style="font-size:10px; background:rgba(147,51,234,0.1); color:#9333ea; border-color:rgba(147,51,234,0.3);">
-                      <i class="bi bi-file-earmark-ruled me-1"></i>SK Kepsek
+                    <span class="situan-tag-badge sk">
+                      <i class="bi bi-file-earmark-ruled"></i>SK Kepsek
                     </span>
                   @endif
                 </div>
               </td>
               <td class="text-center px-3" style="white-space:nowrap;">
-                <div class="btn-group btn-group-sm" role="group">
-                  @if($item->link_cetak)
-                    <a href="{{ $item->link_cetak }}" target="_blank" class="btn btn-outline-primary py-1 px-2" style="font-size:11.5px;" title="Buka Lembar Cetak Dokumen A4 Resmi">
+                @php
+                  $printUrl = $item->link_cetak;
+                  if (!$printUrl) {
+                    if ($item->pelayanans && $item->pelayanans->isNotEmpty()) {
+                      $printUrl = route('situan.pelayanan.cetak', $item->pelayanans->first()->id);
+                    } elseif (!empty($item->isi_surat)) {
+                      $printUrl = route('situan.surat-keluar.cetak', $item->id);
+                    }
+                  }
+                @endphp
+                <div class="situan-action-group">
+                  @if($printUrl)
+                    <a href="{{ $printUrl }}" target="_blank" class="situan-action-icon-btn btn-print" title="Buka Lembar Cetak Dokumen A4 Resmi">
                       <i class="bi bi-printer-fill"></i>
                     </a>
                   @endif
 
                   @if($item->file_arsip)
-                    <a href="{{ asset('storage/' . $item->file_arsip) }}" target="_blank" class="btn btn-outline-secondary py-1 px-2" style="font-size:11.5px;" title="Buka Berkas Scan PDF">
+                    <a href="{{ asset('storage/' . $item->file_arsip) }}" target="_blank" class="situan-action-icon-btn btn-pdf" title="Buka Berkas Scan PDF">
                       <i class="bi bi-file-earmark-pdf-fill"></i>
                     </a>
                   @endif
 
                   {{-- Tombol Edit Surat --}}
-                  <button type="button" class="btn btn-outline-warning py-1 px-2" style="font-size:11.5px;" data-bs-toggle="modal" data-bs-target="#modalEditSurat_{{ $item->id }}" title="Edit / Sesuaikan Nomor &amp; Data Surat">
+                  <button type="button" class="situan-action-icon-btn btn-edit" data-bs-toggle="modal" data-bs-target="#modalEditSurat_{{ $item->id }}" title="Edit / Sesuaikan Nomor &amp; Data Surat">
                     <i class="bi bi-pencil-square"></i>
                   </button>
 
                   {{-- Tombol Hapus Surat --}}
-                  <button type="button" class="btn btn-outline-danger py-1 px-2" style="font-size:11.5px;" onclick="if(confirm('Yakin ingin menghapus nomor surat keluar ini?')) { document.getElementById('formHapusSurat_{{ $item->id }}').submit(); }" title="Hapus dari Buku Agenda">
+                  <button type="button" class="situan-action-icon-btn btn-delete" onclick="if(confirm('Yakin ingin menghapus nomor surat keluar ini?')) { document.getElementById('formHapusSurat_{{ $item->id }}').submit(); }" title="Hapus dari Buku Agenda">
                     <i class="bi bi-trash-fill"></i>
                   </button>
                 </div>

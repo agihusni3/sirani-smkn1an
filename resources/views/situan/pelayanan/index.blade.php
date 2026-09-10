@@ -102,17 +102,17 @@
   </div>
 
   {{-- Pelayanan History Table --}}
-  <div class="card border-0 shadow-sm rounded-3" style="background:var(--surface); border:1px solid var(--border)!important;">
+  <div class="situan-table-card shadow-sm border rounded-4 overflow-hidden mb-4" style="background:var(--surface); border:1px solid var(--border)!important;">
     <div class="table-responsive">
       <table class="table table-hover align-middle mb-0" style="font-size:12.5px;">
-        <thead class="table-light" style="border-bottom:1.5px solid var(--border);">
+        <thead style="background:#f8fafc; border-bottom:1.5px solid var(--border);">
           <tr>
-            <th class="py-3 px-3" style="width:220px;">Nomor Agenda &amp; Surat</th>
-            <th class="py-3 px-3" style="width:200px;">Nama Siswa / Rombel</th>
-            <th class="py-3 px-3" style="width:170px;">Jenis Layanan</th>
-            <th class="py-3 px-3">Keperluan / Keterangan</th>
-            <th class="py-3 px-3" style="width:120px;">Tgl Terbit</th>
-            <th class="py-3 px-3 text-center" style="width:160px;">Aksi</th>
+            <th class="py-3 px-3" style="width:230px; font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:0.05em; color:#475569;">Nomor Agenda &amp; Surat</th>
+            <th class="py-3 px-3" style="width:200px; font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:0.05em; color:#475569;">Nama Siswa / Rombel</th>
+            <th class="py-3 px-3" style="width:170px; font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:0.05em; color:#475569;">Jenis Layanan</th>
+            <th class="py-3 px-3" style="font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:0.05em; color:#475569;">Keperluan / Keterangan</th>
+            <th class="py-3 px-3" style="width:130px; font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:0.05em; color:#475569;">Tgl Terbit</th>
+            <th class="py-3 px-3 text-center" style="width:120px; font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:0.05em; color:#475569;">Aksi</th>
           </tr>
         </thead>
         <tbody>
@@ -131,41 +131,45 @@
                 'suket_mutasi_keluar' => 'Mutasi Keluar',
                 'suket_skl' => 'SKL Sementara',
                 'suket_pengantar_pkl' => 'Pengantar PKL',
-                default => 'Suket Kesiswaan',
+                default => 'Surat Keterangan',
               };
+            @endphp
+            @php
               $rombelNama = $item->siswa?->siswaRombels?->first()?->rombel?->nama_rombel ?? ($item->payload_snapshot['rombel'] ?? '-');
             @endphp
             <tr>
               <td class="px-3">
-                <div class="fw-bold font-monospace text-primary" style="font-size:12px;">{{ $item->suratKeluar?->nomor_surat_lengkap ?? 'No. Pending' }}</div>
-                <small class="text-muted">Kode Klasifikasi: 422.4</small>
-              </td>
-              <td class="px-3">
-                <div class="fw-bold text-dark">{{ $item->siswa?->nama ?? ($item->payload_snapshot['nama'] ?? 'Siswa') }}</div>
-                <div class="text-secondary" style="font-size:11.5px;">
-                  NISN: {{ $item->siswa?->nisn ?: '-' }} &bull; <span class="badge bg-light text-dark border">{{ $rombelNama }}</span>
+                <div>
+                  <span class="situan-nomor-badge">{{ $item->suratKeluar?->nomor_surat_lengkap ?? 'No. Pending' }}</span>
+                </div>
+                <div class="text-muted d-flex align-items-center gap-1 mt-1" style="font-size:11px;">
+                  @if($item->suratKeluar)
+                    <span class="situan-agenda-badge" style="padding:1px 5px; font-size:10px;">Agenda #{{ str_pad((string)$item->suratKeluar->nomor_agenda, 3, '0', STR_PAD_LEFT) }}</span>
+                  @endif
                 </div>
               </td>
               <td class="px-3">
-                <span class="badge {{ $badgeClass }} px-2 py-1 rounded-pill" style="font-size:11px; font-weight:600;">
+                <div class="fw-bold" style="color:var(--text); font-size:13px;">{{ $item->siswa->nama ?? ($item->payload_snapshot['nama'] ?? 'Siswa') }}</div>
+                <div class="text-muted small">NISN: {{ $item->siswa->nisn ?? '-' }} &bull; {{ $rombelNama }}</div>
+              </td>
+              <td class="px-3">
+                <span class="badge {{ $badgeClass }} px-2 py-1 rounded-pill" style="font-size:11px;">
                   {{ $namaLayanan }}
                 </span>
               </td>
               <td class="px-3">
-                <div class="text-dark">{{ $item->keperluan }}</div>
-                @if($item->jenis_pelayanan === 'suket_mutasi_keluar' && !empty($item->payload_snapshot['sekolah_tujuan']))
-                  <div class="text-muted small">Tujuan: <strong>{{ $item->payload_snapshot['sekolah_tujuan'] }}</strong></div>
-                @endif
+                <div class="text-dark" style="font-size:12.5px; line-height:1.4;">{{ $item->keperluan ?: '-' }}</div>
               </td>
               <td class="px-3 text-muted">
-                <i class="bi bi-calendar-event me-1"></i>{{ \Carbon\Carbon::parse($item->created_at)->translatedFormat('d M Y') }}
+                <div class="fw-semibold text-dark" style="font-size:12px;">{{ \Carbon\Carbon::parse($item->created_at)->translatedFormat('d M Y') }}</div>
+                <div style="font-size:10.5px;">{{ \Carbon\Carbon::parse($item->created_at)->diffForHumans() }}</div>
               </td>
-              <td class="text-center px-3">
-                <div class="btn-group btn-group-sm">
-                  <a href="{{ route('situan.pelayanan.cetak', $item->id) }}" target="_blank" class="btn btn-primary" title="Cetak Surat Resmi A4">
-                    <i class="bi bi-printer-fill me-1"></i> Cetak
+              <td class="text-center px-3" style="white-space:nowrap;">
+                <div class="situan-action-group">
+                  <a href="{{ route('situan.pelayanan.cetak', $item->id) }}" target="_blank" class="situan-action-icon-btn btn-print" title="Cetak Surat Resmi A4">
+                    <i class="bi bi-printer-fill"></i>
                   </a>
-                  <a href="{{ route('situan.verifikasi-surat', $item->kode_verifikasi_qr) }}" target="_blank" class="btn btn-outline-secondary" title="Cek Halaman Verifikasi QR Publik">
+                  <a href="{{ route('situan.verifikasi-surat', $item->kode_verifikasi_qr) }}" target="_blank" class="situan-action-icon-btn btn-pdf" title="Cek Halaman Verifikasi QR Publik">
                     <i class="bi bi-qr-code-scan"></i>
                   </a>
                 </div>

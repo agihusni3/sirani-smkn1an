@@ -944,25 +944,178 @@ body.situan-body {
 }
 
 /* Action Icon Buttons in Table */
+.situan-action-group {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
 .situan-action-icon-btn {
-  width: 30px;
-  height: 30px;
-  border-radius: 6px;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
   background: #ffffff;
-  border: 1px solid #cbd5e1;
-  color: #000000;
+  border: 1.5px solid #cbd5e1;
+  color: #334155;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   font-size: 13px;
   text-decoration: none;
-  transition: all 0.15s ease;
+  cursor: pointer;
+  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
 }
 
 .situan-action-icon-btn:hover {
-  background: #0284c7;
+  transform: translateY(-1px);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
+}
+
+.situan-action-icon-btn.btn-print {
+  background: #eff6ff;
+  color: #2563eb;
+  border-color: #bfdbfe;
+}
+.situan-action-icon-btn.btn-print:hover {
+  background: #2563eb;
   color: #ffffff;
-  border-color: #0284c7;
+  border-color: #2563eb;
+  box-shadow: 0 3px 8px rgba(37, 99, 235, 0.25);
+}
+
+.situan-action-icon-btn.btn-pdf {
+  background: #f8fafc;
+  color: #475569;
+  border-color: #cbd5e1;
+}
+.situan-action-icon-btn.btn-pdf:hover {
+  background: #334155;
+  color: #ffffff;
+  border-color: #334155;
+  box-shadow: 0 3px 8px rgba(51, 65, 85, 0.25);
+}
+
+.situan-action-icon-btn.btn-edit {
+  background: #fffbeb;
+  color: #d97706;
+  border-color: #fde68a;
+}
+.situan-action-icon-btn.btn-edit:hover {
+  background: #d97706;
+  color: #ffffff;
+  border-color: #d97706;
+  box-shadow: 0 3px 8px rgba(217, 119, 6, 0.25);
+}
+
+.situan-action-icon-btn.btn-delete {
+  background: #fef2f2;
+  color: #dc2626;
+  border-color: #fecaca;
+}
+.situan-action-icon-btn.btn-delete:hover {
+  background: #dc2626;
+  color: #ffffff;
+  border-color: #dc2626;
+  box-shadow: 0 3px 8px rgba(220, 38, 38, 0.25);
+}
+
+.situan-action-icon-btn.btn-disp {
+  background: #f0fdf4;
+  color: #16a34a;
+  border-color: #bbf7d0;
+}
+.situan-action-icon-btn.btn-disp:hover {
+  background: #16a34a;
+  color: #ffffff;
+  border-color: #16a34a;
+  box-shadow: 0 3px 8px rgba(22, 163, 74, 0.25);
+}
+
+/* Agenda & Nomor Surat Badges */
+.situan-agenda-badge {
+  display: inline-block;
+  padding: 3px 8px;
+  font-size: 11.5px;
+  font-weight: 800;
+  font-family: var(--font-mono, ui-monospace, monospace);
+  color: #334155;
+  background: #f1f5f9;
+  border: 1.5px solid #cbd5e1;
+  border-radius: 6px;
+  letter-spacing: 0.02em;
+}
+
+.situan-nomor-badge {
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-weight: 700;
+  font-size: 12.5px;
+  color: #0284c7;
+  background: rgba(2, 132, 199, 0.08);
+  border: 1px solid rgba(2, 132, 199, 0.2);
+  padding: 2.5px 8px;
+  border-radius: 6px;
+  display: inline-block;
+  line-height: 1.4;
+  word-break: break-word;
+}
+
+.situan-tag-badge {
+  font-size: 10.5px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  line-height: 1.35;
+  border: 1px solid transparent;
+}
+.situan-tag-badge.kode {
+  background: #e0f2fe;
+  color: #0369a1;
+  border-color: #bae6fd;
+}
+.situan-tag-badge.kesiswaan {
+  background: #fef3c7;
+  color: #92400e;
+  border-color: #fde68a;
+}
+.situan-tag-badge.bk {
+  background: #e0e7ff;
+  color: #3730a3;
+  border-color: #c7d2fe;
+}
+.situan-tag-badge.disiplin {
+  background: #fee2e2;
+  color: #991b1b;
+  border-color: #fca5a5;
+}
+.situan-tag-badge.kepegawaian {
+  background: #f1f5f9;
+  color: #334155;
+  border-color: #cbd5e1;
+}
+.situan-tag-badge.pelayanan {
+  background: #dbeafe;
+  color: #1e40af;
+  border-color: #bfdbfe;
+}
+.situan-tag-badge.tu {
+  background: #f8fafc;
+  color: #475569;
+  border-color: #e2e8f0;
+}
+.situan-tag-badge.suket {
+  background: #dcfce7;
+  color: #166534;
+  border-color: #bbf7d0;
+}
+.situan-tag-badge.sk {
+  background: #f3e8ff;
+  color: #6b21a8;
+  border-color: #e9d5ff;
 }
 
 /* Action Button Aliases */

@@ -121,4 +121,31 @@ class PersuratanManualDanAdhocTest extends TestCase
         $deleteResponse->assertRedirect(route('situan.surat-keluar.index'));
         $this->assertDatabaseMissing('surat_keluars', ['id' => $surat->id]);
     }
+
+    public function test_tampilan_agenda_surat_keluar_merender_badge_modern_dan_tombol_aksi_simetris(): void
+    {
+        SuratKeluar::create([
+            'nomor_agenda'        => 5,
+            'tahun_agenda'        => 2026,
+            'kode_klasifikasi'    => '421.3',
+            'nomor_surat_lengkap' => '005/421.3/SMKN1AN/IX/2026',
+            'tujuan_surat'        => 'Kepala Dinas Pendidikan',
+            'perihal'             => 'Pengantar KGB',
+            'tanggal_surat'       => '2026-09-10',
+            'penandatangan'       => 'Kepala Sekolah',
+            'jenis_surat'         => 'umum',
+            'sumber_modul'        => 'situan_kepegawaian',
+        ]);
+
+        $res = $this->actingAs($this->admin)->get(route('situan.surat-keluar.index'));
+        $res->assertOk();
+        $res->assertSee('situan-table-card', false);
+        $res->assertSee('situan-agenda-badge', false);
+        $res->assertSee('situan-nomor-badge', false);
+        $res->assertSee('situan-action-group', false);
+        $res->assertSee('situan-action-icon-btn', false);
+        $res->assertSee('#005');
+        $res->assertSee('005/421.3/SMKN1AN/IX/2026');
+    }
 }
+

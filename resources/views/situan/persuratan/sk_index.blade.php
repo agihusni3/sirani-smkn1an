@@ -92,29 +92,29 @@
   </div>
 
   {{-- SK List Table --}}
-  <div class="card border-0 shadow-sm rounded-3" style="background:var(--surface); border:1px solid var(--border)!important;">
+  <div class="situan-table-card shadow-sm border rounded-4 overflow-hidden mb-4" style="background:var(--surface); border:1px solid var(--border)!important;">
     <div class="table-responsive">
       <table class="table table-hover align-middle mb-0" style="font-size:13px;">
-        <thead class="table-light" style="border-bottom:1.5px solid var(--border);">
+        <thead style="background:#f8fafc; border-bottom:1.5px solid var(--border);">
           <tr>
-            <th class="py-3 px-3 text-center" style="width:75px;">No. Urut</th>
-            <th class="py-3 px-3" style="width:230px;">Nomor SK Resmi</th>
-            <th class="py-3 px-3" style="width:130px;">Tgl Penetapan</th>
-            <th class="py-3 px-3" style="width:180px;">Kategori</th>
-            <th class="py-3 px-3">Tentang / Ketetapan SK</th>
-            <th class="py-3 px-3 text-center" style="width:120px;">Arsip Digital</th>
+            <th class="py-3 px-3 text-center" style="width:85px; font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:0.05em; color:#475569;">No. Urut</th>
+            <th class="py-3 px-3" style="width:230px; font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:0.05em; color:#475569;">Nomor SK Resmi</th>
+            <th class="py-3 px-3" style="width:130px; font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:0.05em; color:#475569;">Tgl Penetapan</th>
+            <th class="py-3 px-3" style="width:180px; font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:0.05em; color:#475569;">Kategori</th>
+            <th class="py-3 px-3" style="font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:0.05em; color:#475569;">Tentang / Ketetapan SK</th>
+            <th class="py-3 px-3 text-center" style="width:120px; font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:0.05em; color:#475569;">Arsip Digital</th>
           </tr>
         </thead>
         <tbody>
           @forelse($bukuSks as $sk)
             <tr>
               <td class="text-center px-3">
-                <span class="badge bg-secondary-subtle text-secondary px-2 py-1 fw-bold font-monospace" style="font-size:12px;">
+                <span class="situan-agenda-badge">
                   #{{ str_pad((string)$sk->nomor_urut_sk, 3, '0', STR_PAD_LEFT) }}
                 </span>
               </td>
               <td class="px-3">
-                <span class="fw-bold font-monospace text-primary" style="font-size:12.5px;">{{ $sk->nomor_sk_lengkap }}</span>
+                <span class="situan-nomor-badge">{{ $sk->nomor_sk_lengkap }}</span>
               </td>
               <td class="px-3 text-muted">
                 <i class="bi bi-calendar3 me-1 text-secondary"></i>{{ \Carbon\Carbon::parse($sk->tanggal_ditetapkan)->translatedFormat('d M Y') }}
@@ -136,8 +136,8 @@
               </td>
               <td class="text-center px-3">
                 @if($sk->file_dokumen)
-                  <a href="{{ asset('storage/' . $sk->file_dokumen) }}" target="_blank" class="btn btn-sm btn-outline-primary" style="font-size:11.5px; padding:3px 8px;">
-                    <i class="bi bi-file-earmark-pdf me-1"></i> Buka PDF
+                  <a href="{{ asset('storage/' . $sk->file_dokumen) }}" target="_blank" class="situan-action-icon-btn btn-pdf" title="Buka Berkas PDF SK">
+                    <i class="bi bi-file-earmark-pdf-fill"></i>
                   </a>
                 @else
                   <span class="text-muted" style="font-size:11px;">Belum Unggah</span>

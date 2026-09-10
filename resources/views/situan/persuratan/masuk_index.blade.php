@@ -96,17 +96,17 @@
   </div>
 
   {{-- Agenda Table --}}
-  <div class="card border-0 shadow-sm rounded-3" style="background:var(--surface); border:1px solid var(--border)!important;">
+  <div class="situan-table-card shadow-sm border rounded-4 overflow-hidden mb-4" style="background:var(--surface); border:1px solid var(--border)!important;">
     <div class="table-responsive">
       <table class="table table-hover align-middle mb-0" style="font-size:12.5px;">
-        <thead class="table-light" style="border-bottom:1.5px solid var(--border);">
+        <thead style="background:#f8fafc; border-bottom:1.5px solid var(--border);">
           <tr>
-            <th class="py-3 px-3 text-center" style="width:75px;">No. Agenda</th>
-            <th class="py-3 px-3" style="width:160px;">Tgl Terima / Surat</th>
-            <th class="py-3 px-3" style="width:220px;">Nomor &amp; Pengirim</th>
-            <th class="py-3 px-3">Perihal &amp; Urgensi</th>
-            <th class="py-3 px-3" style="width:180px;">Status Disposisi</th>
-            <th class="py-3 px-3 text-center" style="width:170px;">Aksi</th>
+            <th class="py-3 px-3 text-center" style="width:85px; font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:0.05em; color:#475569;">No. Agenda</th>
+            <th class="py-3 px-3" style="width:160px; font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:0.05em; color:#475569;">Tgl Terima / Surat</th>
+            <th class="py-3 px-3" style="width:230px; font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:0.05em; color:#475569;">Nomor &amp; Pengirim</th>
+            <th class="py-3 px-3" style="font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:0.05em; color:#475569;">Perihal &amp; Urgensi</th>
+            <th class="py-3 px-3" style="width:180px; font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:0.05em; color:#475569;">Status Disposisi</th>
+            <th class="py-3 px-3 text-center" style="width:140px; font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:0.05em; color:#475569;">Aksi</th>
           </tr>
         </thead>
         <tbody>
@@ -114,21 +114,25 @@
             <tr>
               {{-- No Agenda --}}
               <td class="text-center px-3">
-                <span class="badge bg-secondary-subtle text-secondary px-2 py-1 fw-bold" style="font-size:12px; font-family:var(--font-mono, monospace);">
+                <span class="situan-agenda-badge">
                   #{{ str_pad((string)$item->nomor_agenda, 3, '0', STR_PAD_LEFT) }}
                 </span>
               </td>
 
               {{-- Tanggal --}}
               <td class="px-3">
-                <div class="fw-bold" style="color:var(--text);">{{ $item->tanggal_diterima->translatedFormat('d M Y') }}</div>
-                <div class="text-muted" style="font-size:11px;">Surat: {{ $item->tanggal_surat->translatedFormat('d/m/Y') }}</div>
+                <div class="fw-bold" style="color:var(--text); font-size:12.5px;">{{ $item->tanggal_diterima->translatedFormat('d M Y') }}</div>
+                <div class="text-muted" style="font-size:10.5px;">Surat: {{ $item->tanggal_surat->translatedFormat('d/m/Y') }}</div>
               </td>
 
               {{-- Nomor & Pengirim --}}
               <td class="px-3">
-                <div class="fw-bold text-primary" style="font-family:var(--font-mono, monospace); font-size:12px;">{{ $item->nomor_surat_asal }}</div>
-                <div class="text-muted small"><i class="bi bi-building me-1"></i>{{ $item->pengirim }}</div>
+                <div>
+                  <span class="situan-nomor-badge">
+                    {{ $item->nomor_surat_asal }}
+                  </span>
+                </div>
+                <div class="text-muted small mt-1"><i class="bi bi-building me-1"></i>{{ $item->pengirim }}</div>
               </td>
 
               {{-- Perihal & Urgensi --}}
@@ -176,24 +180,24 @@
               </td>
 
               {{-- Aksi --}}
-              <td class="text-center px-3">
-                <div class="btn-group btn-group-sm">
+              <td class="text-center px-3" style="white-space:nowrap;">
+                <div class="situan-action-group">
                   {{-- Tombol Disposisi (Kepsek/Admin) --}}
                   @if(auth()->user()->isKepalaSekolah() || auth()->user()->isAdmin())
-                    <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#modalDisposisi{{ $item->id }}" title="Beri Disposisi Kepsek">
-                      <i class="bi bi-pencil-square"></i> Disposisi
+                    <button type="button" class="situan-action-icon-btn btn-disp" data-bs-toggle="modal" data-bs-target="#modalDisposisi{{ $item->id }}" title="Beri Disposisi Kepala Sekolah">
+                      <i class="bi bi-pencil-square"></i>
                     </button>
                   @endif
 
                   {{-- Cetak Lembar Disposisi Resmi A5 --}}
-                  <a href="{{ route('situan.surat-masuk.cetak-disposisi', $item->id) }}" target="_blank" class="btn btn-outline-secondary" title="Cetak Lembar Disposisi Standar A5">
+                  <a href="{{ route('situan.surat-masuk.cetak-disposisi', $item->id) }}" target="_blank" class="situan-action-icon-btn btn-print" title="Cetak Lembar Disposisi Standar A5">
                     <i class="bi bi-printer-fill"></i>
                   </a>
 
                   {{-- Lihat Berkas Lampiran --}}
                   @if($item->file_lampiran)
-                    <a href="{{ asset('storage/' . $item->file_lampiran) }}" target="_blank" class="btn btn-outline-info" title="Buka File Scan">
-                      <i class="bi bi-file-earmark-pdf"></i>
+                    <a href="{{ asset('storage/' . $item->file_lampiran) }}" target="_blank" class="situan-action-icon-btn btn-pdf" title="Buka File Scan PDF">
+                      <i class="bi bi-file-earmark-pdf-fill"></i>
                     </a>
                   @endif
                 </div>
