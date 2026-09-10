@@ -192,4 +192,60 @@ class SituanEKabinetTest extends TestCase
         $responseKabinet->assertSee('Pelatihan Pembelajaran Berbasis AI');
         $responseKabinet->assertSee('Sertifikat Pelatihan / Diklat');
     }
+
+    public function test_akses_rute_terpisah_ekabinet_siswa_ptk_lembaga_dan_mou(): void
+    {
+        // 1. E-Kabinet Siswa
+        $resSiswa = $this->actingAs($this->stafTu)->get(route('situan.ekabinet.siswa'));
+        $resSiswa->assertOk();
+        $resSiswa->assertSee('E-Kabinet Siswa');
+
+        // 2. E-Kabinet PTK
+        $resPtk = $this->actingAs($this->stafTu)->get(route('situan.ekabinet.ptk'));
+        $resPtk->assertOk();
+        $resPtk->assertSee('E-Kabinet PTK');
+
+        // 3. E-Kabinet Lembaga
+        $resLembaga = $this->actingAs($this->stafTu)->get(route('situan.ekabinet.lembaga'));
+        $resLembaga->assertOk();
+        $resLembaga->assertSee('E-Kabinet Lembaga');
+
+        // 4. E-Kabinet MoU
+        $resMou = $this->actingAs($this->stafTu)->get(route('situan.ekabinet.mou'));
+        $resMou->assertOk();
+        $resMou->assertSee('E-Kabinet MoU');
+    }
+
+    public function test_staf_tu_dapat_mengunggah_dan_menghapus_mou_industri_via_ekabinet_mou(): void
+    {
+        Storage::fake('public');
+
+        $file = UploadedFile::fake()->create('mou_honda.pdf', 800, 'application/pdf');
+
+        $response = $this->actingAs($this->stafTu)->post(route('situan.ekabinet.mou.store'), [
+            'nama_arsip'       => 'MoU Kerjasama PKL dengan PT Astra Honda Motor',
+            'mitra_instansi'   => 'PT Astra Honda Motor (AHM)',
+            'nomor_dokumen'    => '421.5/120/SMKN1AN/2026',
+            'tanggal_dokumen'  => '2026-02-01',
+            'tanggal_berakhir' => '2029-02-01',
+            'file_dokumen'     => $file,
+            'keterangan'       => 'Kerjasama guru magang dan sertifikasi kompetensi keahlian TBSM',
+        ]);
+
+        $response->assertRedirect(route('situan.ekabinet.index', ['tab' => 'mou']));
+        $response->assertSessionHas('success');
+
+        $mou = ArsipSekolah::where('kategori_arsip', 'mou_industri')
+            ->where('mitra_instansi', 'PT Astra Honda Motor (AHM)')
+            ->first();
+
+        $this->assertNotNull($mou);
+        $this->assertEquals('MoU Kerjasama PKL dengan PT Astra Honda Motor', $mou->nama_arsip);
+
+        // Hapus MoU
+        $resDelete = $this->actingAs($this->stafTu)->delete(route('situan.ekabinet.mou.destroy', $mou->id));
+        $resDelete->assertRedirect(route('situan.ekabinet.index', ['tab' => 'mou']));
+
+        $this->assertDatabaseMissing('arsip_sekolahs', ['id' => $mou->id]);
+    }
 }

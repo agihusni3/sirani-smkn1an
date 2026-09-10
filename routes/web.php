@@ -189,8 +189,13 @@ Route::middleware('auth')->group(function () {
         Route::post('/situan/arsip-ptk/{guruId}', [SituanKepegawaianController::class, 'arsipPtkStore'])->name('situan.arsip-ptk.store');
         Route::delete('/situan/arsip-ptk/{id}', [SituanKepegawaianController::class, 'arsipPtkDestroy'])->name('situan.arsip-ptk.destroy');
 
-        // E-Kabinet & E-Arsip Digital Terpusat (Sentral Dokumen PTK, Siswa, Lembaga & MoU)
+        // E-Kabinet & E-Arsip Digital Terpusat (Sentral Dokumen Siswa, PTK, Lembaga & MoU)
         Route::get('/situan/ekabinet', [SituanEKabinetController::class, 'index'])->name('situan.ekabinet.index');
+        Route::get('/situan/ekabinet/siswa', [SituanEKabinetController::class, 'siswa'])->name('situan.ekabinet.siswa');
+        Route::get('/situan/ekabinet/ptk', [SituanEKabinetController::class, 'ptk'])->name('situan.ekabinet.ptk');
+        Route::get('/situan/ekabinet/lembaga', [SituanEKabinetController::class, 'lembaga'])->name('situan.ekabinet.lembaga');
+        Route::get('/situan/ekabinet/mou', [SituanEKabinetController::class, 'mou'])->name('situan.ekabinet.mou');
+
         Route::post('/situan/ekabinet/ptk', [SituanEKabinetController::class, 'storePtk'])->name('situan.ekabinet.ptk.store');
         Route::delete('/situan/ekabinet/ptk/{id}', [SituanEKabinetController::class, 'destroyPtk'])->name('situan.ekabinet.ptk.destroy');
         Route::post('/situan/ekabinet/siswa', [SituanEKabinetController::class, 'storeSiswa'])->name('situan.ekabinet.siswa.store');
@@ -198,6 +203,8 @@ Route::middleware('auth')->group(function () {
         Route::post('/situan/ekabinet/sync-ppdb', [SituanEKabinetController::class, 'syncFromPpdb'])->name('situan.ekabinet.sync-ppdb');
         Route::post('/situan/ekabinet/lembaga', [SituanEKabinetController::class, 'storeLembaga'])->name('situan.ekabinet.lembaga.store');
         Route::delete('/situan/ekabinet/lembaga/{id}', [SituanEKabinetController::class, 'destroyLembaga'])->name('situan.ekabinet.lembaga.destroy');
+        Route::post('/situan/ekabinet/mou', [SituanEKabinetController::class, 'storeMou'])->name('situan.ekabinet.mou.store');
+        Route::delete('/situan/ekabinet/mou/{id}', [SituanEKabinetController::class, 'destroyMou'])->name('situan.ekabinet.mou.destroy');
     });
 
     // 1. Modul SIRANI (Sistem Informasi Responsif Absensi & Kedisiplinan)

@@ -53,6 +53,42 @@
 @section('content')
 <div class="container-fluid px-3 px-md-4 py-4">
 
+  @php
+    $headerConfigs = [
+      'siswa' => [
+        'badge' => 'E-Kabinet Siswa',
+        'badge_class' => 'bg-success-subtle text-success border-success-subtle',
+        'title' => 'E-Kabinet Digital Peserta Didik',
+        'desc' => 'Penyimpanan terpadu berkas resmi siswa (Ijazah SMP, Akta, KK, Rapor, KIP/PIP, dan sinkronisasi PPDB).',
+      ],
+      'ptk' => [
+        'badge' => 'E-Kabinet PTK',
+        'badge_class' => 'bg-primary-subtle text-primary border-primary-subtle',
+        'title' => 'E-Kabinet Digital PTK & Kepegawaian',
+        'desc' => 'Penyimpanan terpusat dokumen kepegawaian Guru dan Tenaga Kependidikan (SK Pangkat, KGB, Serdik, Karpeg).',
+      ],
+      'lembaga' => [
+        'badge' => 'E-Kabinet Lembaga',
+        'badge_class' => 'bg-secondary-subtle text-dark border-secondary-subtle',
+        'title' => 'E-Kabinet Dokumen Lembaga & Legalitas',
+        'desc' => 'Penyimpanan arsip institusi (Akreditasi BAN-SM, Izin Operasional, Sertifikat Tanah/Aset, KOSP, SOP, SK Kelembagaan).',
+      ],
+      'mou' => [
+        'badge' => 'E-Kabinet MoU',
+        'badge_class' => 'bg-warning-subtle text-warning border-warning-subtle',
+        'title' => 'E-Kabinet MoU & Kemitraan DUDI',
+        'desc' => 'Sentral dokumen Perjanjian Kerjasama (PKS) dan MoU kemitraan industri, dunia usaha/kerja, serta magang PKL.',
+      ],
+      'kelengkapan' => [
+        'badge' => 'Radar Kelengkapan',
+        'badge_class' => 'bg-info-subtle text-info border-info-subtle',
+        'title' => 'Radar Kelengkapan Berkas Administrasi Guru',
+        'desc' => 'Monitoring kepatuhan dan matriks pemenuhan berkas kepegawaian seluruh GTK SMKN 1 Air Naningan.',
+      ],
+    ];
+    $activeHeader = $headerConfigs[$activeTab] ?? $headerConfigs['siswa'];
+  @endphp
+
   {{-- Page Header --}}
   <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3 mb-4">
     <div>
@@ -60,87 +96,128 @@
         <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-2 py-1 rounded-pill" style="font-size:11px; font-weight:700;">
           <i class="bi bi-archive-fill me-1"></i> E-Kabinet Digital Terpusat
         </span>
-        <span class="text-muted" style="font-size:12px;">Sentral Berkas Kepegawaian &amp; Lembaga</span>
+        <span class="badge {{ $activeHeader['badge_class'] }} px-2 py-1 rounded-pill" style="font-size:11px; font-weight:700;">
+          {{ $activeHeader['badge'] }}
+        </span>
+        <span class="text-muted" style="font-size:12px;">SITUAN SMKN 1 Air Naningan</span>
       </div>
       <h1 class="h3 mb-0 fw-bold" style="color:var(--text); letter-spacing:-0.02em;">Lemari Arsip &amp; E-Kabinet Sekolah</h1>
-      <p class="text-muted mb-0 small">Penyimpanan cloud terpadu berkas PTK, regulasi kedinasan, akreditasi, dan naskah kerjasama (MoU) industri.</p>
+      <p class="text-muted mb-0 small">{{ $activeHeader['desc'] }}</p>
     </div>
 
     <div class="d-flex gap-2 flex-wrap align-items-center">
       <a href="{{ route('situan.index') }}" class="btn btn-outline-secondary btn-sm px-3 d-inline-flex align-items-center" style="font-weight:700; height:36px;">
         <i class="bi bi-arrow-left me-1.5"></i> Dasbor SITUAN
       </a>
-      <button type="button" class="btn btn-success btn-sm px-3 d-inline-flex align-items-center" data-bs-toggle="modal" data-bs-target="#modalUploadArsipSiswa" style="font-weight:700; height:36px;">
-        <i class="bi bi-mortarboard-fill me-1.5"></i> Unggah Berkas Siswa
-      </button>
-      <button type="button" class="btn btn-primary btn-sm px-3 d-inline-flex align-items-center" data-bs-toggle="modal" data-bs-target="#modalUploadArsipPtk" style="font-weight:700; height:36px;">
-        <i class="bi bi-person-badge-fill me-1.5"></i> Unggah Berkas PTK
-      </button>
-      @if(!empty($ppdbReadyCount) && $ppdbReadyCount > 0)
-        <button type="button" class="btn btn-outline-info btn-sm px-3 d-inline-flex align-items-center" data-bs-toggle="modal" data-bs-target="#modalSyncPpdb" style="font-weight:700; height:36px;">
-          <i class="bi bi-arrow-repeat me-1.5"></i> Tarik PPDB <span class="badge bg-info text-dark ms-1.5">{{ $ppdbReadyCount }}</span>
+
+      @if($activeTab === 'siswa')
+        <button type="button" class="btn btn-success btn-sm px-3 d-inline-flex align-items-center" data-bs-toggle="modal" data-bs-target="#modalUploadArsipSiswa" style="font-weight:700; height:36px;">
+          <i class="bi bi-mortarboard-fill me-1.5"></i> Unggah Berkas Siswa
+        </button>
+        @if(!empty($ppdbReadyCount) && $ppdbReadyCount > 0)
+          <button type="button" class="btn btn-outline-info btn-sm px-3 d-inline-flex align-items-center" data-bs-toggle="modal" data-bs-target="#modalSyncPpdb" style="font-weight:700; height:36px;">
+            <i class="bi bi-arrow-repeat me-1.5"></i> Tarik PPDB <span class="badge bg-info text-dark ms-1.5">{{ $ppdbReadyCount }}</span>
+          </button>
+        @endif
+      @elseif($activeTab === 'ptk' || $activeTab === 'kelengkapan')
+        <button type="button" class="btn btn-primary btn-sm px-3 d-inline-flex align-items-center" data-bs-toggle="modal" data-bs-target="#modalUploadArsipPtk" style="font-weight:700; height:36px;">
+          <i class="bi bi-person-badge-fill me-1.5"></i> Unggah Berkas PTK
+        </button>
+      @elseif($activeTab === 'lembaga')
+        <button type="button" class="btn btn-dark btn-sm px-3 d-inline-flex align-items-center" data-bs-toggle="modal" data-bs-target="#modalUploadArsipLembaga" style="font-weight:700; height:36px;">
+          <i class="bi bi-building-fill-add me-1.5"></i> Unggah Dokumen Lembaga
+        </button>
+      @elseif($activeTab === 'mou')
+        <button type="button" class="btn btn-warning btn-sm px-3 d-inline-flex align-items-center text-dark fw-bold" data-bs-toggle="modal" data-bs-target="#modalUploadArsipMou" style="height:36px;">
+          <i class="bi bi-briefcase-fill me-1.5"></i> Unggah Dokumen MoU
         </button>
       @endif
-      <button type="button" class="btn btn-dark btn-sm px-3 d-inline-flex align-items-center" data-bs-toggle="modal" data-bs-target="#modalUploadArsipLembaga" style="font-weight:700; height:36px;">
-        <i class="bi bi-building-fill-add me-1.5"></i> Unggah Lembaga / MoU
-      </button>
     </div>
   </div>
 
   {{-- Quick Metric Cards --}}
   <div class="row g-3 mb-4">
     <div class="col-6 col-md-3">
-      <div class="card border-0 shadow-sm rounded-3 p-3" style="background:var(--surface); border:1px solid var(--border)!important;">
-        <div class="text-muted small fw-semibold mb-1">Total Arsip PTK</div>
-        <div class="h3 mb-0 fw-bolder text-primary">{{ $totalArsipPtk }}</div>
-        <div class="text-muted" style="font-size:11px;">{{ $totalGuruWithArsip }} dari {{ $gurus->count() }} Guru terarsip</div>
-      </div>
+      <a href="{{ route('situan.ekabinet.siswa') }}" class="text-decoration-none">
+        <div class="card border-0 shadow-sm rounded-3 p-3 {{ $activeTab === 'siswa' ? 'border-success' : '' }}" style="background:var(--surface); border:1px solid var(--border)!important;">
+          <div class="d-flex justify-content-between align-items-center mb-1">
+            <span class="text-muted small fw-semibold">Total Arsip Siswa</span>
+            <i class="bi bi-mortarboard-fill text-success"></i>
+          </div>
+          <div class="h3 mb-0 fw-bolder text-success">{{ $totalArsipSiswa }}</div>
+          <div class="text-muted" style="font-size:11px;">{{ $totalSiswaWithArsip }} siswa terdata</div>
+        </div>
+      </a>
     </div>
     <div class="col-6 col-md-3">
-      <div class="card border-0 shadow-sm rounded-3 p-3" style="background:var(--surface); border:1px solid var(--border)!important;">
-        <div class="text-muted small fw-semibold mb-1">Total Arsip Siswa</div>
-        <div class="h3 mb-0 fw-bolder text-success">{{ $totalArsipSiswa }}</div>
-        <div class="text-success" style="font-size:11px;"><i class="bi bi-mortarboard-fill me-1"></i>{{ $totalSiswaWithArsip }} Siswa memiliki berkas</div>
-      </div>
+      <a href="{{ route('situan.ekabinet.ptk') }}" class="text-decoration-none">
+        <div class="card border-0 shadow-sm rounded-3 p-3 {{ $activeTab === 'ptk' ? 'border-primary' : '' }}" style="background:var(--surface); border:1px solid var(--border)!important;">
+          <div class="d-flex justify-content-between align-items-center mb-1">
+            <span class="text-muted small fw-semibold">Total Arsip PTK</span>
+            <i class="bi bi-person-badge-fill text-primary"></i>
+          </div>
+          <div class="h3 mb-0 fw-bolder text-primary">{{ $totalArsipPtk }}</div>
+          <div class="text-muted" style="font-size:11px;">{{ $totalGuruWithArsip }} dari {{ $gurus->count() }} Guru terarsip</div>
+        </div>
+      </a>
     </div>
     <div class="col-6 col-md-3">
-      <div class="card border-0 shadow-sm rounded-3 p-3" style="background:var(--surface); border:1px solid var(--border)!important;">
-        <div class="text-muted small fw-semibold mb-1">Arsip Lembaga &amp; Aset</div>
-        <div class="h3 mb-0 fw-bolder text-info">{{ $totalArsipSekolah }}</div>
-        <div class="text-muted" style="font-size:11px;">Akreditasi, SK, &amp; Kurikulum</div>
-      </div>
+      <a href="{{ route('situan.ekabinet.lembaga') }}" class="text-decoration-none">
+        <div class="card border-0 shadow-sm rounded-3 p-3 {{ $activeTab === 'lembaga' ? 'border-dark' : '' }}" style="background:var(--surface); border:1px solid var(--border)!important;">
+          <div class="d-flex justify-content-between align-items-center mb-1">
+            <span class="text-muted small fw-semibold">Arsip Lembaga &amp; Aset</span>
+            <i class="bi bi-building text-dark"></i>
+          </div>
+          <div class="h3 mb-0 fw-bolder text-dark">{{ $totalArsipLembaga }}</div>
+          <div class="text-muted" style="font-size:11px;">Akreditasi, SK, &amp; Aset Sekolah</div>
+        </div>
+      </a>
     </div>
     <div class="col-6 col-md-3">
-      <div class="card border-0 shadow-sm rounded-3 p-3" style="background:var(--surface); border:1px solid var(--border)!important;">
-        <div class="text-muted small fw-semibold mb-1">MoU Industri Aktif</div>
-        <div class="h3 mb-0 fw-bolder text-warning">{{ $totalMouAktif }}</div>
-        <div class="text-muted" style="font-size:11px;">Kerjasama DUDI &amp; PKL berjalan</div>
-      </div>
+      <a href="{{ route('situan.ekabinet.mou') }}" class="text-decoration-none">
+        <div class="card border-0 shadow-sm rounded-3 p-3 {{ $activeTab === 'mou' ? 'border-warning' : '' }}" style="background:var(--surface); border:1px solid var(--border)!important;">
+          <div class="d-flex justify-content-between align-items-center mb-1">
+            <span class="text-muted small fw-semibold">MoU Industri Aktif</span>
+            <i class="bi bi-briefcase-fill text-warning"></i>
+          </div>
+          <div class="h3 mb-0 fw-bolder text-warning">{{ $totalArsipMou }}</div>
+          <div class="text-muted" style="font-size:11px;">{{ $totalMouAktif }} Kerjasama Aktif</div>
+        </div>
+      </a>
     </div>
   </div>
 
   {{-- Navigation Tabs --}}
-  <ul class="nav nav-pills mb-3 gap-2" id="ekabinetTabs" role="tablist">
+  <ul class="nav nav-pills mb-3 gap-2 flex-wrap" id="ekabinetTabs" role="tablist">
     <li class="nav-item" role="presentation">
-      <a class="nav-link {{ $activeTab === 'ptk' ? 'active' : '' }} fw-bold" href="{{ route('situan.ekabinet.index', ['tab' => 'ptk']) }}">
-        <i class="bi bi-person-vcard me-1"></i> Laci Arsip PTK &amp; Kepegawaian
-        <span class="badge bg-light text-dark ms-1">{{ $totalArsipPtk }}</span>
+      <a class="nav-link {{ $activeTab === 'siswa' ? 'active bg-success text-white' : '' }} fw-bold" href="{{ route('situan.ekabinet.siswa') }}">
+        <i class="bi bi-mortarboard-fill me-1"></i> E-Kabinet Siswa (Peserta Didik)
+        <span class="visually-hidden">Laci Arsip Siswa (Peserta Didik)</span>
+        <span class="badge {{ $activeTab === 'siswa' ? 'bg-light text-success' : 'bg-success-subtle text-success border border-success-subtle' }} ms-1">{{ $totalArsipSiswa }}</span>
       </a>
     </li>
     <li class="nav-item" role="presentation">
-      <a class="nav-link {{ $activeTab === 'siswa' ? 'active' : '' }} fw-bold" href="{{ route('situan.ekabinet.index', ['tab' => 'siswa']) }}">
-        <i class="bi bi-mortarboard me-1"></i> Laci Arsip Siswa (Peserta Didik)
-        <span class="badge bg-success-subtle text-success border border-success-subtle ms-1">{{ $totalArsipSiswa }}</span>
+      <a class="nav-link {{ $activeTab === 'ptk' ? 'active bg-primary text-white' : '' }} fw-bold" href="{{ route('situan.ekabinet.ptk') }}">
+        <i class="bi bi-person-badge-fill me-1"></i> E-Kabinet PTK &amp; Kepegawaian
+        <span class="visually-hidden">Laci Arsip PTK &amp; Kepegawaian</span>
+        <span class="badge {{ $activeTab === 'ptk' ? 'bg-light text-primary' : 'bg-primary-subtle text-primary border border-primary-subtle' }} ms-1">{{ $totalArsipPtk }}</span>
       </a>
     </li>
     <li class="nav-item" role="presentation">
-      <a class="nav-link {{ $activeTab === 'lembaga' ? 'active' : '' }} fw-bold" href="{{ route('situan.ekabinet.index', ['tab' => 'lembaga']) }}">
-        <i class="bi bi-buildings-fill me-1"></i> Laci Arsip Lembaga &amp; MoU DUDI
-        <span class="badge bg-light text-dark ms-1">{{ $totalArsipSekolah }}</span>
+      <a class="nav-link {{ $activeTab === 'lembaga' ? 'active bg-dark text-white' : '' }} fw-bold" href="{{ route('situan.ekabinet.lembaga') }}">
+        <i class="bi bi-building me-1"></i> E-Kabinet Lembaga &amp; Aset
+        <span class="badge {{ $activeTab === 'lembaga' ? 'bg-light text-dark' : 'bg-secondary-subtle text-dark border' }} ms-1">{{ $totalArsipLembaga }}</span>
       </a>
     </li>
     <li class="nav-item" role="presentation">
-      <a class="nav-link {{ $activeTab === 'kelengkapan' ? 'active' : '' }} fw-bold" href="{{ route('situan.ekabinet.index', ['tab' => 'kelengkapan']) }}">
+      <a class="nav-link {{ $activeTab === 'mou' ? 'active bg-warning text-dark' : '' }} fw-bold" href="{{ route('situan.ekabinet.mou') }}">
+        <i class="bi bi-briefcase-fill me-1"></i> E-Kabinet MoU Kemitraan DUDI
+        <span class="visually-hidden">Laci Arsip Lembaga &amp; MoU DUDI</span>
+        <span class="badge {{ $activeTab === 'mou' ? 'bg-dark text-warning' : 'bg-warning-subtle text-warning border border-warning-subtle' }} ms-1">{{ $totalArsipMou }}</span>
+      </a>
+    </li>
+    <li class="nav-item" role="presentation">
+      <a class="nav-link {{ $activeTab === 'kelengkapan' ? 'active bg-info text-dark' : '' }} fw-bold" href="{{ route('situan.ekabinet.index', ['tab' => 'kelengkapan']) }}">
         <i class="bi bi-radar me-1"></i> Radar Kelengkapan Berkas Guru
       </a>
     </li>
@@ -486,23 +563,22 @@
     </div>
   @endif
 
-  {{-- Tab 3: Lemari Berkas Lembaga & MoU --}}
+  {{-- Tab 3: Lemari Berkas Lembaga (Dokumen Sekolah & Aset) --}}
   @if($activeTab === 'lembaga')
     <div class="card border-0 shadow-sm rounded-3 mb-4" style="background:var(--surface); border:1px solid var(--border)!important;">
       <div class="card-body p-3">
-        <form method="GET" action="{{ route('situan.ekabinet.index') }}" class="row g-2 align-items-center">
+        <form method="GET" action="{{ route('situan.ekabinet.lembaga') }}" class="row g-2 align-items-center">
           <input type="hidden" name="tab" value="lembaga">
           <div class="col-md-6 col-12">
             <div class="input-group input-group-sm">
               <span class="input-group-text bg-light border-end-0"><i class="bi bi-search"></i></span>
-              <input type="text" name="q_lembaga" value="{{ request('q_lembaga') }}" class="form-control border-start-0" placeholder="Cari nama dokumen, mitra instansi, atau nomor SK...">
+              <input type="text" name="q_lembaga" value="{{ request('q_lembaga') }}" class="form-control border-start-0" placeholder="Cari nama dokumen legalitas atau nomor SK...">
             </div>
           </div>
           <div class="col-md-4 col-8">
-            <select name="kategori_lembaga" class="form-select form-select-sm">
-              <option value="">— Semua Kategori Dokumen Sekolah —</option>
+            <select name="kategori_lembaga" class="form-select form-select-sm" onchange="this.form.submit()">
+              <option value="">— Semua Kategori Dokumen Lembaga —</option>
               <option value="akreditasi" {{ request('kategori_lembaga') == 'akreditasi' ? 'selected' : '' }}>Akreditasi Sekolah (BAN-SM)</option>
-              <option value="mou_industri" {{ request('kategori_lembaga') == 'mou_industri' ? 'selected' : '' }}>MoU Kemitraan DUDI / Industri (PKL)</option>
               <option value="izin_operasional" {{ request('kategori_lembaga') == 'izin_operasional' ? 'selected' : '' }}>Izin Operasional &amp; Pendirian</option>
               <option value="sertifikat_aset" {{ request('kategori_lembaga') == 'sertifikat_aset' ? 'selected' : '' }}>Sertifikat Tanah &amp; Aset Gedung</option>
               <option value="kurikulum_kosp" {{ request('kategori_lembaga') == 'kurikulum_kosp' ? 'selected' : '' }}>Dokumen Kurikulum (KOSP)</option>
@@ -512,8 +588,8 @@
             </select>
           </div>
           <div class="col-md-2 col-4 d-flex gap-2">
-            <button type="submit" class="btn btn-sm btn-primary w-100 fw-bold">Filter</button>
-            <a href="{{ route('situan.ekabinet.index', ['tab' => 'lembaga']) }}" class="btn btn-sm btn-outline-secondary" title="Reset"><i class="bi bi-arrow-counterclockwise"></i></a>
+            <button type="submit" class="btn btn-sm btn-dark w-100 fw-bold">Filter</button>
+            <a href="{{ route('situan.ekabinet.lembaga') }}" class="btn btn-sm btn-outline-secondary" title="Reset"><i class="bi bi-arrow-counterclockwise"></i></a>
           </div>
         </form>
       </div>
@@ -522,12 +598,11 @@
         <table class="table table-hover align-middle mb-0" style="font-size:12.5px;">
           <thead class="table-light" style="border-bottom:1.5px solid var(--border);">
             <tr>
-              <th class="py-3 px-3" style="width:160px;">Kategori Berkas</th>
+              <th class="py-3 px-3" style="width:180px;">Kategori Berkas</th>
               <th class="py-3 px-3">Nama Dokumen / Arsip</th>
-              <th class="py-3 px-3" style="width:180px;">Mitra / Lembaga</th>
-              <th class="py-3 px-3" style="width:160px;">Nomor Dokumen</th>
-              <th class="py-3 px-3" style="width:150px;">Masa Berlaku</th>
-              <th class="py-3 px-3 text-center" style="width:130px;">Aksi</th>
+              <th class="py-3 px-3" style="width:180px;">Nomor Dokumen</th>
+              <th class="py-3 px-3" style="width:160px;">Tanggal / Masa Berlaku</th>
+              <th class="py-3 px-3 text-center" style="width:120px;">Aksi</th>
             </tr>
           </thead>
           <tbody>
@@ -544,18 +619,11 @@
                 <td class="px-3">
                   <div class="fw-bold text-dark">{{ $arsip->nama_arsip }}</div>
                   @if($arsip->keterangan)
-                    <div class="text-muted" style="font-size:11px;">{{ Str::limit($arsip->keterangan, 60) }}</div>
+                    <div class="text-muted" style="font-size:11px;">{{ Str::limit($arsip->keterangan, 70) }}</div>
                   @endif
                 </td>
                 <td class="px-3 text-muted">
-                  @if($arsip->mitra_instansi)
-                    <span class="fw-semibold text-dark"><i class="bi bi-building me-1 text-primary"></i>{{ $arsip->mitra_instansi }}</span>
-                  @else
-                    <span class="text-muted">-</span>
-                  @endif
-                </td>
-                <td class="px-3 text-muted">
-                  {{ $arsip->nomor_dokumen ?: '-' }}
+                  <span class="font-monospace small">{{ $arsip->nomor_dokumen ?: '-' }}</span>
                 </td>
                 <td class="px-3">
                   @if($arsip->tanggal_berakhir)
@@ -587,9 +655,9 @@
               </tr>
             @empty
               <tr>
-                <td colspan="6" class="text-center py-5 text-muted">
+                <td colspan="5" class="text-center py-5 text-muted">
                   <i class="bi bi-buildings fs-1 d-block mb-2 text-secondary"></i>
-                  Belum ada dokumen lembaga atau MoU yang tersimpan.<br>
+                  Belum ada dokumen legalitas atau arsip lembaga yang tersimpan.<br>
                   <button type="button" class="btn btn-sm btn-dark mt-2" data-bs-toggle="modal" data-bs-target="#modalUploadArsipLembaga">
                     <i class="bi bi-building-fill-add me-1"></i> Unggah Dokumen Lembaga Baru
                   </button>
@@ -603,6 +671,139 @@
       @if($arsipLembagas->hasPages())
         <div class="card-footer bg-transparent py-3 border-0">
           {{ $arsipLembagas->links() }}
+        </div>
+      @endif
+    </div>
+  @endif
+
+  {{-- Tab 4: E-Kabinet MoU (Kerjasama Industri & DUDI) --}}
+  @if($activeTab === 'mou')
+    <div class="card border-0 shadow-sm rounded-3 mb-4" style="background:var(--surface); border:1px solid var(--border)!important;">
+      <div class="card-body p-3">
+        <form method="GET" action="{{ route('situan.ekabinet.mou') }}" class="row g-2 align-items-center">
+          <input type="hidden" name="tab" value="mou">
+          <div class="col-md-6 col-12">
+            <div class="input-group input-group-sm">
+              <span class="input-group-text bg-light border-end-0"><i class="bi bi-search"></i></span>
+              <input type="text" name="q_mou" value="{{ request('q_mou') }}" class="form-control border-start-0" placeholder="Cari nama MoU, mitra instansi / perusahaan, atau nomor dokumen...">
+            </div>
+          </div>
+          <div class="col-md-4 col-8">
+            <select name="status_mou" class="form-select form-select-sm" onchange="this.form.submit()">
+              <option value="">— Semua Status Masa Berlaku —</option>
+              <option value="aktif" {{ request('status_mou') == 'aktif' ? 'selected' : '' }}>Masih Aktif / Berlaku</option>
+              <option value="kedaluwarsa" {{ request('status_mou') == 'kedaluwarsa' ? 'selected' : '' }}>Telah Kedaluwarsa (Expired)</option>
+            </select>
+          </div>
+          <div class="col-md-2 col-4 d-flex gap-2">
+            <button type="submit" class="btn btn-sm btn-warning w-100 fw-bold text-dark">Filter</button>
+            <a href="{{ route('situan.ekabinet.mou') }}" class="btn btn-sm btn-outline-secondary" title="Reset"><i class="bi bi-arrow-counterclockwise"></i></a>
+          </div>
+        </form>
+      </div>
+
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0" style="font-size:12.5px;">
+          <thead class="table-light" style="border-bottom:1.5px solid var(--border);">
+            <tr>
+              <th class="py-3 px-3" style="width:220px;">Mitra Instansi / DUDI</th>
+              <th class="py-3 px-3">Judul Kerjasama &amp; Ruang Lingkup</th>
+              <th class="py-3 px-3" style="width:170px;">Nomor Perjanjian</th>
+              <th class="py-3 px-3" style="width:160px;">Masa Berlaku</th>
+              <th class="py-3 px-3 text-center" style="width:120px;">Status</th>
+              <th class="py-3 px-3 text-center" style="width:120px;">Aksi</th>
+            </tr>
+          </thead>
+          <tbody>
+            @forelse($arsipMous as $mou)
+              @php
+                $isExpired = $mou->tanggal_berakhir && $mou->tanggal_berakhir->isPast();
+              @endphp
+              <tr>
+                <td class="px-3">
+                  <div class="d-flex align-items-center gap-2">
+                    <div class="p-2 rounded-2 bg-warning-subtle text-warning border border-warning-subtle d-inline-flex">
+                      <i class="bi bi-building fs-5"></i>
+                    </div>
+                    <div>
+                      <div class="fw-bold text-dark" style="font-size:13px;">{{ $mou->mitra_instansi ?: 'Mitra Industri' }}</div>
+                      <span class="text-muted" style="font-size:11px;">DUDI / Mitra PKL</span>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-3">
+                  <div class="fw-bold text-dark">{{ $mou->nama_arsip }}</div>
+                  @if($mou->keterangan)
+                    <div class="text-muted" style="font-size:11px;">{{ Str::limit($mou->keterangan, 75) }}</div>
+                  @endif
+                </td>
+                <td class="px-3 text-muted">
+                  <span class="font-monospace small">{{ $mou->nomor_dokumen ?: '-' }}</span>
+                </td>
+                <td class="px-3 text-muted" style="font-size:11.5px;">
+                  @if($mou->tanggal_dokumen && $mou->tanggal_berakhir)
+                    <div><i class="bi bi-calendar-event me-1"></i>{{ $mou->tanggal_dokumen->format('d/m/Y') }}</div>
+                    <div><i class="bi bi-arrow-right-short"></i>{{ $mou->tanggal_berakhir->format('d/m/Y') }}</div>
+                  @elseif($mou->tanggal_berakhir)
+                    <div>s.d {{ $mou->tanggal_berakhir->format('d/m/Y') }}</div>
+                  @elseif($mou->tanggal_dokumen)
+                    <div>Mulai {{ $mou->tanggal_dokumen->format('d/m/Y') }}</div>
+                  @else
+                    <div>-</div>
+                  @endif
+                </td>
+                <td class="px-3 text-center">
+                  @if($mou->tanggal_berakhir)
+                    @if($isExpired)
+                      <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1 rounded-pill">
+                        <i class="bi bi-exclamation-triangle-fill me-1"></i> Kedaluwarsa
+                      </span>
+                    @else
+                      <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1 rounded-pill">
+                        <i class="bi bi-check-circle-fill me-1"></i> Aktif
+                      </span>
+                    @endif
+                  @else
+                    <span class="badge bg-info-subtle text-info border border-info-subtle px-2 py-1 rounded-pill">
+                      <i class="bi bi-infinity me-1"></i> Permanen
+                    </span>
+                  @endif
+                </td>
+                <td class="px-3 text-center">
+                  <div class="btn-group btn-group-sm">
+                    @if($mou->file_path)
+                      <a href="{{ asset('storage/' . $mou->file_path) }}" target="_blank" class="btn btn-outline-primary" title="Lihat / Unduh MoU">
+                        <i class="bi bi-eye-fill"></i>
+                      </a>
+                    @endif
+                    <form action="{{ route('situan.ekabinet.mou.destroy', $mou->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Hapus dokumen MoU ini dari E-Kabinet MoU?');">
+                      @csrf
+                      @method('DELETE')
+                      <button type="submit" class="btn btn-outline-danger" title="Hapus Dokumen MoU">
+                        <i class="bi bi-trash"></i>
+                      </button>
+                    </form>
+                  </div>
+                </td>
+              </tr>
+            @empty
+              <tr>
+                <td colspan="6" class="text-center py-5 text-muted">
+                  <i class="bi bi-briefcase fs-1 d-block mb-2 text-warning"></i>
+                  Belum ada dokumen MoU atau Kerjasama Industri yang tersimpan.<br>
+                  <button type="button" class="btn btn-sm btn-warning mt-2 fw-bold text-dark" data-bs-toggle="modal" data-bs-target="#modalUploadArsipMou">
+                    <i class="bi bi-briefcase-fill me-1"></i> Unggah Dokumen MoU Baru
+                  </button>
+                </td>
+              </tr>
+            @endforelse
+          </tbody>
+        </table>
+      </div>
+
+      @if($arsipMous->hasPages())
+        <div class="card-footer bg-transparent py-3 border-0">
+          {{ $arsipMous->links() }}
         </div>
       @endif
     </div>
@@ -834,13 +1035,13 @@
   </div>
 </div>
 
-{{-- MODAL 2: UNGGAH DOKUMEN LEMBAGA / MOU INDUSTRI --}}
+{{-- MODAL 2: UNGGAH DOKUMEN LEMBAGA & LEGALITAS SEKOLAH --}}
 <div class="modal fade" id="modalUploadArsipLembaga" tabindex="-1" aria-labelledby="modalUploadArsipLembagaLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content border-0 shadow">
       <div class="modal-header bg-dark text-white px-4 py-3">
         <h5 class="modal-title fw-bold" id="modalUploadArsipLembagaLabel">
-          <i class="bi bi-building-fill-add me-1"></i> Unggah Dokumen Lembaga / MoU
+          <i class="bi bi-building-fill-add me-1"></i> Unggah Dokumen Lembaga &amp; Legalitas
         </h5>
         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
@@ -850,7 +1051,6 @@
           <div class="mb-3">
             <label class="form-label fw-semibold small">Kategori Arsip Lembaga <span class="text-danger">*</span></label>
             <select name="kategori_arsip" class="form-select" required>
-              <option value="mou_industri">MoU Kemitraan DUDI / Mitra Industri (PKL)</option>
               <option value="akreditasi">Sertifikat Akreditasi Sekolah (BAN-SM)</option>
               <option value="izin_operasional">Izin Operasional / Pendirian Sekolah</option>
               <option value="sertifikat_aset">Sertifikat Tanah / Gedung / Aset</option>
@@ -863,27 +1063,22 @@
 
           <div class="mb-3">
             <label class="form-label fw-semibold small">Nama / Judul Dokumen <span class="text-danger">*</span></label>
-            <input type="text" name="nama_arsip" class="form-control" placeholder="Contoh: MoU Kerjasama PKL PT Indomobil Prima" required>
-          </div>
-
-          <div class="mb-3">
-            <label class="form-label fw-semibold small">Mitra Instansi / Perusahaan (Khusus MoU)</label>
-            <input type="text" name="mitra_instansi" class="form-control" placeholder="Contoh: PT Telkom Akses / RSUD Pringsewu">
+            <input type="text" name="nama_arsip" class="form-control" placeholder="Contoh: Sertifikat Akreditasi BAN-SM Tahun 2025" required>
           </div>
 
           <div class="row g-2 mb-3">
             <div class="col-6">
-              <label class="form-label fw-semibold small">Nomor Surat / Perjanjian</label>
+              <label class="form-label fw-semibold small">Nomor Surat / Dokumen</label>
               <input type="text" name="nomor_dokumen" class="form-control" placeholder="421.5/022/SMKN1/2026">
             </div>
             <div class="col-6">
-              <label class="form-label fw-semibold small">Tanggal Mulai / Dokumen</label>
+              <label class="form-label fw-semibold small">Tanggal Dokumen</label>
               <input type="date" name="tanggal_dokumen" class="form-control">
             </div>
           </div>
 
           <div class="mb-3">
-            <label class="form-label fw-semibold small">Masa Berlaku Berakhir (Khusus Akreditasi / MoU)</label>
+            <label class="form-label fw-semibold small">Masa Berlaku Berakhir (Khusus Akreditasi)</label>
             <input type="date" name="tanggal_berakhir" class="form-control">
             <div class="form-text">Biarkan kosong jika berlaku seterusnya / permanen.</div>
           </div>
@@ -895,13 +1090,74 @@
 
           <div class="mb-2">
             <label class="form-label fw-semibold small">Catatan / Keterangan Tambahan</label>
-            <textarea name="keterangan" class="form-control" rows="2" placeholder="Catatan bidang keahlian, ruang lingkup MoU, atau lokasi penyimpanan fisik..."></textarea>
+            <textarea name="keterangan" class="form-control" rows="2" placeholder="Catatan bidang keahlian, nomor register, atau lokasi fisik dokumen..."></textarea>
           </div>
         </div>
         <div class="modal-footer px-4 py-3 bg-light d-flex justify-content-end gap-2 border-top">
           <button type="button" class="btn btn-sm btn-outline-secondary px-3" data-bs-dismiss="modal" style="font-weight:600; border-radius:8px;">Batal</button>
           <button type="submit" class="btn btn-sm btn-dark px-3 fw-bold" style="border-radius:8px;">
             <i class="bi bi-building-fill-add me-1"></i> Simpan Dokumen Lembaga
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+{{-- MODAL KHUSUS: UNGGAH DOKUMEN MOU & KEMITRAAN DUDI INDUSTRI --}}
+<div class="modal fade" id="modalUploadArsipMou" tabindex="-1" aria-labelledby="modalUploadArsipMouLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow">
+      <div class="modal-header bg-warning text-dark px-4 py-3">
+        <h5 class="modal-title fw-bold" id="modalUploadArsipMouLabel">
+          <i class="bi bi-briefcase-fill me-1"></i> Unggah Dokumen MoU &amp; Kerjasama DUDI
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form action="{{ route('situan.ekabinet.mou.store') }}" method="POST" enctype="multipart/form-data">
+        @csrf
+        <div class="modal-body">
+          <div class="mb-3">
+            <label class="form-label fw-semibold small">Mitra Instansi / Perusahaan (DUDI) <span class="text-danger">*</span></label>
+            <input type="text" name="mitra_instansi" class="form-control" placeholder="Contoh: PT Astra Honda Motor / PT Auto 2000" required>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-semibold small">Nama / Judul Dokumen MoU <span class="text-danger">*</span></label>
+            <input type="text" name="nama_arsip" class="form-control" placeholder="Contoh: MoU Praktek Kerja Lapangan &amp; Penyelarasan Kurikulum" required>
+          </div>
+
+          <div class="row g-2 mb-3">
+            <div class="col-6">
+              <label class="form-label fw-semibold small">Nomor Surat / Perjanjian</label>
+              <input type="text" name="nomor_dokumen" class="form-control" placeholder="421.5/088/SMKN1AN/2026">
+            </div>
+            <div class="col-6">
+              <label class="form-label fw-semibold small">Tanggal Penandatanganan</label>
+              <input type="date" name="tanggal_dokumen" class="form-control">
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-semibold small">Masa Berlaku Berakhir (Batas Akhir Kerjasama)</label>
+            <input type="date" name="tanggal_berakhir" class="form-control">
+            <div class="form-text">Biarkan kosong jika berlaku tanpa batas waktu / permanen.</div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-semibold small">Pilih File Berkas MoU (PDF/JPG/PNG, Maks 10MB) <span class="text-danger">*</span></label>
+            <input type="file" name="file_dokumen" class="form-control" accept=".pdf,.jpg,.jpeg,.png" required>
+          </div>
+
+          <div class="mb-2">
+            <label class="form-label fw-semibold small">Ruang Lingkup Kerjasama / Catatan</label>
+            <textarea name="keterangan" class="form-control" rows="2" placeholder="Contoh: Kerjasama magang siswa TKRO/TBSM, guru tamu industri, uji kompetensi..."></textarea>
+          </div>
+        </div>
+        <div class="modal-footer px-4 py-3 bg-light d-flex justify-content-end gap-2 border-top">
+          <button type="button" class="btn btn-sm btn-outline-secondary px-3" data-bs-dismiss="modal" style="font-weight:600; border-radius:8px;">Batal</button>
+          <button type="submit" class="btn btn-sm btn-warning px-3 fw-bold text-dark" style="border-radius:8px;">
+            <i class="bi bi-briefcase-fill me-1"></i> Simpan ke E-Kabinet MoU
           </button>
         </div>
       </form>

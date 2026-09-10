@@ -16,56 +16,74 @@ use Illuminate\Support\Facades\Storage;
 class SituanEKabinetController extends Controller
 {
     /**
+     * Akses E-Kabinet Siswa
+     */
+    public function siswa(Request $request)
+    {
+        $request->merge(['tab' => 'siswa']);
+        return $this->index($request);
+    }
+
+    /**
+     * Akses E-Kabinet PTK
+     */
+    public function ptk(Request $request)
+    {
+        $request->merge(['tab' => 'ptk']);
+        return $this->index($request);
+    }
+
+    /**
+     * Akses E-Kabinet Lembaga
+     */
+    public function lembaga(Request $request)
+    {
+        $request->merge(['tab' => 'lembaga']);
+        return $this->index($request);
+    }
+
+    /**
+     * Akses E-Kabinet MoU
+     */
+    public function mou(Request $request)
+    {
+        $request->merge(['tab' => 'mou']);
+        return $this->index($request);
+    }
+
+    /**
      * Tampilkan Dasbor Lemari Berkas Digital Terpusat (E-Kabinet SITUAN).
      */
     public function index(Request $request)
     {
-        $activeTab = $request->get('tab', 'ptk'); // 'ptk', 'siswa', 'lembaga', 'kelengkapan'
+        $activeTab = $request->get('tab', 'ptk'); // 'ptk', 'siswa', 'lembaga', 'mou', 'kelengkapan'
 
-        // 1. Metrik Ringkasan Kabinet
-        $totalArsipPtk = ArsipDokumenPtk::count();
-        $totalGuruWithArsip = ArsipDokumenPtk::distinct('guru_id')->count('guru_id');
-
+        // 1. Metrik Ringkasan Tiap Kabinet
         $totalArsipSiswa = ArsipDokumenSiswa::count();
         $totalSiswaWithArsip = ArsipDokumenSiswa::distinct('siswa_id')->count('siswa_id');
 
+        $totalArsipPtk = ArsipDokumenPtk::count();
+        $totalGuruWithArsip = ArsipDokumenPtk::distinct('guru_id')->count('guru_id');
+
+        $totalArsipLembaga = ArsipSekolah::where('kategori_arsip', '!=', 'mou_industri')->count();
         $totalArsipSekolah = ArsipSekolah::count();
+
+        $totalArsipMou = ArsipSekolah::where('kategori_arsip', 'mou_industri')->count();
         $totalMouAktif = ArsipSekolah::where('kategori_arsip', 'mou_industri')
             ->where(function ($q) {
                 $q->whereNull('tanggal_berakhir')->orWhere('tanggal_berakhir', '>=', now()->toDateString());
             })->count();
+        $totalMouExpired = ArsipSekolah::where('kategori_arsip', 'mou_industri')
+            ->whereNotNull('tanggal_berakhir')
+            ->where('tanggal_berakhir', '<', now()->toDateString())
+            ->count();
 
         // 2. Daftar Guru Aktif untuk Dropdown Filter & Upload
         $gurus = Guru::where('status', 'aktif')
             ->orderBy('nama')
             ->get(['id', 'nama', 'nip', 'jabatan', 'golongan_ruang']);
 
-        // 3. Query Arsip PTK (Tab 1)
-        $arsipPtkQuery = ArsipDokumenPtk::with('guru')->latest();
-
-        if ($request->filled('guru_id')) {
-            $arsipPtkQuery->where('guru_id', $request->guru_id);
-        }
-
-        if ($request->filled('kategori_ptk')) {
-            $arsipPtkQuery->where('kategori_berkas', $request->kategori_ptk);
-        }
-
-        if ($request->filled('q_ptk')) {
-            $q = $request->q_ptk;
-            $arsipPtkQuery->where(function ($query) use ($q) {
-                $query->where('nama_dokumen', 'like', "%{$q}%")
-                    ->orWhere('nomor_dokumen', 'like', "%{$q}%")
-                    ->orWhereHas('guru', function ($gQuery) use ($q) {
-                        $gQuery->where('nama', 'like', "%{$q}%")
-                            ->orWhere('nip', 'like', "%{$q}%");
-                    });
-            });
-        }
-
-        $arsipPtks = $arsipPtkQuery->paginate(15, ['*'], 'page_ptk')->withQueryString();
-
-        // 4. Query Arsip Siswa (Tab 2 - BARU)
+        // 3. Query Arsip Siswa (Tab Siswa)
         $rombels = Rombel::orderBy('nama_rombel')->get(['id', 'nama_rombel']);
         $kamusKategoriSiswa = ArsipDokumenSiswa::getKamusKategori();
 
@@ -103,8 +121,35 @@ class SituanEKabinetController extends Controller
         // Cari siswa spesifik jika difilter untuk info header
         $selectedSiswa = $request->filled('siswa_id') ? Siswa::with('siswaRombels.rombel')->find($request->siswa_id) : null;
 
-        // 5. Query Arsip Lembaga & MoU Industri (Tab 3)
-        $arsipLembagaQuery = ArsipSekolah::with('pengunggah')->latest();
+        // 4. Query Arsip PTK (Tab PTK)
+        $arsipPtkQuery = ArsipDokumenPtk::with('guru')->latest();
+
+        if ($request->filled('guru_id')) {
+            $arsipPtkQuery->where('guru_id', $request->guru_id);
+        }
+
+        if ($request->filled('kategori_ptk')) {
+            $arsipPtkQuery->where('kategori_berkas', $request->kategori_ptk);
+        }
+
+        if ($request->filled('q_ptk')) {
+            $q = $request->q_ptk;
+            $arsipPtkQuery->where(function ($query) use ($q) {
+                $query->where('nama_dokumen', 'like', "%{$q}%")
+                    ->orWhere('nomor_dokumen', 'like', "%{$q}%")
+                    ->orWhereHas('guru', function ($gQuery) use ($q) {
+                        $gQuery->where('nama', 'like', "%{$q}%")
+                            ->orWhere('nip', 'like', "%{$q}%");
+                    });
+            });
+        }
+
+        $arsipPtks = $arsipPtkQuery->paginate(15, ['*'], 'page_ptk')->withQueryString();
+
+        // 5. Query Arsip Lembaga (Tab Lembaga - Tanpa MoU Industri)
+        $arsipLembagaQuery = ArsipSekolah::with('pengunggah')
+            ->where('kategori_arsip', '!=', 'mou_industri')
+            ->latest();
 
         if ($request->filled('kategori_lembaga')) {
             $arsipLembagaQuery->where('kategori_arsip', $request->kategori_lembaga);
@@ -114,14 +159,40 @@ class SituanEKabinetController extends Controller
             $qLembaga = $request->q_lembaga;
             $arsipLembagaQuery->where(function ($query) use ($qLembaga) {
                 $query->where('nama_arsip', 'like', "%{$qLembaga}%")
-                    ->orWhere('nomor_dokumen', 'like', "%{$qLembaga}%")
-                    ->orWhere('mitra_instansi', 'like', "%{$qLembaga}%");
+                    ->orWhere('nomor_dokumen', 'like', "%{$qLembaga}%");
             });
         }
 
         $arsipLembagas = $arsipLembagaQuery->paginate(15, ['*'], 'page_lembaga')->withQueryString();
 
-        // 6. Radar Kelengkapan Berkas PTK (Tab 4)
+        // 6. Query Arsip MoU (Tab MoU - Khusus Kerjasama & DUDI)
+        $arsipMouQuery = ArsipSekolah::with('pengunggah')
+            ->where('kategori_arsip', 'mou_industri')
+            ->latest();
+
+        if ($request->filled('status_mou')) {
+            if ($request->status_mou === 'aktif') {
+                $arsipMouQuery->where(function ($q) {
+                    $q->whereNull('tanggal_berakhir')->orWhere('tanggal_berakhir', '>=', now()->toDateString());
+                });
+            } elseif ($request->status_mou === 'kedaluwarsa') {
+                $arsipMouQuery->whereNotNull('tanggal_berakhir')
+                    ->where('tanggal_berakhir', '<', now()->toDateString());
+            }
+        }
+
+        if ($request->filled('q_mou')) {
+            $qMou = $request->q_mou;
+            $arsipMouQuery->where(function ($query) use ($qMou) {
+                $query->where('nama_arsip', 'like', "%{$qMou}%")
+                    ->orWhere('mitra_instansi', 'like', "%{$qMou}%")
+                    ->orWhere('nomor_dokumen', 'like', "%{$qMou}%");
+            });
+        }
+
+        $arsipMous = $arsipMouQuery->paginate(15, ['*'], 'page_mou')->withQueryString();
+
+        // 7. Radar Kelengkapan Berkas PTK (Tab Kelengkapan)
         $radarKelengkapan = Guru::where('status', 'aktif')
             ->with(['arsipDokumens' => function ($q) {
                 $q->select('id', 'guru_id', 'kategori_berkas');
@@ -153,8 +224,11 @@ class SituanEKabinetController extends Controller
             'totalGuruWithArsip',
             'totalArsipSiswa',
             'totalSiswaWithArsip',
+            'totalArsipLembaga',
             'totalArsipSekolah',
+            'totalArsipMou',
             'totalMouAktif',
+            'totalMouExpired',
             'gurus',
             'rombels',
             'kamusKategoriSiswa',
@@ -163,6 +237,7 @@ class SituanEKabinetController extends Controller
             'selectedSiswa',
             'allSiswaAktif',
             'arsipLembagas',
+            'arsipMous',
             'radarKelengkapan',
             'ppdbReadyCount'
         ));
@@ -445,5 +520,66 @@ class SituanEKabinetController extends Controller
 
         return redirect()->route('situan.ekabinet.index', ['tab' => 'lembaga'])
             ->with('success', "Dokumen {$namaArsip} berhasil dihapus dari E-Kabinet.");
+    }
+
+    /**
+     * Unggah Dokumen Perjanjian Kerjasama / MoU Kemitraan DUDI Industri.
+     */
+    public function storeMou(Request $request)
+    {
+        $request->validate([
+            'nama_arsip'       => 'required|string|max:200',
+            'mitra_instansi'   => 'required|string|max:150',
+            'nomor_dokumen'    => 'nullable|string|max:100',
+            'tanggal_dokumen'  => 'nullable|date',
+            'tanggal_berakhir' => 'nullable|date',
+            'file_dokumen'     => 'required|file|mimes:pdf,jpg,jpeg,png|max:10240',
+            'keterangan'       => 'nullable|string|max:500',
+        ]);
+
+        $file = $request->file('file_dokumen');
+        $extension = $file->getClientOriginalExtension();
+        $fileSize = $file->getSize();
+        $fileName = 'mou_' . time() . '_' . uniqid() . '.' . $extension;
+        $filePath = $file->storeAs('arsip_sekolah/mou_industri', $fileName, 'public');
+
+        ArsipSekolah::create([
+            'kategori_arsip'        => 'mou_industri',
+            'nama_arsip'            => $request->nama_arsip,
+            'nomor_dokumen'         => $request->nomor_dokumen,
+            'mitra_instansi'        => $request->mitra_instansi,
+            'tanggal_dokumen'       => $request->tanggal_dokumen,
+            'tanggal_berakhir'      => $request->tanggal_berakhir,
+            'file_path'             => $filePath,
+            'file_type'             => $extension,
+            'file_size'             => $fileSize,
+            'keterangan'            => $request->keterangan,
+            'diunggah_oleh_user_id' => auth()->id(),
+        ]);
+
+        AuditLog::catat('create', 'situan_ekabinet_mou', "Mengarsipkan MoU Kerjasama: {$request->nama_arsip} dengan {$request->mitra_instansi}");
+
+        return redirect()->route('situan.ekabinet.index', ['tab' => 'mou'])
+            ->with('success', "Dokumen MoU Kerjasama dengan {$request->mitra_instansi} berhasil disimpan ke E-Kabinet MoU.");
+    }
+
+    /**
+     * Hapus Dokumen MoU dari E-Kabinet MoU.
+     */
+    public function destroyMou($id)
+    {
+        $arsip = ArsipSekolah::where('kategori_arsip', 'mou_industri')->findOrFail($id);
+        $namaArsip = $arsip->nama_arsip;
+
+        if ($arsip->file_path && Storage::disk('public')->exists($arsip->file_path)) {
+            Storage::disk('public')->delete($arsip->file_path);
+        }
+
+        $arsip->delete();
+
+        AuditLog::catat('delete', 'situan_ekabinet_mou', "Menghapus dokumen MoU Kerjasama: {$namaArsip}");
+
+        return redirect()->route('situan.ekabinet.index', ['tab' => 'mou'])
+            ->with('success', "Dokumen MoU {$namaArsip} berhasil dihapus dari E-Kabinet MoU.");
     }
 }

@@ -99,17 +99,46 @@
     </div>
 
     {{-- 3. Kepegawaian & Kearsipan Sentral --}}
+    {{-- 3. E-Kabinet Digital Terpisah --}}
     @if($isAdmin || $isKepsek || $isStafTu || $isWakaKurikulum || $isWakasis || ($user && in_array($user->role, ['waka_sarpras', 'waka_hubin'])))
       <div class="situan-nav-group">
-        <div class="situan-nav-group-title">Kepegawaian &amp; Arsip</div>
+        <div class="situan-nav-group-title">E-Kabinet Digital</div>
 
-        <a href="{{ route('situan.ekabinet.index') }}" class="situan-nav-link {{ request()->is('situan/ekabinet*') ? 'active' : '' }}" title="Sentral Lemari Berkas Digital PTK, Dokumen Sekolah &amp; MoU Industri">
+        <a href="{{ route('situan.ekabinet.siswa') }}" class="situan-nav-link {{ request()->is('situan/ekabinet/siswa') || (request()->is('situan/ekabinet*') && (request('tab') === 'siswa' || !request('tab'))) ? 'active' : '' }}" title="Lemari Berkas Digital Peserta Didik">
           <div class="situan-nav-link-left">
-            <i class="bi bi-archive-fill"></i>
-            <span>E-Kabinet &amp; Arsip</span>
+            <i class="bi bi-mortarboard-fill text-success"></i>
+            <span>E-Kabinet Siswa</span>
           </div>
-          <span class="situan-nav-badge" style="background:#f0fdf4; color:#16a34a; border-color:#bbf7d0;">Sentral</span>
+          <span class="situan-nav-badge" style="background:#ecfdf5; color:#059669; border-color:#a7f3d0;">Siswa</span>
         </a>
+
+        <a href="{{ route('situan.ekabinet.ptk') }}" class="situan-nav-link {{ request()->is('situan/ekabinet/ptk') || (request()->is('situan/ekabinet*') && in_array(request('tab'), ['ptk', 'kelengkapan'])) ? 'active' : '' }}" title="Lemari Berkas Kepegawaian Guru &amp; Tenaga Kependidikan">
+          <div class="situan-nav-link-left">
+            <i class="bi bi-person-badge-fill text-primary"></i>
+            <span>E-Kabinet PTK</span>
+          </div>
+          <span class="situan-nav-badge" style="background:#eff6ff; color:#2563eb; border-color:#bfdbfe;">PTK</span>
+        </a>
+
+        <a href="{{ route('situan.ekabinet.lembaga') }}" class="situan-nav-link {{ request()->is('situan/ekabinet/lembaga') || (request()->is('situan/ekabinet*') && request('tab') === 'lembaga') ? 'active' : '' }}" title="Dokumen Lembaga, Akreditasi, Izin &amp; Aset Sekolah">
+          <div class="situan-nav-link-left">
+            <i class="bi bi-building text-dark"></i>
+            <span>E-Kabinet Lembaga</span>
+          </div>
+          <span class="situan-nav-badge" style="background:#f1f5f9; color:#334155; border-color:#cbd5e1;">Sekolah</span>
+        </a>
+
+        <a href="{{ route('situan.ekabinet.mou') }}" class="situan-nav-link {{ request()->is('situan/ekabinet/mou') || (request()->is('situan/ekabinet*') && request('tab') === 'mou') ? 'active' : '' }}" title="Perjanjian Kerjasama &amp; MoU Kemitraan DUDI / Industri">
+          <div class="situan-nav-link-left">
+            <i class="bi bi-briefcase-fill text-warning"></i>
+            <span>E-Kabinet MoU</span>
+          </div>
+          <span class="situan-nav-badge" style="background:#fefce8; color:#ca8a04; border-color:#fef08a;">Mitra</span>
+        </a>
+      </div>
+
+      <div class="situan-nav-group">
+        <div class="situan-nav-group-title">Kepegawaian &amp; Pangkat</div>
 
         <a href="{{ route('situan.radar-kgb.index') }}" class="situan-nav-link {{ request()->is('situan/radar-kgb*') ? 'active' : '' }}" title="Radar Kenaikan Gaji Berkala (KGB) &amp; Pangkat Guru/Pegawai">
           <div class="situan-nav-link-left">
