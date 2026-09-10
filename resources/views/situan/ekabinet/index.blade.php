@@ -2,6 +2,54 @@
 
 @section('title', 'E-Kabinet & E-Arsip Digital — SITUAN SMKN 1 AN')
 
+@push('styles')
+<style>
+  .searchable-select {
+    position: relative;
+  }
+  .searchable-trigger {
+    cursor: pointer;
+    background-color: #ffffff;
+    user-select: none;
+    min-height: 40px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    padding: 8px 12px;
+    transition: all .15s ease;
+  }
+  .searchable-trigger:hover, .searchable-trigger:focus {
+    border-color: #0284c7;
+    box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.12);
+  }
+  .searchable-menu {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    right: 0;
+    z-index: 1070;
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 10px;
+    box-shadow: 0 12px 28px -5px rgba(0, 0, 0, 0.22);
+    overflow: hidden;
+  }
+  .searchable-item {
+    cursor: pointer;
+    transition: background 0.15s ease;
+    border-bottom: 1px solid #f1f5f9;
+  }
+  .searchable-item:last-child {
+    border-bottom: none;
+  }
+  .searchable-item:hover, .searchable-item.active {
+    background-color: #f0fdf4;
+  }
+  .searchable-item.selected {
+    background-color: #e0f2fe;
+  }
+</style>
+@endpush
+
 @section('content')
 <div class="container-fluid px-3 px-md-4 py-4">
 
@@ -677,14 +725,61 @@
         <div class="modal-body">
           <div class="mb-3">
             <label class="form-label fw-semibold small">Pilih Guru / PTK <span class="text-danger">*</span></label>
-            <select name="guru_id" class="form-select" required>
-              <option value="">— Pilih Guru Tujuan —</option>
-              @foreach($gurus as $g)
-                <option value="{{ $g->id }}" {{ request('guru_id') == $g->id ? 'selected' : '' }}>
-                  {{ $g->nama }} (NIP: {{ $g->nip ?: '-' }})
-                </option>
-              @endforeach
-            </select>
+            <div class="searchable-select" id="wrapper_guru">
+              <input type="text" name="guru_id" id="hidden_guru_id" value="{{ request('guru_id') }}" required style="position: absolute; opacity: 0; pointer-events: none; width: 1px; height: 1px; left: 20px; bottom: 0;" tabindex="-1">
+              
+              <div class="searchable-trigger d-flex align-items-center justify-content-between" id="trigger_guru" onclick="toggleSearchable('guru')">
+                <div class="d-flex align-items-center gap-2 overflow-hidden">
+                  <i class="bi bi-person-badge text-primary fs-5"></i>
+                  <span id="label_guru" class="text-truncate {{ request('guru_id') ? 'text-dark fw-semibold' : 'text-muted' }}" style="font-size:13.5px;">
+                    @if(request('guru_id') && ($preGuru = $gurus->firstWhere('id', request('guru_id'))))
+                      {{ $preGuru->nama }} (NIP: {{ $preGuru->nip ?: '-' }})
+                    @else
+                      — Cari / Pilih Guru Tujuan —
+                    @endif
+                  </span>
+                </div>
+                <div class="d-flex align-items-center gap-1">
+                  <button type="button" class="btn btn-sm btn-link text-muted p-0 me-1 {{ request('guru_id') ? '' : 'd-none' }}" id="btn_clear_guru" onclick="clearSearchable('guru', event)" title="Hapus pilihan">
+                    <i class="bi bi-x-circle-fill fs-6"></i>
+                  </button>
+                  <i class="bi bi-chevron-down text-muted small" id="chevron_guru"></i>
+                </div>
+              </div>
+
+              <div class="searchable-menu d-none" id="menu_guru">
+                <div class="p-2 border-bottom bg-light">
+                  <div class="input-group input-group-sm">
+                    <span class="input-group-text bg-white border-end-0"><i class="bi bi-search text-muted"></i></span>
+                    <input type="text" class="form-control border-start-0 ps-0" id="search_input_guru" placeholder="Ketik nama atau NIP guru..." autocomplete="off" oninput="filterSearchable('guru')">
+                  </div>
+                </div>
+                <div class="overflow-auto" style="max-height: 220px;" id="list_guru">
+                  @foreach($gurus as $g)
+                    <div class="searchable-item p-2 px-3 d-flex align-items-center justify-content-between {{ request('guru_id') == $g->id ? 'selected' : '' }}"
+                         data-id="{{ $g->id }}"
+                         data-nama="{{ strtolower($g->nama) }}"
+                         data-nip="{{ strtolower($g->nip ?? '') }}"
+                         data-display="{{ $g->nama }} (NIP: {{ $g->nip ?: '-' }})"
+                         onclick="selectSearchable('guru', '{{ $g->id }}', '{{ addslashes($g->nama) }} (NIP: {{ addslashes($g->nip ?: '-') }})')">
+                      <div>
+                        <div class="fw-semibold text-dark" style="font-size:13px;">{{ $g->nama }}</div>
+                        <div class="text-muted" style="font-size:11px;">
+                          <span>NIP: {{ $g->nip ?: '-' }}</span>
+                          @if($g->jabatan)
+                            <span class="ms-1">&bull; {{ $g->jabatan }}</span>
+                          @endif
+                        </div>
+                      </div>
+                      <i class="bi bi-check2 text-primary fs-5 {{ request('guru_id') == $g->id ? '' : 'd-none' }} check-icon"></i>
+                    </div>
+                  @endforeach
+                  <div class="p-3 text-center text-muted small d-none" id="empty_guru">
+                    <i class="bi bi-search me-1"></i> Guru tidak ditemukan
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
 
           <div class="mb-3">
@@ -829,17 +924,67 @@
         <div class="modal-body">
           <div class="mb-3">
             <label class="form-label fw-semibold small">Pilih Peserta Didik <span class="text-danger">*</span></label>
-            <select name="siswa_id" class="form-select" required>
-              <option value="">— Pilih Siswa Tujuan —</option>
-              @foreach($allSiswaAktif as $s)
-                @php
-                  $rombel = $s->siswaRombels->firstWhere('status_keanggotaan', 'aktif')?->rombel?->nama_rombel ?? 'Tanpa Rombel';
-                @endphp
-                <option value="{{ $s->id }}" {{ (request('siswa_id') == $s->id) ? 'selected' : '' }}>
-                  {{ $s->nama }} (NISN: {{ $s->nisn ?: '-' }} &bull; {{ $rombel }})
-                </option>
-              @endforeach
-            </select>
+            <div class="searchable-select" id="wrapper_siswa">
+              <input type="text" name="siswa_id" id="hidden_siswa_id" value="{{ request('siswa_id') }}" required style="position: absolute; opacity: 0; pointer-events: none; width: 1px; height: 1px; left: 20px; bottom: 0;" tabindex="-1">
+              
+              <div class="searchable-trigger d-flex align-items-center justify-content-between" id="trigger_siswa" onclick="toggleSearchable('siswa')">
+                <div class="d-flex align-items-center gap-2 overflow-hidden">
+                  <i class="bi bi-mortarboard text-success fs-5"></i>
+                  <span id="label_siswa" class="text-truncate {{ request('siswa_id') ? 'text-dark fw-semibold' : 'text-muted' }}" style="font-size:13.5px;">
+                    @if(request('siswa_id') && ($preSiswa = $allSiswaAktif->firstWhere('id', request('siswa_id'))))
+                      @php
+                        $preRombel = $preSiswa->siswaRombels->firstWhere('status_keanggotaan', 'aktif')?->rombel?->nama_rombel ?? 'Tanpa Rombel';
+                      @endphp
+                      {{ $preSiswa->nama }} (NISN: {{ $preSiswa->nisn ?: '-' }} &bull; {{ $preRombel }})
+                    @else
+                      — Cari / Pilih Siswa Tujuan —
+                    @endif
+                  </span>
+                </div>
+                <div class="d-flex align-items-center gap-1">
+                  <button type="button" class="btn btn-sm btn-link text-muted p-0 me-1 {{ request('siswa_id') ? '' : 'd-none' }}" id="btn_clear_siswa" onclick="clearSearchable('siswa', event)" title="Hapus pilihan">
+                    <i class="bi bi-x-circle-fill fs-6"></i>
+                  </button>
+                  <i class="bi bi-chevron-down text-muted small" id="chevron_siswa"></i>
+                </div>
+              </div>
+
+              <div class="searchable-menu d-none" id="menu_siswa">
+                <div class="p-2 border-bottom bg-light">
+                  <div class="input-group input-group-sm">
+                    <span class="input-group-text bg-white border-end-0"><i class="bi bi-search text-muted"></i></span>
+                    <input type="text" class="form-control border-start-0 ps-0" id="search_input_siswa" placeholder="Ketik nama, NISN, atau rombel siswa..." autocomplete="off" oninput="filterSearchable('siswa')">
+                  </div>
+                </div>
+                <div class="overflow-auto" style="max-height: 220px;" id="list_siswa">
+                  @foreach($allSiswaAktif as $s)
+                    @php
+                      $rombelName = $s->siswaRombels->firstWhere('status_keanggotaan', 'aktif')?->rombel?->nama_rombel ?? 'Tanpa Rombel';
+                      $displaySiswa = $s->nama . ' (NISN: ' . ($s->nisn ?: '-') . ' • ' . $rombelName . ')';
+                    @endphp
+                    <div class="searchable-item p-2 px-3 d-flex align-items-center justify-content-between {{ request('siswa_id') == $s->id ? 'selected' : '' }}"
+                         data-id="{{ $s->id }}"
+                         data-nama="{{ strtolower($s->nama) }}"
+                         data-nisn="{{ strtolower($s->nisn ?? '') }}"
+                         data-rombel="{{ strtolower($rombelName) }}"
+                         data-display="{{ $displaySiswa }}"
+                         onclick="selectSearchable('siswa', '{{ $s->id }}', '{{ addslashes($displaySiswa) }}')">
+                      <div>
+                        <div class="fw-semibold text-dark" style="font-size:13px;">{{ $s->nama }}</div>
+                        <div class="text-muted" style="font-size:11px;">
+                          <span>NISN: {{ $s->nisn ?: '-' }}</span>
+                          <span class="ms-1 badge bg-secondary-subtle text-dark border px-1" style="font-size:10.5px;">{{ $rombelName }}</span>
+                        </div>
+                      </div>
+                      <i class="bi bi-check2 text-success fs-5 {{ request('siswa_id') == $s->id ? '' : 'd-none' }} check-icon"></i>
+                    </div>
+                  @endforeach
+                  <div class="p-3 text-center text-muted small d-none" id="empty_siswa">
+                    <i class="bi bi-search me-1"></i> Siswa tidak ditemukan
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
 
           <div class="mb-3">
@@ -936,3 +1081,188 @@
   </div>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+function toggleSearchable(type) {
+  const menu = document.getElementById('menu_' + type);
+  const input = document.getElementById('search_input_' + type);
+  if (!menu) return;
+  
+  const isHidden = menu.classList.contains('d-none');
+  
+  // Tutup searchable dropdown lainnya
+  ['guru', 'siswa'].forEach(t => {
+    if (t !== type) {
+      const otherMenu = document.getElementById('menu_' + t);
+      if (otherMenu) otherMenu.classList.add('d-none');
+    }
+  });
+
+  if (isHidden) {
+    menu.classList.remove('d-none');
+    // Hapus highlight error jika ada
+    const trigger = document.getElementById('trigger_' + type);
+    if (trigger) trigger.classList.remove('border-danger');
+
+    setTimeout(() => {
+      if (input) input.focus();
+    }, 60);
+  } else {
+    menu.classList.add('d-none');
+  }
+}
+
+function filterSearchable(type) {
+  const input = document.getElementById('search_input_' + type);
+  const query = (input ? input.value : '').trim().toLowerCase();
+  const list = document.getElementById('list_' + type);
+  if (!list) return;
+
+  const items = list.querySelectorAll('.searchable-item');
+  const emptyEl = document.getElementById('empty_' + type);
+  let visibleCount = 0;
+
+  items.forEach(item => {
+    let match = false;
+    if (type === 'guru') {
+      const nama = item.getAttribute('data-nama') || '';
+      const nip = item.getAttribute('data-nip') || '';
+      match = nama.includes(query) || nip.includes(query);
+    } else if (type === 'siswa') {
+      const nama = item.getAttribute('data-nama') || '';
+      const nisn = item.getAttribute('data-nisn') || '';
+      const rombel = item.getAttribute('data-rombel') || '';
+      match = nama.includes(query) || nisn.includes(query) || rombel.includes(query);
+    }
+
+    if (match) {
+      item.style.setProperty('display', 'flex', 'important');
+      visibleCount++;
+    } else {
+      item.style.setProperty('display', 'none', 'important');
+    }
+  });
+
+  if (emptyEl) {
+    if (visibleCount === 0) {
+      emptyEl.classList.remove('d-none');
+    } else {
+      emptyEl.classList.add('d-none');
+    }
+  }
+}
+
+function selectSearchable(type, id, displayText) {
+  const hiddenInput = document.getElementById('hidden_' + type + '_id');
+  const label = document.getElementById('label_' + type);
+  const btnClear = document.getElementById('btn_clear_' + type);
+  const menu = document.getElementById('menu_' + type);
+  const list = document.getElementById('list_' + type);
+  const trigger = document.getElementById('trigger_' + type);
+
+  if (hiddenInput) hiddenInput.value = id;
+  if (trigger) trigger.classList.remove('border-danger');
+
+  if (label) {
+    label.textContent = displayText;
+    label.classList.remove('text-muted');
+    label.classList.add('text-dark', 'fw-semibold');
+  }
+
+  if (btnClear) btnClear.classList.remove('d-none');
+
+  if (list) {
+    list.querySelectorAll('.searchable-item').forEach(el => {
+      const isSelected = el.getAttribute('data-id') === String(id);
+      el.classList.toggle('selected', isSelected);
+      const check = el.querySelector('.check-icon');
+      if (check) {
+        check.classList.toggle('d-none', !isSelected);
+      }
+    });
+  }
+
+  if (menu) menu.classList.add('d-none');
+}
+
+function clearSearchable(type, event) {
+  if (event) {
+    event.stopPropagation();
+  }
+  const hiddenInput = document.getElementById('hidden_' + type + '_id');
+  const label = document.getElementById('label_' + type);
+  const btnClear = document.getElementById('btn_clear_' + type);
+  const list = document.getElementById('list_' + type);
+  const searchInput = document.getElementById('search_input_' + type);
+  const emptyEl = document.getElementById('empty_' + type);
+
+  if (hiddenInput) hiddenInput.value = '';
+  if (label) {
+    label.textContent = (type === 'guru') ? '— Cari / Pilih Guru Tujuan —' : '— Cari / Pilih Siswa Tujuan —';
+    label.classList.remove('text-dark', 'fw-semibold');
+    label.classList.add('text-muted');
+  }
+
+  if (btnClear) btnClear.classList.add('d-none');
+
+  if (list) {
+    list.querySelectorAll('.searchable-item').forEach(el => {
+      el.classList.remove('selected');
+      const check = el.querySelector('.check-icon');
+      if (check) check.classList.add('d-none');
+      el.style.setProperty('display', 'flex', 'important');
+    });
+  }
+
+  if (searchInput) searchInput.value = '';
+  if (emptyEl) emptyEl.classList.add('d-none');
+}
+
+// Event listener tutup saat klik di luar
+document.addEventListener('click', function(e) {
+  ['guru', 'siswa'].forEach(type => {
+    const wrapper = document.getElementById('wrapper_' + type);
+    const menu = document.getElementById('menu_' + type);
+    if (wrapper && menu && !wrapper.contains(e.target)) {
+      menu.classList.add('d-none');
+    }
+  });
+});
+
+// Validasi form saat submit agar pilihan wajib diisi
+document.addEventListener('DOMContentLoaded', function() {
+  const formPtk = document.querySelector('#modalUploadArsipPtk form');
+  if (formPtk) {
+    formPtk.addEventListener('submit', function(e) {
+      const hidden = document.getElementById('hidden_guru_id');
+      if (!hidden || !hidden.value) {
+        e.preventDefault();
+        const trigger = document.getElementById('trigger_guru');
+        if (trigger) {
+          trigger.classList.add('border-danger');
+          trigger.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+        toggleSearchable('guru');
+      }
+    });
+  }
+
+  const formSiswa = document.querySelector('#modalUploadArsipSiswa form');
+  if (formSiswa) {
+    formSiswa.addEventListener('submit', function(e) {
+      const hidden = document.getElementById('hidden_siswa_id');
+      if (!hidden || !hidden.value) {
+        e.preventDefault();
+        const trigger = document.getElementById('trigger_siswa');
+        if (trigger) {
+          trigger.classList.add('border-danger');
+          trigger.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+        toggleSearchable('siswa');
+      }
+    });
+  }
+});
+</script>
+@endpush
