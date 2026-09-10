@@ -68,12 +68,23 @@
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
     }
 
+    /* ─── Fix Focus Ring & Blue Border on Tabs ─── */
+    .tab-pane,
+    .tab-pane:focus,
+    .tab-pane:focus-visible,
+    .ptk-info-card,
+    .ptk-info-card:focus,
+    .ptk-info-card:focus-visible {
+      outline: none !important;
+      box-shadow: none !important;
+    }
+
     /* ─── Info Section Cards ─── */
     .ptk-info-card {
       background: var(--bg-2, #FFFFFF);
       border: 1px solid var(--border, rgba(0,0,0,0.08));
       border-radius: 18px;
-      box-shadow: 0 2px 12px -2px rgba(15, 23, 42, 0.04);
+      box-shadow: 0 2px 12px -2px rgba(15, 23, 42, 0.04) !important;
       height: 100%;
       display: flex;
       flex-direction: column;
@@ -89,6 +100,48 @@
     .ptk-info-card-body {
       padding: 22px;
       flex: 1;
+    }
+
+    /* ─── Filter Pills Bar ─── */
+    .ptk-filter-pills {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+      scrollbar-width: thin;
+    }
+    .ptk-filter-pill {
+      border: 1px solid var(--border, rgba(0,0,0,0.08));
+      background: var(--surface, #F8FAFC);
+      color: var(--text-2, #475569);
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      text-decoration: none;
+      user-select: none;
+    }
+    .ptk-filter-pill:hover {
+      background: #EFF6FF;
+      color: #1D4ED8;
+      border-color: #BFDBFE;
+    }
+    .ptk-filter-pill.active {
+      background: #2563EB !important;
+      color: #FFFFFF !important;
+      border-color: #2563EB !important;
+      box-shadow: 0 2px 8px rgba(37, 99, 235, 0.25);
+    }
+    .ptk-filter-pill.active .badge-count {
+      background: rgba(255, 255, 255, 0.25) !important;
+      color: #FFFFFF !important;
     }
 
     /* ─── Modern Key-Value Field Grid ─── */
@@ -148,6 +201,78 @@
       transform: translateY(-2px);
       box-shadow: 0 8px 24px -4px rgba(0,0,0,0.08);
       border-color: #3B82F6;
+    }
+
+    /* ─── Upload Card Slot ─── */
+    .ptk-upload-slot {
+      border: 2px dashed rgba(37, 99, 235, 0.3);
+      background: rgba(248, 250, 252, 0.7);
+      border-radius: 14px;
+      padding: 24px 16px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 180px;
+      height: 100%;
+      text-decoration: none;
+    }
+    .ptk-upload-slot:hover {
+      border-color: #2563EB;
+      background: #EFF6FF;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(37, 99, 235, 0.08);
+    }
+    .ptk-upload-slot:hover .ptk-upload-icon {
+      transform: scale(1.08);
+      background: #2563EB;
+      color: #FFFFFF;
+    }
+    .ptk-upload-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: #EFF6FF;
+      color: #2563EB;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      margin-bottom: 10px;
+      transition: all 0.2s ease;
+    }
+
+    /* ─── Checklist Widget ─── */
+    .ptk-checklist-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 12px;
+      border-radius: 12px;
+      margin-bottom: 8px;
+      background: var(--surface, #F8FAFC);
+      border: 1px solid var(--border, rgba(0,0,0,0.04));
+      font-size: 12px;
+      transition: all 0.15s ease;
+    }
+    .ptk-checklist-item:hover {
+      background: #FFFFFF;
+      border-color: rgba(37, 99, 235, 0.2);
+    }
+    .ptk-checklist-item.terpenuhi {
+      background: #F0FDF4;
+      border-color: #DCFCE7;
+    }
+
+    /* ─── Sync Info Box ─── */
+    .ptk-sync-box {
+      background: linear-gradient(135deg, #F8FAFC 0%, #EFF6FF 100%);
+      border: 1px solid #BFDBFE;
+      border-radius: 16px;
+      padding: 18px;
     }
 
     /* ─── Metric Card ─── */
@@ -307,7 +432,7 @@
       <div class="tab-content" id="ptkTabContent">
 
         {{-- TAB 1: BIODATA KEPEGAWAIAN LENGKAP --}}
-        <div class="tab-pane fade show active" id="tab-biodata" role="tabpanel" tabindex="0">
+        <div class="tab-pane fade show active" id="tab-biodata" role="tabpanel">
           <div class="row g-4 mb-4">
             
             {{-- Panel 1: Identitas Diri & Kontak --}}
@@ -513,118 +638,277 @@
         </div>
 
         {{-- TAB 2: LEMARI BERKAS DIGITAL SAYA --}}
-        <div class="tab-pane fade" id="tab-berkas" role="tabpanel" tabindex="0">
-          <div class="ptk-info-card">
+        <div class="tab-pane fade" id="tab-berkas" role="tabpanel">
+          
+          @php
+            // Hitung statistik kategori berkas
+            $countSk = $arsips->filter(fn($d) => in_array($d->kategori_berkas, ['sk_cpns', 'sk_pns', 'sk_pppk', 'sk_pangkat_terakhir', 'sk_kgb_terakhir']))->count();
+            $countSertifikat = $arsips->filter(fn($d) => in_array($d->kategori_berkas, ['sertifikat_pendidik', 'lainnya']) || str_contains(strtolower($d->nama_dokumen), 'sertifikat') || str_contains(strtolower($d->nama_dokumen), 'diklat') || str_contains(strtolower($d->nama_dokumen), 'pelatihan') || str_contains(strtolower($d->nama_dokumen), 'bimtek'))->count();
+            $countPendidikan = $arsips->filter(fn($d) => in_array($d->kategori_berkas, ['ijazah', 'transkrip']))->count();
+            $countKependudukan = $arsips->filter(fn($d) => in_array($d->kategori_berkas, ['ktp', 'kk', 'kartu_pegawai']))->count();
+
+            // Checklist kelengkapan berkas pokok PTK
+            $hasSkPengangkatan = $arsips->contains(fn($d) => in_array($d->kategori_berkas, ['sk_cpns', 'sk_pns', 'sk_pppk']));
+            $hasSkPangkat      = $arsips->contains('kategori_berkas', 'sk_pangkat_terakhir');
+            $hasSkKgb          = $arsips->contains('kategori_berkas', 'sk_kgb_terakhir');
+            $hasIjazah         = $arsips->contains(fn($d) => in_array($d->kategori_berkas, ['ijazah', 'transkrip']));
+            $hasSertifikat     = $arsips->contains(fn($d) => in_array($d->kategori_berkas, ['sertifikat_pendidik', 'lainnya']) || str_contains(strtolower($d->nama_dokumen), 'sertifikat') || str_contains(strtolower($d->nama_dokumen), 'pelatihan') || str_contains(strtolower($d->nama_dokumen), 'diklat') || str_contains(strtolower($d->nama_dokumen), 'bimtek'));
+            $hasKtpKarpeg      = $arsips->contains(fn($d) => in_array($d->kategori_berkas, ['ktp', 'kk', 'kartu_pegawai']));
+
+            $checklist = [
+              ['key' => 'sk_pns',               'nama' => 'SK Pengangkatan (CPNS/PNS/PPPK)', 'ada' => $hasSkPengangkatan, 'kategori' => 'sk_pns'],
+              ['key' => 'sk_pangkat_terakhir',  'nama' => 'SK Pangkat Terakhir',             'ada' => $hasSkPangkat,      'kategori' => 'sk_pangkat_terakhir'],
+              ['key' => 'sk_kgb_terakhir',      'nama' => 'SK Berkala (KGB) Terakhir',       'ada' => $hasSkKgb,          'kategori' => 'sk_kgb_terakhir'],
+              ['key' => 'ijazah',               'nama' => 'Ijazah Pendidikan Terakhir',       'ada' => $hasIjazah,         'kategori' => 'ijazah'],
+              ['key' => 'sertifikat_pendidik',  'nama' => 'Sertifikat Pendidik / Pelatihan',  'ada' => $hasSertifikat,     'kategori' => 'lainnya'],
+              ['key' => 'ktp',                  'nama' => 'KTP / Kartu Pegawai',             'ada' => $hasKtpKarpeg,      'kategori' => 'ktp'],
+            ];
+
+            $totalTerpenuhi = collect($checklist)->where('ada', true)->count();
+            $persenBerkas = count($checklist) > 0 ? round(($totalTerpenuhi / count($checklist)) * 100) : 0;
+          @endphp
+
+          <div class="row g-4">
             
-            <div class="ptk-info-card-header">
-              <div>
-                <h3 class="h6 fw-bold mb-0" style="color:var(--text, #0F172A);">
-                  <i class="bi bi-folder-symlink-fill text-primary me-1.5"></i> Lemari Berkas Digital Saya (E-Arsip Pribadi)
-                </h3>
-                <div class="text-muted" style="font-size:11.5px;">Dokumen digital yang tersimpan aman di server sekolah dan dapat dibuka kapan pun Anda butuhkan.</div>
-              </div>
-
-              <button type="button" class="btn btn-sm btn-primary px-3 py-1.5 fw-bold d-inline-flex align-items-center gap-1.5 shadow-sm" data-bs-toggle="modal" data-bs-target="#modalUnggahBerkas" style="border-radius:8px;">
-                <i class="bi bi-cloud-arrow-up-fill"></i> Unggah Dokumen Baru
-              </button>
-            </div>
-
-            <div class="ptk-info-card-body">
-              
-              @if($arsips->isEmpty())
-                {{-- Empty State Lemari Berkas --}}
-                <div class="text-center py-5 px-3">
-                  <div class="d-inline-flex align-items-center justify-content-center rounded-circle mb-3 shadow-sm" style="width:72px; height:72px; background:#EFF6FF; color:#2563EB;">
-                    <i class="bi bi-folder-plus fs-1"></i>
+            {{-- KOLOM KIRI (col-lg-8): Galeri Dokumen & Filter --}}
+            <div class="col-lg-8">
+              <div class="ptk-info-card">
+                
+                {{-- Header Lemari Berkas --}}
+                <div class="ptk-info-card-header flex-wrap gap-2">
+                  <div class="d-flex align-items-center gap-2">
+                    <div class="p-2 rounded-3 bg-primary-subtle text-primary">
+                      <i class="bi bi-folder-symlink-fill"></i>
+                    </div>
+                    <div>
+                      <h3 class="h6 fw-bold mb-0" style="color:var(--text, #0F172A);">
+                        Lemari Berkas Digital Saya (E-Arsip Pribadi)
+                      </h3>
+                      <div class="text-muted" style="font-size:11.5px;">Dokumen digital yang tersimpan aman di server sekolah dan dapat dibuka kapan saja.</div>
+                    </div>
                   </div>
-                  <h5 class="fw-bold mb-1" style="color:var(--text, #0F172A);">Belum Ada Berkas Digital Tersimpan</h5>
-                  <p class="text-muted small mb-4" style="max-width:440px; margin:0 auto; line-height:1.6;">
-                    Simpan scan berkas penting Anda di sini (seperti KTP, SK CPNS/PNS/PPPK, SK Pangkat Terakhir, SK KGB, Ijazah, atau Sertifikat Pendidik) agar tidak repot saat sewaktu-waktu dibutuhkan dinas.
-                  </p>
-                  <button type="button" class="btn btn-primary px-4 py-2 fw-bold rounded-pill shadow-sm" data-bs-toggle="modal" data-bs-target="#modalUnggahBerkas">
-                    <i class="bi bi-cloud-arrow-up me-1.5"></i> Unggah Berkas Pertama Saya
+
+                  <button type="button" class="btn btn-sm btn-primary px-3 py-1.5 fw-bold d-inline-flex align-items-center gap-1.5 shadow-sm" data-bs-toggle="modal" data-bs-target="#modalUnggahBerkas" style="border-radius:8px;">
+                    <i class="bi bi-cloud-arrow-up-fill"></i> Unggah Dokumen Baru
                   </button>
                 </div>
-              @else
-                
-                {{-- Grid Tampilan Kartu Berkas --}}
-                <div class="row g-3">
-                  @foreach($arsips as $dok)
-                    @php
-                      $badgeCat = match($dok->kategori_berkas) {
-                        'sk_cpns', 'sk_pns', 'sk_pppk' => ['bg' => '#EFF6FF', 'color' => '#1D4ED8', 'border' => '#BFDBFE', 'label' => 'SK Pengangkatan', 'icon' => 'bi-file-earmark-person'],
-                        'sk_pangkat_terakhir'          => ['bg' => '#ECFDF5', 'color' => '#047857', 'border' => '#A7F3D0', 'label' => 'SK Pangkat', 'icon' => 'bi-award'],
-                        'sk_kgb_terakhir'              => ['bg' => '#FFFBEB', 'color' => '#B45309', 'border' => '#FDE68A', 'label' => 'SK KGB', 'icon' => 'bi-cash-coin'],
-                        'ktp', 'kk'                    => ['bg' => '#F1F5F9', 'color' => '#475569', 'border' => '#CBD5E1', 'label' => 'Kependudukan', 'icon' => 'bi-person-badge'],
-                        'ijazah', 'transkrip'          => ['bg' => '#FAF5FF', 'color' => '#7E22CE', 'border' => '#E9D5FF', 'label' => 'Pendidikan', 'icon' => 'bi-mortarboard'],
-                        'sertifikat_pendidik'          => ['bg' => '#FDF2F8', 'color' => '#BE185D', 'border' => '#FBCFE8', 'label' => 'Serdik', 'icon' => 'bi-patch-check'],
-                        'kartu_pegawai'                => ['bg' => '#F0FDFA', 'color' => '#0F766E', 'border' => '#99F6E4', 'label' => 'Karpeg', 'icon' => 'bi-credit-card-2-front'],
-                        default                        => ['bg' => '#F8FAFC', 'color' => '#475569', 'border' => '#E2E8F0', 'label' => 'Kedinasan', 'icon' => 'bi-file-earmark-text'],
-                      };
-                      $fileUrl = asset('storage/' . $dok->file_path);
-                      $isPdf = str_ends_with(strtolower($dok->file_path), '.pdf');
-                    @endphp
+
+                <div class="ptk-info-card-body">
+
+                  {{-- Filter Pills Bar --}}
+                  <div class="ptk-filter-pills mb-3">
+                    <button type="button" class="ptk-filter-pill active" onclick="filterBerkas('all', this)">
+                      Semua <span class="badge rounded-pill bg-light text-dark badge-count" style="font-size:10px;">{{ $arsips->count() }}</span>
+                    </button>
+                    <button type="button" class="ptk-filter-pill" onclick="filterBerkas('sk', this)">
+                      <i class="bi bi-file-earmark-person"></i> SK Kedinasan <span class="badge rounded-pill bg-light text-dark badge-count" style="font-size:10px;">{{ $countSk }}</span>
+                    </button>
+                    <button type="button" class="ptk-filter-pill" onclick="filterBerkas('sertifikat', this)">
+                      <i class="bi bi-award"></i> Sertifikat &amp; Diklat <span class="badge rounded-pill bg-light text-dark badge-count" style="font-size:10px;">{{ $countSertifikat }}</span>
+                    </button>
+                    <button type="button" class="ptk-filter-pill" onclick="filterBerkas('pendidikan', this)">
+                      <i class="bi bi-mortarboard"></i> Pendidikan <span class="badge rounded-pill bg-light text-dark badge-count" style="font-size:10px;">{{ $countPendidikan }}</span>
+                    </button>
+                    <button type="button" class="ptk-filter-pill" onclick="filterBerkas('kependudukan', this)">
+                      <i class="bi bi-person-badge"></i> Kependudukan <span class="badge rounded-pill bg-light text-dark badge-count" style="font-size:10px;">{{ $countKependudukan }}</span>
+                    </button>
+                  </div>
+
+                  @if($arsips->isEmpty())
+                    {{-- Empty State Lemari Berkas --}}
+                    <div class="text-center py-5 px-3">
+                      <div class="d-inline-flex align-items-center justify-content-center rounded-circle mb-3 shadow-sm" style="width:72px; height:72px; background:#EFF6FF; color:#2563EB;">
+                        <i class="bi bi-folder-plus fs-1"></i>
+                      </div>
+                      <h5 class="fw-bold mb-1" style="color:var(--text, #0F172A);">Belum Ada Berkas Digital Tersimpan</h5>
+                      <p class="text-muted small mb-4" style="max-width:440px; margin:0 auto; line-height:1.6;">
+                        Simpan scan berkas penting Anda di sini (seperti KTP, SK CPNS/PNS/PPPK, SK Pangkat Terakhir, SK KGB, Ijazah, atau Sertifikat Pelatihan) agar rapi dan tidak repot saat sewaktu-waktu dibutuhkan dinas.
+                      </p>
+                      <button type="button" class="btn btn-primary px-4 py-2 fw-bold rounded-pill shadow-sm" data-bs-toggle="modal" data-bs-target="#modalUnggahBerkas">
+                        <i class="bi bi-cloud-arrow-up me-1.5"></i> Unggah Berkas Pertama Saya
+                      </button>
+                    </div>
+                  @else
                     
-                    <div class="col-md-6 col-xl-4">
-                      <div class="ptk-doc-card">
+                    {{-- Grid Tampilan Kartu Berkas (2 Balanced Cards per Row) --}}
+                    <div class="row g-3" id="daftarBerkasGrid">
+                      @foreach($arsips as $dok)
+                        @php
+                          // Deteksi grup filter
+                          $isCert = in_array($dok->kategori_berkas, ['sertifikat_pendidik', 'lainnya']) || str_contains(strtolower($dok->nama_dokumen), 'sertifikat') || str_contains(strtolower($dok->nama_dokumen), 'diklat') || str_contains(strtolower($dok->nama_dokumen), 'pelatihan') || str_contains(strtolower($dok->nama_dokumen), 'bimtek');
+                          
+                          $group = match(true) {
+                            in_array($dok->kategori_berkas, ['sk_cpns', 'sk_pns', 'sk_pppk', 'sk_pangkat_terakhir', 'sk_kgb_terakhir']) => 'sk',
+                            $isCert => 'sertifikat',
+                            in_array($dok->kategori_berkas, ['ijazah', 'transkrip']) => 'pendidikan',
+                            in_array($dok->kategori_berkas, ['ktp', 'kk', 'kartu_pegawai']) => 'kependudukan',
+                            default => 'lainnya',
+                          };
+
+                          $badgeCat = match(true) {
+                            in_array($dok->kategori_berkas, ['sk_cpns', 'sk_pns', 'sk_pppk']) => ['bg' => '#EFF6FF', 'color' => '#1D4ED8', 'border' => '#BFDBFE', 'label' => 'SK Pengangkatan', 'icon' => 'bi-file-earmark-person'],
+                            $dok->kategori_berkas === 'sk_pangkat_terakhir'                   => ['bg' => '#ECFDF5', 'color' => '#047857', 'border' => '#A7F3D0', 'label' => 'SK Pangkat', 'icon' => 'bi-award'],
+                            $dok->kategori_berkas === 'sk_kgb_terakhir'                       => ['bg' => '#FFFBEB', 'color' => '#B45309', 'border' => '#FDE68A', 'label' => 'SK KGB', 'icon' => 'bi-cash-coin'],
+                            in_array($dok->kategori_berkas, ['ktp', 'kk'])                   => ['bg' => '#F1F5F9', 'color' => '#475569', 'border' => '#CBD5E1', 'label' => 'Kependudukan', 'icon' => 'bi-person-badge'],
+                            in_array($dok->kategori_berkas, ['ijazah', 'transkrip'])         => ['bg' => '#FAF5FF', 'color' => '#7E22CE', 'border' => '#E9D5FF', 'label' => 'Pendidikan', 'icon' => 'bi-mortarboard'],
+                            $isCert                                                          => ['bg' => '#FDF2F8', 'color' => '#BE185D', 'border' => '#FBCFE8', 'label' => 'Sertifikat & Diklat', 'icon' => 'bi-award-fill'],
+                            $dok->kategori_berkas === 'kartu_pegawai'                         => ['bg' => '#F0FDFA', 'color' => '#0F766E', 'border' => '#99F6E4', 'label' => 'Karpeg', 'icon' => 'bi-credit-card-2-front'],
+                            default                                                           => ['bg' => '#F8FAFC', 'color' => '#475569', 'border' => '#E2E8F0', 'label' => 'Kedinasan', 'icon' => 'bi-file-earmark-text'],
+                          };
+
+                          $fileUrl = asset('storage/' . $dok->file_path);
+                          $isPdf = str_ends_with(strtolower($dok->file_path), '.pdf');
+                        @endphp
                         
-                        <div>
-                          <div class="d-flex align-items-center justify-content-between gap-2 mb-2.5">
-                            <span class="badge rounded-pill px-2.5 py-1" style="background:{{ $badgeCat['bg'] }}; color:{{ $badgeCat['color'] }}; border:1px solid {{ $badgeCat['border'] }}; font-size:11px; font-weight:700;">
-                              <i class="bi {{ $badgeCat['icon'] }} me-1"></i> {{ $badgeCat['label'] }}
-                            </span>
-                            <span class="badge {{ $isPdf ? 'bg-danger-subtle text-danger' : 'bg-primary-subtle text-primary' }} px-2 py-0.5 rounded" style="font-size:10px; font-weight:700;">
-                              {{ $isPdf ? 'PDF' : 'GAMBAR' }}
-                            </span>
-                          </div>
+                        <div class="col-sm-6 ptk-doc-col" data-group="{{ $group }}">
+                          <div class="ptk-doc-card shadow-sm">
+                            
+                            <div>
+                              <div class="d-flex align-items-center justify-content-between gap-2 mb-2.5">
+                                <span class="badge rounded-pill px-2.5 py-1" style="background:{{ $badgeCat['bg'] }}; color:{{ $badgeCat['color'] }}; border:1px solid {{ $badgeCat['border'] }}; font-size:11px; font-weight:700;">
+                                  <i class="bi {{ $badgeCat['icon'] }} me-1"></i> {{ $badgeCat['label'] }}
+                                </span>
+                                <span class="badge {{ $isPdf ? 'bg-danger-subtle text-danger' : 'bg-primary-subtle text-primary' }} px-2 py-0.5 rounded" style="font-size:10px; font-weight:700;">
+                                  {{ $isPdf ? 'PDF' : 'GAMBAR' }}
+                                </span>
+                              </div>
 
-                          <h6 class="fw-bold mb-1" style="color:var(--text, #0F172A); line-height:1.4;">
-                            {{ $dok->nama_dokumen }}
-                          </h6>
+                              <h6 class="fw-bold mb-1" style="color:var(--text, #0F172A); line-height:1.4; font-size:13px;" title="{{ $dok->nama_dokumen }}">
+                                {{ \Illuminate\Support\Str::limit($dok->nama_dokumen, 68) }}
+                              </h6>
 
-                          <div class="text-muted small font-monospace mb-2" style="font-size:11.5px;">
-                            {{ $dok->nomor_dokumen ?: 'Tanpa nomor surat' }}
-                          </div>
+                              <div class="text-muted small font-monospace mb-2" style="font-size:11px;">
+                                {{ $dok->nomor_dokumen ?: 'Tanpa nomor surat' }}
+                              </div>
 
-                          <div class="d-flex align-items-center gap-2 text-muted" style="font-size:11px;">
-                            <i class="bi bi-clock"></i>
-                            <span>Diunggah: {{ $dok->created_at ? $dok->created_at->translatedFormat('d M Y') : '—' }}</span>
-                          </div>
-                        </div>
+                              <div class="d-flex align-items-center gap-2 text-muted" style="font-size:11px;">
+                                <i class="bi bi-clock"></i>
+                                <span>Diunggah: {{ $dok->created_at ? $dok->created_at->translatedFormat('d M Y') : '—' }}</span>
+                              </div>
+                            </div>
 
-                        <div class="pt-3 mt-3 border-top d-flex align-items-center justify-content-between gap-2">
-                          <button type="button" class="btn btn-sm btn-outline-primary px-3 py-1.5 fw-bold rounded-2 d-inline-flex align-items-center gap-1" onclick="bukaPreviewDokumen('{{ $fileUrl }}', '{{ addslashes($dok->nama_dokumen) }}', {{ $isPdf ? 'true' : 'false' }})">
-                            <i class="bi bi-eye"></i> Buka
-                          </button>
-
-                          <div class="d-flex align-items-center gap-1">
-                            <a href="{{ $fileUrl }}" download="{{ $dok->nama_dokumen }}" class="btn btn-sm btn-light border px-2.5 py-1.5 rounded-2 text-dark" title="Unduh File">
-                              <i class="bi bi-download"></i>
-                            </a>
-
-                            <form action="{{ route('ptk.hapus-berkas', $dok->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Hapus berkas \'{{ addslashes($dok->nama_dokumen) }}\' dari lemari digital Anda?')">
-                              @csrf
-                              @method('DELETE')
-                              <button type="submit" class="btn btn-sm btn-light border border-danger-subtle px-2.5 py-1.5 rounded-2 text-danger" title="Hapus Dokumen">
-                                <i class="bi bi-trash"></i>
+                            <div class="pt-3 mt-3 border-top d-flex align-items-center justify-content-between gap-2">
+                              <button type="button" class="btn btn-sm btn-outline-primary px-3 py-1.5 fw-bold rounded-2 d-inline-flex align-items-center gap-1.5" onclick="bukaPreviewDokumen('{{ $fileUrl }}', '{{ addslashes($dok->nama_dokumen) }}', {{ $isPdf ? 'true' : 'false' }})">
+                                <i class="bi bi-eye"></i> Buka
                               </button>
-                            </form>
+
+                              <div class="d-flex align-items-center gap-1">
+                                <a href="{{ $fileUrl }}" download="{{ $dok->nama_dokumen }}" class="btn btn-sm btn-light border px-2.5 py-1.5 rounded-2 text-dark" title="Unduh File">
+                                  <i class="bi bi-download"></i>
+                                </a>
+
+                                <form action="{{ route('ptk.hapus-berkas', $dok->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Hapus berkas \'{{ addslashes($dok->nama_dokumen) }}\' dari lemari digital Anda?')">
+                                  @csrf
+                                  @method('DELETE')
+                                  <button type="submit" class="btn btn-sm btn-light border border-danger-subtle px-2.5 py-1.5 rounded-2 text-danger" title="Hapus Dokumen">
+                                    <i class="bi bi-trash"></i>
+                                  </button>
+                                </form>
+                              </div>
+                            </div>
+
                           </div>
                         </div>
+                      @endforeach
 
+                      {{-- Slot Kartu Tambah Berkas (Quick Upload Slot) --}}
+                      <div class="col-sm-6 ptk-doc-col" data-group="all">
+                        <div class="ptk-upload-slot" onclick="bukaModalKategori('lainnya')">
+                          <div class="ptk-upload-icon">
+                            <i class="bi bi-cloud-arrow-up-fill"></i>
+                          </div>
+                          <div class="fw-bold" style="color:var(--text, #0F172A); font-size:13.5px;">+ Unggah Berkas Baru</div>
+                          <div class="text-muted small mt-1" style="font-size:11.5px; max-width:200px;">
+                            Scan SK, Ijazah, KTP, atau Sertifikat Pelatihan
+                          </div>
+                        </div>
+                      </div>
+
+                    </div>
+
+                  @endif
+
+                </div>
+              </div>
+            </div>
+
+            {{-- KOLOM KANAN (col-lg-4): Status Kelengkapan Berkas & Integrasi SITUAN --}}
+            <div class="col-lg-4 d-flex flex-column gap-3">
+              
+              {{-- Card 1: Status Kelengkapan Berkas Pokok --}}
+              <div class="ptk-checklist-card">
+                <div class="d-flex align-items-center justify-content-between mb-2">
+                  <div class="fw-bold text-dark d-flex align-items-center gap-1.5" style="font-size:13px;">
+                    <i class="bi bi-clipboard2-check text-primary"></i> Kelengkapan Berkas Pokok
+                  </div>
+                  <span class="badge rounded-pill {{ $persenBerkas >= 80 ? 'bg-success' : 'bg-primary' }} px-2.5 py-1" style="font-size:11px;">
+                    {{ $totalTerpenuhi }} / {{ count($checklist) }} ({{ $persenBerkas }}%)
+                  </span>
+                </div>
+
+                {{-- Progress Bar --}}
+                <div class="progress mb-3" style="height: 6px; background:#E2E8F0; border-radius:10px;">
+                  <div class="progress-bar {{ $persenBerkas >= 80 ? 'bg-success' : 'bg-primary' }}" role="progressbar" style="width: {{ $persenBerkas }}%;" aria-valuenow="{{ $persenBerkas }}" aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
+
+                {{-- Checklist Items --}}
+                <div class="ptk-checklist-list">
+                  @foreach($checklist as $item)
+                    <div class="ptk-checklist-item {{ $item['ada'] ? 'terpenuhi' : '' }}">
+                      <div class="d-flex align-items-center gap-2">
+                        @if($item['ada'])
+                          <i class="bi bi-check-circle-fill text-success fs-6"></i>
+                        @else
+                          <i class="bi bi-dash-circle text-muted fs-6"></i>
+                        @endif
+                        <span class="{{ $item['ada'] ? 'fw-semibold text-dark' : 'text-muted' }}" style="font-size:11.5px;">
+                          {{ $item['nama'] }}
+                        </span>
+                      </div>
+
+                      <div>
+                        @if($item['ada'])
+                          <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill" style="font-size:10px;">
+                            Terpenuhi
+                          </span>
+                        @else
+                          <button type="button" class="btn btn-sm btn-link text-primary p-0 fw-bold text-decoration-none" style="font-size:11px;" onclick="bukaModalKategori('{{ $item['kategori'] }}')">
+                            + Unggah
+                          </button>
+                        @endif
                       </div>
                     </div>
                   @endforeach
                 </div>
+              </div>
 
-              @endif
+              {{-- Card 2: Sinkronisasi SITUAN Tata Usaha --}}
+              <div class="ptk-sync-box">
+                <div class="d-flex align-items-center gap-2 mb-2">
+                  <div class="p-2 rounded-3 bg-white shadow-sm text-primary">
+                    <i class="bi bi-shield-lock-fill"></i>
+                  </div>
+                  <div>
+                    <h6 class="fw-bold mb-0 text-dark" style="font-size:13px;">Tersinkronisasi Otomatis SITUAN</h6>
+                    <div class="text-muted" style="font-size:11px;">Kepegawaian &amp; Persuratan SMKN 1 AN</div>
+                  </div>
+                </div>
+                <p class="text-muted mb-2" style="font-size:11.5px; line-height:1.5;">
+                  Semua berkas digital yang Anda simpan di lemari ini langsung terhubung dengan Tata Usaha. Berkas ini otomatis digunakan saat pengusulan KGB, kenaikan pangkat, atau pelaporan dinas sehingga Anda tidak perlu fotokopi berulang kali.
+                </p>
+                <div class="d-flex align-items-center gap-1.5 text-primary fw-semibold" style="font-size:11px;">
+                  <i class="bi bi-patch-check-fill"></i> Akses Terenkripsi &amp; Terverifikasi
+                </div>
+              </div>
 
             </div>
+
           </div>
+
         </div>
 
         {{-- TAB 3: CATATAN PRESENSI SAYA --}}
-        <div class="tab-pane fade" id="tab-presensi" role="tabpanel" tabindex="0">
+        <div class="tab-pane fade" id="tab-presensi" role="tabpanel">
           
           {{-- Stat Tiles --}}
           <div class="row g-3 mb-4">
@@ -790,7 +1074,7 @@
               <option value="kartu_pegawai">Kartu Pegawai (Karpeg / e-KTP)</option>
               <option value="ktp">KTP Pribadi</option>
               <option value="kk">Kartu Keluarga (KK)</option>
-              <option value="lainnya">Dokumen Kedinasan Lainnya</option>
+              <option value="lainnya">Sertifikat Pelatihan / Diklat / Bimtek / Kedinasan</option>
             </select>
           </div>
 
@@ -856,6 +1140,33 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
+  function filterBerkas(group, btn) {
+    document.querySelectorAll('.ptk-filter-pill').forEach(el => el.classList.remove('active'));
+    if (btn) btn.classList.add('active');
+
+    const cards = document.querySelectorAll('.ptk-doc-col');
+    cards.forEach(card => {
+      const cardGroup = card.getAttribute('data-group');
+      if (group === 'all' || cardGroup === 'all' || cardGroup === group) {
+        card.style.display = '';
+      } else {
+        card.style.display = 'none';
+      }
+    });
+  }
+
+  function bukaModalKategori(kategori) {
+    const select = document.querySelector('select[name="kategori_berkas"]');
+    if (select && kategori) {
+      select.value = kategori;
+    }
+    const modalEl = document.getElementById('modalUnggahBerkas');
+    if (modalEl) {
+      const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+      modal.show();
+    }
+  }
+
   function bukaPreviewDokumen(url, nama, isPdf) {
     document.getElementById('modalPreviewTitle').innerText = nama;
     const downloadLink = document.getElementById('modalPreviewDownloadLink');
