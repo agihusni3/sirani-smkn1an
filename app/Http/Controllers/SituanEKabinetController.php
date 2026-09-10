@@ -3,9 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Models\ArsipDokumenPtk;
+use App\Models\ArsipDokumenSiswa;
 use App\Models\ArsipSekolah;
 use App\Models\AuditLog;
 use App\Models\Guru;
+use App\Models\PpdbPendaftar;
+use App\Models\Rombel;
+use App\Models\Siswa;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -16,11 +20,15 @@ class SituanEKabinetController extends Controller
      */
     public function index(Request $request)
     {
-        $activeTab = $request->get('tab', 'ptk'); // 'ptk', 'lembaga', 'kelengkapan'
+        $activeTab = $request->get('tab', 'ptk'); // 'ptk', 'siswa', 'lembaga', 'kelengkapan'
 
         // 1. Metrik Ringkasan Kabinet
         $totalArsipPtk = ArsipDokumenPtk::count();
         $totalGuruWithArsip = ArsipDokumenPtk::distinct('guru_id')->count('guru_id');
+
+        $totalArsipSiswa = ArsipDokumenSiswa::count();
+        $totalSiswaWithArsip = ArsipDokumenSiswa::distinct('siswa_id')->count('siswa_id');
+
         $totalArsipSekolah = ArsipSekolah::count();
         $totalMouAktif = ArsipSekolah::where('kategori_arsip', 'mou_industri')
             ->where(function ($q) {
@@ -57,7 +65,45 @@ class SituanEKabinetController extends Controller
 
         $arsipPtks = $arsipPtkQuery->paginate(15, ['*'], 'page_ptk')->withQueryString();
 
-        // 4. Query Arsip Lembaga & MoU Industri (Tab 2)
+        // 4. Query Arsip Siswa (Tab 2 - BARU)
+        $rombels = Rombel::orderBy('nama_rombel')->get(['id', 'nama_rombel']);
+        $kamusKategoriSiswa = ArsipDokumenSiswa::getKamusKategori();
+
+        $arsipSiswaQuery = ArsipDokumenSiswa::with(['siswa.siswaRombels.rombel', 'pengunggah', 'pelayananSurat'])->latest();
+
+        if ($request->filled('siswa_id')) {
+            $arsipSiswaQuery->where('siswa_id', $request->siswa_id);
+        }
+
+        if ($request->filled('rombel_id')) {
+            $rombelId = $request->rombel_id;
+            $arsipSiswaQuery->whereHas('siswa.siswaRombels', function ($rQuery) use ($rombelId) {
+                $rQuery->where('rombel_id', $rombelId)->where('status_keanggotaan', 'aktif');
+            });
+        }
+
+        if ($request->filled('kategori_siswa')) {
+            $arsipSiswaQuery->where('kategori_berkas', $request->kategori_siswa);
+        }
+
+        if ($request->filled('q_siswa')) {
+            $qSiswa = $request->q_siswa;
+            $arsipSiswaQuery->where(function ($query) use ($qSiswa) {
+                $query->where('nama_dokumen', 'like', "%{$qSiswa}%")
+                    ->orWhere('nomor_dokumen', 'like', "%{$qSiswa}%")
+                    ->orWhereHas('siswa', function ($sQuery) use ($qSiswa) {
+                        $sQuery->where('nama', 'like', "%{$qSiswa}%")
+                            ->orWhere('nisn', 'like', "%{$qSiswa}%");
+                    });
+            });
+        }
+
+        $arsipSiswas = $arsipSiswaQuery->paginate(15, ['*'], 'page_siswa')->withQueryString();
+
+        // Cari siswa spesifik jika difilter untuk info header
+        $selectedSiswa = $request->filled('siswa_id') ? Siswa::with('siswaRombels.rombel')->find($request->siswa_id) : null;
+
+        // 5. Query Arsip Lembaga & MoU Industri (Tab 3)
         $arsipLembagaQuery = ArsipSekolah::with('pengunggah')->latest();
 
         if ($request->filled('kategori_lembaga')) {
@@ -75,7 +121,7 @@ class SituanEKabinetController extends Controller
 
         $arsipLembagas = $arsipLembagaQuery->paginate(15, ['*'], 'page_lembaga')->withQueryString();
 
-        // 5. Radar Kelengkapan Berkas PTK (Tab 3)
+        // 6. Radar Kelengkapan Berkas PTK (Tab 4)
         $radarKelengkapan = Guru::where('status', 'aktif')
             ->with(['arsipDokumens' => function ($q) {
                 $q->select('id', 'guru_id', 'kategori_berkas');
@@ -83,16 +129,42 @@ class SituanEKabinetController extends Controller
             ->orderBy('nama')
             ->get(['id', 'nama', 'nip', 'jabatan', 'golongan_ruang']);
 
+        // Data pendaftar PPDB yang dapat disinkronkan
+        $ppdbReadyCount = PpdbPendaftar::whereNotNull('siswa_id')
+            ->where(function ($q) {
+                $q->whereNotNull('berkas_kk')
+                    ->orWhereNotNull('berkas_ijazah_skl')
+                    ->orWhereNotNull('berkas_akta')
+                    ->orWhereNotNull('berkas_kip')
+                    ->orWhereNotNull('berkas_ktp_ortu');
+            })->count();
+
+        // Daftar seluruh siswa aktif untuk modal upload berkas siswa
+        $allSiswaAktif = Siswa::whereIn('status', ['aktif', 'pkl'])
+            ->with(['siswaRombels' => function ($q) {
+                $q->where('status_keanggotaan', 'aktif')->with('rombel');
+            }])
+            ->orderBy('nama')
+            ->get(['id', 'nama', 'nisn']);
+
         return view('situan.ekabinet.index', compact(
             'activeTab',
             'totalArsipPtk',
             'totalGuruWithArsip',
+            'totalArsipSiswa',
+            'totalSiswaWithArsip',
             'totalArsipSekolah',
             'totalMouAktif',
             'gurus',
+            'rombels',
+            'kamusKategoriSiswa',
             'arsipPtks',
+            'arsipSiswas',
+            'selectedSiswa',
+            'allSiswaAktif',
             'arsipLembagas',
-            'radarKelengkapan'
+            'radarKelengkapan',
+            'ppdbReadyCount'
         ));
     }
 
@@ -168,6 +240,149 @@ class SituanEKabinetController extends Controller
 
         return redirect()->route('situan.ekabinet.index', ['tab' => 'ptk'])
             ->with('success', "Dokumen {$namaDok} berhasil dihapus dari E-Kabinet.");
+    }
+
+    /**
+     * Unggah Dokumen Berkas Siswa ke E-Kabinet.
+     */
+    public function storeSiswa(Request $request)
+    {
+        $request->validate([
+            'siswa_id'        => 'required|exists:siswas,id',
+            'kategori_berkas' => 'required|string|max:50',
+            'nama_dokumen'    => 'required|string|max:150',
+            'nomor_dokumen'   => 'nullable|string|max:100',
+            'tanggal_dokumen' => 'nullable|date',
+            'file_dokumen'    => 'required|file|mimes:pdf,jpg,jpeg,png|max:10240',
+            'keterangan'      => 'nullable|string|max:500',
+        ]);
+
+        $siswa = Siswa::findOrFail($request->siswa_id);
+        $file = $request->file('file_dokumen');
+        $extension = $file->getClientOriginalExtension();
+        $fileSize = $file->getSize();
+        $fileName = 'siswa_' . $siswa->id . '_' . $request->kategori_berkas . '_' . time() . '.' . $extension;
+        $filePath = $file->storeAs('arsip_siswa/' . $siswa->id, $fileName, 'public');
+
+        ArsipDokumenSiswa::create([
+            'siswa_id'        => $siswa->id,
+            'kategori_berkas' => $request->kategori_berkas,
+            'nama_dokumen'    => $request->nama_dokumen,
+            'nomor_dokumen'   => $request->nomor_dokumen,
+            'tanggal_dokumen' => $request->tanggal_dokumen,
+            'file_path'       => $filePath,
+            'file_size'       => $fileSize,
+            'keterangan'      => $request->keterangan,
+            'created_by'      => auth()->id(),
+        ]);
+
+        AuditLog::catat('create', 'situan_ekabinet_siswa', "Mengunggah berkas {$request->nama_dokumen} untuk siswa {$siswa->nama} (NISN: {$siswa->nisn}) via E-Kabinet");
+
+        return redirect()->route('situan.ekabinet.index', ['tab' => 'siswa', 'siswa_id' => $siswa->id])
+            ->with('success', "Berkas digital untuk siswa {$siswa->nama} berhasil disimpan ke E-Kabinet.");
+    }
+
+    /**
+     * Hapus Dokumen Berkas Siswa dari E-Kabinet.
+     */
+    public function destroySiswa($id)
+    {
+        $arsip = ArsipDokumenSiswa::findOrFail($id);
+        $namaDok = $arsip->nama_dokumen;
+        $siswaNama = $arsip->siswa?->nama ?? 'Siswa';
+        $siswaId = $arsip->siswa_id;
+
+        if ($arsip->file_path && Storage::disk('public')->exists($arsip->file_path)) {
+            Storage::disk('public')->delete($arsip->file_path);
+        }
+
+        $arsip->delete();
+
+        AuditLog::catat('delete', 'situan_ekabinet_siswa', "Menghapus berkas digital {$namaDok} milik siswa {$siswaNama}");
+
+        return redirect()->route('situan.ekabinet.index', ['tab' => 'siswa', 'siswa_id' => $siswaId])
+            ->with('success', "Berkas {$namaDok} berhasil dihapus dari lemari arsip siswa.");
+    }
+
+    /**
+     * Sinkronisasi Otomatis Berkas Pendaftar PPDB ke E-Kabinet Siswa.
+     */
+    public function syncFromPpdb(Request $request)
+    {
+        // Temukan pendaftar PPDB yang memiliki relasi siswa_id atau match NISN
+        $pendaftars = PpdbPendaftar::where(function ($q) {
+            $q->whereNotNull('siswa_id')
+                ->orWhereIn('status', ['diterima', 'lulus', 'aktif']);
+        })->get();
+
+        $syncedCount = 0;
+
+        foreach ($pendaftars as $p) {
+            // Cari model siswa
+            $siswa = null;
+            if ($p->siswa_id) {
+                $siswa = Siswa::find($p->siswa_id);
+            }
+            if (!$siswa && $p->nisn) {
+                $siswa = Siswa::where('nisn', $p->nisn)->first();
+            }
+            if (!$siswa && $p->nama_lengkap) {
+                $siswa = Siswa::where('nama', $p->nama_lengkap)->first();
+            }
+
+            if (!$siswa) continue;
+
+            // Mapping file PPDB ke kategori berkas
+            $fieldMapping = [
+                'berkas_kk'         => ['kategori' => 'kartu_keluarga', 'nama' => 'Kartu Keluarga (PPDB)'],
+                'berkas_ijazah_skl' => ['kategori' => 'ijazah_smp',     'nama' => 'Ijazah / SKL SMP (PPDB)'],
+                'berkas_akta'       => ['kategori' => 'akta_kelahiran', 'nama' => 'Akta Kelahiran (PPDB)'],
+                'berkas_ktp_ortu'   => ['kategori' => 'ktp_kia',        'nama' => 'KTP Orang Tua / Wali (PPDB)'],
+                'berkas_kip'        => ['kategori' => 'kip_pip_pkh',    'nama' => 'Kartu KIP / PIP (PPDB)'],
+            ];
+
+            foreach ($fieldMapping as $field => $cfg) {
+                $path = $p->{$field};
+                if (!empty($path)) {
+                    // Cek apakah sudah terarsip
+                    $exists = ArsipDokumenSiswa::where('siswa_id', $siswa->id)
+                        ->where(function ($q) use ($path, $cfg) {
+                            $q->where('file_path', $path)
+                                ->orWhere('kategori_berkas', $cfg['kategori']);
+                        })->exists();
+
+                    if (!$exists) {
+                        $size = null;
+                        try {
+                            if (Storage::disk('public')->exists($path)) {
+                                $size = Storage::disk('public')->size($path);
+                            }
+                        } catch (\Throwable $e) {
+                            $size = null;
+                        }
+
+                        ArsipDokumenSiswa::create([
+                            'siswa_id'          => $siswa->id,
+                            'ppdb_pendaftar_id' => $p->id,
+                            'kategori_berkas'   => $cfg['kategori'],
+                            'nama_dokumen'      => $cfg['nama'],
+                            'nomor_dokumen'     => $p->no_pendaftaran,
+                            'tanggal_dokumen'   => $p->created_at?->toDateString(),
+                            'file_path'         => $path,
+                            'file_size'         => $size,
+                            'keterangan'        => 'Sinkronisasi berkas otomatis dari PPDB No: ' . $p->no_pendaftaran,
+                            'created_by'        => auth()->id(),
+                        ]);
+                        $syncedCount++;
+                    }
+                }
+            }
+        }
+
+        AuditLog::catat('sync', 'situan_ekabinet_siswa', "Menyinkronkan {$syncedCount} berkas dari modul PPDB ke E-Kabinet Siswa");
+
+        return redirect()->route('situan.ekabinet.index', ['tab' => 'siswa'])
+            ->with('success', "Berhasil menyinkronkan {$syncedCount} berkas pendaftaran dari PPDB ke Lemari Berkas Siswa.");
     }
 
     /**

@@ -22,11 +22,19 @@
       <a href="{{ route('situan.index') }}" class="btn btn-outline-secondary btn-sm px-3 d-inline-flex align-items-center" style="font-weight:700; height:36px;">
         <i class="bi bi-arrow-left me-1.5"></i> Dasbor SITUAN
       </a>
+      <button type="button" class="btn btn-success btn-sm px-3 d-inline-flex align-items-center" data-bs-toggle="modal" data-bs-target="#modalUploadArsipSiswa" style="font-weight:700; height:36px;">
+        <i class="bi bi-mortarboard-fill me-1.5"></i> Unggah Berkas Siswa
+      </button>
       <button type="button" class="btn btn-primary btn-sm px-3 d-inline-flex align-items-center" data-bs-toggle="modal" data-bs-target="#modalUploadArsipPtk" style="font-weight:700; height:36px;">
         <i class="bi bi-person-badge-fill me-1.5"></i> Unggah Berkas PTK
       </button>
+      @if(!empty($ppdbReadyCount) && $ppdbReadyCount > 0)
+        <button type="button" class="btn btn-outline-info btn-sm px-3 d-inline-flex align-items-center" data-bs-toggle="modal" data-bs-target="#modalSyncPpdb" style="font-weight:700; height:36px;">
+          <i class="bi bi-arrow-repeat me-1.5"></i> Tarik PPDB <span class="badge bg-info text-dark ms-1.5">{{ $ppdbReadyCount }}</span>
+        </button>
+      @endif
       <button type="button" class="btn btn-dark btn-sm px-3 d-inline-flex align-items-center" data-bs-toggle="modal" data-bs-target="#modalUploadArsipLembaga" style="font-weight:700; height:36px;">
-        <i class="bi bi-building-fill-add me-1.5"></i> Unggah Dokumen Lembaga / MoU
+        <i class="bi bi-building-fill-add me-1.5"></i> Unggah Lembaga / MoU
       </button>
     </div>
   </div>
@@ -37,14 +45,14 @@
       <div class="card border-0 shadow-sm rounded-3 p-3" style="background:var(--surface); border:1px solid var(--border)!important;">
         <div class="text-muted small fw-semibold mb-1">Total Arsip PTK</div>
         <div class="h3 mb-0 fw-bolder text-primary">{{ $totalArsipPtk }}</div>
-        <div class="text-muted" style="font-size:11px;">Berkas digital pegawai tersimpan</div>
+        <div class="text-muted" style="font-size:11px;">{{ $totalGuruWithArsip }} dari {{ $gurus->count() }} Guru terarsip</div>
       </div>
     </div>
     <div class="col-6 col-md-3">
       <div class="card border-0 shadow-sm rounded-3 p-3" style="background:var(--surface); border:1px solid var(--border)!important;">
-        <div class="text-muted small fw-semibold mb-1">PTK Terarsip</div>
-        <div class="h3 mb-0 fw-bolder text-success">{{ $totalGuruWithArsip }} <span class="fs-6 fw-normal text-muted">/ {{ $gurus->count() }} Guru</span></div>
-        <div class="text-success" style="font-size:11px;"><i class="bi bi-check-circle-fill me-1"></i>Memiliki data berkas</div>
+        <div class="text-muted small fw-semibold mb-1">Total Arsip Siswa</div>
+        <div class="h3 mb-0 fw-bolder text-success">{{ $totalArsipSiswa }}</div>
+        <div class="text-success" style="font-size:11px;"><i class="bi bi-mortarboard-fill me-1"></i>{{ $totalSiswaWithArsip }} Siswa memiliki berkas</div>
       </div>
     </div>
     <div class="col-6 col-md-3">
@@ -69,6 +77,12 @@
       <a class="nav-link {{ $activeTab === 'ptk' ? 'active' : '' }} fw-bold" href="{{ route('situan.ekabinet.index', ['tab' => 'ptk']) }}">
         <i class="bi bi-person-vcard me-1"></i> Laci Arsip PTK &amp; Kepegawaian
         <span class="badge bg-light text-dark ms-1">{{ $totalArsipPtk }}</span>
+      </a>
+    </li>
+    <li class="nav-item" role="presentation">
+      <a class="nav-link {{ $activeTab === 'siswa' ? 'active' : '' }} fw-bold" href="{{ route('situan.ekabinet.index', ['tab' => 'siswa']) }}">
+        <i class="bi bi-mortarboard me-1"></i> Laci Arsip Siswa (Peserta Didik)
+        <span class="badge bg-success-subtle text-success border border-success-subtle ms-1">{{ $totalArsipSiswa }}</span>
       </a>
     </li>
     <li class="nav-item" role="presentation">
@@ -241,7 +255,190 @@
     </div>
   @endif
 
-  {{-- Tab 2: Lemari Berkas Lembaga & MoU --}}
+  {{-- Tab 2: Laci Arsip Siswa (Peserta Didik) --}}
+  @if($activeTab === 'siswa')
+    <div class="card border-0 shadow-sm rounded-3 mb-4" style="background:var(--surface); border:1px solid var(--border)!important;">
+      <div class="card-body p-3">
+        <form method="GET" action="{{ route('situan.ekabinet.index') }}" class="row g-2 align-items-center">
+          <input type="hidden" name="tab" value="siswa">
+          @if(request('siswa_id'))
+            <input type="hidden" name="siswa_id" value="{{ request('siswa_id') }}">
+          @endif
+
+          <div class="col-md-4 col-12">
+            <div class="input-group input-group-sm">
+              <span class="input-group-text bg-light border-end-0"><i class="bi bi-search"></i></span>
+              <input type="text" name="q_siswa" value="{{ request('q_siswa') }}" class="form-control border-start-0" placeholder="Cari nama berkas, no. dokumen, nama siswa, atau NISN...">
+            </div>
+          </div>
+
+          <div class="col-md-3 col-6">
+            <select name="rombel_id" class="form-select form-select-sm" onchange="this.form.submit()">
+              <option value="">— Semua Rombel / Kelas —</option>
+              @foreach($rombels as $r)
+                <option value="{{ $r->id }}" {{ request('rombel_id') == $r->id ? 'selected' : '' }}>{{ $r->nama_rombel }}</option>
+              @endforeach
+            </select>
+          </div>
+
+          <div class="col-md-3 col-6">
+            <select name="kategori_siswa" class="form-select form-select-sm" onchange="this.form.submit()">
+              <option value="">— Semua Kategori Berkas —</option>
+              @foreach($kamusKategoriSiswa as $catKey => $catCfg)
+                <option value="{{ $catKey }}" {{ request('kategori_siswa') === $catKey ? 'selected' : '' }}>
+                  {{ $catCfg['label'] }}
+                </option>
+              @endforeach
+            </select>
+          </div>
+
+          <div class="col-md-2 col-12 d-flex gap-1">
+            <button type="submit" class="btn btn-sm btn-primary w-100 fw-bold">
+              <i class="bi bi-filter"></i> Terapkan
+            </button>
+            @if(request()->hasAny(['q_siswa', 'rombel_id', 'kategori_siswa', 'siswa_id']))
+              <a href="{{ route('situan.ekabinet.index', ['tab' => 'siswa']) }}" class="btn btn-sm btn-outline-secondary" title="Reset Filter">
+                <i class="bi bi-x-lg"></i>
+              </a>
+            @endif
+          </div>
+        </form>
+
+        @if($selectedSiswa)
+          <div class="alert alert-info py-2 px-3 mt-3 mb-0 d-flex justify-content-between align-items-center" style="font-size:12.5px; border-radius:8px;">
+            <div>
+              <i class="bi bi-info-circle-fill me-1"></i> Menampilkan khusus lemari berkas: <strong>{{ $selectedSiswa->nama }}</strong> (NISN: {{ $selectedSiswa->nisn ?: '-' }})
+              &bull; Kelas: <strong>{{ $selectedSiswa->siswaRombels->firstWhere('status_keanggotaan', 'aktif')?->rombel?->nama_rombel ?? 'Belum ada kelas' }}</strong>
+            </div>
+            <a href="{{ route('situan.ekabinet.index', ['tab' => 'siswa']) }}" class="btn btn-outline-info btn-sm py-0 px-2 fw-bold" style="font-size:11px;">
+              Tampilkan Seluruh Siswa
+            </a>
+          </div>
+        @endif
+      </div>
+
+      {{-- Table List Arsip Siswa --}}
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0" style="font-size:12.5px;">
+          <thead class="table-light">
+            <tr>
+              <th class="py-3 px-3" style="width:40px;">No</th>
+              <th class="py-3 px-3">Nama Dokumen &amp; Kategori</th>
+              <th class="py-3 px-3">Peserta Didik / Rombel</th>
+              <th class="py-3 px-3">Nomor &amp; Tanggal Dokumen</th>
+              <th class="py-3 px-2 text-center" style="width:140px;">Sumber Dokumen</th>
+              <th class="py-3 px-2 text-center" style="width:90px;">Ukuran</th>
+              <th class="py-3 px-3 text-center" style="width:130px;">Aksi</th>
+            </tr>
+          </thead>
+          <tbody>
+            @forelse($arsipSiswas as $idx => $arsip)
+              @php
+                $catCfg = $kamusKategoriSiswa[$arsip->kategori_berkas] ?? ['label' => ucfirst($arsip->kategori_berkas), 'badge' => 'secondary', 'icon' => 'bi-file-earmark'];
+                $rombelNama = $arsip->siswa?->siswaRombels?->firstWhere('status_keanggotaan', 'aktif')?->rombel?->nama_rombel ?? '-';
+              @endphp
+              <tr>
+                <td class="px-3 text-muted">{{ $arsipSiswas->firstItem() + $idx }}</td>
+                <td class="px-3">
+                  <div class="d-flex align-items-center gap-2">
+                    <span class="badge bg-{{ $catCfg['badge'] }}-subtle text-{{ $catCfg['badge'] }} border border-{{ $catCfg['badge'] }}-subtle p-2 rounded-3">
+                      <i class="bi {{ $catCfg['icon'] }} fs-6"></i>
+                    </span>
+                    <div>
+                      <div class="fw-bold text-dark">{{ $arsip->nama_dokumen }}</div>
+                      <div class="d-flex align-items-center gap-2 text-muted" style="font-size:11px;">
+                        <span class="badge bg-light text-dark border">{{ $catCfg['label'] }}</span>
+                        @if($arsip->keterangan)
+                          <span class="text-truncate" style="max-width:200px;" title="{{ $arsip->keterangan }}">&bull; {{ $arsip->keterangan }}</span>
+                        @endif
+                      </div>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-3">
+                  <a href="{{ route('situan.ekabinet.index', ['tab' => 'siswa', 'siswa_id' => $arsip->siswa_id]) }}" class="text-decoration-none fw-bold text-dark" title="Filter berkas siswa ini">
+                    {{ $arsip->siswa?->nama ?? 'Siswa Terhapus' }}
+                  </a>
+                  <div class="text-muted" style="font-size:11px;">
+                    NISN: {{ $arsip->siswa?->nisn ?: '-' }} &bull; Rombel: <span class="badge bg-light text-secondary border">{{ $rombelNama }}</span>
+                  </div>
+                </td>
+                <td class="px-3">
+                  <div>{{ $arsip->nomor_dokumen ?: '-' }}</div>
+                  <div class="text-muted" style="font-size:11px;">
+                    <i class="bi bi-calendar-event me-1"></i>
+                    {{ $arsip->tanggal_dokumen ? $arsip->tanggal_dokumen->translatedFormat('d M Y') : 'Tanpa tanggal' }}
+                  </div>
+                </td>
+                <td class="px-2 text-center">
+                  @if($arsip->ppdb_pendaftar_id)
+                    <span class="badge bg-info-subtle text-info border border-info-subtle" title="Otomatis ditarik dari berkas pendaftaran PPDB">
+                      <i class="bi bi-cloud-check-fill me-1"></i> PPDB
+                    </span>
+                  @elseif($arsip->pelayanan_surat_id)
+                    <span class="badge bg-success-subtle text-success border border-success-subtle" title="Diterbitkan dari Loket Surat Resmi TU">
+                      <i class="bi bi-file-earmark-check-fill me-1"></i> Loket TU
+                    </span>
+                  @else
+                    <span class="badge bg-primary-subtle text-primary border border-primary-subtle" title="Diunggah manual via E-Kabinet">
+                      <i class="bi bi-person-fill-up me-1"></i> Staf TU
+                    </span>
+                  @endif
+                </td>
+                <td class="px-2 text-center text-muted" style="font-size:11.5px;">
+                  {{ $arsip->formatted_file_size }}
+                </td>
+                <td class="px-3 text-center">
+                  <div class="btn-group btn-group-sm">
+                    @if($arsip->file_path)
+                      <a href="{{ $arsip->file_url }}" target="_blank" class="btn btn-outline-primary" title="Lihat / Unduh Dokumen">
+                        <i class="bi bi-eye-fill"></i>
+                      </a>
+                    @endif
+                    <a href="{{ route('situan.ekabinet.index', ['tab' => 'siswa', 'siswa_id' => $arsip->siswa_id]) }}" class="btn btn-outline-secondary" title="Buka Lemari Siswa Ini">
+                      <i class="bi bi-folder2-open"></i>
+                    </a>
+                    <form action="{{ route('situan.ekabinet.siswa.destroy', $arsip->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Hapus berkas ini dari E-Kabinet siswa?');">
+                      @csrf
+                      @method('DELETE')
+                      <button type="submit" class="btn btn-outline-danger" title="Hapus Dokumen">
+                        <i class="bi bi-trash"></i>
+                      </button>
+                    </form>
+                  </div>
+                </td>
+              </tr>
+            @empty
+              <tr>
+                <td colspan="7" class="text-center py-5 text-muted">
+                  <i class="bi bi-folder-x fs-1 d-block mb-2 text-secondary opacity-50"></i>
+                  Belum ada berkas digital siswa yang cocok dengan filter pencarian.<br>
+                  <div class="d-flex justify-content-center gap-2 mt-3">
+                    <button type="button" class="btn btn-sm btn-success fw-bold" data-bs-toggle="modal" data-bs-target="#modalUploadArsipSiswa">
+                      <i class="bi bi-cloud-arrow-up-fill me-1"></i> Unggah Berkas Siswa
+                    </button>
+                    @if(!empty($ppdbReadyCount) && $ppdbReadyCount > 0)
+                      <button type="button" class="btn btn-sm btn-outline-info fw-bold" data-bs-toggle="modal" data-bs-target="#modalSyncPpdb">
+                        <i class="bi bi-arrow-repeat me-1"></i> Tarik Berkas dari PPDB
+                      </button>
+                    @endif
+                  </div>
+                </td>
+              </tr>
+            @endforelse
+          </tbody>
+        </table>
+      </div>
+
+      @if($arsipSiswas->hasPages())
+        <div class="card-footer bg-transparent py-3 border-0">
+          {{ $arsipSiswas->links() }}
+        </div>
+      @endif
+    </div>
+  @endif
+
+  {{-- Tab 3: Lemari Berkas Lembaga & MoU --}}
   @if($activeTab === 'lembaga')
     <div class="card border-0 shadow-sm rounded-3 mb-4" style="background:var(--surface); border:1px solid var(--border)!important;">
       <div class="card-body p-3">
@@ -610,6 +807,128 @@
           <button type="button" class="btn btn-sm btn-outline-secondary px-3" data-bs-dismiss="modal" style="font-weight:600; border-radius:8px;">Batal</button>
           <button type="submit" class="btn btn-sm btn-dark px-3 fw-bold" style="border-radius:8px;">
             <i class="bi bi-building-fill-add me-1"></i> Simpan Dokumen Lembaga
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+{{-- MODAL 3: UNGGAH BERKAS DIGITAL SISWA (PESERTA DIDIK) --}}
+<div class="modal fade" id="modalUploadArsipSiswa" tabindex="-1" aria-labelledby="modalUploadArsipSiswaLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow">
+      <div class="modal-header bg-success text-white px-4 py-3">
+        <h5 class="modal-title fw-bold" id="modalUploadArsipSiswaLabel">
+          <i class="bi bi-mortarboard-fill me-1"></i> Unggah Berkas Digital Siswa
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form action="{{ route('situan.ekabinet.siswa.store') }}" method="POST" enctype="multipart/form-data">
+        @csrf
+        <div class="modal-body">
+          <div class="mb-3">
+            <label class="form-label fw-semibold small">Pilih Peserta Didik <span class="text-danger">*</span></label>
+            <select name="siswa_id" class="form-select" required>
+              <option value="">— Pilih Siswa Tujuan —</option>
+              @foreach($allSiswaAktif as $s)
+                @php
+                  $rombel = $s->siswaRombels->firstWhere('status_keanggotaan', 'aktif')?->rombel?->nama_rombel ?? 'Tanpa Rombel';
+                @endphp
+                <option value="{{ $s->id }}" {{ (request('siswa_id') == $s->id) ? 'selected' : '' }}>
+                  {{ $s->nama }} (NISN: {{ $s->nisn ?: '-' }} &bull; {{ $rombel }})
+                </option>
+              @endforeach
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-semibold small">Kategori Berkas Siswa <span class="text-danger">*</span></label>
+            <select name="kategori_berkas" class="form-select" required>
+              @foreach($kamusKategoriSiswa as $catKey => $catCfg)
+                <option value="{{ $catKey }}">{{ $catCfg['label'] }}</option>
+              @endforeach
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-semibold small">Nama &amp; Judul Dokumen <span class="text-danger">*</span></label>
+            <input type="text" name="nama_dokumen" class="form-control" placeholder="Contoh: Ijazah Asli SMP Negeri 1 Air Naningan" required>
+          </div>
+
+          <div class="row g-2 mb-3">
+            <div class="col-6">
+              <label class="form-label fw-semibold small">Nomor Dokumen (Opsional)</label>
+              <input type="text" name="nomor_dokumen" class="form-control" placeholder="No. Ijazah / Akta / KK">
+            </div>
+            <div class="col-6">
+              <label class="form-label fw-semibold small">Tanggal Dokumen</label>
+              <input type="date" name="tanggal_dokumen" class="form-control">
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-semibold small">Pilih File Berkas (PDF/JPG/PNG, Maks 10MB) <span class="text-danger">*</span></label>
+            <input type="file" name="file_dokumen" class="form-control" accept=".pdf,.jpg,.jpeg,.png" required>
+            <div class="form-text">Pastikan hasil scan berkas siswa terlihat jelas untuk kebutuhan verifikasi.</div>
+          </div>
+
+          <div class="mb-2">
+            <label class="form-label fw-semibold small">Catatan / Keterangan Tambahan</label>
+            <textarea name="keterangan" class="form-control" rows="2" placeholder="Keterangan tambahan atau catatan fisik dokumen..."></textarea>
+          </div>
+        </div>
+        <div class="modal-footer px-4 py-3 bg-light d-flex justify-content-end gap-2 border-top">
+          <button type="button" class="btn btn-sm btn-outline-secondary px-3" data-bs-dismiss="modal" style="font-weight:600; border-radius:8px;">Batal</button>
+          <button type="submit" class="btn btn-sm btn-success px-3 fw-bold" style="border-radius:8px;">
+            <i class="bi bi-cloud-arrow-up-fill me-1"></i> Simpan ke E-Kabinet Siswa
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+{{-- MODAL 4: SINKRONISASI BERKAS DARI PPDB --}}
+<div class="modal fade" id="modalSyncPpdb" tabindex="-1" aria-labelledby="modalSyncPpdbLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow">
+      <div class="modal-header bg-info text-dark px-4 py-3">
+        <h5 class="modal-title fw-bold" id="modalSyncPpdbLabel">
+          <i class="bi bi-cloud-arrow-down-fill me-1"></i> Sinkronisasi Berkas dari PPDB
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form action="{{ route('situan.ekabinet.sync-ppdb') }}" method="POST">
+        @csrf
+        <div class="modal-body p-4">
+          <div class="text-center mb-3">
+            <div class="badge bg-info-subtle text-info p-3 rounded-circle mb-2">
+              <i class="bi bi-arrow-repeat fs-1"></i>
+            </div>
+            <h6 class="fw-bold mb-1">Tarik Berkas Pendaftar ke E-Kabinet Siswa</h6>
+            <p class="text-muted small mb-0">Fitur ini mengotomatiskan migrasi berkas pendaftaran calon siswa di PPDB yang telah diterima menjadi arsip resmi siswa di SITUAN.</p>
+          </div>
+
+          <div class="card border-0 bg-light p-3 rounded-3 mb-3" style="font-size:12.5px;">
+            <div class="fw-bold text-dark mb-2"><i class="bi bi-check2-circle text-success me-1"></i> Berkas yang Akan Ditarik:</div>
+            <ul class="mb-0 ps-3 text-muted">
+              <li>Kartu Keluarga (KK)</li>
+              <li>Akta Kelahiran Siswa</li>
+              <li>Ijazah / SKL SMP Sederajat</li>
+              <li>KTP Orang Tua / Wali</li>
+              <li>Kartu Indonesia Pintar (KIP / PIP) jika ada</li>
+            </ul>
+          </div>
+
+          <div class="alert alert-warning py-2 px-3 small mb-0">
+            <i class="bi bi-info-circle-fill me-1"></i> Berkas yang sudah ada di lemari arsip tidak akan diduplikasi. Sistem akan mencocokkan data berdasarkan NISN atau Nama Pendaftar.
+          </div>
+        </div>
+        <div class="modal-footer px-4 py-3 bg-light d-flex justify-content-end gap-2 border-top">
+          <button type="button" class="btn btn-sm btn-outline-secondary px-3" data-bs-dismiss="modal" style="font-weight:600; border-radius:8px;">Batal</button>
+          <button type="submit" class="btn btn-sm btn-info px-3 fw-bold" style="border-radius:8px;">
+            <i class="bi bi-arrow-repeat me-1"></i> Mulai Sinkronisasi Sekarang
           </button>
         </div>
       </form>

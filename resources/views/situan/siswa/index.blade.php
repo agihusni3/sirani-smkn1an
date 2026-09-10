@@ -609,6 +609,12 @@
                        title="Lihat Barcode &amp; Kartu Digital Siswa">
                        <i class="bi bi-qr-code-scan"></i>
                     </a>
+                    <a href="{{ route('situan.ekabinet.index', ['tab' => 'siswa', 'siswa_id' => $s->id]) }}" target="_blank"
+                       class="btn-icon"
+                       style="text-decoration:none; background:#ecfdf5; color:#059669; border:1px solid #a7f3d0;"
+                       title="Buka Lemari Berkas Digital Siswa (E-Kabinet)">
+                       <i class="bi bi-archive-fill"></i>
+                    </a>
                     @if($canManageSiswa)
                       <button type="button" onclick="openEditModal({{ json_encode($s) }})" class="btn-icon btn-icon-edit" title="Edit Data Siswa">
                         <i class="bi bi-pencil-square"></i>

@@ -120,6 +120,11 @@ class Siswa extends Model
         return $this->hasMany(KartuRfid::class, 'pemilik_id')->where('pemilik_type', 'siswa');
     }
 
+    public function arsipDokumens(): HasMany
+    {
+        return $this->hasMany(ArsipDokumenSiswa::class, 'siswa_id');
+    }
+
     /**
      * Standarisasi nomor HP ke format 628...
      */
