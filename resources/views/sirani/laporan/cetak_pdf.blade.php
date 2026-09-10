@@ -10,9 +10,10 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
   <style>
+    /* STANDAR CETAK DINAS A4 RESMI DENGAN MARGIN KONSISTEN DI SELURUH HALAMAN */
     @page {
       size: A4 portrait;
-      margin: 0;
+      margin: 12mm 12mm 14mm 12mm;
     }
     *, *::before, *::after {
       box-sizing: border-box;
@@ -281,6 +282,24 @@
       font-size: 8pt;
       margin-bottom: 14px;
       color: #000000;
+      page-break-inside: auto;
+      break-inside: auto;
+    }
+    .table-data thead {
+      display: table-header-group;
+      page-break-inside: avoid;
+      break-inside: avoid;
+    }
+    .table-data thead tr {
+      page-break-inside: avoid;
+      break-inside: avoid;
+    }
+    .table-data tbody {
+      display: table-row-group;
+    }
+    .table-data tr {
+      page-break-inside: avoid !important;
+      break-inside: avoid !important;
     }
     .table-data th, .table-data td {
       border: 1px solid #000000;
@@ -288,6 +307,8 @@
       color: #000000;
       word-wrap: break-word;
       overflow-wrap: break-word;
+      page-break-inside: avoid !important;
+      break-inside: avoid !important;
     }
     .table-data th {
       background-color: #F1F5F9;
@@ -304,7 +325,8 @@
       width: 100%;
       margin-top: 16px;
       font-size: 9.5pt;
-      page-break-inside: avoid;
+      page-break-inside: avoid !important;
+      break-inside: avoid !important;
       color: #000000;
     }
     .ttd-table {
@@ -320,7 +342,7 @@
       color: #000000;
     }
     .ttd-space {
-      height: 50px;
+      height: 48px;
     }
     .ttd-name {
       font-weight: 800;
@@ -329,6 +351,10 @@
     }
 
     @media print {
+      @page {
+        size: A4 portrait;
+        margin: 12mm 12mm 14mm 12mm;
+      }
       html, body {
         background: #FFFFFF !important;
         color: #000000 !important;
@@ -346,10 +372,11 @@
       }
       .a4-sheet {
         box-shadow: none !important;
-        padding: 10mm 12mm 12mm 12mm !important;
+        padding: 0 !important; /* Margin konsisten dikelola oleh @page */
         width: 100% !important;
         min-height: auto !important;
         margin: 0 !important;
+        border: none !important;
       }
       .table-data th {
         background-color: #F1F5F9 !important;

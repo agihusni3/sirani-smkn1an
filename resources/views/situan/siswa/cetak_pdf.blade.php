@@ -10,14 +10,13 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
   
   <style>
+    /* STANDAR CETAK DINAS A4 RESMI DENGAN MARGIN KONSISTEN DI SELURUH HALAMAN */
     @page {
       size: A4 portrait;
-      margin: 0;
+      margin: 12mm 12mm 14mm 12mm;
     }
     *, *::before, *::after {
       box-sizing: border-box;
-      margin: 0;
-      padding: 0;
       -webkit-print-color-adjust: exact !important;
       print-color-adjust: exact !important;
     }
@@ -115,13 +114,13 @@
       padding-bottom: 30px;
     }
 
-    /* KERTAS A4 PORTRAIT */
+    /* KERTAS A4 PORTRAIT - TAMPILAN SCREEN */
     .a4-sheet {
       width: 210mm;
       min-width: 210mm;
       min-height: 297mm;
       background: #FFFFFF;
-      padding: 12mm 15mm 15mm 15mm;
+      padding: 12mm 12mm 14mm 12mm;
       box-shadow: 0 4px 25px rgba(0,0,0,0.35);
       box-sizing: border-box;
       margin: 0 auto;
@@ -174,6 +173,8 @@
       text-align: center;
       margin-bottom: 2px;
       width: 100%;
+      page-break-inside: avoid;
+      break-inside: avoid;
     }
     .kop-logo-left, .kop-logo-right {
       width: 68px;
@@ -231,23 +232,25 @@
       border-top: 2.5px solid #000000;
       border-bottom: 0.8px solid #000000;
       height: 3.5px;
-      margin: 5px 0 14px;
+      margin: 5px 0 12px;
     }
 
     /* JUDUL */
     .judul-laporan {
       text-align: center;
       margin-bottom: 12px;
+      page-break-inside: avoid;
+      break-inside: avoid;
     }
     .judul-laporan h2 {
-      font-size: 12.5pt;
+      font-size: 12pt;
       font-weight: 800;
       text-transform: uppercase;
       text-decoration: underline;
       letter-spacing: 0.5px;
     }
     .judul-laporan .sub-judul {
-      font-size: 10pt;
+      font-size: 9.5pt;
       font-weight: 600;
       margin-top: 2px;
     }
@@ -255,24 +258,51 @@
     /* TABEL DATA */
     .table-data {
       width: 100%;
-      table-layout: fixed;
+      table-layout: auto;
       border-collapse: collapse;
       font-size: 8.5pt;
-      margin-bottom: 16px;
-      word-wrap: break-word;
+      margin-bottom: 12px;
+      page-break-inside: auto;
+      break-inside: auto;
+    }
+    .table-data thead {
+      display: table-header-group;
+      page-break-inside: avoid;
+      break-inside: avoid;
+    }
+    .table-data thead tr {
+      page-break-inside: avoid;
+      break-inside: avoid;
+    }
+    .table-data tbody {
+      display: table-row-group;
+    }
+    .table-data tr {
+      page-break-inside: avoid !important;
+      break-inside: avoid !important;
     }
     .table-data th, .table-data td {
       border: 1px solid #000000;
-      padding: 4px 6px;
+      padding: 4px 5px;
       vertical-align: middle;
-      word-break: break-word;
-      overflow: hidden;
+      page-break-inside: avoid !important;
+      break-inside: avoid !important;
+      overflow-wrap: break-word;
+      word-break: normal;
     }
     .table-data th {
-      background-color: #F1F5F9;
+      background-color: #F1F5F9 !important;
       text-align: center;
       font-weight: 700;
       font-size: 8.5pt;
+      line-height: 1.25;
+    }
+    .table-data th.col-no,
+    .table-data td.col-no {
+      width: 1%;
+      white-space: nowrap !important;
+      text-align: center;
+      padding: 4px 6px;
     }
     .table-data td.text-center {
       text-align: center;
@@ -282,8 +312,9 @@
     .ttd-container {
       width: 100%;
       margin-top: 16px;
-      font-size: 10pt;
-      page-break-inside: avoid;
+      font-size: 9.5pt;
+      page-break-inside: avoid !important;
+      break-inside: avoid !important;
     }
     .ttd-table {
       width: 100%;
@@ -296,7 +327,7 @@
       padding: 4px;
     }
     .ttd-space {
-      height: 50px;
+      height: 48px;
     }
     .ttd-name {
       font-weight: 700;
@@ -304,6 +335,10 @@
     }
 
     @media print {
+      @page {
+        size: A4 portrait;
+        margin: 12mm 12mm 14mm 12mm;
+      }
       html, body {
         background: #FFFFFF !important;
         margin: 0 !important;
@@ -322,10 +357,11 @@
       }
       .a4-sheet {
         box-shadow: none !important;
-        margin: 0 auto !important;
-        padding: 12mm 15mm 15mm 15mm !important;
+        margin: 0 !important;
+        padding: 0 !important; /* Margin halaman dikontrol oleh @page secara konsisten */
         width: 100% !important;
         min-width: 100% !important;
+        border: none !important;
         box-sizing: border-box !important;
       }
     }
@@ -387,7 +423,7 @@
     <table class="table-data">
       <thead>
         <tr>
-          <th style="width:4%;">No</th>
+          <th class="col-no">No</th>
           <th style="width:13%;">NISN</th>
           <th style="width:24%;">Nama Lengkap Siswa</th>
           <th style="width:5%;">L/P</th>
@@ -401,7 +437,7 @@
         @forelse($siswas as $idx => $s)
           @php $sr = $s->siswaRombels->firstWhere('status_keanggotaan', 'aktif'); @endphp
           <tr>
-            <td class="text-center">{{ $idx + 1 }}</td>
+            <td class="col-no">{{ $idx + 1 }}</td>
             <td class="text-center" style="font-family:'JetBrains Mono', monospace; font-size:8.5pt; font-weight:700;">{{ $s->nisn ?? '-' }}</td>
             <td><strong>{{ $s->nama }}</strong></td>
             <td class="text-center" style="font-weight:700; font-size:8pt;">{{ $s->jenis_kelamin ?? '-' }}</td>

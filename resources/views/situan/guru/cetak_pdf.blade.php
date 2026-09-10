@@ -10,15 +10,13 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
   
   <style>
-    /* STANDAR CETAK DINAS A4 BEBAS HEADER/FOOTER URL BROWSER */
+    /* STANDAR CETAK DINAS A4 RESMI DENGAN MARGIN KONSISTEN DI SELURUH HALAMAN */
     @page {
       size: A4 {{ $orientasi ?? 'portrait' }};
-      margin: 0;
+      margin: 12mm 12mm 14mm 12mm;
     }
     *, *::before, *::after {
       box-sizing: border-box;
-      margin: 0;
-      padding: 0;
       -webkit-print-color-adjust: exact !important;
       print-color-adjust: exact !important;
     }
@@ -116,13 +114,13 @@
       padding-bottom: 30px;
     }
 
-    /* KERTAS A4 (PORTRAIT / LANDSCAPE) */
+    /* KERTAS A4 (PORTRAIT / LANDSCAPE) - TAMPILAN SCREEN */
     .a4-sheet {
       width: {{ ($orientasi ?? 'portrait') === 'landscape' ? '297mm' : '210mm' }};
       min-width: {{ ($orientasi ?? 'portrait') === 'landscape' ? '297mm' : '210mm' }};
       min-height: {{ ($orientasi ?? 'portrait') === 'landscape' ? '210mm' : '297mm' }};
       background: #FFFFFF;
-      padding: 12mm 15mm 15mm 15mm;
+      padding: 12mm 12mm 14mm 12mm;
       box-shadow: 0 4px 25px rgba(0,0,0,0.35);
       box-sizing: border-box;
       margin: 0 auto;
@@ -175,6 +173,8 @@
       text-align: center;
       margin-bottom: 2px;
       width: 100%;
+      page-break-inside: avoid;
+      break-inside: avoid;
     }
     .kop-logo-left, .kop-logo-right {
       width: 68px;
@@ -232,23 +232,25 @@
       border-top: 2.5px solid #000000;
       border-bottom: 0.8px solid #000000;
       height: 3.5px;
-      margin: 5px 0 14px;
+      margin: 5px 0 12px;
     }
 
     /* JUDUL */
     .judul-laporan {
       text-align: center;
       margin-bottom: 12px;
+      page-break-inside: avoid;
+      break-inside: avoid;
     }
     .judul-laporan h2 {
-      font-size: 12.5pt;
+      font-size: 12pt;
       font-weight: 800;
       text-transform: uppercase;
       text-decoration: underline;
       letter-spacing: 0.5px;
     }
     .judul-laporan .sub-judul {
-      font-size: 10pt;
+      font-size: 9.5pt;
       font-weight: 600;
       margin-top: 2px;
     }
@@ -256,24 +258,50 @@
     /* TABEL DATA */
     .table-data {
       width: 100%;
-      table-layout: fixed;
+      table-layout: {{ count($kolomTerpilih) > 7 ? 'auto' : 'fixed' }};
       border-collapse: collapse;
-      font-size: 8.5pt;
-      margin-bottom: 16px;
-      word-wrap: break-word;
+      font-size: {{ count($kolomTerpilih) > 9 ? '7.5pt' : (count($kolomTerpilih) > 6 ? '8pt' : '8.5pt') }};
+      margin-bottom: 12px;
+      page-break-inside: auto;
+      break-inside: auto;
+    }
+    .table-data thead {
+      display: table-header-group;
+      page-break-inside: avoid;
+      break-inside: avoid;
+    }
+    .table-data thead tr {
+      page-break-inside: avoid;
+      break-inside: avoid;
+    }
+    .table-data tbody {
+      display: table-row-group;
+    }
+    .table-data tr {
+      page-break-inside: avoid !important;
+      break-inside: avoid !important;
     }
     .table-data th, .table-data td {
       border: 1px solid #000000;
-      padding: 5px 6px;
+      padding: {{ count($kolomTerpilih) > 9 ? '3.5px 4px' : (count($kolomTerpilih) > 6 ? '4px 5px' : '5px 6px') }};
       vertical-align: middle;
-      word-break: break-word;
-      overflow: hidden;
+      page-break-inside: avoid !important;
+      break-inside: avoid !important;
+      overflow-wrap: break-word;
+      word-break: normal;
     }
     .table-data th {
-      background-color: #F1F5F9;
+      background-color: #F1F5F9 !important;
       text-align: center;
       font-weight: 700;
-      font-size: 8.5pt;
+      line-height: 1.25;
+    }
+    .table-data th.col-no,
+    .table-data td.col-no {
+      width: 1%;
+      white-space: nowrap !important;
+      text-align: center;
+      padding: 4px 6px;
     }
     .table-data td.text-center {
       text-align: center;
@@ -285,9 +313,10 @@
     /* TANDA TANGAN */
     .ttd-container {
       width: 100%;
-      margin-top: 18px;
-      font-size: 10pt;
-      page-break-inside: avoid;
+      margin-top: 16px;
+      font-size: 9.5pt;
+      page-break-inside: avoid !important;
+      break-inside: avoid !important;
     }
     .ttd-table {
       width: 100%;
@@ -300,7 +329,7 @@
       padding: 4px;
     }
     .ttd-space {
-      height: 50px;
+      height: 48px;
     }
     .ttd-name {
       font-weight: 700;
@@ -308,6 +337,10 @@
     }
 
     @media print {
+      @page {
+        size: A4 {{ $orientasi ?? 'portrait' }};
+        margin: 12mm 12mm 14mm 12mm;
+      }
       html, body {
         background: #FFFFFF !important;
         margin: 0 !important;
@@ -326,11 +359,12 @@
       }
       .a4-sheet {
         box-shadow: none !important;
-        margin: 0 auto !important;
-        padding: 12mm 15mm 15mm 15mm !important;
+        margin: 0 !important;
+        padding: 0 !important; /* Margin halaman diatur secara bersih oleh @page pada SEMUA halaman */
         width: 100% !important;
         min-width: 100% !important;
         max-width: 100% !important;
+        border: none !important;
         box-sizing: border-box !important;
       }
     }
@@ -346,6 +380,15 @@
       <span class="badge-a4">A4 {{ ucfirst($orientasi ?? 'portrait') }}</span>
       @if(!($withKop ?? true))
         <span class="badge-a4" style="background:rgba(59,130,246,0.2); color:#93C5FD; border-color:rgba(59,130,246,0.4);">Tanpa Kop (Kertas Pre-Printed)</span>
+      @endif
+      @if(($orientasi ?? 'portrait') === 'portrait')
+        <a href="{{ request()->fullUrlWithQuery(['orientasi' => 'landscape']) }}" class="badge-a4" style="text-decoration:none; background:rgba(34,197,94,0.2); color:#86EFAC; border-color:rgba(34,197,94,0.4); display:inline-flex; align-items:center; gap:4px;" title="Ganti ke orientasi mendatar / landscape">
+          <i class="bi bi-arrow-repeat"></i> Ganti ke Landscape
+        </a>
+      @else
+        <a href="{{ request()->fullUrlWithQuery(['orientasi' => 'portrait']) }}" class="badge-a4" style="text-decoration:none; background:rgba(148,163,184,0.2); color:#CBD5E1; border-color:rgba(148,163,184,0.4); display:inline-flex; align-items:center; gap:4px;" title="Ganti ke orientasi tegak / portrait">
+          <i class="bi bi-arrow-repeat"></i> Ganti ke Portrait
+        </a>
       @endif
       <span style="font-size:11px; font-weight:normal; color:#94A3B8; margin-left:8px;">
         <i class="bi bi-info-circle"></i> Hilangkan centang <em>"Headers and footers"</em> di opsi cetak browser agar URL tidak tercetak.
@@ -385,11 +428,11 @@
     <table class="table-data">
       <thead>
         <tr>
-          <th style="width: 4%;">No</th>
+          <th class="col-no">No</th>
           @foreach($kolomTerpilih as $colKey)
             @php $cfg = $kamusKolom[$colKey] ?? null; @endphp
             @if($cfg)
-              <th style="{{ isset($cfg['width']) ? 'width:'.$cfg['width'].';' : '' }}">
+              <th style="{{ count($kolomTerpilih) <= 7 && isset($cfg['width']) ? 'width:'.$cfg['width'].';' : '' }}">
                 {{ $cfg['label'] }}
               </th>
             @endif
@@ -399,7 +442,7 @@
       <tbody>
         @forelse($gurus as $idx => $g)
           <tr>
-            <td class="text-center">{{ $idx + 1 }}</td>
+            <td class="col-no">{{ $idx + 1 }}</td>
             @foreach($kolomTerpilih as $colKey)
               @php 
                 $cfg = $kamusKolom[$colKey] ?? null; 
@@ -408,15 +451,14 @@
                 $alignClass = ($cfg['align'] ?? 'left') === 'center' ? 'text-center' : (($cfg['align'] ?? 'left') === 'right' ? 'text-end' : '');
                 $isMono = !empty($cfg['mono']);
               @endphp
-              <td class="{{ $alignClass }}" style="{{ $isMono ? "font-family:'JetBrains Mono', monospace; font-size:8pt;" : "" }}">
+              <td class="{{ $alignClass }}" style="{{ $isMono ? "font-family:'JetBrains Mono', monospace; font-size:7.5pt;" : "" }}">
                 @if($colKey === 'tanda_tangan')
-                  <div style="height: 32px; width: 100%;"></div>
+                  <div style="height: 28px; width: 100%;"></div>
                 @elseif($colKey === 'nama')
                   <strong>{{ $val }}</strong>
                 @else
                   {{ $val }}
                 @endif
-              </td>
             @endforeach
           </tr>
         @empty
