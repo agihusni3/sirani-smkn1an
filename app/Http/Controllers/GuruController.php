@@ -132,6 +132,7 @@ class GuruController extends Controller
         $statSertifikasi = Guru::where('status_sertifikasi', 'sudah')->count();
         $statTotalSertifikat = SertifikatGuru::count();
         $rfidStatus = $rfidFilter;
+        $kamusKolom = self::getKamusKolom();
 
         return view('situan.guru.index', compact(
             'gurus',
@@ -147,7 +148,8 @@ class GuruController extends Controller
             'sertifikasi',
             'ptk',
             'rfidStatus',
-            'sort'
+            'sort',
+            'kamusKolom'
         ));
     }
 
@@ -610,74 +612,260 @@ class GuruController extends Controller
         return redirect()->back()->with('success', "Data guru {$nama} dan akun terkait berhasil dihapus.");
     }
 
-    public function export()
+    /**
+     * Kamus Kolom & Atribut Data Guru untuk Fleksibilitas Ekspor & Cetak TU.
+     */
+    public static function getKamusKolom(): array
     {
-        $gurus = Guru::withCount('sertifikats')->orderBy('nama')->get();
+        return [
+            'nip' => [
+                'label' => 'NIP / NI PPPK',
+                'width' => '16%',
+                'align' => 'text-center',
+                'mono'  => true,
+                'value' => fn($g) => $g->nip ?: '-',
+            ],
+            'nama' => [
+                'label' => 'Nama Lengkap & Gelar',
+                'width' => '22%',
+                'align' => 'text-start',
+                'mono'  => false,
+                'value' => fn($g) => $g->nama_lengkap_gelar,
+            ],
+            'golongan' => [
+                'label' => 'Pangkat / Golongan',
+                'width' => '13%',
+                'align' => 'text-center',
+                'mono'  => false,
+                'value' => fn($g) => $g->golongan_pangkat ?: ($g->golongan_ruang ?: '-'),
+            ],
+            'alamat' => [
+                'label' => 'Alamat Rumah / Domisili',
+                'width' => '25%',
+                'align' => 'text-start',
+                'mono'  => false,
+                'value' => fn($g) => $g->alamat ?: ($g->alamat_lengkap ?: '-'),
+            ],
+            'jabatan' => [
+                'label' => 'Jabatan / Peran',
+                'width' => '15%',
+                'align' => 'text-start',
+                'mono'  => false,
+                'value' => fn($g) => $g->jabatan ?: ($g->jenis_ptk ?: '-'),
+            ],
+            'status_kepegawaian' => [
+                'label' => 'Status Kepegawaian',
+                'width' => '14%',
+                'align' => 'text-center',
+                'mono'  => false,
+                'value' => fn($g) => strtoupper($g->jenis_kepegawaian ?: ($g->status_kepegawaian ?: '-')),
+            ],
+            'no_hp' => [
+                'label' => 'No. WhatsApp / HP',
+                'width' => '14%',
+                'align' => 'text-center',
+                'mono'  => true,
+                'value' => fn($g) => $g->no_hp ?: '-',
+            ],
+            'pendidikan' => [
+                'label' => 'Pendidikan Terakhir',
+                'width' => '16%',
+                'align' => 'text-start',
+                'mono'  => false,
+                'value' => fn($g) => ($g->pendidikan_terakhir ? $g->pendidikan_terakhir . ($g->jurusan_kuliah ? ' ' . $g->jurusan_kuliah : '') : '-'),
+            ],
+            'mapel' => [
+                'label' => 'Mapel Diampu',
+                'width' => '18%',
+                'align' => 'text-start',
+                'mono'  => false,
+                'value' => fn($g) => $g->mapel_diampu ?: '-',
+            ],
+            'jjm' => [
+                'label' => 'JJM (Jam Mengajar)',
+                'width' => '11%',
+                'align' => 'text-center',
+                'mono'  => true,
+                'value' => fn($g) => $g->jjm ? ($g->jjm . ' Jam') : '-',
+            ],
+            'tugas_tambahan' => [
+                'label' => 'Tugas Tambahan',
+                'width' => '15%',
+                'align' => 'text-start',
+                'mono'  => false,
+                'value' => fn($g) => $g->tugas_tambahan ?: '-',
+            ],
+            'nuptk' => [
+                'label' => 'NUPTK',
+                'width' => '15%',
+                'align' => 'text-center',
+                'mono'  => true,
+                'value' => fn($g) => $g->nuptk ?: '-',
+            ],
+            'nik' => [
+                'label' => 'NIK',
+                'width' => '16%',
+                'align' => 'text-center',
+                'mono'  => true,
+                'value' => fn($g) => $g->nik ?: '-',
+            ],
+            'sertifikasi' => [
+                'label' => 'Status Sertifikasi',
+                'width' => '14%',
+                'align' => 'text-center',
+                'mono'  => false,
+                'value' => fn($g) => $g->status_sertifikasi === 'sudah' ? 'Sudah Sertifikasi' : 'Belum Sertifikasi',
+            ],
+            'tmt_kerja' => [
+                'label' => 'TMT Kerja',
+                'width' => '12%',
+                'align' => 'text-center',
+                'mono'  => false,
+                'value' => fn($g) => $g->tmt_kerja ? \Carbon\Carbon::parse($g->tmt_kerja)->format('d/m/Y') : '-',
+            ],
+            'status' => [
+                'label' => 'Status Keaktifan',
+                'width' => '11%',
+                'align' => 'text-center',
+                'mono'  => false,
+                'value' => fn($g) => strtoupper($g->status ?: 'AKTIF'),
+            ],
+            'email' => [
+                'label' => 'Email Akun',
+                'width' => '18%',
+                'align' => 'text-start',
+                'mono'  => true,
+                'value' => fn($g) => $g->user?->email ?: '-',
+            ],
+            'tanda_tangan' => [
+                'label' => 'Tanda Tangan',
+                'width' => '15%',
+                'align' => 'text-center',
+                'mono'  => false,
+                'value' => fn($g) => '',
+            ],
+        ];
+    }
+
+    /**
+     * Ekspor Data Guru Fleksibel (Mendukung Kolom Pilihan Bebas / Penuh ke CSV/Excel).
+     */
+    public function export(Request $request)
+    {
+        $kamusKolom = self::getKamusKolom();
+        $rawKolom = $request->input('kolom');
+
+        if (!empty($rawKolom)) {
+            if (is_string($rawKolom)) {
+                $kolomTerpilih = array_filter(array_map('trim', explode(',', $rawKolom)));
+            } elseif (is_array($rawKolom)) {
+                $kolomTerpilih = array_filter($rawKolom);
+            } else {
+                $kolomTerpilih = [];
+            }
+            $kolomTerpilih = array_values(array_intersect($kolomTerpilih, array_keys($kamusKolom)));
+        } else {
+            $kolomTerpilih = [];
+        }
+
+        $query = Guru::with(['user', 'sertifikats'])->orderBy('nama');
+        if ($request->filled('status') && $request->status !== 'semua') {
+            $query->where('status', $request->status);
+        }
+        if ($request->filled('jenis_ptk')) {
+            $query->where('jenis_ptk', $request->jenis_ptk);
+        }
+        $gurus = $query->get();
+
         $csvFileName = 'data_gtk_guru_smkn1an_' . date('Y-m-d') . '.csv';
 
         $headers = [
-            "Content-type" => "text/csv; charset=UTF-8",
+            "Content-type"        => "text/csv; charset=UTF-8",
             "Content-Disposition" => "attachment; filename=$csvFileName",
-            "Pragma" => "no-cache",
-            "Cache-Control" => "must-revalidate, post-check=0, pre-check=0",
-            "Expires" => "0"
+            "Pragma"              => "no-cache",
+            "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
+            "Expires"             => "0"
         ];
 
-        $callback = function () use ($gurus) {
+        $callback = function () use ($gurus, $kamusKolom, $kolomTerpilih) {
             $file = fopen('php://output', 'w');
             fprintf($file, chr(0xEF).chr(0xBB).chr(0xBF)); // BOM UTF-8
             fwrite($file, "sep=;\n");
 
-            fputcsv($file, [
-                'No',
-                'Nama Lengkap Beserta Gelar',
-                'Nama Lengkap (Tanpa Gelar)',
-                'Gelar Depan',
-                'Gelar Belakang',
-                'NIK',
-                'NUPTK',
-                'NIP / NI PPPK',
-                'Jenis PTK',
-                'Status Kepegawaian',
-                'Golongan / Pangkat',
-                'Pendidikan Terakhir',
-                'Program Studi / Jurusan',
-                'Perguruan Tinggi / Kampus',
-                'Status Sertifikasi',
-                'Nomor Serdik',
-                'Mata Pelajaran Diampu',
-                'JJM per Minggu',
-                'Tugas Tambahan',
-                'Nomor Handphone / WhatsApp',
-                'Jumlah Sertifikat Pelatihan',
-                'Status Keaktifan'
-            ], ';');
+            if (!empty($kolomTerpilih)) {
+                // Baris Header Kustom
+                $headerRow = ['No'];
+                foreach ($kolomTerpilih as $k) {
+                    $headerRow[] = $kamusKolom[$k]['label'];
+                }
+                fputcsv($file, $headerRow, ';');
 
-            foreach ($gurus as $idx => $g) {
+                // Baris Data
+                foreach ($gurus as $idx => $g) {
+                    $row = [$idx + 1];
+                    foreach ($kolomTerpilih as $k) {
+                        $val = $kamusKolom[$k]['value']($g);
+                        if (in_array($k, ['nip', 'nik', 'nuptk', 'no_hp']) && !empty($val) && $val !== '-') {
+                            $row[] = '="' . $val . '"';
+                        } else {
+                            $row[] = $val;
+                        }
+                    }
+                    fputcsv($file, $row, ';');
+                }
+            } else {
+                // Format Default Lengkap
                 fputcsv($file, [
-                    $idx + 1,
-                    $g->nama_lengkap_gelar,
-                    $g->nama_lengkap ?: $g->nama,
-                    $g->gelar_depan ?: '-',
-                    $g->gelar_belakang ?: '-',
-                    $g->nik ? '="' . $g->nik . '"' : '-',
-                    $g->nuptk ? '="' . $g->nuptk . '"' : '-',
-                    $g->nip ? '="' . $g->nip . '"' : '-',
-                    $g->jenis_ptk ?: $g->jabatan,
-                    strtoupper($g->jenis_kepegawaian),
-                    $g->golongan_pangkat ?: '-',
-                    $g->pendidikan_terakhir ?: '-',
-                    $g->jurusan_kuliah ?: '-',
-                    $g->kampus ?: '-',
-                    $g->status_sertifikasi === 'sudah' ? 'Sudah Sertifikasi' : 'Belum Sertifikasi',
-                    $g->nomor_serdik ?: '-',
-                    $g->mapel_diampu ?: '-',
-                    $g->jjm ? ($g->jjm . ' Jam') : '-',
-                    $g->tugas_tambahan ?: '-',
-                    $g->no_hp ? '="' . $g->no_hp . '"' : '-',
-                    $g->sertifikats_count ?? 0,
-                    strtoupper($g->status),
+                    'No',
+                    'Nama Lengkap Beserta Gelar',
+                    'Nama Lengkap (Tanpa Gelar)',
+                    'Gelar Depan',
+                    'Gelar Belakang',
+                    'NIK',
+                    'NUPTK',
+                    'NIP / NI PPPK',
+                    'Jenis PTK',
+                    'Status Kepegawaian',
+                    'Golongan / Pangkat',
+                    'Pendidikan Terakhir',
+                    'Program Studi / Jurusan',
+                    'Perguruan Tinggi / Kampus',
+                    'Status Sertifikasi',
+                    'Nomor Serdik',
+                    'Mata Pelajaran Diampu',
+                    'JJM per Minggu',
+                    'Tugas Tambahan',
+                    'Nomor Handphone / WhatsApp',
+                    'Jumlah Sertifikat Pelatihan',
+                    'Status Keaktifan'
                 ], ';');
+
+                foreach ($gurus as $idx => $g) {
+                    fputcsv($file, [
+                        $idx + 1,
+                        $g->nama_lengkap_gelar,
+                        $g->nama_lengkap ?: $g->nama,
+                        $g->gelar_depan ?: '-',
+                        $g->gelar_belakang ?: '-',
+                        $g->nik ? '="' . $g->nik . '"' : '-',
+                        $g->nuptk ? '="' . $g->nuptk . '"' : '-',
+                        $g->nip ? '="' . $g->nip . '"' : '-',
+                        $g->jenis_ptk ?: $g->jabatan,
+                        strtoupper($g->jenis_kepegawaian),
+                        $g->golongan_pangkat ?: '-',
+                        $g->pendidikan_terakhir ?: '-',
+                        $g->jurusan_kuliah ?: '-',
+                        $g->kampus ?: '-',
+                        $g->status_sertifikasi === 'sudah' ? 'Sudah Sertifikasi' : 'Belum Sertifikasi',
+                        $g->nomor_serdik ?: '-',
+                        $g->mapel_diampu ?: '-',
+                        $g->jjm ? ($g->jjm . ' Jam') : '-',
+                        $g->tugas_tambahan ?: '-',
+                        $g->no_hp ? '="' . $g->no_hp . '"' : '-',
+                        $g->sertifikats_count ?? 0,
+                        strtoupper($g->status),
+                    ], ';');
+                }
             }
             fclose($file);
         };
@@ -686,14 +874,59 @@ class GuruController extends Controller
     }
 
     /**
-     * Cetak Daftar Guru & Tenaga Kependidikan Format A4 Resmi ber-KOP Dinas.
+     * Cetak Daftar Guru & Tenaga Kependidikan Fleksibel (Dinamis Kolom, Judul, Kertas, Kop).
      */
     public function cetakPdf(Request $request)
     {
-        $gurus = Guru::with(['user', 'sertifikats'])->orderBy('nama')->get();
+        $kamusKolom = self::getKamusKolom();
         $sekolah = PengaturanSekolah::getAktif();
 
-        return view('situan.guru.cetak_pdf', compact('gurus', 'sekolah'));
+        // Ambil kolom dari request
+        $rawKolom = $request->input('kolom');
+        if (is_string($rawKolom)) {
+            $kolomTerpilih = array_filter(array_map('trim', explode(',', $rawKolom)));
+        } elseif (is_array($rawKolom)) {
+            $kolomTerpilih = array_filter($rawKolom);
+        } else {
+            // Default jika dibuka langsung tanpa parameter
+            $kolomTerpilih = ['nip', 'nama', 'golongan', 'jabatan', 'no_hp', 'status'];
+        }
+
+        $kolomTerpilih = array_values(array_intersect($kolomTerpilih, array_keys($kamusKolom)));
+        if (empty($kolomTerpilih)) {
+            $kolomTerpilih = ['nip', 'nama', 'golongan', 'jabatan', 'status'];
+        }
+
+        $judulLaporan = $request->input('judul_laporan') ?: 'DAFTAR PENDIDIK & TENAGA KEPENDIDIKAN';
+        $subJudul = $request->input('sub_judul') ?: ('Tahun Pelajaran ' . ($sekolah->tahun_ajaran_aktif ?? '2026/2027') . ' · SMKN 1 Air Naningan');
+        $withKop = $request->has('with_kop') ? $request->boolean('with_kop') : true;
+
+        // Auto-orientasi jika kolom banyak
+        $orientasi = $request->input('orientasi');
+        if (empty($orientasi)) {
+            $orientasi = count($kolomTerpilih) > 5 ? 'landscape' : 'portrait';
+        }
+
+        $query = Guru::with(['user', 'sertifikats'])->orderBy('nama');
+        if ($request->filled('status') && $request->status !== 'semua') {
+            $query->where('status', $request->status);
+        }
+        if ($request->filled('jenis_ptk')) {
+            $query->where('jenis_ptk', $request->jenis_ptk);
+        }
+
+        $gurus = $query->get();
+
+        return view('situan.guru.cetak_pdf', compact(
+            'gurus',
+            'sekolah',
+            'kamusKolom',
+            'kolomTerpilih',
+            'judulLaporan',
+            'subJudul',
+            'withKop',
+            'orientasi'
+        ));
     }
 
     /**

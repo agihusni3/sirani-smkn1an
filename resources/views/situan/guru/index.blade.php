@@ -177,6 +177,9 @@
               <i class="bi bi-file-earmark-arrow-up-fill" style="color:#0284c7;"></i> Import CSV
             </button>
           @endif
+          <button type="button" onclick="openModal('modalOutputDinamisGtk')" class="situan-btn-outline" style="font-weight:700; border-color:#0284c7; color:#0369a1; background:#f0f9ff;" title="Cetak / Export Fleksibel Sesuai Kebutuhan TU (Pilih Kolom, Judul & Format)">
+            <i class="bi bi-sliders2-vertical" style="color:#0284c7;"></i> Output Fleksibel TU
+          </button>
           <a href="/guru/export" class="situan-btn-outline" title="Unduh CSV Lengkap Kompatibel Excel">
             <i class="bi bi-file-earmark-excel-fill" style="color:#10b981;"></i> Export CSV
           </a>
@@ -1356,6 +1359,242 @@
   </div>
 </div>
 
+<!-- Modal Output Fleksibel TU (Dinamis Kolom, Kop, Orientasi & Judul) -->
+<div id="modalOutputDinamisGtk" class="modal-overlay">
+  <div class="modal-card" style="max-width:760px; width:95vw; max-height:90vh; display:flex; flex-direction:column; padding:0; overflow:hidden;">
+    
+    <!-- Modal Header -->
+    <div style="padding:16px 20px; border-bottom:1px solid var(--border-2); background:var(--surface); display:flex; justify-content:space-between; align-items:center;">
+      <div>
+        <h3 style="font-size:15.5px; font-weight:800; color:var(--text); margin:0; display:flex; align-items:center; gap:8px;">
+          <i class="bi bi-sliders2-vertical" style="color:#0284c7;"></i> Output Fleksibel Data Pendidik &amp; Tenaga Kependidikan
+        </h3>
+        <p style="font-size:12px; color:var(--text-3); margin:3px 0 0 0;">
+          Kustomisasi kolom data, judul dokumen, orientasi cetak, dan kop dinas sesuai permintaan kedinasan TU.
+        </p>
+      </div>
+      <button type="button" class="btn btn-sm btn-outline" onclick="closeModal('modalOutputDinamisGtk')" style="border-radius:8px;">
+        <i class="bi bi-x-lg"></i>
+      </button>
+    </div>
+
+    <!-- Modal Body (Scrollable) -->
+    <div style="padding:18px 20px; overflow-y:auto; flex:1; display:flex; flex-direction:column; gap:16px;">
+      
+      <!-- PRESETS CEPAT KEBUTUHAN DINAS (1-CLICK) -->
+      <div style="background:var(--bg-2); border:1px solid var(--border-2); border-radius:12px; padding:12px 14px;">
+        <div style="font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:0.5px; color:var(--text-2); margin-bottom:8px; display:flex; align-items:center; gap:6px;">
+          <i class="bi bi-lightning-charge-fill" style="color:#eab308;"></i> Template Kebutuhan Cepat (Presets 1-Klik)
+        </div>
+        <div style="display:flex; flex-wrap:wrap; gap:6px;">
+          <button type="button" class="btn btn-sm btn-outline-mono" onclick="setPresetOutputGtk('permintaan_dinas')" style="font-size:11px; padding:5px 10px; background:var(--surface); font-weight:700; border-color:#0284c7; color:#0369a1;">
+            <i class="bi bi-building-check"></i> Dinas: Nama, NIP, Alamat, Golongan
+          </button>
+          <button type="button" class="btn btn-sm btn-outline-mono" onclick="setPresetOutputGtk('kepegawaian')" style="font-size:11px; padding:5px 10px; background:var(--surface); font-weight:700;">
+            <i class="bi bi-person-badge"></i> Data Kepegawaian &amp; Jabatan
+          </button>
+          <button type="button" class="btn btn-sm btn-outline-mono" onclick="setPresetOutputGtk('kontak')" style="font-size:11px; padding:5px 10px; background:var(--surface); font-weight:700;">
+            <i class="bi bi-telephone"></i> Kontak &amp; Domisili GTK
+          </button>
+          <button type="button" class="btn btn-sm btn-outline-mono" onclick="setPresetOutputGtk('kurikulum')" style="font-size:11px; padding:5px 10px; background:var(--surface); font-weight:700;">
+            <i class="bi bi-journal-check"></i> Akademik, Mapel &amp; JJM
+          </button>
+          <button type="button" class="btn btn-sm btn-outline-mono" onclick="setPresetOutputGtk('blanko_ttd')" style="font-size:11px; padding:5px 10px; background:var(--surface); font-weight:700;">
+            <i class="bi bi-pen"></i> Blanko Daftar Hadir / TTD
+          </button>
+          <button type="button" class="btn btn-sm btn-outline-mono" onclick="toggleAllKolomGtk(true)" style="font-size:11px; padding:5px 8px; background:var(--surface); color:#0284c7;">
+            Pilih Semua
+          </button>
+          <button type="button" class="btn btn-sm btn-outline-mono" onclick="toggleAllKolomGtk(false)" style="font-size:11px; padding:5px 8px; background:var(--surface); color:#ef4444;">
+            Kosongkan
+          </button>
+        </div>
+      </div>
+
+      <!-- FORM OUTPUT -->
+      <form id="formOutputDinamisGtk" method="GET" action="/guru/cetak-pdf">
+        
+        <!-- PILIHAN KOLOM DATA -->
+        <div style="margin-bottom:16px;">
+          <div style="font-size:12px; font-weight:800; color:var(--text); margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
+            <span><i class="bi bi-check2-square" style="color:#0284c7; margin-right:4px;"></i> Pilih Kolom Data yang Diinginkan</span>
+            <span id="outputGtkCountSelected" style="font-size:11px; font-weight:700; color:#0284c7; background:rgba(2,132,199,0.1); padding:2px 8px; border-radius:10px;">
+              6 Kolom Dipilih
+            </span>
+          </div>
+
+          <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap:10px;">
+            
+            <!-- Kelompok 1: Identitas Pokok -->
+            <div style="background:var(--surface); border:1px solid var(--border-2); border-radius:10px; padding:10px 12px;">
+              <div style="font-size:10.5px; font-weight:800; color:#000; text-transform:uppercase; margin-bottom:6px; border-bottom:1px solid var(--border-2); padding-bottom:4px;">
+                Identitas Pokok
+              </div>
+              <label style="display:flex; align-items:center; gap:8px; font-size:12px; margin-bottom:6px; cursor:pointer;">
+                <input type="checkbox" name="kolom[]" value="nama" checked onchange="updateOutputGtkCount()">
+                <span><strong>Nama Lengkap &amp; Gelar</strong></span>
+              </label>
+              <label style="display:flex; align-items:center; gap:8px; font-size:12px; margin-bottom:6px; cursor:pointer;">
+                <input type="checkbox" name="kolom[]" value="nip" checked onchange="updateOutputGtkCount()">
+                <span>NIP / NI PPPK</span>
+              </label>
+              <label style="display:flex; align-items:center; gap:8px; font-size:12px; margin-bottom:6px; cursor:pointer;">
+                <input type="checkbox" name="kolom[]" value="nik" onchange="updateOutputGtkCount()">
+                <span>NIK</span>
+              </label>
+              <label style="display:flex; align-items:center; gap:8px; font-size:12px; margin-bottom:6px; cursor:pointer;">
+                <input type="checkbox" name="kolom[]" value="nuptk" onchange="updateOutputGtkCount()">
+                <span>NUPTK</span>
+              </label>
+              <label style="display:flex; align-items:center; gap:8px; font-size:12px; cursor:pointer;">
+                <input type="checkbox" name="kolom[]" value="status" checked onchange="updateOutputGtkCount()">
+                <span>Status Keaktifan</span>
+              </label>
+            </div>
+
+            <!-- Kelompok 2: Pangkat & Kepegawaian -->
+            <div style="background:var(--surface); border:1px solid var(--border-2); border-radius:10px; padding:10px 12px;">
+              <div style="font-size:10.5px; font-weight:800; color:#000; text-transform:uppercase; margin-bottom:6px; border-bottom:1px solid var(--border-2); padding-bottom:4px;">
+                Pangkat &amp; Jabatan
+              </div>
+              <label style="display:flex; align-items:center; gap:8px; font-size:12px; margin-bottom:6px; cursor:pointer;">
+                <input type="checkbox" name="kolom[]" value="golongan" checked onchange="updateOutputGtkCount()">
+                <span><strong>Pangkat / Golongan</strong></span>
+              </label>
+              <label style="display:flex; align-items:center; gap:8px; font-size:12px; margin-bottom:6px; cursor:pointer;">
+                <input type="checkbox" name="kolom[]" value="jabatan" checked onchange="updateOutputGtkCount()">
+                <span>Jabatan / Jenis PTK</span>
+              </label>
+              <label style="display:flex; align-items:center; gap:8px; font-size:12px; margin-bottom:6px; cursor:pointer;">
+                <input type="checkbox" name="kolom[]" value="status_kepegawaian" onchange="updateOutputGtkCount()">
+                <span>Status Pegawai (ASN/PPPK)</span>
+              </label>
+              <label style="display:flex; align-items:center; gap:8px; font-size:12px; cursor:pointer;">
+                <input type="checkbox" name="kolom[]" value="tmt_kerja" onchange="updateOutputGtkCount()">
+                <span>TMT Kerja / SK</span>
+              </label>
+            </div>
+
+            <!-- Kelompok 3: Kontak & Domisili -->
+            <div style="background:var(--surface); border:1px solid var(--border-2); border-radius:10px; padding:10px 12px;">
+              <div style="font-size:10.5px; font-weight:800; color:#000; text-transform:uppercase; margin-bottom:6px; border-bottom:1px solid var(--border-2); padding-bottom:4px;">
+                Kontak &amp; Domisili
+              </div>
+              <label style="display:flex; align-items:center; gap:8px; font-size:12px; margin-bottom:6px; cursor:pointer;">
+                <input type="checkbox" name="kolom[]" value="alamat" checked onchange="updateOutputGtkCount()">
+                <span><strong>Alamat Rumah / Tinggal</strong></span>
+              </label>
+              <label style="display:flex; align-items:center; gap:8px; font-size:12px; margin-bottom:6px; cursor:pointer;">
+                <input type="checkbox" name="kolom[]" value="no_hp" onchange="updateOutputGtkCount()">
+                <span>No. WhatsApp / HP</span>
+              </label>
+              <label style="display:flex; align-items:center; gap:8px; font-size:12px; cursor:pointer;">
+                <input type="checkbox" name="kolom[]" value="email" onchange="updateOutputGtkCount()">
+                <span>Email Akun Login</span>
+              </label>
+            </div>
+
+            <!-- Kelompok 4: Akademik & Khusus -->
+            <div style="background:var(--surface); border:1px solid var(--border-2); border-radius:10px; padding:10px 12px;">
+              <div style="font-size:10.5px; font-weight:800; color:#000; text-transform:uppercase; margin-bottom:6px; border-bottom:1px solid var(--border-2); padding-bottom:4px;">
+                Akademik &amp; Khusus
+              </div>
+              <label style="display:flex; align-items:center; gap:8px; font-size:12px; margin-bottom:6px; cursor:pointer;">
+                <input type="checkbox" name="kolom[]" value="pendidikan" onchange="updateOutputGtkCount()">
+                <span>Pendidikan Terakhir</span>
+              </label>
+              <label style="display:flex; align-items:center; gap:8px; font-size:12px; margin-bottom:6px; cursor:pointer;">
+                <input type="checkbox" name="kolom[]" value="mapel" onchange="updateOutputGtkCount()">
+                <span>Mata Pelajaran Diampu</span>
+              </label>
+              <label style="display:flex; align-items:center; gap:8px; font-size:12px; margin-bottom:6px; cursor:pointer;">
+                <input type="checkbox" name="kolom[]" value="jjm" onchange="updateOutputGtkCount()">
+                <span>JJM (Jam Mengajar)</span>
+              </label>
+              <label style="display:flex; align-items:center; gap:8px; font-size:12px; margin-bottom:6px; cursor:pointer;">
+                <input type="checkbox" name="kolom[]" value="sertifikasi" onchange="updateOutputGtkCount()">
+                <span>Status Sertifikasi</span>
+              </label>
+              <label style="display:flex; align-items:center; gap:8px; font-size:12px; margin-bottom:6px; cursor:pointer;">
+                <input type="checkbox" name="kolom[]" value="tugas_tambahan" onchange="updateOutputGtkCount()">
+                <span>Tugas Tambahan</span>
+              </label>
+              <label style="display:flex; align-items:center; gap:8px; font-size:12px; cursor:pointer; color:#b45309;">
+                <input type="checkbox" name="kolom[]" value="tanda_tangan" onchange="updateOutputGtkCount()">
+                <span><strong>Kolom Tanda Tangan</strong></span>
+              </label>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- PENGATURAN CETAK / DOKUMEN -->
+        <div style="background:var(--surface); border:1px solid var(--border-2); border-radius:12px; padding:14px; display:flex; flex-direction:column; gap:12px;">
+          <div style="font-size:12px; font-weight:800; color:var(--text); display:flex; align-items:center; gap:6px;">
+            <i class="bi bi-file-earmark-text-fill" style="color:#0284c7;"></i> Pengaturan Format Dokumen Resmi
+          </div>
+
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
+            <div>
+              <label class="form-label" style="font-size:11px; font-weight:700; margin-bottom:4px; display:block;">Judul Dokumen / Kop Laporan</label>
+              <input type="text" name="judul_laporan" id="output_judul_laporan" class="form-control" value="DAFTAR PENDIDIK &amp; TENAGA KEPENDIDIKAN" style="font-size:12px; font-weight:600;">
+            </div>
+            <div>
+              <label class="form-label" style="font-size:11px; font-weight:700; margin-bottom:4px; display:block;">Sub-Judul / Keterangan Waktu</label>
+              <input type="text" name="sub_judul" id="output_sub_judul" class="form-control" value="Tahun Pelajaran 2026/2027 · SMKN 1 Air Naningan" style="font-size:12px;">
+            </div>
+          </div>
+
+          <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:12px;">
+            <div>
+              <label class="form-label" style="font-size:11px; font-weight:700; margin-bottom:4px; display:block;">Kop Surat Resmi</label>
+              <select name="with_kop" id="output_with_kop" class="form-control" style="font-size:12px;">
+                <option value="1">Gunakan Kop Dinas Resmi (2 Logo)</option>
+                <option value="0">Tanpa Kop (Kertas Kop Resmi Fisik)</option>
+              </select>
+            </div>
+            <div>
+              <label class="form-label" style="font-size:11px; font-weight:700; margin-bottom:4px; display:block;">Orientasi Kertas A4</label>
+              <select name="orientasi" id="output_orientasi" class="form-control" style="font-size:12px;">
+                <option value="">Otomatis (Landscape jika &gt; 5 Kolom)</option>
+                <option value="portrait">Portrait (Tegak)</option>
+                <option value="landscape">Landscape (Mendatar)</option>
+              </select>
+            </div>
+            <div>
+              <label class="form-label" style="font-size:11px; font-weight:700; margin-bottom:4px; display:block;">Filter Status GTK</label>
+              <select name="status" id="output_status_filter" class="form-control" style="font-size:12px;">
+                <option value="semua">Semua GTK Terdaftar</option>
+                <option value="aktif" selected>Hanya GTK Aktif</option>
+                <option value="nonaktif">Hanya GTK Non-Aktif</option>
+              </select>
+            </div>
+          </div>
+
+        </div>
+
+      </form>
+    </div>
+
+    <!-- Modal Footer -->
+    <div style="padding:14px 20px; border-top:1px solid var(--border-2); background:var(--surface); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+      <button type="button" class="btn btn-outline" onclick="closeModal('modalOutputDinamisGtk')">
+        Tutup
+      </button>
+
+      <div style="display:flex; gap:10px;">
+        <button type="button" onclick="submitOutputDinamisGtk('export')" class="btn btn-outline-mono" style="background:#f0fdf4; border-color:#86efac; color:#166534; font-weight:700;">
+          <i class="bi bi-file-earmark-excel-fill" style="color:#10b981;"></i> Unduh Excel (CSV)
+        </button>
+        <button type="button" onclick="submitOutputDinamisGtk('cetak')" class="btn btn-gold" style="font-weight:800;">
+          <i class="bi bi-printer-fill"></i> Cetak Lembar A4 / PDF
+        </button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
 <script>
   function switchGtkTab(scope, tabId, btnElement) {
     const parent = btnElement.closest('.panel, .modal-card');
@@ -1614,7 +1853,98 @@
         }
       });
     }
+
+    updateOutputGtkCount();
   });
+
+  /* === HELPER OUTPUT DINAMIS GTK (TU) === */
+  function updateOutputGtkCount() {
+    const form = document.getElementById('formOutputDinamisGtk');
+    if (!form) return;
+    const checked = form.querySelectorAll('input[name="kolom[]"]:checked');
+    const countEl = document.getElementById('outputGtkCountSelected');
+    if (countEl) {
+      countEl.innerText = checked.length + ' Kolom Dipilih';
+    }
+  }
+
+  function toggleAllKolomGtk(state) {
+    const form = document.getElementById('formOutputDinamisGtk');
+    if (!form) return;
+    form.querySelectorAll('input[name="kolom[]"]').forEach(cb => {
+      cb.checked = state;
+    });
+    updateOutputGtkCount();
+  }
+
+  function setPresetOutputGtk(preset) {
+    const form = document.getElementById('formOutputDinamisGtk');
+    if (!form) return;
+
+    // Kosongkan semua dahulu
+    form.querySelectorAll('input[name="kolom[]"]').forEach(cb => cb.checked = false);
+
+    let cols = [];
+    let orientasi = '';
+    let judul = 'DAFTAR PENDIDIK & TENAGA KEPENDIDIKAN';
+
+    if (preset === 'permintaan_dinas') {
+      // Skenario TU: Nama, NIP, Alamat, Golongan
+      cols = ['nip', 'nama', 'golongan', 'alamat'];
+      orientasi = 'portrait';
+      judul = 'DAFTAR NAMA, NIP, GOLONGAN & ALAMAT GTK';
+    } else if (preset === 'kepegawaian') {
+      cols = ['nip', 'nama', 'golongan', 'jabatan', 'status_kepegawaian', 'tmt_kerja', 'status'];
+      orientasi = 'landscape';
+      judul = 'DAFTAR NOMINATIF KEPEGAWAIAN GTK';
+    } else if (preset === 'kontak') {
+      cols = ['nip', 'nama', 'alamat', 'no_hp', 'email'];
+      orientasi = 'portrait';
+      judul = 'BUKU INDUK KONTAK & DOMISILI GTK';
+    } else if (preset === 'kurikulum') {
+      cols = ['nama', 'pendidikan', 'mapel', 'jjm', 'sertifikasi', 'tugas_tambahan'];
+      orientasi = 'landscape';
+      judul = 'DAFTAR PEMBAGIAN TUGAS MENGAJAR & SERTIFIKASI';
+    } else if (preset === 'blanko_ttd') {
+      cols = ['nip', 'nama', 'golongan', 'jabatan', 'tanda_tangan'];
+      orientasi = 'portrait';
+      judul = 'DAFTAR HADIR / TANDA TERIMA GTK';
+    }
+
+    cols.forEach(c => {
+      const el = form.querySelector('input[name="kolom[]"][value="' + c + '"]');
+      if (el) el.checked = true;
+    });
+
+    const orEl = document.getElementById('output_orientasi');
+    if (orEl) orEl.value = orientasi;
+
+    const jdEl = document.getElementById('output_judul_laporan');
+    if (jdEl) jdEl.value = judul;
+
+    updateOutputGtkCount();
+  }
+
+  function submitOutputDinamisGtk(type) {
+    const form = document.getElementById('formOutputDinamisGtk');
+    if (!form) return;
+
+    const checked = form.querySelectorAll('input[name="kolom[]"]:checked');
+    if (checked.length === 0) {
+      alert('Silakan pilih minimal 1 kolom data untuk dicetak atau diunduh.');
+      return;
+    }
+
+    if (type === 'export') {
+      form.action = '/guru/export';
+      form.target = '_self';
+    } else {
+      form.action = '/guru/cetak-pdf';
+      form.target = '_blank';
+    }
+
+    form.submit();
+  }
 </script>
 
 @include('partials.crop_modal')

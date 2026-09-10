@@ -343,4 +343,54 @@ class SituanAdministrationTest extends TestCase
             'nama_dokumen'    => '[SK Kolektif] Pengangkatan Kepala Program Keahlian RPL TA 2026/2027',
         ]);
     }
+
+    public function test_tu_dapat_mencetak_dokumen_guru_dengan_kolom_dinamis_dan_kop_resmi(): void
+    {
+        // Pastikan ada guru dengan data alamat & golongan
+        $this->guru->update([
+            'alamat'           => 'Jl. Raya Air Naningan No. 45',
+            'golongan_pangkat' => 'Penata Muda / III-a',
+        ]);
+
+        // Request cetak PDF dengan kolom dinamis (Nama, NIP, Alamat, Golongan)
+        $response = $this->actingAs($this->admin)->get('/guru/cetak-pdf?' . http_build_query([
+            'kolom'         => ['nip', 'nama', 'golongan', 'alamat'],
+            'judul_laporan' => 'DAFTAR NAMA, NIP, GOLONGAN & ALAMAT GTK',
+            'with_kop'      => '1',
+            'orientasi'     => 'portrait',
+        ]));
+
+        $response->assertStatus(200);
+        $response->assertSee('DAFTAR NAMA, NIP, GOLONGAN & ALAMAT GTK');
+        $response->assertSee('PEMERINTAH PROVINSI LAMPUNG');
+        $response->assertSee('Pangkat / Golongan');
+        $response->assertSee('Alamat Rumah / Domisili');
+        $response->assertSee('Jl. Raya Air Naningan No. 45');
+        $response->assertSee('Penata Muda / III-a');
+    }
+
+    public function test_tu_dapat_mengunduh_csv_dengan_kolom_kustom_nama_nip_alamat_golongan(): void
+    {
+        $this->guru->update([
+            'alamat'           => 'Desa Datar Lebuay RT 02/01',
+            'golongan_pangkat' => 'Pembina / IV-a',
+        ]);
+
+        $response = $this->actingAs($this->admin)->get('/guru/export?' . http_build_query([
+            'kolom' => ['nip', 'nama', 'golongan', 'alamat'],
+        ]));
+
+        $response->assertStatus(200);
+        $this->assertStringContainsString('text/csv', $response->headers->get('content-type'));
+
+        // Stream content
+        $content = $response->streamedContent();
+        $this->assertStringContainsString('NIP / NI PPPK', $content);
+        $this->assertStringContainsString('Nama Lengkap & Gelar', $content);
+        $this->assertStringContainsString('Pangkat / Golongan', $content);
+        $this->assertStringContainsString('Alamat Rumah / Domisili', $content);
+        $this->assertStringContainsString('Desa Datar Lebuay RT 02/01', $content);
+        $this->assertStringContainsString('Pembina / IV-a', $content);
+    }
 }
+

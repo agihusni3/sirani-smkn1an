@@ -11,7 +11,7 @@
   
   <style>
     @page {
-      size: A4 portrait;
+      size: A4 {{ $orientasi ?? 'portrait' }};
       margin: 12mm 15mm 15mm 15mm;
     }
     *, *::before, *::after {
@@ -35,7 +35,7 @@
       overflow-x: auto;
     }
     .print-actions-bar {
-      width: 210mm;
+      width: {{ ($orientasi ?? 'portrait') === 'landscape' ? '297mm' : '210mm' }};
       max-width: 95vw;
       background: #1E293B;
       border: 1px solid #334155;
@@ -113,11 +113,11 @@
       padding-bottom: 30px;
     }
 
-    /* KERTAS A4 PORTRAIT */
+    /* KERTAS A4 (PORTRAIT / LANDSCAPE) */
     .a4-sheet {
-      width: 210mm;
-      min-width: 210mm;
-      min-height: 297mm;
+      width: {{ ($orientasi ?? 'portrait') === 'landscape' ? '297mm' : '210mm' }};
+      min-width: {{ ($orientasi ?? 'portrait') === 'landscape' ? '297mm' : '210mm' }};
+      min-height: {{ ($orientasi ?? 'portrait') === 'landscape' ? '210mm' : '297mm' }};
       background: #FFFFFF;
       padding: 12mm 15mm 15mm 15mm;
       box-shadow: 0 4px 25px rgba(0,0,0,0.35);
@@ -275,6 +275,9 @@
     .table-data td.text-center {
       text-align: center;
     }
+    .table-data td.text-end {
+      text-align: right;
+    }
 
     /* TANDA TANGAN */
     .ttd-container {
@@ -313,6 +316,7 @@
         box-shadow: none;
         padding: 0;
         width: 100%;
+        min-width: 100%;
       }
     }
   </style>
@@ -323,8 +327,11 @@
   <div class="print-actions-bar no-print">
     <div class="print-title-info">
       <i class="bi bi-file-earmark-pdf-fill" style="color:#FACC15; font-size:18px;"></i>
-      <span>Daftar Guru &amp; Tenaga Kependidikan (Format Standar A4)</span>
-      <span class="badge-a4">A4 Portrait</span>
+      <span>{{ $judulLaporan ?? 'Daftar Pendidik & Tenaga Kependidikan' }}</span>
+      <span class="badge-a4">A4 {{ ucfirst($orientasi ?? 'portrait') }}</span>
+      @if(!($withKop ?? true))
+        <span class="badge-a4" style="background:rgba(59,130,246,0.2); color:#93C5FD; border-color:rgba(59,130,246,0.4);">Tanpa Kop (Kertas Pre-Printed)</span>
+      @endif
     </div>
     <div class="btn-action-group">
       <a href="{{ url('/guru') }}" class="btn-back">
@@ -341,48 +348,71 @@
     <div class="a4-sheet">
 
     {{-- KOP SURAT DINAS --}}
-    @include('partials.kop_surat')
+    @if($withKop ?? true)
+      @include('partials.kop_surat')
+    @else
+      {{-- Spacer kosong jika dicetak pada kertas kop surat resmi fisik --}}
+      <div style="height: 30mm;"></div>
+    @endif
 
     {{-- JUDUL LAPORAN --}}
     <div class="judul-laporan">
-      <h2>DAFTAR PENDIDIK &amp; TENAGA KEPENDIDIKAN</h2>
-      <div class="sub-judul">Tahun Pelajaran 2026/2027 · SMKN 1 Air Naningan</div>
+      <h2>{{ $judulLaporan ?? 'DAFTAR PENDIDIK & TENAGA KEPENDIDIKAN' }}</h2>
+      @if(!empty($subJudul))
+        <div class="sub-judul">{{ $subJudul }}</div>
+      @endif
     </div>
 
-    {{-- TABEL GURU --}}
+    {{-- TABEL DATA FLEKSIBEL SESUAI KOLOM TERPILIH --}}
     <table class="table-data">
       <thead>
         <tr>
-          <th style="width:5%;">No</th>
-          <th style="width:18%;">NIP</th>
-          <th style="width:22%;">Nama Lengkap Guru / Staf</th>
-          <th style="width:16%;">Jabatan / Peran</th>
-          <th style="width:13%;">Kontak WhatsApp</th>
-          <th style="width:18%;">Akun Login</th>
-          <th style="width:8%;">Status</th>
+          <th style="width: 4%;">No</th>
+          @foreach($kolomTerpilih as $colKey)
+            @php $cfg = $kamusKolom[$colKey] ?? null; @endphp
+            @if($cfg)
+              <th style="{{ isset($cfg['width']) ? 'width:'.$cfg['width'].';' : '' }}">
+                {{ $cfg['label'] }}
+              </th>
+            @endif
+          @endforeach
         </tr>
       </thead>
       <tbody>
         @forelse($gurus as $idx => $g)
           <tr>
             <td class="text-center">{{ $idx + 1 }}</td>
-            <td class="text-center" style="font-family:'JetBrains Mono', monospace; font-size:8pt; font-weight:600;">{{ $g->nip ?? '-' }}</td>
-            <td><strong>{{ $g->nama_lengkap_gelar }}</strong></td>
-            <td style="font-size:8pt;">{{ $g->jabatan }}</td>
-            <td class="text-center" style="font-family:'JetBrains Mono', monospace; font-size:8pt;">{{ $g->no_hp ?: '-' }}</td>
-            <td style="font-family:'JetBrains Mono', monospace; font-size:7.5pt; word-break:break-all;">{{ $g->user ? $g->user->email : '-' }}</td>
-            <td class="text-center" style="font-size:8pt; font-weight:700;">{{ strtoupper($g->status) }}</td>
+            @foreach($kolomTerpilih as $colKey)
+              @php 
+                $cfg = $kamusKolom[$colKey] ?? null; 
+                $fn = $cfg['value'] ?? ($cfg['val'] ?? null);
+                $val = $fn ? $fn($g) : '-';
+                $alignClass = ($cfg['align'] ?? 'left') === 'center' ? 'text-center' : (($cfg['align'] ?? 'left') === 'right' ? 'text-end' : '');
+                $isMono = !empty($cfg['mono']);
+              @endphp
+              <td class="{{ $alignClass }}" style="{{ $isMono ? "font-family:'JetBrains Mono', monospace; font-size:8pt;" : "" }}">
+                @if($colKey === 'tanda_tangan')
+                  <div style="height: 32px; width: 100%;"></div>
+                @elseif($colKey === 'nama')
+                  <strong>{{ $val }}</strong>
+                @else
+                  {{ $val }}
+                @endif
+              </td>
+            @endforeach
           </tr>
         @empty
           <tr>
-            <td colspan="7" class="text-center" style="padding:16px; color:#666;">Tidak ada data guru / pegawai terdaftar.</td>
+            <td colspan="{{ count($kolomTerpilih) + 1 }}" class="text-center" style="padding:16px; color:#666;">
+              Tidak ada data guru / pegawai terdaftar.
+            </td>
           </tr>
         @endforelse
       </tbody>
     </table>
 
     <div style="font-size:8.5pt; color:#444; margin-bottom:10px;">
-      <em>* Total Terdaftar: {{ $gurus->count() }} Guru &amp; Pegawai. Dicetak otomatis dari SIRANI (Sistem Informasi Responsif Absensi &amp; Penegakan Disiplin) SMKN 1 Air Naningan pada {{ \Carbon\Carbon::now()->translatedFormat('d F Y, H:i') }} WIB.</em>
+      <em>* Total Data: {{ $gurus->count() }} Orang. Dicetak otomatis dari SIRANI (Sistem Informasi Responsif Absensi &amp; Penegakan Disiplin) SMKN 1 Air Naningan pada {{ \Carbon\Carbon::now()->translatedFormat('d F Y, H:i') }} WIB.</em>
     </div>
 
     {{-- TANDA TANGAN --}}
