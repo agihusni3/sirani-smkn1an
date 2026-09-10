@@ -103,7 +103,7 @@ class SituanEKabinetController extends Controller
     {
         $request->validate([
             'guru_id'         => 'required|exists:gurus,id',
-            'kategori_berkas' => 'required|in:ktp,kk,sk_cpns,sk_pns,sk_pppk,sk_pangkat_terakhir,sk_kgb_terakhir,ijazah,transkrip,sertifikat_pendidik,kartu_pegawai,lainnya',
+            'kategori_berkas' => 'required|in:ktp,kk,sk_cpns,sk_pns,sk_pppk,sk_pangkat_terakhir,sk_kgb_terakhir,ijazah,transkrip,sertifikat_pendidik,sertifikat_pelatihan,kartu_pegawai,lainnya',
             'nama_dokumen'    => 'required|string|max:150',
             'nomor_dokumen'   => 'nullable|string|max:100',
             'tanggal_dokumen' => 'nullable|date',
@@ -125,6 +125,17 @@ class SituanEKabinetController extends Controller
             'file_path'       => $filePath,
         ]);
 
+        // Jika kategori berkas adalah sertifikat pelatihan, sinkronkan juga ke SertifikatGuru
+        if ($request->kategori_berkas === 'sertifikat_pelatihan') {
+            \App\Models\SertifikatGuru::create([
+                'guru_id'         => $guru->id,
+                'nama_pelatihan'  => $request->nama_dokumen,
+                'penyelenggara'   => 'Kementerian / Lembaga Pelatihan',
+                'tahun'           => $request->tanggal_dokumen ? date('Y', strtotime($request->tanggal_dokumen)) : date('Y'),
+                'file_sertifikat' => $filePath,
+            ]);
+        }
+
         AuditLog::catat('create', 'situan_ekabinet_ptk', "Mengunggah berkas {$request->nama_dokumen} untuk {$guru->nama} via E-Kabinet");
 
         return redirect()->route('situan.ekabinet.index', ['tab' => 'ptk'])
@@ -139,6 +150,13 @@ class SituanEKabinetController extends Controller
         $arsip = ArsipDokumenPtk::findOrFail($id);
         $namaDok = $arsip->nama_dokumen;
         $guruNama = $arsip->guru?->nama ?? 'PTK';
+
+        // Jika sertifikat pelatihan, sinkronkan hapus di SertifikatGuru
+        if ($arsip->kategori_berkas === 'sertifikat_pelatihan') {
+            \App\Models\SertifikatGuru::where('guru_id', $arsip->guru_id)
+                ->where('file_sertifikat', $arsip->file_path)
+                ->delete();
+        }
 
         if ($arsip->file_path && Storage::disk('public')->exists($arsip->file_path)) {
             Storage::disk('public')->delete($arsip->file_path);

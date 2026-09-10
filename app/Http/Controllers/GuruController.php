@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Guru;
 use App\Models\User;
 use App\Models\SertifikatGuru;
+use App\Models\ArsipDokumenPtk;
 use App\Models\PengaturanSekolah;
 use App\Models\AuditLog;
 use Illuminate\Http\Request;
@@ -1477,7 +1478,7 @@ class GuruController extends Controller
             $filePath = $request->file('file_sertifikat')->store('sertifikat_guru', 'public');
         }
 
-        SertifikatGuru::create([
+        $sertifikat = SertifikatGuru::create([
             'guru_id'         => $guru->id,
             'nama_pelatihan'  => $request->input('nama_pelatihan'),
             'penyelenggara'   => $request->input('penyelenggara'),
@@ -1485,7 +1486,19 @@ class GuruController extends Controller
             'file_sertifikat' => $filePath,
         ]);
 
-        return redirect()->back()->with('success', "Sertifikat pelatihan \"{$request->input('nama_pelatihan')}\" berhasil ditambahkan ke portofolio {$guru->nama}.");
+        // Sinkronisasi otomatis ke Sentral Lemari Berkas Digital E-Kabinet (SITUAN)
+        if ($filePath) {
+            ArsipDokumenPtk::create([
+                'guru_id'         => $guru->id,
+                'kategori_berkas' => 'sertifikat_pelatihan',
+                'nama_dokumen'    => 'Sertifikat: ' . $request->input('nama_pelatihan') . ($request->input('penyelenggara') ? ' (' . $request->input('penyelenggara') . ')' : ''),
+                'nomor_dokumen'   => null,
+                'tanggal_dokumen' => $request->input('tahun') ? ($request->input('tahun') . '-01-01') : now(),
+                'file_path'       => $filePath,
+            ]);
+        }
+
+        return redirect()->back()->with('success', "Sertifikat pelatihan \"{$request->input('nama_pelatihan')}\" berhasil ditambahkan ke portofolio & lemari berkas E-Kabinet {$guru->nama}.");
     }
 
     /**
@@ -1496,12 +1509,19 @@ class GuruController extends Controller
         $sertifikat = SertifikatGuru::where('guru_id', $id)->findOrFail($sertifikatId);
         $namaPelatihan = $sertifikat->nama_pelatihan;
 
-        if ($sertifikat->file_sertifikat && \Illuminate\Support\Facades\Storage::disk('public')->exists($sertifikat->file_sertifikat)) {
-            \Illuminate\Support\Facades\Storage::disk('public')->delete($sertifikat->file_sertifikat);
+        if ($sertifikat->file_sertifikat) {
+            // Hapus juga dari ArsipDokumenPtk di E-Kabinet
+            ArsipDokumenPtk::where('guru_id', $id)
+                ->where('file_path', $sertifikat->file_sertifikat)
+                ->delete();
+
+            if (\Illuminate\Support\Facades\Storage::disk('public')->exists($sertifikat->file_sertifikat)) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($sertifikat->file_sertifikat);
+            }
         }
 
         $sertifikat->delete();
 
-        return redirect()->back()->with('success', "Sertifikat \"{$namaPelatihan}\" berhasil dihapus dari portofolio.");
+        return redirect()->back()->with('success', "Sertifikat \"{$namaPelatihan}\" berhasil dihapus dari portofolio & E-Kabinet.");
     }
 }

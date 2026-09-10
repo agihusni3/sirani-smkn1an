@@ -140,7 +140,7 @@ class SituanKepegawaianController extends Controller
         $guru = Guru::findOrFail($guruId);
 
         $request->validate([
-            'kategori_berkas' => 'required|in:ktp,kk,sk_cpns,sk_pns,sk_pppk,sk_pangkat_terakhir,sk_kgb_terakhir,ijazah,transkrip,sertifikat_pendidik,kartu_pegawai,lainnya',
+            'kategori_berkas' => 'required|in:ktp,kk,sk_cpns,sk_pns,sk_pppk,sk_pangkat_terakhir,sk_kgb_terakhir,ijazah,transkrip,sertifikat_pendidik,sertifikat_pelatihan,kartu_pegawai,lainnya',
             'nama_dokumen'    => 'required|string|max:150',
             'nomor_dokumen'   => 'nullable|string|max:100',
             'tanggal_dokumen' => 'nullable|date',
@@ -160,6 +160,16 @@ class SituanKepegawaianController extends Controller
             'file_path'       => $filePath,
         ]);
 
+        if ($request->kategori_berkas === 'sertifikat_pelatihan') {
+            \App\Models\SertifikatGuru::create([
+                'guru_id'         => $guru->id,
+                'nama_pelatihan'  => $request->nama_dokumen,
+                'penyelenggara'   => 'Kementerian / Lembaga Pelatihan',
+                'tahun'           => $request->tanggal_dokumen ? date('Y', strtotime($request->tanggal_dokumen)) : date('Y'),
+                'file_sertifikat' => $filePath,
+            ]);
+        }
+
         AuditLog::catat('create', 'situan_arsip_ptk', "Mengunggah arsip digital {$request->nama_dokumen} untuk {$guru->nama}");
 
         return back()->with('success', "Dokumen {$request->nama_dokumen} berhasil diarsipkan.");
@@ -173,13 +183,20 @@ class SituanKepegawaianController extends Controller
         $arsip = ArsipDokumenPtk::findOrFail($id);
         $guruId = $arsip->guru_id;
 
+        if ($arsip->kategori_berkas === 'sertifikat_pelatihan') {
+            \App\Models\SertifikatGuru::where('guru_id', $arsip->guru_id)
+                ->where('file_sertifikat', $arsip->file_path)
+                ->delete();
+        }
+
         if ($arsip->file_path && Storage::disk('public')->exists($arsip->file_path)) {
             Storage::disk('public')->delete($arsip->file_path);
         }
 
         $arsip->delete();
 
-        return redirect()->route('situan.arsip-ptk.index', $guruId)
-            ->with('success', 'Dokumen arsip berhasil dihapus.');
+        AuditLog::catat('delete', 'situan_arsip_ptk', "Menghapus arsip digital ID {$id}");
+
+        return back()->with('success', 'Dokumen berhasil dihapus dari arsip.');
     }
 }

@@ -72,6 +72,7 @@
                 'sk_cpns', 'sk_pns', 'sk_pppk' => 'bg-primary-subtle text-primary border border-primary-subtle',
                 'sk_penugasan_sekolah' => 'bg-info-subtle text-dark border border-info-subtle',
                 'ijazah', 'transkrip', 'sertifikat_pendidik' => 'bg-success-subtle text-success border border-success-subtle',
+                'sertifikat_pelatihan' => 'bg-warning-subtle text-dark border border-warning-subtle',
                 'ktp', 'kk', 'kartu_pegawai' => 'bg-info-subtle text-info border border-info-subtle',
                 default => 'bg-secondary-subtle text-secondary',
               };
@@ -85,6 +86,7 @@
                 'ijazah'              => 'Ijazah Pendidikan',
                 'transkrip'           => 'Transkrip Nilai',
                 'sertifikat_pendidik' => 'Sertifikat Pendidik (Serdik)',
+                'sertifikat_pelatihan'=> 'Sertifikat Pelatihan / Diklat',
                 'kartu_pegawai'       => 'Karpeg / KPE',
                 'ktp'                 => 'KTP Elektronik',
                 'kk'                  => 'Kartu Keluarga',
@@ -167,6 +169,7 @@
               <option value="sk_pns">SK Pengangkatan PNS (100%)</option>
               <option value="sk_pppk">SK Pengangkatan PPPK</option>
               <option value="sertifikat_pendidik">Sertifikat Pendidik (Serdik)</option>
+              <option value="sertifikat_pelatihan">Sertifikat Pelatihan / Diklat / Workshop</option>
               <option value="ijazah">Ijazah Terakhir (S1 / S2)</option>
               <option value="transkrip">Transkrip Nilai Akademik</option>
               <option value="kartu_pegawai">Kartu Pegawai (Karpeg / KPE)</option>

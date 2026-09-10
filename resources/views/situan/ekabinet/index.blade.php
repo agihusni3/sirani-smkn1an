@@ -115,6 +115,7 @@
               <option value="ijazah" {{ request('kategori_ptk') == 'ijazah' ? 'selected' : '' }}>Ijazah Pendidikan</option>
               <option value="transkrip" {{ request('kategori_ptk') == 'transkrip' ? 'selected' : '' }}>Transkrip Nilai</option>
               <option value="sertifikat_pendidik" {{ request('kategori_ptk') == 'sertifikat_pendidik' ? 'selected' : '' }}>Sertifikat Pendidik (Serdik)</option>
+              <option value="sertifikat_pelatihan" {{ request('kategori_ptk') == 'sertifikat_pelatihan' ? 'selected' : '' }}>Sertifikat Pelatihan / Diklat</option>
               <option value="sk_penugasan_sekolah" {{ request('kategori_ptk') == 'sk_penugasan_sekolah' ? 'selected' : '' }}>SK Penugasan / Kolektif Sekolah</option>
               <option value="kartu_pegawai" {{ request('kategori_ptk') == 'kartu_pegawai' ? 'selected' : '' }}>Karpeg / KPE</option>
               <option value="ktp" {{ request('kategori_ptk') == 'ktp' ? 'selected' : '' }}>KTP Elektronik</option>
@@ -149,6 +150,7 @@
                   'sk_cpns', 'sk_pns', 'sk_pppk' => 'bg-primary-subtle text-primary border border-primary-subtle',
                   'sk_penugasan_sekolah' => 'bg-info-subtle text-dark border border-info-subtle',
                   'ijazah', 'transkrip', 'sertifikat_pendidik' => 'bg-success-subtle text-success border border-success-subtle',
+                  'sertifikat_pelatihan' => 'bg-warning-subtle text-dark border border-warning-subtle',
                   'ktp', 'kk', 'kartu_pegawai' => 'bg-info-subtle text-info border border-info-subtle',
                   default => 'bg-secondary-subtle text-secondary',
                 };
@@ -162,6 +164,7 @@
                   'ijazah'              => 'Ijazah Pendidikan',
                   'transkrip'           => 'Transkrip Nilai',
                   'sertifikat_pendidik' => 'Sertifikat Pendidik (Serdik)',
+                  'sertifikat_pelatihan'=> 'Sertifikat Pelatihan / Diklat',
                   'kartu_pegawai'       => 'Karpeg / KPE',
                   'ktp'                 => 'KTP Elektronik',
                   'kk'                  => 'Kartu Keluarga',
@@ -378,12 +381,13 @@
           <thead class="table-light">
             <tr>
               <th class="py-3 px-3">Nama PTK</th>
-              <th class="py-3 px-2 text-center" style="width:110px;">SK KGB</th>
-              <th class="py-3 px-2 text-center" style="width:110px;">SK Pangkat</th>
-              <th class="py-3 px-2 text-center" style="width:110px;">Ijazah</th>
-              <th class="py-3 px-2 text-center" style="width:110px;">Serdik</th>
-              <th class="py-3 px-2 text-center" style="width:110px;">KTP / KK</th>
-              <th class="py-3 px-3 text-center" style="width:140px;">Aksi</th>
+              <th class="py-3 px-2 text-center" style="width:100px;">SK KGB</th>
+              <th class="py-3 px-2 text-center" style="width:100px;">SK Pangkat</th>
+              <th class="py-3 px-2 text-center" style="width:100px;">Ijazah</th>
+              <th class="py-3 px-2 text-center" style="width:100px;">Serdik</th>
+              <th class="py-3 px-2 text-center" style="width:110px;">Sertifikat Diklat</th>
+              <th class="py-3 px-2 text-center" style="width:100px;">KTP / KK</th>
+              <th class="py-3 px-3 text-center" style="width:130px;">Aksi</th>
             </tr>
           </thead>
           <tbody>
@@ -394,6 +398,7 @@
                 $hasPangkat = in_array('sk_pangkat_terakhir', $cats) || in_array('sk_pns', $cats) || in_array('sk_pppk', $cats);
                 $hasIjazah = in_array('ijazah', $cats);
                 $hasSerdik = in_array('sertifikat_pendidik', $cats);
+                $hasDiklat = in_array('sertifikat_pelatihan', $cats);
                 $hasIdentitas = in_array('ktp', $cats) || in_array('kk', $cats);
               @endphp
               <tr>
@@ -425,6 +430,13 @@
                 <td class="text-center px-2">
                   @if($hasSerdik)
                     <span class="badge bg-primary-subtle text-primary"><i class="bi bi-check-lg"></i> Ada</span>
+                  @else
+                    <span class="badge bg-light text-muted border">-</span>
+                  @endif
+                </td>
+                <td class="text-center px-2">
+                  @if($hasDiklat)
+                    <span class="badge bg-warning-subtle text-dark border border-warning-subtle"><i class="bi bi-award-fill text-warning"></i> Ada</span>
                   @else
                     <span class="badge bg-light text-muted border">-</span>
                   @endif
@@ -489,6 +501,7 @@
               <option value="ijazah">Ijazah Pendidikan Terakhir</option>
               <option value="transkrip">Transkrip Nilai Akademik</option>
               <option value="sertifikat_pendidik">Sertifikat Pendidik (Serdik)</option>
+              <option value="sertifikat_pelatihan">Sertifikat Pelatihan / Diklat / Workshop</option>
               <option value="kartu_pegawai">Kartu Pegawai (Karpeg / KPE)</option>
               <option value="ktp">KTP Elektronik</option>
               <option value="kk">Kartu Keluarga (KK)</option>

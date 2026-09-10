@@ -156,4 +156,40 @@ class SituanEKabinetTest extends TestCase
         $resDeleteLembaga->assertRedirect(route('situan.ekabinet.index', ['tab' => 'lembaga']));
         $this->assertDatabaseMissing('arsip_sekolahs', ['id' => $arsipLembaga->id]);
     }
+
+    public function test_sertifikat_pelatihan_guru_otomatis_tersinkronisasi_dengan_e_kabinet(): void
+    {
+        Storage::fake('public');
+        $file = UploadedFile::fake()->create('sertifikat_diklat.pdf', 300, 'application/pdf');
+
+        // 1. Upload dari menu guru / portofolio
+        $response = $this->actingAs($this->admin)->post("/guru/{$this->guru->id}/sertifikat", [
+            'nama_pelatihan'  => 'Pelatihan Pembelajaran Berbasis AI',
+            'penyelenggara'   => 'BBPPMPV BMTI',
+            'tahun'           => '2026',
+            'file_sertifikat' => $file,
+        ]);
+
+        $response->assertSessionHas('success');
+
+        // Pastikan tersimpan di sertifikat_gurus
+        $this->assertDatabaseHas('sertifikat_gurus', [
+            'guru_id'        => $this->guru->id,
+            'nama_pelatihan' => 'Pelatihan Pembelajaran Berbasis AI',
+            'penyelenggara'  => 'BBPPMPV BMTI',
+        ]);
+
+        // Pastikan otomatis tersinkronkan ke E-Kabinet (arsip_dokumen_ptks)
+        $this->assertDatabaseHas('arsip_dokumen_ptks', [
+            'guru_id'         => $this->guru->id,
+            'kategori_berkas' => 'sertifikat_pelatihan',
+            'nama_dokumen'    => 'Sertifikat: Pelatihan Pembelajaran Berbasis AI (BBPPMPV BMTI)',
+        ]);
+
+        // Cek tampil di halaman E-Kabinet
+        $responseKabinet = $this->actingAs($this->admin)->get(route('situan.ekabinet.index', ['tab' => 'ptk']));
+        $responseKabinet->assertStatus(200);
+        $responseKabinet->assertSee('Pelatihan Pembelajaran Berbasis AI');
+        $responseKabinet->assertSee('Sertifikat Pelatihan / Diklat');
+    }
 }
