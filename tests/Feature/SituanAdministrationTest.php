@@ -404,5 +404,58 @@ class SituanAdministrationTest extends TestCase
         $this->assertStringContainsString('Desa Datar Lebuay RT 02/01', $content);
         $this->assertStringContainsString('Pembina / IV-a', $content);
     }
+
+    public function test_output_guru_mengurutkan_berdasarkan_hirarki_jabatan_dan_abjad_nama(): void
+    {
+        // Bersihkan data guru selain yang ada
+        Guru::where('id', '!=', $this->guru->id)->delete();
+
+        $this->guru->update([
+            'nama'    => 'Zulham Staf',
+            'jabatan' => 'Staf Tata Usaha',
+            'status'  => 'aktif',
+        ]);
+
+        $kepsek = Guru::create([
+            'nama'    => 'Aprida Kepsek',
+            'jabatan' => 'Kepala Sekolah',
+            'status'  => 'aktif',
+        ]);
+
+        $waka = Guru::create([
+            'nama'    => 'Budi Waka',
+            'jabatan' => 'Waka Kurikulum',
+            'status'  => 'aktif',
+        ]);
+
+        $guruA = Guru::create([
+            'nama'    => 'Anwar Guru',
+            'jabatan' => 'Guru Mapel',
+            'status'  => 'aktif',
+        ]);
+
+        $guruB = Guru::create([
+            'nama'    => 'Bambang Guru',
+            'jabatan' => 'Guru Mapel',
+            'status'  => 'aktif',
+        ]);
+
+        // Request cetak PDF (default urutan: hirarki & abjad nama)
+        $response = $this->actingAs($this->admin)->get('/guru/cetak-pdf');
+        $response->assertStatus(200);
+
+        $html = $response->getContent();
+        $posKepsek = strpos($html, 'Aprida Kepsek');
+        $posWaka   = strpos($html, 'Budi Waka');
+        $posGuruA  = strpos($html, 'Anwar Guru');
+        $posGuruB  = strpos($html, 'Bambang Guru');
+        $posZulham = strpos($html, 'Zulham Staf');
+
+        // Pastikan urutan muncul: Kepsek < Waka < Guru A < Guru B < Staf TU
+        $this->assertTrue($posKepsek < $posWaka, 'Kepsek harus sebelum Waka');
+        $this->assertTrue($posWaka < $posGuruA, 'Waka harus sebelum Guru Mapel');
+        $this->assertTrue($posGuruA < $posGuruB, 'Guru Mapel berawalan A harus sebelum berawalan B');
+        $this->assertTrue($posGuruB < $posZulham, 'Guru Mapel harus sebelum Staf TU');
+    }
 }
 

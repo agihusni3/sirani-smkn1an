@@ -1546,18 +1546,26 @@
             </div>
           </div>
 
-          <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:12px;">
+          <div style="display:grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap:10px;">
+            <div>
+              <label class="form-label" style="font-size:11px; font-weight:700; margin-bottom:4px; display:block;">Urutan / Prioritas Data</label>
+              <select name="sort" id="output_sort" class="form-control" style="font-size:12px; font-weight:600;">
+                <option value="hirarki" selected>Hirarki Jabatan, Abjad Nama</option>
+                <option value="nama_asc">Abjad Nama (A - Z)</option>
+                <option value="nip_asc">NIP / NI PPPK Terurut</option>
+              </select>
+            </div>
             <div>
               <label class="form-label" style="font-size:11px; font-weight:700; margin-bottom:4px; display:block;">Kop Surat Resmi</label>
               <select name="with_kop" id="output_with_kop" class="form-control" style="font-size:12px;">
-                <option value="1">Gunakan Kop Dinas Resmi (2 Logo)</option>
-                <option value="0">Tanpa Kop (Kertas Kop Resmi Fisik)</option>
+                <option value="1">Gunakan Kop Dinas (2 Logo)</option>
+                <option value="0">Tanpa Kop (Kertas Resmi Fisik)</option>
               </select>
             </div>
             <div>
               <label class="form-label" style="font-size:11px; font-weight:700; margin-bottom:4px; display:block;">Orientasi Kertas A4</label>
               <select name="orientasi" id="output_orientasi" class="form-control" style="font-size:12px;">
-                <option value="">Otomatis (Landscape jika &gt; 5 Kolom)</option>
+                <option value="">Otomatis (&gt; 5 Kolom Landscape)</option>
                 <option value="portrait">Portrait (Tegak)</option>
                 <option value="landscape">Landscape (Mendatar)</option>
               </select>

@@ -108,18 +108,7 @@ class GuruController extends Controller
                 break;
             case 'hirarki':
             default:
-                $query->orderByRaw("
-                    CASE 
-                        WHEN jabatan LIKE '%Kepala Sekolah%' OR tugas_tambahan LIKE '%Kepala Sekolah%' THEN 1
-                        WHEN jabatan LIKE '%Waka%' OR jabatan LIKE '%Wakil%' OR tugas_tambahan LIKE '%Waka%' THEN 2
-                        WHEN jabatan LIKE '%Kaprog%' OR jabatan LIKE '%Ketua%' OR tugas_tambahan LIKE '%Kaprog%' THEN 3
-                        WHEN jabatan LIKE '%BK%' OR jabatan LIKE '%Bimbingan%' OR jenis_ptk = 'Guru BK' THEN 4
-                        WHEN jabatan LIKE '%Wali Kelas%' OR tugas_tambahan LIKE '%Wali Kelas%' THEN 5
-                        WHEN jabatan LIKE '%Guru%' THEN 6
-                        WHEN jabatan LIKE '%Tata Usaha%' OR jabatan LIKE '%TU%' OR jabatan LIKE '%Staf%' OR jabatan LIKE '%Operator%' OR jabatan LIKE '%Tendik%' THEN 7
-                        ELSE 8
-                    END ASC, nama ASC
-                ");
+                self::applyUrutanHirarki($query);
                 break;
         }
 
@@ -613,6 +602,25 @@ class GuruController extends Controller
     }
 
     /**
+     * Terapkan urutan prioritas hirarki organisasi sekolah, lalu abjad nama.
+     */
+    public static function applyUrutanHirarki($query)
+    {
+        return $query->orderByRaw("
+            CASE 
+                WHEN jabatan LIKE '%Kepala Sekolah%' OR tugas_tambahan LIKE '%Kepala Sekolah%' THEN 1
+                WHEN jabatan LIKE '%Waka%' OR jabatan LIKE '%Wakil%' OR tugas_tambahan LIKE '%Waka%' THEN 2
+                WHEN jabatan LIKE '%Kaprog%' OR jabatan LIKE '%Ketua%' OR tugas_tambahan LIKE '%Kaprog%' THEN 3
+                WHEN jabatan LIKE '%BK%' OR jabatan LIKE '%Bimbingan%' OR jenis_ptk = 'Guru BK' THEN 4
+                WHEN jabatan LIKE '%Wali Kelas%' OR tugas_tambahan LIKE '%Wali Kelas%' THEN 5
+                WHEN jabatan LIKE '%Guru%' THEN 6
+                WHEN jabatan LIKE '%Tata Usaha%' OR jabatan LIKE '%TU%' OR jabatan LIKE '%Staf%' OR jabatan LIKE '%Operator%' OR jabatan LIKE '%Tendik%' THEN 7
+                ELSE 8
+            END ASC, nama ASC
+        ");
+    }
+
+    /**
      * Kamus Kolom & Atribut Data Guru untuk Fleksibilitas Ekspor & Cetak TU.
      */
     public static function getKamusKolom(): array
@@ -768,7 +776,25 @@ class GuruController extends Controller
             $kolomTerpilih = [];
         }
 
-        $query = Guru::with(['user', 'sertifikats'])->orderBy('nama');
+        $query = Guru::with(['user', 'sertifikats']);
+
+        $sort = $request->input('sort', 'hirarki');
+        switch ($sort) {
+            case 'nama_asc':
+                $query->orderBy('nama', 'asc');
+                break;
+            case 'nama_desc':
+                $query->orderBy('nama', 'desc');
+                break;
+            case 'nip_asc':
+                $query->orderBy('nip', 'asc');
+                break;
+            case 'hirarki':
+            default:
+                self::applyUrutanHirarki($query);
+                break;
+        }
+
         if ($request->filled('status') && $request->status !== 'semua') {
             $query->where('status', $request->status);
         }
@@ -907,7 +933,25 @@ class GuruController extends Controller
             $orientasi = count($kolomTerpilih) > 5 ? 'landscape' : 'portrait';
         }
 
-        $query = Guru::with(['user', 'sertifikats'])->orderBy('nama');
+        $query = Guru::with(['user', 'sertifikats']);
+
+        $sort = $request->input('sort', 'hirarki');
+        switch ($sort) {
+            case 'nama_asc':
+                $query->orderBy('nama', 'asc');
+                break;
+            case 'nama_desc':
+                $query->orderBy('nama', 'desc');
+                break;
+            case 'nip_asc':
+                $query->orderBy('nip', 'asc');
+                break;
+            case 'hirarki':
+            default:
+                self::applyUrutanHirarki($query);
+                break;
+        }
+
         if ($request->filled('status') && $request->status !== 'semua') {
             $query->where('status', $request->status);
         }
