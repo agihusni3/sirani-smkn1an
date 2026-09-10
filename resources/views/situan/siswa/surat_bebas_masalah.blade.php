@@ -301,7 +301,7 @@
 
 @section('footer')
   <div style="display:flex; justify-content:space-between; font-size:8pt; color:#64748b;">
-    <div>Dokumen Resmi Sistem Informasi Responsif Absensi &amp; Disiplin (SIRANI)</div>
-    <div>Dicetak Otomatis pada {{ date('d/m/Y H:i') }} WIB | ID: {{ $nomorSurat }}</div>
+    <div>Dokumen Resmi Tata Usaha &middot; SITUAN (Sistem Informasi Tata Usaha &amp; Administrasi Terpadu) SMKN 1 Air Naningan</div>
+    <div>Tanggal Terbit: {{ date('d/m/Y H:i') }} WIB | ID: {{ $nomorSurat }}</div>
   </div>
 @endsection

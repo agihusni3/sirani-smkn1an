@@ -206,3 +206,11 @@
     </div>
   </div>
 @endsection
+
+@section('footer')
+  <div style="display:flex; justify-content:space-between; align-items:center; font-size:8pt; color:#64748b; font-family:'Plus Jakarta Sans', sans-serif;">
+    <span>Dokumen Resmi Kepegawaian &amp; Tata Usaha · <strong>SITUAN (Sistem Informasi Tata Usaha &amp; Administrasi Terpadu) SMKN 1 Air Naningan</strong></span>
+    <span>Dicetak: {{ \Carbon\Carbon::now()->translatedFormat('d F Y, H:i') }} WIB</span>
+  </div>
+@endsection
+

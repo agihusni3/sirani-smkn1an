@@ -17,7 +17,7 @@
        ═══════════════════════════════════════════════════════════════════ */
     @page {
       size: {{ $paperSize ?? 'A4 portrait' }};
-      margin: {{ $pageMargin ?? '12mm 15mm 15mm 15mm' }};
+      margin: 0;
     }
 
     * {
@@ -183,7 +183,7 @@
         width: 100% !important;
         min-height: auto !important;
         box-shadow: none !important;
-        padding: 0 !important;
+        padding: {{ $sheetPadding ?? '15mm 20mm 15mm 20mm' }} !important;
         margin: 0 !important;
       }
     }

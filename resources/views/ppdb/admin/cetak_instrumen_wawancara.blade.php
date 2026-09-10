@@ -7,7 +7,7 @@
     <style>
         @page {
             size: A4 portrait;
-            margin: 10mm 12mm 10mm 12mm;
+            margin: 0;
         }
 
         * {
@@ -223,7 +223,7 @@
             }
             .page-a4 {
                 box-shadow: none;
-                padding: 0;
+                padding: 10mm 14mm !important;
                 width: 100%;
             }
         }
@@ -504,6 +504,13 @@
                 </td>
             </tr>
         </table>
+
+        {{-- FOOTER KETERANGAN DATA PPDB --}}
+        <div style="margin-top:10px; font-size:7.5pt; color:#475569; border-top:1px solid #cbd5e1; padding-top:3px; display:flex; justify-content:space-between; align-items:center; font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+            <span>Instrumen Pengujian Resmi · <strong>PPDB SMKN 1 Air Naningan</strong></span>
+            <span>Dicetak: {{ \Carbon\Carbon::now()->translatedFormat('d F Y, H:i') }} WIB</span>
+        </div>
+
     </div>
 
 </body>

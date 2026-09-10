@@ -74,9 +74,13 @@
 
 @section('footer')
   @if($surat->tembusan)
-    <div style="font-size:9.5pt; line-height:1.4; margin-top:20px; border-top:1px dashed #CBD5E1; padding-top:8px;">
+    <div style="font-size:9.5pt; line-height:1.4; margin-top:12px; border-top:1px dashed #CBD5E1; padding-top:6px; margin-bottom:8px;">
       <strong>Tembusan Yth:</strong><br />
       {!! nl2br(e($surat->tembusan)) !!}
     </div>
   @endif
+  <div style="display:flex; justify-content:space-between; align-items:center; font-size:8pt; color:#64748b; border-top:1px solid #e2e8f0; padding-top:4px; font-family:'Plus Jakarta Sans', sans-serif;">
+    <span>Dokumen Resmi Tata Usaha · <strong>SITUAN (Sistem Informasi Tata Usaha &amp; Administrasi Terpadu) SMKN 1 Air Naningan</strong></span>
+    <span>No. Reg: {{ $surat->nomor_surat_lengkap }}</span>
+  </div>
 @endsection

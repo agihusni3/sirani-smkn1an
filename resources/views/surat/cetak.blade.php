@@ -834,6 +834,12 @@
       </div>
     @endif
 
+    {{-- FOOTER KETERANGAN DATA SIRANI --}}
+    <div style="position:absolute; bottom:10mm; left:22mm; right:20mm; display:flex; justify-content:space-between; align-items:center; font-size:8pt; color:#64748b; border-top:1px solid #e2e8f0; padding-top:4px; font-family:'Plus Jakarta Sans', sans-serif;">
+      <span>Dokumen Kedisiplinan Kesiswaan · <strong>SIRANI (Sistem Informasi Responsif Absensi &amp; Penegakan Disiplin) SMKN 1 Air Naningan</strong></span>
+      <span>Dicetak: {{ \Carbon\Carbon::now()->translatedFormat('d F Y, H:i') }} WIB</span>
+    </div>
+
   </div>
 
   {{-- ========================================================
@@ -1008,6 +1014,12 @@
           </td>
         </tr>
       </table>
+    </div>
+
+    {{-- FOOTER KETERANGAN DATA SIRANI --}}
+    <div style="position:absolute; bottom:10mm; left:22mm; right:20mm; display:flex; justify-content:space-between; align-items:center; font-size:8pt; color:#64748b; border-top:1px solid #e2e8f0; padding-top:4px; font-family:'Plus Jakarta Sans', sans-serif;">
+      <span>Rekapitulasi Presensi Kesiswaan · <strong>SIRANI SMKN 1 Air Naningan</strong></span>
+      <span>Dicetak: {{ \Carbon\Carbon::now()->translatedFormat('d F Y, H:i') }} WIB</span>
     </div>
 
   </div>

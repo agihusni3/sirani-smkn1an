@@ -7,7 +7,7 @@
   <style>
     @page {
       size: A4;
-      margin: 15mm 20mm;
+      margin: 0;
     }
     body {
       font-family: 'Times New Roman', Times, serif;
@@ -184,7 +184,7 @@
     }
     @media print {
       .no-print-bar { display: none !important; }
-      body { padding: 0; }
+      body { padding: 15mm 20mm !important; }
     }
   </style>
 </head>
@@ -351,6 +351,12 @@
     <div style="font-weight:bold; text-decoration:underline;">{{ $sekolah->nama_kepsek ?: ($sekolah->nama_kepala_sekolah ?: 'Drs. H. Ahmad Sudrajat, M.Pd.') }}</div>
     <div>NIP. {{ $sekolah->nip_kepsek ?: ($sekolah->nip_kepala_sekolah ?: '19750510 200003 1 005') }}</div>
   </div>
+</div>
+
+{{-- FOOTER KETERANGAN DATA SIRANI --}}
+<div style="margin-top:20px; font-size:7.5pt; color:#64748b; border-top:1px solid #cbd5e1; padding-top:4px; display:flex; justify-content:space-between; align-items:center; font-family:'Plus Jakarta Sans', sans-serif;">
+  <span>Dokumen Resume Rekam Jejak &amp; Disiplin Kesiswaan · <strong>SIRANI (Sistem Informasi Responsif Absensi &amp; Penegakan Disiplin) SMKN 1 Air Naningan</strong></span>
+  <span>Dicetak: {{ \Carbon\Carbon::now()->translatedFormat('d F Y, H:i') }} WIB</span>
 </div>
 
 </body>

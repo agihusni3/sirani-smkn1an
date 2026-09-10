@@ -6,16 +6,22 @@
   <style>
     @page {
       size: A5 portrait;
-      margin: 10mm 12mm;
+      margin: 0;
+    }
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
     }
     body {
       font-family: 'Times New Roman', Times, serif;
-      font-size: 11pt;
+      font-size: 10.5pt;
       color: #000;
       background: #fff;
       margin: 0;
-      padding: 10px;
-    }
+      padding: 10mm 12mm;
     }
     .judul-lembar {
       text-align: center;

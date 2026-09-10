@@ -7,7 +7,7 @@
     <style>
         @page {
             size: A4 portrait;
-            margin: 10mm 12mm 10mm 12mm;
+            margin: 0;
         }
 
         * {
@@ -214,7 +214,7 @@
             }
             .page-a4 {
                 box-shadow: none;
-                padding: 0;
+                padding: 10mm 14mm !important;
                 width: 100%;
             }
         }
@@ -372,7 +372,7 @@
         </table>
 
         <div style="margin-top: 14px; font-size: 8pt; color: #475569; font-style: italic; text-align: center; font-family: 'Times New Roman', serif;">
-            * Piringan Ishihara ini disusun berdasarkan standar uji pseudoisochromatic untuk keperluan seleksi masuk kejuruan SMKN 1 Air Naningan Tahun 2026.
+            * Piringan Ishihara ini disusun berdasarkan standar uji pseudoisochromatic untuk keperluan seleksi masuk kejuruan PPDB SMKN 1 Air Naningan Tahun 2026.
         </div>
     </div>
 

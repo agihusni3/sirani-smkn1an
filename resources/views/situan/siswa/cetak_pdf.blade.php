@@ -12,12 +12,14 @@
   <style>
     @page {
       size: A4 portrait;
-      margin: 12mm 15mm 15mm 15mm;
+      margin: 0;
     }
     *, *::before, *::after {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
     }
     body {
       background-color: #334155;
@@ -302,17 +304,29 @@
     }
 
     @media print {
-      body {
-        background: transparent;
-        padding: 0;
+      html, body {
+        background: #FFFFFF !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        width: 100% !important;
+        height: auto !important;
       }
       .no-print, .print-actions-bar {
         display: none !important;
       }
+      .print-sheet-wrapper {
+        padding: 0 !important;
+        margin: 0 !important;
+        display: block !important;
+        width: 100% !important;
+      }
       .a4-sheet {
-        box-shadow: none;
-        padding: 0;
-        width: 100%;
+        box-shadow: none !important;
+        margin: 0 auto !important;
+        padding: 12mm 15mm 15mm 15mm !important;
+        width: 100% !important;
+        min-width: 100% !important;
+        box-sizing: border-box !important;
       }
     }
   </style>
@@ -404,8 +418,8 @@
       </tbody>
     </table>
 
-    <div style="font-size:8.5pt; color:#444; margin-bottom:10px;">
-      <em>* Total Terdaftar: {{ $siswas->count() }} Siswa. Dicetak otomatis dari SIRANI (Sistem Informasi Responsif Absensi &amp; Penegakan Disiplin) SMKN 1 Air Naningan pada {{ \Carbon\Carbon::now()->translatedFormat('d F Y, H:i') }} WIB.</em>
+    <div style="font-size:8.5pt; color:#333; margin-bottom:12px;">
+      <em>* Total Terdaftar: {{ $siswas->count() }} Siswa &middot; Keterangan Data: SITUAN (Sistem Informasi Tata Usaha &amp; Administrasi Terpadu) SMKN 1 Air Naningan</em>
     </div>
 
     {{-- TANDA TANGAN --}}

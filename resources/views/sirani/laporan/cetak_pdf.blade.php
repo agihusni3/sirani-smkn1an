@@ -12,7 +12,7 @@
   <style>
     @page {
       size: A4 portrait;
-      margin: 10mm 12mm 12mm 12mm;
+      margin: 0;
     }
     *, *::before, *::after {
       box-sizing: border-box;
@@ -346,7 +346,7 @@
       }
       .a4-sheet {
         box-shadow: none !important;
-        padding: 0 !important;
+        padding: 10mm 12mm 12mm 12mm !important;
         width: 100% !important;
         min-height: auto !important;
         margin: 0 !important;

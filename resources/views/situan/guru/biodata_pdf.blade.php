@@ -12,12 +12,14 @@
   <style>
     @page {
       size: A4 portrait;
-      margin: 12mm 15mm 15mm 15mm;
+      margin: 0;
     }
     *, *::before, *::after {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
     }
     body {
       background-color: #334155;
@@ -307,19 +309,29 @@
     }
 
     @media print {
-      body {
-        background: transparent;
-        padding: 0;
+      html, body {
+        background: #FFFFFF !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        width: 100% !important;
+        height: auto !important;
       }
-      .print-actions-bar {
+      .no-print, .print-actions-bar {
         display: none !important;
       }
+      .print-sheet-wrapper {
+        padding: 0 !important;
+        margin: 0 !important;
+        display: block !important;
+        width: 100% !important;
+      }
       .page-sheet {
-        width: 100%;
-        min-height: auto;
-        padding: 0;
-        box-shadow: none;
-        margin: 0;
+        width: 100% !important;
+        min-height: auto !important;
+        box-shadow: none !important;
+        margin: 0 auto !important;
+        padding: 12mm 15mm 15mm 15mm !important;
+        box-sizing: border-box !important;
       }
     }
   </style>
@@ -600,8 +612,8 @@
 
     <!-- FOOTER INFORMASI -->
     <div class="doc-footer">
-      <div>Dicetak melalui Sistem Informasi Presensi &amp; Layanan Akademik (SIRANI) SMKN 1 Air Naningan</div>
-      <div>Tanggal Cetak: {{ \Carbon\Carbon::now()->format('d/m/Y H:i:s') }} WIB</div>
+      <div>Keterangan Data: SITUAN (Sistem Informasi Tata Usaha &amp; Administrasi Terpadu) SMKN 1 Air Naningan</div>
+      <div>Tanggal Cetak: {{ \Carbon\Carbon::now()->translatedFormat('d F Y, H:i') }} WIB</div>
     </div>
 
   </div>
