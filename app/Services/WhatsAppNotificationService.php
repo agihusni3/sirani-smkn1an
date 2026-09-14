@@ -185,7 +185,20 @@ class WhatsAppNotificationService
                     'typing'  => true,
                 ]);
 
-                return ['success' => $response->successful(), 'response' => $response->body()];
+                // Fonnte selalu return HTTP 200 bahkan saat gagal (token invalid dll)
+                // Cek status dari JSON response body
+                $body = $response->json();
+                $fonnteSuccess = ($body['status'] ?? false) === true;
+
+                if (!$fonnteSuccess) {
+                    Log::warning('[SIRANI FONNTE GAGAL] Target: ' . $noWa . ' | Reason: ' . ($body['reason'] ?? 'unknown') . ' | Response: ' . $response->body());
+                }
+
+                return [
+                    'success'  => $fonnteSuccess,
+                    'response' => $response->body(),
+                    'message'  => $fonnteSuccess ? 'Pesan berhasil dikirim.' : ('Fonnte gagal: ' . ($body['reason'] ?? 'unknown')),
+                ];
             }
 
             if ($setting->wa_provider === 'wablas') {
