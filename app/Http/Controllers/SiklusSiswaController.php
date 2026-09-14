@@ -73,7 +73,7 @@ class SiklusSiswaController extends Controller
         }])->get();
 
         $tahunAjarans = TahunAjaran::all();
-        $allSiswas = Siswa::with(['siswaRombel.rombel'])->where('status', 'aktif')->orderBy('nama')->get();
+        $allSiswas = Siswa::with(['siswaRombels.rombel'])->whereIn('status', ['aktif', 'pkl'])->orderBy('nama')->get();
 
         return view('situan.siklus_siswa', compact('siswas', 'rombels', 'tahunAjarans', 'allSiswas', 'search', 'rombelId', 'status', 'sort'));
     }

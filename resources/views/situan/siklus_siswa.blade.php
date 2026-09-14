@@ -493,7 +493,15 @@
                 </td>
                 <td style="text-align:center;" class="no-print">
                   <div style="display:flex; gap:6px; justify-content:center;">
-                    <button type="button" class="btn btn-sm" onclick="pilihSiswaTransisi({{ $s->id }})" style="font-size:13px; padding:4px 6px; font-weight:800; color:var(--text); border:none; background:transparent; box-shadow:none; cursor:pointer;" title="Proses Transisi Siswa Ini">
+                    <button type="button" class="btn btn-sm"
+                      data-id="{{ $s->id }}"
+                      data-nama="{{ $s->nama }}"
+                      data-nisn="{{ $s->nisn ?: '-' }}"
+                      data-rombel="{{ $sr->rombel->nama_rombel ?? 'Tanpa Rombel' }}"
+                      data-status="{{ strtoupper($s->status) }}"
+                      onclick="pilihSiswaTransisiBtn(this)"
+                      style="font-size:13px; padding:4px 6px; font-weight:800; color:var(--text); border:none; background:transparent; box-shadow:none; cursor:pointer;"
+                      title="Proses Transisi Siswa Ini">
                       <i class="bi bi-arrow-left-right"></i>
                     </button>
                     <a href="/portal-siswa/{{ $s->nisn ?: $s->id }}" target="_blank" class="btn btn-sm" style="font-size:13px; padding:4px 6px; font-weight:800; color:var(--text); border:none; background:transparent; box-shadow:none; text-decoration:none;" title="Portal Rekap Siswa">
@@ -717,14 +725,37 @@
     const status = item.getAttribute('data-status') || 'AKTIF';
     const statusStyle = item.getAttribute('data-status-style') || 'background:#f1f5f9; color:#475569;';
 
-    // Update hidden input
+    applySelectedSiswa(
+      siswaId,
+      item.getAttribute('data-nama') || '',
+      item.getAttribute('data-nisn') || '-',
+      item.getAttribute('data-rombel') || 'Tanpa Rombel',
+      item.getAttribute('data-status') || 'AKTIF',
+      item.getAttribute('data-status-style') || ''
+    );
+  }
+
+  function applySelectedSiswa(siswaId, nama, nisn, rombel, status, customStyle = '') {
+    // 1. Update hidden input
     const hiddenInput = document.getElementById('select_siswa_id');
     if (hiddenInput) {
       hiddenInput.value = siswaId;
       hiddenInput.dispatchEvent(new Event('change'));
     }
 
-    // Update trigger display
+    // 2. Tentukan styling status
+    let statusStyle = customStyle;
+    if (!statusStyle) {
+      const st = (status || '').toLowerCase();
+      if (st === 'aktif') statusStyle = 'background:#dcfce7; color:#15803d; border:1px solid #bbf7d0;';
+      else if (st === 'pkl') statusStyle = 'background:#e0f2fe; color:#0369a1; border:1px solid #bae6fd;';
+      else if (st === 'lulus') statusStyle = 'background:#f1f5f9; color:#475569; border:1px solid #cbd5e1;';
+      else if (st === 'pindah') statusStyle = 'background:#fef3c7; color:#b45309; border:1px solid #fde68a;';
+      else if (st === 'keluar') statusStyle = 'background:#fee2e2; color:#b91c1c; border:1px solid #fecaca;';
+      else statusStyle = 'background:#f1f5f9; color:#64748b; border:1px solid #cbd5e1;';
+    }
+
+    // 3. Tampilkan identitas siswa pada trigger tombol
     const display = document.getElementById('display_search_siswa');
     const btnClear = document.getElementById('btn_clear_siswa');
     const trigger = document.getElementById('trigger_search_siswa');
@@ -739,13 +770,13 @@
             ${nama}
           </span>
           <span class="font-mono" style="font-size:10.5px; background:#f1f5f9; color:#475569; padding:1px 6px; border-radius:4px; font-weight:700; border:1px solid #cbd5e1; flex-shrink:0;">
-            NISN: ${nisn}
+            NISN: ${nisn || '-'}
           </span>
           <span style="font-size:10.5px; background:#e0f2fe; color:#0369a1; padding:1px 6px; border-radius:4px; font-weight:800; border:1px solid #bae6fd; flex-shrink:0;">
-            ${rombel}
+            ${rombel || 'Tanpa Rombel'}
           </span>
           <span style="font-size:10px; font-weight:800; padding:1px 6px; border-radius:4px; flex-shrink:0; ${statusStyle}">
-            ${status}
+            ${(status || 'AKTIF').toUpperCase()}
           </span>
         </div>
       `;
@@ -757,13 +788,29 @@
       trigger.classList.remove('active');
     }
 
-    // Mark selected in list
-    list.querySelectorAll('.siswa-item').forEach(el => el.classList.remove('selected'));
-    item.classList.add('selected');
+    // 4. Tandai terpilih di list jika item ada
+    const list = document.getElementById('list_search_siswa');
+    if (list) {
+      list.querySelectorAll('.siswa-item').forEach(el => el.classList.remove('selected'));
+      const item = list.querySelector(`.siswa-item[data-id="${siswaId}"]`);
+      if (item) item.classList.add('selected');
+    }
 
-    // Close menu
+    // 5. Tutup dropdown menu
     const menu = document.getElementById('menu_search_siswa');
     if (menu) menu.style.display = 'none';
+
+    // 6. Penyesuaian otomatis jenis transisi jika status siswa PKL
+    const selectJenis = document.getElementById('select_jenis');
+    if (selectJenis && status) {
+      const st = status.toLowerCase();
+      if (st === 'pkl') {
+        selectJenis.value = 'selesai_pkl';
+      } else if (st === 'aktif' && selectJenis.value === 'selesai_pkl') {
+        selectJenis.value = 'naik_kelas';
+      }
+      toggleTransisiFields();
+    }
   }
 
   function clearSearchSiswa(event) {
@@ -829,13 +876,32 @@
     return true;
   }
 
-  function pilihSiswaTransisi(siswaId) {
+  function pilihSiswaTransisiBtn(btn) {
+    const id = btn.getAttribute('data-id');
+    const nama = btn.getAttribute('data-nama') || '';
+    const nisn = btn.getAttribute('data-nisn') || '-';
+    const rombel = btn.getAttribute('data-rombel') || 'Tanpa Rombel';
+    const status = btn.getAttribute('data-status') || 'AKTIF';
+    pilihSiswaTransisi(id, nama, nisn, rombel, status);
+  }
+
+  function pilihSiswaTransisi(siswaId, nama = '', nisn = '', rombel = '', status = '') {
     switchTransisiTab('individu');
-    selectSiswaItem(siswaId);
+
+    if (nama) {
+      applySelectedSiswa(siswaId, nama, nisn, rombel, status);
+    } else {
+      selectSiswaItem(siswaId);
+    }
+
     const trigger = document.getElementById('trigger_search_siswa');
     if (trigger) {
       trigger.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      trigger.focus();
+      trigger.style.transition = 'all 0.3s ease';
+      trigger.style.boxShadow = '0 0 0 4px rgba(2, 132, 199, 0.45)';
+      setTimeout(() => {
+        trigger.style.boxShadow = '';
+      }, 1500);
     }
   }
 
