@@ -214,22 +214,90 @@
 
       {{-- FORM 2: AKSI PERORANGAN / INDIVIDU --}}
       <div id="panelFormIndividu" style="display:none;">
-        <form action="/siklus-siswa/transisi" method="POST">
+        <form action="/siklus-siswa/transisi" method="POST" onsubmit="return validateTransisiIndividu(event)">
           @csrf
           <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap:10px; margin-bottom:10px;">
-            <div class="step-card">
+            <div class="step-card" style="position:relative;">
               <label class="step-label">
                 <span class="step-badge">1</span> Pilih Siswa <span style="color:var(--red); margin-left:3px;">*</span>
               </label>
-              <select name="siswa_id" id="select_siswa_id" required class="input-field" style="width:100%; height:34px; font-size:12px; font-weight:700;">
-                <option value="">-- Cari / Pilih Siswa --</option>
-                @foreach($allSiswas as $s)
-                  @php $srAktif = $s->siswaRombels->firstWhere('status_keanggotaan', 'aktif'); @endphp
-                  <option value="{{ $s->id }}" data-status="{{ $s->status }}">
-                    {{ $s->nama }} (NISN: {{ $s->nisn ?: '-' }}) — [{{ $srAktif->rombel->nama_rombel ?? 'Tanpa Rombel' }}] ({{ strtoupper($s->status) }})
-                  </option>
-                @endforeach
-              </select>
+
+              {{-- Hidden input for form submission --}}
+              <input type="hidden" name="siswa_id" id="select_siswa_id" value="">
+
+              {{-- Searchable Trigger --}}
+              <div class="searchable-siswa-wrapper" id="wrapper_search_siswa">
+                <div class="searchable-siswa-trigger" id="trigger_search_siswa" onclick="toggleSearchSiswa(event)" tabindex="0" role="button" aria-haspopup="listbox" aria-expanded="false">
+                  <div class="searchable-siswa-display" id="display_search_siswa">
+                    <i class="bi bi-search" style="font-size:13px; color:var(--text-3);"></i>
+                    <span id="placeholder_search_siswa" style="color:var(--text-3); font-size:12px; font-weight:600;">-- Cari / Pilih Siswa (Ketik Nama, NISN, atau Kelas) --</span>
+                  </div>
+                  <div class="searchable-siswa-actions">
+                    <button type="button" class="btn-clear-siswa" id="btn_clear_siswa" onclick="clearSearchSiswa(event)" title="Hapus pilihan" style="display:none;">
+                      <i class="bi bi-x-circle-fill"></i>
+                    </button>
+                    <i class="bi bi-chevron-down chevron-icon" id="chevron_search_siswa"></i>
+                  </div>
+                </div>
+
+                {{-- Dropdown Search Menu --}}
+                <div class="searchable-siswa-menu" id="menu_search_siswa" style="display:none;">
+                  <div class="searchable-siswa-searchbar">
+                    <div class="search-input-box">
+                      <i class="bi bi-search"></i>
+                      <input type="text" id="input_filter_siswa" placeholder="Ketik nama siswa, NISN, atau rombel..." autocomplete="off" oninput="filterSiswaList()" onkeydown="handleSiswaKeydown(event)">
+                      <button type="button" id="btn_clear_input_filter" onclick="clearFilterInput()" class="btn-clear-siswa" style="display:none;" title="Kosongkan ketikan"><i class="bi bi-x-circle-fill"></i></button>
+                    </div>
+                    <div class="search-count-info" id="search_count_info">
+                      <span>Total: {{ count($allSiswas) }} siswa terdaftar</span>
+                    </div>
+                  </div>
+
+                  <div class="searchable-siswa-list" id="list_search_siswa" role="listbox">
+                    @foreach($allSiswas as $s)
+                      @php
+                        $srAktif = $s->siswaRombels->firstWhere('status_keanggotaan', 'aktif');
+                        $rombelText = $srAktif->rombel->nama_rombel ?? 'Tanpa Rombel';
+                        $statusBadge = match($s->status) {
+                            'aktif' => 'background:#dcfce7; color:#15803d; border:1px solid #bbf7d0;',
+                            'pkl'   => 'background:#e0f2fe; color:#0369a1; border:1px solid #bae6fd;',
+                            'lulus' => 'background:#f1f5f9; color:#475569; border:1px solid #cbd5e1;',
+                            'pindah'=> 'background:#fef3c7; color:#b45309; border:1px solid #fde68a;',
+                            'keluar'=> 'background:#fee2e2; color:#b91c1c; border:1px solid #fecaca;',
+                            default => 'background:#f1f5f9; color:#64748b; border:1px solid #cbd5e1;',
+                        };
+                      @endphp
+                      <div class="siswa-item"
+                           role="option"
+                           data-id="{{ $s->id }}"
+                           data-nama="{{ $s->nama }}"
+                           data-nisn="{{ $s->nisn ?: '-' }}"
+                           data-rombel="{{ $rombelText }}"
+                           data-status="{{ strtoupper($s->status) }}"
+                           data-status-style="{{ $statusBadge }}"
+                           data-search="{{ strtolower($s->nama . ' ' . ($s->nisn ?: '') . ' ' . $rombelText . ' ' . $s->status) }}"
+                           onclick="selectSiswaItem('{{ $s->id }}')">
+                        <div class="siswa-item-info">
+                          <div class="siswa-item-name">{{ $s->nama }}</div>
+                          <div class="siswa-item-meta">
+                            <span class="siswa-item-nisn font-mono"><i class="bi bi-person-badge"></i> NISN: {{ $s->nisn ?: '-' }}</span>
+                            <span class="siswa-item-rombel"><i class="bi bi-door-open"></i> {{ $rombelText }}</span>
+                          </div>
+                        </div>
+                        <div class="siswa-item-badge">
+                          <span style="font-size:10px; font-weight:800; padding:2px 7px; border-radius:4px; {{ $statusBadge }}">
+                            {{ strtoupper($s->status) }}
+                          </span>
+                        </div>
+                      </div>
+                    @endforeach
+                    <div id="no_match_siswa" class="no-match-item" style="display:none;">
+                      <i class="bi bi-search" style="font-size:22px; color:var(--text-3); display:block; margin-bottom:6px;"></i>
+                      Tidak ada siswa yang cocok dengan kata kunci pencarian.
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
 
             <div class="step-card">
@@ -557,15 +625,230 @@
     }
   }
 
-  function pilihSiswaTransisi(siswaId) {
-    switchTransisiTab('individu');
-    const select = document.getElementById('select_siswa_id');
-    if (select) {
-      select.value = siswaId;
-      select.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      select.focus();
+  /* ─── SEARCHABLE SISWA DROPDOWN LOGIC ─── */
+  function toggleSearchSiswa(event, forceOpen = false) {
+    if (event) event.stopPropagation();
+    const menu = document.getElementById('menu_search_siswa');
+    const trigger = document.getElementById('trigger_search_siswa');
+    const filterInput = document.getElementById('input_filter_siswa');
+    if (!menu || !trigger) return;
+
+    const isOpen = menu.style.display !== 'none';
+    if (forceOpen || !isOpen) {
+      menu.style.display = 'block';
+      trigger.classList.add('active');
+      trigger.classList.remove('trigger-error');
+      filterSiswaList();
+      setTimeout(() => {
+        if (filterInput) filterInput.focus();
+      }, 60);
+    } else {
+      menu.style.display = 'none';
+      trigger.classList.remove('active');
     }
   }
+
+  function filterSiswaList() {
+    const filterInput = document.getElementById('input_filter_siswa');
+    const query = (filterInput ? filterInput.value : '').trim().toLowerCase();
+    const list = document.getElementById('list_search_siswa');
+    if (!list) return;
+
+    const items = list.querySelectorAll('.siswa-item');
+    const noMatch = document.getElementById('no_match_siswa');
+    const countInfo = document.getElementById('search_count_info');
+    const btnClearInput = document.getElementById('btn_clear_input_filter');
+
+    if (btnClearInput) {
+      btnClearInput.style.display = query.length > 0 ? 'inline-flex' : 'none';
+    }
+
+    let matched = 0;
+    const maxDisplay = 50;
+
+    items.forEach(item => {
+      const searchData = item.getAttribute('data-search') || '';
+      const isMatch = query === '' || searchData.includes(query);
+      if (isMatch) {
+        matched++;
+        if (matched <= maxDisplay) {
+          item.style.display = 'flex';
+        } else {
+          item.style.display = 'none';
+        }
+      } else {
+        item.style.display = 'none';
+      }
+    });
+
+    if (matched === 0) {
+      if (noMatch) noMatch.style.display = 'block';
+      if (countInfo) countInfo.innerHTML = '<span>0 siswa ditemukan</span>';
+    } else {
+      if (noMatch) noMatch.style.display = 'none';
+      if (countInfo) {
+        if (matched > maxDisplay) {
+          countInfo.innerHTML = `<span>Menampilkan <strong>${maxDisplay}</strong> dari <strong>${matched}</strong> siswa (ketik lebih spesifik)</span>`;
+        } else {
+          countInfo.innerHTML = `<span>Menampilkan <strong>${matched}</strong> siswa</span>`;
+        }
+      }
+    }
+  }
+
+  function clearFilterInput() {
+    const input = document.getElementById('input_filter_siswa');
+    if (input) {
+      input.value = '';
+      input.focus();
+      filterSiswaList();
+    }
+  }
+
+  function selectSiswaItem(siswaId) {
+    const list = document.getElementById('list_search_siswa');
+    if (!list) return;
+    const item = list.querySelector(`.siswa-item[data-id="${siswaId}"]`);
+    if (!item) return;
+
+    const nama = item.getAttribute('data-nama') || '';
+    const nisn = item.getAttribute('data-nisn') || '-';
+    const rombel = item.getAttribute('data-rombel') || 'Tanpa Rombel';
+    const status = item.getAttribute('data-status') || 'AKTIF';
+    const statusStyle = item.getAttribute('data-status-style') || 'background:#f1f5f9; color:#475569;';
+
+    // Update hidden input
+    const hiddenInput = document.getElementById('select_siswa_id');
+    if (hiddenInput) {
+      hiddenInput.value = siswaId;
+      hiddenInput.dispatchEvent(new Event('change'));
+    }
+
+    // Update trigger display
+    const display = document.getElementById('display_search_siswa');
+    const btnClear = document.getElementById('btn_clear_siswa');
+    const trigger = document.getElementById('trigger_search_siswa');
+
+    if (display) {
+      display.innerHTML = `
+        <div style="display:flex; align-items:center; gap:8px; width:100%; overflow:hidden;">
+          <span style="background:#0f172a; color:#fff; width:22px; height:22px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; font-size:10px; flex-shrink:0;">
+            <i class="bi bi-person-fill"></i>
+          </span>
+          <span style="font-weight:800; font-size:12.5px; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+            ${nama}
+          </span>
+          <span class="font-mono" style="font-size:10.5px; background:#f1f5f9; color:#475569; padding:1px 6px; border-radius:4px; font-weight:700; border:1px solid #cbd5e1; flex-shrink:0;">
+            NISN: ${nisn}
+          </span>
+          <span style="font-size:10.5px; background:#e0f2fe; color:#0369a1; padding:1px 6px; border-radius:4px; font-weight:800; border:1px solid #bae6fd; flex-shrink:0;">
+            ${rombel}
+          </span>
+          <span style="font-size:10px; font-weight:800; padding:1px 6px; border-radius:4px; flex-shrink:0; ${statusStyle}">
+            ${status}
+          </span>
+        </div>
+      `;
+    }
+
+    if (btnClear) btnClear.style.display = 'inline-flex';
+    if (trigger) {
+      trigger.classList.remove('trigger-error');
+      trigger.classList.remove('active');
+    }
+
+    // Mark selected in list
+    list.querySelectorAll('.siswa-item').forEach(el => el.classList.remove('selected'));
+    item.classList.add('selected');
+
+    // Close menu
+    const menu = document.getElementById('menu_search_siswa');
+    if (menu) menu.style.display = 'none';
+  }
+
+  function clearSearchSiswa(event) {
+    if (event) event.stopPropagation();
+    const hiddenInput = document.getElementById('select_siswa_id');
+    if (hiddenInput) {
+      hiddenInput.value = '';
+      hiddenInput.dispatchEvent(new Event('change'));
+    }
+
+    const display = document.getElementById('display_search_siswa');
+    const btnClear = document.getElementById('btn_clear_siswa');
+    if (display) {
+      display.innerHTML = `
+        <i class="bi bi-search" style="font-size:13px; color:var(--text-3);"></i>
+        <span id="placeholder_search_siswa" style="color:var(--text-3); font-size:12px; font-weight:600;">-- Cari / Pilih Siswa (Ketik Nama, NISN, atau Kelas) --</span>
+      `;
+    }
+    if (btnClear) btnClear.style.display = 'none';
+
+    const list = document.getElementById('list_search_siswa');
+    if (list) {
+      list.querySelectorAll('.siswa-item').forEach(el => el.classList.remove('selected'));
+    }
+  }
+
+  function handleSiswaKeydown(event) {
+    const list = document.getElementById('list_search_siswa');
+    if (!list) return;
+
+    if (event.key === 'Escape') {
+      const menu = document.getElementById('menu_search_siswa');
+      const trigger = document.getElementById('trigger_search_siswa');
+      if (menu) menu.style.display = 'none';
+      if (trigger) trigger.classList.remove('active');
+      return;
+    }
+
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      // Pilih item pertama yang sedang ditampilkan
+      const visibleItems = Array.from(list.querySelectorAll('.siswa-item')).filter(el => el.style.display !== 'none');
+      if (visibleItems.length > 0) {
+        const firstId = visibleItems[0].getAttribute('data-id');
+        selectSiswaItem(firstId);
+      }
+    }
+  }
+
+  function validateTransisiIndividu(event) {
+    const siswaId = document.getElementById('select_siswa_id')?.value;
+    if (!siswaId) {
+      if (event) event.preventDefault();
+      const trigger = document.getElementById('trigger_search_siswa');
+      if (trigger) {
+        trigger.classList.add('trigger-error');
+        trigger.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+      alert('Silakan cari dan pilih siswa terlebih dahulu!');
+      toggleSearchSiswa(null, true);
+      return false;
+    }
+    return true;
+  }
+
+  function pilihSiswaTransisi(siswaId) {
+    switchTransisiTab('individu');
+    selectSiswaItem(siswaId);
+    const trigger = document.getElementById('trigger_search_siswa');
+    if (trigger) {
+      trigger.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      trigger.focus();
+    }
+  }
+
+  // Tutup dropdown jika klik di luar
+  document.addEventListener('click', (e) => {
+    const wrapper = document.getElementById('wrapper_search_siswa');
+    if (wrapper && !wrapper.contains(e.target)) {
+      const menu = document.getElementById('menu_search_siswa');
+      const trigger = document.getElementById('trigger_search_siswa');
+      if (menu) menu.style.display = 'none';
+      if (trigger) trigger.classList.remove('active');
+    }
+  });
 
   function openModalTa(id) {
     const el = document.getElementById(id);
@@ -580,6 +863,7 @@
   document.addEventListener('DOMContentLoaded', () => {
     toggleTransisiFields();
     toggleMassalFields();
+    filterSiswaList();
   });
 </script>
 
