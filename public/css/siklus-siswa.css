@@ -205,29 +205,216 @@
         flex-shrink: 0 !important;
       }
 
-      .table-filter-row th {
-        padding: 6px 4px !important;
+      .minimal-toolbar {
+        flex-direction: column !important;
+        align-items: stretch !important;
+      }
+      .minimal-toolbar-form {
+        width: 100% !important;
+      }
+      .minimal-search-box {
+        width: 100% !important;
+      }
+      .minimal-select-wrap {
+        flex: 1 1 45% !important;
+      }
+      .minimal-select-wrap select {
+        width: 100% !important;
       }
     }
 
-/* ─── Table Filter Row Inside the Table ─── */
-.table-filter-row th {
-  background: #f8fafc !important;
-  border-bottom: 1.5px solid #cbd5e1 !important;
-  font-weight: 500 !important;
-  vertical-align: middle !important;
+/* ─── Ultra Minimalist Table Card & Toolbar ─── */
+.table-card-minimal {
+  padding: 0 !important;
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 10px !important;
+  background: #ffffff !important;
+  overflow: hidden !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04) !important;
+  margin-bottom: 24px !important;
 }
 
-.table-filter-row .input-field {
-  background: #ffffff !important;
-  border: 1.5px solid #cbd5e1 !important;
-  box-shadow: none !important;
+.minimal-toolbar {
+  padding: 10px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  border-bottom: 1px solid #e2e8f0;
+  background: #ffffff;
+}
+
+.minimal-toolbar-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.minimal-title {
+  font-size: 13.5px;
+  font-weight: 800;
+  color: #0f172a;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  letter-spacing: -0.01em;
+}
+
+.minimal-title i {
+  color: #0284c7;
+  font-size: 15px;
+}
+
+.minimal-count-pill {
+  font-size: 11px;
+  font-weight: 800;
+  font-family: var(--font-mono, monospace);
+  background: #f1f5f9;
+  color: #475569;
+  padding: 2px 7px;
+  border-radius: 6px;
+  border: 1px solid #e2e8f0;
+}
+
+.minimal-toolbar-form {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.minimal-search-box {
+  position: relative;
+  width: 200px;
+}
+
+.minimal-search-box i.bi-search {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #94a3b8;
+  font-size: 12px;
+  pointer-events: none;
+}
+
+.minimal-search-box input {
+  width: 100%;
+  height: 32px;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 0 28px 0 30px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  background: #f8fafc;
+  color: #0f172a;
+  outline: none;
   transition: all .15s ease;
 }
 
-.table-filter-row .input-field:focus {
-  border-color: #000000 !important;
-  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.08) !important;
+.minimal-search-box input:focus {
+  background: #ffffff;
+  border-color: #0f172a;
+  box-shadow: 0 0 0 2px rgba(15, 23, 42, 0.08);
+}
+
+.minimal-clear-search {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #94a3b8;
+  font-size: 12px;
+  display: inline-flex;
+  text-decoration: none;
+}
+
+.minimal-clear-search:hover {
+  color: #ef4444;
+}
+
+.minimal-select-wrap select {
+  height: 32px;
+  font-size: 11.5px;
+  font-weight: 600;
+  padding: 0 24px 0 10px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  background: #f8fafc;
+  color: #334155;
+  cursor: pointer;
+  outline: none;
+  transition: all .15s ease;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+}
+
+.minimal-select-wrap select:focus,
+.minimal-select-wrap select:hover {
+  border-color: #0f172a;
+  background-color: #ffffff;
+}
+
+.minimal-btn-reset {
+  height: 32px;
+  padding: 0 10px;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  background: #fff5f5;
+  border-radius: 6px;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: all .15s ease;
+  white-space: nowrap;
+}
+
+.minimal-btn-reset:hover {
+  background: #fee2e2;
+  border-color: #ef4444;
+}
+
+/* Minimal Table Styles */
+.minimal-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12.5px;
+}
+
+.minimal-table th {
+  background: #f8fafc !important;
+  color: #475569 !important;
+  font-size: 11px !important;
+  font-weight: 800 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.04em !important;
+  padding: 10px 14px !important;
+  border-bottom: 1px solid #e2e8f0 !important;
+}
+
+.minimal-table td {
+  padding: 11px 14px !important;
+  border-bottom: 1px solid #f1f5f9 !important;
+  vertical-align: middle !important;
+}
+
+.minimal-table tr:last-child td {
+  border-bottom: none !important;
+}
+
+.minimal-table tbody tr {
+  transition: background-color .1s ease;
+}
+
+.minimal-table tbody tr:hover {
+  background-color: #f8fafc !important;
 }
 
 /* ─── Searchable Siswa Component ─── */
