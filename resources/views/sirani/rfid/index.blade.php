@@ -562,7 +562,7 @@
       </button>
     </div>
 
-    <form action="{{ route('rfid.broadcast.wa') }}" method="POST" onsubmit="return confirm('Kirimkan broadcast WhatsApp berisi barcode presensi ke kontak sasaran?')">
+    <form id="waBroadcastForm" action="{{ route('rfid.broadcast.wa') }}" method="POST" onsubmit="handleBroadcastSubmit(event)">
       @csrf
       <div style="margin-bottom:12px;">
         <label style="display:block; font-size:12px; font-weight:800; color:var(--text); margin-bottom:5px;">Sasaran Penerima:</label>
@@ -706,9 +706,9 @@
 
       <div style="background:var(--surface); border:1px solid var(--border-2); border-radius:8px; padding:10px 12px; font-size:11.5px; color:var(--text-2); margin-bottom:16px; line-height:1.4;">
         <strong style="color:var(--text); display:block; margin-bottom:2px;">
-          <i class="bi bi-info-circle-fill" style="color:var(--primary);"></i> Informasi Pengiriman Aman:
+          <i class="bi bi-info-circle-fill" style="color:var(--primary);"></i> Sistem Pengiriman Real-Time:
         </strong>
-        Pesan dikirim berurutan dengan <strong>jeda aman 5–7 detik antar nomor</strong> untuk melindungi nomor WA dari pemblokiran spam. Setiap penerima akan mendapatkan pesan personal berisi <strong>Nama, NISN/NIP</strong>, dan <strong>Link Akses Kartu / Portal Presensi Digital</strong>.
+        Pesan diproses secara bertahap langsung di browser dengan tampilan progress interaktif untuk mencegah <em>timeout</em> server. Setiap penerima akan mendapatkan pesan personal berisi <strong>Nama, NISN/NIP</strong>, dan <strong>Link Akses Kartu / Portal Presensi</strong>.
       </div>
 
       <div style="display:flex; justify-content:flex-end; gap:8px; border-top:1px solid var(--border); padding-top:14px;">
@@ -718,6 +718,61 @@
         </button>
       </div>
     </form>
+
+    {{-- PROGRESS CONSOLE LIVE BROADCAST --}}
+    <div id="waBroadcastProgressWrap" style="display:none;">
+      <div style="text-align:center; margin-bottom:14px;">
+        <div style="width:44px; height:44px; border-radius:50%; background:rgba(34,197,94,0.12); color:#16a34a; display:inline-flex; align-items:center; justify-content:center; font-size:22px; margin-bottom:8px;">
+          <i class="bi bi-whatsapp" id="waProgressIcon"></i>
+        </div>
+        <div style="font-weight:900; font-size:15px; color:var(--text);" id="waProgressTitle">Mengirim Broadcast Barcode...</div>
+        <div style="font-size:11.5px; color:var(--text-3); margin-top:2px;" id="waProgressSub">Menyiapkan kontak sasaran WhatsApp</div>
+      </div>
+
+      {{-- Progress Bar --}}
+      <div style="background:var(--bg-3); border-radius:999px; height:12px; overflow:hidden; margin-bottom:8px; border:1px solid var(--border-2); position:relative;">
+        <div id="waProgressBar" style="width:0%; height:100%; background:linear-gradient(90deg, #16a34a, #22c55e); transition:width 0.3s ease;"></div>
+      </div>
+      <div style="display:flex; justify-content:space-between; align-items:center; font-size:11px; font-weight:800; color:var(--text-2); margin-bottom:12px;">
+        <span id="waProgressPercent" style="color:#16a34a;">0%</span>
+        <span id="waProgressFraction" style="font-family:var(--font-mono);">0 / 0 Kontak</span>
+      </div>
+
+      {{-- Counters Badge --}}
+      <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; margin-bottom:12px; text-align:center;">
+        <div style="background:rgba(34,197,94,0.08); border:1px solid rgba(34,197,94,0.25); border-radius:8px; padding:6px 8px;">
+          <span style="font-size:10px; color:#16a34a; font-weight:800; display:block;">TERKIRIM</span>
+          <strong style="font-size:14px; color:#16a34a;" id="waCountSuccess">0</strong>
+        </div>
+        <div style="background:rgba(239,68,68,0.08); border:1px solid rgba(239,68,68,0.25); border-radius:8px; padding:6px 8px;">
+          <span style="font-size:10px; color:#ef4444; font-weight:800; display:block;">GAGAL</span>
+          <strong style="font-size:14px; color:#ef4444;" id="waCountFailed">0</strong>
+        </div>
+        <div style="background:var(--bg-3); border:1px solid var(--border-2); border-radius:8px; padding:6px 8px;">
+          <span style="font-size:10px; color:var(--text-3); font-weight:800; display:block;">TOTAL</span>
+          <strong style="font-size:14px; color:var(--text);" id="waCountTotal">0</strong>
+        </div>
+      </div>
+
+      {{-- Current Contact Info --}}
+      <div style="font-size:11.5px; color:var(--text-2); background:var(--surface); border:1px solid var(--border-2); border-radius:8px; padding:8px 12px; margin-bottom:12px; display:flex; align-items:center; gap:8px;">
+        <i class="bi bi-hourglass-split" style="color:#16a34a;" id="waProgressStatusSpinner"></i>
+        <span id="waProgressStatusText" style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">Menghubungi server...</span>
+      </div>
+
+      {{-- Scrollable Mini Log --}}
+      <div id="waProgressLog" style="max-height:120px; overflow-y:auto; background:var(--bg-1); border:1px solid var(--border-2); border-radius:6px; padding:8px 10px; font-size:10.5px; font-family:var(--font-mono); color:var(--text-3); margin-bottom:14px; display:flex; flex-direction:column; gap:4px;">
+      </div>
+
+      <div style="display:flex; justify-content:flex-end; gap:8px; border-top:1px solid var(--border); padding-top:12px;">
+        <button type="button" id="btnCancelWaBroadcast" onclick="stopWaBroadcast()" class="btn btn-sm btn-outline" style="color:#ef4444; border-color:rgba(239,68,68,0.4);">
+          <i class="bi bi-stop-circle-fill"></i> Hentikan
+        </button>
+        <button type="button" id="btnCloseWaBroadcast" onclick="closeModalBroadcastWa(); window.location.reload();" class="btn btn-sm btn-gold" style="display:none;">
+          <i class="bi bi-check-circle-fill"></i> Selesai
+        </button>
+      </div>
+    </div>
 
   </div>
 </div>
@@ -971,6 +1026,11 @@
     }
   }
   function openModalBroadcastWa() {
+    const form = document.getElementById('waBroadcastForm');
+    const progWrap = document.getElementById('waBroadcastProgressWrap');
+    if (form) form.style.display = 'block';
+    if (progWrap) progWrap.style.display = 'none';
+
     const modal = document.getElementById('modalBroadcastWaWrap');
     if (modal) {
       modal.classList.add('active');
@@ -985,6 +1045,229 @@
       modal.classList.remove('active');
       modal.style.display = 'none';
     }
+  }
+
+  let isWaBroadcastCancelled = false;
+
+  async function handleBroadcastSubmit(e) {
+    e.preventDefault();
+    const tabVal = document.getElementById('wa_broadcast_tab').value;
+
+    // A. Pengiriman Satuan (1 Orang)
+    if (tabVal === 'individu_siswa' || tabVal === 'individu_ortu') {
+      const siswaId = document.getElementById('wa_target_siswa_id').value;
+      if (!siswaId) {
+        alert('Silakan cari dan pilih 1 siswa terlebih dahulu.');
+        return;
+      }
+      const targetType = (tabVal === 'individu_ortu') ? 'ortu' : 'siswa';
+      const labelSasaran = (tabVal === 'individu_ortu') ? 'Orang Tua Siswa' : 'Siswa';
+      if (!confirm(`Kirimkan kartu barcode presensi ke ${labelSasaran} terpilih?`)) return;
+
+      const submitBtn = e.target.querySelector('button[type="submit"]');
+      const origText = submitBtn.innerHTML;
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> Mengirim...';
+
+      try {
+        const res = await fetch('{{ route("rfid.kirim.wa.personal") }}', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+          },
+          body: JSON.stringify({ type: targetType, id: siswaId })
+        });
+        const json = await res.json();
+        if (json.success) {
+          alert('✅ ' + json.message);
+          closeModalBroadcastWa();
+        } else {
+          alert('❌ Gagal: ' + (json.message || 'Terjadi kendala saat mengirim.'));
+        }
+      } catch (err) {
+        alert('❌ Terjadi kesalahan jaringan ke server.');
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = origText;
+      }
+      return;
+    }
+
+    if (tabVal === 'individu_guru') {
+      const guruId = document.getElementById('wa_target_guru_id').value;
+      if (!guruId) {
+        alert('Silakan cari dan pilih 1 guru/pegawai terlebih dahulu.');
+        return;
+      }
+      if (!confirm('Kirimkan kartu barcode presensi ke Guru/Pegawai terpilih?')) return;
+
+      const submitBtn = e.target.querySelector('button[type="submit"]');
+      const origText = submitBtn.innerHTML;
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> Mengirim...';
+
+      try {
+        const res = await fetch('{{ route("rfid.kirim.wa.personal") }}', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+          },
+          body: JSON.stringify({ type: 'guru', id: guruId })
+        });
+        const json = await res.json();
+        if (json.success) {
+          alert('✅ ' + json.message);
+          closeModalBroadcastWa();
+        } else {
+          alert('❌ Gagal: ' + (json.message || 'Terjadi kendala saat mengirim.'));
+        }
+      } catch (err) {
+        alert('❌ Terjadi kesalahan jaringan ke server.');
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = origText;
+      }
+      return;
+    }
+
+    // B. Pengiriman Massal (Real-Time Live Batching)
+    const rombelSelect = document.querySelector('select[name="rombel_id"]');
+    const rombelId = (tabVal === 'siswa' || tabVal === 'ortu') ? (rombelSelect ? rombelSelect.value : '') : '';
+    const labelSasaran = (tabVal === 'siswa') ? 'Seluruh Siswa' : ((tabVal === 'ortu') ? 'Seluruh Orang Tua' : 'Seluruh Guru & Pegawai');
+
+    if (!confirm(`Mulai broadcast barcode presensi ke ${labelSasaran}? Proses pengiriman akan berjalan secara real-time.`)) {
+      return;
+    }
+
+    // Tampilkan panel Progress
+    document.getElementById('waBroadcastForm').style.display = 'none';
+    const progWrap = document.getElementById('waBroadcastProgressWrap');
+    progWrap.style.display = 'block';
+
+    document.getElementById('waProgressBar').style.width = '0%';
+    document.getElementById('waProgressPercent').textContent = '0%';
+    document.getElementById('waProgressFraction').textContent = 'Memuat kontak...';
+    document.getElementById('waCountSuccess').textContent = '0';
+    document.getElementById('waCountFailed').textContent = '0';
+    document.getElementById('waCountTotal').textContent = '0';
+    document.getElementById('waProgressStatusText').textContent = 'Mengambil daftar kontak dari server...';
+    document.getElementById('waProgressLog').innerHTML = '';
+    document.getElementById('btnCancelWaBroadcast').style.display = 'inline-flex';
+    document.getElementById('btnCancelWaBroadcast').disabled = false;
+    document.getElementById('btnCloseWaBroadcast').style.display = 'none';
+
+    isWaBroadcastCancelled = false;
+
+    // 1. Ambil daftar kontak sasaran
+    let recipients = [];
+    try {
+      const url = `{{ route('rfid.broadcast.recipients') }}?tab=${encodeURIComponent(tabVal)}&rombel_id=${encodeURIComponent(rombelId)}`;
+      const res = await fetch(url, { credentials: 'same-origin' });
+      const data = await res.json();
+      recipients = data.recipients || [];
+    } catch (err) {
+      document.getElementById('waProgressStatusText').textContent = 'Gagal memuat kontak sasaran dari server.';
+      document.getElementById('waProgressStatusText').style.color = '#ef4444';
+      document.getElementById('btnCancelWaBroadcast').style.display = 'none';
+      document.getElementById('btnCloseWaBroadcast').style.display = 'inline-flex';
+      return;
+    }
+
+    const total = recipients.length;
+    document.getElementById('waCountTotal').textContent = total;
+
+    if (total === 0) {
+      document.getElementById('waProgressStatusText').textContent = 'Tidak ada kontak penerima yang memiliki nomor WhatsApp valid.';
+      document.getElementById('waProgressFraction').textContent = '0 / 0 Kontak';
+      document.getElementById('btnCancelWaBroadcast').style.display = 'none';
+      document.getElementById('btnCloseWaBroadcast').style.display = 'inline-flex';
+      return;
+    }
+
+    let successCount = 0;
+    let failCount = 0;
+
+    // 2. Kirim kontak satu demi satu via AJAX
+    for (let i = 0; i < total; i++) {
+      if (isWaBroadcastCancelled) {
+        appendWaLog('⚠ Pengiriman dihentikan oleh pengguna.', 'warn');
+        break;
+      }
+
+      const item = recipients[i];
+      const index = i + 1;
+      const pct = Math.round((index / total) * 100);
+
+      document.getElementById('waProgressBar').style.width = pct + '%';
+      document.getElementById('waProgressPercent').textContent = pct + '%';
+      document.getElementById('waProgressFraction').textContent = `${index} / ${total} Kontak`;
+      document.getElementById('waProgressStatusText').textContent = `Mengirim ke ${item.nama} (${item.sub})...`;
+
+      try {
+        const sendRes = await fetch('{{ route("rfid.kirim.wa.personal") }}', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+          },
+          body: JSON.stringify({ type: item.type, id: item.id })
+        });
+
+        const sendJson = await sendRes.json();
+        if (sendJson.success) {
+          successCount++;
+          document.getElementById('waCountSuccess').textContent = successCount;
+          appendWaLog(`✔ [${index}/${total}] ${item.nama} (${item.no_hp}) — Terkirim`, 'success');
+        } else {
+          failCount++;
+          document.getElementById('waCountFailed').textContent = failCount;
+          appendWaLog(`✖ [${index}/${total}] ${item.nama} — ${sendJson.message || 'Gagal'}`, 'error');
+        }
+      } catch (err) {
+        failCount++;
+        document.getElementById('waCountFailed').textContent = failCount;
+        appendWaLog(`✖ [${index}/${total}] ${item.nama} — Gangguan koneksi`, 'error');
+      }
+
+      // Jeda ringan 350ms antar pengiriman
+      if (i < total - 1 && !isWaBroadcastCancelled) {
+        await new Promise(r => setTimeout(r, 350));
+      }
+    }
+
+    // 3. Selesai
+    const finalMsg = isWaBroadcastCancelled
+      ? `Broadcast dihentikan. Berhasil: ${successCount}, Gagal: ${failCount}.`
+      : `Broadcast selesai! Berhasil: ${successCount}, Gagal: ${failCount}.`;
+    document.getElementById('waProgressStatusText').textContent = finalMsg;
+    document.getElementById('waProgressStatusText').style.color = '#16a34a';
+    document.getElementById('btnCancelWaBroadcast').style.display = 'none';
+    document.getElementById('btnCloseWaBroadcast').style.display = 'inline-flex';
+  }
+
+  function stopWaBroadcast() {
+    if (confirm('Yakin ingin menghentikan proses broadcast? Kontak yang sudah terkirim tidak dapat dibatalkan.')) {
+      isWaBroadcastCancelled = true;
+      document.getElementById('waProgressStatusText').textContent = 'Menghentikan proses...';
+      document.getElementById('btnCancelWaBroadcast').disabled = true;
+    }
+  }
+
+  function appendWaLog(msg, type = 'info') {
+    const logBox = document.getElementById('waProgressLog');
+    if (!logBox) return;
+    const item = document.createElement('div');
+    if (type === 'success') item.style.color = '#16a34a';
+    else if (type === 'error') item.style.color = '#ef4444';
+    else if (type === 'warn') item.style.color = '#eab308';
+    item.textContent = `[${new Date().toLocaleTimeString('id-ID')}] ${msg}`;
+    logBox.appendChild(item);
+    logBox.scrollTop = logBox.scrollHeight;
   }
 
   function toggleWaTarget(val) {

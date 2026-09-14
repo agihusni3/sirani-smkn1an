@@ -490,12 +490,69 @@ class RfidController extends Controller
     }
 
     /**
+     * Ambil Daftar Kontak Sasaran Broadcast untuk Pengiriman Terjadwal / Progress Real-time
+     */
+    public function getBroadcastRecipients(Request $request): JsonResponse
+    {
+        $tab = $request->input('tab', 'siswa'); // 'siswa', 'ortu', 'guru'
+        $rombelId = $request->input('rombel_id');
+
+        if ($tab === 'guru') {
+            $gurus = Guru::where('status', 'aktif')->get();
+            $recipients = [];
+            foreach ($gurus as $g) {
+                if (empty($g->no_hp)) continue;
+                $recipients[] = [
+                    'id'    => $g->id,
+                    'type'  => 'guru',
+                    'nama'  => $g->nama,
+                    'sub'   => $g->jabatan ?: ($g->nip ? 'NIP: ' . $g->nip : 'Guru / Staf'),
+                    'no_hp' => $g->no_hp,
+                ];
+            }
+        } else {
+            $query = Siswa::whereIn('status', ['aktif', 'pkl'])->with(['siswaRombels' => function ($q) {
+                $q->where('status_keanggotaan', 'aktif')->with('rombel');
+            }]);
+
+            if ($rombelId) {
+                $query->whereHas('siswaRombels', function ($rq) use ($rombelId) {
+                    $rq->where('rombel_id', $rombelId)->where('status_keanggotaan', 'aktif');
+                });
+            }
+
+            $siswas = $query->get();
+            $recipients = [];
+            foreach ($siswas as $s) {
+                $noHp = ($tab === 'ortu') ? ($s->no_hp_ortu ?: $s->no_hp_siswa) : ($s->no_hp_siswa ?: $s->no_hp_ortu);
+                if (empty($noHp)) continue;
+
+                $rombelNama = $s->siswaRombels->first()?->rombel?->nama_rombel ?? 'Siswa';
+                $recipients[] = [
+                    'id'    => $s->id,
+                    'type'  => $tab, // 'siswa' atau 'ortu'
+                    'nama'  => $s->nama,
+                    'sub'   => $rombelNama,
+                    'no_hp' => $noHp,
+                ];
+            }
+        }
+
+        return response()->json([
+            'success'    => true,
+            'tab'        => $tab,
+            'total'      => count($recipients),
+            'recipients' => $recipients,
+        ]);
+    }
+
+    /**
      * Kirim Pesan Barcode & Kartu Digital Personal via WhatsApp Gateway
      */
     public function kirimWaPersonal(Request $request, \App\Services\WhatsAppNotificationService $waService): JsonResponse
     {
         $request->validate([
-            'type' => 'required|in:siswa,guru',
+            'type' => 'required|in:siswa,ortu,guru',
             'id'   => 'required',
         ]);
 
@@ -505,7 +562,7 @@ class RfidController extends Controller
         $namaSekolah = $sekolah->nama_sekolah ?? 'SMKN 1 AIR NANINGAN';
         $baseUrl = self::getPublicBaseUrl();
 
-        if ($type === 'siswa') {
+        if ($type === 'siswa' || $type === 'ortu') {
             $siswa = Siswa::with(['siswaRombels' => function ($q) {
                 $q->where('status_keanggotaan', 'aktif')->with('rombel');
             }, 'kartuRfid'])->where('id', $id)->orWhere('nisn', $id)->first();
@@ -514,30 +571,43 @@ class RfidController extends Controller
                 return response()->json(['success' => false, 'message' => 'Data siswa tidak ditemukan.'], 404);
             }
 
-            $noHp = $siswa->no_hp_siswa ?: $siswa->no_hp_ortu;
+            $noHp = ($type === 'ortu') ? ($siswa->no_hp_ortu ?: $siswa->no_hp_siswa) : ($siswa->no_hp_siswa ?: $siswa->no_hp_ortu);
             if (!$noHp) {
-                return response()->json(['success' => false, 'message' => 'Nomor WhatsApp siswa belum terisi di data siswa (no_hp_siswa / no_hp_ortu).'], 422);
+                return response()->json(['success' => false, 'message' => 'Nomor WhatsApp siswa/ortu belum terisi di data siswa.'], 422);
             }
 
             $rombelNama = $siswa->siswaRombels->first()?->rombel?->nama_rombel ?? 'Siswa';
             $codeVal = $siswa->kartuRfid?->uid ?? ($siswa->nisn ?: $siswa->id);
             $linkPortal = $baseUrl . '/cek-presensi/' . ($siswa->nisn ?: $siswa->id);
 
-            $pesan = "🔔 *PORTAL PRESENSI SISWA & ORANG TUA — {$namaSekolah}*\n\n"
-                   . "Ananda *{$siswa->nama}*:\n"
-                   . "🏷️ *NISN:* " . ($siswa->nisn ?: '-') . "\n"
-                   . "🏫 *Kelas:* {$rombelNama}\n\n"
-                   . "Berikut akses portal presensi dan QR Code presensi Anda:\n\n"
-                   . "📱 *Buka Portal Presensi Mandiri:*\n"
-                   . "{$linkPortal}\n\n"
-                   . "_Simpan gambar QR di HP atau tunjukkan saat tiba di scanner gerbang sekolah._";
+            if ($type === 'siswa') {
+                $pesan = "🔔 *PORTAL PRESENSI SISWA & ORANG TUA — {$namaSekolah}*\n\n"
+                       . "Ananda *{$siswa->nama}*:\n"
+                       . "🏷️ *NISN:* " . ($siswa->nisn ?: '-') . "\n"
+                       . "🏫 *Kelas:* {$rombelNama}\n\n"
+                       . "Berikut akses portal presensi dan QR Code presensi Anda:\n\n"
+                       . "📱 *Buka Portal Presensi Mandiri:*\n"
+                       . "{$linkPortal}\n\n"
+                       . "_Simpan gambar QR di HP atau tunjukkan saat tiba di scanner gerbang sekolah._";
+            } else {
+                $pesan = "🔔 *PORTAL PRESENSI SISWA & ORANG TUA — {$namaSekolah}*\n\n"
+                       . "Yth. Bapak/Ibu Orang Tua / Wali dari:\n"
+                       . "👤 *Nama Siswa:* {$siswa->nama}\n"
+                       . "🏷️ *NISN:* " . ($siswa->nisn ?: '-') . "\n"
+                       . "🏫 *Kelas:* {$rombelNama}\n\n"
+                       . "Berikut akses portal presensi dan QR Code presensi ananda:\n\n"
+                       . "📱 *Buka Portal Presensi Mandiri:*\n"
+                       . "{$linkPortal}\n\n"
+                       . "_Portal ini dapat digunakan untuk memantau kehadiran, jadwal, dan rekap ananda secara berkala._";
+            }
 
             $res = $waService->kirimDirect($noHp, $pesan, 'KARTU PRESENSI DIGITAL');
 
+            $labelTarget = ($type === 'ortu') ? 'Orang Tua' : 'Siswa';
             return response()->json([
                 'success' => $res['success'] ?? false,
                 'message' => ($res['success'] ?? false)
-                    ? "Kartu Presensi Digital {$siswa->nama} berhasil dikirim ke WhatsApp ({$noHp}) via WA Gateway!"
+                    ? "Kartu Presensi Digital {$siswa->nama} berhasil dikirim ke WhatsApp {$labelTarget} ({$noHp})!"
                     : ($res['message'] ?? 'Gagal mengirim pesan via WhatsApp Gateway.'),
             ]);
         } else {

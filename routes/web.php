@@ -380,6 +380,7 @@ Route::middleware('auth')->group(function () {
     Route::middleware('role:admin,staf_tu')->group(function () {
         Route::get('/kartu-rfid', [\App\Http\Controllers\RfidController::class, 'index'])->name('rfid.index');
         Route::get('/kartu-rfid/cetak', [\App\Http\Controllers\RfidController::class, 'cetak'])->name('rfid.cetak');
+        Route::get('/kartu-rfid/broadcast-recipients', [\App\Http\Controllers\RfidController::class, 'getBroadcastRecipients'])->name('rfid.broadcast.recipients');
         Route::post('/kartu-rfid/broadcast-wa', [\App\Http\Controllers\RfidController::class, 'broadcastWa'])->name('rfid.broadcast.wa');
         Route::get('/manajemen-rfid', [\App\Http\Controllers\RfidController::class, 'index']);
     });
