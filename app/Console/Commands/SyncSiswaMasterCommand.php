@@ -109,12 +109,16 @@ class SyncSiswaMasterCommand extends Command
                 'status'      => strtolower($status) ?: 'aktif',
             ];
 
-            if ($siswa) {
-                $siswa->update($data);
-                $updated++;
-            } else {
-                $siswa = Siswa::create($data);
-                $created++;
+            try {
+                if ($siswa) {
+                    $siswa->update($data);
+                    $updated++;
+                } else {
+                    $siswa = Siswa::create($data);
+                    $created++;
+                }
+            } catch (\Throwable $e) {
+                continue;
             }
 
             // Assign Rombel
