@@ -40,8 +40,7 @@ fi
 # 2. Perbaiki kepemilikan file & folder .git
 echo -e "${YELLOW}[2/4] Memperbaiki kepemilikan file & hak akses folder...${NC}"
 chown -R "${REAL_USER}:www-data" "${APP_DIR}" 2>/dev/null || true
-chmod -R 775 "${APP_DIR}/storage" "${APP_DIR}/bootstrap/cache" 2>/dev/null || true
-chmod -R ug+rwX "${APP_DIR}/.git" 2>/dev/null || true
+chmod -R ug+rwX "${APP_DIR}" 2>/dev/null || true
 if [ -f "${APP_DIR}/database/database.sqlite" ]; then
     chmod 664 "${APP_DIR}/database/database.sqlite" 2>/dev/null || true
     chmod 775 "${APP_DIR}/database" 2>/dev/null || true
