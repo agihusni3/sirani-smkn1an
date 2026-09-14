@@ -37,10 +37,9 @@ class DeployController extends Controller
         $basePath = base_path();
         $logs = [];
 
-        // 1. Eksekusi git pull / reset hard ke origin/main
+        // 1. Eksekusi git pull / reset hard ke origin/main dengan safe.directory in-memory (tanpa sentuh ~/.gitconfig)
         $gitCmd = sprintf(
-            'cd %s && git config --global --add safe.directory %s 2>&1 && git fetch origin main 2>&1 && git reset --hard origin/main 2>&1',
-            escapeshellarg($basePath),
+            'cd %s && git -c safe.directory=* fetch origin 2>&1 && git -c safe.directory=* reset --hard origin/main 2>&1',
             escapeshellarg($basePath)
         );
         exec($gitCmd, $gitOutput, $gitStatus);
@@ -56,7 +55,7 @@ class DeployController extends Controller
 
         // 3. Sinkronisasi Data Siswa jika perintah tersedia
         try {
-            if (Artisan::has('sirani:sync-siswa')) {
+            if (array_key_exists('sirani:sync-siswa', Artisan::all())) {
                 Artisan::call('sirani:sync-siswa');
                 $logs['sync_siswa'] = trim(Artisan::output());
             }
@@ -76,7 +75,7 @@ class DeployController extends Controller
         }
 
         // 5. Ambil informasi commit terbaru
-        exec(sprintf('cd %s && git log -1 --pretty=format:"%%h - %%s (%%cr)" 2>&1', escapeshellarg($basePath)), $commitOut);
+        exec(sprintf('cd %s && git -c safe.directory=* log -1 --pretty=format:"%%h - %%s (%%cr)" 2>&1', escapeshellarg($basePath)), $commitOut);
         $latestCommit = !empty($commitOut) ? implode(' ', $commitOut) : 'Unknown';
 
         Log::info('Deploy webhook sukses dieksekusi: ' . $latestCommit);
