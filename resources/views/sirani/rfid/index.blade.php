@@ -1234,9 +1234,9 @@
         appendWaLog(`✖ [${index}/${total}] ${item.nama} — Gangguan koneksi`, 'error');
       }
 
-      // Jeda ringan 350ms antar pengiriman
+      // Jeda 2 detik antar pengiriman (menghindari rate-limit Fonnte/WhatsApp)
       if (i < total - 1 && !isWaBroadcastCancelled) {
-        await new Promise(r => setTimeout(r, 350));
+        await new Promise(r => setTimeout(r, 2000));
       }
     }
 
