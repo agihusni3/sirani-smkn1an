@@ -39,7 +39,8 @@ class DeployController extends Controller
 
         // 1. Eksekusi git pull / reset hard ke origin/main dengan safe.directory in-memory (tanpa sentuh ~/.gitconfig)
         $gitCmd = sprintf(
-            'cd %s && git -c safe.directory=* fetch origin 2>&1 && git -c safe.directory=* reset --hard origin/main 2>&1',
+            'chmod -R ug+rwX %s 2>/dev/null; cd %s && git -c safe.directory=* fetch origin 2>&1 && git -c safe.directory=* reset --hard origin/main 2>&1',
+            escapeshellarg($basePath),
             escapeshellarg($basePath)
         );
         exec($gitCmd, $gitOutput, $gitStatus);
