@@ -1,6 +1,7 @@
 @php
   $isEdit = isset($soal);
-  $tipe = old('tipe_soal', $isEdit ? $soal->tipe_soal : (request('type', 'pg')));
+  $tipe = old('tipe_soal', $isEdit ? $soal->tipe_soal : ($type ?? request('type', 'pg')));
+  $cssVersion = file_exists(public_path('css/admin-ppdb.css')) ? filemtime(public_path('css/admin-ppdb.css')) : time();
 @endphp
 <!DOCTYPE html>
 <html lang="id">
@@ -9,93 +10,120 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>{{ $isEdit ? 'Edit Soal' : 'Tambah Soal' }} CBT PPDB — SMKN 1 Air Naningan</title>
   @include('partials.styles')
-  <link rel="stylesheet" href="{{ asset('css/admin-ppdb.css') }}?v={{ filemtime(public_path('css/admin-ppdb.css')) }}">
+  <link rel="stylesheet" href="{{ asset('css/admin-ppdb.css') }}?v={{ $cssVersion }}">
 </head>
 <body>
 <div class="app-container">
   @include('partials.sidebar_ppdb')
 
   <main class="main-content">
-    <div style="max-width: 900px; margin: 0 auto; padding: 24px 20px;">
+    <div class="cbt-container">
 
       {{-- BREADCRUMB --}}
-      <div style="font-size: 13px; color: #64748b; margin-bottom: 12px;">
-        <a href="{{ route('admin.ppdb.seleksi', ['tab' => 'pengaturan']) }}" style="color: #2563eb; text-decoration: none;">PPDB Seleksi</a>
-        <span style="margin: 0 6px;">/</span>
-        <a href="{{ route('admin.ppdb.soal.index', $setting->id) }}" style="color: #2563eb; text-decoration: none;">Bank Soal CBT</a>
-        <span style="margin: 0 6px;">/</span>
-        <span style="color: #0f172a; font-weight: 600;">{{ $isEdit ? 'Edit Soal #' . $soal->nomor_urut : 'Tambah Soal Baru' }}</span>
-      </div>
+      <nav class="cbt-breadcrumb" aria-label="Breadcrumb">
+        <a href="{{ route('admin.ppdb.seleksi', ['tab' => 'pengaturan']) }}">PPDB Seleksi</a>
+        <span class="cbt-breadcrumb-separator">/</span>
+        <a href="{{ route('admin.ppdb.soal.index', $setting->id) }}">Bank Soal CBT</a>
+        <span class="cbt-breadcrumb-separator">/</span>
+        <span class="cbt-breadcrumb-current">{{ $isEdit ? 'Edit Soal #' . $soal->nomor_urut : 'Tambah Soal Baru' }}</span>
+      </nav>
 
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+      {{-- HEADER --}}
+      <div class="cbt-page-header">
         <div>
-          <h1 style="font-size: 22px; font-weight: 800; color: #0f172a; margin: 0 0 4px;">
+          <h1 class="cbt-page-title">
             {{ $isEdit ? 'Edit Soal CBT #' . $soal->nomor_urut : 'Tambah Soal CBT Baru' }}
           </h1>
-          <div style="font-size: 13px; color: #64748b;">
-            {{ $setting->judul_ujian }}
+          <div class="cbt-page-subtitle">
+            {{ $setting->judul_ujian }} &bull; PPDB SMKN 1 Air Naningan
           </div>
         </div>
 
-        <a href="{{ route('admin.ppdb.soal.index', $setting->id) }}" style="padding: 8px 16px; background: #ffffff; border: 1px solid #cbd5e1; color: #334155; border-radius: 8px; font-size: 13px; font-weight: 700; text-decoration: none;">
+        <a href="{{ route('admin.ppdb.soal.index', $setting->id) }}" class="cbt-btn cbt-btn-secondary">
           &larr; Kembali ke Daftar Soal
         </a>
       </div>
 
+      {{-- ERROR ALERT SUMMARY --}}
       @if($errors->any())
-        <div style="padding: 14px 18px; background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; color: #991b1b; font-size: 13px; margin-bottom: 20px;">
-          <div style="font-weight: 700; margin-bottom: 4px;">Terdapat kesalahan pada input:</div>
-          <ul style="margin: 0; padding-left: 18px;">
-            @foreach($errors->all() as $err)
-              <li>{{ $err }}</li>
-            @endforeach
-          </ul>
+        <div class="cbt-alert cbt-alert-danger" role="alert">
+          <div>
+            <strong>Terdapat kesalahan pada formulir soal:</strong>
+            <ul>
+              @foreach($errors->all() as $err)
+                <li>{{ $err }}</li>
+              @endforeach
+            </ul>
+          </div>
         </div>
       @endif
 
-      <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.02);">
-        <form action="{{ $isEdit ? route('admin.ppdb.soal.update', $soal->id) : route('admin.ppdb.soal.store', $setting->id) }}" method="POST">
+      {{-- CARD FORM --}}
+      <div class="cbt-card">
+        <form action="{{ $isEdit ? route('admin.ppdb.soal.update', $soal->id) : route('admin.ppdb.soal.store', $setting->id) }}" method="POST" id="formSoal">
           @csrf
           @if($isEdit)
             @method('PUT')
           @endif
 
           {{-- TIPE SOAL & NOMOR URUT --}}
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
-            <div>
-              <label style="display: block; font-size: 13px; font-weight: 700; color: #1e293b; margin-bottom: 6px;">
-                Tipe Soal:
+          <div class="cbt-form-grid">
+            <div class="cbt-form-group">
+              <label for="tipe_soal" class="cbt-label">
+                Tipe Soal <span class="cbt-label-req">*</span>
               </label>
-              <select name="tipe_soal" id="tipe_soal" onchange="toggleTipeSoal()" style="width: 100%; padding: 9px 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 13px; font-weight: 600;" {{ $isEdit ? 'disabled' : '' }}>
-                <option value="pg" {{ $tipe === 'pg' ? 'selected' : '' }}>Pilihan Ganda (PG) - Koreksi Otomatis</option>
-                <option value="esai" {{ $tipe === 'esai' ? 'selected' : '' }}>Esai / Uraian - Koreksi Manual</option>
+              <select name="tipe_soal" id="tipe_soal" class="cbt-control @error('tipe_soal') is-invalid @enderror" onchange="handleTipeChange()" {{ $isEdit ? 'disabled' : '' }}>
+                <option value="pg" {{ $tipe === 'pg' ? 'selected' : '' }}>Pilihan Ganda (PG) — Koreksi Otomatis</option>
+                <option value="esai" {{ $tipe === 'esai' ? 'selected' : '' }}>Esai / Uraian — Koreksi Manual</option>
               </select>
               @if($isEdit)
                 <input type="hidden" name="tipe_soal" value="{{ $soal->tipe_soal }}">
               @endif
+              @error('tipe_soal')
+                <span class="cbt-error-feedback">{{ $message }}</span>
+              @enderror
             </div>
 
-            <div>
-              <label style="display: block; font-size: 13px; font-weight: 700; color: #1e293b; margin-bottom: 6px;">
-                Nomor Urut Soal:
+            <div class="cbt-form-group">
+              <label for="nomor_urut" class="cbt-label">
+                Nomor Urut Soal <span class="cbt-label-req">*</span>
               </label>
-              <input type="number" name="nomor_urut" value="{{ old('nomor_urut', $isEdit ? $soal->nomor_urut : ($nextNomor ?? 1)) }}" min="1" max="100" required style="width: 100%; padding: 9px 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 13px; font-weight: 700;">
-              <span style="font-size: 11px; color: #64748b;">Standar: 1-30 untuk PG, 31-35 untuk Esai</span>
+              <input type="number" 
+                     id="nomor_urut" 
+                     name="nomor_urut" 
+                     value="{{ old('nomor_urut', $isEdit ? $soal->nomor_urut : ($nextNomor ?? 1)) }}" 
+                     min="1" 
+                     max="500" 
+                     required 
+                     class="cbt-control @error('nomor_urut') is-invalid @enderror">
+              <span class="cbt-hint">Standar rekomendasi: 1-{{ $setting->jumlah_soal_pg ?: 30 }} untuk PG, dilanjutkan untuk Esai</span>
+              @error('nomor_urut')
+                <span class="cbt-error-feedback">{{ $message }}</span>
+              @enderror
             </div>
           </div>
 
           {{-- PERTANYAAN SOAL --}}
-          <div style="margin-bottom: 24px;">
-            <label style="display: block; font-size: 13px; font-weight: 700; color: #1e293b; margin-bottom: 6px;">
-              Isi Pertanyaan / Soal: <span style="color: #dc2626;">*</span>
+          <div class="cbt-form-group">
+            <label for="pertanyaan" class="cbt-label">
+              Isi Pertanyaan / Soal <span class="cbt-label-req">*</span>
             </label>
-            <textarea name="pertanyaan" rows="5" required placeholder="Ketik pertanyaan atau soal lengkap di sini..." style="width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 13.5px; line-height: 1.5; font-family: inherit;">{{ old('pertanyaan', $isEdit ? $soal->pertanyaan : '') }}</textarea>
+            <textarea name="pertanyaan" 
+                      id="pertanyaan" 
+                      rows="6" 
+                      required 
+                      placeholder="Ketik pertanyaan atau soal lengkap di sini..." 
+                      class="cbt-control @error('pertanyaan') is-invalid @enderror">{{ old('pertanyaan', $isEdit ? $soal->pertanyaan : '') }}</textarea>
+            @error('pertanyaan')
+              <span class="cbt-error-feedback">{{ $message }}</span>
+            @enderror
           </div>
 
           {{-- SECTION OPSI PG --}}
           <div id="section_pg" style="{{ $tipe === 'esai' ? 'display: none;' : 'display: block;' }}">
-            <div style="font-size: 14px; font-weight: 800; color: #0f172a; margin-bottom: 14px; padding-bottom: 8px; border-bottom: 1px solid #e2e8f0;">
-              Pilihan Opsi Jawaban (A s/d E) &amp; Kunci Jawaban
+            <div class="cbt-section-title">
+              <span>Pilihan Opsi Jawaban (A s/d E) &amp; Kunci Jawaban</span>
+              <span class="cbt-hint" style="margin: 0;">Pilih radio "Kunci" pada opsi yang benar</span>
             </div>
 
             @foreach(['A', 'B', 'C', 'D', 'E'] as $opt)
@@ -103,27 +131,47 @@
                 $field = 'opsi_' . strtolower($opt); 
                 $currVal = old($field, $isEdit ? $soal->$field : '');
                 $currKunci = old('kunci_jawaban', $isEdit ? $soal->kunci_jawaban : 'A');
+                $isKunci = ($currKunci === $opt);
               @endphp
-              <div style="display: flex; gap: 12px; align-items: center; margin-bottom: 12px;">
-                <div style="width: 38px; height: 38px; background: #f1f5f9; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 800; color: #334155; flex-shrink: 0;">
+              <div class="cbt-opsi-row">
+                <div class="cbt-opsi-letter" title="Opsi {{ $opt }}">
                   {{ $opt }}
                 </div>
-                <input type="text" name="{{ $field }}" value="{{ $currVal }}" placeholder="Opsi jawaban {{ $opt }}..." style="flex: 1; padding: 9px 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 13px;">
-                <label style="display: flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 700; cursor: pointer; color: #1e293b; background: #f8fafc; padding: 8px 12px; border: 1px solid #e2e8f0; border-radius: 8px;">
-                  <input type="radio" name="kunci_jawaban" value="{{ $opt }}" {{ $currKunci === $opt ? 'checked' : '' }}>
+                
+                <input type="text" 
+                       id="{{ $field }}"
+                       name="{{ $field }}" 
+                       value="{{ $currVal }}" 
+                       placeholder="Opsi jawaban {{ $opt }}..." 
+                       class="cbt-control cbt-opsi-input @error($field) is-invalid @enderror">
+
+                <label class="cbt-kunci-toggle {{ $isKunci ? 'is-active' : '' }}" id="label_kunci_{{ $opt }}">
+                  <input type="radio" 
+                         name="kunci_jawaban" 
+                         value="{{ $opt }}" 
+                         {{ $isKunci ? 'checked' : '' }}
+                         onchange="updateKunciHighlight('{{ $opt }}')">
                   Kunci
                 </label>
               </div>
+              @error($field)
+                <span class="cbt-error-feedback" style="margin-bottom: 8px;">{{ $message }}</span>
+              @enderror
             @endforeach
+
+            @error('kunci_jawaban')
+              <span class="cbt-error-feedback" style="margin-top: 6px;">{{ $message }}</span>
+            @enderror
           </div>
 
-          {{-- TOMBOL SIMPAN --}}
-          <div style="margin-top: 28px; padding-top: 20px; border-top: 1px solid #e2e8f0; display: flex; justify-content: flex-end; gap: 10px;">
-            <a href="{{ route('admin.ppdb.soal.index', $setting->id) }}" style="padding: 10px 18px; background: #f1f5f9; border: 1px solid #cbd5e1; color: #475569; border-radius: 8px; font-size: 13px; font-weight: 700; text-decoration: none;">
+          {{-- TOMBOL AKSI --}}
+          <div class="cbt-form-actions">
+            <a href="{{ route('admin.ppdb.soal.index', $setting->id) }}" class="cbt-btn cbt-btn-secondary">
               Batal
             </a>
-            <button type="submit" style="padding: 10px 24px; background: #2563eb; color: #ffffff; border: none; border-radius: 8px; font-size: 13px; font-weight: 800; cursor: pointer; box-shadow: 0 2px 4px rgba(37,99,235,0.2);">
-              {{ $isEdit ? 'Simpan Perubahan Soal' : 'Simpan & Tambah ke Bank Soal' }}
+            <button type="submit" class="cbt-btn cbt-btn-primary">
+              <i class="bi bi-check2-circle"></i>
+              {{ $isEdit ? 'Simpan Perubahan Soal' : 'Simpan ke Bank Soal' }}
             </button>
           </div>
 
@@ -135,14 +183,42 @@
 </div>
 
 <script>
-  function toggleTipeSoal() {
-    const tipe = document.getElementById('tipe_soal').value;
+  const isEditMode = {{ $isEdit ? 'true' : 'false' }};
+  const nextPgVal = {{ $nextPg ?? 1 }};
+  const nextEsaiVal = {{ $nextEsai ?? 31 }};
+
+  function handleTipeChange() {
+    const tipeEl = document.getElementById('tipe_soal');
+    if (!tipeEl) return;
+
+    const tipe = tipeEl.value;
     const secPg = document.getElementById('section_pg');
+    const nomorInput = document.getElementById('nomor_urut');
+
     if (tipe === 'esai') {
       secPg.style.display = 'none';
+      if (!isEditMode && (nomorInput.value === String(nextPgVal) || !nomorInput.value)) {
+        nomorInput.value = nextEsaiVal;
+      }
     } else {
       secPg.style.display = 'block';
+      if (!isEditMode && (nomorInput.value === String(nextEsaiVal) || !nomorInput.value)) {
+        nomorInput.value = nextPgVal;
+      }
     }
+  }
+
+  function updateKunciHighlight(selectedOpt) {
+    ['A', 'B', 'C', 'D', 'E'].forEach(function(opt) {
+      const lbl = document.getElementById('label_kunci_' + opt);
+      if (lbl) {
+        if (opt === selectedOpt) {
+          lbl.classList.add('is-active');
+        } else {
+          lbl.classList.remove('is-active');
+        }
+      }
+    });
   }
 </script>
 </body>

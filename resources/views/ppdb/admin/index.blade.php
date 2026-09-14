@@ -5,76 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Dasbor Panitia PPDB Online 2026 — SMKN 1 Air Naningan</title>
   @include('partials.styles')
-  <link rel="stylesheet" href="{{ asset('css/admin-ppdb.css') }}?v={{ filemtime(public_path('css/admin-ppdb.css')) }}">
-  <style>
-    .ppdb-hero-bar {
-      background: linear-gradient(135deg, #1e1b4b 0%, #312e81 40%, #4338ca 100%);
-      border-radius: 16px;
-      padding: 22px 24px;
-      color: #ffffff;
-      margin-bottom: 20px;
-      box-shadow: 0 10px 25px rgba(49, 46, 129, 0.18);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 16px;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-    }
-    .ppdb-jurusan-strip {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 12px;
-      margin-bottom: 20px;
-    }
-    .ppdb-jurusan-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 14px 16px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      transition: all 0.15s ease;
-    }
-    .ppdb-jurusan-card:hover {
-      border-color: #d97706;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-    }
-    .status-tab-btn {
-      padding: 8px 14px;
-      border-radius: 8px;
-      font-size: 12px;
-      font-weight: 700;
-      text-decoration: none;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      border: 1px solid var(--border);
-      background: var(--surface);
-      color: var(--text-2);
-      transition: all 0.15s ease;
-    }
-    .status-tab-btn.active {
-      background: #4338ca;
-      color: #ffffff;
-      border-color: #4338ca;
-      box-shadow: 0 2px 8px rgba(67, 56, 202, 0.25);
-    }
-    .bulk-action-bar {
-      display: none;
-      background: linear-gradient(135deg, #ecfdf5, #d1fae5);
-      border: 1px solid #6ee7b7;
-      border-radius: 10px;
-      padding: 12px 18px;
-      margin-bottom: 12px;
-      align-items: center;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
-    .bulk-action-bar.visible { display: flex; }
-    .cb-row:has(input[type=checkbox]:checked) { background: rgba(16,185,129,0.05); }
-  </style>
+  <link rel="stylesheet" href="{{ asset('css/admin-ppdb.css') }}?v={{ file_exists(public_path('css/admin-ppdb.css')) ? filemtime(public_path('css/admin-ppdb.css')) : time() }}">
 </head>
 <body>
 <div class="app-container">
