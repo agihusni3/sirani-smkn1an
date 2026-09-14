@@ -487,39 +487,40 @@
             @foreach($allSiswas as $s)
               @php $rNama = $s->siswaRombels->first()?->rombel?->nama_rombel ?? 'Tanpa Rombel'; @endphp
               <div class="person-select-item item-siswa"
+                   style="display:flex; align-items:center; gap:10px; padding:10px 12px; cursor:pointer; border-bottom:1px solid var(--border-2); transition:background .15s ease;"
                    data-id="{{ $s->id }}"
                    data-nama="{{ strtolower($s->nama) }}"
                    data-nisn="{{ strtolower($s->nisn ?? '') }}"
                    data-rombel="{{ strtolower($rNama) }}"
                    onclick="selectModalPerson('siswa', '{{ $s->id }}', '{{ addslashes($s->nama) }}', 'NISN: {{ $s->nisn ?: '-' }} &bull; {{ $rNama }}', '{{ $s->foto_url }}')">
-                <div style="width:28px; height:28px; border-radius:6px; background:rgba(0,0,0,0.06); display:flex; align-items:center; justify-content:center; font-weight:800; font-size:12px; color:var(--text); flex-shrink:0;">
+                <div class="person-select-avatar" style="width:32px; height:32px; border-radius:8px; background:rgba(0,0,0,0.06); border:1px solid var(--border-2); display:flex; align-items:center; justify-content:center; font-weight:800; font-size:12px; color:var(--text); flex-shrink:0;">
                   {{ strtoupper(substr($s->nama, 0, 1)) }}
                 </div>
                 <div style="min-width:0; flex:1;">
                   <strong style="font-size:12.5px; color:var(--text); display:block; line-height:1.25; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ $s->nama }}</strong>
-                  <span style="font-size:11px; color:var(--text-3); font-family:var(--font-mono); margin-top:2px; display:block;">NISN: {{ $s->nisn ?: '-' }} &bull; {{ $rNama }}</span>
+                  <span style="font-size:11px; color:var(--text-3); font-family:var(--font-mono); margin-top:2px; display:block; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">NISN: {{ $s->nisn ?: '-' }} &bull; {{ $rNama }}</span>
                 </div>
-                <i class="bi bi-chevron-right" style="color:var(--text-3); font-size:11px; opacity:0.6; flex-shrink:0;"></i>
+                <i class="bi bi-chevron-right" style="color:var(--text-3); font-size:12px; opacity:0.6; flex-shrink:0; margin-left:4px;"></i>
               </div>
             @endforeach
 
             {{-- Guru List --}}
             @foreach($allGurus as $g)
               <div class="person-select-item item-guru"
-                   style="display:none;"
+                   style="display:none; align-items:center; gap:10px; padding:10px 12px; cursor:pointer; border-bottom:1px solid var(--border-2); transition:background .15s ease;"
                    data-id="{{ $g->id }}"
                    data-nama="{{ strtolower($g->nama) }}"
                    data-nip="{{ strtolower($g->nip ?? '') }}"
                    data-jabatan="{{ strtolower($g->jabatan ?? '') }}"
                    onclick="selectModalPerson('guru', '{{ $g->id }}', '{{ addslashes($g->nama) }}', '{{ $g->nip ? 'NIP: '.$g->nip : $g->label_kepegawaian }} &bull; {{ $g->jabatan }}', '{{ $g->foto_url }}')">
-                <div style="width:28px; height:28px; border-radius:6px; background:rgba(0,0,0,0.06); display:flex; align-items:center; justify-content:center; font-weight:800; font-size:12px; color:var(--text); flex-shrink:0;">
+                <div class="person-select-avatar" style="width:32px; height:32px; border-radius:8px; background:rgba(0,0,0,0.06); border:1px solid var(--border-2); display:flex; align-items:center; justify-content:center; font-weight:800; font-size:12px; color:var(--text); flex-shrink:0;">
                   {{ strtoupper(substr($g->nama, 0, 1)) }}
                 </div>
                 <div style="min-width:0; flex:1;">
                   <strong style="font-size:12.5px; color:var(--text); display:block; line-height:1.25; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ $g->nama }}</strong>
-                  <span style="font-size:11px; color:var(--text-3); font-family:var(--font-mono); margin-top:2px; display:block;">{{ $g->nip ? 'NIP: '.$g->nip : $g->label_kepegawaian }} &bull; {{ $g->jabatan }}</span>
+                  <span style="font-size:11px; color:var(--text-3); font-family:var(--font-mono); margin-top:2px; display:block; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ $g->nip ? 'NIP: '.$g->nip : $g->label_kepegawaian }} &bull; {{ $g->jabatan }}</span>
                 </div>
-                <i class="bi bi-chevron-right" style="color:var(--text-3); font-size:11px; opacity:0.6; flex-shrink:0;"></i>
+                <i class="bi bi-chevron-right" style="color:var(--text-3); font-size:12px; opacity:0.6; flex-shrink:0; margin-left:4px;"></i>
               </div>
             @endforeach
           </div>
@@ -548,8 +549,8 @@
 </div>
 
 {{-- MODAL BROADCAST WA BARCODE --}}
-<div id="modalBroadcastWaWrap" class="modal-backdrop" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.75); z-index:9999; align-items:center; justify-content:center; backdrop-filter:blur(4px);">
-  <div class="panel" style="max-width:440px; width:92%; background:var(--bg-2); border:1px solid var(--border-2); border-radius:var(--r-md); padding:20px 24px; box-shadow:0 20px 50px rgba(0,0,0,0.5); position:relative;">
+<div id="modalBroadcastWaWrap" class="modal-backdrop" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.75); z-index:9999; align-items:center; justify-content:center; backdrop-filter:blur(4px); padding:16px;">
+  <div class="panel" style="max-width:480px; width:100%; background:var(--bg-2); border:1px solid var(--border-2); border-radius:var(--r-md); padding:22px 24px; box-shadow:0 20px 50px rgba(0,0,0,0.5); position:relative;">
     
     <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border); padding-bottom:12px; margin-bottom:14px;">
       <div style="font-weight:900; font-size:15px; color:var(--text); display:flex; align-items:center; gap:8px;">
@@ -598,7 +599,7 @@
         <input type="hidden" name="target_siswa_id" id="wa_target_siswa_id" />
 
         {{-- Banner Siswa Terpilih --}}
-        <div id="waSelectedSiswaBanner" style="display:none; align-items:center; justify-content:space-between; background:var(--surface); border:1.5px solid #000000; border-radius:8px; padding:8px 12px; margin-bottom:6px;">
+        <div id="waSelectedSiswaBanner" style="display:none; align-items:center; justify-content:space-between; background:var(--surface); border:1.5px solid var(--border-2); border-radius:8px; padding:8px 12px; margin-bottom:6px;">
           <div style="display:flex; align-items:center; gap:10px; overflow:hidden;">
             <img id="waBannerSiswaFoto" src="/img/user-default.png" style="width:32px; height:32px; border-radius:6px; object-fit:cover; border:1px solid rgba(0,0,0,0.15); flex-shrink:0;" />
             <div style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
@@ -619,7 +620,7 @@
               style="width:100%; height:34px; padding-left:32px; padding-right:10px; font-size:12px; border-radius:var(--r-sm); background:var(--bg-3); border:1px solid var(--border-2); color:var(--text); outline:none;" />
           </div>
 
-          <div id="waSiswaListContainer" style="max-height:160px; overflow-y:auto; border:1px solid var(--border-2); border-radius:var(--r-sm); background:var(--bg-2);">
+          <div id="waSiswaListContainer" style="max-height:180px; overflow-y:auto; border:1px solid var(--border-2); border-radius:var(--r-sm); background:var(--bg-2);">
             @foreach($allSiswas as $s)
               @php
                 $rNama = $s->siswaRombels->first()?->rombel?->nama_rombel ?? 'Tanpa Rombel';
@@ -627,21 +628,22 @@
                 $hpOrtu = $s->no_hp_ortu ?: '-';
               @endphp
               <div class="person-select-item wa-item-siswa"
+                   style="display:flex; align-items:center; gap:10px; padding:10px 12px; cursor:pointer; border-bottom:1px solid var(--border-2); transition:background .15s ease;"
                    data-id="{{ $s->id }}"
                    data-nama="{{ strtolower($s->nama) }}"
                    data-nisn="{{ strtolower($s->nisn ?? '') }}"
                    data-rombel="{{ strtolower($rNama) }}"
                    onclick="selectWaSiswa('{{ $s->id }}', '{{ addslashes($s->nama) }}', 'NISN: {{ $s->nisn ?: '-' }} · {{ $rNama }} · HP: {{ $s->no_hp_siswa ?: '(kosong)' }} / Ortu: {{ $s->no_hp_ortu ?: '(kosong)' }}', '{{ $s->foto_url }}')">
-                <div style="width:28px; height:28px; border-radius:6px; background:rgba(0,0,0,0.06); display:flex; align-items:center; justify-content:center; font-weight:800; font-size:12px; color:var(--text); flex-shrink:0;">
+                <div class="person-select-avatar" style="width:32px; height:32px; border-radius:8px; background:rgba(0,0,0,0.06); border:1px solid var(--border-2); display:flex; align-items:center; justify-content:center; font-weight:800; font-size:12px; color:var(--text); flex-shrink:0;">
                   {{ strtoupper(substr($s->nama, 0, 1)) }}
                 </div>
                 <div style="min-width:0; flex:1;">
                   <strong style="font-size:12.5px; color:var(--text); display:block; line-height:1.25; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ $s->nama }}</strong>
-                  <span style="font-size:10.5px; color:var(--text-3); font-family:var(--font-mono); margin-top:2px; display:block;">
+                  <span style="font-size:10.5px; color:var(--text-3); font-family:var(--font-mono); margin-top:2px; display:block; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
                     NISN: {{ $s->nisn ?: '-' }} &bull; {{ $rNama }} &bull; HP Siswa: {{ $hpSiswa }} &bull; Ortu: {{ $hpOrtu }}
                   </span>
                 </div>
-                <i class="bi bi-chevron-right" style="color:var(--text-3); font-size:11px; opacity:0.6; flex-shrink:0;"></i>
+                <i class="bi bi-chevron-right" style="color:var(--text-3); font-size:12px; opacity:0.6; flex-shrink:0; margin-left:4px;"></i>
               </div>
             @endforeach
           </div>
@@ -656,7 +658,7 @@
         <input type="hidden" name="target_guru_id" id="wa_target_guru_id" />
 
         {{-- Banner Guru Terpilih --}}
-        <div id="waSelectedGuruBanner" style="display:none; align-items:center; justify-content:space-between; background:var(--surface); border:1.5px solid #000000; border-radius:8px; padding:8px 12px; margin-bottom:6px;">
+        <div id="waSelectedGuruBanner" style="display:none; align-items:center; justify-content:space-between; background:var(--surface); border:1.5px solid var(--border-2); border-radius:8px; padding:8px 12px; margin-bottom:6px;">
           <div style="display:flex; align-items:center; gap:10px; overflow:hidden;">
             <img id="waBannerGuruFoto" src="/img/user-default.png" style="width:32px; height:32px; border-radius:6px; object-fit:cover; border:1px solid rgba(0,0,0,0.15); flex-shrink:0;" />
             <div style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
@@ -677,24 +679,25 @@
               style="width:100%; height:34px; padding-left:32px; padding-right:10px; font-size:12px; border-radius:var(--r-sm); background:var(--bg-3); border:1px solid var(--border-2); color:var(--text); outline:none;" />
           </div>
 
-          <div id="waGuruListContainer" style="max-height:160px; overflow-y:auto; border:1px solid var(--border-2); border-radius:var(--r-sm); background:var(--bg-2);">
+          <div id="waGuruListContainer" style="max-height:180px; overflow-y:auto; border:1px solid var(--border-2); border-radius:var(--r-sm); background:var(--bg-2);">
             @foreach($allGurus as $g)
               <div class="person-select-item wa-item-guru"
+                   style="display:flex; align-items:center; gap:10px; padding:10px 12px; cursor:pointer; border-bottom:1px solid var(--border-2); transition:background .15s ease;"
                    data-id="{{ $g->id }}"
                    data-nama="{{ strtolower($g->nama) }}"
                    data-nip="{{ strtolower($g->nip ?? '') }}"
                    data-jabatan="{{ strtolower($g->jabatan ?? '') }}"
                    onclick="selectWaGuru('{{ $g->id }}', '{{ addslashes($g->nama) }}', '{{ $g->nip ? 'NIP: '.$g->nip : $g->label_kepegawaian }} · {{ $g->jabatan }} · HP: {{ $g->no_hp ?: '(kosong)' }}', '{{ $g->foto_url }}')">
-                <div style="width:28px; height:28px; border-radius:6px; background:rgba(0,0,0,0.06); display:flex; align-items:center; justify-content:center; font-weight:800; font-size:12px; color:var(--text); flex-shrink:0;">
+                <div class="person-select-avatar" style="width:32px; height:32px; border-radius:8px; background:rgba(0,0,0,0.06); border:1px solid var(--border-2); display:flex; align-items:center; justify-content:center; font-weight:800; font-size:12px; color:var(--text); flex-shrink:0;">
                   {{ strtoupper(substr($g->nama, 0, 1)) }}
                 </div>
                 <div style="min-width:0; flex:1;">
                   <strong style="font-size:12.5px; color:var(--text); display:block; line-height:1.25; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ $g->nama }}</strong>
-                  <span style="font-size:10.5px; color:var(--text-3); font-family:var(--font-mono); margin-top:2px; display:block;">
+                  <span style="font-size:10.5px; color:var(--text-3); font-family:var(--font-mono); margin-top:2px; display:block; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
                     {{ $g->nip ? 'NIP: '.$g->nip : $g->label_kepegawaian }} &bull; {{ $g->jabatan }} &bull; HP: {{ $g->no_hp ?: '-' }}
                   </span>
                 </div>
-                <i class="bi bi-chevron-right" style="color:var(--text-3); font-size:11px; opacity:0.6; flex-shrink:0;"></i>
+                <i class="bi bi-chevron-right" style="color:var(--text-3); font-size:12px; opacity:0.6; flex-shrink:0; margin-left:4px;"></i>
               </div>
             @endforeach
           </div>
@@ -705,7 +708,7 @@
         <strong style="color:var(--text); display:block; margin-bottom:2px;">
           <i class="bi bi-info-circle-fill" style="color:var(--primary);"></i> Informasi Pengiriman Aman:
         </strong>
-        Pesan dikirim berurutan dengan <strong>jeda aman 5–7 detik antar nomor</strong> untuk melindungi nomor WA dari pemblokiran spam. Setiap penerima akan mendapatkan pesan personal berisi <strong>Nama, NISN/NIP, Link Kartu Digital</strong>, dan <strong>Link Gambar QR Code</strong>.
+        Pesan dikirim berurutan dengan <strong>jeda aman 5–7 detik antar nomor</strong> untuk melindungi nomor WA dari pemblokiran spam. Setiap penerima akan mendapatkan pesan personal berisi <strong>Nama, NISN/NIP</strong>, dan <strong>Link Akses Kartu / Portal Presensi Digital</strong>.
       </div>
 
       <div style="display:flex; justify-content:flex-end; gap:8px; border-top:1px solid var(--border); padding-top:14px;">
@@ -997,6 +1000,12 @@
     const lblSiswa = document.getElementById('waLabelSiswaTarget');
     if (lblSiswa) {
       lblSiswa.textContent = (val === 'individu_ortu') ? 'Cari & Pilih Siswa (Kirim ke Nomor Ortu):' : 'Cari & Pilih Siswa (Kirim ke Nomor Siswa):';
+    }
+
+    if (val === 'individu_guru') {
+      filterWaGuruList('');
+    } else if (val === 'individu_siswa' || val === 'individu_ortu') {
+      filterWaSiswaList('');
     }
   }
 

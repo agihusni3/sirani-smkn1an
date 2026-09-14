@@ -57,7 +57,8 @@ class WhatsAppNotificationService
                 ])->connectTimeout(5)->timeout(15)->post($endpoint, [
                     'target'  => $noWa,
                     'message' => $notifikasi->pesan,
-                    'delay'   => (string) rand(5, 7),
+                    'delay'   => '5-10',
+                    'typing'  => true,
                 ]);
 
                 if ($response->successful()) {
@@ -177,10 +178,11 @@ class WhatsAppNotificationService
                 $endpoint = $setting->wa_endpoint_url ?: 'https://api.fonnte.com/send';
                 $response = Http::withHeaders([
                     'Authorization' => $setting->wa_api_token,
-                ])->connectTimeout(5)->timeout(15)->post($endpoint, [
+                ])->connectTimeout(3)->timeout(8)->post($endpoint, [
                     'target'  => $noWa,
                     'message' => $pesan,
-                    'delay'   => (string) rand(5, 7),
+                    'delay'   => '5-10',
+                    'typing'  => true,
                 ]);
 
                 return ['success' => $response->successful(), 'response' => $response->body()];

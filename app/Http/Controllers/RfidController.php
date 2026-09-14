@@ -341,18 +341,15 @@ class RfidController extends Controller
             $rombelNama = $s->siswaRombels->first()?->rombel?->nama_rombel ?? 'Siswa';
             $codeVal = $s->kartuRfid?->uid ?? ($s->nisn ?: $s->id);
             $linkPortal = $baseUrl . '/cek-presensi/' . ($s->nisn ?: $s->id);
-            $linkQr = $baseUrl . '/qr/siswa/' . $s->id;
 
             if ($tab === 'individu_siswa') {
                 $pesan = "🔔 *PORTAL PRESENSI MANDIRI SISWA & ORTU — {$namaSekolah}*\n\n"
-                       . "Yth. *{$s->nama}*:\n"
+                       . "Ananda *{$s->nama}*:\n"
                        . "🏷️ *NISN:* " . ($s->nisn ?: '-') . "\n"
                        . "🏫 *Kelas:* {$rombelNama}\n\n"
                        . "Berikut akses portal presensi dan QR Code presensi Anda:\n\n"
                        . "📱 *Buka Portal Presensi Mandiri:*\n"
                        . "{$linkPortal}\n\n"
-                       . "📥 *Download Gambar QR Code Langsung:*\n"
-                       . "{$linkQr}\n\n"
                        . "_Simpan gambar QR di HP atau tunjukkan saat tiba di scanner gerbang sekolah._";
             } else {
                 $pesan = "🔔 *PORTAL PRESENSI SISWA & ORANG TUA — {$namaSekolah}*\n\n"
@@ -363,8 +360,6 @@ class RfidController extends Controller
                        . "Berikut akses portal presensi dan QR Code ananda:\n\n"
                        . "📱 *Buka Portal Presensi Mandiri:*\n"
                        . "{$linkPortal}\n\n"
-                       . "📥 *Download Gambar QR Code Langsung:*\n"
-                       . "{$linkQr}\n\n"
                        . "_Portal ini dapat digunakan untuk memantau kehadiran, jadwal, dan rekap ananda secara berkala._";
             }
 
@@ -391,7 +386,6 @@ class RfidController extends Controller
 
             $codeVal = $g->kartuRfid?->uid ?? ($g->nip ?: 'GURU-'.$g->id);
             $linkKartu = $baseUrl . '/kartu-digital-guru/' . $g->id;
-            $linkQr = $baseUrl . '/qr/guru/' . $g->id;
 
             $pesan = "🔔 *KARTU PRESENSI DIGITAL GURU & STAF — {$namaSekolah}*\n\n"
                    . "Yth. Bapak/Ibu:\n"
@@ -401,8 +395,6 @@ class RfidController extends Controller
                    . "Berikut akses kartu dan QR Code presensi mandiri Anda:\n\n"
                    . "📱 *Buka Kartu Presensi Digital:*\n"
                    . "{$linkKartu}\n\n"
-                   . "📥 *Download Gambar QR Code Langsung:*\n"
-                   . "{$linkQr}\n\n"
                    . "_Simpan QR di HP untuk melakukan presensi mandiri pada scanner gerbang sekolah._";
 
             $res = $waService->kirimDirect($noHp, $pesan, 'KARTU PRESENSI GURU');
@@ -431,27 +423,19 @@ class RfidController extends Controller
                 $noHp = ($tab === 'siswa') ? $s->no_hp_siswa : $s->no_hp_ortu;
                 if (!$noHp) continue;
 
-                // Jeda delay aman 5-7 detik antar nomor untuk mencegah blokir spam WhatsApp
-                if ($totalTarget > 0) {
-                    sleep(rand(5, 7));
-                }
-
                 $totalTarget++;
                 $rombelNama = $s->siswaRombels->first()?->rombel?->nama_rombel ?? 'Siswa';
                 $codeVal = $s->kartuRfid?->uid ?? $s->nisn;
                 $linkPortal = $baseUrl . '/cek-presensi/' . ($s->nisn ?: $s->id);
-                $linkQr = $baseUrl . '/qr/siswa/' . $s->id;
 
                 if ($tab === 'siswa') {
                     $pesan = "🔔 *PORTAL PRESENSI MANDIRI SISWA & ORTU — {$namaSekolah}*\n\n"
-                           . "Yth. *{$s->nama}*:\n"
+                           . "Ananda *{$s->nama}*:\n"
                            . "🏷️ *NISN:* " . ($s->nisn ?: '-') . "\n"
                            . "🏫 *Kelas:* {$rombelNama}\n\n"
                            . "Berikut akses portal presensi dan QR Code presensi Anda:\n\n"
                            . "📱 *Buka Portal Presensi Mandiri:*\n"
                            . "{$linkPortal}\n\n"
-                           . "📥 *Download Gambar QR Code Langsung:*\n"
-                           . "{$linkQr}\n\n"
                            . "_Simpan gambar QR di HP atau tunjukkan saat tiba di scanner gerbang sekolah._";
                 } else {
                     $pesan = "🔔 *PORTAL PRESENSI SISWA & ORANG TUA — {$namaSekolah}*\n\n"
@@ -462,8 +446,6 @@ class RfidController extends Controller
                            . "Berikut akses portal presensi dan QR Code ananda:\n\n"
                            . "📱 *Buka Portal Presensi Mandiri:*\n"
                            . "{$linkPortal}\n\n"
-                           . "📥 *Download Gambar QR Code Langsung:*\n"
-                           . "{$linkQr}\n\n"
                            . "_Portal ini dapat digunakan untuk memantau kehadiran, jadwal, dan rekap ananda secara berkala._";
                 }
 
@@ -474,7 +456,7 @@ class RfidController extends Controller
             }
 
             $labelTarget = ($tab === 'siswa') ? 'Siswa' : 'Orang Tua / Wali';
-            return redirect()->back()->with('success', "Broadcast QR Code {$labelTarget} berhasil diproses. Terkirim ke {$totalTerkirim} kontak dengan jeda delay aman 5-7 detik.");
+            return redirect()->back()->with('success', "Broadcast Barcode Presensi {$labelTarget} berhasil diproses. Terkirim ke {$totalTerkirim} kontak.");
         } else {
             // ── 4. PENGIRIMAN MASSAL (BROADCAST) SELURUH GURU ──
             $gurus = Guru::where('status', 'aktif')->with('kartuRfid')->get();
@@ -483,15 +465,9 @@ class RfidController extends Controller
                 $noHp = $g->no_hp;
                 if (!$noHp) continue;
 
-                // Jeda delay aman 5-7 detik antar nomor
-                if ($totalTarget > 0) {
-                    sleep(rand(5, 7));
-                }
-
                 $totalTarget++;
                 $codeVal = $g->kartuRfid?->uid ?? ($g->nip ?: 'GURU-'.$g->id);
                 $linkKartu = $baseUrl . '/kartu-digital-guru/' . $g->id;
-                $linkQr = $baseUrl . '/qr/guru/' . $g->id;
 
                 $pesan = "🔔 *KARTU PRESENSI DIGITAL GURU & STAF — {$namaSekolah}*\n\n"
                        . "Yth. Bapak/Ibu:\n"
@@ -501,8 +477,6 @@ class RfidController extends Controller
                        . "Berikut akses kartu dan QR Code presensi mandiri Anda:\n\n"
                        . "📱 *Buka Kartu Presensi Digital:*\n"
                        . "{$linkKartu}\n\n"
-                       . "📥 *Download Gambar QR Code Langsung:*\n"
-                       . "{$linkQr}\n\n"
                        . "_Simpan QR di HP untuk melakukan presensi mandiri pada scanner gerbang sekolah._";
 
                 $res = $waService->kirimDirect($noHp, $pesan, 'KARTU PRESENSI GURU');
@@ -511,7 +485,7 @@ class RfidController extends Controller
                 }
             }
 
-            return redirect()->back()->with('success', "Broadcast QR Code Guru/Staf berhasil diproses. Terkirim ke {$totalTerkirim} kontak dengan jeda delay aman 5-7 detik.");
+            return redirect()->back()->with('success', "Broadcast Barcode Presensi Guru/Staf berhasil diproses. Terkirim ke {$totalTerkirim} kontak.");
         }
     }
 
@@ -548,18 +522,14 @@ class RfidController extends Controller
             $rombelNama = $siswa->siswaRombels->first()?->rombel?->nama_rombel ?? 'Siswa';
             $codeVal = $siswa->kartuRfid?->uid ?? ($siswa->nisn ?: $siswa->id);
             $linkPortal = $baseUrl . '/cek-presensi/' . ($siswa->nisn ?: $siswa->id);
-            $linkQr = $baseUrl . '/qr/siswa/' . $siswa->id;
 
             $pesan = "🔔 *PORTAL PRESENSI SISWA & ORANG TUA — {$namaSekolah}*\n\n"
-                   . "Yth. Orang Tua / Siswa:\n"
-                   . "👤 *Nama:* {$siswa->nama}\n"
+                   . "Ananda *{$siswa->nama}*:\n"
                    . "🏷️ *NISN:* " . ($siswa->nisn ?: '-') . "\n"
                    . "🏫 *Kelas:* {$rombelNama}\n\n"
                    . "Berikut akses portal presensi dan QR Code presensi Anda:\n\n"
                    . "📱 *Buka Portal Presensi Mandiri:*\n"
                    . "{$linkPortal}\n\n"
-                   . "📥 *Download Gambar QR Code Langsung:*\n"
-                   . "{$linkQr}\n\n"
                    . "_Simpan gambar QR di HP atau tunjukkan saat tiba di scanner gerbang sekolah._";
 
             $res = $waService->kirimDirect($noHp, $pesan, 'KARTU PRESENSI DIGITAL');
@@ -584,7 +554,6 @@ class RfidController extends Controller
 
             $codeVal = $guru->kartuRfid?->uid ?? ($guru->nip ?: 'GURU-'.$guru->id);
             $linkKartu = $baseUrl . '/kartu-digital-guru/' . $guru->id;
-            $linkQr = $baseUrl . '/qr/guru/' . $guru->id;
 
             $pesan = "🔔 *KARTU PRESENSI DIGITAL GURU & STAF — {$namaSekolah}*\n\n"
                    . "Yth. Bapak/Ibu:\n"
@@ -594,8 +563,6 @@ class RfidController extends Controller
                    . "Berikut akses kartu dan QR Code presensi mandiri Anda:\n\n"
                    . "📱 *Buka Kartu Presensi Digital:*\n"
                    . "{$linkKartu}\n\n"
-                   . "📥 *Download Gambar QR Code Langsung:*\n"
-                   . "{$linkQr}\n\n"
                    . "_Simpan QR di HP untuk melakukan presensi mandiri pada scanner gerbang sekolah._";
 
             $res = $waService->kirimDirect($noHp, $pesan, 'KARTU PRESENSI GURU');
