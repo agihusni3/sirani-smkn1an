@@ -205,34 +205,30 @@
         flex-shrink: 0 !important;
       }
 
-      /* Toolbar Mobile Responsive */
-      .siklus-table-toolbar {
-        flex-direction: column !important;
-        align-items: stretch !important;
-        gap: 6px !important;
-      }
-      .siklus-table-title {
-        width: 100% !important;
-      }
-      .siklus-table-form {
-        width: 100% !important;
-        max-width: 100% !important;
-        flex-direction: column !important;
-        align-items: stretch !important;
-        gap: 6px !important;
-      }
-      .siklus-search-box {
-        width: 100% !important;
-      }
-      .siklus-filter-group {
-        width: 100% !important;
-        display: flex !important;
-        gap: 4px !important;
-      }
-      .siklus-filter-group select {
-        font-size: 10.5px !important;
+      .table-filter-row th {
+        padding: 6px 4px !important;
       }
     }
+
+/* ─── Table Filter Row Inside the Table ─── */
+.table-filter-row th {
+  background: #f8fafc !important;
+  border-bottom: 1.5px solid #cbd5e1 !important;
+  font-weight: 500 !important;
+  vertical-align: middle !important;
+}
+
+.table-filter-row .input-field {
+  background: #ffffff !important;
+  border: 1.5px solid #cbd5e1 !important;
+  box-shadow: none !important;
+  transition: all .15s ease;
+}
+
+.table-filter-row .input-field:focus {
+  border-color: #000000 !important;
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.08) !important;
+}
 
 /* ─── Searchable Siswa Component ─── */
 .searchable-siswa-wrapper {

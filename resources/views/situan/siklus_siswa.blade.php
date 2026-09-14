@@ -351,86 +351,99 @@
     <!-- ═══════════════════════════════════════════════════════════════════ -->
     <div class="panel" style="padding:0; overflow:hidden; border:1px solid var(--border); border-radius:var(--r-md); box-shadow:var(--shadow-sm); background:var(--bg-2); margin-bottom:24px;">
       
-      {{-- Header & Toolbar Terpadu --}}
-      <div class="siklus-table-toolbar" style="padding:10px 14px; border-bottom:1px solid var(--border); background:var(--surface); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
-        
-        {{-- Judul --}}
-        <div class="siklus-table-title" style="font-weight:800; font-size:13px; color:var(--text); display:flex; align-items:center; gap:6px; flex-shrink:0;">
-          <i class="bi bi-people-fill" style="color:#000000;"></i>
+      {{-- Header Panel Histori Siswa --}}
+      <div style="padding:12px 18px; border-bottom:1px solid var(--border); background:var(--surface); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+        <div style="font-weight:900; font-size:13.5px; color:var(--text); display:flex; align-items:center; gap:8px;">
+          <i class="bi bi-people-fill" style="color:#000000; font-size:16px;"></i>
           <span>Histori Siswa</span>
-          <span style="background:var(--bg-3); border:1px solid var(--border-2); color:var(--text-2); font-size:10.5px; font-weight:700; padding:1px 7px; border-radius:4px; font-family:var(--font-mono);">
-            {{ $siswas->total() }}
+          <span style="background:var(--bg-3); border:1px solid var(--border-2); color:var(--text-2); font-size:11px; font-weight:800; padding:2px 8px; border-radius:4px; font-family:var(--font-mono);">
+            {{ $siswas->total() }} Siswa
           </span>
         </div>
 
-        {{-- Form Filter & Search --}}
-        <form method="GET" action="{{ route('siklus-siswa.index') }}" style="display:flex; flex-wrap:wrap; gap:6px; align-items:center;">
-          
-          {{-- Search Box --}}
-          <div style="position:relative; min-width:180px; flex:1;">
-            <i class="bi bi-search" style="position:absolute; left:10px; top:50%; transform:translateY(-50%); color:var(--text-3); font-size:11px; pointer-events:none;"></i>
-            <input type="text" name="q" value="{{ $search }}" placeholder="Cari nama, NIS..." class="input-field"
-              style="width:100%; height:33px; font-size:11.5px; padding-left:30px; padding-right:8px; border-radius:6px;" />
+        @if($search || $rombelId || $status || ($sort && $sort !== 'nama_asc'))
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span style="font-size:11px; color:#0284c7; font-weight:800; background:#e0f2fe; padding:3px 8px; border-radius:4px; border:1px solid #bae6fd;">
+              <i class="bi bi-funnel-fill"></i> Filter Aktif
+            </span>
+            <a href="{{ route('siklus-siswa.index') }}" style="font-size:11.5px; color:#ef4444; font-weight:800; text-decoration:none; display:inline-flex; align-items:center; gap:4px;" title="Kosongkan Semua Filter">
+              <i class="bi bi-x-circle-fill"></i> Reset Filter
+            </a>
           </div>
-
-          {{-- Filter Kelas --}}
-          <select name="rombel_id" class="input-field" style="height:33px; font-size:11.5px; padding:0 8px; border-radius:6px; min-width:105px;" onchange="this.form.submit()">
-            <option value="">Semua Kelas</option>
-            @foreach($rombels as $r)
-              <option value="{{ $r->id }}" {{ $rombelId == $r->id ? 'selected' : '' }}>{{ $r->nama_rombel }}</option>
-            @endforeach
-          </select>
-
-          {{-- Filter Status --}}
-          <select name="status" class="input-field" style="height:33px; font-size:11.5px; padding:0 8px; border-radius:6px; min-width:90px;" onchange="this.form.submit()">
-            <option value="">Status</option>
-            <option value="aktif"  {{ $status === 'aktif'  ? 'selected' : '' }}>Aktif</option>
-            <option value="pkl"    {{ $status === 'pkl'    ? 'selected' : '' }}>PKL</option>
-            <option value="lulus"  {{ $status === 'lulus'  ? 'selected' : '' }}>Lulus</option>
-            <option value="pindah" {{ $status === 'pindah' ? 'selected' : '' }}>Pindah</option>
-            <option value="keluar" {{ $status === 'keluar' ? 'selected' : '' }}>Keluar</option>
-          </select>
-
-          {{-- Filter Urutan --}}
-          <select name="sort" class="input-field" style="height:33px; font-size:11.5px; padding:0 8px; border-radius:6px; min-width:105px;" onchange="this.form.submit()">
-            <option value="nama_asc"  {{ $sort === 'nama_asc'  ? 'selected' : '' }}>Nama (A-Z)</option>
-            <option value="nama_desc" {{ $sort === 'nama_desc' ? 'selected' : '' }}>Nama (Z-A)</option>
-            <option value="nis_asc"   {{ $sort === 'nis_asc'   ? 'selected' : '' }}>NIS (Kecil)</option>
-            <option value="terbaru"   {{ $sort === 'terbaru'   ? 'selected' : '' }}>Terbaru</option>
-          </select>
-
-          {{-- Tombol Aksi --}}
-          <div style="display:flex; gap:5px; align-items:center; flex-shrink:0;">
-            <button type="submit" class="btn btn-sm btn-black"
-              style="height:33px; padding:0 14px; font-size:11.5px; font-weight:800; border-radius:6px; white-space:nowrap;">
-              Filter
-            </button>
-            @if($search || $rombelId || $status || ($sort && $sort !== 'nama_asc'))
-              <a href="{{ route('siklus-siswa.index') }}"
-                style="height:33px; padding:0 12px; font-size:11.5px; font-weight:800; border-radius:6px; border:1.5px solid rgba(239,68,68,0.5); color:#ef4444; background:transparent; display:inline-flex; align-items:center; white-space:nowrap; text-decoration:none;"
-                title="Reset Filter">
-                Reset
-              </a>
-            @endif
-          </div>
-        </form>
+        @endif
       </div>
 
-      <div class="table-responsive">
-        <table class="data-table">
-          <thead>
-            <tr>
-              <th style="width:44px; text-align:center;">No</th>
-              <th style="width:48px; text-align:center;">Foto</th>
-              <th style="width:110px; text-align:center;">NISN</th>
-              <th style="text-align:left;">Nama Lengkap Siswa</th>
-              <th style="width:100px; text-align:center;">Status</th>
-              <th style="width:120px; text-align:center;">Rombel Aktif</th>
-              <th style="width:110px; text-align:center;">Tahun Ajaran</th>
-              <th style="min-width:260px; text-align:left;">Histori Siklus Perjalanan Kelas</th>
-              <th style="width:90px; text-align:center;" class="no-print">Aksi</th>
-            </tr>
-          </thead>
+      {{-- Form Pencarian & Filter yang Terintegrasi Langsung ke Dalam Tabel --}}
+      <form method="GET" action="{{ route('siklus-siswa.index') }}" id="formFilterSiklus" style="margin:0;">
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th style="width:44px; text-align:center;">No</th>
+                <th style="width:48px; text-align:center;">Foto</th>
+                <th style="width:110px; text-align:center;">NISN</th>
+                <th style="text-align:left;">Nama Lengkap Siswa</th>
+                <th style="width:110px; text-align:center;">Status</th>
+                <th style="width:125px; text-align:center;">Rombel Aktif</th>
+                <th style="width:110px; text-align:center;">Tahun Ajaran</th>
+                <th style="min-width:240px; text-align:left;">Histori Siklus Perjalanan Kelas</th>
+                <th style="width:90px; text-align:center;" class="no-print">Aksi</th>
+              </tr>
+
+              {{-- Baris Filter di Dalam Tabel --}}
+              <tr class="table-filter-row" style="background:#f8fafc; border-bottom:1.5px solid #cbd5e1;">
+                <th colspan="2" style="text-align:center; padding:6px 4px; vertical-align:middle; background:rgba(0,0,0,0.02);">
+                  <span style="font-size:11px; color:var(--text-3); font-weight:800;"><i class="bi bi-funnel-fill"></i> Filter</span>
+                </th>
+                <th colspan="2" style="padding:6px 8px; vertical-align:middle;">
+                  <div style="position:relative; width:100%;">
+                    <i class="bi bi-search" style="position:absolute; left:9px; top:50%; transform:translateY(-50%); color:var(--text-3); font-size:11px; pointer-events:none;"></i>
+                    <input type="text" name="q" value="{{ $search }}" placeholder="Cari nama siswa atau NISN..." class="input-field" style="width:100%; height:32px; font-size:11.5px; font-weight:600; padding-left:28px; padding-right:8px; border-radius:6px; background:#ffffff; border:1px solid #cbd5e1;" />
+                  </div>
+                </th>
+                <th style="padding:6px 4px; vertical-align:middle;">
+                  <select name="status" class="input-field" style="width:100%; height:32px; font-size:11px; font-weight:700; padding:0 6px; border-radius:6px; background:#ffffff; border:1px solid #cbd5e1;" onchange="this.form.submit()">
+                    <option value="">Semua Status</option>
+                    <option value="aktif"  {{ $status === 'aktif'  ? 'selected' : '' }}>Aktif</option>
+                    <option value="pkl"    {{ $status === 'pkl'    ? 'selected' : '' }}>PKL</option>
+                    <option value="lulus"  {{ $status === 'lulus'  ? 'selected' : '' }}>Lulus</option>
+                    <option value="pindah" {{ $status === 'pindah' ? 'selected' : '' }}>Pindah</option>
+                    <option value="keluar" {{ $status === 'keluar' ? 'selected' : '' }}>Keluar</option>
+                  </select>
+                </th>
+                <th style="padding:6px 4px; vertical-align:middle;">
+                  <select name="rombel_id" class="input-field" style="width:100%; height:32px; font-size:11px; font-weight:700; padding:0 6px; border-radius:6px; background:#ffffff; border:1px solid #cbd5e1;" onchange="this.form.submit()">
+                    <option value="">Semua Kelas</option>
+                    @foreach($rombels as $r)
+                      <option value="{{ $r->id }}" {{ $rombelId == $r->id ? 'selected' : '' }}>{{ $r->nama_rombel }}</option>
+                    @endforeach
+                  </select>
+                </th>
+                <th colspan="2" style="padding:6px 8px; vertical-align:middle;">
+                  <div style="display:flex; align-items:center; gap:6px;">
+                    <span style="font-size:11px; color:var(--text-3); font-weight:700; white-space:nowrap;"><i class="bi bi-arrow-down-up"></i> Urut:</span>
+                    <select name="sort" class="input-field" style="width:100%; max-width:160px; height:32px; font-size:11px; font-weight:700; padding:0 6px; border-radius:6px; background:#ffffff; border:1px solid #cbd5e1;" onchange="this.form.submit()">
+                      <option value="nama_asc"  {{ $sort === 'nama_asc'  ? 'selected' : '' }}>Nama (A - Z)</option>
+                      <option value="nama_desc" {{ $sort === 'nama_desc' ? 'selected' : '' }}>Nama (Z - A)</option>
+                      <option value="nis_asc"   {{ $sort === 'nis_asc'   ? 'selected' : '' }}>NISN (Kecil)</option>
+                      <option value="terbaru"   {{ $sort === 'terbaru'   ? 'selected' : '' }}>Terbaru</option>
+                    </select>
+                  </div>
+                </th>
+                <th style="text-align:center; padding:6px 4px; vertical-align:middle;" class="no-print">
+                  <div style="display:flex; gap:4px; justify-content:center; align-items:center;">
+                    <button type="submit" class="btn btn-sm btn-black" style="height:32px; padding:0 10px; font-size:11px; font-weight:800; border-radius:6px; white-space:nowrap;" title="Terapkan Filter">
+                      <i class="bi bi-funnel-fill"></i> Filter
+                    </button>
+                    @if($search || $rombelId || $status || ($sort && $sort !== 'nama_asc'))
+                      <a href="{{ route('siklus-siswa.index') }}" style="height:32px; width:32px; display:inline-flex; align-items:center; justify-content:center; font-size:12px; font-weight:800; border-radius:6px; border:1.5px solid rgba(239,68,68,0.5); color:#ef4444; background:#ffffff; text-decoration:none;" title="Reset Filter">
+                        <i class="bi bi-x-lg"></i>
+                      </a>
+                    @endif
+                  </div>
+                </th>
+              </tr>
+            </thead>
           <tbody>
             @forelse($siswas as $idx => $s)
               @php
@@ -521,6 +534,7 @@
           </tbody>
         </table>
       </div>
+      </form>
 
       @if($siswas->hasPages())
         <div style="padding:16px 20px; border-top:1px solid var(--border-2); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
