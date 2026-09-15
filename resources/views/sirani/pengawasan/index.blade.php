@@ -207,127 +207,166 @@
       font-family: var(--font-mono);
     }
 
-    /* Attendance Pills in Table */
+    /* Attendance Numbers in Table (Clean, No Border, No BG, Black Font) */
     .absen-mini-grid {
       display: flex;
-      gap: 5px;
+      gap: 6px;
       align-items: center;
       flex-wrap: wrap;
+      font-size: 12.5px;
+      color: #0f172a;
     }
-    .absen-mini-pill {
+    .absen-mini-item {
       display: inline-flex;
       align-items: center;
-      gap: 3px;
-      padding: 2px 7px;
-      border-radius: 6px;
-      font-size: 11px;
+      gap: 2px;
+      color: #0f172a;
+      font-weight: 600;
+    }
+    .absen-mini-item strong {
+      color: #0f172a;
       font-weight: 800;
-      white-space: nowrap;
-    }
-    .absen-mini-pill.hadir { background: rgba(16, 185, 129, 0.12); color: #059669; }
-    .absen-mini-pill.terlambat { background: rgba(245, 158, 11, 0.12); color: #b45309; }
-    .absen-mini-pill.izin { background: rgba(59, 130, 246, 0.12); color: #2563eb; }
-    .absen-mini-pill.alpha { background: rgba(239, 68, 68, 0.14); color: #dc2626; border: 1px solid rgba(239, 68, 68, 0.3); }
-
-    /* Status Badges */
-    .status-badge-lg {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      padding: 4px 10px;
-      border-radius: 7px;
-      font-size: 11.5px;
-      font-weight: 800;
-      white-space: nowrap;
-    }
-    .status-badge-lg.aktif {
-      background: rgba(16, 185, 129, 0.14);
-      color: #059669;
-      border: 1px solid rgba(16, 185, 129, 0.35);
-    }
-    .status-badge-lg.bahaya {
-      background: rgba(239, 68, 68, 0.12);
-      color: #dc2626;
-      border: 1px solid rgba(239, 68, 68, 0.35);
-      animation: pulse-border 2s infinite ease-in-out;
-    }
-    .status-badge-lg.belum {
-      background: rgba(100, 116, 139, 0.12);
-      color: #475569;
-      border: 1px solid rgba(100, 116, 139, 0.25);
     }
 
-    /* Action Buttons */
-    .btn-action-wa {
+    /* Status Text (Clean, No Border, No BG, Black Font) */
+    .status-text-row {
       display: inline-flex;
       align-items: center;
-      gap: 5px;
-      padding: 5px 10px;
-      border-radius: 7px;
-      font-size: 11.5px;
-      font-weight: 800;
-      background: #25D366;
-      color: #ffffff;
-      text-decoration: none;
-      border: none;
-      cursor: pointer;
-      transition: all .2s;
-      box-shadow: 0 2px 6px rgba(37, 211, 102, 0.25);
-    }
-    .btn-action-wa:hover {
-      background: #1eb956;
-      transform: translateY(-1px);
-      color: #ffffff;
-    }
-    .btn-action-detail {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      padding: 5px 9px;
-      border-radius: 7px;
-      font-size: 11.5px;
+      gap: 7px;
+      font-size: 12.5px;
       font-weight: 700;
-      background: var(--bg-3);
-      color: var(--text);
-      border: 1px solid var(--border-2);
-      cursor: pointer;
-      transition: all .2s;
+      color: #0f172a;
+      white-space: nowrap;
     }
-    .btn-action-detail:hover {
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .status-dot.aktif { background: #10b981; }
+    .status-dot.bahaya { background: #ef4444; }
+    .status-dot.belum { background: #94a3b8; }
+
+    /* Action Buttons (Simplified, Compact Icon Buttons with Hover Tooltip) */
+    .action-btn-group {
+      display: inline-flex;
+      gap: 6px;
+      align-items: center;
+      justify-content: flex-end;
+    }
+    .action-tooltip-box {
+      position: relative;
+      display: inline-flex;
+    }
+    .action-tooltip-box .tooltip-text {
+      visibility: hidden;
+      opacity: 0;
+      position: absolute;
+      bottom: calc(100% + 7px);
+      right: 50%;
+      transform: translateX(50%) translateY(4px);
+      background: #0f172a;
+      color: #ffffff;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 5px 9px;
+      border-radius: 6px;
+      white-space: nowrap;
+      pointer-events: none;
+      z-index: 1000;
+      box-shadow: 0 4px 12px rgba(15,23,42,0.2);
+      transition: opacity 0.18s ease, transform 0.18s ease;
+    }
+    .action-tooltip-box .tooltip-text::after {
+      content: "";
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      border-width: 4px;
+      border-style: solid;
+      border-color: #0f172a transparent transparent transparent;
+    }
+    .action-tooltip-box:hover .tooltip-text {
+      visibility: visible;
+      opacity: 1;
+      transform: translateX(50%) translateY(0);
+    }
+    
+    .btn-action-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      border: 1px solid var(--border-2);
       background: var(--surface);
-      border-color: var(--text);
+      color: #0f172a;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all .15s ease;
+    }
+    .btn-action-icon:hover {
+      background: #0f172a;
+      color: #ffffff;
+      border-color: #0f172a;
+      transform: translateY(-1px);
+    }
+    .btn-action-icon.wa {
+      color: #16a34a;
+      border-color: #bbf7d0;
+      background: #f0fdf4;
+    }
+    .btn-action-icon.wa:hover {
+      background: #16a34a;
+      color: #ffffff;
+      border-color: #16a34a;
+    }
+    .btn-action-icon.disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+      pointer-events: auto;
+      background: var(--bg-2);
+      border-color: var(--border);
+      color: #94a3b8;
+    }
+    .btn-action-icon.disabled:hover {
+      background: var(--bg-2);
+      color: #94a3b8;
+      transform: none;
     }
 
-    /* Timeline Log Item */
+    /* Timeline Log Item (Clean, No BG/Border on badge, Black Font) */
     .log-item {
       display: flex;
       gap: 12px;
       padding: 10px 14px;
       border-bottom: 1px solid var(--border);
-      font-size: 12px;
+      font-size: 12.5px;
       align-items: flex-start;
+      color: #0f172a;
     }
     .log-item:last-child {
       border-bottom: none;
     }
     .log-time {
       font-family: var(--font-mono);
-      font-weight: 800;
-      color: var(--text-3);
+      font-weight: 700;
+      color: #64748b;
       font-size: 11px;
       white-space: nowrap;
       padding-top: 1px;
     }
-    .log-badge {
-      font-size: 10px;
+    .log-badge-clean {
+      font-size: 11px;
       font-weight: 800;
-      padding: 2px 6px;
-      border-radius: 5px;
+      color: #0f172a;
       text-transform: uppercase;
-      background: var(--bg-3);
-      color: var(--text);
-      border: 1px solid var(--border-2);
       white-space: nowrap;
+      letter-spacing: 0.3px;
     }
 
     /* Modal Styling */
@@ -413,37 +452,37 @@
       <!-- 1. Total Wali Kelas -->
       <div class="kpi-stat-card">
         <div class="kpi-stat-head">
-          <span class="kpi-stat-title">Total Rombel / Wali</span>
+          <span class="kpi-stat-title">Total Wali Kelas</span>
           <div class="kpi-stat-icon" style="background:#f1f5f9; color:#475569;">
             <i class="bi bi-person-badge-fill"></i>
           </div>
         </div>
-        <div class="kpi-stat-val" style="color:var(--text);">{{ $totalWaliKelas }} <span style="font-size:13px; font-weight:600; color:var(--text-3);">Kelas</span></div>
-        <div class="kpi-stat-sub">9 Rombel aktif di SMK</div>
+        <div class="kpi-stat-val" style="color:#0f172a;">{{ $totalWaliKelas }} <span style="font-size:13px; font-weight:600; color:#475569;">Guru</span></div>
+        <div class="kpi-stat-sub">Membina rombel aktif di sekolah</div>
       </div>
 
       <!-- 2. Wali Kelas Sudah Login & Memantau -->
-      <div class="kpi-stat-card" style="border-color:rgba(16, 185, 129, 0.35);">
+      <div class="kpi-stat-card">
         <div class="kpi-stat-head">
-          <span class="kpi-stat-title" style="color:#059669;">Aktif Memantau</span>
-          <div class="kpi-stat-icon" style="background:#ecfdf5; color:#059669;">
-            <i class="bi bi-check-circle-fill"></i>
+          <span class="kpi-stat-title">Aktif Memantau</span>
+          <div class="kpi-stat-icon" style="background:#f1f5f9; color:#0f172a;">
+            <i class="bi bi-check2-circle"></i>
           </div>
         </div>
-        <div class="kpi-stat-val" style="color:#059669;">{{ $waliKelasAktif }} <span style="font-size:13px; font-weight:600; color:#059669;">Wali Kelas</span></div>
+        <div class="kpi-stat-val" style="color:#0f172a;">{{ $waliKelasAktif }} <span style="font-size:13px; font-weight:600; color:#475569;">Wali Kelas</span></div>
         <div class="kpi-stat-sub">Telah login &amp; memantau SIRANI hari ini</div>
       </div>
 
       <!-- 3. Wali Kelas Belum Login / Belum Memantau -->
-      <div class="kpi-stat-card" style="border-color:{{ $waliKelasBelumAktif > 0 ? 'rgba(239, 68, 68, 0.4)' : 'var(--border)' }};">
+      <div class="kpi-stat-card">
         <div class="kpi-stat-head">
-          <span class="kpi-stat-title" style="color:{{ $waliKelasBelumAktif > 0 ? '#dc2626' : 'var(--text-3)' }};">Belum Login / Memantau</span>
-          <div class="kpi-stat-icon" style="background:#fef2f2; color:#dc2626;">
-            <i class="bi bi-exclamation-octagon-fill"></i>
+          <span class="kpi-stat-title">Belum Memantau</span>
+          <div class="kpi-stat-icon" style="background:#f1f5f9; color:#0f172a;">
+            <i class="bi bi-exclamation-circle"></i>
           </div>
         </div>
-        <div class="kpi-stat-val" style="color:{{ $waliKelasBelumAktif > 0 ? '#dc2626' : 'var(--text)' }};">
-          {{ $waliKelasBelumAktif }} <span style="font-size:13px; font-weight:600; color:var(--text-3);">Wali Kelas</span>
+        <div class="kpi-stat-val" style="color:#0f172a;">
+          {{ $waliKelasBelumAktif }} <span style="font-size:13px; font-weight:600; color:#475569;">Wali Kelas</span>
         </div>
         <div class="kpi-stat-sub">{{ $waliKelasBelumAktif > 0 ? 'Perlu perhatian / teguran' : 'Semua wali kelas aktif' }}</div>
       </div>
@@ -452,11 +491,11 @@
       <div class="kpi-stat-card">
         <div class="kpi-stat-head">
           <span class="kpi-stat-title">Kehadiran Siswa</span>
-          <div class="kpi-stat-icon" style="background:#f0f9ff; color:#0284c7;">
-            <i class="bi bi-pie-chart-fill"></i>
+          <div class="kpi-stat-icon" style="background:#f1f5f9; color:#0f172a;">
+            <i class="bi bi-pie-chart"></i>
           </div>
         </div>
-        <div class="kpi-stat-val" style="color:#0284c7;">{{ $persenSekolah }}%</div>
+        <div class="kpi-stat-val" style="color:#0f172a;">{{ $persenSekolah }}%</div>
         <div class="kpi-stat-sub">{{ $totalHadirSekolah }} dari {{ $totalSiswaSekolah }} siswa hadir ({{ $totalAlphaSekolah }} Alpha)</div>
       </div>
     </div>
@@ -465,11 +504,11 @@
     <div class="matrix-card">
       <div class="matrix-head">
         <div class="matrix-title">
-          <i class="bi bi-table" style="color:#d97706;"></i>
-          <span>Matriks Pengawasan Wali Kelas (Kelas Binaan &amp; Status Monitoring)</span>
+          <i class="bi bi-table" style="color:#0f172a;"></i>
+          <span style="color:#0f172a;">Matriks Pengawasan Wali Kelas (Kelas Binaan &amp; Status Monitoring)</span>
         </div>
         <div class="matrix-search">
-          <i class="bi bi-search" style="color:var(--text-3);"></i>
+          <i class="bi bi-search" style="color:#64748b;"></i>
           <input type="text" id="filterMatrixInput" placeholder="Cari nama guru / kelas..." onkeyup="filterMatrixRows()" />
         </div>
       </div>
@@ -478,54 +517,48 @@
         <table class="table-custom" id="matrixTable">
           <thead>
             <tr>
-              <th style="width:40px; text-align:center;">No</th>
-              <th>Wali Kelas</th>
-              <th>Kelas Binaan</th>
-              <th>Status Monitoring Hari Ini</th>
-              <th>Kehadiran Siswa Kelas</th>
-              <th>Login Terakhir</th>
-              <th style="text-align:right;">Tindakan Kepala Sekolah</th>
+              <th style="width:40px; text-align:center; color:#0f172a;">No</th>
+              <th style="color:#0f172a;">Wali Kelas</th>
+              <th style="color:#0f172a;">Kelas Binaan</th>
+              <th style="color:#0f172a;">Status Monitoring Hari Ini</th>
+              <th style="color:#0f172a;">Kehadiran Siswa Kelas</th>
+              <th style="color:#0f172a;">Login Terakhir</th>
+              <th style="text-align:right; color:#0f172a;">Tindakan</th>
             </tr>
           </thead>
           <tbody>
             @forelse($rekapWaliKelas as $idx => $item)
               <tr class="matrix-row" data-search="{{ strtolower($item['nama_guru'] . ' ' . $item['nama_rombel'] . ' ' . $item['nip']) }}">
-                <td style="text-align:center; color:var(--text-3); font-family:var(--font-mono); font-size:11.5px;">{{ $idx + 1 }}</td>
+                <td style="text-align:center; color:#475569; font-family:var(--font-mono); font-size:12px;">{{ $idx + 1 }}</td>
                 
                 <!-- Wali Kelas -->
                 <td>
                   <div class="teacher-cell">
                     <img src="{{ $item['foto'] }}" alt="{{ $item['nama_guru'] }}" class="teacher-thumb" onerror="this.src='/img/user-default.png'" />
                     <div>
-                      <div class="teacher-name">{{ $item['nama_guru'] }}</div>
-                      <div class="teacher-nip">NIP: {{ $item['nip'] }}</div>
+                      <div class="teacher-name" style="color:#0f172a;">{{ $item['nama_guru'] }}</div>
+                      <div class="teacher-nip" style="color:#64748b;">NIP: {{ $item['nip'] }}</div>
                     </div>
                   </div>
                 </td>
 
                 <!-- Kelas Binaan -->
                 <td>
-                  <span style="display:inline-flex; align-items:center; gap:5px; font-weight:800; font-size:13px; color:var(--text);">
-                    <i class="bi bi-door-closed" style="color:#d97706;"></i> {{ $item['nama_rombel'] }}
+                  <span style="display:inline-flex; align-items:center; gap:5px; font-weight:800; font-size:13px; color:#0f172a;">
+                    <i class="bi bi-door-closed" style="color:#64748b;"></i> {{ $item['nama_rombel'] }}
                   </span>
-                  <div style="font-size:11px; color:var(--text-3); margin-top:2px;">{{ $item['total_siswa'] }} Peserta Didik</div>
+                  <div style="font-size:11px; color:#475569; margin-top:2px;">{{ $item['total_siswa'] }} Peserta Didik</div>
                 </td>
 
                 <!-- Status Monitoring -->
                 <td>
-                  <span class="status-badge-lg {{ $item['status_badge'] }}" title="{{ $item['status_desc'] }}">
-                    @if($item['status_badge'] === 'aktif')
-                      <i class="bi bi-check-circle-fill"></i>
-                    @elseif($item['status_badge'] === 'bahaya')
-                      <i class="bi bi-exclamation-triangle-fill"></i>
-                    @else
-                      <i class="bi bi-clock-history"></i>
-                    @endif
-                    <span>{{ $item['status_label'] }}</span>
-                  </span>
+                  <div class="status-text-row" title="{{ $item['status_desc'] }}">
+                    <span class="status-dot {{ $item['status_badge'] }}"></span>
+                    <span style="color:#0f172a; font-weight:700;">{{ $item['status_label'] }}</span>
+                  </div>
                   @if($item['total_aktivitas'] > 0)
-                    <div style="font-size:10.5px; color:var(--text-3); margin-top:3px;">
-                      {{ $item['total_aktivitas'] }} aksi tercatat di log
+                    <div style="font-size:11px; color:#64748b; margin-top:2px;">
+                      {{ $item['total_aktivitas'] }} aksi di sistem
                     </div>
                   @endif
                 </td>
@@ -533,58 +566,71 @@
                 <!-- Rekap Siswa Kelas -->
                 <td>
                   <div class="absen-mini-grid">
-                    <span class="absen-mini-pill hadir" title="Hadir Tepat Waktu">
-                      <i class="bi bi-check2"></i> {{ $item['hadir'] }} Hadir
+                    <span class="absen-mini-item">
+                      <strong>{{ $item['hadir'] }}</strong> Hadir
                     </span>
                     @if($item['terlambat'] > 0)
-                      <span class="absen-mini-pill terlambat" title="Terlambat Gerbang">
-                        <i class="bi bi-clock"></i> {{ $item['terlambat'] }}
+                      <span style="color:#94a3b8;">·</span>
+                      <span class="absen-mini-item">
+                        <strong>{{ $item['terlambat'] }}</strong> Telat
                       </span>
                     @endif
                     @if($item['izin'] > 0)
-                      <span class="absen-mini-pill izin" title="Izin / Sakit Sah">
-                        <i class="bi bi-file-earmark-text"></i> {{ $item['izin'] }}
+                      <span style="color:#94a3b8;">·</span>
+                      <span class="absen-mini-item">
+                        <strong>{{ $item['izin'] }}</strong> Izin
                       </span>
                     @endif
                     @if($item['alpha'] > 0)
-                      <span class="absen-mini-pill alpha" title="Alpha / Belum Hadir">
-                        <i class="bi bi-x-circle"></i> {{ $item['alpha'] }} Alpha
+                      <span style="color:#94a3b8;">·</span>
+                      <span class="absen-mini-item">
+                        <strong>{{ $item['alpha'] }}</strong> Alpha
                       </span>
                     @endif
                   </div>
-                  <div style="font-size:11px; color:var(--text-3); margin-top:3px;">
-                    Kehadiran: <strong>{{ $item['persen_hadir'] }}%</strong>
+                  <div style="font-size:11px; color:#475569; margin-top:3px;">
+                    Kehadiran: <strong style="color:#0f172a;">{{ $item['persen_hadir'] }}%</strong>
                   </div>
                 </td>
 
-                <!-- Login Terakhir -->
+                <!-- Login Terakhir (Non-redundant) -->
                 <td>
-                  <div style="font-size:12px; font-weight:700; color:var(--text);">
-                    {{ $item['login_terakhir'] }}
-                  </div>
-                  @if($item['aktivitas_terakhir'])
-                    <div style="font-size:10.5px; color:#059669; margin-top:2px;">
-                      <i class="bi bi-broadcast"></i> Terakhir akses: {{ $item['aktivitas_terakhir'] }} WIB
+                  @if($item['is_aktif_hari_ini'] && $item['aktivitas_terakhir'])
+                    <div style="font-size:12.5px; font-weight:700; color:#0f172a;">
+                      Hari ini, {{ $item['aktivitas_terakhir'] }} WIB
+                    </div>
+                  @else
+                    <div style="font-size:12.5px; font-weight:700; color:#0f172a;">
+                      {{ $item['login_terakhir'] }}
                     </div>
                   @endif
                 </td>
 
-                <!-- Tindakan Kepala Sekolah -->
+                <!-- Tindakan Kepala Sekolah (Simplified Buttons with Hover Tooltip) -->
                 <td style="text-align:right;">
-                  <div style="display:inline-flex; gap:6px; align-items:center;">
+                  <div class="action-btn-group">
                     @if($item['wa_link'])
-                      <a href="{{ $item['wa_link'] }}" target="_blank" class="btn-action-wa" title="Kirim Pengingat Resmi via WhatsApp ke Wali Kelas">
-                        <i class="bi bi-whatsapp"></i>
-                        <span>Ingatkan WA</span>
-                      </a>
+                      <div class="action-tooltip-box">
+                        <a href="{{ $item['wa_link'] }}" target="_blank" class="btn-action-icon wa" title="Kirim Pengingat WhatsApp" aria-label="Kirim Pengingat WhatsApp">
+                          <i class="bi bi-whatsapp"></i>
+                        </a>
+                        <span class="tooltip-text">Kirim Pesan WhatsApp</span>
+                      </div>
                     @else
-                      <span class="btn-action-detail" style="opacity:0.5; cursor:not-allowed;" title="Nomor HP belum terdaftar">
-                        <i class="bi bi-telephone-x"></i> No WA -
-                      </span>
+                      <div class="action-tooltip-box">
+                        <span class="btn-action-icon disabled" title="Nomor WhatsApp belum terdaftar">
+                          <i class="bi bi-whatsapp"></i>
+                        </span>
+                        <span class="tooltip-text">Nomor WA Belum Ada</span>
+                      </div>
                     @endif
-                    <button type="button" class="btn-action-detail" onclick="openDetailAktivitasGuru({{ $item['guru_id'] }})" title="Lihat Riwayat Jejak Log Aktivitas Guru">
-                      <i class="bi bi-clock-history"></i> Log
-                    </button>
+
+                    <div class="action-tooltip-box">
+                      <button type="button" class="btn-action-icon" onclick="openDetailAktivitasGuru({{ $item['guru_id'] }})" title="Lihat Riwayat Log Aktivitas" aria-label="Lihat Riwayat Log">
+                        <i class="bi bi-clock-history"></i>
+                      </button>
+                      <span class="tooltip-text">Lihat Riwayat Log</span>
+                    </div>
                   </div>
                 </td>
               </tr>
@@ -616,12 +662,12 @@
         @forelse($aktivitasGuruList as $log)
           <div class="log-item">
             <span class="log-time">{{ $log->created_at->format('H:i:s') }}</span>
-            <span class="log-badge">{{ $log->modul }}:{{ $log->aksi }}</span>
+            <span class="log-badge-clean">{{ strtoupper($log->modul) }}:{{ strtoupper($log->aksi) }}</span>
             <div style="flex:1;">
-              <strong style="color:var(--text);">{{ $log->user?->name ?? 'Guru' }}</strong>:
-              <span style="color:var(--text-2);">{{ $log->deskripsi }}</span>
+              <strong style="color:#0f172a;">{{ $log->user?->name ?? 'Guru' }}:</strong>
+              <span style="color:#0f172a;">{{ $log->deskripsi }}</span>
             </div>
-            <span style="font-size:10.5px; color:var(--text-3); font-family:var(--font-mono);">
+            <span style="font-size:10.5px; color:#64748b; font-family:var(--font-mono);">
               {{ $log->created_at->diffForHumans() }}
             </span>
           </div>
@@ -644,8 +690,8 @@
       <div style="display:flex; align-items:center; gap:10px;">
         <img id="modalGuruFoto" src="/img/user-default.png" style="width:36px; height:36px; border-radius:8px; object-fit:cover;" />
         <div>
-          <div id="modalGuruNama" style="font-weight:900; font-size:14px; color:var(--text);">Nama Guru</div>
-          <div id="modalGuruSub" style="font-size:11.5px; color:var(--text-3);">NIP / Jabatan</div>
+          <div id="modalGuruNama" style="font-weight:900; font-size:14px; color:#0f172a;">Nama Guru</div>
+          <div id="modalGuruSub" style="font-size:11.5px; color:#64748b;">NIP / Jabatan</div>
         </div>
       </div>
       <button type="button" class="btn btn-sm btn-outline" onclick="closeModalAktivitas()" style="padding:4px 8px; border-radius:6px;">
@@ -653,7 +699,7 @@
       </button>
     </div>
     <div class="pengawasan-modal-body" id="modalLogListContainer">
-      <div style="text-align:center; padding:30px; color:var(--text-3);">Memuat log aktivitas...</div>
+      <div style="text-align:center; padding:30px; color:#64748b;">Memuat log aktivitas...</div>
     </div>
   </div>
 </div>
@@ -684,7 +730,7 @@
     if (!modal || !container) return;
 
     modal.classList.add('active');
-    container.innerHTML = '<div style="text-align:center; padding:30px; color:var(--text-3);"><i class="bi bi-arrow-repeat spin" style="font-size:20px; display:block; margin-bottom:8px;"></i>Memuat riwayat log...</div>';
+    container.innerHTML = '<div style="text-align:center; padding:30px; color:#64748b;"><i class="bi bi-arrow-repeat spin" style="font-size:20px; display:block; margin-bottom:8px;"></i>Memuat riwayat log...</div>';
 
     try {
       const res = await fetch(`/pengawasan-guru/${guruId}/aktivitas`, {
@@ -702,7 +748,7 @@
       if (fotoEl) fotoEl.src = data.guru?.foto || '/img/user-default.png';
 
       if (!data.logs || data.logs.length === 0) {
-        container.innerHTML = '<div style="text-align:center; padding:30px; color:var(--text-3); font-size:12.5px;"><i class="bi bi-clock-history" style="font-size:24px; display:block; margin-bottom:6px; opacity:.4;"></i>Belum ada rekaman riwayat aktivitas untuk guru ini.</div>';
+        container.innerHTML = '<div style="text-align:center; padding:30px; color:#64748b; font-size:12.5px;"><i class="bi bi-clock-history" style="font-size:24px; display:block; margin-bottom:6px; opacity:.4;"></i>Belum ada rekaman riwayat aktivitas untuk guru ini.</div>';
         return;
       }
 
@@ -711,11 +757,11 @@
         html += `
           <div class="log-item">
             <span class="log-time">${log.tanggal} ${log.waktu}</span>
-            <span class="log-badge">${log.modul}:${log.aksi}</span>
+            <span class="log-badge-clean">${log.modul}:${log.aksi}</span>
             <div style="flex:1;">
-              <span style="color:var(--text);">${escapeHtml(log.deskripsi)}</span>
+              <span style="color:#0f172a; font-weight:500;">${escapeHtml(log.deskripsi)}</span>
             </div>
-            <span style="font-size:10.5px; color:var(--text-3); font-family:var(--font-mono);">${log.relatif}</span>
+            <span style="font-size:10.5px; color:#64748b; font-family:var(--font-mono);">${log.relatif}</span>
           </div>
         `;
       });

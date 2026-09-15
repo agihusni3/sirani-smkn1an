@@ -95,11 +95,11 @@ class PengawasanGuruController extends Controller
 
             if ($isAktifHariIni) {
                 $statusBadge = 'aktif';
-                $statusLabel = 'Aktif Memantau (' . $logAktivitasHariIni->created_at->format('H:i') . ' WIB)';
+                $statusLabel = 'Aktif Memantau';
                 $statusDesc  = "Telah melakukan {$totalAktivitasHariIni} aktivitas di sistem hari ini";
             } elseif ($alphaCount > 0) {
                 $statusBadge = 'bahaya';
-                $statusLabel = "Belum Memantau ({$alphaCount} Siswa Alpha)";
+                $statusLabel = 'Belum Memantau';
                 $statusDesc  = "Terdapat {$alphaCount} siswa belum hadir/alpha namun belum dipantau wali kelas";
             } else {
                 $statusBadge = 'belum';
