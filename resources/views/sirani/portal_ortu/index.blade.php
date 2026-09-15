@@ -219,18 +219,10 @@
 
         {{-- TOMBOL AKSI KARTU --}}
         <div style="display:flex; flex-direction:column; gap:10px;">
-          {{-- TOMBOL 1: SIMPAN GAMBAR KARTU IDENTIK --}}
+          {{-- TOMBOL: SIMPAN GAMBAR KARTU IDENTIK --}}
           <button type="button" id="btnDownloadSiswaCard" onclick="downloadSiswaFullCard()" class="btn-qr-action-download">
             <i class="bi bi-download"></i> Simpan Gambar Kartu ke Galeri HP
           </button>
-
-          {{-- TOMBOL 2: KIRIM VIA WHATSAPP --}}
-          @php
-            $pesanWaGateway = rawurlencode("Halo, ini Kartu Presensi Siswa {$siswa->nama} (NISN: " . ($siswa->nisn ?: $siswa->nis) . ") SMKN 1 Air Naningan. Dapat digunakan untuk scan presensi di gerbang & kiosk sekolah.");
-          @endphp
-          <a href="https://wa.me/?text={{ $pesanWaGateway }}" target="_blank" class="btn-qr-action-wa">
-            <i class="bi bi-whatsapp"></i> Kirim via WhatsApp Gateway
-          </a>
         </div>
       </div>
 
