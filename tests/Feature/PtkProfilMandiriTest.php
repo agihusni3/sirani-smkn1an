@@ -66,7 +66,7 @@ class PtkProfilMandiriTest extends TestCase
         $res->assertSee('198501012010011005');
         $res->assertSee('Biodata Kepegawaian');
         $res->assertSee('Lemari Berkas Digital');
-        $res->assertSee('Catatan Presensi Saya');
+        $res->assertDontSee('Catatan Presensi Saya');
     }
 
     public function test_guru_dapat_mengunggah_berkas_digital_mandiri()

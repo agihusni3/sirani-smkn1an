@@ -317,16 +317,14 @@
 
       {{-- Alert Flash Notifikasi --}}
       @if(session('success'))
-        <div class="alert alert-success alert-dismissible fade show border-0 shadow-sm rounded-4 mb-4 d-flex align-items-center gap-2" role="alert" style="background:#ECFDF5; color:#065F46; border-left:4px solid #10B981!important;">
-          <i class="bi bi-check-circle-fill fs-5 text-success"></i>
+        <div class="alert alert-success alert-dismissible fade show border-0 shadow-sm rounded-4 mb-4 d-flex align-items-center gap-2" role="alert" style="background:#ECFDF5; color:#000000; border-left:4px solid #10B981!important;">
           <div class="fw-semibold">{{ session('success') }}</div>
           <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
       @endif
 
       @if(session('error'))
-        <div class="alert alert-danger alert-dismissible fade show border-0 shadow-sm rounded-4 mb-4 d-flex align-items-center gap-2" role="alert" style="background:#FEF2F2; color:#991B1B; border-left:4px solid #EF4444!important;">
-          <i class="bi bi-exclamation-triangle-fill fs-5 text-danger"></i>
+        <div class="alert alert-danger alert-dismissible fade show border-0 shadow-sm rounded-4 mb-4 d-flex align-items-center gap-2" role="alert" style="background:#FEF2F2; color:#000000; border-left:4px solid #EF4444!important;">
           <div>{{ session('error') }}</div>
           <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
@@ -365,28 +363,28 @@
               <div style="display:flex; flex-direction:column; justify-content:center; gap:2px; min-width:0; padding-top:4px;">
                 @if($guru->golongan_ruang)
                   <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-sm-start gap-2 mb-0.5">
-                    <span class="badge rounded-pill px-2 py-0.5" style="background:#FFFBEB; color:#B45309; border:1px solid #FDE68A; font-size:11px; font-weight:700;">
+                    <span class="badge rounded-pill px-2 py-0.5" style="background:#FFFBEB; color:#000000; border:1px solid #FDE68A; font-size:11px; font-weight:700;">
                       Gol. {{ $guru->golongan_ruang }}
                     </span>
                   </div>
                 @endif
 
-                <h2 class="fw-bold m-0" style="color:var(--text, #0F172A); font-size:18.5px; letter-spacing:-0.02em; white-space:nowrap;">
+                <h2 class="fw-bold m-0" style="color:#000000; font-size:18.5px; letter-spacing:-0.02em; white-space:nowrap;">
                   {{ $guru->nama_lengkap_gelar ?: $guru->nama }}
                 </h2>
 
-                <div style="font-size:12.5px; color:var(--text-3, #64748B); line-height:1.4;">
-                  NIP: <strong style="color:var(--text, #0F172A); font-family:var(--font-mono, monospace);">{{ $guru->nip ?: '—' }}</strong>
+                <div style="font-size:12.5px; color:#000000; line-height:1.4;">
+                  NIP: <strong style="color:#000000; font-family:var(--font-mono, monospace);">{{ $guru->nip ?: '—' }}</strong>
                 </div>
 
                 @if($guru->nuptk)
-                  <div style="font-size:12.5px; color:var(--text-3, #64748B); line-height:1.4;">
-                    NUPTK: <strong style="color:var(--text, #0F172A); font-family:var(--font-mono, monospace);">{{ $guru->nuptk }}</strong>
+                  <div style="font-size:12.5px; color:#000000; line-height:1.4;">
+                    NUPTK: <strong style="color:#000000; font-family:var(--font-mono, monospace);">{{ $guru->nuptk }}</strong>
                   </div>
                 @endif
 
-                <div style="font-size:12.5px; color:var(--text-3, #64748B); line-height:1.4;">
-                  Jabatan: <strong style="color:var(--text, #0F172A);">{{ $guru->jabatan ?: 'Guru' }}</strong>
+                <div style="font-size:12.5px; color:#000000; line-height:1.4;">
+                  Jabatan: <strong style="color:#000000;">{{ $guru->jabatan ?: 'Guru' }}</strong>
                 </div>
               </div>
 
@@ -397,8 +395,8 @@
               
               @if(auth()->user()->isAdmin() && $semuaGuru->count() > 0)
                 <div class="d-flex align-items-center gap-2 px-3 py-1.5 rounded-3 border" style="background:var(--surface, #F8FAFC); font-size:12px;">
-                  <span class="text-muted"><i class="bi bi-eye"></i> Pratinjau PTK:</span>
-                  <select class="form-select form-select-sm border-0 bg-transparent fw-semibold" onchange="location.href='?guru_id=' + this.value" style="font-size:12px; max-width:210px; cursor:pointer;">
+                  <span style="color:#000000; font-weight:600;">Pratinjau PTK:</span>
+                  <select class="form-select form-select-sm border-0 bg-transparent fw-semibold" onchange="location.href='?guru_id=' + this.value" style="font-size:12px; max-width:210px; cursor:pointer; color:#000000;">
                     @foreach($semuaGuru as $g)
                       <option value="{{ $g->id }}" {{ $g->id == $guru->id ? 'selected' : '' }}>{{ $g->nama }}</option>
                     @endforeach
@@ -433,9 +431,6 @@
           <button class="ptk-tab-btn" id="tab-berkas-btn" data-bs-toggle="pill" data-bs-target="#tab-berkas" type="button" role="tab">
             <i class="bi bi-folder2-open text-warning"></i> Lemari Berkas Digital
             <span class="badge rounded-pill bg-primary" style="font-size:10px; padding:3px 7px;">{{ $arsips->count() }}</span>
-          </button>
-          <button class="ptk-tab-btn" id="tab-presensi-btn" data-bs-toggle="pill" data-bs-target="#tab-presensi" type="button" role="tab">
-            <i class="bi bi-calendar-check text-success"></i> Catatan Presensi Saya
           </button>
         </div>
 
@@ -689,20 +684,15 @@
               <div class="ptk-info-card">
                 
                 {{-- Header Lemari Berkas --}}
-                <div class="ptk-info-card-header flex-wrap gap-2">
-                  <div class="d-flex align-items-center gap-2">
-                    <div class="p-2 rounded-3 bg-primary-subtle text-primary">
-                      <i class="bi bi-folder-symlink-fill"></i>
-                    </div>
-                    <div>
-                      <h3 class="h6 fw-bold mb-0" style="color:var(--text, #0F172A);">
-                        Lemari Berkas Digital Saya (E-Arsip Pribadi)
-                      </h3>
-                      <div class="text-muted" style="font-size:11.5px;">Dokumen digital yang tersimpan aman di server sekolah dan dapat dibuka kapan saja.</div>
-                    </div>
+                <div class="ptk-info-card-header flex-wrap gap-2 d-flex align-items-center justify-content-between">
+                  <div>
+                    <h3 class="h6 fw-bold mb-0" style="color:#000000; font-size:15.5px; letter-spacing:-0.01em;">
+                      Lemari Berkas Digital Saya (E-Arsip Pribadi)
+                    </h3>
+                    <div style="font-size:12px; margin-top:2px; color:#000000;">Dokumen digital yang tersimpan aman di server sekolah dan dapat dibuka kapan saja.</div>
                   </div>
 
-                  <button type="button" class="btn btn-sm btn-primary px-3 py-1.5 fw-bold d-inline-flex align-items-center gap-1.5 shadow-sm" data-bs-toggle="modal" data-bs-target="#modalUnggahBerkas" style="border-radius:8px;">
+                  <button type="button" class="btn btn-sm btn-primary px-3 py-1.5 fw-bold d-inline-flex align-items-center gap-1.5 shadow-sm" data-bs-toggle="modal" data-bs-target="#modalUnggahBerkas" style="border-radius:8px; background:#2563EB; border-color:#2563EB;">
                     <i class="bi bi-cloud-arrow-up-fill"></i> Unggah Dokumen Baru
                   </button>
                 </div>
@@ -711,34 +701,31 @@
 
                   {{-- Filter Pills Bar --}}
                   <div class="ptk-filter-pills mb-3">
-                    <button type="button" class="ptk-filter-pill active" onclick="filterBerkas('all', this)">
-                      Semua <span class="badge rounded-pill bg-light text-dark badge-count" style="font-size:10px;">{{ $arsips->count() }}</span>
+                    <button type="button" class="ptk-filter-pill active" onclick="filterBerkas('all', this)" style="color:#000000; font-weight:700;">
+                      Semua <span class="badge rounded-pill bg-light text-dark badge-count" style="font-size:10px; color:#000000!important;">{{ $arsips->count() }}</span>
                     </button>
-                    <button type="button" class="ptk-filter-pill" onclick="filterBerkas('sk', this)">
-                      <i class="bi bi-file-earmark-person"></i> SK Kedinasan <span class="badge rounded-pill bg-light text-dark badge-count" style="font-size:10px;">{{ $countSk }}</span>
+                    <button type="button" class="ptk-filter-pill" onclick="filterBerkas('sk', this)" style="color:#000000; font-weight:600;">
+                      SK Kedinasan <span class="badge rounded-pill bg-light text-dark badge-count" style="font-size:10px; color:#000000!important;">{{ $countSk }}</span>
                     </button>
-                    <button type="button" class="ptk-filter-pill" onclick="filterBerkas('sertifikat', this)">
-                      <i class="bi bi-award"></i> Sertifikat &amp; Diklat <span class="badge rounded-pill bg-light text-dark badge-count" style="font-size:10px;">{{ $countSertifikat }}</span>
+                    <button type="button" class="ptk-filter-pill" onclick="filterBerkas('sertifikat', this)" style="color:#000000; font-weight:600;">
+                      Sertifikat &amp; Diklat <span class="badge rounded-pill bg-light text-dark badge-count" style="font-size:10px; color:#000000!important;">{{ $countSertifikat }}</span>
                     </button>
-                    <button type="button" class="ptk-filter-pill" onclick="filterBerkas('pendidikan', this)">
-                      <i class="bi bi-mortarboard"></i> Pendidikan <span class="badge rounded-pill bg-light text-dark badge-count" style="font-size:10px;">{{ $countPendidikan }}</span>
+                    <button type="button" class="ptk-filter-pill" onclick="filterBerkas('pendidikan', this)" style="color:#000000; font-weight:600;">
+                      Pendidikan <span class="badge rounded-pill bg-light text-dark badge-count" style="font-size:10px; color:#000000!important;">{{ $countPendidikan }}</span>
                     </button>
-                    <button type="button" class="ptk-filter-pill" onclick="filterBerkas('kependudukan', this)">
-                      <i class="bi bi-person-badge"></i> Kependudukan <span class="badge rounded-pill bg-light text-dark badge-count" style="font-size:10px;">{{ $countKependudukan }}</span>
+                    <button type="button" class="ptk-filter-pill" onclick="filterBerkas('kependudukan', this)" style="color:#000000; font-weight:600;">
+                      Kependudukan <span class="badge rounded-pill bg-light text-dark badge-count" style="font-size:10px; color:#000000!important;">{{ $countKependudukan }}</span>
                     </button>
                   </div>
 
                   @if($arsips->isEmpty())
                     {{-- Empty State Lemari Berkas --}}
                     <div class="text-center py-5 px-3">
-                      <div class="d-inline-flex align-items-center justify-content-center rounded-circle mb-3 shadow-sm" style="width:72px; height:72px; background:#EFF6FF; color:#2563EB;">
-                        <i class="bi bi-folder-plus fs-1"></i>
-                      </div>
-                      <h5 class="fw-bold mb-1" style="color:var(--text, #0F172A);">Belum Ada Berkas Digital Tersimpan</h5>
-                      <p class="text-muted small mb-4" style="max-width:440px; margin:0 auto; line-height:1.6;">
+                      <h5 class="fw-bold mb-1" style="color:#000000;">Belum Ada Berkas Digital Tersimpan</h5>
+                      <p class="small mb-4" style="max-width:440px; margin:0 auto; line-height:1.6; color:#000000;">
                         Simpan scan berkas penting Anda di sini (seperti KTP, SK CPNS/PNS/PPPK, SK Pangkat Terakhir, SK KGB, Ijazah, atau Sertifikat Pelatihan) agar rapi dan tidak repot saat sewaktu-waktu dibutuhkan dinas.
                       </p>
-                      <button type="button" class="btn btn-primary px-4 py-2 fw-bold rounded-pill shadow-sm" data-bs-toggle="modal" data-bs-target="#modalUnggahBerkas">
+                      <button type="button" class="btn btn-primary px-4 py-2 fw-bold rounded-pill shadow-sm" data-bs-toggle="modal" data-bs-target="#modalUnggahBerkas" style="background:#2563EB; border-color:#2563EB;">
                         <i class="bi bi-cloud-arrow-up me-1.5"></i> Unggah Berkas Pertama Saya
                       </button>
                     </div>
@@ -759,15 +746,15 @@
                             default => 'lainnya',
                           };
 
-                          $badgeCat = match(true) {
-                            in_array($dok->kategori_berkas, ['sk_cpns', 'sk_pns', 'sk_pppk']) => ['bg' => '#EFF6FF', 'color' => '#1D4ED8', 'border' => '#BFDBFE', 'label' => 'SK Pengangkatan', 'icon' => 'bi-file-earmark-person'],
-                            $dok->kategori_berkas === 'sk_pangkat_terakhir'                   => ['bg' => '#ECFDF5', 'color' => '#047857', 'border' => '#A7F3D0', 'label' => 'SK Pangkat', 'icon' => 'bi-award'],
-                            $dok->kategori_berkas === 'sk_kgb_terakhir'                       => ['bg' => '#FFFBEB', 'color' => '#B45309', 'border' => '#FDE68A', 'label' => 'SK KGB', 'icon' => 'bi-cash-coin'],
-                            in_array($dok->kategori_berkas, ['ktp', 'kk'])                   => ['bg' => '#F1F5F9', 'color' => '#475569', 'border' => '#CBD5E1', 'label' => 'Kependudukan', 'icon' => 'bi-person-badge'],
-                            in_array($dok->kategori_berkas, ['ijazah', 'transkrip'])         => ['bg' => '#FAF5FF', 'color' => '#7E22CE', 'border' => '#E9D5FF', 'label' => 'Pendidikan', 'icon' => 'bi-mortarboard'],
-                            $isCert                                                          => ['bg' => '#FDF2F8', 'color' => '#BE185D', 'border' => '#FBCFE8', 'label' => 'Sertifikat & Diklat', 'icon' => 'bi-award-fill'],
-                            $dok->kategori_berkas === 'kartu_pegawai'                         => ['bg' => '#F0FDFA', 'color' => '#0F766E', 'border' => '#99F6E4', 'label' => 'Karpeg', 'icon' => 'bi-credit-card-2-front'],
-                            default                                                           => ['bg' => '#F8FAFC', 'color' => '#475569', 'border' => '#E2E8F0', 'label' => 'Kedinasan', 'icon' => 'bi-file-earmark-text'],
+                          $badgeLabel = match(true) {
+                            in_array($dok->kategori_berkas, ['sk_cpns', 'sk_pns', 'sk_pppk']) => 'SK Pengangkatan',
+                            $dok->kategori_berkas === 'sk_pangkat_terakhir'                   => 'SK Pangkat',
+                            $dok->kategori_berkas === 'sk_kgb_terakhir'                       => 'SK KGB',
+                            in_array($dok->kategori_berkas, ['ktp', 'kk'])                   => 'Kependudukan',
+                            in_array($dok->kategori_berkas, ['ijazah', 'transkrip'])         => 'Pendidikan',
+                            $isCert                                                          => 'Sertifikat & Diklat',
+                            $dok->kategori_berkas === 'kartu_pegawai'                         => 'Karpeg',
+                            default                                                           => 'Kedinasan',
                           };
 
                           $fileUrl = asset('storage/' . $dok->file_path);
@@ -775,29 +762,28 @@
                         @endphp
                         
                         <div class="col-sm-6 ptk-doc-col" data-group="{{ $group }}">
-                          <div class="ptk-doc-card shadow-sm">
+                          <div class="ptk-doc-card shadow-sm" style="border:1px solid #E2E8F0;">
                             
                             <div>
                               <div class="d-flex align-items-center justify-content-between gap-2 mb-2.5">
-                                <span class="badge rounded-pill px-2.5 py-1" style="background:{{ $badgeCat['bg'] }}; color:{{ $badgeCat['color'] }}; border:1px solid {{ $badgeCat['border'] }}; font-size:11px; font-weight:700;">
-                                  <i class="bi {{ $badgeCat['icon'] }} me-1"></i> {{ $badgeCat['label'] }}
+                                <span class="badge rounded-pill px-2.5 py-1" style="background:#F1F5F9; color:#000000; border:1px solid #CBD5E1; font-size:11px; font-weight:700;">
+                                  {{ $badgeLabel }}
                                 </span>
                                 <span class="badge {{ $isPdf ? 'bg-danger-subtle text-danger' : 'bg-primary-subtle text-primary' }} px-2 py-0.5 rounded" style="font-size:10px; font-weight:700;">
                                   {{ $isPdf ? 'PDF' : 'GAMBAR' }}
                                 </span>
                               </div>
 
-                              <h6 class="fw-bold mb-1" style="color:var(--text, #0F172A); line-height:1.4; font-size:13px;" title="{{ $dok->nama_dokumen }}">
+                              <h6 class="fw-bold mb-1" style="color:#000000; line-height:1.4; font-size:13.5px;" title="{{ $dok->nama_dokumen }}">
                                 {{ \Illuminate\Support\Str::limit($dok->nama_dokumen, 68) }}
                               </h6>
 
-                              <div class="text-muted small font-monospace mb-2" style="font-size:11px;">
+                              <div class="font-monospace mb-2" style="font-size:11.5px; color:#000000; font-weight:600;">
                                 {{ $dok->nomor_dokumen ?: 'Tanpa nomor surat' }}
                               </div>
 
-                              <div class="d-flex align-items-center gap-2 text-muted" style="font-size:11px;">
-                                <i class="bi bi-clock"></i>
-                                <span>Diunggah: {{ $dok->created_at ? $dok->created_at->translatedFormat('d M Y') : '—' }}</span>
+                              <div style="font-size:11.5px; color:#000000; font-weight:500;">
+                                Diunggah: {{ $dok->created_at ? $dok->created_at->translatedFormat('d M Y') : '—' }}
                               </div>
                             </div>
 
@@ -827,12 +813,9 @@
 
                       {{-- Slot Kartu Tambah Berkas (Quick Upload Slot) --}}
                       <div class="col-sm-6 ptk-doc-col" data-group="all">
-                        <div class="ptk-upload-slot" onclick="bukaModalKategori('lainnya')">
-                          <div class="ptk-upload-icon">
-                            <i class="bi bi-cloud-arrow-up-fill"></i>
-                          </div>
-                          <div class="fw-bold" style="color:var(--text, #0F172A); font-size:13.5px;">+ Unggah Berkas Baru</div>
-                          <div class="text-muted small mt-1" style="font-size:11.5px; max-width:200px;">
+                        <div class="ptk-upload-slot" onclick="bukaModalKategori('lainnya')" style="border: 2px dashed #CBD5E1; background:#F8FAFC;">
+                          <div class="fw-bold" style="color:#000000; font-size:14px;">+ Unggah Berkas Baru</div>
+                          <div class="small mt-1" style="font-size:12px; color:#000000; max-width:200px;">
                             Scan SK, Ijazah, KTP, atau Sertifikat Pelatihan
                           </div>
                         </div>
@@ -850,19 +833,19 @@
             <div class="col-lg-4 d-flex flex-column gap-3">
               
               {{-- Card 1: Status Kelengkapan Berkas Pokok --}}
-              <div class="ptk-checklist-card">
+              <div class="ptk-checklist-card" style="border:1px solid #E2E8F0;">
                 <div class="d-flex align-items-center justify-content-between mb-2">
-                  <div class="fw-bold text-dark d-flex align-items-center gap-1.5" style="font-size:13px;">
-                    <i class="bi bi-clipboard2-check text-primary"></i> Kelengkapan Berkas Pokok
+                  <div class="fw-bold d-flex align-items-center" style="font-size:13.5px; color:#000000;">
+                    Kelengkapan Berkas Pokok
                   </div>
-                  <span class="badge rounded-pill {{ $persenBerkas >= 80 ? 'bg-success' : 'bg-primary' }} px-2.5 py-1" style="font-size:11px;">
+                  <span class="badge rounded-pill px-2.5 py-1" style="background:#F1F5F9; color:#000000; border:1px solid #CBD5E1; font-size:11px; font-weight:700;">
                     {{ $totalTerpenuhi }} / {{ count($checklist) }} ({{ $persenBerkas }}%)
                   </span>
                 </div>
 
                 {{-- Progress Bar --}}
                 <div class="progress mb-3" style="height: 6px; background:#E2E8F0; border-radius:10px;">
-                  <div class="progress-bar {{ $persenBerkas >= 80 ? 'bg-success' : 'bg-primary' }}" role="progressbar" style="width: {{ $persenBerkas }}%;" aria-valuenow="{{ $persenBerkas }}" aria-valuemin="0" aria-valuemax="100"></div>
+                  <div class="progress-bar bg-primary" role="progressbar" style="width: {{ $persenBerkas }}%;" aria-valuenow="{{ $persenBerkas }}" aria-valuemin="0" aria-valuemax="100"></div>
                 </div>
 
                 {{-- Checklist Items --}}
@@ -870,23 +853,18 @@
                   @foreach($checklist as $item)
                     <div class="ptk-checklist-item {{ $item['ada'] ? 'terpenuhi' : '' }}">
                       <div class="d-flex align-items-center gap-2">
-                        @if($item['ada'])
-                          <i class="bi bi-check-circle-fill text-success fs-6"></i>
-                        @else
-                          <i class="bi bi-dash-circle text-muted fs-6"></i>
-                        @endif
-                        <span class="{{ $item['ada'] ? 'fw-semibold text-dark' : 'text-muted' }}" style="font-size:11.5px;">
+                        <span style="font-size:12px; color:#000000; font-weight:600;">
                           {{ $item['nama'] }}
                         </span>
                       </div>
 
                       <div>
                         @if($item['ada'])
-                          <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill" style="font-size:10px;">
+                          <span class="badge rounded-pill" style="font-size:10.5px; background:#DCFCE7; color:#000000; border:1px solid #86EFAC; font-weight:700;">
                             Terpenuhi
                           </span>
                         @else
-                          <button type="button" class="btn btn-sm btn-link text-primary p-0 fw-bold text-decoration-none" style="font-size:11px;" onclick="bukaModalKategori('{{ $item['kategori'] }}')">
+                          <button type="button" class="btn btn-sm btn-link text-primary p-0 fw-bold text-decoration-none" style="font-size:11.5px;" onclick="bukaModalKategori('{{ $item['kategori'] }}')">
                             + Unggah
                           </button>
                         @endif
@@ -897,149 +875,21 @@
               </div>
 
               {{-- Card 2: Sinkronisasi SITUAN Tata Usaha --}}
-              <div class="ptk-sync-box">
-                <div class="d-flex align-items-center gap-2 mb-2">
-                  <div class="p-2 rounded-3 bg-white shadow-sm text-primary">
-                    <i class="bi bi-shield-lock-fill"></i>
-                  </div>
-                  <div>
-                    <h6 class="fw-bold mb-0 text-dark" style="font-size:13px;">Tersinkronisasi Otomatis SITUAN</h6>
-                    <div class="text-muted" style="font-size:11px;">Kepegawaian &amp; Persuratan SMKN 1 AN</div>
-                  </div>
+              <div class="ptk-sync-box" style="border:1px solid #E2E8F0; background:#F8FAFC;">
+                <div class="mb-2">
+                  <h6 class="fw-bold mb-0" style="font-size:13.5px; color:#000000;">Tersinkronisasi Otomatis SITUAN</h6>
+                  <div style="font-size:11.5px; color:#000000; margin-top:2px;">Kepegawaian &amp; Persuratan SMKN 1 AN</div>
                 </div>
-                <p class="text-muted mb-2" style="font-size:11.5px; line-height:1.5;">
+                <p class="mb-2" style="font-size:12px; line-height:1.5; color:#000000;">
                   Semua berkas digital yang Anda simpan di lemari ini langsung terhubung dengan Tata Usaha. Berkas ini otomatis digunakan saat pengusulan KGB, kenaikan pangkat, atau pelaporan dinas sehingga Anda tidak perlu fotokopi berulang kali.
                 </p>
-                <div class="d-flex align-items-center gap-1.5 text-primary fw-semibold" style="font-size:11px;">
-                  <i class="bi bi-patch-check-fill"></i> Akses Terenkripsi &amp; Terverifikasi
+                <div class="fw-bold" style="font-size:11.5px; color:#000000;">
+                  Akses Terenkripsi &amp; Terverifikasi
                 </div>
               </div>
 
             </div>
 
-          </div>
-
-        </div>
-
-        {{-- TAB 3: CATATAN PRESENSI SAYA --}}
-        <div class="tab-pane fade" id="tab-presensi" role="tabpanel">
-          
-          {{-- Stat Tiles --}}
-          <div class="row g-3 mb-4">
-            
-            <div class="col-sm-6 col-lg-3">
-              <div class="ptk-stat-tile">
-                <div class="ptk-stat-icon" style="background:#ECFDF5; color:#059669;">
-                  <i class="bi bi-check2-circle"></i>
-                </div>
-                <div>
-                  <div class="h3 fw-bold mb-0" style="color:#059669;">{{ $stats['hadir'] }}</div>
-                  <div class="text-muted small fw-semibold">Hadir Tepat Waktu</div>
-                </div>
-              </div>
-            </div>
-
-            <div class="col-sm-6 col-lg-3">
-              <div class="ptk-stat-tile">
-                <div class="ptk-stat-icon" style="background:#FFFBEB; color:#D97706;">
-                  <i class="bi bi-hourglass-split"></i>
-                </div>
-                <div>
-                  <div class="h3 fw-bold mb-0" style="color:#D97706;">{{ $stats['terlambat'] }}</div>
-                  <div class="text-muted small fw-semibold">Terlambat</div>
-                </div>
-              </div>
-            </div>
-
-            <div class="col-sm-6 col-lg-3">
-              <div class="ptk-stat-tile">
-                <div class="ptk-stat-icon" style="background:#EFF6FF; color:#2563EB;">
-                  <i class="bi bi-file-earmark-medical"></i>
-                </div>
-                <div>
-                  <div class="h3 fw-bold mb-0" style="color:#2563EB;">{{ $stats['izin'] }}</div>
-                  <div class="text-muted small fw-semibold">Izin / Sakit / Dinas</div>
-                </div>
-              </div>
-            </div>
-
-            <div class="col-sm-6 col-lg-3">
-              <div class="ptk-stat-tile">
-                <div class="ptk-stat-icon" style="background:#F8FAFC; color:#2563EB; border:1px solid #E2E8F0;">
-                  <i class="bi bi-shield-check"></i>
-                </div>
-                <div>
-                  <div class="h3 fw-bold mb-0" style="color:#2563EB;">{{ $stats['persen'] }}%</div>
-                  <div class="text-muted small fw-semibold">Skor Disiplin ({{ $stats['nama_bulan'] }})</div>
-                </div>
-              </div>
-            </div>
-
-          </div>
-
-          {{-- Tabel Presensi Harian --}}
-          <div class="ptk-info-card overflow-hidden">
-            <div class="ptk-info-card-header">
-              <div>
-                <h3 class="h6 fw-bold mb-0" style="color:var(--text, #0F172A);">
-                  <i class="bi bi-clock-history text-primary me-1.5"></i> Riwayat Kehadiran Bulan {{ $stats['nama_bulan'] }}
-                </h3>
-                <div class="text-muted" style="font-size:11.5px;">Rekaman otomatis sensor Smart Gate Presensi gerbang sekolah</div>
-              </div>
-            </div>
-
-            <div class="card-body p-0">
-              @if($absensisBulanIni->isEmpty())
-                <div class="text-center py-5 text-muted small">
-                  Belum ada rekaman presensi pada bulan ini.
-                </div>
-              @else
-                <div class="table-responsive">
-                  <table class="table table-hover align-middle mb-0" style="font-size:13px;">
-                    <thead class="table-light" style="border-bottom:1.5px solid var(--border, #E2E8F0);">
-                      <tr>
-                        <th class="py-3 px-4" style="width:60px;">No</th>
-                        <th class="py-3 px-3">Hari &amp; Tanggal</th>
-                        <th class="py-3 px-3 text-center" style="width:130px;">Jam Masuk</th>
-                        <th class="py-3 px-3 text-center" style="width:130px;">Jam Pulang</th>
-                        <th class="py-3 px-3 text-center" style="width:140px;">Status</th>
-                        <th class="py-3 px-4">Keterangan Sumber</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      @foreach($absensisBulanIni as $i => $absen)
-                        <tr>
-                          <td class="py-3 px-4 text-muted text-center">{{ $i + 1 }}</td>
-                          <td class="py-3 px-3 fw-bold" style="color:var(--text, #0F172A);">
-                            {{ \Carbon\Carbon::parse($absen->tanggal)->translatedFormat('l, d F Y') }}
-                          </td>
-                          <td class="py-3 px-3 text-center font-monospace">
-                            {{ $absen->jam_masuk ? substr($absen->jam_masuk, 0, 5) . ' WIB' : '—' }}
-                          </td>
-                          <td class="py-3 px-3 text-center font-monospace">
-                            {{ $absen->jam_pulang ? substr($absen->jam_pulang, 0, 5) . ' WIB' : '—' }}
-                          </td>
-                          <td class="py-3 px-3 text-center">
-                            @if($absen->status === 'hadir')
-                              <span class="badge bg-success-subtle text-success border border-success-subtle px-2.5 py-1 rounded-pill">Hadir</span>
-                            @elseif($absen->status === 'terlambat')
-                              <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle px-2.5 py-1 rounded-pill">Terlambat</span>
-                            @elseif($absen->status === 'alpha')
-                              <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2.5 py-1 rounded-pill">Alpha</span>
-                            @else
-                              <span class="badge bg-info-subtle text-info border border-info-subtle px-2.5 py-1 rounded-pill">{{ ucfirst($absen->status) }}</span>
-                            @endif
-                          </td>
-                          <td class="py-3 px-4 text-muted small">
-                            {{ $absen->keterangan ?: 'Terekam Smart Gate Presensi' }}
-                          </td>
-                        </tr>
-                      @endforeach
-                    </tbody>
-                  </table>
-                </div>
-              @endif
-            </div>
           </div>
 
         </div>
@@ -1058,10 +908,10 @@
       
       <div class="modal-header border-0 pb-2 pt-4 px-4 bg-light">
         <div>
-          <h5 class="modal-title fw-bold mb-1" id="modalUpdateBiodataLabel" style="color:var(--text, #0F172A);">
-            <i class="bi bi-pencil-square text-primary me-1.5"></i> Pembaruan Biodata Mandiri PTK
+          <h5 class="modal-title fw-bold mb-1" id="modalUpdateBiodataLabel" style="color:#000000;">
+            Pembaruan Biodata Mandiri PTK
           </h5>
-          <div class="text-muted small">Perbarui data kependudukan, kontak, status kepegawaian, dan riwayat pendidikan Anda.</div>
+          <div class="small" style="color:#000000;">Perbarui data kependudukan, kontak, status kepegawaian, dan riwayat pendidikan Anda.</div>
         </div>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
@@ -1076,18 +926,18 @@
         <div class="px-4 pt-3 border-bottom bg-light">
           <ul class="nav nav-tabs border-0 gap-2" id="modalBiodataTabs" role="tablist">
             <li class="nav-item" role="presentation">
-              <button class="nav-link active fw-bold small py-2 px-3 rounded-top-3 border-0" id="tab-modal-identitas-btn" data-bs-toggle="tab" data-bs-target="#tab-modal-identitas" type="button" role="tab" style="font-size:12.5px;">
-                <i class="bi bi-person-lines-fill text-primary me-1"></i> Identitas &amp; Kontak
+              <button class="nav-link active fw-bold small py-2 px-3 rounded-top-3 border-0" id="tab-modal-identitas-btn" data-bs-toggle="tab" data-bs-target="#tab-modal-identitas" type="button" role="tab" style="font-size:12.5px; color:#000000;">
+                Identitas &amp; Kontak
               </button>
             </li>
             <li class="nav-item" role="presentation">
-              <button class="nav-link fw-bold small py-2 px-3 rounded-top-3 border-0" id="tab-modal-kepegawaian-btn" data-bs-toggle="tab" data-bs-target="#tab-modal-kepegawaian" type="button" role="tab" style="font-size:12.5px;">
-                <i class="bi bi-briefcase-fill text-warning me-1"></i> Kepegawaian &amp; Tugas
+              <button class="nav-link fw-bold small py-2 px-3 rounded-top-3 border-0" id="tab-modal-kepegawaian-btn" data-bs-toggle="tab" data-bs-target="#tab-modal-kepegawaian" type="button" role="tab" style="font-size:12.5px; color:#000000;">
+                Kepegawaian &amp; Tugas
               </button>
             </li>
             <li class="nav-item" role="presentation">
-              <button class="nav-link fw-bold small py-2 px-3 rounded-top-3 border-0" id="tab-modal-pendidikan-btn" data-bs-toggle="tab" data-bs-target="#tab-modal-pendidikan" type="button" role="tab" style="font-size:12.5px;">
-                <i class="bi bi-mortarboard-fill text-success me-1"></i> Pendidikan &amp; Sertifikasi
+              <button class="nav-link fw-bold small py-2 px-3 rounded-top-3 border-0" id="tab-modal-pendidikan-btn" data-bs-toggle="tab" data-bs-target="#tab-modal-pendidikan" type="button" role="tab" style="font-size:12.5px; color:#000000;">
+                Pendidikan &amp; Sertifikasi
               </button>
             </li>
           </ul>
@@ -1275,10 +1125,10 @@
       
       <div class="modal-header border-0 pb-0 pt-4 px-4">
         <div>
-          <h5 class="modal-title fw-bold mb-1" id="modalUnggahBerkasLabel" style="color:var(--text, #0F172A);">
-            <i class="bi bi-cloud-arrow-up-fill text-primary me-1.5"></i> Unggah Berkas Digital Saya
+          <h5 class="modal-title fw-bold mb-1" id="modalUnggahBerkasLabel" style="color:#000000;">
+            Unggah Berkas Digital Saya
           </h5>
-          <div class="text-muted small">Berkas akan tersimpan aman ke lemari digital E-Arsip Anda.</div>
+          <div class="small" style="color:#000000;">Berkas akan tersimpan aman ke lemari digital E-Arsip Anda.</div>
         </div>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
@@ -1350,7 +1200,6 @@
     <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden" style="height:88vh;">
       <div class="modal-header py-3 px-4 bg-dark text-white border-0">
         <div class="d-flex align-items-center gap-2">
-          <i class="bi bi-file-earmark-pdf-fill text-danger fs-5"></i>
           <h6 class="modal-title fw-bold mb-0 text-white" id="modalPreviewTitle">Pratinjau Dokumen</h6>
         </div>
         <div class="d-flex align-items-center gap-2">
