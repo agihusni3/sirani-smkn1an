@@ -132,7 +132,6 @@ Route::middleware('auth')->group(function () {
         Route::get('/kios-rfid', [\App\Http\Controllers\RfidController::class, 'kiosk']);
         Route::get('/rfid', [\App\Http\Controllers\RfidController::class, 'kiosk']);
         Route::get('/kiosk/monitor-feed', [\App\Http\Controllers\RfidController::class, 'monitorFeed'])->name('kiosk.monitor.feed');
-        Route::post('/kiosk/input-pulang', [\App\Http\Controllers\RfidController::class, 'inputPulang'])->name('kiosk.input.pulang');
     });
 
 

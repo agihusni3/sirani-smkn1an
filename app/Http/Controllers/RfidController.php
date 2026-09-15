@@ -743,36 +743,65 @@ class RfidController extends Controller
     {
         $today = Carbon::today()->toDateString();
 
-        // 1. Aktivitas scan terkini (Hadir, Terlambat, Pulang)
-        $recentScans = Absensi::where('tanggal', $today)
+        // 1. Aktivitas scan terkini (mencatat baik saat scan masuk maupun saat scan pulang)
+        $absensiHariIni = Absensi::where('tanggal', $today)
             ->where(function ($q) {
                 $q->whereNotNull('jam_masuk')->orWhereNotNull('jam_pulang');
             })
-            ->orderBy('updated_at', 'desc')
-            ->limit(20)
             ->with(['siswa.siswaRombels.rombel', 'guru'])
-            ->get()
-            ->map(function ($a) {
-                $isSiswa = $a->pemilik_type === 'siswa';
-                $person = $isSiswa ? $a->siswa : $a->guru;
-                $rombel = $isSiswa ? ($person?->siswaRombels?->first()?->rombel?->nama_rombel ?? '-') : ($person?->jabatan ?? 'Guru');
-                $jam = $a->jam_masuk ? substr($a->jam_masuk, 0, 5) : ($a->jam_pulang ? substr($a->jam_pulang, 0, 5) : ($a->updated_at ? $a->updated_at->format('H:i') : '--:--'));
-                return [
-                    'id'                  => $a->id,
-                    'nama'                => $person?->nama ?? '—',
+            ->get();
+
+        $scanEvents = collect();
+
+        foreach ($absensiHariIni as $a) {
+            $isSiswa = $a->pemilik_type === 'siswa';
+            $person = $isSiswa ? $a->siswa : $a->guru;
+            if (!$person) continue;
+
+            $rombel = $isSiswa ? ($person?->siswaRombels?->first()?->rombel?->nama_rombel ?? '-') : ($person?->jabatan ?? 'Guru');
+            $identitas = $isSiswa ? ('NISN: ' . ($person?->nisn ?: '-')) : ($person?->nip ? 'NIP: ' . $person->nip : 'Non-NIP');
+            $foto = $person?->foto_url ?? '/img/user-default.png';
+
+            // Peristiwa Scan Masuk (jika sudah tap masuk)
+            if (!empty($a->jam_masuk)) {
+                $stMasuk = strtolower($a->status ?? 'hadir');
+                $stLabel = $stMasuk === 'terlambat' ? 'Terlambat' : 'Hadir';
+                $scanEvents->push([
+                    'id'                  => $a->id . '_masuk',
+                    'nama'                => $person->nama,
                     'type'                => $a->pemilik_type,
-                    'identitas'           => $isSiswa ? ('NISN: ' . ($person?->nisn ?: '-')) : ($person?->nip ? 'NIP: ' . $person->nip : 'Non-NIP'),
+                    'identitas'           => $identitas,
                     'rombel'              => $rombel,
                     'rombel_atau_jabatan' => $rombel,
-                    'foto'                => $person?->foto_url ?? '/img/user-default.png',
-                    'status'              => $a->status,
-                    'status_label'        => ucfirst($a->status),
-                    'jam_masuk'           => $a->jam_masuk ? substr($a->jam_masuk, 0, 5) : null,
-                    'jam_pulang'          => $a->jam_pulang ? substr($a->jam_pulang, 0, 5) : null,
-                    'jam'                 => $jam,
-                    'time'                => $a->updated_at ? $a->updated_at->format('H:i:s') : now()->format('H:i:s'),
-                ];
-            });
+                    'foto'                => $foto,
+                    'status'              => $stMasuk,
+                    'status_label'        => $stLabel,
+                    'jam'                 => substr($a->jam_masuk, 0, 5),
+                    'time'                => substr($a->jam_masuk, 0, 8),
+                    'sort_time'           => $a->jam_masuk,
+                ]);
+            }
+
+            // Peristiwa Scan Pulang (jika sudah tap pulang)
+            if (!empty($a->jam_pulang)) {
+                $scanEvents->push([
+                    'id'                  => $a->id . '_pulang',
+                    'nama'                => $person->nama,
+                    'type'                => $a->pemilik_type,
+                    'identitas'           => $identitas,
+                    'rombel'              => $rombel,
+                    'rombel_atau_jabatan' => $rombel,
+                    'foto'                => $foto,
+                    'status'              => 'pulang',
+                    'status_label'        => 'Pulang',
+                    'jam'                 => substr($a->jam_pulang, 0, 5),
+                    'time'                => substr($a->jam_pulang, 0, 8),
+                    'sort_time'           => $a->jam_pulang,
+                ]);
+            }
+        }
+
+        $recentScans = $scanEvents->sortByDesc('sort_time')->take(20)->values();
 
         // 2. Log Percobaan Gagal Absen / Ditolak hari ini
         $failedScans = \App\Services\RfidScanService::getFailedScansToday();
@@ -808,43 +837,7 @@ class RfidController extends Controller
             })
             ->values();
 
-        // 4. Siswa yang Sudah Scan Masuk tapi Belum Scan Pulang
-        $belumPulangIds = Absensi::where('tanggal', $today)
-            ->where('pemilik_type', 'siswa')
-            ->whereNotNull('jam_masuk')
-            ->whereNull('jam_pulang')
-            ->pluck('pemilik_id')
-            ->toArray();
-
-        $belumPulangAbsensi = Absensi::where('tanggal', $today)
-            ->where('pemilik_type', 'siswa')
-            ->whereNotNull('jam_masuk')
-            ->whereNull('jam_pulang')
-            ->with(['siswa.siswaRombels.rombel'])
-            ->get()
-            ->map(function ($a) {
-                $s = $a->siswa;
-                if (!$s) return null;
-                $rombel = $s->siswaRombels->first()?->rombel?->nama_rombel ?? 'Tanpa Rombel';
-                $hpClean = preg_replace('/[^0-9]/', '', $s->no_hp_ortu ?? ($s->no_hp_siswa ?? ''));
-                if (str_starts_with($hpClean, '0')) $hpClean = '62' . substr($hpClean, 1);
-                return [
-                    'id'         => $s->id,
-                    'absensi_id' => $a->id,
-                    'nama'       => $s->nama,
-                    'nisn'       => $s->nisn ?: $s->nis,
-                    'rombel'     => $rombel,
-                    'foto'       => $s->foto_url ?? '/img/user-default.png',
-                    'jam_masuk'  => $a->jam_masuk ? substr($a->jam_masuk, 0, 5) : null,
-                    'status'     => $a->status,
-                    'no_hp_ortu' => $s->no_hp_ortu,
-                    'hp_clean'   => $hpClean,
-                ];
-            })
-            ->filter()
-            ->sortBy(fn($s) => ($s['rombel'] ?? '') . ' ' . ($s['nama'] ?? ''))
-            ->values();
-
+        // 4. Statistik Ringkas
         $totalHadir = Absensi::where('tanggal', $today)->where('status', 'hadir')->count();
         $totalTerlambat = Absensi::where('tanggal', $today)->where('status', 'terlambat')->count();
         $totalPulang = Absensi::where('tanggal', $today)->whereNotNull('jam_pulang')->count();
@@ -854,134 +847,14 @@ class RfidController extends Controller
             'recent_scans'       => $recentScans,
             'failed_scans'       => $failedScans,
             'belum_hadir'        => $belumHadir,
-            'belum_pulang'       => $belumPulangAbsensi,
             'stats'              => [
-                'total_hadir'        => $totalHadir,
-                'total_terlambat'    => $totalTerlambat,
-                'total_pulang'       => $totalPulang,
-                'total_gagal'        => count($failedScans),
-                'total_belum_absen'  => count($belumHadir),
-                'total_belum_pulang' => count($belumPulangAbsensi),
+                'total_hadir'      => $totalHadir,
+                'total_terlambat'  => $totalTerlambat,
+                'total_pulang'     => $totalPulang,
+                'total_gagal'      => count($failedScans),
+                'total_belum_absen'=> count($belumHadir),
             ],
             'server_time'        => now()->format('H:i:s'),
-        ]);
-    }
-
-    /**
-     * Input / Catat Presensi Pulang Siswa dari Kiosk Presensi
-     */
-    public function inputPulang(Request $request): JsonResponse
-    {
-        $today = Carbon::today()->toDateString();
-        $timeNow = Carbon::now()->toTimeString();
-        $jamPulang = $request->input('jam_pulang') ? Carbon::parse($request->input('jam_pulang'))->toTimeString() : $timeNow;
-
-        // Mode A: Pulangkan Semua Siswa yang belum absen pulang
-        if ($request->boolean('all')) {
-            $absensis = Absensi::where('tanggal', $today)
-                ->where('pemilik_type', 'siswa')
-                ->whereNotNull('jam_masuk')
-                ->whereNull('jam_pulang')
-                ->with('siswa')
-                ->get();
-
-            $count = 0;
-            $settingNotif = null;
-            try {
-                $settingNotif = \App\Models\PengaturanNotifikasi::getPengaturan();
-            } catch (\Throwable $e) {}
-
-            foreach ($absensis as $abs) {
-                $abs->update([
-                    'jam_pulang'   => $jamPulang,
-                    'sumber_absen' => 'kiosk_manual_pulang',
-                ]);
-                $count++;
-
-                if ($abs->siswa && $settingNotif && $settingNotif->isKategoriAktif('pulang')) {
-                    try {
-                        \App\Services\NotifikasiDraftService::buatDraft($abs->siswa, 'pulang', [
-                            'tanggal'    => $today,
-                            'jam'        => $jamPulang,
-                            'keterangan' => 'Presensi Pulang via Kiosk Smart Gate',
-                        ], 'sistem_rfid');
-                    } catch (\Throwable $e) {}
-                }
-            }
-
-            return response()->json([
-                'success' => true,
-                'message' => "Berhasil mencatat absen pulang untuk {$count} siswa.",
-                'count'   => $count,
-            ]);
-        }
-
-        // Mode B: Pulangkan Siswa Tertentu (berdasarkan siswa_id atau absensi_id)
-        $siswaId = $request->input('siswa_id');
-        $absensiId = $request->input('absensi_id');
-
-        $query = Absensi::where('tanggal', $today)->where('pemilik_type', 'siswa');
-        if ($absensiId) {
-            $query->where('id', $absensiId);
-        } elseif ($siswaId) {
-            $query->where('pemilik_id', $siswaId);
-        } else {
-            return response()->json([
-                'success' => false,
-                'message' => 'Parameter siswa_id atau absensi_id diperlukan.',
-            ], 422);
-        }
-
-        $absensi = $query->first();
-
-        if (!$absensi) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Siswa belum tercatat melakukan presensi masuk hari ini.',
-            ], 422);
-        }
-
-        if (empty($absensi->jam_masuk)) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Siswa belum memiliki jam masuk hari ini.',
-            ], 422);
-        }
-
-        if (!empty($absensi->jam_pulang)) {
-            return response()->json([
-                'success' => false,
-                'message' => "Siswa sudah tercatat absen pulang pada pukul " . substr($absensi->jam_pulang, 0, 5) . " WIB.",
-            ], 422);
-        }
-
-        $absensi->update([
-            'jam_pulang'   => $jamPulang,
-            'sumber_absen' => 'kiosk_manual_pulang',
-        ]);
-
-        $siswa = Siswa::find($absensi->pemilik_id);
-        $nama = $siswa?->nama ?? 'Siswa';
-
-        try {
-            $settingNotif = \App\Models\PengaturanNotifikasi::getPengaturan();
-            if ($siswa && $settingNotif->isKategoriAktif('pulang')) {
-                \App\Services\NotifikasiDraftService::buatDraft($siswa, 'pulang', [
-                    'tanggal'    => $today,
-                    'jam'        => $jamPulang,
-                    'keterangan' => 'Presensi Pulang via Kiosk Smart Gate',
-                ], 'sistem_rfid');
-            }
-        } catch (\Throwable $e) {}
-
-        return response()->json([
-            'success' => true,
-            'message' => "Presensi pulang {$nama} berhasil dicatat pada pukul " . substr($jamPulang, 0, 5) . " WIB.",
-            'data'    => [
-                'nama'       => $nama,
-                'jam_masuk'  => $absensi->jam_masuk,
-                'jam_pulang' => $jamPulang,
-            ],
         ]);
     }
 

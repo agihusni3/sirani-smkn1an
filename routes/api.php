@@ -7,7 +7,6 @@ Route::prefix('v1')->group(function () {
     // Endpoint Scan Smart Gate RFID & Barcode
     Route::post('/rfid-scan', [RfidController::class, 'scan'])->middleware('throttle:300,1');
     Route::get('/kiosk-monitor-feed', [RfidController::class, 'monitorFeed']);
-    Route::post('/kiosk-input-pulang', [RfidController::class, 'inputPulang']);
 });
 
 // Endpoint Webhook Auto-Deploy Server SIRANI
