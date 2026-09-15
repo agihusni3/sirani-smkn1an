@@ -104,7 +104,7 @@
                   autofocus
                 />
                 <button type="submit" class="btn-search">
-                  Cek Presensi
+                 Masuk Portal Siswa
                 </button>
               </div>
               <div class="search-hints-row" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-top:10px;">
