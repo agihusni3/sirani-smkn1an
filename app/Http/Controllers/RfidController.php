@@ -756,17 +756,21 @@ class RfidController extends Controller
                 $isSiswa = $a->pemilik_type === 'siswa';
                 $person = $isSiswa ? $a->siswa : $a->guru;
                 $rombel = $isSiswa ? ($person?->siswaRombels?->first()?->rombel?->nama_rombel ?? '-') : ($person?->jabatan ?? 'Guru');
+                $jam = $a->jam_masuk ? substr($a->jam_masuk, 0, 5) : ($a->jam_pulang ? substr($a->jam_pulang, 0, 5) : ($a->updated_at ? $a->updated_at->format('H:i') : '--:--'));
                 return [
-                    'id'         => $a->id,
-                    'nama'       => $person?->nama ?? '—',
-                    'type'       => $a->pemilik_type,
-                    'identitas'  => $isSiswa ? ('NISN: ' . ($person?->nisn ?: '-')) : ($person?->nip ? 'NIP: ' . $person->nip : 'Non-NIP'),
-                    'rombel'     => $rombel,
-                    'foto'       => $person?->foto_url ?? '/img/user-default.png',
-                    'status'     => $a->status,
-                    'jam_masuk'  => $a->jam_masuk ? substr($a->jam_masuk, 0, 5) : null,
-                    'jam_pulang' => $a->jam_pulang ? substr($a->jam_pulang, 0, 5) : null,
-                    'time'       => $a->updated_at ? $a->updated_at->format('H:i:s') : now()->format('H:i:s'),
+                    'id'                  => $a->id,
+                    'nama'                => $person?->nama ?? '—',
+                    'type'                => $a->pemilik_type,
+                    'identitas'           => $isSiswa ? ('NISN: ' . ($person?->nisn ?: '-')) : ($person?->nip ? 'NIP: ' . $person->nip : 'Non-NIP'),
+                    'rombel'              => $rombel,
+                    'rombel_atau_jabatan' => $rombel,
+                    'foto'                => $person?->foto_url ?? '/img/user-default.png',
+                    'status'              => $a->status,
+                    'status_label'        => ucfirst($a->status),
+                    'jam_masuk'           => $a->jam_masuk ? substr($a->jam_masuk, 0, 5) : null,
+                    'jam_pulang'          => $a->jam_pulang ? substr($a->jam_pulang, 0, 5) : null,
+                    'jam'                 => $jam,
+                    'time'                => $a->updated_at ? $a->updated_at->format('H:i:s') : now()->format('H:i:s'),
                 ];
             });
 

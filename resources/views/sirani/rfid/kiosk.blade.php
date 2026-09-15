@@ -78,97 +78,197 @@
   </div>
 </header>
 
-<!-- MAIN KIOSK INTERFACE -->
+<!-- MAIN KIOSK INTERFACE (2-COLUMN GRID) -->
 <main onclick="focusScanner()">
   <input type="text" id="rfidInput" autofocus autocomplete="off" />
 
-  <div class="kiosk-stage-box">
+  <div class="kiosk-layout-grid">
 
-    <!-- ══ STATE 1: CENTRAL SCANNER CARD (STANDBY) ══ -->
-    <div id="scannerState" class="scanner-main-card">
-      <div class="scanner-portal">
-        <div class="portal-ring-outer"></div>
-        <div class="portal-ring-inner"></div>
-        <div class="portal-reticle">
-          <div class="portal-laser"></div>
-          <i class="bi bi-upc-scan portal-glyph"></i>
+    <!-- ══ SEBELAH KIRI: AKTIVITAS & PANTAUAN ABSENSI GERBANG REALTIME ══ -->
+    <div class="kiosk-col-left" id="kioskColLeft">
+      <div class="monitor-panel-card">
+
+        <!-- Panel Header -->
+        <div class="monitor-panel-header">
+          <div class="monitor-panel-title-group">
+            <div class="monitor-panel-title">
+              <span class="live-dot-pulse"></span>
+              <span>Aktivitas Gerbang Presensi</span>
+            </div>
+            <div class="monitor-panel-sub">Pantauan Realtime Siswa &amp; Guru SMKN 1 Air Naningan</div>
+          </div>
+          <button type="button" class="drawer-icon-btn" onclick="fetchMonitorFeed(true)" title="Segarkan Data Realtime">
+            <i class="bi bi-arrow-clockwise" id="monitorRefreshIcon"></i>
+          </button>
         </div>
-      </div>
 
-      <h1 class="scanner-title">Tempelkan Kartu RFID / Scan Barcode</h1>
-      <p class="scanner-desc">
-        Dekatkan Kartu Pelajar RFID / e-KTP ke sensor pembaca atau arahkan Barcode / QR Code NISN siswa ke scanner USB.
-      </p>
+        <!-- Quick Stats Counter Grid -->
+        <div class="monitor-stats-grid">
+          <div class="monitor-stat-item" onclick="switchMonitorTab('live')" style="cursor:pointer;" title="Klik untuk lihat Semua Hadir">
+            <div class="monitor-stat-val c-emerald" id="mStatHadir">0</div>
+            <div class="monitor-stat-lbl">Hadir</div>
+          </div>
+          <div class="monitor-stat-item" onclick="switchMonitorTab('live')" style="cursor:pointer;" title="Klik untuk lihat Terlambat">
+            <div class="monitor-stat-val c-amber" id="mStatTerlambat">0</div>
+            <div class="monitor-stat-lbl">Terlambat</div>
+          </div>
+          <div class="monitor-stat-item" onclick="switchMonitorTab('gagal')" style="cursor:pointer;" id="mStatGagalCard" title="Klik untuk lihat Kartu Gagal">
+            <div class="monitor-stat-val c-rose" id="mStatGagal">0</div>
+            <div class="monitor-stat-lbl">Gagal Scan</div>
+          </div>
+          <div class="monitor-stat-item" onclick="switchMonitorTab('belum')" style="cursor:pointer;" title="Klik untuk pantau Siswa Belum Hadir">
+            <div class="monitor-stat-val c-slate" id="mStatBelum">0</div>
+            <div class="monitor-stat-lbl">Belum Hadir</div>
+          </div>
+        </div>
 
-      <div class="scanner-status-indicator" id="scannerStatus">
-        <span class="pulse-dot"></span>
-        <span>PEMINDAI SIAP MENERIMA INPUT</span>
+        <!-- ══ LIVE ACTIVITY TICKER SPOTLIGHT ══ -->
+        <div class="kiosk-live-ticker" id="kioskLiveTicker" onclick="handleTickerClick()" title="Klik untuk beralih tab aktivitas">
+          <div class="ticker-pulse-icon">
+            <span class="ticker-dot"></span>
+            <i class="bi bi-broadcast"></i>
+          </div>
+          <div class="ticker-content" id="tickerContent">
+            <span class="ticker-label">ABSEN TERKINI:</span>
+            <span class="ticker-text" id="tickerText">Memuat aktivitas gerbang presensi...</span>
+          </div>
+          <div class="ticker-meta" id="tickerMeta">
+            <span class="ticker-stat" id="tickerStatHadir"><i class="bi bi-check-circle-fill"></i> <span id="tickerCountHadir">0</span> Hadir</span>
+            <span class="ticker-stat failed" id="tickerStatGagal" style="display:none;"><i class="bi bi-exclamation-octagon-fill"></i> <span id="tickerCountGagal">0</span> Gagal</span>
+            <span class="ticker-arrow"><i class="bi bi-chevron-right"></i></span>
+          </div>
+        </div>
+
+        <!-- Tab Buttons Navigation -->
+        <div class="monitor-tabs">
+          <button type="button" class="monitor-tab-btn active" id="tabBtnLive" onclick="switchMonitorTab('live')">
+            <i class="bi bi-broadcast"></i>
+            <span>Absen Terkini</span>
+            <span class="tab-badge" id="badgeTabLive">0</span>
+          </button>
+          <button type="button" class="monitor-tab-btn" id="tabBtnGagal" onclick="switchMonitorTab('gagal')">
+            <i class="bi bi-exclamation-triangle-fill"></i>
+            <span>Gagal Scan</span>
+            <span class="tab-badge danger" id="badgeTabGagal">0</span>
+          </button>
+          <button type="button" class="monitor-tab-btn" id="tabBtnBelum" onclick="switchMonitorTab('belum')">
+            <i class="bi bi-person-x-fill"></i>
+            <span>Belum Hadir</span>
+            <span class="tab-badge" id="badgeTabBelum">0</span>
+          </button>
+        </div>
+
+        <!-- Tab Content 1: Live Feed Siswa yang Baru Hadir (Default Aktif) -->
+        <div class="monitor-drawer-body" id="tabContentLive">
+          <div id="listLiveScans">
+            <!-- Diisi oleh JS -->
+          </div>
+        </div>
+
+        <!-- Tab Content 2: Gagal Absen / Kartu Ditolak -->
+        <div class="monitor-drawer-body" id="tabContentGagal" style="display:none;">
+          <div id="listFailedScans">
+            <!-- Diisi oleh JS -->
+          </div>
+        </div>
+
+        <!-- Tab Content 3: Belum Hadir Hari Ini -->
+        <div class="monitor-drawer-body" id="tabContentBelum" style="display:none;">
+          <div class="monitor-filter-bar">
+            <input type="text" class="monitor-search-input" id="searchBelumInput" placeholder="Cari nama siswa / NISN..." oninput="filterBelumHadir()" />
+            <select class="monitor-select-rombel" id="filterRombelSelect" onchange="filterBelumHadir()">
+              <option value="">Semua Kelas</option>
+            </select>
+          </div>
+          <div id="listBelumHadir">
+            <!-- Diisi oleh JS -->
+          </div>
+        </div>
+
       </div>
     </div>
 
-    <!-- ══ STATE 2: RESPONSE IDENTITAS LENGKAP (KETIKA SCAN BERHASIL) ══ -->
-    <div id="responseState" class="kios-fade-enter" style="display:none;">
-      <div class="identity-result-card" id="identityCard">
+    <!-- ══ SEBELAH KANAN: TEMPELKAN KARTU / SCAN BARCODE & HASIL IDENTITAS ══ -->
+    <div class="kiosk-col-right" id="kioskColRight">
+      <div class="kiosk-stage-box">
 
-        {{-- Top Header Row --}}
-        <div class="identity-top-bar">
-          <div class="result-badge-large hadir" id="resBadge">
-            <span id="resBadgeText">BERHASIL HADIR</span>
-          </div>
-          <div class="identity-gate-label">
-            <span>Smart Gate Presensi SMKN 1 Air Naningan</span>
-          </div>
-        </div>
-
-        {{-- Body: Foto & Identitas --}}
-        <div class="identity-body">
-          <div class="identity-avatar-wrap" id="avatarWrap">
-            <img id="resPhoto" class="identity-avatar-img" src="/img/user-default.png" alt="Foto Profil" />
-          </div>
-
-          <div class="identity-details">
-            <div class="identity-name-text" id="resName">-</div>
-            <div class="identity-sub-text" id="resSub">
-              <span id="resSubTxt">-</span>
-            </div>
-            <div class="identity-time-pill" id="resTimePill">
-              <span id="resTimeTxt">-</span>
+        <!-- ══ STATE 1: CENTRAL SCANNER CARD (STANDBY) ══ -->
+        <div id="scannerState" class="scanner-main-card">
+          <div class="scanner-portal">
+            <div class="portal-ring-outer"></div>
+            <div class="portal-ring-inner"></div>
+            <div class="portal-reticle">
+              <div class="portal-laser"></div>
+              <i class="bi bi-upc-scan portal-glyph"></i>
             </div>
           </div>
-        </div>
 
-        {{-- Pesan Notifikasi --}}
-        <div class="identity-notification-box" id="resMessageBox">
-          <span id="resMessageTxt">Presensi berhasil dicatat. Notifikasi otomatis dikirimkan ke orang tua.</span>
-        </div>
+          <h1 class="scanner-title">Tempelkan Kartu RFID / Scan Barcode</h1>
+          <p class="scanner-desc">
+            Dekatkan Kartu Pelajar RFID / e-KTP ke sensor pembaca atau arahkan Barcode / QR Code NISN siswa ke scanner USB.
+          </p>
 
-        {{-- Auto-Reset Countdown Bar --}}
-        <div class="countdown-section">
-          <div class="countdown-track">
-            <div class="countdown-fill" id="countdownFill"></div>
+          <div class="scanner-status-indicator" id="scannerStatus">
+            <span class="pulse-dot"></span>
+            <span>PEMINDAI SIAP MENERIMA INPUT</span>
           </div>
-          <div class="countdown-caption">
-            <span>Kembali ke mode pemindaian dalam <strong id="countdownSec">4</strong> detik...</span>
+
+          <div class="scanner-protocols">
+            <span class="protocol-pill"><i class="bi bi-broadcast-pin"></i> RFID 13.56 MHz</span>
+            <span class="protocol-pill"><i class="bi bi-qr-code-scan"></i> Barcode 1D / 2D QR</span>
+            <span class="protocol-pill"><i class="bi bi-cloud-check"></i> Cloud Sync</span>
           </div>
         </div>
 
-      </div>
-    </div>
+        <!-- ══ STATE 2: RESPONSE IDENTITAS LENGKAP (KETIKA SCAN BERHASIL) ══ -->
+        <div id="responseState" class="kios-fade-enter" style="display:none;">
+          <div class="identity-result-card" id="identityCard">
 
-    <!-- ══ LIVE ACTIVITY & ALERT TICKER ══ -->
-    <div class="kiosk-live-ticker" id="kioskLiveTicker" onclick="openMonitorDrawer()" title="Klik untuk membuka Absen Terkini & Monitoring Gagal">
-      <div class="ticker-pulse-icon">
-        <span class="ticker-dot"></span>
-        <i class="bi bi-broadcast"></i>
-      </div>
-      <div class="ticker-content" id="tickerContent">
-        <span class="ticker-label">ABSEN TERKINI:</span>
-        <span class="ticker-text" id="tickerText">Memuat aktivitas gerbang presensi...</span>
-      </div>
-      <div class="ticker-meta" id="tickerMeta">
-        <span class="ticker-stat" id="tickerStatHadir"><i class="bi bi-check-circle-fill"></i> <span id="tickerCountHadir">0</span> Hadir</span>
-        <span class="ticker-stat failed" id="tickerStatGagal" style="display:none;"><i class="bi bi-exclamation-octagon-fill"></i> <span id="tickerCountGagal">0</span> Gagal</span>
-        <span class="ticker-arrow"><i class="bi bi-chevron-right"></i></span>
+            {{-- Top Header Row --}}
+            <div class="identity-top-bar">
+              <div class="result-badge-large hadir" id="resBadge">
+                <span id="resBadgeText">BERHASIL HADIR</span>
+              </div>
+              <div class="identity-gate-label">
+                <span>Smart Gate Presensi SMKN 1 Air Naningan</span>
+              </div>
+            </div>
+
+            {{-- Body: Foto & Identitas --}}
+            <div class="identity-body">
+              <div class="identity-avatar-wrap" id="avatarWrap">
+                <img id="resPhoto" class="identity-avatar-img" src="/img/user-default.png" alt="Foto Profil" />
+              </div>
+
+              <div class="identity-details">
+                <div class="identity-name-text" id="resName">-</div>
+                <div class="identity-sub-text" id="resSub">
+                  <span id="resSubTxt">-</span>
+                </div>
+                <div class="identity-time-pill" id="resTimePill">
+                  <span id="resTimeTxt">-</span>
+                </div>
+              </div>
+            </div>
+
+            {{-- Pesan Notifikasi --}}
+            <div class="identity-notification-box" id="resMessageBox">
+              <span id="resMessageTxt">Presensi berhasil dicatat. Notifikasi otomatis dikirimkan ke orang tua.</span>
+            </div>
+
+            {{-- Auto-Reset Countdown Bar --}}
+            <div class="countdown-section">
+              <div class="countdown-track">
+                <div class="countdown-fill" id="countdownFill"></div>
+              </div>
+              <div class="countdown-caption">
+                <span>Kembali ke mode pemindaian dalam <strong id="countdownSec">4</strong> detik...</span>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
       </div>
     </div>
 
@@ -185,92 +285,6 @@
     Tutup Gerbang: <strong>{{ $jadwal ? substr($jadwal->jam_tutup_gerbang ?? '17:00', 0, 5) : '17:00' }} WIB</strong>
   </div>
 </footer>
-
-<!-- ══ SLIDE-OVER DRAWER: ABSEN TERKINI & MONITOR SISWA GAGAL ══ -->
-<div class="monitor-drawer-overlay" id="monitorDrawerOverlay" onclick="closeMonitorDrawer()"></div>
-<aside class="monitor-drawer" id="monitorDrawer" aria-label="Absensi Terkini & Monitoring Gagal">
-  <!-- Drawer Header -->
-  <div class="monitor-drawer-header">
-    <div class="monitor-drawer-title-box">
-      <h3><i class="bi bi-activity" style="color:var(--cyan);"></i> Absensi Terkini &amp; Monitoring</h3>
-      <p>Pantau siswa gagal absen, kartu tidak dikenal, dan siswa belum hadir</p>
-    </div>
-    <div class="monitor-drawer-actions">
-      <button type="button" class="drawer-icon-btn" onclick="fetchMonitorFeed(true)" title="Segarkan Data (Refresh)">
-        <i class="bi bi-arrow-clockwise" id="monitorRefreshIcon"></i>
-      </button>
-      <button type="button" class="drawer-icon-btn" onclick="closeMonitorDrawer()" title="Tutup Panel">
-        <i class="bi bi-x-lg"></i>
-      </button>
-    </div>
-  </div>
-
-  <!-- Quick Stats Counter -->
-  <div class="monitor-stats-grid">
-    <div class="monitor-stat-item" onclick="switchMonitorTab('live')" style="cursor:pointer;">
-      <div class="monitor-stat-val c-emerald" id="mStatHadir">0</div>
-      <div class="monitor-stat-lbl">Hadir</div>
-    </div>
-    <div class="monitor-stat-item" onclick="switchMonitorTab('live')" style="cursor:pointer;">
-      <div class="monitor-stat-val c-amber" id="mStatTerlambat">0</div>
-      <div class="monitor-stat-lbl">Terlambat</div>
-    </div>
-    <div class="monitor-stat-item" onclick="switchMonitorTab('gagal')" style="cursor:pointer;" id="mStatGagalCard">
-      <div class="monitor-stat-val c-rose" id="mStatGagal">0</div>
-      <div class="monitor-stat-lbl">Gagal Scan</div>
-    </div>
-    <div class="monitor-stat-item" onclick="switchMonitorTab('belum')" style="cursor:pointer;">
-      <div class="monitor-stat-val c-slate" id="mStatBelum">0</div>
-      <div class="monitor-stat-lbl">Belum Hadir</div>
-    </div>
-  </div>
-
-  <!-- Tab Buttons -->
-  <div class="monitor-tabs">
-    <button type="button" class="monitor-tab-btn active" id="tabBtnGagal" onclick="switchMonitorTab('gagal')">
-      <i class="bi bi-exclamation-triangle-fill"></i>
-      <span>Gagal Absen</span>
-      <span class="tab-badge danger" id="badgeTabGagal">0</span>
-    </button>
-    <button type="button" class="monitor-tab-btn" id="tabBtnBelum" onclick="switchMonitorTab('belum')">
-      <i class="bi bi-person-x-fill"></i>
-      <span>Belum Hadir</span>
-      <span class="tab-badge" id="badgeTabBelum">0</span>
-    </button>
-    <button type="button" class="monitor-tab-btn" id="tabBtnLive" onclick="switchMonitorTab('live')">
-      <i class="bi bi-broadcast"></i>
-      <span>Semua Aktivitas</span>
-      <span class="tab-badge" id="badgeTabLive">0</span>
-    </button>
-  </div>
-
-  <!-- Tab Content: Gagal Absen -->
-  <div class="monitor-drawer-body" id="tabContentGagal">
-    <div id="listFailedScans">
-      <!-- Diisi oleh JS -->
-    </div>
-  </div>
-
-  <!-- Tab Content: Belum Hadir -->
-  <div class="monitor-drawer-body" id="tabContentBelum" style="display:none;">
-    <div class="monitor-filter-bar">
-      <input type="text" class="monitor-search-input" id="searchBelumInput" placeholder="Cari nama siswa / NISN..." oninput="filterBelumHadir()" />
-      <select class="monitor-select-rombel" id="filterRombelSelect" onchange="filterBelumHadir()">
-        <option value="">Semua Kelas</option>
-      </select>
-    </div>
-    <div id="listBelumHadir">
-      <!-- Diisi oleh JS -->
-    </div>
-  </div>
-
-  <!-- Tab Content: Live Feed -->
-  <div class="monitor-drawer-body" id="tabContentLive" style="display:none;">
-    <div id="listLiveScans">
-      <!-- Diisi oleh JS -->
-    </div>
-  </div>
-</aside>
 
 <script>
   let scannerBuffer = '';
@@ -571,32 +585,30 @@
       total_belum_absen: 0
     }
   };
-  let currentMonitorTab = 'gagal';
+  let currentMonitorTab = 'live';
   let rombelOptionsPopulated = false;
+
+  function handleTickerClick() {
+    if (monitorData.failed_scans && monitorData.failed_scans.length > 0) {
+      switchMonitorTab('gagal');
+    } else {
+      switchMonitorTab('live');
+    }
+  }
 
   function openMonitorDrawer(tab = null) {
     if (tab) {
       switchMonitorTab(tab);
+    } else if (monitorData.failed_scans && monitorData.failed_scans.length > 0) {
+      switchMonitorTab('gagal');
     } else {
-      // Prioritaskan tab gagal jika ada kartu gagal, jika tidak tab belum hadir
-      if (monitorData.failed_scans && monitorData.failed_scans.length > 0) {
-        switchMonitorTab('gagal');
-      } else {
-        switchMonitorTab(currentMonitorTab || 'belum');
-      }
+      switchMonitorTab('live');
     }
-    const overlay = document.getElementById('monitorDrawerOverlay');
-    const drawer = document.getElementById('monitorDrawer');
-    if (overlay) overlay.classList.add('active');
-    if (drawer) drawer.classList.add('active');
+    const el = document.getElementById('kioskColLeft');
+    if (el && window.innerWidth <= 1080) {
+      el.scrollIntoView({ behavior: 'smooth' });
+    }
     fetchMonitorFeed(true);
-  }
-
-  function closeMonitorDrawer() {
-    const overlay = document.getElementById('monitorDrawerOverlay');
-    const drawer = document.getElementById('monitorDrawer');
-    if (overlay) overlay.classList.remove('active');
-    if (drawer) drawer.classList.remove('active');
     focusScanner();
   }
 
@@ -613,6 +625,7 @@
     if (tabName === 'gagal') renderFailedScans(monitorData.failed_scans || []);
     if (tabName === 'belum') filterBelumHadir();
     if (tabName === 'live') renderLiveFeed(monitorData.recent_scans || []);
+    focusScanner();
   }
 
   async function fetchMonitorFeed(isManual = false) {
