@@ -318,6 +318,44 @@
                     <span>Master Plan Ekosistem Digital SMKN 1 Air Naningan</span>
                 </div>
 
+                <!-- Group 0: Akses Gerbang Mandiri & Dasbor (ditampilkan paling atas di mobile) -->
+                <div class="drawer-gateways" style="padding-top: 0; border-top: none;">
+                    <div class="drawer-section-label">Akses Gerbang Mandiri &amp; Dasbor</div>
+                    <div class="drawer-gateway-grid">
+                        <a href="{{ route('portal.ortu.index') }}" class="drawer-gateway-card">
+                            <div class="gateway-icon-box blue">
+                                <i class="fa-solid fa-id-card-clip"></i>
+                            </div>
+                            <div>
+                                <div class="gateway-card-title">Monitoring Absen Mandiri</div>
+                                <div class="gateway-card-sub">Khusus Siswa &amp; Orang Tua</div>
+                            </div>
+                        </a>
+
+                        @auth
+                            <a href="{{ route('admin.portal') }}" class="drawer-gateway-card">
+                                <div class="gateway-icon-box dark">
+                                    <i class="fa-solid fa-gauge-high"></i>
+                                </div>
+                                <div>
+                                    <div class="gateway-card-title">DCC Portal</div>
+                                    <div class="gateway-card-sub">Halo, {{ auth()->user()->name }}</div>
+                                </div>
+                            </a>
+                        @else
+                            <a href="{{ route('login') }}" class="drawer-gateway-card">
+                                <div class="gateway-icon-box dark">
+                                    <i class="fa-solid fa-right-to-bracket"></i>
+                                </div>
+                                <div>
+                                    <div class="gateway-card-title">Login DCC</div>
+                                    <div class="gateway-card-sub">Pusat Komando &amp; Portal GTK</div>
+                                </div>
+                            </a>
+                        @endauth
+                    </div>
+                </div>
+
                 <!-- Group 1: Navigasi Kampus Utama -->
                 <div class="drawer-gateways" style="padding-top: 0; border-top: none;">
                     <div class="drawer-section-label">Navigasi Kampus Utama</div>
@@ -432,43 +470,7 @@
                     </div>
                 </div>
 
-                <!-- Group 3: Akses Gerbang Mandiri & Dasbor -->
-                <div class="drawer-gateways">
-                    <div class="drawer-section-label">Akses Gerbang Mandiri &amp; Dasbor</div>
-                    <div class="drawer-gateway-grid">
-                        <a href="{{ route('portal.ortu.index') }}" class="drawer-gateway-card">
-                            <div class="gateway-icon-box blue">
-                                <i class="fa-solid fa-id-card-clip"></i>
-                            </div>
-                            <div>
-                                <div class="gateway-card-title">Monitoring Absen Mandiri</div>
-                                <div class="gateway-card-sub">Khusus Siswa &amp; Orang Tua</div>
-                            </div>
-                        </a>
-
-                        @auth
-                            <a href="{{ route('admin.portal') }}" class="drawer-gateway-card">
-                                <div class="gateway-icon-box dark">
-                                    <i class="fa-solid fa-gauge-high"></i>
-                                </div>
-                                <div>
-                                    <div class="gateway-card-title">DCC Portal</div>
-                                    <div class="gateway-card-sub">Halo, {{ auth()->user()->name }}</div>
-                                </div>
-                            </a>
-                        @else
-                            <a href="{{ route('login') }}" class="drawer-gateway-card">
-                                <div class="gateway-icon-box dark">
-                                    <i class="fa-solid fa-right-to-bracket"></i>
-                                </div>
-                                <div>
-                                    <div class="gateway-card-title">Login DCC</div>
-                                    <div class="gateway-card-sub">Pusat Komando &amp; Portal GTK</div>
-                                </div>
-                            </a>
-                        @endauth
-                    </div>
-                </div>
+                {{-- Group 3 sudah dipindah ke atas (setelah drawer-announcement) --}}
 
                 <!-- Group 4: WhatsApp Helpdesk -->
                 <div class="drawer-helpdesk">
