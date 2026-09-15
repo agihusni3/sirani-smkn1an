@@ -336,15 +336,23 @@
         flex: 1;
       }
 
-      /* Tab navigasi — font lebih kecil, padding minimal */
-      .portal-main-tabs { gap: 5px; }
+      /* Tab navigasi — icon atas, teks bawah, proporsional penuh */
+      .portal-main-tabs { gap: 4px; margin-bottom: 12px; }
       .portal-main-tab {
-        padding: 8px 5px;
-        font-size: 10.5px;
-        gap: 4px;
+        flex-direction: column;
+        padding: 8px 4px;
+        font-size: 9.5px;
+        gap: 3px;
         border-radius: 10px;
+        letter-spacing: 0;
       }
-      .portal-main-tab i { font-size: 11px; }
+      .portal-main-tab i { font-size: 16px; }
+      .portal-main-tab span {
+        white-space: normal;
+        word-break: break-word;
+        line-height: 1.2;
+        text-align: center;
+      }
     }
 
     /* ─── Compact Search Bar (When Student Found) ─── */
@@ -468,15 +476,17 @@
     .portal-main-tabs {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 8px;
+      gap: 6px;
       margin-bottom: 16px;
+      width: 100%;
     }
     .portal-main-tab {
-      display: inline-flex;
+      display: flex;
+      flex-direction: row;
       align-items: center;
       justify-content: center;
       gap: 7px;
-      padding: 10px 14px;
+      padding: 10px 12px;
       font-size: 12px;
       font-weight: 800;
       border-radius: 12px;
@@ -487,10 +497,21 @@
       transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
       font-family: var(--font-main);
       box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+      white-space: normal;
+      text-align: center;
+      min-width: 0;
+      overflow: hidden;
+    }
+    .portal-main-tab span {
+      overflow: hidden;
+      text-overflow: ellipsis;
       white-space: nowrap;
+      min-width: 0;
+      flex: 1;
     }
     .portal-main-tab i {
       font-size: 13px;
+      flex-shrink: 0;
     }
     .portal-main-tab.active {
       background: #0f172a;
