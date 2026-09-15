@@ -600,9 +600,11 @@
 
                     <div class="ptk-field-item">
                       <div class="ptk-field-label"><i class="bi bi-diagram-3"></i> Tugas Tambahan</div>
-                      <div class="ptk-field-value">
-                        @if($guru->tugas_tambahan)
-                          <span class="badge bg-light text-dark border px-2 py-1">{{ $guru->tugas_tambahan }}</span>
+                      <div class="ptk-field-value d-flex flex-wrap gap-1.5">
+                        @if(!empty($guru->list_tugas_tambahan))
+                          @foreach($guru->list_tugas_tambahan as $tgs)
+                            <span class="badge bg-light text-dark border px-2 py-1 shadow-2xs">{{ $tgs }}</span>
+                          @endforeach
                         @else
                           <span class="ptk-field-empty">Tidak ada</span>
                         @endif
@@ -1202,10 +1204,12 @@
                 <div class="col-md-6">
                   <label class="form-label fw-bold small">Tugas / Jabatan Utama</label>
                   <input type="text" name="jabatan" class="form-control rounded-3" style="font-size:13px;" value="{{ old('jabatan', $guru->jabatan) }}" placeholder="Contoh: Guru Informatika / Guru Matematika" />
+                  <div class="form-text text-muted" style="font-size:11px;">Tugas pokok fungsional pengampu mapel.</div>
                 </div>
                 <div class="col-md-6">
                   <label class="form-label fw-bold small">Tugas Tambahan</label>
-                  <input type="text" name="tugas_tambahan" class="form-control rounded-3" style="font-size:13px;" value="{{ old('tugas_tambahan', $guru->tugas_tambahan) }}" placeholder="Contoh: Waka Sarpras, Wali Kelas X TKJ" />
+                  <input type="text" name="tugas_tambahan" class="form-control rounded-3" style="font-size:13px;" value="{{ old('tugas_tambahan', $guru->tugas_tambahan) }}" placeholder="Contoh: Waka Sarpras, Wali Kelas X TKJ 1" />
+                  <div class="form-text text-muted" style="font-size:11px;">Jika lebih dari 1, pisahkan dengan koma (misal: <em>Waka Sarpras, Wali Kelas X TKJ 1</em>).</div>
                 </div>
 
                 <div class="col-md-4">
