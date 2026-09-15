@@ -12,19 +12,19 @@
   @include('partials.sidebar_web')
   <main class="main-content">
     
-    <div class="panel no-print" style="background:#f2efe7; border:1px solid #c8dfdb; padding:12px 18px; margin-bottom:14px; border-radius:var(--r-md);">
+    <div class="panel no-print" style="background:var(--bg-2); border:1px solid var(--border); padding:12px 18px; margin-bottom:14px; border-radius:var(--r-md);">
       <div style="display:flex; justify-content:space-between; align-items:center;">
         <div style="display:flex; align-items:center; gap:8px;">
-          <a href="{{ route('admin.banner.index') }}" class="btn btn-sm" style="background:#ffffff; border:1px solid #c8dfdb; color:#000000; font-weight:700; padding:6px 12px; border-radius:6px; font-size:12px; text-decoration:none;">
-            <i class="bi bi-arrow-left" style="color:#3368a0;"></i> Kembali ke Daftar
+          <a href="{{ route('admin.banner.index') }}" class="btn btn-sm" style="background:var(--bg-3); border:1px solid var(--border-2); color:var(--text); font-weight:700; padding:6px 12px; border-radius:6px; font-size:12px; text-decoration:none;">
+            <i class="bi bi-arrow-left" style="color:var(--navy);"></i> Kembali ke Daftar
           </a>
-          <h1 style="margin:0; font-size:16px; font-weight:900; color:#000000;">Tambah Hero Banner Baru</h1>
+          <h1 style="margin:0; font-size:16px; font-weight:900; color:var(--text);">Tambah Hero Banner Baru</h1>
         </div>
       </div>
     </div>
 
     @if($errors->any())
-      <div class="panel" style="background:#fef2f2; border:1px solid #fecaca; color:#991b1b; padding:12px 16px; margin-bottom:14px; border-radius:var(--r-sm);">
+      <div class="panel" style="background:rgba(239,68,68,0.12); border:1px solid rgba(239,68,68,0.3); color:#ef4444; padding:12px 16px; margin-bottom:14px; border-radius:var(--r-sm);">
         <ul style="margin:0; padding-left:18px; font-size:12.5px;">
           @foreach($errors->all() as $err)
             <li>{{ $err }}</li>
@@ -33,17 +33,17 @@
       </div>
     @endif
 
-    <div class="panel" style="background:#ffffff; border:1px solid #c8dfdb; border-radius:12px; padding:24px; max-width:860px; box-shadow:0 2px 8px rgba(0,0,0,0.02);">
+    <div class="panel" style="background:var(--bg-2); border:1px solid var(--border); border-radius:12px; padding:24px; max-width:860px; box-shadow:0 2px 8px rgba(0,0,0,0.02);">
       <form action="{{ route('admin.banner.store') }}" method="POST" enctype="multipart/form-data">
         @csrf
 
         {{-- Posisi & Urutan --}}
         <div style="display:grid; grid-template-columns:1fr 140px; gap:16px; margin-bottom:16px;">
           <div>
-            <label style="display:block; font-size:12px; font-weight:800; color:#000000; margin-bottom:5px;">
+            <label style="display:block; font-size:12px; font-weight:800; color:var(--text); margin-bottom:5px;">
               Posisi Penempatan <span style="color:#ef4444;">*</span>
             </label>
-            <select name="posisi" required style="width:100%; padding:9px 12px; font-size:13px; border-radius:6px; border:1px solid var(--border); background:var(--surface); color:var(--text);">
+            <select name="posisi" required style="width:100%; padding:9px 12px; font-size:13px; border-radius:6px; border:1px solid var(--border-2); background:var(--bg-3); color:var(--text); font-weight:600;">
               <option value="hero_home" selected>Hero Utama Beranda Web (Full Photo Slider)</option>
               <option value="ppdb_callout">Banner Callout PPDB (Beranda Web)</option>
               <option value="top_bar">Top Bar Pengumuman</option>
@@ -55,7 +55,7 @@
             <label style="display:block; font-size:12px; font-weight:700; color:var(--text-2); margin-bottom:4px;">
               Urutan Tampil <span style="color:#ef4444;">*</span>
             </label>
-            <input type="number" name="urutan" value="{{ old('urutan', $nextUrutan) }}" min="1" required style="width:100%; padding:9px 12px; font-size:13px; border-radius:6px; border:1px solid var(--border); background:var(--surface); color:var(--text);">
+            <input type="number" name="urutan" value="{{ old('urutan', $nextUrutan) }}" min="1" required style="width:100%; padding:9px 12px; font-size:13px; border-radius:6px; border:1px solid var(--border-2); background:var(--bg-3); color:var(--text);">
           </div>
         </div>
 
@@ -111,7 +111,7 @@
             <label style="display:block; font-size:12px; font-weight:700; color:var(--text-2); margin-bottom:4px;">
               Tag Keterangan / Benefit Pills (Overlay)
             </label>
-            <input type="text" name="tag_overlay" value="{{ old('tag_overlay', 'SMKN 1 Air Naningan • Tanggamus, Lampung') }}" placeholder="Contoh: Bebas Biaya Pendaftaran | Tanpa Uang Gedung | Lisensi BNSP" style="width:100%; padding:9px 12px; font-size:13px; border-radius:6px; border:1px solid var(--border); background:var(--surface); color:var(--text);">
+            <input type="text" name="tag_overlay" value="{{ old('tag_overlay', 'SMKN 1 Air Naningan • Tanggamus, Lampung') }}" placeholder="Contoh: Bebas Biaya Pendaftaran | Tanpa Uang Gedung | Lisensi BNSP" style="width:100%; padding:9px 12px; font-size:13px; border-radius:6px; border:1px solid var(--border-2); background:var(--bg-3); color:var(--text);">
             <div style="font-size:11px; color:var(--text-3); margin-top:3px;">Untuk Banner PPDB: pisahkan poin keunggulan dengan tanda | atau koma.</div>
           </div>
         </div>
@@ -121,7 +121,7 @@
           <label style="display:block; font-size:12px; font-weight:700; color:var(--text-2); margin-bottom:4px;">
             Judul Utama Headline (Hero Title) <span style="color:#ef4444;">*</span>
           </label>
-          <input type="text" name="judul" value="{{ old('judul') }}" required placeholder="Contoh: Menempa Keahlian Teknik, Rekayasa, & Agro-Industri." style="width:100%; padding:10px 12px; font-size:14px; font-weight:700; border-radius:6px; border:1px solid var(--border); background:var(--surface); color:var(--text);">
+          <input type="text" name="judul" value="{{ old('judul') }}" required placeholder="Contoh: Menempa Keahlian Teknik, Rekayasa, & Agro-Industri." style="width:100%; padding:10px 12px; font-size:14px; font-weight:700; border-radius:6px; border:1px solid var(--border-2); background:var(--bg-3); color:var(--text);">
         </div>
 
         {{-- Narasi / Subjudul --}}
@@ -129,16 +129,16 @@
           <label style="display:block; font-size:12px; font-weight:700; color:var(--text-2); margin-bottom:4px;">
             Paragraf Pengantar / Narasi Vokasi
           </label>
-          <textarea name="subjudul" rows="3" placeholder="Jelaskan secara ringkas keunggulan vokasi, fasilitas bengkel, atau pesan sambutan sekolah..." style="width:100%; padding:10px 12px; font-size:13px; border-radius:6px; border:1px solid var(--border); background:var(--surface); color:var(--text); resize:vertical;">{{ old('subjudul') }}</textarea>
+          <textarea name="subjudul" rows="3" placeholder="Jelaskan secara ringkas keunggulan vokasi, fasilitas bengkel, atau pesan sambutan sekolah..." style="width:100%; padding:10px 12px; font-size:13px; border-radius:6px; border:1px solid var(--border-2); background:var(--bg-3); color:var(--text); resize:vertical;">{{ old('subjudul') }}</textarea>
         </div>
 
         {{-- Upload Foto --}}
-        <div style="margin-bottom:20px; padding:16px; background:var(--surface); border:1px solid var(--border); border-radius:8px;">
+        <div style="margin-bottom:20px; padding:16px; background:var(--bg-3); border:1px solid var(--border); border-radius:8px;">
           <label style="display:block; font-size:12px; font-weight:800; color:var(--text); margin-bottom:6px;">
             <i class="bi bi-camera"></i> Foto Visual Hero Banner
           </label>
           <div style="display:flex; align-items:flex-start; gap:16px; flex-wrap:wrap;">
-            <div id="previewContainer" style="width:200px; height:120px; border-radius:8px; overflow:hidden; border:2px dashed var(--border); background:var(--bg-2); display:flex; align-items:center; justify-content:center; text-align:center;">
+            <div id="previewContainer" style="width:200px; height:120px; border-radius:8px; overflow:hidden; border:2px dashed var(--border-2); background:var(--bg-2); display:flex; align-items:center; justify-content:center; text-align:center;">
               <span id="previewPlaceholder" style="font-size:11px; color:var(--text-3);">Preview Foto</span>
               <img id="previewImage" src="#" alt="Preview" style="display:none; width:100%; height:100%; object-fit:cover;">
             </div>
@@ -154,45 +154,45 @@
 
         {{-- Tombol Aksi (CTA 1, CTA 2, CTA 3) --}}
         <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr)); gap:16px; margin-bottom:18px;">
-          <div style="padding:14px; background:var(--surface); border:1px solid var(--border); border-radius:8px;">
+          <div style="padding:14px; background:var(--bg-3); border:1px solid var(--border); border-radius:8px;">
             <div style="font-size:12px; font-weight:800; color:var(--text); margin-bottom:8px;">
               <i class="bi bi-box-arrow-in-up-right"></i> Tombol Aksi 1 (Putih / Primer)
             </div>
             <div style="margin-bottom:8px;">
               <label style="font-size:11px; font-weight:700; color:var(--text-3);">Teks Tombol 1</label>
-              <input type="text" name="tombol_teks_1" value="{{ old('tombol_teks_1', 'Eksplorasi 3 Kejuruan') }}" placeholder="Contoh: Eksplorasi 3 Kejuruan" style="width:100%; padding:7px 10px; font-size:12px; border-radius:6px; border:1px solid var(--border); background:var(--bg-2); color:var(--text);">
+              <input type="text" name="tombol_teks_1" value="{{ old('tombol_teks_1', 'Eksplorasi 3 Kejuruan') }}" placeholder="Contoh: Eksplorasi 3 Kejuruan" style="width:100%; padding:7px 10px; font-size:12px; border-radius:6px; border:1px solid var(--border-2); background:var(--bg-2); color:var(--text);">
             </div>
             <div>
               <label style="font-size:11px; font-weight:700; color:var(--text-3);">Tujuan URL / Link</label>
-              <input type="text" name="tombol_url_1" value="{{ old('tombol_url_1', '/kejuruan') }}" placeholder="Contoh: /kejuruan atau https://..." style="width:100%; padding:7px 10px; font-size:12px; border-radius:6px; border:1px solid var(--border); background:var(--bg-2); color:var(--text);">
+              <input type="text" name="tombol_url_1" value="{{ old('tombol_url_1', '/kejuruan') }}" placeholder="Contoh: /kejuruan atau https://..." style="width:100%; padding:7px 10px; font-size:12px; border-radius:6px; border:1px solid var(--border-2); background:var(--bg-2); color:var(--text);">
             </div>
           </div>
 
-          <div style="padding:14px; background:var(--surface); border:1px solid var(--border); border-radius:8px;">
+          <div style="padding:14px; background:var(--bg-3); border:1px solid var(--border); border-radius:8px;">
             <div style="font-size:12px; font-weight:800; color:var(--text); margin-bottom:8px;">
               <i class="bi bi-box-arrow-in-up-right"></i> Tombol Aksi 2 (Kaca / Sekunder)
             </div>
             <div style="margin-bottom:8px;">
               <label style="font-size:11px; font-weight:700; color:var(--text-3);">Teks Tombol 2</label>
-              <input type="text" name="tombol_teks_2" value="{{ old('tombol_teks_2', 'Pendaftaran PPDB 2026/2027') }}" placeholder="Contoh: Pendaftaran PPDB" style="width:100%; padding:7px 10px; font-size:12px; border-radius:6px; border:1px solid var(--border); background:var(--bg-2); color:var(--text);">
+              <input type="text" name="tombol_teks_2" value="{{ old('tombol_teks_2', 'Pendaftaran PPDB 2026/2027') }}" placeholder="Contoh: Pendaftaran PPDB" style="width:100%; padding:7px 10px; font-size:12px; border-radius:6px; border:1px solid var(--border-2); background:var(--bg-2); color:var(--text);">
             </div>
             <div>
               <label style="font-size:11px; font-weight:700; color:var(--text-3);">Tujuan URL / Link</label>
-              <input type="text" name="tombol_url_2" value="{{ old('tombol_url_2', '/ppdb') }}" placeholder="Contoh: /ppdb atau https://..." style="width:100%; padding:7px 10px; font-size:12px; border-radius:6px; border:1px solid var(--border); background:var(--bg-2); color:var(--text);">
+              <input type="text" name="tombol_url_2" value="{{ old('tombol_url_2', '/ppdb') }}" placeholder="Contoh: /ppdb atau https://..." style="width:100%; padding:7px 10px; font-size:12px; border-radius:6px; border:1px solid var(--border-2); background:var(--bg-2); color:var(--text);">
             </div>
           </div>
 
-          <div style="padding:14px; background:var(--surface); border:1px solid var(--border); border-radius:8px;">
+          <div style="padding:14px; background:var(--bg-3); border:1px solid var(--border); border-radius:8px;">
             <div style="font-size:12px; font-weight:800; color:#10b981; margin-bottom:8px;">
               <i class="bi bi-whatsapp"></i> Tombol Aksi 3 (WhatsApp / Bantuan)
             </div>
             <div style="margin-bottom:8px;">
               <label style="font-size:11px; font-weight:700; color:var(--text-3);">Teks Tombol 3</label>
-              <input type="text" name="tombol_teks_3" value="{{ old('tombol_teks_3', 'Tanya Panitia PPDB') }}" placeholder="Contoh: Tanya Panitia PPDB" style="width:100%; padding:7px 10px; font-size:12px; border-radius:6px; border:1px solid var(--border); background:var(--bg-2); color:var(--text);">
+              <input type="text" name="tombol_teks_3" value="{{ old('tombol_teks_3', 'Tanya Panitia PPDB') }}" placeholder="Contoh: Tanya Panitia PPDB" style="width:100%; padding:7px 10px; font-size:12px; border-radius:6px; border:1px solid var(--border-2); background:var(--bg-2); color:var(--text);">
             </div>
             <div>
               <label style="font-size:11px; font-weight:700; color:var(--text-3);">Tujuan Link WA / URL</label>
-              <input type="text" name="tombol_url_3" value="{{ old('tombol_url_3') }}" placeholder="Contoh: https://wa.me/62812... atau link lain" style="width:100%; padding:7px 10px; font-size:12px; border-radius:6px; border:1px solid var(--border); background:var(--bg-2); color:var(--text);">
+              <input type="text" name="tombol_url_3" value="{{ old('tombol_url_3') }}" placeholder="Contoh: https://wa.me/62812... atau link lain" style="width:100%; padding:7px 10px; font-size:12px; border-radius:6px; border:1px solid var(--border-2); background:var(--bg-2); color:var(--text);">
             </div>
           </div>
         </div>
@@ -206,11 +206,11 @@
         </div>
 
         {{-- Tombol Submit --}}
-        <div style="display:flex; justify-content:flex-end; gap:10px; border-top:1px solid #c8dfdb; padding-top:16px;">
-          <a href="{{ route('admin.banner.index') }}" class="btn" style="background:#ffffff; border:1px solid #c8dfdb; color:#000000; padding:8px 18px; border-radius:6px; font-weight:700; font-size:12.5px; text-decoration:none;">
+        <div style="display:flex; justify-content:flex-end; gap:10px; border-top:1px solid var(--border); padding-top:16px;">
+          <a href="{{ route('admin.banner.index') }}" class="btn" style="background:var(--bg-3); border:1px solid var(--border-2); color:var(--text); padding:8px 18px; border-radius:6px; font-weight:700; font-size:12.5px; text-decoration:none;">
             Batal
           </a>
-          <button type="submit" class="btn" style="background:#3368a0; color:#ffffff; font-weight:800; font-size:13px; padding:9px 24px; border-radius:6px; border:none; cursor:pointer; box-shadow:0 2px 6px rgba(51,104,160,0.25);">
+          <button type="submit" class="btn" style="background:var(--navy); color:#ffffff; font-weight:800; font-size:13px; padding:9px 24px; border-radius:6px; border:none; cursor:pointer; box-shadow:0 2px 6px rgba(37,99,235,0.25);">
             <i class="bi bi-check-lg"></i> Simpan Banner
           </button>
         </div>
