@@ -339,34 +339,40 @@
           <div class="d-flex flex-column flex-lg-row justify-content-between align-items-start align-items-lg-center gap-4">
             
             {{-- Bagian Kiri: Avatar & Identitas Guru --}}
-            <div class="d-flex flex-column flex-sm-row align-items-center align-items-sm-start gap-4 text-center text-sm-start">
+            <div class="d-flex flex-column flex-sm-row align-items-center align-items-sm-start gap-3 text-center text-sm-start">
               
               {{-- Avatar Foto (Kotak Portrait Rasio 4x6) --}}
-              <div class="position-relative">
+              <div class="position-relative flex-shrink-0">
                 <img src="{{ $guru->foto_url }}" alt="{{ $guru->nama }}" class="shadow-sm" style="width:72px; height:108px; object-fit:cover; border-radius:12px; border:3px solid #FFFFFF; box-shadow:0 4px 12px rgba(0,0,0,0.1)!important;" />
                 <span class="position-absolute bottom-0 end-0 p-1.5 rounded-circle border border-2 border-white" style="background: {{ $guru->status === 'aktif' ? '#10B981' : '#94A3B8' }}; width:16px; height:16px; transform:translate(25%, 25%);" title="Status: {{ ucfirst($guru->status) }}"></span>
               </div>
 
               {{-- Detail Nama & Metadata --}}
-              <div>
+              <div style="display:flex; flex-direction:column; justify-content:center; gap:2px; min-width:0; padding-top:4px;">
                 @if($guru->golongan_ruang)
-                  <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-sm-start gap-2 mb-1.5">
-                    <span class="badge rounded-pill px-2.5 py-1" style="background:#FFFBEB; color:#B45309; border:1px solid #FDE68A; font-size:11.5px; font-weight:700;">
+                  <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-sm-start gap-2 mb-0.5">
+                    <span class="badge rounded-pill px-2 py-0.5" style="background:#FFFBEB; color:#B45309; border:1px solid #FDE68A; font-size:11px; font-weight:700;">
                       Gol. {{ $guru->golongan_ruang }}
                     </span>
                   </div>
                 @endif
 
-                <h2 class="h4 fw-bold mb-1.5" style="color:var(--text, #0F172A); letter-spacing:-0.02em;">
+                <h2 class="fw-bold m-0" style="color:var(--text, #0F172A); font-size:18.5px; letter-spacing:-0.02em; white-space:nowrap;">
                   {{ $guru->nama_lengkap_gelar ?: $guru->nama }}
                 </h2>
 
-                <div class="d-flex flex-wrap justify-content-center justify-content-sm-start gap-3 small" style="color:var(--text-3, #64748B);">
-                  <span><i class="bi bi-hash text-muted"></i> NIP: <strong style="color:var(--text, #0F172A);">{{ $guru->nip ?: '—' }}</strong></span>
-                  @if($guru->nuptk)
-                    <span><i class="bi bi-award text-muted"></i> NUPTK: <strong style="color:var(--text, #0F172A);">{{ $guru->nuptk }}</strong></span>
-                  @endif
-                  <span><i class="bi bi-briefcase text-muted"></i> Jabatan: <strong style="color:var(--text, #0F172A);">{{ $guru->jabatan ?: 'Guru' }}</strong></span>
+                <div style="font-size:12.5px; color:var(--text-3, #64748B); line-height:1.4;">
+                  NIP: <strong style="color:var(--text, #0F172A); font-family:var(--font-mono, monospace);">{{ $guru->nip ?: '—' }}</strong>
+                </div>
+
+                @if($guru->nuptk)
+                  <div style="font-size:12.5px; color:var(--text-3, #64748B); line-height:1.4;">
+                    NUPTK: <strong style="color:var(--text, #0F172A); font-family:var(--font-mono, monospace);">{{ $guru->nuptk }}</strong>
+                  </div>
+                @endif
+
+                <div style="font-size:12.5px; color:var(--text-3, #64748B); line-height:1.4;">
+                  Jabatan: <strong style="color:var(--text, #0F172A);">{{ $guru->jabatan ?: 'Guru' }}</strong>
                 </div>
               </div>
 
