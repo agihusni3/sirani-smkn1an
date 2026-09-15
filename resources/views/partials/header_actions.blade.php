@@ -357,6 +357,7 @@ window.toggleTheme = function() {
   document.querySelectorAll('.theme-toggle-icon').forEach(icon => {
     icon.className = (next === 'dark') ? 'bi bi-moon-stars-fill theme-toggle-icon' : 'bi bi-sun-fill theme-toggle-icon';
   });
+  window.dispatchEvent(new CustomEvent('theme-changed', { detail: { theme: next } }));
 };
 
 window.toggleAcctDropdown = function(e, btn) {
