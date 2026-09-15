@@ -93,7 +93,7 @@
                   name="keyword"
                   class="search-input"
                   value="{{ $keyword }}"
-                  placeholder="Masukkan NISN Siswa (contoh: 0071234567)..."
+                  placeholder="Masukkan NISN Anda"
                   autocomplete="off"
                   required
                   autofocus
