@@ -79,7 +79,7 @@
               Nomor Induk Siswa Nasional (NISN) <strong>"{{ $keyword }}"</strong> tidak terdaftar pada pangkalan data aktif sekolah. Pastikan nomor yang Anda masukkan sudah sesuai.
             </p>
             <a href="{{ route('portal.ortu.index') }}" class="btn-search" style="text-decoration:none; display:inline-flex; align-items:center; gap:6px; padding:9px 22px; border-radius:8px; font-size:13px;">
-              <i class="bi bi-arrow-repeat"></i> Coba NISN Lain
+              <i class="bi bi-arrow-repeat"></i> Masukkan NISN
             </a>
           </div>
         @else
