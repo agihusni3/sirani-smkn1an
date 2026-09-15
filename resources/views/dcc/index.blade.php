@@ -221,9 +221,9 @@
         <h2 class="portal-section-title">
           <span>Roadmap Modul DCC SMKN 1 AN</span>
         </h2>
-        <span style="font-size:12px; color:#000000; font-weight:600;">
+        <div class="portal-section-subtitle">
           Modul yang telah dipetakan dalam arsitektur digital sekolah dan siap diaktifkan secara bertahap.
-        </span>
+        </div>
       </div>
       <span class="portal-section-badge">5 Modul Rancang Bangun</span>
     </div>

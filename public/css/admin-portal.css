@@ -257,21 +257,55 @@ body {
   font-size: 15px;
   font-weight: 900;
   letter-spacing: -0.01em;
-  color: #000000;
+  color: var(--dcc-text-heading, #000000);
   display: flex;
   align-items: center;
   gap: 8px;
   margin: 0;
 }
 
+[data-theme="dark"] .portal-section-title {
+  color: #ffffff;
+}
+
+.portal-section-subtitle {
+  font-size: 12px;
+  color: #475569;
+  font-weight: 500;
+  margin-top: 2px;
+}
+
+[data-theme="dark"] .portal-section-subtitle {
+  color: #94a3b8;
+}
+
 .portal-section-badge {
   font-size: 10.5px;
-  font-weight: 800;
-  padding: 3px 8px;
+  font-weight: 700;
+  padding: 3px 9px;
   border-radius: 6px;
-  background: var(--dcc-color-cream);
-  border: 1px solid var(--dcc-color-ice);
-  color: #000000;
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  color: #334155;
+  transition: all 0.15s ease;
+}
+
+[data-theme="dark"] .portal-section-badge {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.14);
+  color: #cbd5e1;
+}
+
+a.portal-section-badge:hover {
+  background: #eff6ff;
+  border-color: #bfdbfe;
+  color: #2563eb;
+}
+
+[data-theme="dark"] a.portal-section-badge:hover {
+  background: rgba(37, 99, 235, 0.2);
+  border-color: #3b82f6;
+  color: #93c5fd;
 }
 
 /* ─── Active Module Grid (4 Core Ecosystem Modules) ─── */
@@ -726,11 +760,16 @@ body {
   background: var(--dcc-card-bg);
   border: 1px solid var(--dcc-card-border);
   border-radius: 10px;
-  padding: 12px;
+  padding: 14px 12px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   transition: all 0.15s ease;
+}
+
+[data-theme="dark"] .roadmap-card {
+  background: #111827;
+  border-color: rgba(255, 255, 255, 0.08);
 }
 
 .roadmap-card:hover {
@@ -738,11 +777,16 @@ body {
   transform: translateY(-1px);
 }
 
+[data-theme="dark"] .roadmap-card:hover {
+  border-color: #3b82f6;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+}
+
 .roadmap-top {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 6px;
+  margin-bottom: 8px;
 }
 
 .roadmap-icon-wrap {
@@ -753,53 +797,81 @@ body {
   align-items: center;
   justify-content: center;
   font-size: 13px;
-  color: #000000;
+  color: #0f172a;
   font-weight: 800;
   background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+}
+
+[data-theme="dark"] .roadmap-icon-wrap {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.1);
+  color: #60a5fa;
 }
 
 .roadmap-badge {
-  font-size: 9px;
+  font-size: 9.5px;
   font-weight: 800;
   letter-spacing: 0.02em;
-  padding: 2px 6px;
+  padding: 2px 7px;
   border-radius: 4px;
   background: #f1f5f9;
-  color: #000000;
+  color: #334155;
   border: 1px solid #e2e8f0;
+}
+
+[data-theme="dark"] .roadmap-badge {
+  background: rgba(37, 99, 235, 0.18);
+  border-color: rgba(59, 130, 246, 0.35);
+  color: #93c5fd;
 }
 
 .roadmap-title {
   font-size: 12px;
   font-weight: 900;
   margin: 0 0 2px;
-  color: #000000;
+  color: #0f172a;
+}
+
+[data-theme="dark"] .roadmap-title {
+  color: #f8fafc;
 }
 
 .roadmap-sub {
   font-size: 10px;
   font-weight: 700;
-  color: #000000;
-  opacity: 0.7;
+  color: #64748b;
   margin: 0 0 4px;
+}
+
+[data-theme="dark"] .roadmap-sub {
+  color: #94a3b8;
 }
 
 .roadmap-desc {
   font-size: 10.5px;
-  line-height: 1.4;
-  color: #000000;
-  opacity: 0.75;
+  line-height: 1.45;
+  color: #334155;
   margin: 0 0 8px;
   flex: 1;
   font-weight: 500;
+}
+
+[data-theme="dark"] .roadmap-desc {
+  color: #cbd5e1;
 }
 
 .roadmap-lead {
   font-size: 9.5px;
   font-weight: 700;
   color: #64748b;
-  padding-top: 4px;
+  padding-top: 6px;
   border-top: 1px solid #f1f5f9;
+}
+
+[data-theme="dark"] .roadmap-lead {
+  color: #94a3b8;
+  border-top-color: rgba(255, 255, 255, 0.08);
 }
 
 /* ─── Clean Minimalist Portal Footer ─── */
