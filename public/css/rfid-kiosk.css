@@ -974,6 +974,14 @@
       background: var(--rose);
       color: #fff;
     }
+    .tab-badge.warning {
+      background: var(--amber);
+      color: #fff;
+    }
+    .c-cyan {
+      color: var(--cyan);
+    }
+
 
     /* Drawer Scroll Body */
     .monitor-drawer-body {

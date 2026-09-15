@@ -808,7 +808,42 @@ class RfidController extends Controller
             })
             ->values();
 
-        // 4. Statistik Ringkas
+        // 4. Siswa yang Sudah Scan Masuk tapi Belum Scan Pulang
+        $belumPulangIds = Absensi::where('tanggal', $today)
+            ->where('pemilik_type', 'siswa')
+            ->whereNotNull('jam_masuk')
+            ->whereNull('jam_pulang')
+            ->pluck('pemilik_id')
+            ->toArray();
+
+        $belumPulangAbsensi = Absensi::where('tanggal', $today)
+            ->where('pemilik_type', 'siswa')
+            ->whereNotNull('jam_masuk')
+            ->whereNull('jam_pulang')
+            ->with(['siswa.siswaRombels.rombel'])
+            ->get()
+            ->map(function ($a) {
+                $s = $a->siswa;
+                if (!$s) return null;
+                $rombel = $s->siswaRombels->first()?->rombel?->nama_rombel ?? 'Tanpa Rombel';
+                $hpClean = preg_replace('/[^0-9]/', '', $s->no_hp_ortu ?? ($s->no_hp_siswa ?? ''));
+                if (str_starts_with($hpClean, '0')) $hpClean = '62' . substr($hpClean, 1);
+                return [
+                    'id'         => $s->id,
+                    'nama'       => $s->nama,
+                    'nisn'       => $s->nisn ?: $s->nis,
+                    'rombel'     => $rombel,
+                    'foto'       => $s->foto_url ?? '/img/user-default.png',
+                    'jam_masuk'  => $a->jam_masuk ? substr($a->jam_masuk, 0, 5) : null,
+                    'status'     => $a->status,
+                    'no_hp_ortu' => $s->no_hp_ortu,
+                    'hp_clean'   => $hpClean,
+                ];
+            })
+            ->filter()
+            ->sortBy(fn($s) => ($s['rombel'] ?? '') . ' ' . ($s['nama'] ?? ''))
+            ->values();
+
         $totalHadir = Absensi::where('tanggal', $today)->where('status', 'hadir')->count();
         $totalTerlambat = Absensi::where('tanggal', $today)->where('status', 'terlambat')->count();
         $totalPulang = Absensi::where('tanggal', $today)->whereNotNull('jam_pulang')->count();
@@ -818,12 +853,14 @@ class RfidController extends Controller
             'recent_scans'       => $recentScans,
             'failed_scans'       => $failedScans,
             'belum_hadir'        => $belumHadir,
+            'belum_pulang'       => $belumPulangAbsensi,
             'stats'              => [
-                'total_hadir'      => $totalHadir,
-                'total_terlambat'  => $totalTerlambat,
-                'total_pulang'     => $totalPulang,
-                'total_gagal'      => count($failedScans),
-                'total_belum_absen'=> count($belumHadir),
+                'total_hadir'        => $totalHadir,
+                'total_terlambat'    => $totalTerlambat,
+                'total_pulang'       => $totalPulang,
+                'total_gagal'        => count($failedScans),
+                'total_belum_absen'  => count($belumHadir),
+                'total_belum_pulang' => count($belumPulangAbsensi),
             ],
             'server_time'        => now()->format('H:i:s'),
         ]);

@@ -120,6 +120,10 @@
             <div class="monitor-stat-val c-slate" id="mStatBelum">0</div>
             <div class="monitor-stat-lbl">Belum Hadir</div>
           </div>
+          <div class="monitor-stat-item" onclick="switchMonitorTab('pulang')" style="cursor:pointer;" title="Klik untuk pantau Siswa Belum Pulang">
+            <div class="monitor-stat-val c-cyan" id="mStatBelumPulang">0</div>
+            <div class="monitor-stat-lbl">Belum Pulang</div>
+          </div>
         </div>
 
         <!-- ══ LIVE ACTIVITY TICKER SPOTLIGHT ══ -->
@@ -156,6 +160,11 @@
             <span>Belum Hadir</span>
             <span class="tab-badge" id="badgeTabBelum">0</span>
           </button>
+          <button type="button" class="monitor-tab-btn" id="tabBtnPulang" onclick="switchMonitorTab('pulang')">
+            <i class="bi bi-door-open-fill"></i>
+            <span>Blm Pulang</span>
+            <span class="tab-badge warning" id="badgeTabPulang">0</span>
+          </button>
         </div>
 
         <!-- Tab Content 1: Live Feed Siswa yang Baru Hadir (Default Aktif) -->
@@ -181,6 +190,19 @@
             </select>
           </div>
           <div id="listBelumHadir">
+            <!-- Diisi oleh JS -->
+          </div>
+        </div>
+
+        <!-- Tab Content 4: Sudah Masuk Belum Scan Pulang -->
+        <div class="monitor-drawer-body" id="tabContentPulang" style="display:none;">
+          <div class="monitor-filter-bar">
+            <input type="text" class="monitor-search-input" id="searchPulangInput" placeholder="Cari nama siswa..." oninput="filterBelumPulang()" />
+            <select class="monitor-select-rombel" id="filterRombelPulangSelect" onchange="filterBelumPulang()">
+              <option value="">Semua Kelas</option>
+            </select>
+          </div>
+          <div id="listBelumPulang">
             <!-- Diisi oleh JS -->
           </div>
         </div>
@@ -614,10 +636,11 @@
 
   function switchMonitorTab(tabName) {
     currentMonitorTab = tabName;
-    const tabs = ['gagal', 'belum', 'live'];
+    const tabs = ['gagal', 'belum', 'live', 'pulang'];
     tabs.forEach(t => {
-      const btn = document.getElementById('tabBtn' + t.charAt(0).toUpperCase() + t.slice(1));
-      const content = document.getElementById('tabContent' + t.charAt(0).toUpperCase() + t.slice(1));
+      const key = t.charAt(0).toUpperCase() + t.slice(1);
+      const btn = document.getElementById('tabBtn' + key);
+      const content = document.getElementById('tabContent' + key);
       if (btn) btn.classList.toggle('active', t === tabName);
       if (content) content.style.display = (t === tabName) ? 'flex' : 'none';
     });
@@ -625,6 +648,7 @@
     if (tabName === 'gagal') renderFailedScans(monitorData.failed_scans || []);
     if (tabName === 'belum') filterBelumHadir();
     if (tabName === 'live') renderLiveFeed(monitorData.recent_scans || []);
+    if (tabName === 'pulang') filterBelumPulang();
     focusScanner();
   }
 
@@ -665,6 +689,7 @@
     const totalHadir = stats.total_hadir || 0;
     const totalTerlambat = stats.total_terlambat || 0;
     const totalBelum = stats.total_belum_absen || 0;
+    const totalBelumPulang = stats.total_belum_pulang || (monitorData.belum_pulang || []).length;
 
     // Header Badge
     const headerBadge = document.getElementById('headerFailedBadge');
@@ -682,18 +707,22 @@
     const elTerlambat = document.getElementById('mStatTerlambat');
     const elGagal = document.getElementById('mStatGagal');
     const elBelum = document.getElementById('mStatBelum');
+    const elBelumPulang = document.getElementById('mStatBelumPulang');
     if (elHadir) elHadir.textContent = totalHadir;
     if (elTerlambat) elTerlambat.textContent = totalTerlambat;
     if (elGagal) elGagal.textContent = totalGagal;
     if (elBelum) elBelum.textContent = totalBelum;
+    if (elBelumPulang) elBelumPulang.textContent = totalBelumPulang;
 
     // Tab Badges
     const badgeGagal = document.getElementById('badgeTabGagal');
     const badgeBelum = document.getElementById('badgeTabBelum');
     const badgeLive = document.getElementById('badgeTabLive');
+    const badgePulang = document.getElementById('badgeTabPulang');
     if (badgeGagal) badgeGagal.textContent = totalGagal;
     if (badgeBelum) badgeBelum.textContent = totalBelum;
     if (badgeLive) badgeLive.textContent = (monitorData.recent_scans || []).length;
+    if (badgePulang) badgePulang.textContent = totalBelumPulang;
 
     // Live Ticker Below Scanner
     const ticker = document.getElementById('kioskLiveTicker');
@@ -734,25 +763,120 @@
     if (currentMonitorTab === 'gagal') renderFailedScans(monitorData.failed_scans || []);
     if (currentMonitorTab === 'belum') filterBelumHadir();
     if (currentMonitorTab === 'live') renderLiveFeed(monitorData.recent_scans || []);
+    if (currentMonitorTab === 'pulang') filterBelumPulang();
   }
 
   function populateRombelOptions() {
-    if (rombelOptionsPopulated || !monitorData.belum_hadir) return;
-    const select = document.getElementById('filterRombelSelect');
-    if (!select) return;
+    // Populate filter rombel untuk tab Belum Hadir
+    const selectBelum = document.getElementById('filterRombelSelect');
+    if (selectBelum && monitorData.belum_hadir) {
+      const rombels = [...new Set(monitorData.belum_hadir.map(s => s.rombel).filter(Boolean))].sort();
+      if (rombels.length > 0 && selectBelum.options.length <= 1) {
+        selectBelum.innerHTML = '<option value="">Semua Kelas (' + monitorData.belum_hadir.length + ')</option>';
+        rombels.forEach(r => {
+          const opt = document.createElement('option');
+          opt.value = r; opt.textContent = r;
+          selectBelum.appendChild(opt);
+        });
+      }
+    }
 
-    const rombels = [...new Set(monitorData.belum_hadir.map(s => s.rombel).filter(Boolean))].sort();
-    if (rombels.length === 0) return;
+    // Populate filter rombel untuk tab Belum Pulang
+    const selectPulang = document.getElementById('filterRombelPulangSelect');
+    if (selectPulang && monitorData.belum_pulang) {
+      const rombelsPulang = [...new Set(monitorData.belum_pulang.map(s => s.rombel).filter(Boolean))].sort();
+      if (rombelsPulang.length > 0 && selectPulang.options.length <= 1) {
+        selectPulang.innerHTML = '<option value="">Semua Kelas (' + monitorData.belum_pulang.length + ')</option>';
+        rombelsPulang.forEach(r => {
+          const opt = document.createElement('option');
+          opt.value = r; opt.textContent = r;
+          selectPulang.appendChild(opt);
+        });
+      }
+    }
 
-    select.innerHTML = '<option value="">Semua Kelas (' + monitorData.belum_hadir.length + ')</option>';
-    rombels.forEach(r => {
-      const opt = document.createElement('option');
-      opt.value = r;
-      opt.textContent = r;
-      select.appendChild(opt);
-    });
     rombelOptionsPopulated = true;
   }
+
+  // Render Tab "Belum Scan Pulang": Siswa sudah masuk tapi belum tap pulang
+  function filterBelumPulang() {
+    const searchVal = (document.getElementById('searchPulangInput')?.value || '').toLowerCase().trim();
+    const rombelVal = document.getElementById('filterRombelPulangSelect')?.value || '';
+    const container = document.getElementById('listBelumPulang');
+    if (!container) return;
+
+    let list = monitorData.belum_pulang || [];
+    if (rombelVal) list = list.filter(s => s.rombel === rombelVal);
+    if (searchVal) {
+      list = list.filter(s => {
+        return (s.nama || '').toLowerCase().includes(searchVal)
+          || (s.nisn || '').toLowerCase().includes(searchVal)
+          || (s.rombel || '').toLowerCase().includes(searchVal);
+      });
+    }
+
+    if (list.length === 0) {
+      container.innerHTML = `
+        <div class="drawer-empty-state">
+          <div class="drawer-empty-icon" style="color:var(--emerald);">
+            <i class="bi bi-house-check-fill"></i>
+          </div>
+          <div class="drawer-empty-title">${(searchVal || rombelVal) ? 'Tidak ada yang cocok' : 'Semua Siswa Sudah Pulang!'}</div>
+          <div class="drawer-empty-desc">
+            ${(searchVal || rombelVal) ? 'Tidak ada siswa yang cocok dengan pencarian.' : 'Seluruh siswa yang hadir hari ini sudah melakukan presensi pulang.'}
+          </div>
+        </div>
+      `;
+      return;
+    }
+
+    let html = '';
+    list.slice(0, 100).forEach(s => {
+      const nama = s.nama || 'Siswa';
+      const rombel = s.rombel || '-';
+      const nisn = s.nisn || '-';
+      const foto = s.foto || '/img/user-default.png';
+      const jamMasuk = s.jam_masuk || '--:--';
+      const hpClean = s.hp_clean || '';
+
+      let waBtn = '';
+      if (hpClean) {
+        const pesanWa = encodeURIComponent(`Assalamu'alaikum Wr. Wb. Pemberitahuan Smart Gate SMKN 1 Air Naningan: Menginformasikan bahwa ananda ${nama} (${rombel}) telah tercatat hadir pada pukul ${jamMasuk} WIB namun hingga saat ini belum melakukan presensi kepulangan. Mohon konfirmasi. Terima kasih.`);
+        waBtn = `
+          <a href="https://wa.me/${hpClean}?text=${pesanWa}" target="_blank" class="btn-action-sm btn-wa" title="Ingatkan Orang Tua via WA">
+            <i class="bi bi-whatsapp"></i> WA Ortu
+          </a>
+        `;
+      } else {
+        waBtn = `<span class="btn-action-sm" style="opacity:0.5;cursor:default;"><i class="bi bi-telephone-x"></i> No WA -</span>`;
+      }
+
+      html += `
+        <div class="belum-hadir-card">
+          <img src="${escapeHtml(foto)}" alt="${escapeHtml(nama)}" class="belum-foto-3x4" onerror="this.src='/img/user-default.png'" />
+          <div class="belum-info">
+            <div class="belum-nama">${escapeHtml(nama)}</div>
+            <div class="belum-sub">
+              <strong>${escapeHtml(rombel)}</strong> &bull; NISN: ${escapeHtml(nisn)}
+            </div>
+            <div class="belum-sub" style="color:var(--cyan);font-size:11px;margin-top:2px;">
+              <i class="bi bi-box-arrow-in-right"></i> Masuk: ${escapeHtml(jamMasuk)} WIB &bull; <i class="bi bi-hourglass-split"></i> Belum scan pulang
+            </div>
+          </div>
+          <div class="belum-actions">
+            ${waBtn}
+          </div>
+        </div>
+      `;
+    });
+
+    if (list.length > 100) {
+      html += `<div style="text-align:center;padding:12px;font-size:12px;color:var(--text-muted);">Menampilkan 100 dari ${list.length} siswa.</div>`;
+    }
+
+    container.innerHTML = html;
+  }
+
 
   // Render Tab 1: Gagal Absen & Ditolak
   function renderFailedScans(list) {
