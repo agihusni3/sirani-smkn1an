@@ -47,18 +47,35 @@ class RfidScanService
             $failedList = \Illuminate\Support\Facades\Cache::get($key, []);
             if (!is_array($failedList)) $failedList = [];
 
-            $d = $res['data'] ?? null;
+            $d    = $res['data'] ?? null;
+            $msg  = $res['message'] ?? 'Pemindaian ditolak sistem';
+            $jam  = now()->format('H:i');
+
+            // Ambil nomor HP ortu jika ada di data siswa (untuk tombol WA di panel monitor)
+            $noHpOrtu = $d['no_hp_ortu'] ?? null;
+            $hpClean  = '';
+            if ($noHpOrtu) {
+                $hpClean = preg_replace('/[^0-9]/', '', $noHpOrtu);
+                if (str_starts_with($hpClean, '0')) $hpClean = '62' . substr($hpClean, 1);
+            }
+
             $entry = [
-                'id'        => uniqid('fail_'),
-                'time'      => now()->format('H:i:s'),
-                'timestamp' => now()->timestamp,
-                'uid'       => strtoupper(trim($uid)),
-                'type'      => $res['type'] ?? 'gagal',
-                'message'   => $res['message'] ?? 'Pemindaian ditolak sistem',
-                'nama'      => $d['nama'] ?? null,
-                'sub'       => $d['sub'] ?? ($d['rombel_atau_jabatan'] ?? null),
-                'identitas' => $d['identitas'] ?? null,
-                'foto'      => $d['foto'] ?? ($d['foto_url'] ?? null),
+                'id'         => uniqid('fail_'),
+                'time'       => $jam,
+                'jam'        => $jam,          // alias agar JS konsisten
+                'timestamp'  => now()->timestamp,
+                'uid'        => strtoupper(trim($uid)),
+                'type'       => $res['type'] ?? 'gagal',
+                'message'    => $msg,
+                'pesan'      => $msg,          // alias untuk renderFailedScans JS
+                'alasan'     => $msg,          // alias untuk ticker JS
+                'nama'       => $d['nama'] ?? null,
+                'rombel'     => $d['rombel_atau_jabatan'] ?? ($d['sub'] ?? null),
+                'sub'        => $d['sub'] ?? ($d['rombel_atau_jabatan'] ?? null),
+                'identitas'  => $d['identitas'] ?? null,
+                'foto'       => $d['foto'] ?? ($d['foto_url'] ?? '/img/user-default.png'),
+                'no_hp_ortu' => $noHpOrtu,
+                'hp_clean'   => $hpClean,
             ];
 
             array_unshift($failedList, $entry);

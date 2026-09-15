@@ -711,7 +711,9 @@
         if (tickerStatGagal) tickerStatGagal.style.display = 'inline-flex';
         const lastFail = monitorData.failed_scans[0];
         const failTarget = lastFail.nama || (lastFail.uid ? `Kartu UID: ${lastFail.uid}` : 'Kartu Tidak Dikenal');
-        tickerText.innerHTML = `<strong>PERHATIAN GAGAL ABSEN:</strong> ${escapeHtml(failTarget)} &bull; ${escapeHtml(lastFail.alasan || lastFail.pesan)} (${lastFail.jam} WIB)`;
+        const failJam = lastFail.jam || lastFail.time || '--:--';
+        const failAlasan = lastFail.alasan || lastFail.pesan || lastFail.message || 'Kartu belum terdaftar di sistem';
+        tickerText.innerHTML = `<strong>PERHATIAN GAGAL ABSEN:</strong> ${escapeHtml(failTarget)} &bull; ${escapeHtml(failAlasan)} (${escapeHtml(failJam)} WIB)`;
       } else if (monitorData.recent_scans && monitorData.recent_scans.length > 0) {
         ticker.classList.remove('has-alert');
         if (tickerStatGagal) tickerStatGagal.style.display = 'none';
