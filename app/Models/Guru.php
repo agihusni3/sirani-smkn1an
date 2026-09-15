@@ -246,11 +246,49 @@ class Guru extends Model
         // Bersihkan gelar akademik depan dan belakang untuk inisial nama yang akurat
         $cleanName = preg_replace('/\b(Drs|Dra|Ir|Prof|Dr|H|Hj)\.\s*/i', '', $this->nama);
         $cleanName = preg_replace('/,.*$/', '', $cleanName); // Hapus gelar belakang seperti ', S.Pd', ', S.T.', ', M.Pd'
-        $cleanName = trim($cleanName);
-
         $namaEncoded = urlencode($cleanName ?: $this->nama);
         return "https://ui-avatars.com/api/?name={$namaEncoded}&background=3B82F6&color=ffffff&bold=true&size=200";
     }
+
+    public function getPangkatAttribute(): ?string
+    {
+        return $this->attributes['pangkat'] ?? $this->golongan_pangkat ?? null;
+    }
+
+    public function getTmtCpnsAttribute(): ?string
+    {
+        if (!empty($this->attributes['tmt_cpns'])) {
+            return $this->attributes['tmt_cpns'];
+        }
+        if (!empty($this->tmt_kerja)) {
+            return is_string($this->tmt_kerja) ? $this->tmt_kerja : $this->tmt_kerja->toDateString();
+        }
+        return null;
+    }
+
+    public function getTmtPangkatAttribute(): ?string
+    {
+        if (!empty($this->attributes['tmt_pangkat'])) {
+            return $this->attributes['tmt_pangkat'];
+        }
+        if (!empty($this->tmt_pangkat_terakhir)) {
+            return is_string($this->tmt_pangkat_terakhir) ? $this->tmt_pangkat_terakhir : $this->tmt_pangkat_terakhir;
+        }
+        return null;
+    }
+
+    public function getTmtKgbBerikutnyaAttribute(): ?string
+    {
+        if (!empty($this->tmt_kgb_terakhir)) {
+            try {
+                return \Carbon\Carbon::parse($this->tmt_kgb_terakhir)->addYears(2)->toDateString();
+            } catch (\Throwable $e) {
+                return null;
+            }
+        }
+        return null;
+    }
+
 
     public function absensis(): \Illuminate\Database\Eloquent\Relations\HasMany
     {

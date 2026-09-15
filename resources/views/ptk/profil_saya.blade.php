@@ -408,6 +408,9 @@
               @endif
 
               <div class="d-flex flex-wrap gap-2 justify-content-center justify-content-lg-end align-items-center">
+                <button type="button" class="btn btn-sm btn-light border px-3 fw-bold d-inline-flex align-items-center gap-1.5 shadow-sm" data-bs-toggle="modal" data-bs-target="#modalUpdateBiodata" style="border-radius:10px; height:38px; color:var(--text, #0F172A); background:#FFFFFF;">
+                  <i class="bi bi-pencil-square text-primary"></i> Update Biodata
+                </button>
                 <a href="{{ route('kartu.digital.guru', $guru->id) }}" target="_blank" class="btn btn-sm btn-outline-secondary px-3 fw-bold d-inline-flex align-items-center gap-1.5" style="border-radius:10px; height:38px;">
                   <i class="bi bi-qr-code"></i> Kartu Digital Barcode
                 </a>
@@ -453,7 +456,7 @@
             {{-- Panel 1: Identitas Diri & Kontak --}}
             <div class="col-lg-6">
               <div class="ptk-info-card">
-                <div class="ptk-info-card-header">
+                <div class="ptk-info-card-header d-flex align-items-center justify-content-between">
                   <div class="d-flex align-items-center gap-2">
                     <div class="p-2 rounded-3 bg-primary-subtle text-primary">
                       <i class="bi bi-person-lines-fill"></i>
@@ -463,6 +466,9 @@
                       <div class="text-muted" style="font-size:11.5px;">Data resmi kependudukan sesuai KTP / Dapodik</div>
                     </div>
                   </div>
+                  <button type="button" class="btn btn-sm btn-outline-primary py-1 px-2.5 rounded-pill fw-semibold" style="font-size:11.5px;" data-bs-toggle="modal" data-bs-target="#modalUpdateBiodata" data-tab-target="#tab-modal-identitas">
+                    <i class="bi bi-pencil-square me-1"></i> Edit Data
+                  </button>
                 </div>
 
                 <div class="ptk-info-card-body">
@@ -549,7 +555,7 @@
             {{-- Panel 2: Kepegawaian & Riwayat Pangkat --}}
             <div class="col-lg-6">
               <div class="ptk-info-card">
-                <div class="ptk-info-card-header">
+                <div class="ptk-info-card-header d-flex align-items-center justify-content-between">
                   <div class="d-flex align-items-center gap-2">
                     <div class="p-2 rounded-3 bg-warning-subtle text-warning-emphasis">
                       <i class="bi bi-briefcase-fill"></i>
@@ -559,6 +565,9 @@
                       <div class="text-muted" style="font-size:11.5px;">Pangkat, golongan, dan histori kenaikan berkala</div>
                     </div>
                   </div>
+                  <button type="button" class="btn btn-sm btn-outline-warning text-dark py-1 px-2.5 rounded-pill fw-semibold" style="font-size:11.5px;" data-bs-toggle="modal" data-bs-target="#modalUpdateBiodata" data-tab-target="#tab-modal-kepegawaian">
+                    <i class="bi bi-pencil-square me-1"></i> Edit Riwayat
+                  </button>
                 </div>
 
                 <div class="ptk-info-card-body">
@@ -642,13 +651,18 @@
           </div>
 
           {{-- Catatan Panduan Pembaruan Data --}}
-          <div class="p-3 rounded-4 d-flex align-items-center gap-3 border" style="background:#F8FAFC; border-color:#E2E8F0!important;">
-            <div class="p-2 rounded-circle bg-primary-subtle text-primary fs-5">
-              <i class="bi bi-info-circle"></i>
+          <div class="p-3 rounded-4 d-flex flex-column flex-sm-row align-items-start align-items-sm-center justify-content-between gap-3 border" style="background:#F8FAFC; border-color:#E2E8F0!important;">
+            <div class="d-flex align-items-center gap-3">
+              <div class="p-2 rounded-circle bg-primary-subtle text-primary fs-5">
+                <i class="bi bi-info-circle"></i>
+              </div>
+              <div class="small text-muted">
+                <strong>Catatan Pembaruan Biodata:</strong> Anda dapat memperbarui data identitas kependudukan, nomor kontak, serta riwayat kepegawaian secara mandiri. Perubahan akan langsung disinkronkan ke Data Pokok GTK SITUAN.
+              </div>
             </div>
-            <div class="small text-muted">
-              <strong>Catatan Pembaruan Biodata:</strong> Jika terdapat ketidaksesuaian data identitas, NIP/NUPTK, atau status kenaikan pangkat di atas, silakan hubungi bagian Kepegawaian Tata Usaha (SITUAN) untuk proses validasi dan sinkronisasi berkas kedinasan.
-            </div>
+            <button type="button" class="btn btn-sm btn-primary px-3 py-1.5 rounded-pill fw-bold text-nowrap flex-shrink-0 shadow-sm" data-bs-toggle="modal" data-bs-target="#modalUpdateBiodata" style="font-size:12px; background:#2563EB; border-color:#2563EB;">
+              <i class="bi bi-pencil-square me-1"></i> Update Biodata Sekarang
+            </button>
           </div>
         </div>
 
@@ -1052,6 +1066,221 @@
   </main>
 </div>
 
+{{-- MODAL UPDATE BIODATA MANDIRI PTK --}}
+<div class="modal fade" id="modalUpdateBiodata" tabindex="-1" aria-labelledby="modalUpdateBiodataLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+      
+      <div class="modal-header border-0 pb-2 pt-4 px-4 bg-light">
+        <div>
+          <h5 class="modal-title fw-bold mb-1" id="modalUpdateBiodataLabel" style="color:var(--text, #0F172A);">
+            <i class="bi bi-pencil-square text-primary me-1.5"></i> Pembaruan Biodata Mandiri PTK
+          </h5>
+          <div class="text-muted small">Perbarui data kependudukan, kontak, status kepegawaian, dan riwayat pendidikan Anda.</div>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <form action="{{ route('ptk.update-biodata') }}" method="POST">
+        @csrf
+        @if(auth()->user()->isAdmin() && request('guru_id'))
+          <input type="hidden" name="guru_id" value="{{ $guru->id }}" />
+        @endif
+
+        {{-- Nav Tabs Internal Modal --}}
+        <div class="px-4 pt-3 border-bottom bg-light">
+          <ul class="nav nav-tabs border-0 gap-2" id="modalBiodataTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+              <button class="nav-link active fw-bold small py-2 px-3 rounded-top-3 border-0" id="tab-modal-identitas-btn" data-bs-toggle="tab" data-bs-target="#tab-modal-identitas" type="button" role="tab" style="font-size:12.5px;">
+                <i class="bi bi-person-lines-fill text-primary me-1"></i> Identitas &amp; Kontak
+              </button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button class="nav-link fw-bold small py-2 px-3 rounded-top-3 border-0" id="tab-modal-kepegawaian-btn" data-bs-toggle="tab" data-bs-target="#tab-modal-kepegawaian" type="button" role="tab" style="font-size:12.5px;">
+                <i class="bi bi-briefcase-fill text-warning me-1"></i> Kepegawaian &amp; Tugas
+              </button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button class="nav-link fw-bold small py-2 px-3 rounded-top-3 border-0" id="tab-modal-pendidikan-btn" data-bs-toggle="tab" data-bs-target="#tab-modal-pendidikan" type="button" role="tab" style="font-size:12.5px;">
+                <i class="bi bi-mortarboard-fill text-success me-1"></i> Pendidikan &amp; Sertifikasi
+              </button>
+            </li>
+          </ul>
+        </div>
+
+        <div class="modal-body px-4 py-3" style="max-height: 65vh; overflow-y: auto;">
+          <div class="tab-content" id="modalBiodataTabContent">
+            
+            {{-- TAB 1: IDENTITAS & KONTAK --}}
+            <div class="tab-pane fade show active" id="tab-modal-identitas" role="tabpanel">
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label class="form-label fw-bold small">Nama Lengkap (Tanpa Gelar) <span class="text-danger">*</span></label>
+                  <input type="text" name="nama_lengkap" class="form-control rounded-3" style="font-size:13px;" value="{{ old('nama_lengkap', $guru->nama_lengkap ?: $guru->nama) }}" required placeholder="Contoh: Agi Husni Widodo" />
+                </div>
+                <div class="col-md-3">
+                  <label class="form-label fw-bold small">Gelar Depan</label>
+                  <input type="text" name="gelar_depan" class="form-control rounded-3" style="font-size:13px;" value="{{ old('gelar_depan', $guru->gelar_depan) }}" placeholder="Contoh: Dr., Drs." />
+                </div>
+                <div class="col-md-3">
+                  <label class="form-label fw-bold small">Gelar Belakang</label>
+                  <input type="text" name="gelar_belakang" class="form-control rounded-3" style="font-size:13px;" value="{{ old('gelar_belakang', $guru->gelar_belakang) }}" placeholder="Contoh: S.Kom., M.Pd." />
+                </div>
+
+                <div class="col-md-4">
+                  <label class="form-label fw-bold small">NIP (Nomor Induk Pegawai)</label>
+                  <input type="text" name="nip" class="form-control rounded-3 font-monospace" style="font-size:13px;" value="{{ old('nip', $guru->nip) }}" placeholder="18 digit angka NIP" />
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label fw-bold small">NIK (Nomor KTP)</label>
+                  <input type="text" name="nik" class="form-control rounded-3 font-monospace" style="font-size:13px;" value="{{ old('nik', $guru->nik) }}" maxlength="20" placeholder="16 digit angka NIK" />
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label fw-bold small">NUPTK</label>
+                  <input type="text" name="nuptk" class="form-control rounded-3 font-monospace" style="font-size:13px;" value="{{ old('nuptk', $guru->nuptk) }}" placeholder="16 digit NUPTK" />
+                </div>
+
+                <div class="col-md-6">
+                  <label class="form-label fw-bold small">Tempat Lahir</label>
+                  <input type="text" name="tempat_lahir" class="form-control rounded-3" style="font-size:13px;" value="{{ old('tempat_lahir', $guru->tempat_lahir) }}" placeholder="Kota / Kabupaten Lahir" />
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label fw-bold small">Tanggal Lahir</label>
+                  <input type="date" name="tanggal_lahir" class="form-control rounded-3" style="font-size:13px;" value="{{ old('tanggal_lahir', $guru->tanggal_lahir ? \Carbon\Carbon::parse($guru->tanggal_lahir)->format('Y-m-d') : '') }}" />
+                </div>
+
+                <div class="col-md-6">
+                  <label class="form-label fw-bold small">Jenis Kelamin</label>
+                  <select name="jenis_kelamin" class="form-select rounded-3" style="font-size:13px;">
+                    <option value="">-- Pilih Jenis Kelamin --</option>
+                    <option value="L" {{ old('jenis_kelamin', $guru->jenis_kelamin) === 'L' ? 'selected' : '' }}>Laki-laki</option>
+                    <option value="P" {{ old('jenis_kelamin', $guru->jenis_kelamin) === 'P' ? 'selected' : '' }}>Perempuan</option>
+                  </select>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label fw-bold small">Agama</label>
+                  <select name="agama" class="form-select rounded-3" style="font-size:13px;">
+                    @php $agamaList = ['Islam', 'Kristen Protestan', 'Katolik', 'Hindu', 'Buddha', 'Khonghucu']; @endphp
+                    @foreach($agamaList as $ag)
+                      <option value="{{ $ag }}" {{ old('agama', $guru->agama ?: 'Islam') === $ag ? 'selected' : '' }}>{{ $ag }}</option>
+                    @endforeach
+                  </select>
+                </div>
+
+                <div class="col-md-6">
+                  <label class="form-label fw-bold small">Kontak WhatsApp / HP</label>
+                  <input type="text" name="no_hp" class="form-control rounded-3" style="font-size:13px;" value="{{ old('no_hp', $guru->no_hp) }}" placeholder="Contoh: 082227749797" />
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label fw-bold small">Alamat Tempat Tinggal (Domisili)</label>
+                  <textarea name="alamat" class="form-control rounded-3" rows="2" style="font-size:13px;" placeholder="Dusun, RT/RW, Desa/Pekon, Kecamatan, Kabupaten">{{ old('alamat', $guru->alamat) }}</textarea>
+                </div>
+              </div>
+            </div>
+
+            {{-- TAB 2: KEPEGAWAIAN & TUGAS --}}
+            <div class="tab-pane fade" id="tab-modal-kepegawaian" role="tabpanel">
+              <div class="row g-3">
+                <div class="col-md-4">
+                  <label class="form-label fw-bold small">Status Kepegawaian</label>
+                  <select name="jenis_kepegawaian" class="form-select rounded-3" style="font-size:13px;">
+                    <option value="pns" {{ old('jenis_kepegawaian', $guru->jenis_kepegawaian) === 'pns' ? 'selected' : '' }}>PNS</option>
+                    <option value="pppk" {{ old('jenis_kepegawaian', $guru->jenis_kepegawaian) === 'pppk' ? 'selected' : '' }}>PPPK</option>
+                    <option value="honor" {{ old('jenis_kepegawaian', $guru->jenis_kepegawaian) === 'honor' ? 'selected' : '' }}>Guru Honor (GTT)</option>
+                    <option value="tendik" {{ old('jenis_kepegawaian', $guru->jenis_kepegawaian) === 'tendik' ? 'selected' : '' }}>Tenaga Kependidikan</option>
+                  </select>
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label fw-bold small">Pangkat / Jabatan Fungsional</label>
+                  <input type="text" name="golongan_pangkat" class="form-control rounded-3" style="font-size:13px;" value="{{ old('golongan_pangkat', $guru->golongan_pangkat ?: $guru->pangkat) }}" placeholder="Contoh: Penata Muda / Guru Ahli Pertama" />
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label fw-bold small">Golongan / Ruang</label>
+                  <input type="text" name="golongan_ruang" class="form-control rounded-3" style="font-size:13px;" value="{{ old('golongan_ruang', $guru->golongan_ruang) }}" placeholder="Contoh: III/a, III/c, IX" />
+                </div>
+
+                <div class="col-md-6">
+                  <label class="form-label fw-bold small">Tugas / Jabatan Utama</label>
+                  <input type="text" name="jabatan" class="form-control rounded-3" style="font-size:13px;" value="{{ old('jabatan', $guru->jabatan) }}" placeholder="Contoh: Guru Informatika / Guru Matematika" />
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label fw-bold small">Tugas Tambahan</label>
+                  <input type="text" name="tugas_tambahan" class="form-control rounded-3" style="font-size:13px;" value="{{ old('tugas_tambahan', $guru->tugas_tambahan) }}" placeholder="Contoh: Waka Sarpras, Wali Kelas X TKJ" />
+                </div>
+
+                <div class="col-md-4">
+                  <label class="form-label fw-bold small">TMT CPNS / Mulai Tugas</label>
+                  <input type="date" name="tmt_kerja" class="form-control rounded-3" style="font-size:13px;" value="{{ old('tmt_kerja', $guru->tmt_kerja ? \Carbon\Carbon::parse($guru->tmt_kerja)->format('Y-m-d') : '') }}" />
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label fw-bold small">TMT Pangkat Terakhir</label>
+                  <input type="date" name="tmt_pangkat_terakhir" class="form-control rounded-3" style="font-size:13px;" value="{{ old('tmt_pangkat_terakhir', $guru->tmt_pangkat_terakhir ? \Carbon\Carbon::parse($guru->tmt_pangkat_terakhir)->format('Y-m-d') : '') }}" />
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label fw-bold small">TMT Berkala (KGB) Terakhir</label>
+                  <input type="date" name="tmt_kgb_terakhir" class="form-control rounded-3" style="font-size:13px;" value="{{ old('tmt_kgb_terakhir', $guru->tmt_kgb_terakhir ? \Carbon\Carbon::parse($guru->tmt_kgb_terakhir)->format('Y-m-d') : '') }}" />
+                </div>
+              </div>
+            </div>
+
+            {{-- TAB 3: PENDIDIKAN & SERTIFIKASI --}}
+            <div class="tab-pane fade" id="tab-modal-pendidikan" role="tabpanel">
+              <div class="row g-3">
+                <div class="col-md-4">
+                  <label class="form-label fw-bold small">Jenjang Pendidikan Terakhir</label>
+                  <select name="pendidikan_terakhir" class="form-select rounded-3" style="font-size:13px;">
+                    <option value="">-- Pilih Jenjang --</option>
+                    @foreach(['D3', 'D4', 'S1', 'S2', 'S3', 'SMA/SMK'] as $jenjang)
+                      <option value="{{ $jenjang }}" {{ old('pendidikan_terakhir', $guru->pendidikan_terakhir) === $jenjang ? 'selected' : '' }}>{{ $jenjang }}</option>
+                    @endforeach
+                  </select>
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label fw-bold small">Program Studi / Jurusan</label>
+                  <input type="text" name="jurusan_kuliah" class="form-control rounded-3" style="font-size:13px;" value="{{ old('jurusan_kuliah', $guru->jurusan_kuliah) }}" placeholder="Contoh: Sistem Informasi / Pendidikan TIK" />
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label fw-bold small">Nama Perguruan Tinggi / Kampus</label>
+                  <input type="text" name="kampus" class="form-control rounded-3" style="font-size:13px;" value="{{ old('kampus', $guru->kampus) }}" placeholder="Contoh: Universitas Negeri Lampung" />
+                </div>
+
+                <div class="col-md-4">
+                  <label class="form-label fw-bold small">Tahun Kelulusan</label>
+                  <input type="text" name="tahun_lulus" class="form-control rounded-3" style="font-size:13px;" value="{{ old('tahun_lulus', $guru->tahun_lulus) }}" placeholder="Contoh: 2016" maxlength="4" />
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label fw-bold small">Status Sertifikasi Pendidik</label>
+                  <select name="status_sertifikasi" class="form-select rounded-3" style="font-size:13px;">
+                    <option value="sudah" {{ old('status_sertifikasi', $guru->status_sertifikasi) === 'sudah' ? 'selected' : '' }}>Sudah Sertifikasi</option>
+                    <option value="belum" {{ old('status_sertifikasi', $guru->status_sertifikasi) === 'belum' ? 'selected' : '' }}>Belum Sertifikasi</option>
+                  </select>
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label fw-bold small">Nomor Sertifikat Pendidik (Serdik)</label>
+                  <input type="text" name="nomor_serdik" class="form-control rounded-3 font-monospace" style="font-size:13px;" value="{{ old('nomor_serdik', $guru->nomor_serdik) }}" placeholder="Nomor Serdik / NRG" />
+                </div>
+
+                <div class="col-12">
+                  <label class="form-label fw-bold small">Mata Pelajaran yang Diampu</label>
+                  <input type="text" name="mapel_diampu" class="form-control rounded-3" style="font-size:13px;" value="{{ old('mapel_diampu', $guru->mapel_diampu) }}" placeholder="Contoh: Informatika, Pemrograman Web (pisahkan dengan koma)" />
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <div class="modal-footer border-0 px-4 pb-4 pt-2 bg-light d-flex justify-content-between">
+          <button type="button" class="btn btn-light px-3 rounded-pill fw-semibold" data-bs-dismiss="modal">Tutup</button>
+          <button type="submit" class="btn btn-primary px-4 rounded-pill fw-bold shadow-sm" style="background:#2563EB; border-color:#2563EB;">
+            <i class="bi bi-check-circle-fill me-1"></i> Simpan Pembaruan Biodata
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
 {{-- MODAL UNGGAH BERKAS MANDIRI --}}
 <div class="modal fade" id="modalUnggahBerkas" tabindex="-1" aria-labelledby="modalUnggahBerkasLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
@@ -1212,6 +1441,18 @@
     const modal = new bootstrap.Modal(document.getElementById('modalPreviewDokumen'));
     modal.show();
   }
+
+  // Handler switch tab modal update biodata
+  document.querySelectorAll('[data-tab-target]').forEach(function(el) {
+    el.addEventListener('click', function() {
+      const target = this.getAttribute('data-tab-target');
+      const tabTrigger = document.querySelector(`button[data-bs-target="${target}"]`);
+      if (tabTrigger) {
+        const tab = bootstrap.Tab.getOrCreateInstance(tabTrigger);
+        tab.show();
+      }
+    });
+  });
 </script>
 </body>
 </html>

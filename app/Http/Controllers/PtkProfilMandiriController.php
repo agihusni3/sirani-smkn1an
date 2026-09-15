@@ -181,4 +181,115 @@ class PtkProfilMandiriController extends Controller
 
         return back()->with('success', 'Foto profil PTK berhasil diperbarui dan disinkronkan dengan Data Pokok Guru!');
     }
+
+    /**
+     * Perbarui Biodata Mandiri PTK.
+     */
+    public function updateBiodata(Request $request)
+    {
+        $user = auth()->user();
+        $guru = $user->guru;
+
+        if (!$guru && $user->isAdmin() && $request->has('guru_id')) {
+            $guru = Guru::findOrFail($request->guru_id);
+        }
+
+        if (!$guru) {
+            return back()->with('error', 'Akses ditolak: Akun Anda tidak terhubung ke profil PTK.');
+        }
+
+        $request->validate([
+            'nama_lengkap'         => 'required|string|max:150',
+            'gelar_depan'          => 'nullable|string|max:20',
+            'gelar_belakang'       => 'nullable|string|max:30',
+            'nik'                  => 'nullable|string|max:20',
+            'nuptk'                => 'nullable|string|max:25',
+            'nip'                  => 'nullable|string|max:25|unique:gurus,nip,' . $guru->id,
+            'tempat_lahir'         => 'nullable|string|max:80',
+            'tanggal_lahir'        => 'nullable|date',
+            'jenis_kelamin'        => 'nullable|in:L,P',
+            'agama'                => 'nullable|string|max:30',
+            'no_hp'                => 'nullable|string|max:25',
+            'alamat'               => 'nullable|string|max:300',
+            'jenis_kepegawaian'    => 'nullable|in:pns,pppk,honor,tendik',
+            'golongan_pangkat'     => 'nullable|string|max:80',
+            'golongan_ruang'       => 'nullable|string|max:20',
+            'jabatan'              => 'nullable|string|max:100',
+            'tugas_tambahan'       => 'nullable|string|max:150',
+            'tmt_kerja'            => 'nullable|date',
+            'tmt_pangkat_terakhir' => 'nullable|date',
+            'tmt_kgb_terakhir'     => 'nullable|date',
+            'pendidikan_terakhir'  => 'nullable|string|max:30',
+            'jurusan_kuliah'       => 'nullable|string|max:100',
+            'kampus'               => 'nullable|string|max:150',
+            'tahun_lulus'          => 'nullable|string|max:10',
+            'status_sertifikasi'   => 'nullable|in:sudah,belum',
+            'nomor_serdik'         => 'nullable|string|max:50',
+            'mapel_diampu'         => 'nullable|string|max:200',
+        ], [
+            'nama_lengkap.required' => 'Nama lengkap wajib diisi.',
+            'nip.unique'            => 'NIP tersebut sudah digunakan oleh guru lain.',
+        ]);
+
+        $namaLengkap = trim($request->input('nama_lengkap'));
+        $gelarDepan = $request->input('gelar_depan') ? trim($request->input('gelar_depan')) : null;
+        $gelarBelakang = $request->input('gelar_belakang') ? trim($request->input('gelar_belakang')) : null;
+
+        // Susun nama tampilan lengkap dengan gelar
+        $namaTampil = $namaLengkap;
+        if ($gelarDepan && !str_starts_with(strtolower($namaTampil), strtolower($gelarDepan))) {
+            $namaTampil = $gelarDepan . ' ' . $namaTampil;
+        }
+        if ($gelarBelakang && !str_ends_with(strtolower($namaTampil), strtolower($gelarBelakang))) {
+            $namaTampil = rtrim($namaTampil, ', ') . ', ' . $gelarBelakang;
+        }
+
+        $updateData = [
+            'nama'                 => $namaTampil,
+            'nama_lengkap'         => $namaLengkap,
+            'gelar_depan'          => $gelarDepan,
+            'gelar_belakang'       => $gelarBelakang,
+            'nik'                  => $request->input('nik') ?: null,
+            'nuptk'                => $request->input('nuptk') ?: null,
+            'tempat_lahir'         => $request->input('tempat_lahir') ?: null,
+            'tanggal_lahir'        => $request->input('tanggal_lahir') ?: null,
+            'jenis_kelamin'        => $request->input('jenis_kelamin') ?: null,
+            'agama'                => $request->input('agama') ?: null,
+            'no_hp'                => $request->input('no_hp') ?: null,
+            'alamat'               => $request->input('alamat') ?: null,
+            'golongan_pangkat'     => $request->input('golongan_pangkat') ?: null,
+            'golongan_ruang'       => $request->input('golongan_ruang') ?: null,
+            'jabatan'              => $request->input('jabatan') ?: $guru->jabatan,
+            'tugas_tambahan'       => $request->input('tugas_tambahan') ?: null,
+            'tmt_kerja'            => $request->input('tmt_kerja') ?: null,
+            'tmt_pangkat_terakhir' => $request->input('tmt_pangkat_terakhir') ?: null,
+            'tmt_kgb_terakhir'     => $request->input('tmt_kgb_terakhir') ?: null,
+            'pendidikan_terakhir'  => $request->input('pendidikan_terakhir') ?: null,
+            'jurusan_kuliah'       => $request->input('jurusan_kuliah') ?: null,
+            'kampus'               => $request->input('kampus') ?: null,
+            'tahun_lulus'          => $request->input('tahun_lulus') ?: null,
+            'status_sertifikasi'   => $request->input('status_sertifikasi') ?: 'belum',
+            'nomor_serdik'         => $request->input('nomor_serdik') ?: null,
+            'mapel_diampu'         => $request->input('mapel_diampu') ?: null,
+        ];
+
+        if ($request->filled('nip')) {
+            $updateData['nip'] = trim($request->input('nip'));
+        }
+
+        if ($request->filled('jenis_kepegawaian')) {
+            $updateData['jenis_kepegawaian'] = $request->input('jenis_kepegawaian');
+        }
+
+        $guru->update($updateData);
+
+        // Sinkronkan nama di akun User terkait jika ada
+        if ($guru->user) {
+            $guru->user->update(['name' => $namaLengkap]);
+        }
+
+        AuditLog::catat('update', 'biodata_ptk_mandiri', "PTK {$guru->nama} memperbarui biodata mandiri.");
+
+        return back()->with('success', 'Biodata PTK Anda berhasil diperbarui dan disinkronkan ke sistem!');
+    }
 }

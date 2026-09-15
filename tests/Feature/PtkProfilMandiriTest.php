@@ -154,5 +154,64 @@ class PtkProfilMandiriTest extends TestCase
         $resPage = $this->actingAs($this->userGuruA)->get(route('ptk.profil-saya'));
         $resPage->assertSee(e($this->guruA->foto_url), false);
     }
+
+    public function test_guru_dapat_memperbarui_biodata_mandiri_dan_sinkron_ke_data_ptk()
+    {
+        $payload = [
+            'nama_lengkap'         => 'Budi Santoso',
+            'gelar_depan'          => 'Dr.',
+            'gelar_belakang'       => 'M.Pd.',
+            'nip'                  => '198501012010011005',
+            'nik'                  => '3201010101850001',
+            'nuptk'                => '1234567890123456',
+            'tempat_lahir'         => 'Bandar Lampung',
+            'tanggal_lahir'        => '1985-01-01',
+            'jenis_kelamin'        => 'L',
+            'agama'                => 'Islam',
+            'no_hp'                => '081234567890',
+            'alamat'               => 'Jl. Pendidikan No. 10 Air Naningan',
+            'jenis_kepegawaian'    => 'pns',
+            'golongan_pangkat'     => 'Pembina',
+            'golongan_ruang'       => 'IV/a',
+            'jabatan'              => 'Guru Ahli Madya',
+            'tugas_tambahan'       => 'Waka Kurikulum',
+            'tmt_kerja'            => '2010-01-01',
+            'tmt_pangkat_terakhir' => '2022-04-01',
+            'tmt_kgb_terakhir'     => '2024-04-01',
+            'pendidikan_terakhir'  => 'S2',
+            'jurusan_kuliah'       => 'Manajemen Pendidikan',
+            'kampus'               => 'Universitas Negeri Yogyakarta',
+            'tahun_lulus'          => '2012',
+            'status_sertifikasi'   => 'sudah',
+            'nomor_serdik'         => '1234567890',
+            'mapel_diampu'         => 'Fisika, Matematika',
+        ];
+
+        $res = $this->actingAs($this->userGuruA)->post(route('ptk.update-biodata'), $payload);
+
+        $res->assertRedirect();
+        $res->assertSessionHas('success');
+
+        $this->guruA->refresh();
+        $this->assertEquals('Dr. Budi Santoso, M.Pd.', $this->guruA->nama);
+        $this->assertEquals('Budi Santoso', $this->guruA->nama_lengkap);
+        $this->assertEquals('3201010101850001', $this->guruA->nik);
+        $this->assertEquals('Bandar Lampung', $this->guruA->tempat_lahir);
+        $this->assertEquals('081234567890', $this->guruA->no_hp);
+        $this->assertEquals('Pembina', $this->guruA->golongan_pangkat);
+        $this->assertEquals('Pembina', $this->guruA->pangkat);
+        $this->assertEquals('IV/a', $this->guruA->golongan_ruang);
+        $this->assertEquals('Guru Ahli Madya', $this->guruA->jabatan);
+        $this->assertEquals('Waka Kurikulum', $this->guruA->tugas_tambahan);
+        $this->assertEquals('2024-04-01', $this->guruA->tmt_kgb_terakhir);
+        $this->assertEquals('2026-04-01', $this->guruA->tmt_kgb_berikutnya);
+
+        // Pastikan tampilan halaman profil merefleksikan perubahan
+        $resPage = $this->actingAs($this->userGuruA)->get(route('ptk.profil-saya'));
+        $resPage->assertSee('Dr. Budi Santoso, M.Pd.');
+        $resPage->assertSee('IV/a');
+        $resPage->assertSee('081234567890');
+    }
 }
+
 
