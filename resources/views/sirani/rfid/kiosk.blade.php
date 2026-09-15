@@ -201,6 +201,9 @@
             <select class="monitor-select-rombel" id="filterRombelPulangSelect" onchange="filterBelumPulang()">
               <option value="">Semua Kelas</option>
             </select>
+            <button type="button" class="btn-pulangkan-semua" onclick="konfirmasiPulangkanSemua()" title="Catat Pulang Semua Siswa yang Belum Pulang">
+              <i class="bi bi-check2-all"></i> Pulangkan Semua
+            </button>
           </div>
           <div id="listBelumPulang">
             <!-- Diisi oleh JS -->
@@ -490,7 +493,16 @@
       const speechNama = (d.nama || '').split(',')[0].trim();
 
       // Status variations
-      if (st === 'selesai' || res.type === 'sudah_lengkap') {
+      if (res.type === 'jam_pulang' || st === 'pulang') {
+        card.className = 'identity-result-card status-pulang';
+        badge.className = 'result-badge-large pulang';
+        badgeTxt.textContent = 'BERHASIL PULANG';
+        avatarWrap.style.borderColor = 'var(--cyan)';
+        avatarWrap.style.boxShadow = '0 0 25px var(--cyan-glow)';
+        countdownFill.style.background = 'var(--cyan)';
+        msgTxt.textContent = res.message || 'Presensi pulang berhasil dicatat. Hati-hati di jalan!';
+        speak(`Terima kasih, ${speechNama}, presensi pulang berhasil. Hati-hati di jalan.`);
+      } else if (st === 'selesai' || res.type === 'sudah_lengkap') {
         card.className = 'identity-result-card status-selesai';
         badge.className = 'result-badge-large selesai';
         badgeTxt.textContent = 'PRESENSI SELESAI';
@@ -508,6 +520,9 @@
         countdownFill.style.background = '#3B82F6';
         msgTxt.textContent = res.message || 'Anda sudah melakukan presensi masuk.';
         speak(`${salam}, ${speechNama}, Anda sudah tercatat presensi masuk.`);
+        if (res.type === 'belum_waktunya_pulang' && d.id) {
+          msgTxt.innerHTML = `${escapeHtml(res.message || 'Anda sudah melakukan presensi masuk.')}<div style="margin-top:10px;"><button type="button" class="btn-action-sm btn-pulang-direct" onclick="catatPulangSiswa(${d.id}, '${escapeHtml(d.nama || '')}')"><i class="bi bi-box-arrow-right"></i> Izinkan & Catat Pulang Sekarang</button></div>`;
+        }
       } else if (st === 'terlambat') {
         card.className = 'identity-result-card status-terlambat';
         badge.className = 'result-badge-large terlambat';
@@ -517,15 +532,6 @@
         countdownFill.style.background = 'var(--amber)';
         msgTxt.textContent = res.message || 'Presensi terlambat dicatat.';
         speak(`Perhatian, ${speechNama}, Anda tercatat terlambat.`);
-      } else if (st === 'pulang') {
-        card.className = 'identity-result-card status-pulang';
-        badge.className = 'result-badge-large pulang';
-        badgeTxt.textContent = 'BERHASIL PULANG';
-        avatarWrap.style.borderColor = 'var(--cyan)';
-        avatarWrap.style.boxShadow = '0 0 25px var(--cyan-glow)';
-        countdownFill.style.background = 'var(--cyan)';
-        msgTxt.textContent = res.message || 'Presensi pulang berhasil dicatat. Hati-hati di jalan!';
-        speak(`Terima kasih, ${speechNama}, presensi pulang berhasil. Hati-hati di jalan.`);
       } else {
         card.className = 'identity-result-card status-hadir';
         badge.className = 'result-badge-large hadir';
@@ -865,6 +871,9 @@
           </div>
           <div class="belum-actions">
             ${waBtn}
+            <button type="button" class="btn-action-sm btn-pulang-direct" onclick="catatPulangSiswa(${s.id}, '${escapeHtml(nama)}')" title="Catat Absen Pulang Sekarang">
+              <i class="bi bi-door-open-fill"></i> Pulangkan
+            </button>
           </div>
         </div>
       `;
@@ -875,6 +884,74 @@
     }
 
     container.innerHTML = html;
+  }
+
+  // Aksi Manual: Catat Absen Pulang untuk 1 Siswa
+  async function catatPulangSiswa(siswaId, nama) {
+    if (!confirm(`Catat presensi pulang untuk siswa "${nama}" sekarang?`)) {
+      return;
+    }
+
+    try {
+      const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+      const res = await fetch('/api/v1/kiosk-input-pulang', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'X-CSRF-TOKEN': csrfToken
+        },
+        body: JSON.stringify({ siswa_id: siswaId })
+      });
+      const data = await res.json();
+      if (data.success) {
+        speak(`Presensi pulang ${nama} berhasil dicatat.`);
+        alert(data.message || `Presensi pulang untuk ${nama} berhasil dicatat.`);
+        fetchMonitorFeed(true);
+      } else {
+        alert(data.message || 'Gagal mencatat presensi pulang.');
+      }
+    } catch (e) {
+      console.error(e);
+      alert('Terjadi kesalahan koneksi saat mencatat presensi pulang.');
+    }
+  }
+
+  // Aksi Manual: Catat Absen Pulang Semua Siswa yang Belum Pulang
+  async function konfirmasiPulangkanSemua() {
+    const list = monitorData.belum_pulang || [];
+    if (list.length === 0) {
+      alert('Tidak ada siswa yang belum scan pulang.');
+      return;
+    }
+
+    if (!confirm(`PERINGATAN:\nApakah Anda yakin ingin mencatat presensi PULANG untuk seluruh ${list.length} siswa yang belum scan pulang hari ini?`)) {
+      return;
+    }
+
+    try {
+      const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+      const res = await fetch('/api/v1/kiosk-input-pulang', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'X-CSRF-TOKEN': csrfToken
+        },
+        body: JSON.stringify({ all: true })
+      });
+      const data = await res.json();
+      if (data.success) {
+        speak(`Berhasil mencatat kepulangan untuk ${data.count || list.length} siswa.`);
+        alert(data.message || 'Berhasil memulangkan semua siswa.');
+        fetchMonitorFeed(true);
+      } else {
+        alert(data.message || 'Gagal memulangkan semua siswa.');
+      }
+    } catch (e) {
+      console.error(e);
+      alert('Terjadi kesalahan koneksi saat memproses kepulangan massal.');
+    }
   }
 
 

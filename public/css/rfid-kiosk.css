@@ -1123,6 +1123,37 @@
     .btn-action-sm.btn-wa:hover {
       background: #20BA56;
     }
+    .btn-action-sm.btn-pulang-direct {
+      background: rgba(6, 182, 212, 0.15);
+      color: var(--cyan);
+      border-color: rgba(6, 182, 212, 0.4);
+    }
+    .btn-action-sm.btn-pulang-direct:hover {
+      background: var(--cyan);
+      color: #0f172a;
+      border-color: var(--cyan);
+      transform: translateY(-1px);
+    }
+    .btn-pulangkan-semua {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 11.5px;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+      border: 1px solid rgba(6, 182, 212, 0.45);
+      background: rgba(6, 182, 212, 0.14);
+      color: var(--cyan);
+      transition: all .2s;
+    }
+    .btn-pulangkan-semua:hover {
+      background: var(--cyan);
+      color: #0f172a;
+      transform: translateY(-1px);
+    }
 
     /* Item Card: Belum Hadir (dengan foto 3:4) */
     .belum-hadir-card {
@@ -1166,7 +1197,12 @@
       margin-top: 2px;
     }
     .belum-actions {
+      display: flex;
+      gap: 6px;
+      align-items: center;
       flex-shrink: 0;
+      flex-wrap: wrap;
+      justify-content: flex-end;
     }
 
     /* Item Card: Live Scan Feed */

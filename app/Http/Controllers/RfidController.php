@@ -830,6 +830,7 @@ class RfidController extends Controller
                 if (str_starts_with($hpClean, '0')) $hpClean = '62' . substr($hpClean, 1);
                 return [
                     'id'         => $s->id,
+                    'absensi_id' => $a->id,
                     'nama'       => $s->nama,
                     'nisn'       => $s->nisn ?: $s->nis,
                     'rombel'     => $rombel,
@@ -863,6 +864,124 @@ class RfidController extends Controller
                 'total_belum_pulang' => count($belumPulangAbsensi),
             ],
             'server_time'        => now()->format('H:i:s'),
+        ]);
+    }
+
+    /**
+     * Input / Catat Presensi Pulang Siswa dari Kiosk Presensi
+     */
+    public function inputPulang(Request $request): JsonResponse
+    {
+        $today = Carbon::today()->toDateString();
+        $timeNow = Carbon::now()->toTimeString();
+        $jamPulang = $request->input('jam_pulang') ? Carbon::parse($request->input('jam_pulang'))->toTimeString() : $timeNow;
+
+        // Mode A: Pulangkan Semua Siswa yang belum absen pulang
+        if ($request->boolean('all')) {
+            $absensis = Absensi::where('tanggal', $today)
+                ->where('pemilik_type', 'siswa')
+                ->whereNotNull('jam_masuk')
+                ->whereNull('jam_pulang')
+                ->with('siswa')
+                ->get();
+
+            $count = 0;
+            $settingNotif = null;
+            try {
+                $settingNotif = \App\Models\PengaturanNotifikasi::getPengaturan();
+            } catch (\Throwable $e) {}
+
+            foreach ($absensis as $abs) {
+                $abs->update([
+                    'jam_pulang'   => $jamPulang,
+                    'sumber_absen' => 'kiosk_manual_pulang',
+                ]);
+                $count++;
+
+                if ($abs->siswa && $settingNotif && $settingNotif->isKategoriAktif('pulang')) {
+                    try {
+                        \App\Services\NotifikasiDraftService::buatDraft($abs->siswa, 'pulang', [
+                            'tanggal'    => $today,
+                            'jam'        => $jamPulang,
+                            'keterangan' => 'Presensi Pulang via Kiosk Smart Gate',
+                        ], 'sistem_rfid');
+                    } catch (\Throwable $e) {}
+                }
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => "Berhasil mencatat absen pulang untuk {$count} siswa.",
+                'count'   => $count,
+            ]);
+        }
+
+        // Mode B: Pulangkan Siswa Tertentu (berdasarkan siswa_id atau absensi_id)
+        $siswaId = $request->input('siswa_id');
+        $absensiId = $request->input('absensi_id');
+
+        $query = Absensi::where('tanggal', $today)->where('pemilik_type', 'siswa');
+        if ($absensiId) {
+            $query->where('id', $absensiId);
+        } elseif ($siswaId) {
+            $query->where('pemilik_id', $siswaId);
+        } else {
+            return response()->json([
+                'success' => false,
+                'message' => 'Parameter siswa_id atau absensi_id diperlukan.',
+            ], 422);
+        }
+
+        $absensi = $query->first();
+
+        if (!$absensi) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Siswa belum tercatat melakukan presensi masuk hari ini.',
+            ], 422);
+        }
+
+        if (empty($absensi->jam_masuk)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Siswa belum memiliki jam masuk hari ini.',
+            ], 422);
+        }
+
+        if (!empty($absensi->jam_pulang)) {
+            return response()->json([
+                'success' => false,
+                'message' => "Siswa sudah tercatat absen pulang pada pukul " . substr($absensi->jam_pulang, 0, 5) . " WIB.",
+            ], 422);
+        }
+
+        $absensi->update([
+            'jam_pulang'   => $jamPulang,
+            'sumber_absen' => 'kiosk_manual_pulang',
+        ]);
+
+        $siswa = Siswa::find($absensi->pemilik_id);
+        $nama = $siswa?->nama ?? 'Siswa';
+
+        try {
+            $settingNotif = \App\Models\PengaturanNotifikasi::getPengaturan();
+            if ($siswa && $settingNotif->isKategoriAktif('pulang')) {
+                \App\Services\NotifikasiDraftService::buatDraft($siswa, 'pulang', [
+                    'tanggal'    => $today,
+                    'jam'        => $jamPulang,
+                    'keterangan' => 'Presensi Pulang via Kiosk Smart Gate',
+                ], 'sistem_rfid');
+            }
+        } catch (\Throwable $e) {}
+
+        return response()->json([
+            'success' => true,
+            'message' => "Presensi pulang {$nama} berhasil dicatat pada pukul " . substr($jamPulang, 0, 5) . " WIB.",
+            'data'    => [
+                'nama'       => $nama,
+                'jam_masuk'  => $absensi->jam_masuk,
+                'jam_pulang' => $jamPulang,
+            ],
         ]);
     }
 
