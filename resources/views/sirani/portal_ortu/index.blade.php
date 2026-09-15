@@ -121,29 +121,7 @@
         </div>
       </section>
     @else
-      {{-- SEARCH BAR RAMPING SAAT SISWA SUDAH TERPILIH --}}
-      <div class="compact-search-card">
-        <div class="compact-search-info">
-          <span style="font-size:11.5px; font-weight:800; color:var(--text-3); text-transform:uppercase; letter-spacing:0.5px;">
-            Siswa Terpilih:
-          </span>
-          <strong style="color:var(--text); font-size:13px;">{{ $siswa->nama }}</strong>
-          <span style="font-size:11.5px; color:var(--text-3); font-family:var(--font-mono);">(NIS: {{ $siswa->nis }})</span>
-        </div>
-
-        <form method="GET" action="{{ route('portal.ortu.index') }}" class="compact-search-form">
-          <input
-            type="text"
-            name="keyword"
-            placeholder="Cari NIS lain..."
-            class="form-control-pt"
-            style="height:34px; padding:0 10px; font-size:12px;"
-          />
-          <button type="submit" class="btn-search" style="padding:0 14px; height:34px; font-size:11.5px;">
-            <i class="bi bi-search"></i> Ganti
-          </button>
-        </form>
-      </div>
+      {{-- Siswa sudah terpilih, langsung tampilkan konten tanpa search bar --}}
     @endif
 
     @if($keyword && !$siswa)
