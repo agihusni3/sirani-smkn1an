@@ -45,6 +45,11 @@
       </a>
 
       <div class="nav-actions" style="display:flex; align-items:center; gap:8px;">
+        @if($siswa)
+          <button type="button" onclick="logoutSavedStudent()" style="background:var(--bg-subtle); color:#ef4444; border:1px solid #fecaca; padding:6px 12px; border-radius:var(--r-sm); font-size:11.5px; font-weight:800; cursor:pointer; display:inline-flex; align-items:center; gap:5px; font-family:var(--font-main);" title="Ganti Siswa / Keluar dari Akun">
+            <i class="bi bi-box-arrow-right"></i> Ganti NISN
+          </button>
+        @endif
         <a href="/" style="text-decoration:none; color:var(--text-2); font-size:12px; font-weight:700; padding:6px 14px; border-radius:var(--r-sm); background:var(--bg-subtle); border:1px solid var(--border-2); display:inline-flex; align-items:center; gap:5px;">
           Portal Sekolah
         </a>
@@ -102,8 +107,12 @@
                   Cek Presensi
                 </button>
               </div>
-              <div class="search-hints-row">
+              <div class="search-hints-row" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-top:10px;">
                 <span class="search-hint-pill">Pencarian menggunakan <strong>NISN Siswa</strong> yang terdaftar.</span>
+                <label style="display:inline-flex; align-items:center; gap:6px; font-size:12px; color:var(--text-2); cursor:pointer; user-select:none; font-weight:600;">
+                  <input type="checkbox" id="rememberNisnCheckbox" checked style="accent-color:#0f172a; cursor:pointer; width:15px; height:15px;" />
+                  <span>Ingat NISN di perangkat ini</span>
+                </label>
               </div>
             </form>
           </div>
@@ -1341,6 +1350,11 @@
           switchPortalMainTab('kartu-qr');
         }
 
+        // Simpan NISN ke localStorage untuk Auto-Login jika tidak dinonaktifkan
+        if (localStorage.getItem('sirani_remember_nisn_disabled') !== 'true') {
+          localStorage.setItem('sirani_saved_nisn', "{{ $siswa->nisn }}");
+        }
+
         saveSiswaToLocalStorage({
           nisn: "{{ $siswa->nisn }}",
           nis: "{{ $siswa->nis }}",
@@ -1349,9 +1363,60 @@
           foto: "{{ $siswa->foto ? asset('storage/'.$siswa->foto) : '' }}"
         });
       @else
-        renderSavedStudents();
+        @if($keyword)
+          // Jika keyword dicari tapi tidak ada siswa, bersihkan memori NISN
+          localStorage.removeItem('sirani_saved_nisn');
+        @else
+          // Auto-Login / Auto-Load profil siswa yang tersimpan
+          const urlParams = new URLSearchParams(window.location.search);
+          const isReset = urlParams.has('reset') || urlParams.has('logout');
+          const savedNisn = localStorage.getItem('sirani_saved_nisn');
+
+          if (!isReset && savedNisn && savedNisn.trim() !== '') {
+            document.body.style.opacity = '0.5';
+            window.location.replace('{{ route("portal.ortu.index") }}?keyword=' + encodeURIComponent(savedNisn.trim()));
+            return;
+          }
+
+          // Inisialisasi checkbox ingat NISN
+          const remCb = document.getElementById('rememberNisnCheckbox');
+          if (remCb) {
+            if (localStorage.getItem('sirani_remember_nisn_disabled') === 'true') {
+              remCb.checked = false;
+            }
+            remCb.addEventListener('change', function() {
+              if (this.checked) {
+                localStorage.removeItem('sirani_remember_nisn_disabled');
+              } else {
+                localStorage.setItem('sirani_remember_nisn_disabled', 'true');
+                localStorage.removeItem('sirani_saved_nisn');
+              }
+            });
+          }
+
+          const searchForm = document.querySelector('.search-form-box form');
+          if (searchForm) {
+            searchForm.addEventListener('submit', function() {
+              if (remCb && !remCb.checked) {
+                localStorage.setItem('sirani_remember_nisn_disabled', 'true');
+                localStorage.removeItem('sirani_saved_nisn');
+              } else {
+                localStorage.removeItem('sirani_remember_nisn_disabled');
+              }
+            });
+          }
+
+          renderSavedStudents();
+        @endif
       @endif
     });
+
+    function logoutSavedStudent() {
+      if (confirm('Keluar dari profil siswa ini dan kembali ke menu pencarian NISN?')) {
+        localStorage.removeItem('sirani_saved_nisn');
+        window.location.href = '{{ route("portal.ortu.index") }}?reset=1';
+      }
+    }
 
     window.addEventListener('load', function() {
       @if($siswa)
@@ -1426,63 +1491,6 @@
       if (confirm('Hapus daftar profil siswa yang tersimpan di perangkat ini?')) {
         localStorage.removeItem('sirani_saved_students');
         renderSavedStudents();
-      }
-    }
-
-    // QR Code Scanner
-    let html5QrCode = null;
-    function startQrScanner() {
-      const modal = document.getElementById('qrModal');
-      if (!modal) return;
-      modal.style.display = 'flex';
-
-      if (!window.Html5Qrcode) {
-        const script = document.createElement('script');
-        script.src = "https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js";
-        script.onload = function() { initQrCode(); };
-        document.body.appendChild(script);
-      } else {
-        initQrCode();
-      }
-    }
-
-    function initQrCode() {
-      if (html5QrCode) {
-        html5QrCode.stop().then(function() { startScanning(); }).catch(function() { startScanning(); });
-      } else {
-        startScanning();
-      }
-    }
-
-    function startScanning() {
-      html5QrCode = new Html5Qrcode("qr-reader");
-      html5QrCode.start(
-        { facingMode: "environment" },
-        { fps: 10, qrbox: { width: 220, height: 220 } },
-        function(decodedText) {
-          html5QrCode.stop().then(function() {
-            closeQrScanner();
-            let target = decodedText.trim();
-            if (target.includes('/presensi-siswa/')) {
-              window.location.href = target;
-            } else {
-              const cleanNis = target.replace(/[^0-9]/g, '');
-              window.location.href = '/presensi-siswa/' + (cleanNis || target);
-            }
-          });
-        },
-        function(errorMessage) {}
-      ).catch(function(err) {
-        alert("Tidak dapat mengakses kamera: " + err);
-        closeQrScanner();
-      });
-    }
-
-    function closeQrScanner() {
-      const modal = document.getElementById('qrModal');
-      if (modal) modal.style.display = 'none';
-      if (html5QrCode) {
-        try { html5QrCode.stop(); } catch(e) {}
       }
     }
 
