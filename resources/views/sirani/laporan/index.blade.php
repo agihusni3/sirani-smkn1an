@@ -393,11 +393,11 @@
             <label style="font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:0.5px; color:var(--text-2); margin-bottom:6px; display:block;">Status Presensi</label>
             <select name="status" style="width:100%; height:42px; background:var(--bg-3); border:1px solid var(--border-2); border-radius:var(--r-sm); padding:0 12px; color:var(--text); font-size:13px; font-weight:700;">
               <option value="">-- Semua Status --</option>
-              <option value="hadir" {{ request('status') === 'hadir' ? 'selected' : '' }}>🟢 Hadir Tepat</option>
-              <option value="terlambat" {{ request('status') === 'terlambat' ? 'selected' : '' }}>⏰ Terlambat</option>
-              <option value="izin" {{ request('status') === 'izin' ? 'selected' : '' }}>📄 Izin / Sakit / Dispen</option>
-              <option value="alpha" {{ request('status') === 'alpha' ? 'selected' : '' }}>❌ Alpha</option>
-              <option value="bolos" {{ request('status') === 'bolos' ? 'selected' : '' }}>🚪 Bolos</option>
+              <option value="hadir" {{ request('status') === 'hadir' ? 'selected' : '' }}>Hadir Tepat</option>
+              <option value="terlambat" {{ request('status') === 'terlambat' ? 'selected' : '' }}>Terlambat</option>
+              <option value="izin" {{ request('status') === 'izin' ? 'selected' : '' }}>Izin / Sakit / Dispen</option>
+              <option value="alpha" {{ request('status') === 'alpha' ? 'selected' : '' }}>Alpha</option>
+              <option value="bolos" {{ request('status') === 'bolos' ? 'selected' : '' }}>Bolos</option>
             </select>
           </div>
 
@@ -1019,13 +1019,13 @@
           Pilih Status Presensi Baru <span style="color: var(--red);">*</span>
         </label>
         <select name="status" id="koreksi_status" required class="input-field" style="width: 100%; height: 42px; font-weight: 700; font-size: 13.5px;">
-          <option value="hadir">✅ HADIR (Tepat Waktu)</option>
-          <option value="terlambat">⏰ TERLAMBAT (Lewat Jam Toleransi)</option>
-          <option value="izin">📩 IZIN (Dengan Keterangan)</option>
-          <option value="sakit">🩺 SAKIT (Surat Dokter / Istirahat)</option>
-          <option value="dispen">🏆 DISPEN (Tugas Dinas / Lomba)</option>
-          <option value="alpha">❌ ALPHA (Tanpa Keterangan)</option>
-          <option value="bolos">⚠️ BOLOS (Tidak Tap Pulang)</option>
+          <option value="hadir">HADIR (Tepat Waktu)</option>
+          <option value="terlambat">TERLAMBAT (Lewat Jam Toleransi)</option>
+          <option value="izin">IZIN (Dengan Keterangan)</option>
+          <option value="sakit">SAKIT (Surat Dokter / Istirahat)</option>
+          <option value="dispen">DISPEN (Tugas Dinas / Lomba)</option>
+          <option value="alpha">ALPHA (Tanpa Keterangan)</option>
+          <option value="bolos">BOLOS (Tidak Tap Pulang)</option>
         </select>
       </div>
 
