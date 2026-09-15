@@ -363,18 +363,16 @@
 
         {{-- KPI: Belum Scan Pulang --}}
         @php $jamTutupLabel = $sudahLewatJamTutup ? 'Dianggap Bolos' : 'Sementara'; @endphp
-        <a href="/jadwal-piket" style="text-decoration:none;">
-          <div class="db-kpi-card" style="border:1.5px solid {{ $sudahLewatJamTutup ? '#000000' : 'var(--border)' }};">
-            <div class="db-kpi-head">
-              <span class="db-kpi-title">Belum Scan Pulang</span>
-              <div class="db-kpi-icon" style="background:var(--bg-3); color:#000000; border:1px solid var(--border-2);">
-                <i class="bi bi-door-open-fill"></i>
-              </div>
+        <div class="db-kpi-card" onclick="openDetailModal('siswa', 'belum_pulang', 'Siswa Belum Scan Pulang Hari Ini')" style="border:1.5px solid {{ $sudahLewatJamTutup ? '#000000' : 'var(--border)' }}; cursor:pointer;" title="Klik untuk melihat daftar siswa yang belum scan pulang">
+          <div class="db-kpi-head">
+            <span class="db-kpi-title">Belum Scan Pulang</span>
+            <div class="db-kpi-icon" style="background:var(--bg-3); color:#000000; border:1px solid var(--border-2);">
+              <i class="bi bi-door-open-fill"></i>
             </div>
-            <div class="db-kpi-val" style="color:#000000;">{{ $siswaBelumPulangCount }} <span style="font-size:12px; font-weight:600; color:var(--text-3);">Siswa</span></div>
-            <div class="db-kpi-sub" style="color:{{ $sudahLewatJamTutup ? '#000000' : 'var(--text-3)' }}; font-weight:{{ $sudahLewatJamTutup ? '800' : '600' }};">{{ $jamTutupLabel }}</div>
           </div>
-        </a>
+          <div class="db-kpi-val" style="color:#000000;">{{ $siswaBelumPulangCount }} <span style="font-size:12px; font-weight:600; color:var(--text-3);">Siswa</span></div>
+          <div class="db-kpi-sub" style="color:{{ $sudahLewatJamTutup ? '#000000' : 'var(--text-3)' }}; font-weight:{{ $sudahLewatJamTutup ? '800' : '600' }};">{{ $jamTutupLabel }}</div>
+        </div>
       </div>
     @endif
 
@@ -431,17 +429,15 @@
 
             <!-- Mini KPI 4: Siswa Belum Scan Pulang -->
             @php $labelPulang = $sudahLewatJamTutup ? 'Dianggap Bolos' : 'Belum Scan Pulang'; @endphp
-            <a href="/jadwal-piket" style="text-decoration:none;">
-              <div style="background:var(--bg-3); border:{{ $sudahLewatJamTutup ? '1.5px solid #000000' : '1px solid var(--border-2)' }}; border-radius:var(--r-sm); padding:12px 14px; cursor:pointer; transition:all .15s;">
-                <div style="font-size:10.5px; font-weight:800; text-transform:uppercase; color:var(--text-3); letter-spacing:0.5px;">{{ $labelPulang }}</div>
-                <div style="font-size:22px; font-weight:900; font-family:var(--font-mono); color:#000000; margin-top:2px;">
-                  {{ $siswaBelumPulangCount }} <span style="font-size:11.5px; font-weight:600; color:var(--text-3);">Siswa</span>
-                </div>
-                <div style="font-size:11px; color:{{ $sudahLewatJamTutup ? '#000000' : 'var(--text-3)' }}; font-weight:{{ $sudahLewatJamTutup ? '800' : '600' }}; margin-top:2px;">
-                  {{ $sudahLewatJamTutup ? 'Lihat di Jadwal Piket →' : 'Sesi masih berlangsung' }}
-                </div>
+            <div onclick="openDetailModal('siswa', 'belum_pulang', 'Siswa Belum Scan Pulang Hari Ini')" style="background:var(--bg-3); border:{{ $sudahLewatJamTutup ? '1.5px solid #000000' : '1px solid var(--border-2)' }}; border-radius:var(--r-sm); padding:12px 14px; cursor:pointer; transition:all .15s;" title="Klik untuk melihat daftar siswa">
+              <div style="font-size:10.5px; font-weight:800; text-transform:uppercase; color:var(--text-3); letter-spacing:0.5px;">{{ $labelPulang }}</div>
+              <div style="font-size:22px; font-weight:900; font-family:var(--font-mono); color:#000000; margin-top:2px;">
+                {{ $siswaBelumPulangCount }} <span style="font-size:11.5px; font-weight:600; color:var(--text-3);">Siswa</span>
               </div>
-            </a>
+              <div style="font-size:11px; color:{{ $sudahLewatJamTutup ? '#000000' : 'var(--text-3)' }}; font-weight:{{ $sudahLewatJamTutup ? '800' : '600' }}; margin-top:2px;">
+                {{ $sudahLewatJamTutup ? 'Klik untuk lihat daftar siswa →' : 'Sesi masih berlangsung' }}
+              </div>
+            </div>
           </div>
 
           {{-- Quick Table Siswa Terlambat Hari Ini --}}
@@ -783,9 +779,24 @@
             nama: s.nama || '-',
             sub: rombelNama,
             jamMasuk: a ? (a.jam_masuk ? a.jam_masuk.substring(0, 5) : '-') : '-',
-            jamPulang: a ? (a.jam_pulang ? a.jam_pulang.substring(0, 5) : '-') : '-',
             status: 'alpha',
             noHp: s.no_hp_ortu || s.nomor_hp_ortu || s.no_hp_siswa || ''
+          };
+        });
+      } else if (filterStatus === 'belum_pulang') {
+        list = rawAbsensiSiswa.filter(item => item && item.jam_masuk && !item.jam_pulang).map(item => {
+          const s = item.siswa;
+          const rombel = (item.siswa_rombel && item.siswa_rombel.rombel) ? item.siswa_rombel.rombel.nama_rombel : '-';
+          return {
+            type: 'siswa',
+            siswaId: s ? s.id : item.pemilik_id,
+            idNumber: s ? (s.nis || s.nisn || '-') : '-',
+            nama: s ? s.nama : 'Siswa',
+            sub: rombel,
+            jamMasuk: item.jam_masuk ? item.jam_masuk.substring(0, 5) : '-',
+            jamPulang: '-',
+            status: 'belum_pulang',
+            noHp: s ? (s.no_hp_ortu || s.nomor_hp_ortu || s.no_hp_siswa || '') : ''
           };
         });
       } else {
@@ -922,6 +933,8 @@
         statusBadge = `<span class="table-status-pill izin"><i class="bi bi-file-earmark-text-fill"></i> ${st.toUpperCase()}</span>`;
       } else if (st === 'pkl') {
         statusBadge = `<span class="table-status-pill pkl"><i class="bi bi-building"></i> PKL</span>`;
+      } else if (st === 'belum_pulang') {
+        statusBadge = `<span class="table-status-pill terlambat" style="background:rgba(217, 119, 6, 0.15); color:#B45309; border:1px solid rgba(217, 119, 6, 0.35);"><i class="bi bi-door-open-fill"></i> Belum Pulang</span>`;
       } else {
         statusBadge = `<span class="table-status-pill belum"><i class="bi bi-exclamation-circle-fill"></i> Belum Scan</span>`;
       }
@@ -939,6 +952,8 @@
         keteranganText = 'Praktik Kerja Lapangan';
       } else if (st === 'dispen' || st === 'cuti') {
         keteranganText = 'Dispensasi / Cuti Sah';
+      } else if (st === 'belum_pulang') {
+        keteranganText = item.jamMasuk && item.jamMasuk !== '-' ? `Tercatat Masuk: ${item.jamMasuk} WIB (Belum scan pulang)` : 'Belum scan pulang';
       } else {
         keteranganText = 'Belum Ada Catatan Scan';
       }
