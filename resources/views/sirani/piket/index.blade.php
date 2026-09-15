@@ -91,16 +91,33 @@
 
     {{-- ══ 2. STRIP PETUGAS PIKET HARI INI ══ --}}
     @if($guruPiketHariIni->isNotEmpty())
+      @php
+        $totalPiket = $guruPiketHariIni->count();
+        $piketBertugas = $guruPiketHariIni->filter(fn($g) => in_array($g->status_piket['status'] ?? '', ['aktif', 'pulang']))->count();
+      @endphp
       <div class="piket-officers-banner no-print">
         <div class="piket-officers-label">
           <span class="duty-pulsing-dot"></span>
           <span>GURU PIKET HARI INI:</span>
+          <span class="piket-duty-summary">({{ $piketBertugas }}/{{ $totalPiket }} Bertugas)</span>
         </div>
         <div class="piket-officers-tags">
           @foreach($guruPiketHariIni as $gp)
-            <span class="piket-officer-tag">
+            @php
+              $st = $gp->status_piket ?? ['status' => 'belum_login', 'badge_class' => 'belum', 'label' => 'Belum Login', 'keterangan' => 'Belum Login ke SIRANI'];
+            @endphp
+            <span class="piket-officer-tag status-{{ $st['badge_class'] ?? 'belum' }}" title="{{ $st['keterangan'] ?? '' }}">
               <img src="{{ $gp->guru?->foto_url ?? '/img/user-default.png' }}" class="officer-thumb" />
               <span>{{ $gp->guru?->nama ?? 'Guru' }}</span>
+              <span class="officer-status-badge {{ $st['badge_class'] ?? 'belum' }}">
+                @if(($st['status'] ?? '') === 'aktif')
+                  <i class="bi bi-check-circle-fill"></i> {{ $st['jam_masuk'] ?? 'Aktif' }}
+                @elseif(($st['status'] ?? '') === 'pulang')
+                  <i class="bi bi-door-open-fill"></i> {{ $st['jam_pulang'] ?? 'Pulang' }}
+                @else
+                  <i class="bi bi-exclamation-circle-fill"></i> Belum Login
+                @endif
+              </span>
             </span>
           @endforeach
         </div>

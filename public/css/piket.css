@@ -459,6 +459,12 @@
       background: #10B981;
       box-shadow: 0 0 6px #10B981;
     }
+    .piket-duty-summary {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--emerald, #10B981);
+      margin-left: 2px;
+    }
     .piket-officers-tags {
       display: flex;
       align-items: center;
@@ -468,23 +474,60 @@
     .piket-officer-tag {
       display: inline-flex;
       align-items: center;
-      gap: 6px;
+      gap: 7px;
       background: var(--surface);
       border: 1px solid var(--border-2);
-      padding: 3px 10px;
+      padding: 3px 10px 3px 6px;
       border-radius: 100px;
       font-size: 11.5px;
       font-weight: 700;
       color: var(--text);
+      transition: all .2s ease;
+    }
+    .piket-officer-tag.status-aktif {
+      background: rgba(16, 185, 129, 0.08);
+      border-color: rgba(16, 185, 129, 0.35);
+    }
+    .piket-officer-tag.status-pulang {
+      background: rgba(6, 182, 212, 0.08);
+      border-color: rgba(6, 182, 212, 0.35);
+    }
+    .piket-officer-tag.status-belum {
+      background: rgba(239, 68, 68, 0.06);
+      border-color: rgba(239, 68, 68, 0.3);
     }
     .officer-thumb {
-      width: 18px;
-      height: 24px;
+      width: 20px;
+      height: 26px;
       aspect-ratio: 3 / 4;
       border-radius: 4px;
       object-fit: cover;
       object-position: center 20%;
       background: #0F172A;
+      flex-shrink: 0;
+    }
+    .officer-status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 6px;
+      white-space: nowrap;
+    }
+    .officer-status-badge.aktif {
+      background: rgba(16, 185, 129, 0.18);
+      color: #059669;
+    }
+    .officer-status-badge.pulang {
+      background: rgba(6, 182, 212, 0.18);
+      color: #0891b2;
+    }
+    .officer-status-badge.belum {
+      background: rgba(239, 68, 68, 0.15);
+      color: #dc2626;
+      animation: pulse-border 2s infinite ease-in-out;
     }
 
     /* ══ KPI ANALYTICS GRID (6 CARDS BERSIH) ══ */

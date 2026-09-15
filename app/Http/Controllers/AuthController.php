@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Guru;
 use App\Models\User;
 use App\Models\AuditLog;
+use App\Models\JadwalPiket;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -88,9 +89,27 @@ class AuthController extends Controller
 
                 AuditLog::catat('login', 'auth', "Login berhasil: {$nama} ({$userIdentifier})", null, ['role' => $user->role ?? 'wali_kelas']);
 
+                // Auto-Absen Masuk Khusus Guru Piket yang Bertugas Hari Ini
+                $pesanSelamatDatang = 'Selamat datang di DCC SMKN 1 Air Naningan, ' . $nama . '!';
+                if ($guru) {
+                    try {
+                        $hasilPiket = JadwalPiket::catatAbsenMasukPiket($guru);
+                        if (!empty($hasilPiket['is_piket'])) {
+                            if (!empty($hasilPiket['created'])) {
+                                $pesanSelamatDatang = "Selamat bertugas sebagai Guru Piket hari ini, {$nama}! Presensi masuk Anda telah otomatis tercatat pukul {$hasilPiket['jam']} WIB. Wajib scan kartu di gerbang saat pulang nanti untuk menyelesaikan presensi.";
+                                AuditLog::catat('absen_piket', 'auth', "Auto-absen masuk guru piket: {$nama} pukul {$hasilPiket['jam']} WIB");
+                            } else {
+                                $pesanSelamatDatang = "Selamat bertugas kembali sebagai Guru Piket hari ini, {$nama}! " . $hasilPiket['message'];
+                            }
+                        }
+                    } catch (\Throwable $e) {
+                        \Illuminate\Support\Facades\Log::warning("Gagal auto-absen guru piket pada login: " . $e->getMessage());
+                    }
+                }
+
                 // Seluruh pengguna diarahkan ke DCC (Digital Command Center) sebagai pintu gerbang utama ekosistem
                 return redirect('/dcc')
-                    ->with('success', 'Selamat datang di DCC SMKN 1 Air Naningan, ' . $nama . '!');
+                    ->with('success', $pesanSelamatDatang);
             }
         }
 

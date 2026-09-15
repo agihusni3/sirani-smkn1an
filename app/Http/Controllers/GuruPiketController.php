@@ -34,10 +34,13 @@ class GuruPiketController extends Controller
         $isLibur    = \App\Models\HariLibur::isLibur($today);
         $liburDetail = \App\Models\HariLibur::getLiburHariIni($today);
 
-        // Guru piket yang bertugas hari ini
+        // Guru piket yang bertugas hari ini beserta status pelaksanaan tugas
         $guruPiketHariIni = JadwalPiket::where('hari', $hariHariIni)
             ->with('guru')
-            ->get();
+            ->get()
+            ->each(function ($gp) use ($today) {
+                $gp->status_piket = JadwalPiket::getStatusKehadiranPiket($gp->guru_id, $today);
+            });
 
         // Rekap absensi siswa hari ini
         $absensiHariIni = Absensi::with(['siswa', 'siswaRombel.rombel'])
