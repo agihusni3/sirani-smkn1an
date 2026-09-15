@@ -152,37 +152,36 @@
     }
     .ptk-field-item {
       background: var(--surface, #F8FAFC);
-      border: 1px solid var(--border, rgba(0,0,0,0.05));
+      border: 1px solid var(--border, #E2E8F0);
       border-radius: 12px;
-      padding: 12px 14px;
+      padding: 13px 16px;
       transition: all 0.15s ease;
     }
     .ptk-field-item:hover {
-      border-color: rgba(37,99,235,0.25);
-      background: #FAFCFF;
+      border-color: #CBD5E1;
+      background: #FFFFFF;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.03);
     }
     .ptk-field-label {
-      font-size: 11px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
+      font-size: 11.5px;
+      font-weight: 600;
       color: var(--text-3, #64748B);
-      margin-bottom: 4px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
+      margin-bottom: 5px;
+      line-height: 1.3;
+      letter-spacing: 0.01em;
     }
     .ptk-field-value {
-      font-size: 13.5px;
+      font-size: 14px;
       font-weight: 600;
       color: var(--text, #0F172A);
+      line-height: 1.45;
       word-break: break-word;
     }
     .ptk-field-empty {
       color: #94A3B8;
       font-weight: 400;
       font-style: italic;
-      font-size: 12.5px;
+      font-size: 13px;
     }
 
     /* ─── Document Card ─── */
@@ -440,8 +439,7 @@
           </button>
         </div>
 
-        <div class="text-muted small d-none d-md-flex align-items-center gap-1.5">
-          <i class="bi bi-shield-check text-success"></i>
+        <div class="text-muted small d-none d-md-flex align-items-center">
           <span>Akses Pribadi Terproteksi &bull; Hanya dapat dilihat oleh Anda &amp; Tata Usaha</span>
         </div>
       </div>
@@ -457,14 +455,9 @@
             <div class="col-lg-6">
               <div class="ptk-info-card">
                 <div class="ptk-info-card-header d-flex align-items-center justify-content-between">
-                  <div class="d-flex align-items-center gap-2">
-                    <div class="p-2 rounded-3 bg-primary-subtle text-primary">
-                      <i class="bi bi-person-lines-fill"></i>
-                    </div>
-                    <div>
-                      <h3 class="h6 fw-bold mb-0" style="color:var(--text, #0F172A);">Identitas Diri &amp; Kependudukan</h3>
-                      <div class="text-muted" style="font-size:11.5px;">Data resmi kependudukan sesuai KTP / Dapodik</div>
-                    </div>
+                  <div>
+                    <h3 class="h6 fw-bold mb-0" style="color:var(--text, #0F172A); font-size:15px; letter-spacing:-0.01em;">Identitas Diri &amp; Kependudukan</h3>
+                    <div class="text-muted" style="font-size:12px; margin-top:2px;">Data resmi kependudukan sesuai KTP / Dapodik</div>
                   </div>
                   <button type="button" class="btn btn-sm btn-outline-primary py-1 px-2.5 rounded-pill fw-semibold" style="font-size:11.5px;" data-bs-toggle="modal" data-bs-target="#modalUpdateBiodata" data-tab-target="#tab-modal-identitas">
                     <i class="bi bi-pencil-square me-1"></i> Edit Data
@@ -475,12 +468,12 @@
                   <div class="ptk-field-grid">
                     
                     <div class="ptk-field-item">
-                      <div class="ptk-field-label"><i class="bi bi-person"></i> Nama Lengkap</div>
+                      <div class="ptk-field-label">Nama Lengkap</div>
                       <div class="ptk-field-value">{{ $guru->nama_lengkap ?: $guru->nama }}</div>
                     </div>
 
                     <div class="ptk-field-item">
-                      <div class="ptk-field-label"><i class="bi bi-mortarboard"></i> Gelar Akademik</div>
+                      <div class="ptk-field-label">Gelar Akademik</div>
                       <div class="ptk-field-value">
                         @if($guru->gelar_depan || $guru->gelar_belakang)
                           {{ ($guru->gelar_depan ? $guru->gelar_depan . ' ' : '') . ($guru->gelar_belakang ?: '') }}
@@ -491,14 +484,14 @@
                     </div>
 
                     <div class="ptk-field-item">
-                      <div class="ptk-field-label"><i class="bi bi-card-text"></i> NIK (Nomor KTP)</div>
+                      <div class="ptk-field-label">NIK (Nomor KTP)</div>
                       <div class="ptk-field-value font-monospace">
                         {{ $guru->nik ?: '—' }}
                       </div>
                     </div>
 
                     <div class="ptk-field-item">
-                      <div class="ptk-field-label"><i class="bi bi-calendar-event"></i> Tempat, Tanggal Lahir</div>
+                      <div class="ptk-field-label">Tempat, Tanggal Lahir</div>
                       <div class="ptk-field-value">
                         @if($guru->tempat_lahir || $guru->tanggal_lahir)
                           {{ $guru->tempat_lahir ?: '—' }}, {{ $guru->tanggal_lahir ? \Carbon\Carbon::parse($guru->tanggal_lahir)->translatedFormat('d F Y') : '—' }}
@@ -509,7 +502,7 @@
                     </div>
 
                     <div class="ptk-field-item">
-                      <div class="ptk-field-label"><i class="bi bi-gender-ambiguous"></i> Jenis Kelamin</div>
+                      <div class="ptk-field-label">Jenis Kelamin</div>
                       <div class="ptk-field-value">
                         @if($guru->jenis_kelamin === 'L')
                           Laki-laki
@@ -522,12 +515,12 @@
                     </div>
 
                     <div class="ptk-field-item">
-                      <div class="ptk-field-label"><i class="bi bi-heart"></i> Agama</div>
+                      <div class="ptk-field-label">Agama</div>
                       <div class="ptk-field-value">{{ $guru->agama ?: 'Islam' }}</div>
                     </div>
 
                     <div class="ptk-field-item" style="grid-column: 1 / -1;">
-                      <div class="ptk-field-label"><i class="bi bi-whatsapp"></i> Kontak WhatsApp / HP</div>
+                      <div class="ptk-field-label">Kontak WhatsApp / HP</div>
                       <div class="ptk-field-value d-flex align-items-center gap-2">
                         @if($guru->no_hp)
                           <strong style="color:#059669;">{{ $guru->no_hp }}</strong>
@@ -541,7 +534,7 @@
                     </div>
 
                     <div class="ptk-field-item" style="grid-column: 1 / -1;">
-                      <div class="ptk-field-label"><i class="bi bi-geo-alt"></i> Alamat Domisili</div>
+                      <div class="ptk-field-label">Alamat Domisili</div>
                       <div class="ptk-field-value">
                         {{ $guru->alamat ?: 'Belum mengisi alamat tempat tinggal.' }}
                       </div>
@@ -556,14 +549,9 @@
             <div class="col-lg-6">
               <div class="ptk-info-card">
                 <div class="ptk-info-card-header d-flex align-items-center justify-content-between">
-                  <div class="d-flex align-items-center gap-2">
-                    <div class="p-2 rounded-3 bg-warning-subtle text-warning-emphasis">
-                      <i class="bi bi-briefcase-fill"></i>
-                    </div>
-                    <div>
-                      <h3 class="h6 fw-bold mb-0" style="color:var(--text, #0F172A);">Status &amp; Riwayat Kepegawaian</h3>
-                      <div class="text-muted" style="font-size:11.5px;">Pangkat, golongan, dan histori kenaikan berkala</div>
-                    </div>
+                  <div>
+                    <h3 class="h6 fw-bold mb-0" style="color:var(--text, #0F172A); font-size:15px; letter-spacing:-0.01em;">Status &amp; Riwayat Kepegawaian</h3>
+                    <div class="text-muted" style="font-size:12px; margin-top:2px;">Pangkat, golongan, dan histori kenaikan berkala</div>
                   </div>
                   <button type="button" class="btn btn-sm btn-outline-warning text-dark py-1 px-2.5 rounded-pill fw-semibold" style="font-size:11.5px;" data-bs-toggle="modal" data-bs-target="#modalUpdateBiodata" data-tab-target="#tab-modal-kepegawaian">
                     <i class="bi bi-pencil-square me-1"></i> Edit Riwayat
@@ -574,7 +562,7 @@
                   <div class="ptk-field-grid">
 
                     <div class="ptk-field-item">
-                      <div class="ptk-field-label"><i class="bi bi-award"></i> Status Pegawai</div>
+                      <div class="ptk-field-label">Status Pegawai</div>
                       <div class="ptk-field-value">
                         <span class="badge px-2.5 py-1 rounded-pill" style="background:#EFF6FF; color:#1D4ED8; font-weight:700;">
                           {{ $guru->label_kepegawaian ?? ($guru->status_kepegawaian ?: 'Pegawai') }}
@@ -583,7 +571,7 @@
                     </div>
 
                     <div class="ptk-field-item">
-                      <div class="ptk-field-label"><i class="bi bi-stars"></i> Pangkat / Gol. Ruang</div>
+                      <div class="ptk-field-label">Pangkat / Gol. Ruang</div>
                       <div class="ptk-field-value">
                         @if($guru->pangkat || $guru->golongan_ruang)
                           <strong>{{ $guru->pangkat ?: '—' }}</strong> ({{ $guru->golongan_ruang ?: '—' }})
@@ -594,12 +582,12 @@
                     </div>
 
                     <div class="ptk-field-item">
-                      <div class="ptk-field-label"><i class="bi bi-person-workspace"></i> Tugas / Jabatan</div>
+                      <div class="ptk-field-label">Tugas / Jabatan</div>
                       <div class="ptk-field-value">{{ $guru->jabatan ?: 'Guru Mata Pelajaran' }}</div>
                     </div>
 
                     <div class="ptk-field-item">
-                      <div class="ptk-field-label"><i class="bi bi-diagram-3"></i> Tugas Tambahan</div>
+                      <div class="ptk-field-label">Tugas Tambahan</div>
                       <div class="ptk-field-value d-flex flex-wrap gap-1.5">
                         @if(!empty($guru->list_tugas_tambahan))
                           @foreach($guru->list_tugas_tambahan as $tgs)
@@ -612,28 +600,28 @@
                     </div>
 
                     <div class="ptk-field-item">
-                      <div class="ptk-field-label"><i class="bi bi-clock-history"></i> TMT CPNS / Mulai Tugas</div>
+                      <div class="ptk-field-label">TMT CPNS / Mulai Tugas</div>
                       <div class="ptk-field-value">
                         {{ $guru->tmt_cpns ? \Carbon\Carbon::parse($guru->tmt_cpns)->translatedFormat('d F Y') : '—' }}
                       </div>
                     </div>
 
                     <div class="ptk-field-item">
-                      <div class="ptk-field-label"><i class="bi bi-graph-up-arrow"></i> TMT Pangkat Terakhir</div>
+                      <div class="ptk-field-label">TMT Pangkat Terakhir</div>
                       <div class="ptk-field-value">
                         {{ $guru->tmt_pangkat ? \Carbon\Carbon::parse($guru->tmt_pangkat)->translatedFormat('d F Y') : '—' }}
                       </div>
                     </div>
 
                     <div class="ptk-field-item">
-                      <div class="ptk-field-label"><i class="bi bi-cash-stack"></i> TMT Berkala (KGB) Terakhir</div>
+                      <div class="ptk-field-label">TMT Berkala (KGB) Terakhir</div>
                       <div class="ptk-field-value">
                         {{ $guru->tmt_kgb_terakhir ? \Carbon\Carbon::parse($guru->tmt_kgb_terakhir)->translatedFormat('d F Y') : '—' }}
                       </div>
                     </div>
 
                     <div class="ptk-field-item">
-                      <div class="ptk-field-label"><i class="bi bi-alarm"></i> Jadwal KGB Berikutnya</div>
+                      <div class="ptk-field-label">Jadwal KGB Berikutnya</div>
                       <div class="ptk-field-value">
                         @if($guru->tmt_kgb_berikutnya)
                           <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle px-2 py-1 rounded-pill">
@@ -654,13 +642,8 @@
 
           {{-- Catatan Panduan Pembaruan Data --}}
           <div class="p-3 rounded-4 d-flex flex-column flex-sm-row align-items-start align-items-sm-center justify-content-between gap-3 border" style="background:#F8FAFC; border-color:#E2E8F0!important;">
-            <div class="d-flex align-items-center gap-3">
-              <div class="p-2 rounded-circle bg-primary-subtle text-primary fs-5">
-                <i class="bi bi-info-circle"></i>
-              </div>
-              <div class="small text-muted">
-                <strong>Catatan Pembaruan Biodata:</strong> Anda dapat memperbarui data identitas kependudukan, nomor kontak, serta riwayat kepegawaian secara mandiri. Perubahan akan langsung disinkronkan ke Data Pokok GTK SITUAN.
-              </div>
+            <div class="small text-muted" style="font-size:12.5px; line-height:1.5;">
+              <strong style="color:var(--text, #0F172A);">Catatan Pembaruan Biodata:</strong> Anda dapat memperbarui data identitas kependudukan, nomor kontak, serta riwayat kepegawaian secara mandiri. Perubahan akan langsung disinkronkan ke Data Pokok GTK SITUAN.
             </div>
             <button type="button" class="btn btn-sm btn-primary px-3 py-1.5 rounded-pill fw-bold text-nowrap flex-shrink-0 shadow-sm" data-bs-toggle="modal" data-bs-target="#modalUpdateBiodata" style="font-size:12px; background:#2563EB; border-color:#2563EB;">
               <i class="bi bi-pencil-square me-1"></i> Update Biodata Sekarang
