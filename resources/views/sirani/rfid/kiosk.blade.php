@@ -984,41 +984,113 @@
       .replace(/'/g, '&#039;');
   }
 
-  // Keyboard shortcut listener
+  // ── SCANNER INPUT HANDLER (via hidden rfidInput) ──
+  // Tangkap input saat rfidInput aktif (Enter dari barcode scanner)
+  const rfidInputEl = document.getElementById('rfidInput');
+  if (rfidInputEl) {
+    rfidInputEl.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        const val = rfidInputEl.value.trim();
+        if (val.length >= 3) {
+          processCode(val);
+        }
+        rfidInputEl.value = '';
+      }
+    });
+    rfidInputEl.addEventListener('input', () => {
+      // Jika scanner kirim semua sekaligus tanpa Enter (jarang tapi bisa terjadi)
+      clearTimeout(scannerTimeout);
+      scannerTimeout = setTimeout(() => {
+        const val = rfidInputEl.value.trim();
+        if (val.length >= 3) {
+          processCode(val);
+          rfidInputEl.value = '';
+        }
+      }, 120);
+    });
+  }
+
+  // ── GLOBAL KEYDOWN: Tangkap barcode/RFID dari scanner USB HID ──
+  // Scanner USB mengirim karakter sangat cepat (<80ms antar karakter)
+  // PENTING: tangkap SEMUA keydown kecuali sedang di textarea biasa
+  let lastKeyTime = 0;
   document.addEventListener('keydown', (e) => {
-    // Escape key to close drawer
+    // Escape key
     if (e.key === 'Escape') {
-      closeMonitorDrawer();
+      focusScanner();
       return;
     }
 
-    // Enter key for barcode/RFID reader
+    const activeTag = document.activeElement?.tagName?.toLowerCase();
+    const isInTextarea = activeTag === 'textarea';
+
+    // Enter key: proses buffer atau submit dari rfidInput
     if (e.key === 'Enter') {
       if (scannerBuffer.length >= 3) {
         processCode(scannerBuffer);
         scannerBuffer = '';
+      } else if (activeTag === 'input' && document.activeElement?.id === 'rfidInput') {
+        const val = document.getElementById('rfidInput')?.value?.trim();
+        if (val && val.length >= 3) {
+          processCode(val);
+          document.getElementById('rfidInput').value = '';
+        }
       }
       return;
     }
 
-    if (e.key.length === 1 && !['input', 'select', 'textarea'].includes(document.activeElement?.tagName?.toLowerCase())) {
-      scannerBuffer += e.key;
-      clearTimeout(scannerTimeout);
-      scannerTimeout = setTimeout(() => {
-        if (scannerBuffer.length >= 6) {
-          processCode(scannerBuffer);
-        }
-        scannerBuffer = '';
-      }, 80);
+    // Abaikan modifier keys
+    if (e.key.length !== 1 || e.ctrlKey || e.altKey || e.metaKey) return;
+
+    // Jika aktif di textarea biasa (bukan rfidInput), abaikan
+    if (isInTextarea) return;
+
+    // Cek kecepatan ketik — scanner USB sangat cepat (< 80ms per karakter)
+    const now = Date.now();
+    const timeDiff = now - lastKeyTime;
+    lastKeyTime = now;
+
+    // Jika ketik manual lambat (> 300ms) dan sedang fokus di input selain rfidInput: abaikan
+    if (timeDiff > 300 && activeTag === 'input' && document.activeElement?.id !== 'rfidInput') {
+      return;
     }
+
+    // Redirect semua keystroke scanner ke rfidInput
+    const inp = document.getElementById('rfidInput');
+    if (inp && document.activeElement?.id !== 'rfidInput') {
+      inp.focus();
+    }
+
+    // Akumulasi buffer scanner
+    scannerBuffer += e.key;
+    clearTimeout(scannerTimeout);
+    scannerTimeout = setTimeout(() => {
+      if (scannerBuffer.length >= 3) {
+        processCode(scannerBuffer);
+      }
+      scannerBuffer = '';
+    }, 80);
   });
 
   document.addEventListener('DOMContentLoaded', () => {
     focusScanner();
-    setInterval(focusScanner, 3000);
+    // Re-fokus ke rfidInput setiap 5 detik untuk jaga-jaga
+    setInterval(focusScanner, 5000);
     // Initial fetch of monitor feed & recurring polling every 12 seconds
     fetchMonitorFeed();
     setInterval(() => fetchMonitorFeed(false), 12000);
+
+    // Jika user klik di elemen non-interaktif panel kiri, kembalikan fokus ke scanner
+    const leftPanel = document.getElementById('kioskColLeft');
+    if (leftPanel) {
+      leftPanel.addEventListener('click', (e) => {
+        const clickedTag = e.target?.tagName?.toLowerCase();
+        if (!['input', 'select', 'button', 'a', 'textarea'].includes(clickedTag)) {
+          setTimeout(focusScanner, 100);
+        }
+      });
+    }
   });
 </script>
 </body>
