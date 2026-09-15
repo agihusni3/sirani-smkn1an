@@ -21,6 +21,7 @@ use App\Http\Controllers\RombelController;
 use App\Http\Controllers\SiklusSiswaController;
 use App\Http\Controllers\SiswaController;
 use App\Http\Controllers\SuratKesiswaanController;
+use App\Http\Controllers\PengawasanGuruController;
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\Web\BerandaController;
@@ -239,6 +240,12 @@ Route::middleware('auth')->group(function () {
     Route::post('/peringkat/save-template-config', [PeringkatController::class, 'saveTemplateConfig'])->name('peringkat.save-template-config');
     Route::post('/peringkat/reset-template', [PeringkatController::class, 'resetTemplate'])->name('peringkat.reset-template');
     Route::get('/peringkat/export-csv', [PeringkatController::class, 'exportCsv'])->name('peringkat.export-csv');
+
+    // 2c. Pengawasan Keaktifan & Monitoring Kinerja Guru / Wali Kelas (Khusus Kepsek & Manajemen)
+    Route::middleware('role:admin,kepala_sekolah,waka_kesiswaan,waka_kurikulum')->group(function () {
+        Route::get('/pengawasan-guru', [PengawasanGuruController::class, 'index'])->name('pengawasan.guru.index');
+        Route::get('/pengawasan-guru/{guruId}/aktivitas', [PengawasanGuruController::class, 'detailAktivitas'])->name('pengawasan.guru.detail');
+    });
 
     // 3. Jadwal Piket Harian
     Route::get('/jadwal-piket', [JadwalPiketController::class, 'index'])->name('jadwal-piket.index')->middleware('role:admin,kepala_sekolah,waka_kesiswaan,waka_kurikulum,staf_tu');

@@ -215,6 +215,16 @@
           </div>
         </a>
       @endif
+
+      @if($isAdmin || $isKepsek || $isWakasis || $isWakaKurikulum)
+        <a href="/pengawasan-guru" class="nav-item {{ request()->is('pengawasan-guru*') ? 'active' : '' }}" title="Monitoring Keaktifan & Kinerja Guru/Wali Kelas">
+          <div class="nav-left-part">
+            <i class="bi bi-shield-check nav-icon" style="color:#0ea5e9;"></i>
+            <span class="nav-text">Pengawasan Guru</span>
+          </div>
+          <span class="nav-count-badge" style="background:#e0f2fe; color:#0369a1; border-color:#bae6fd; font-weight:700;">Kepsek</span>
+        </a>
+      @endif
     </div>
 
     {{-- 4. KESISWAAN BINAAN (Khusus Wali Kelas) --}}
