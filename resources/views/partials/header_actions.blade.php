@@ -60,9 +60,6 @@
         <a href="{{ route('ptk.profil-saya') }}" class="acct-dropdown-item" style="width:100%; text-align:left; padding:9px 12px; font-size:12px; font-weight:700; color:var(--text); text-decoration:none; display:flex; align-items:center; gap:8px; white-space:nowrap; box-sizing:border-box;">
           <i class="bi bi-person-vcard-fill" style="font-size:14.5px; color:#2563EB;"></i> Biodata &amp; Berkas Saya
         </a>
-        <a href="{{ route('guru.ppdb.wawancara') }}" class="acct-dropdown-item" style="width:100%; text-align:left; padding:9px 12px; font-size:12px; font-weight:700; color:var(--text); text-decoration:none; display:flex; align-items:center; gap:8px; white-space:nowrap; box-sizing:border-box;" title="Portal Penguji Wawancara Calon Siswa PPDB 2026">
-          <i class="bi bi-mic-fill" style="font-size:14.5px; color:#D97706;"></i> Wawancara PPDB 2026
-        </a>
         @endif
 
         <button type="button" onclick="openModalProfilMandiri()" class="acct-dropdown-item" style="width:100%; text-align:left; padding:9px 12px; font-size:12px; font-weight:700; color:var(--text); background:none; border:none; border-radius:6px; cursor:pointer; display:flex; align-items:center; gap:8px; white-space:nowrap; box-sizing:border-box;">

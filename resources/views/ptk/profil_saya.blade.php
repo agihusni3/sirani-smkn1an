@@ -341,27 +341,21 @@
             {{-- Bagian Kiri: Avatar & Identitas Guru --}}
             <div class="d-flex flex-column flex-sm-row align-items-center align-items-sm-start gap-4 text-center text-sm-start">
               
-              {{-- Avatar Foto --}}
+              {{-- Avatar Foto (Kotak Landscape Rasio 4x6) --}}
               <div class="position-relative">
-                <img src="{{ $guru->foto_url }}" alt="{{ $guru->nama }}" class="rounded-circle shadow-sm" style="width:84px; height:84px; object-fit:cover; border:3px solid #FFFFFF; box-shadow:0 4px 12px rgba(0,0,0,0.1)!important;" />
-                <span class="position-absolute bottom-0 end-0 p-1.5 rounded-circle border border-2 border-white" style="background: {{ $guru->status === 'aktif' ? '#10B981' : '#94A3B8' }}; width:16px; height:16px;" title="Status: {{ ucfirst($guru->status) }}"></span>
+                <img src="{{ $guru->foto_url }}" alt="{{ $guru->nama }}" class="shadow-sm" style="width:108px; height:72px; object-fit:cover; border-radius:12px; border:3px solid #FFFFFF; box-shadow:0 4px 12px rgba(0,0,0,0.1)!important;" />
+                <span class="position-absolute bottom-0 end-0 p-1.5 rounded-circle border border-2 border-white" style="background: {{ $guru->status === 'aktif' ? '#10B981' : '#94A3B8' }}; width:16px; height:16px; transform:translate(25%, 25%);" title="Status: {{ ucfirst($guru->status) }}"></span>
               </div>
 
               {{-- Detail Nama & Metadata --}}
               <div>
-                <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-sm-start gap-2 mb-1.5">
-                  <span class="badge rounded-pill px-2.5 py-1" style="background:#EFF6FF; color:#1D4ED8; border:1px solid #BFDBFE; font-size:11.5px; font-weight:700;">
-                    <i class="bi bi-person-badge-fill me-1"></i> {{ $guru->label_kepegawaian ?? ($guru->status_kepegawaian ?: 'PTK') }}
-                  </span>
-                  @if($guru->golongan_ruang)
+                @if($guru->golongan_ruang)
+                  <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-sm-start gap-2 mb-1.5">
                     <span class="badge rounded-pill px-2.5 py-1" style="background:#FFFBEB; color:#B45309; border:1px solid #FDE68A; font-size:11.5px; font-weight:700;">
                       Gol. {{ $guru->golongan_ruang }}
                     </span>
-                  @endif
-                  <span class="badge rounded-pill px-2.5 py-1" style="background:#ECFDF5; color:#047857; border:1px solid #A7F3D0; font-size:11.5px; font-weight:700;">
-                    <i class="bi bi-folder-check me-1"></i> {{ $arsips->count() }} Dokumen Terverifikasi
-                  </span>
-                </div>
+                  </div>
+                @endif
 
                 <h2 class="h4 fw-bold mb-1.5" style="color:var(--text, #0F172A); letter-spacing:-0.02em;">
                   {{ $guru->nama_lengkap_gelar ?: $guru->nama }}
