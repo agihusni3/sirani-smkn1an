@@ -341,9 +341,9 @@
             {{-- Bagian Kiri: Avatar & Identitas Guru --}}
             <div class="d-flex flex-column flex-sm-row align-items-center align-items-sm-start gap-4 text-center text-sm-start">
               
-              {{-- Avatar Foto (Kotak Landscape Rasio 4x6) --}}
+              {{-- Avatar Foto (Kotak Portrait Rasio 4x6) --}}
               <div class="position-relative">
-                <img src="{{ $guru->foto_url }}" alt="{{ $guru->nama }}" class="shadow-sm" style="width:108px; height:72px; object-fit:cover; border-radius:12px; border:3px solid #FFFFFF; box-shadow:0 4px 12px rgba(0,0,0,0.1)!important;" />
+                <img src="{{ $guru->foto_url }}" alt="{{ $guru->nama }}" class="shadow-sm" style="width:72px; height:108px; object-fit:cover; border-radius:12px; border:3px solid #FFFFFF; box-shadow:0 4px 12px rgba(0,0,0,0.1)!important;" />
                 <span class="position-absolute bottom-0 end-0 p-1.5 rounded-circle border border-2 border-white" style="background: {{ $guru->status === 'aktif' ? '#10B981' : '#94A3B8' }}; width:16px; height:16px; transform:translate(25%, 25%);" title="Status: {{ ucfirst($guru->status) }}"></span>
               </div>
 
