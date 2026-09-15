@@ -52,6 +52,11 @@ class User extends Authenticatable
         ];
     }
 
+    public function getNameAttribute(?string $value): string
+    {
+        return \App\Support\NamaFormatter::format($value ?? ($this->attributes['name'] ?? ''));
+    }
+
     public function guru(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(Guru::class, 'guru_id');

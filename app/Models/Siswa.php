@@ -62,6 +62,11 @@ class Siswa extends Model
 
     protected $appends = ['foto_url', 'nomor_hp_ortu'];
 
+    public function getNamaAttribute(?string $value): string
+    {
+        return \App\Support\NamaFormatter::format($value ?? ($this->attributes['nama'] ?? ''));
+    }
+
     public function getNamaOrtuAttribute(): ?string
     {
         return $this->attributes['nama_ortu'] 

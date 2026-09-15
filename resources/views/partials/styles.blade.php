@@ -9,6 +9,18 @@
   (function() {
     const saved = localStorage.getItem('smkn1_theme') || 'light';
     document.documentElement.setAttribute('data-theme', saved);
+
+    // Universal Helper Format Nama Title Case (Agi Husni Widodo)
+    window.formatNamaTitle = function(str) {
+      if (!str) return '';
+      if (str.indexOf(',') !== -1) {
+        const parts = str.split(',');
+        const base = parts[0].trim().toLowerCase().replace(/(?:^|\s|-)\S/g, function(a) { return a.toUpperCase(); });
+        const gelars = parts.slice(1).map(function(g) { return g.trim(); }).join(', ');
+        return gelars ? (base + ', ' + gelars) : base;
+      }
+      return str.trim().toLowerCase().replace(/(?:^|\s|-)\S/g, function(a) { return a.toUpperCase(); });
+    };
   })();
 </script>
 <link rel="stylesheet" href="{{ asset('css/sirani-dashboard.css') }}?v={{ filemtime(public_path('css/sirani-dashboard.css')) }}">

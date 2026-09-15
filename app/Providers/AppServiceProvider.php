@@ -4,6 +4,8 @@ namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
 
+require_once __DIR__ . '/../Support/helpers.php';
+
 class AppServiceProvider extends ServiceProvider
 {
     /**
@@ -20,6 +22,11 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         \Illuminate\Pagination\Paginator::defaultView('partials.pagination');
+
+        // Standarisasi helper format nama
+        \Illuminate\Support\Facades\Blade::directive('formatNama', function ($expression) {
+            return "<?php echo \App\Support\NamaFormatter::format($expression); ?>";
+        });
 
         if (!$this->app->runningInConsole()) {
             try {
