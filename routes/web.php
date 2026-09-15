@@ -146,6 +146,7 @@ Route::middleware('auth')->group(function () {
     // 0c-2. Portal Mandiri PTK (Biodata & Lemari Berkas Digital Pribadi)
     Route::get('/ptk/profil-saya', [\App\Http\Controllers\PtkProfilMandiriController::class, 'index'])->name('ptk.profil-saya');
     Route::post('/ptk/profil-saya/unggah-berkas', [\App\Http\Controllers\PtkProfilMandiriController::class, 'unggahBerkasMandiri'])->name('ptk.unggah-berkas');
+    Route::post('/ptk/profil-saya/update-foto', [\App\Http\Controllers\PtkProfilMandiriController::class, 'updateFoto'])->name('ptk.update-foto');
     Route::delete('/ptk/profil-saya/berkas/{id}', [\App\Http\Controllers\PtkProfilMandiriController::class, 'hapusBerkasMandiri'])->name('ptk.hapus-berkas');
 
     // 0c-3. Pintasan ke Modul PPDB — Meja Wawancara 2026

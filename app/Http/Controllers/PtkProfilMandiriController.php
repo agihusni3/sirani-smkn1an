@@ -143,4 +143,42 @@ class PtkProfilMandiriController extends Controller
 
         return back()->with('success', "Berkas '{$namaDok}' berhasil dihapus dari lemari berkas.");
     }
+
+    /**
+     * Perbarui dan Sinkronkan Foto Profil Mandiri PTK dengan Data Pokok Guru.
+     */
+    public function updateFoto(Request $request)
+    {
+        $user = auth()->user();
+        $guru = $user->guru;
+
+        if (!$guru && $user->isAdmin() && $request->has('guru_id')) {
+            $guru = Guru::findOrFail($request->guru_id);
+        }
+
+        if (!$guru) {
+            return back()->with('error', 'Akses ditolak: Akun Anda tidak terhubung ke profil PTK.');
+        }
+
+        $request->validate([
+            'foto' => 'required|image|mimes:jpeg,png,jpg,webp|max:5120',
+        ], [
+            'foto.required' => 'Pilih file foto yang akan diunggah.',
+            'foto.image'    => 'File harus berupa gambar.',
+            'foto.mimes'    => 'Format foto harus JPG, JPEG, PNG, atau WEBP.',
+            'foto.max'      => 'Ukuran foto maksimal 5MB.',
+        ]);
+
+        // Hapus foto lama jika ada
+        if ($guru->foto && Storage::disk('public')->exists($guru->foto)) {
+            Storage::disk('public')->delete($guru->foto);
+        }
+
+        $path = $request->file('foto')->store('foto_guru', 'public');
+        $guru->update(['foto' => $path]);
+
+        AuditLog::catat('update', 'foto_guru', "PTK {$guru->nama} memperbarui foto profil mandiri.");
+
+        return back()->with('success', 'Foto profil PTK berhasil diperbarui dan disinkronkan dengan Data Pokok Guru!');
+    }
 }

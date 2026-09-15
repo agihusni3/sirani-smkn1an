@@ -220,8 +220,27 @@ class Guru extends Model
 
     public function getFotoUrlAttribute(): string
     {
-        if ($this->foto && file_exists(public_path('storage/' . $this->foto))) {
-            return asset('storage/' . $this->foto);
+        if (!empty($this->foto)) {
+            // Jika sudah berupa URL lengkap
+            if (str_starts_with($this->foto, 'http://') || str_starts_with($this->foto, 'https://')) {
+                return $this->foto;
+            }
+
+            $cleanPath = ltrim(str_replace('storage/', '', $this->foto), '/');
+
+            // Cek ketersediaan file fisik di storage maupun public
+            if (\Illuminate\Support\Facades\Storage::disk('public')->exists($cleanPath) ||
+                file_exists(storage_path('app/public/' . $cleanPath)) ||
+                file_exists(public_path('storage/' . $cleanPath))) {
+                return asset('storage/' . $cleanPath);
+            }
+
+            if (file_exists(public_path($cleanPath))) {
+                return asset($cleanPath);
+            }
+
+            // Fallback URL jika path tercatat di database
+            return asset('storage/' . $cleanPath);
         }
 
         // Bersihkan gelar akademik depan dan belakang untuk inisial nama yang akurat

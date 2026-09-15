@@ -54,6 +54,13 @@ class DeployController extends Controller
             $logs['migrate_error'] = $e->getMessage();
         }
 
+        // Pastikan symlink storage terhubung untuk aset foto
+        try {
+            Artisan::call('storage:link');
+        } catch (\Throwable $e) {
+            // Abaikan jika symlink sudah ada
+        }
+
         // 3. Sinkronisasi Data Siswa jika perintah tersedia
         try {
             if (array_key_exists('sirani:sync-siswa', Artisan::all())) {

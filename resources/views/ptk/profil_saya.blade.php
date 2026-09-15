@@ -342,10 +342,25 @@
             <div class="d-flex flex-column flex-sm-row align-items-center align-items-sm-start gap-3 text-center text-sm-start">
               
               {{-- Avatar Foto (Kotak Portrait Rasio 4x6) --}}
-              <div class="position-relative flex-shrink-0">
+              <div class="position-relative flex-shrink-0" style="cursor:pointer;" onclick="document.getElementById('inputGantiFotoPtk').click()" title="Klik untuk mengunggah / mengganti foto profil">
                 <img src="{{ $guru->foto_url }}" alt="{{ $guru->nama }}" class="shadow-sm" style="width:72px; height:108px; object-fit:cover; border-radius:12px; border:3px solid #FFFFFF; box-shadow:0 4px 12px rgba(0,0,0,0.1)!important;" />
-                <span class="position-absolute bottom-0 end-0 p-1.5 rounded-circle border border-2 border-white" style="background: {{ $guru->status === 'aktif' ? '#10B981' : '#94A3B8' }}; width:16px; height:16px; transform:translate(25%, 25%);" title="Status: {{ ucfirst($guru->status) }}"></span>
+                
+                {{-- Badge Tombol Kamera --}}
+                <div style="position:absolute; top:-6px; right:-6px; background:#2563EB; color:#ffffff; width:22px; height:22px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:11px; border:2px solid #ffffff; box-shadow:0 2px 4px rgba(0,0,0,0.2); z-index:2;" title="Ganti Foto Profil">
+                  <i class="bi bi-camera-fill"></i>
+                </div>
+
+                <span class="position-absolute bottom-0 end-0 p-1.5 rounded-circle border border-2 border-white" style="background: {{ $guru->status === 'aktif' ? '#10B981' : '#94A3B8' }}; width:16px; height:16px; transform:translate(25%, 25%); z-index:2;" title="Status: {{ ucfirst($guru->status) }}"></span>
               </div>
+
+              {{-- Form Tersembunyi untuk Unggah Foto Profil Mandiri --}}
+              <form id="formGantiFotoPtk" action="{{ route('ptk.update-foto') }}" method="POST" enctype="multipart/form-data" style="display:none;">
+                @csrf
+                @if(request('guru_id'))
+                  <input type="hidden" name="guru_id" value="{{ $guru->id }}" />
+                @endif
+                <input type="file" id="inputGantiFotoPtk" name="foto" accept="image/jpeg,image/png,image/jpg,image/webp" onchange="if(this.files.length) document.getElementById('formGantiFotoPtk').submit();" />
+              </form>
 
               {{-- Detail Nama & Metadata --}}
               <div style="display:flex; flex-direction:column; justify-content:center; gap:2px; min-width:0; padding-top:4px;">

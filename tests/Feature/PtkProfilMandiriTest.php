@@ -129,4 +129,30 @@ class PtkProfilMandiriTest extends TestCase
         $resHapus->assertSessionHas('success');
         $this->assertDatabaseMissing('arsip_dokumen_ptks', ['id' => $dokA->id]);
     }
+
+    public function test_guru_dapat_mengunggah_foto_profil_mandiri_dan_sinkron_dengan_data_ptk()
+    {
+        $foto = UploadedFile::fake()->image('profil_budi.jpg', 400, 400);
+
+        $res = $this->actingAs($this->userGuruA)->post(route('ptk.update-foto'), [
+            'foto' => $foto,
+        ]);
+
+        $res->assertRedirect();
+        $res->assertSessionHas('success');
+
+        // Pastikan foto tersimpan di database model Guru (Data PTK)
+        $this->guruA->refresh();
+        $this->assertNotNull($this->guruA->foto);
+        $this->assertStringStartsWith('foto_guru/', $this->guruA->foto);
+        Storage::disk('public')->assertExists($this->guruA->foto);
+
+        // Pastikan accessor foto_url menghasilkan URL storage yang valid
+        $this->assertStringContainsString('storage/' . $this->guruA->foto, $this->guruA->foto_url);
+
+        // Pastikan foto ter-render di halaman profil mandiri PTK
+        $resPage = $this->actingAs($this->userGuruA)->get(route('ptk.profil-saya'));
+        $resPage->assertSee(e($this->guruA->foto_url), false);
+    }
 }
+
