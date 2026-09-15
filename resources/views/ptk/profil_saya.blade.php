@@ -341,9 +341,9 @@
             {{-- Bagian Kiri: Avatar & Identitas Guru --}}
             <div class="d-flex flex-column flex-sm-row align-items-center align-items-sm-start gap-3 text-center text-sm-start">
               
-              {{-- Avatar Foto (Kotak Portrait Rasio 4x6) --}}
+              {{-- Avatar Foto (Kotak Portrait Pasfoto Rasio 3x4) --}}
               <div class="position-relative flex-shrink-0" style="cursor:pointer;" onclick="document.getElementById('inputGantiFotoPtk').click()" title="Klik untuk mengunggah / mengganti foto profil">
-                <img src="{{ $guru->foto_url }}" alt="{{ $guru->nama }}" class="shadow-sm" style="width:72px; height:108px; object-fit:cover; border-radius:12px; border:3px solid #FFFFFF; box-shadow:0 4px 12px rgba(0,0,0,0.1)!important;" />
+                <img src="{{ $guru->foto_url }}" alt="{{ $guru->nama }}" class="shadow-sm" style="width:81px; height:108px; aspect-ratio:3/4; object-fit:cover; border-radius:12px; border:3px solid #FFFFFF; box-shadow:0 4px 12px rgba(0,0,0,0.1)!important;" />
                 
                 {{-- Badge Tombol Kamera --}}
                 <div style="position:absolute; top:-6px; right:-6px; background:#2563EB; color:#ffffff; width:22px; height:22px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:11px; border:2px solid #ffffff; box-shadow:0 2px 4px rgba(0,0,0,0.2); z-index:2;" title="Ganti Foto Profil">
