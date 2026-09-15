@@ -438,7 +438,7 @@
                   {{ $siswas->firstItem() + $idx }}
                 </td>
                 <td style="text-align:center; vertical-align:middle;">
-                  <img src="{{ $s->foto_url }}" alt="{{ $s->nama }}" style="width:34px; height:34px; border-radius:50%; object-fit:cover; border:1px solid var(--border-2);" />
+                  <img src="{{ $s->foto_url }}" alt="{{ $s->nama }}" style="width:30px; height:40px; aspect-ratio:3/4; border-radius:6px; object-fit:cover; object-position:center 20%; border:1px solid var(--border-2);" />
                 </td>
                 <td style="text-align:center; font-family:var(--font-mono); font-weight:800; color:var(--text); font-size:12.5px;">
                   {{ $s->nisn ?: '-' }}

@@ -161,9 +161,9 @@
                   <td style="text-align:center; font-family:var(--font-mono); color:var(--text-3); font-weight:700;">{{ ($kasusList instanceof \Illuminate\Pagination\LengthAwarePaginator ? $kasusList->firstItem() : 1) + $idx }}</td>
                   <td>
                     <div style="display:flex; align-items:center; gap:10px;">
-                      <div style="width:34px; height:34px; border-radius:50%; background:var(--bg-3); border:1px solid var(--border); display:flex; align-items:center; justify-content:center; font-weight:800; font-size:12.5px; color:var(--text); flex-shrink:0;">
+                      <div style="width:30px; height:40px; aspect-ratio:3/4; border-radius:6px; background:var(--bg-3); border:1px solid var(--border); display:flex; align-items:center; justify-content:center; font-weight:800; font-size:12.5px; color:var(--text); flex-shrink:0; overflow:hidden;">
                         @if($siswa && $siswa->foto)
-                          <img src="{{ $siswa->foto_url }}" alt="" style="width:100%; height:100%; border-radius:50%; object-fit:cover;" />
+                          <img src="{{ $siswa->foto_url }}" alt="" style="width:100%; height:100%; aspect-ratio:3/4; border-radius:inherit; object-fit:cover; object-position:center 20%;" />
                         @else
                           {{ substr($siswa->nama ?? 'S', 0, 1) }}
                         @endif

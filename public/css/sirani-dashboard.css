@@ -1063,15 +1063,16 @@
     background: var(--bg-2);
   }
 
-  /* ─── Universal Avatar Proportional Rules (Mencegah Foto Gepeng / Distorsi) ─── */
+  /* ─── Universal Avatar Proportional Rules (Kotak Rasio 3x4 Pasfoto Formal) ─── */
   .avatar-circle, .avatar-box {
-    width: 38px;
-    height: 38px;
-    min-width: 38px;
-    min-height: 38px;
-    max-width: 38px;
-    max-height: 38px;
-    border-radius: 50%;
+    width: 33px;
+    height: 44px;
+    min-width: 33px;
+    min-height: 44px;
+    max-width: 33px;
+    max-height: 44px;
+    aspect-ratio: 3 / 4;
+    border-radius: 6px;
     overflow: hidden;
     display: inline-flex;
     align-items: center;
@@ -1083,10 +1084,20 @@
     vertical-align: middle;
   }
   .avatar-circle.avatar-sm, .avatar-box.avatar-sm {
-    width: 32px; height: 32px; min-width: 32px; min-height: 32px; max-width: 32px; max-height: 32px;
+    width: 27px; height: 36px; min-width: 27px; min-height: 36px; max-width: 27px; max-height: 36px;
+    border-radius: 5px;
+  }
+  .avatar-circle.avatar-md, .avatar-box.avatar-md {
+    width: 36px; height: 48px; min-width: 36px; min-height: 48px; max-width: 36px; max-height: 48px;
+    border-radius: 6px;
   }
   .avatar-circle.avatar-lg, .avatar-box.avatar-lg {
-    width: 52px; height: 52px; min-width: 52px; min-height: 52px; max-width: 52px; max-height: 52px;
+    width: 51px; height: 68px; min-width: 51px; min-height: 68px; max-width: 51px; max-height: 68px;
+    border-radius: 8px;
+  }
+  .avatar-circle.avatar-xl, .avatar-box.avatar-xl {
+    width: 66px; height: 88px; min-width: 66px; min-height: 88px; max-width: 66px; max-height: 88px;
+    border-radius: 10px;
   }
   .avatar-circle.gold-border { border-color: rgba(0,0,0,0.25); }
   .avatar-circle.blue-border { border-color: var(--navy); }
@@ -1101,20 +1112,22 @@
     min-height: 100% !important;
     max-width: 100% !important;
     max-height: 100% !important;
-    aspect-ratio: 1 / 1 !important;
+    aspect-ratio: 3 / 4 !important;
     object-fit: cover !important;
-    object-position: center !important;
+    object-position: center 20% !important;
     display: block !important;
     margin: 0 auto !important;
     flex-shrink: 0 !important;
+    border-radius: inherit !important;
   }
 
   .avatar-preview-wrapper {
-    width: 72px;
-    height: 72px;
-    min-width: 72px;
-    min-height: 72px;
-    border-radius: 50%;
+    width: 84px;
+    height: 112px;
+    min-width: 84px;
+    min-height: 112px;
+    aspect-ratio: 3 / 4;
+    border-radius: 8px;
     overflow: hidden;
     display: inline-flex;
     align-items: center;
@@ -1127,10 +1140,11 @@
   .avatar-preview-wrapper img {
     width: 100% !important;
     height: 100% !important;
-    aspect-ratio: 1 / 1 !important;
+    aspect-ratio: 3 / 4 !important;
     object-fit: cover !important;
     object-position: center 20% !important;
     display: block !important;
+    border-radius: inherit !important;
   }
 
   /* ─── Responsive & Mobile Navigation (Hamburger Drawer) ─── */

@@ -1458,9 +1458,9 @@
         const idVal = s.nisn || s.nis;
         html += '<div style="background:var(--bg-card); border:1px solid var(--border); border-radius:var(--r-sm); padding:8px 12px; display:flex; justify-content:space-between; align-items:center; gap:8px;">';
         html += '<div style="display:flex; align-items:center; gap:10px; min-width:0;">';
-        html += '<div style="width:32px; height:32px; border-radius:50%; background:var(--bg-subtle); border:1px solid var(--border); display:flex; align-items:center; justify-content:center; font-weight:800; font-size:13px; color:var(--text); flex-shrink:0; overflow:hidden;">';
+        html += '<div style="width:30px; height:40px; aspect-ratio:3/4; border-radius:6px; background:var(--bg-subtle); border:1px solid var(--border); display:flex; align-items:center; justify-content:center; font-weight:800; font-size:13px; color:var(--text); flex-shrink:0; overflow:hidden;">';
         if (s.foto) {
-          html += '<img src="' + s.foto + '" style="width:100%; height:100%; object-fit:cover;">';
+          html += '<img src="' + s.foto + '" style="width:100%; height:100%; aspect-ratio:3/4; object-fit:cover; object-position:center 20%;">';
         } else {
           html += s.nama.charAt(0).toUpperCase();
         }
@@ -1704,9 +1704,9 @@
                 <div style="width:100%; height:100%; background:#0d1f4a; border-radius:14px;"></div>
               </div>
               @if($siswa->foto)
-                <img src="{{ asset('storage/'.$siswa->foto) }}" alt="{{ $siswa->nama }}" style="position:relative; z-index:1; width:76px; height:92px; object-fit:cover; border-radius:14px; display:block;" />
+                <img src="{{ asset('storage/'.$siswa->foto) }}" alt="{{ $siswa->nama }}" style="position:relative; z-index:1; width:75px; height:100px; aspect-ratio:3/4; object-fit:cover; object-position:center 20%; border-radius:12px; display:block;" />
               @else
-                <div style="position:relative; z-index:1; width:76px; height:92px; background:linear-gradient(135deg,#312e81,#4c1d95,#6d28d9); border-radius:14px; display:flex; align-items:center; justify-content:center; font-size:32px; font-weight:900; color:rgba(255,255,255,0.9); font-family:var(--font-main);">{{ strtoupper(substr($siswa->nama, 0, 1)) }}</div>
+                <div style="position:relative; z-index:1; width:75px; height:100px; aspect-ratio:3/4; background:linear-gradient(135deg,#312e81,#4c1d95,#6d28d9); border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:32px; font-weight:900; color:rgba(255,255,255,0.9); font-family:var(--font-main);">{{ strtoupper(substr($siswa->nama, 0, 1)) }}</div>
               @endif
             </div>
 

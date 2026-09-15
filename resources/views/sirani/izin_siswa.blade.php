@@ -85,7 +85,7 @@
             <div id="personPickerTrigger" class="person-picker-trigger" onclick="togglePersonPickerDropdown()">
               <div id="personSelectedView" style="display:none; align-items:center; justify-content:space-between; width:100%;">
                 <div style="display:flex; align-items:center; gap:8px; overflow:hidden;">
-                  <img id="selectedPersonFoto" src="/img/user-default.png" alt="Foto" style="width:26px; height:26px; border-radius:50%; object-fit:cover; border:1.5px solid rgba(0,0,0,0.15); flex-shrink:0;" />
+                  <img id="selectedPersonFoto" src="/img/user-default.png" alt="Foto" style="width:27px; height:36px; aspect-ratio:3/4; border-radius:5px; object-fit:cover; object-position:center 20%; border:1.5px solid rgba(0,0,0,0.15); flex-shrink:0;" />
                   <div style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
                     <strong id="selectedPersonNama" style="color:var(--text); font-size:13px;"></strong>
                     <span id="selectedPersonMeta" style="font-size:11px; color:#000000; font-family:var(--font-mono); margin-left:6px; font-weight:800;"></span>

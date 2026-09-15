@@ -55,9 +55,9 @@
       {{-- ATAS: IDENTITAS SISWA & TOMBOL DOKUMEN / ESKALASI --}}
       <div class="dossier-hero-top">
         <div style="display:flex; gap:16px; align-items:center;">
-          <div style="width:54px; height:54px; border-radius:12px; background:var(--bg-3); border:1.5px solid var(--border-2); display:flex; align-items:center; justify-content:center; font-weight:900; font-size:22px; color:var(--text); overflow:hidden; flex-shrink:0;">
+          <div style="width:51px; height:68px; aspect-ratio:3/4; border-radius:8px; background:var(--bg-3); border:1.5px solid var(--border-2); display:flex; align-items:center; justify-content:center; font-weight:900; font-size:22px; color:var(--text); overflow:hidden; flex-shrink:0;">
             @if($siswa->foto)
-              <img src="{{ $siswa->foto_url }}" alt="{{ $siswa->nama }}" style="width:100%; height:100%; object-fit:cover;" />
+              <img src="{{ $siswa->foto_url }}" alt="{{ $siswa->nama }}" style="width:100%; height:100%; aspect-ratio:3/4; object-fit:cover; object-position:center 20%;" />
             @else
               {{ substr($siswa->nama, 0, 1) }}
             @endif

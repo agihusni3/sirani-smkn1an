@@ -186,9 +186,10 @@
       background: rgba(255, 255, 255, 0.08) !important;
     }
     .person-select-avatar {
-      width: 32px;
-      height: 32px;
-      border-radius: 8px;
+      width: 30px;
+      height: 40px;
+      aspect-ratio: 3 / 4;
+      border-radius: 6px;
       background: rgba(0, 0, 0, 0.06);
       border: 1px solid var(--border-2);
       display: flex;
@@ -198,6 +199,16 @@
       font-size: 12px;
       color: var(--text);
       flex-shrink: 0;
+      overflow: hidden;
+    }
+    .person-select-avatar img {
+      width: 100%;
+      height: 100%;
+      aspect-ratio: 3 / 4;
+      object-fit: cover;
+      object-position: center 20%;
+      display: block;
+      border-radius: inherit;
     }
     [data-theme="dark"] .person-select-avatar {
       background: rgba(255, 255, 255, 0.08);

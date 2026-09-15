@@ -369,7 +369,7 @@
                   <td style="text-align:center; font-weight:700; color:var(--text-3); font-size:12px;">{{ $idx + 1 }}</td>
                   <td>
                     <div style="display:flex; align-items:center; gap:10px;">
-                      <img src="{{ $ab->siswa?->foto_url }}" alt="{{ $ab->siswa?->nama }}" style="width:34px; height:34px; border-radius:50%; object-fit:cover; border:1.5px solid var(--border-2); flex-shrink:0;" />
+                      <img src="{{ $ab->siswa?->foto_url }}" alt="{{ $ab->siswa?->nama }}" style="width:30px; height:40px; aspect-ratio:3/4; border-radius:6px; object-fit:cover; object-position:center 20%; border:1.5px solid var(--border-2); flex-shrink:0;" />
                       <div style="min-width:0;">
                         <strong style="color:var(--text); font-size:13px; display:block; line-height:1.2;">{{ $ab->siswa?->nama ?? '—' }}</strong>
                         <div style="font-size:11px; color:var(--text-3); margin-top:3px; display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
@@ -461,7 +461,7 @@
                   <td style="text-align:center; font-weight:700; color:var(--text-3); font-size:12px;">{{ $absensiHariIni->count() + $idx2 + 1 }}</td>
                   <td>
                     <div style="display:flex; align-items:center; gap:10px;">
-                      <img src="{{ $sb->foto_url }}" alt="{{ $sb->nama }}" style="width:34px; height:34px; border-radius:50%; object-fit:cover; border:1.5px dashed var(--border-2); opacity:0.8; flex-shrink:0;" />
+                      <img src="{{ $sb->foto_url }}" alt="{{ $sb->nama }}" style="width:30px; height:40px; aspect-ratio:3/4; border-radius:6px; object-fit:cover; object-position:center 20%; border:1.5px dashed var(--border-2); opacity:0.8; flex-shrink:0;" />
                       <div style="min-width:0;">
                         <strong style="color:var(--text); font-size:13px; display:block; line-height:1.2;">{{ $sb->nama ?? '—' }}</strong>
                         <div style="font-size:11px; color:var(--text-3); margin-top:3px; display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
@@ -548,7 +548,7 @@
                   <td style="text-align:center; font-weight:700; color:var(--text-3); font-size:12px;">{{ $idx + 1 }}</td>
                   <td>
                     <div style="display:flex; align-items:center; gap:10px;">
-                      <img src="{{ $ag->guru?->foto_url }}" alt="{{ $ag->guru?->nama }}" style="width:34px; height:34px; border-radius:50%; object-fit:cover; border:1.5px solid var(--border-2); flex-shrink:0;" />
+                      <img src="{{ $ag->guru?->foto_url }}" alt="{{ $ag->guru?->nama }}" style="width:30px; height:40px; aspect-ratio:3/4; border-radius:6px; object-fit:cover; object-position:center 20%; border:1.5px solid var(--border-2); flex-shrink:0;" />
                       <div style="min-width:0;">
                         <strong style="color:var(--text); font-size:13px; display:block; line-height:1.2;">{{ $ag->guru?->nama ?? '—' }}</strong>
                         <div style="font-size:11px; color:var(--text-3); margin-top:3px; display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
@@ -634,7 +634,7 @@
                   <td style="text-align:center; font-weight:700; color:var(--text-3); font-size:12px;">{{ $absensiGuruHariIni->count() + $idx2 + 1 }}</td>
                   <td>
                     <div style="display:flex; align-items:center; gap:10px;">
-                      <img src="{{ $gb->foto_url }}" alt="{{ $gb->nama }}" style="width:34px; height:34px; border-radius:50%; object-fit:cover; border:1.5px dashed var(--border-2); opacity:0.8; flex-shrink:0;" />
+                      <img src="{{ $gb->foto_url }}" alt="{{ $gb->nama }}" style="width:30px; height:40px; aspect-ratio:3/4; border-radius:6px; object-fit:cover; object-position:center 20%; border:1.5px dashed var(--border-2); opacity:0.8; flex-shrink:0;" />
                       <div style="min-width:0;">
                         <strong style="color:var(--text); font-size:13px; display:block; line-height:1.2;">{{ $gb->nama ?? '—' }}</strong>
                         <div style="font-size:11px; color:var(--text-3); margin-top:3px; display:flex; align-items:center; gap:6px; flex-wrap:wrap;">

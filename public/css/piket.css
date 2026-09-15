@@ -479,9 +479,11 @@
     }
     .officer-thumb {
       width: 18px;
-      height: 18px;
-      border-radius: 50%;
+      height: 24px;
+      aspect-ratio: 3 / 4;
+      border-radius: 4px;
       object-fit: cover;
+      object-position: center 20%;
       background: #0F172A;
     }
 

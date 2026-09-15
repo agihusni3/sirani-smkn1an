@@ -68,9 +68,9 @@
           @endphp
 
           @if($hasCustomPhoto)
-            <img src="{{ asset('storage/' . $guru->foto) }}" alt="{{ $guru->nama }}" style="width:54px; height:54px; border-radius:12px; object-fit:cover; border:2px solid rgba(255,255,255,0.7); background:#ffffff; flex-shrink:0;" />
+            <img src="{{ asset('storage/' . $guru->foto) }}" alt="{{ $guru->nama }}" style="width:48px; height:64px; aspect-ratio:3/4; border-radius:8px; object-fit:cover; object-position:center 20%; border:2px solid rgba(255,255,255,0.7); background:#ffffff; flex-shrink:0;" />
           @else
-            <div style="width:54px; height:54px; border-radius:12px; border:2px solid rgba(255,255,255,0.7); background:#2563eb; color:#ffffff; display:flex; align-items:center; justify-content:center; font-size:20px; font-weight:900; letter-spacing:0.5px; flex-shrink:0; box-shadow:0 4px 10px rgba(0,0,0,0.2);">
+            <div style="width:48px; height:64px; aspect-ratio:3/4; border-radius:8px; border:2px solid rgba(255,255,255,0.7); background:#2563eb; color:#ffffff; display:flex; align-items:center; justify-content:center; font-size:18px; font-weight:900; letter-spacing:0.5px; flex-shrink:0; box-shadow:0 4px 10px rgba(0,0,0,0.2);">
               {{ $initials }}
             </div>
           @endif

@@ -304,7 +304,7 @@
                   {{-- Siswa --}}
                   <td style="vertical-align:middle; white-space:nowrap;">
                     <div style="display:flex; align-items:center; gap:10px;">
-                      <img src="{{ $foto }}" alt="{{ $nama }}" style="width:34px; height:34px; border-radius:8px; object-fit:cover; border:1px solid var(--border-2); flex-shrink:0;" />
+                      <img src="{{ $foto }}" alt="{{ $nama }}" style="width:30px; height:40px; aspect-ratio:3/4; border-radius:6px; object-fit:cover; object-position:center 20%; border:1px solid var(--border-2); flex-shrink:0;" />
                       <div style="min-width:0;">
                         <strong style="font-size:13px; color:var(--text); display:block; line-height:1.25;">{{ $nama }}</strong>
                         <div style="font-size:11px; font-family:var(--font-mono); color:var(--text-3); margin-top:2px;">
@@ -336,7 +336,7 @@
                   {{-- Guru --}}
                   <td style="vertical-align:middle; white-space:nowrap;">
                     <div style="display:flex; align-items:center; gap:10px;">
-                      <img src="{{ $foto }}" alt="{{ $nama }}" style="width:34px; height:34px; border-radius:8px; object-fit:cover; border:1px solid var(--border-2); flex-shrink:0;" />
+                      <img src="{{ $foto }}" alt="{{ $nama }}" style="width:30px; height:40px; aspect-ratio:3/4; border-radius:6px; object-fit:cover; object-position:center 20%; border:1px solid var(--border-2); flex-shrink:0;" />
                       <div style="min-width:0;">
                         <strong style="font-size:13px; color:var(--text); display:block; line-height:1.25;">{{ $nama }}</strong>
                         <div style="font-size:11px; font-family:var(--font-mono); color:var(--text-3); margin-top:2px;">
@@ -463,7 +463,7 @@
         {{-- Banner Pemilik Terpilih --}}
         <div id="selectedPersonBanner" style="display:none; align-items:center; justify-content:space-between; background:var(--surface); border:1.5px solid #000000; border-radius:8px; padding:8px 12px; margin-bottom:6px;">
           <div style="display:flex; align-items:center; gap:10px; overflow:hidden;">
-            <img id="bannerFoto" src="/img/user-default.png" style="width:32px; height:32px; border-radius:6px; object-fit:cover; border:1px solid rgba(0,0,0,0.15); flex-shrink:0;" />
+            <img id="bannerFoto" src="/img/user-default.png" style="width:30px; height:40px; aspect-ratio:3/4; border-radius:6px; object-fit:cover; object-position:center 20%; border:1px solid rgba(0,0,0,0.15); flex-shrink:0;" />
             <div style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
               <strong id="bannerNama" style="color:var(--text); font-size:13px; display:block; line-height:1.2;"></strong>
               <span id="bannerMeta" style="font-size:11px; color:var(--text-3); font-family:var(--font-mono);"></span>
@@ -601,7 +601,7 @@
         {{-- Banner Siswa Terpilih --}}
         <div id="waSelectedSiswaBanner" style="display:none; align-items:center; justify-content:space-between; background:var(--surface); border:1.5px solid var(--border-2); border-radius:8px; padding:8px 12px; margin-bottom:6px;">
           <div style="display:flex; align-items:center; gap:10px; overflow:hidden;">
-            <img id="waBannerSiswaFoto" src="/img/user-default.png" style="width:32px; height:32px; border-radius:6px; object-fit:cover; border:1px solid rgba(0,0,0,0.15); flex-shrink:0;" />
+            <img id="waBannerSiswaFoto" src="/img/user-default.png" style="width:30px; height:40px; aspect-ratio:3/4; border-radius:6px; object-fit:cover; object-position:center 20%; border:1px solid rgba(0,0,0,0.15); flex-shrink:0;" />
             <div style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
               <strong id="waBannerSiswaNama" style="color:var(--text); font-size:13px; display:block; line-height:1.2;"></strong>
               <span id="waBannerSiswaMeta" style="font-size:11px; color:var(--text-3); font-family:var(--font-mono);"></span>
@@ -660,7 +660,7 @@
         {{-- Banner Guru Terpilih --}}
         <div id="waSelectedGuruBanner" style="display:none; align-items:center; justify-content:space-between; background:var(--surface); border:1.5px solid var(--border-2); border-radius:8px; padding:8px 12px; margin-bottom:6px;">
           <div style="display:flex; align-items:center; gap:10px; overflow:hidden;">
-            <img id="waBannerGuruFoto" src="/img/user-default.png" style="width:32px; height:32px; border-radius:6px; object-fit:cover; border:1px solid rgba(0,0,0,0.15); flex-shrink:0;" />
+            <img id="waBannerGuruFoto" src="/img/user-default.png" style="width:30px; height:40px; aspect-ratio:3/4; border-radius:6px; object-fit:cover; object-position:center 20%; border:1px solid rgba(0,0,0,0.15); flex-shrink:0;" />
             <div style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
               <strong id="waBannerGuruNama" style="color:var(--text); font-size:13px; display:block; line-height:1.2;"></strong>
               <span id="waBannerGuruMeta" style="font-size:11px; color:var(--text-3); font-family:var(--font-mono);"></span>
@@ -807,7 +807,7 @@
       </div>
 
       <div style="display:flex; gap:12px; align-items:center;">
-        <img id="prevFoto" src="/img/user-default.png" style="width:46px; height:46px; border-radius:8px; object-fit:cover; border:1.5px solid rgba(255,255,255,0.6); background:#ffffff; flex-shrink:0;" onerror="this.src='/img/user-default.png'" />
+        <img id="prevFoto" src="/img/user-default.png" style="width:45px; height:60px; aspect-ratio:3/4; border-radius:8px; object-fit:cover; object-position:center 20%; border:1.5px solid rgba(255,255,255,0.6); background:#ffffff; flex-shrink:0;" onerror="this.src='/img/user-default.png'" />
         <div style="min-width:0; flex:1;">
           <div id="prevNama" style="font-size:13.5px; font-weight:900; color:#ffffff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;"></div>
           <div id="prevIdentitas" style="font-size:11px; font-family:var(--font-mono); color:#e0f2fe; margin-top:2px;"></div>

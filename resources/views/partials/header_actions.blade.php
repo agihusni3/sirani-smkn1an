@@ -173,7 +173,7 @@
       </div>
 
       <div style="display:flex; gap:12px; align-items:center;">
-        <img src="{{ $gSaya->foto_url ?? '/img/user-default.png' }}" alt="{{ $gSaya->nama }}" style="width:50px; height:50px; border-radius:10px; object-fit:cover; border:1.5px solid #7dd3fc; background:#ffffff;" onerror="this.src='/img/user-default.png'" />
+        <img src="{{ $gSaya->foto_url ?? '/img/user-default.png' }}" alt="{{ $gSaya->nama }}" style="width:45px; height:60px; aspect-ratio:3/4; border-radius:8px; object-fit:cover; object-position:center 20%; border:1.5px solid #7dd3fc; background:#ffffff;" onerror="this.src='/img/user-default.png'" />
         <div style="flex:1; min-width:0;">
           <div style="font-size:14px; font-weight:900; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="{{ $gSaya->nama }}">{{ $gSaya->nama }}</div>
           <div style="font-size:11px; color:#e0f2fe; margin-top:2px; font-family:var(--font-mono);">NIP: {{ $gSaya->nip ?: '-' }}</div>
