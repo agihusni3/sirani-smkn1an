@@ -48,57 +48,10 @@ class PortalOrtuController extends Controller
         $codeValue = '';
 
         if ($keyword !== '') {
-            $cleanPhone = preg_replace('/[^0-9]/', '', $keyword);
-            $phoneTrim = ltrim($cleanPhone, '0');
-            if (str_starts_with($phoneTrim, '62')) {
-                $phoneTrim = substr($phoneTrim, 2);
-            }
-
-            // Deteksi apakah keyword berbentuk nomor HP:
-            // Nomor HP Indonesia: dimulai 08..., +62..., 628..., atau 8xxx (min 9 digit)
-            $looksLikePhone = (
-                str_starts_with($keyword, '08') ||
-                str_starts_with($keyword, '+62') ||
-                str_starts_with($keyword, '628') ||
-                (str_starts_with($cleanPhone, '8') && strlen($cleanPhone) >= 9 && strlen($cleanPhone) <= 13)
-            );
-
-            // 1. Coba pencarian via Nomor HP HANYA jika format terlihat seperti nomor HP
-            if ($looksLikePhone && !empty($cleanPhone) && strlen($cleanPhone) >= 9) {
-                $siswaByHpSiswa = Siswa::where(function ($q) use ($cleanPhone, $phoneTrim) {
-                    $q->where('no_hp_siswa', 'LIKE', "%{$cleanPhone}%")
-                      ->orWhere('no_hp_siswa', 'LIKE', "%{$phoneTrim}%");
-                })->with('kartuRfid')->first();
-
-                if ($siswaByHpSiswa) {
-                    $siswa = $siswaByHpSiswa;
-                    $modeAkses = $modeAkses ?: 'siswa'; // Search dengan No HP Siswa -> Mode Siswa
-                } else {
-                    // Coba via Nomor HP Orang Tua
-                    $siswaByHpOrtu = Siswa::where(function ($q) use ($cleanPhone, $phoneTrim) {
-                        $q->where('no_hp_ortu', 'LIKE', "%{$cleanPhone}%")
-                          ->orWhere('no_hp_ortu', 'LIKE', "%{$phoneTrim}%");
-                    })->with('kartuRfid')->first();
-
-                    if ($siswaByHpOrtu) {
-                        $siswa = $siswaByHpOrtu;
-                        $modeAkses = $modeAkses ?: 'ortu'; // Search dengan No HP Ortu -> Mode Ortu
-                    }
-                }
-            }
-
-            // 2. Jika bukan nomor HP atau belum ketemu, cari via NISN / NIS / ID (Mode Orang Tua)
-            if (!$siswa) {
-                $siswa = Siswa::where('nisn', $keyword)
-                    ->orWhere('nis', $keyword)
-                    ->orWhere('id', $keyword)
-                    ->with('kartuRfid')
-                    ->first();
-
-                if ($siswa) {
-                    $modeAkses = $modeAkses ?: 'ortu'; // Search dengan NISN/NIS -> Mode Orang Tua
-                }
-            }
+            // Pencarian siswa hanya berdasarkan NISN saja
+            $siswa = Siswa::where('nisn', $keyword)
+                ->with('kartuRfid')
+                ->first();
 
             // Default mode jika belum terdeteksi
             $modeAkses = $modeAkses ?: 'ortu';

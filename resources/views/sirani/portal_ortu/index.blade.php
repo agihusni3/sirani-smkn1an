@@ -80,20 +80,17 @@
                 name="keyword"
                 class="search-input"
                 value="{{ $keyword }}"
-                placeholder="Masukkan NISN Siswa (contoh: 0071234567) atau No. WhatsApp..."
+                placeholder="Masukkan NISN Siswa (contoh: 0071234567)..."
                 autocomplete="off"
                 required
                 autofocus
               />
-              <button type="button" onclick="startQrScanner()" class="btn-scan-qr" title="Scan QR Code Kartu Pelajar">
-                Scan QR
-              </button>
               <button type="submit" class="btn-search">
                 Cek Presensi
               </button>
             </div>
             <div class="search-hints-row">
-              <span class="search-hint-pill">Pencarian dapat menggunakan <strong>NISN Siswa</strong> atau <strong>Nomor WhatsApp Orang Tua</strong> yang terdaftar.</span>
+              <span class="search-hint-pill">Pencarian menggunakan <strong>NISN Siswa</strong> yang terdaftar.</span>
             </div>
           </form>
         </div>
@@ -130,10 +127,10 @@
         <i class="bi bi-person-x-fill" style="font-size:44px; color:var(--text-3); margin-bottom:12px; display:inline-block;"></i>
         <h3 style="font-size:17px; font-weight:800; margin-bottom:6px; color:var(--text);">Data Siswa Tidak Ditemukan</h3>
         <p style="font-size:13px; color:var(--text-2); max-width:480px; margin:0 auto 20px;">
-          Nomor Induk Siswa (NIS/NISN) <strong>"{{ $keyword }}"</strong> tidak terdaftar pada pangkalan data aktif sekolah. Pastikan nomor yang Anda masukkan sudah sesuai.
+          Nomor Induk Siswa Nasional (NISN) <strong>"{{ $keyword }}"</strong> tidak terdaftar pada pangkalan data aktif sekolah. Pastikan nomor yang Anda masukkan sudah sesuai.
         </p>
         <a href="/cek-presensi" class="btn-search" style="text-decoration:none; display:inline-flex; padding:8px 18px;">
-          <i class="bi bi-arrow-repeat"></i> Coba Nomor Lain
+          <i class="bi bi-arrow-repeat"></i> Coba NISN Lain
         </a>
       </div>
 
@@ -405,22 +402,22 @@
         {{-- KONTROL PILIHAN PERIODE (RINGKAS & RAMPING) --}}
         <div class="period-control-card">
           <div class="period-tabs">
-            <a href="/cek-presensi?keyword={{ $siswa->nis }}&periode=harian#riwayat-kehadiran" class="period-btn {{ $periode === 'harian' ? 'active' : '' }}">
+            <a href="/cek-presensi?keyword={{ $siswa->nisn ?: $siswa->nis }}&periode=harian#riwayat-kehadiran" class="period-btn {{ $periode === 'harian' ? 'active' : '' }}">
               <i class="bi bi-calendar-day"></i> Harian
             </a>
-            <a href="/cek-presensi?keyword={{ $siswa->nis }}&periode=mingguan#riwayat-kehadiran" class="period-btn {{ $periode === 'mingguan' ? 'active' : '' }}">
+            <a href="/cek-presensi?keyword={{ $siswa->nisn ?: $siswa->nis }}&periode=mingguan#riwayat-kehadiran" class="period-btn {{ $periode === 'mingguan' ? 'active' : '' }}">
               <i class="bi bi-calendar-week"></i> Mingguan
             </a>
-            <a href="/cek-presensi?keyword={{ $siswa->nis }}&periode=bulanan#riwayat-kehadiran" class="period-btn {{ $periode === 'bulanan' ? 'active' : '' }}">
+            <a href="/cek-presensi?keyword={{ $siswa->nisn ?: $siswa->nis }}&periode=bulanan#riwayat-kehadiran" class="period-btn {{ $periode === 'bulanan' ? 'active' : '' }}">
               <i class="bi bi-calendar-month"></i> Bulanan
             </a>
-            <a href="/cek-presensi?keyword={{ $siswa->nis }}&periode=tahunan#riwayat-kehadiran" class="period-btn {{ $periode === 'tahunan' ? 'active' : '' }}">
+            <a href="/cek-presensi?keyword={{ $siswa->nisn ?: $siswa->nis }}&periode=tahunan#riwayat-kehadiran" class="period-btn {{ $periode === 'tahunan' ? 'active' : '' }}">
               <i class="bi bi-calendar3"></i> Tahunan
             </a>
           </div>
 
           <form method="GET" action="{{ route('portal.ortu.index') }}#riwayat-kehadiran" class="period-input-wrap">
-            <input type="hidden" name="keyword" value="{{ $siswa->nis }}" />
+            <input type="hidden" name="keyword" value="{{ $siswa->nisn ?: $siswa->nis }}" />
             <input type="hidden" name="periode" value="{{ $periode }}" />
 
             @if($periode === 'harian')
@@ -1346,6 +1343,7 @@
         }
 
         saveSiswaToLocalStorage({
+          nisn: "{{ $siswa->nisn }}",
           nis: "{{ $siswa->nis }}",
           nama: "{{ $siswa->nama }}",
           rombel: "{{ $rombel->nama_rombel ?? '' }}",
@@ -1366,13 +1364,14 @@
 
     // Auto-Remember / LocalStorage Management
     function saveSiswaToLocalStorage(siswaData) {
-      if (!siswaData || !siswaData.nis) return;
+      const idVal = siswaData ? (siswaData.nisn || siswaData.nis) : null;
+      if (!idVal) return;
       let saved = [];
       try {
         saved = JSON.parse(localStorage.getItem('sirani_saved_students') || '[]');
       } catch (e) { saved = []; }
 
-      saved = saved.filter(function(s) { return s.nis !== siswaData.nis; });
+      saved = saved.filter(function(s) { return (s.nisn || s.nis) !== idVal; });
       saved.unshift(siswaData);
       if (saved.length > 5) saved = saved.slice(0, 5);
       localStorage.setItem('sirani_saved_students', JSON.stringify(saved));
@@ -1394,12 +1393,13 @@
 
       let html = '<div style="background:var(--bg-subtle); border:1px solid var(--border); border-radius:var(--r-md); padding:12px 14px; margin-bottom:18px;">';
       html += '<div style="font-size:11.5px; font-weight:800; color:var(--text); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">';
-      html += '<span><i class="bi bi-bookmark-check-fill" style="color:var(--text); margin-right:4px;"></i> Profil Anak Tersimpan di HP Ini</span>';
+      html += '<span><i class="bi bi-bookmark-check-fill" style="color:var(--text); margin-right:4px;"></i> Profil Siswa Tersimpan di HP Ini</span>';
       html += '<button type="button" onclick="clearSavedStudents()" style="background:none; border:none; color:var(--text-3); font-size:11px; font-weight:700; cursor:pointer;"><i class="bi bi-trash"></i> Hapus</button>';
       html += '</div>';
 
       html += '<div style="display:flex; flex-direction:column; gap:6px;">';
       saved.forEach(function(s) {
+        const idVal = s.nisn || s.nis;
         html += '<div style="background:var(--bg-card); border:1px solid var(--border); border-radius:var(--r-sm); padding:8px 12px; display:flex; justify-content:space-between; align-items:center; gap:8px;">';
         html += '<div style="display:flex; align-items:center; gap:10px; min-width:0;">';
         html += '<div style="width:32px; height:32px; border-radius:50%; background:var(--bg-subtle); border:1px solid var(--border); display:flex; align-items:center; justify-content:center; font-weight:800; font-size:13px; color:var(--text); flex-shrink:0; overflow:hidden;">';
@@ -1411,10 +1411,10 @@
         html += '</div>';
         html += '<div style="min-width:0;">';
         html += '<strong style="color:var(--text); font-size:12.5px; display:block; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">' + s.nama + '</strong>';
-        html += '<span style="font-size:11px; color:var(--text-3); font-family:var(--font-mono);">NIS: ' + s.nis + (s.rombel ? ' · ' + s.rombel : '') + '</span>';
+        html += '<span style="font-size:11px; color:var(--text-3); font-family:var(--font-mono);">NISN: ' + idVal + (s.rombel ? ' · ' + s.rombel : '') + '</span>';
         html += '</div>';
         html += '</div>';
-        html += '<a href="/presensi-siswa/' + s.nis + '" class="btn-search" style="padding:4px 12px; height:30px; font-size:11.5px; text-decoration:none; flex-shrink:0;">Buka →</a>';
+        html += '<a href="/cek-presensi?keyword=' + idVal + '" class="btn-search" style="padding:4px 12px; height:30px; font-size:11.5px; text-decoration:none; flex-shrink:0;">Buka →</a>';
         html += '</div>';
       });
       html += '</div></div>';
@@ -1424,7 +1424,7 @@
     }
 
     function clearSavedStudents() {
-      if (confirm('Hapus daftar profil anak yang tersimpan di perangkat ini?')) {
+      if (confirm('Hapus daftar profil siswa yang tersimpan di perangkat ini?')) {
         localStorage.removeItem('sirani_saved_students');
         renderSavedStudents();
       }
@@ -1822,18 +1822,6 @@
   {{-- CSS Animasi Holo --}}
 
   @endif
-
-  {{-- QR SCANNER MODAL --}}
-  <div id="qrModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:9999; align-items:center; justify-content:center; padding:16px;">
-    <div style="background:var(--bg-card); border-radius:var(--r-lg); max-width:380px; width:100%; padding:20px; text-align:center; position:relative; box-shadow:var(--shadow-lg);">
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
-        <strong style="color:var(--text); font-size:14px;"><i class="bi bi-qr-code-scan"></i> Scan QR Kartu Pelajar</strong>
-        <button type="button" onclick="closeQrScanner()" style="background:none; border:none; font-size:18px; color:var(--text-3); cursor:pointer;"><i class="bi bi-x-lg"></i></button>
-      </div>
-      <div id="qr-reader" style="width:100%; border-radius:8px; overflow:hidden;"></div>
-      <div style="font-size:11.5px; color:var(--text-3); margin-top:12px;">Arahkan kamera ke QR Code pada kartu pelajar / rapor ananda.</div>
-    </div>
-  </div>
 
 </body>
 </html>

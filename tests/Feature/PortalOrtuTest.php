@@ -22,11 +22,10 @@ class PortalOrtuTest extends TestCase
     {
         $response = $this->get('/cek-presensi');
         $response->assertOk();
-        $response->assertSee('Portal Wali Murid');
-        $response->assertSee('Pantau Kehadiran Putra/Putri Anda');
+        $response->assertSee('Monitoring Absen Mandiri');
     }
 
-    public function test_pencarian_siswa_dengan_nis_menampilkan_profil_dan_kehadiran()
+    public function test_pencarian_siswa_dengan_nisn_menampilkan_profil_dan_kehadiran()
     {
         $ta = TahunAjaran::create(['nama' => '2026/2027 Ganjil', 'is_active' => true]);
         $jurusan = Jurusan::create(['kode_jurusan' => 'RPL', 'nama_jurusan' => 'Rekayasa Perangkat Lunak']);
@@ -66,7 +65,7 @@ class PortalOrtuTest extends TestCase
             'status'          => 'hadir',
         ]);
 
-        $response = $this->get('/cek-presensi?keyword=1001');
+        $response = $this->get('/cek-presensi?keyword=0012345678');
         $response->assertOk();
         $response->assertSee('Muhammad Rizky');
         $response->assertSee('X RPL 1');
@@ -86,6 +85,7 @@ class PortalOrtuTest extends TestCase
     {
         $siswa = Siswa::create([
             'nis'    => '1002',
+            'nisn'   => '0012345679',
             'nama'   => 'Siti Aisyah',
             'status' => 'aktif',
         ]);
@@ -100,7 +100,7 @@ class PortalOrtuTest extends TestCase
             'status'       => 'terlambat',
         ]);
 
-        $response = $this->get('/cek-presensi?keyword=1002&bulan=' . $lastMonth->format('Y-m'));
+        $response = $this->get('/cek-presensi?keyword=0012345679&bulan=' . $lastMonth->format('Y-m'));
         $response->assertOk();
         $response->assertSee('Siti Aisyah');
         $response->assertSee('Terlambat');
@@ -110,6 +110,7 @@ class PortalOrtuTest extends TestCase
     {
         $siswa = Siswa::create([
             'nis'    => '1003',
+            'nisn'   => '0012345680',
             'nama'   => 'Fajar Nugraha',
             'status' => 'aktif',
         ]);
@@ -122,16 +123,17 @@ class PortalOrtuTest extends TestCase
             'keterangan'   => 'Demam tinggi dan istirahat dokter',
         ]);
 
-        $response = $this->get('/cek-presensi?keyword=1003');
+        $response = $this->get('/cek-presensi?keyword=0012345680');
         $response->assertOk();
         $response->assertSee('Fajar Nugraha');
         $response->assertSee('Sakit');
     }
 
-    public function test_akses_langsung_presensi_siswa_via_url_nis()
+    public function test_akses_langsung_presensi_siswa_via_url_nisn()
     {
         $siswa = Siswa::create([
             'nis'    => '1004',
+            'nisn'   => '0012345681',
             'nama'   => 'Dian Permata',
             'status' => 'aktif',
         ]);
@@ -144,22 +146,23 @@ class PortalOrtuTest extends TestCase
             'status'       => 'hadir',
         ]);
 
-        $response = $this->get('/presensi-siswa/1004');
+        $response = $this->get('/presensi-siswa/0012345681');
         $response->assertOk();
         $response->assertSee('Dian Permata');
         $response->assertSee('07:10 WIB');
         $response->assertSee('Hadir Tepat Waktu');
     }
 
-    public function test_akses_langsung_cek_presensi_via_url_nis()
+    public function test_akses_langsung_cek_presensi_via_url_nisn()
     {
         $siswa = Siswa::create([
             'nis'    => '1005',
+            'nisn'   => '0012345682',
             'nama'   => 'Eko Prasetyo',
             'status' => 'aktif',
         ]);
 
-        $response = $this->get('/cek-presensi/1005');
+        $response = $this->get('/cek-presensi/0012345682');
         $response->assertOk();
         $response->assertSee('Eko Prasetyo');
     }
@@ -168,6 +171,7 @@ class PortalOrtuTest extends TestCase
     {
         $siswa = Siswa::create([
             'nis'    => '1006',
+            'nisn'   => '0012345683',
             'nama'   => 'Rian Firmansyah',
             'status' => 'aktif',
         ]);
@@ -190,10 +194,10 @@ class PortalOrtuTest extends TestCase
             'dicatat_oleh'      => 'Guru PAI',
         ]);
 
-        $response = $this->get('/cek-presensi/1006');
+        $response = $this->get('/cek-presensi/0012345683');
         $response->assertOk();
         $response->assertSee('Portofolio Karakter & Kredit Kedisiplinan');
         $response->assertSee('Petugas Sholat Berjamaah');
-        $response->assertSee('Restorative Justice');
+        $response->assertSee('Apresiasi & Self-Reward');
     }
 }
