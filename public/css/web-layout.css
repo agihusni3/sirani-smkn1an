@@ -554,9 +554,9 @@
         .drawer-nav-item {
             display: flex;
             align-items: center;
-            gap: 12px;
-            padding: 9px 12px;
-            border-radius: 12px;
+            gap: 10px;
+            padding: 8px 12px;
+            border-radius: 10px;
             background: #ffffff;
             border: 1px solid #e2e8f0;
             transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
@@ -577,7 +577,7 @@
         .drawer-nav-item.active {
             background: #f0f7ff;
             border-color: #93c5fd;
-            box-shadow: 0 2px 8px rgba(37, 99, 235, 0.08);
+            box-shadow: 0 2px 6px rgba(37, 99, 235, 0.08);
         }
 
         .drawer-nav-item.active .drawer-nav-title {
@@ -588,6 +588,7 @@
         .drawer-nav-item.active .drawer-nav-icon {
             background: #2563eb;
             color: #ffffff;
+            border-color: #2563eb;
         }
 
         .drawer-nav-item.active .drawer-chevron {
@@ -595,16 +596,17 @@
         }
 
         .drawer-nav-icon {
-            width: 36px;
-            height: 36px;
-            min-width: 36px;
-            border-radius: 9px;
-            background: #f1f5f9;
+            width: 32px;
+            height: 32px;
+            min-width: 32px;
+            border-radius: 8px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
             color: #2563eb;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 0.95rem;
+            font-size: 0.88rem;
             flex-shrink: 0;
             transition: all 0.2s ease;
         }
@@ -612,6 +614,7 @@
         .drawer-nav-icon.ppdb-icon {
             background: #fee2e2;
             color: #dc2626;
+            border-color: #fecaca;
         }
 
         .drawer-nav-text {
@@ -621,7 +624,7 @@
 
         .drawer-nav-title {
             display: block;
-            font-size: 0.86rem;
+            font-size: 0.84rem;
             font-weight: 700;
             color: #0f172a;
             line-height: 1.25;
@@ -629,7 +632,7 @@
 
         .drawer-nav-desc {
             display: block;
-            font-size: 0.7rem;
+            font-size: 0.68rem;
             color: #64748b;
             margin-top: 1px;
             line-height: 1.2;
@@ -639,8 +642,8 @@
         }
 
         .drawer-chevron {
-            font-size: 0.75rem;
-            color: #94a3b8;
+            font-size: 0.82rem;
+            color: #cbd5e1;
             margin-left: auto;
             flex-shrink: 0;
         }
@@ -652,7 +655,7 @@
 
         .drawer-section-label {
             font-family: var(--font-tech, 'Plus Jakarta Sans', sans-serif);
-            font-size: 0.7rem;
+            font-size: 0.68rem;
             font-weight: 800;
             text-transform: uppercase;
             letter-spacing: 0.05em;
@@ -671,15 +674,15 @@
             flex-direction: column;
             align-items: flex-start;
             justify-content: space-between;
-            gap: 10px;
-            padding: 12px 14px;
-            min-height: 102px;
-            border-radius: 12px;
-            border: 1.5px solid #e2e8f0;
+            gap: 8px;
+            padding: 10px 12px;
+            min-height: 88px;
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
             background: #ffffff;
             transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
             text-decoration: none;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
             box-sizing: border-box;
         }
 
@@ -687,7 +690,7 @@
             border-color: #93c5fd;
             background: #f8fafc;
             transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.08);
+            box-shadow: 0 4px 10px rgba(37, 99, 235, 0.06);
         }
 
         .drawer-gateway-card:active {
@@ -696,13 +699,13 @@
         }
 
         .gateway-icon-box {
-            width: 36px;
-            height: 36px;
-            border-radius: 10px;
+            width: 30px;
+            height: 30px;
+            border-radius: 7px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1rem;
+            font-size: 0.9rem;
             flex-shrink: 0;
         }
 
@@ -712,23 +715,24 @@
             border: 1px solid #dbeafe;
         }
 
+        .gateway-icon-box.slate,
         .gateway-icon-box.dark {
-            background: #0f172a;
-            color: #60a5fa;
-            border: 1px solid #1e293b;
+            background: #f1f5f9;
+            color: #334155;
+            border: 1px solid #e2e8f0;
         }
 
         .gateway-card-title {
-            font-size: 0.84rem;
+            font-size: 0.82rem;
             font-weight: 700;
             color: #0f172a;
             line-height: 1.25;
         }
 
         .gateway-card-sub {
-            font-size: 0.68rem;
+            font-size: 0.66rem;
             color: #64748b;
-            margin-top: 2px;
+            margin-top: 1px;
             line-height: 1.2;
         }
 
@@ -1137,11 +1141,11 @@
                 border-radius: 10px;
             }
             .drawer-gateway-card {
-                padding: 11px 12px;
-                min-height: 98px;
+                padding: 10px 12px;
+                min-height: 88px;
             }
             .drawer-nav-item {
-                padding: 9px 12px;
+                padding: 8px 12px;
             }
         }
 
@@ -1149,13 +1153,13 @@
             .brand-titles p { display: none; }
             .brand-titles h1 { font-size: 0.78rem; }
             .drawer-gateway-grid { gap: 6px; }
-            .drawer-gateway-card { padding: 10px 8px; min-height: 94px; }
+            .drawer-gateway-card { padding: 9px 8px; min-height: 84px; }
             .gateway-card-title { font-size: 0.76rem; }
             .gateway-card-sub { font-size: 0.62rem; }
-            .drawer-nav-item { padding: 8px 10px; gap: 9px; }
-            .drawer-nav-icon { width: 32px; height: 32px; min-width: 32px; font-size: 0.85rem; }
+            .drawer-nav-item { padding: 7px 10px; gap: 8px; }
+            .drawer-nav-icon { width: 28px; height: 28px; min-width: 28px; font-size: 0.8rem; }
             .drawer-nav-title { font-size: 0.8rem; }
-            .drawer-nav-desc { font-size: 0.65rem; }
+            .drawer-nav-desc { font-size: 0.64rem; }
             .btn-drawer-whatsapp { padding: 10px 12px; font-size: 0.82rem; }
         }
 

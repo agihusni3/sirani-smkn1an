@@ -324,7 +324,7 @@
                     <div class="drawer-gateway-grid">
                         <a href="{{ route('portal.ortu.index') }}" class="drawer-gateway-card">
                             <div class="gateway-icon-box blue">
-                                <i class="fa-solid fa-id-card-clip"></i>
+                                <i class="fa-solid fa-fingerprint"></i>
                             </div>
                             <div>
                                 <div class="gateway-card-title">Monitoring Absen Mandiri</div>
@@ -334,8 +334,8 @@
 
                         @auth
                             <a href="{{ route('admin.portal') }}" class="drawer-gateway-card">
-                                <div class="gateway-icon-box dark">
-                                    <i class="fa-solid fa-gauge-high"></i>
+                                <div class="gateway-icon-box slate">
+                                    <i class="fa-solid fa-sliders"></i>
                                 </div>
                                 <div>
                                     <div class="gateway-card-title">DCC Portal</div>
@@ -344,8 +344,8 @@
                             </a>
                         @else
                             <a href="{{ route('login') }}" class="drawer-gateway-card">
-                                <div class="gateway-icon-box dark">
-                                    <i class="fa-solid fa-right-to-bracket"></i>
+                                <div class="gateway-icon-box slate">
+                                    <i class="fa-solid fa-arrow-right-to-bracket"></i>
                                 </div>
                                 <div>
                                     <div class="gateway-card-title">Login DCC</div>
@@ -361,48 +361,48 @@
                     <div class="drawer-section-label">Navigasi Kampus Utama</div>
                     <div class="drawer-menu-grid">
                         <a href="{{ route('web.beranda') }}" class="drawer-nav-item {{ request()->routeIs('web.beranda') ? 'active' : '' }}">
-                            <div class="drawer-nav-icon"><i class="fa-solid fa-house"></i></div>
+                            <div class="drawer-nav-icon"><i class="fa-solid fa-compass"></i></div>
                             <div class="drawer-nav-text">
                                 <span class="drawer-nav-title">Beranda Utama</span>
                                 <span class="drawer-nav-desc">Portal resmi kampus kejuruan</span>
                             </div>
-                            <i class="fa-solid fa-chevron-right drawer-chevron"></i>
+                            <i class="fa-solid fa-angle-right drawer-chevron"></i>
                         </a>
 
                         <a href="{{ route('web.profil') }}" class="drawer-nav-item {{ request()->routeIs('web.profil') ? 'active' : '' }}">
-                            <div class="drawer-nav-icon"><i class="fa-solid fa-school"></i></div>
+                            <div class="drawer-nav-icon"><i class="fa-solid fa-building-columns"></i></div>
                             <div class="drawer-nav-text">
                                 <span class="drawer-nav-title">Profil &amp; Fasilitas</span>
                                 <span class="drawer-nav-desc">Visi misi, sarana &amp; bengkel industri</span>
                             </div>
-                            <i class="fa-solid fa-chevron-right drawer-chevron"></i>
+                            <i class="fa-solid fa-angle-right drawer-chevron"></i>
                         </a>
 
                         <a href="{{ route('web.jurusan.index') }}" class="drawer-nav-item {{ request()->routeIs('web.jurusan*') ? 'active' : '' }}">
-                            <div class="drawer-nav-icon"><i class="fa-solid fa-microchip"></i></div>
+                            <div class="drawer-nav-icon"><i class="fa-solid fa-graduation-cap"></i></div>
                             <div class="drawer-nav-text">
                                 <span class="drawer-nav-title">Konsentrasi Keahlian</span>
                                 <span class="drawer-nav-desc">RPL • APHP • TSM • LSP BNSP</span>
                             </div>
-                            <i class="fa-solid fa-chevron-right drawer-chevron"></i>
+                            <i class="fa-solid fa-angle-right drawer-chevron"></i>
                         </a>
 
                         <a href="{{ route('web.berita.index') }}" class="drawer-nav-item {{ request()->routeIs('web.berita*') ? 'active' : '' }}">
-                            <div class="drawer-nav-icon"><i class="fa-solid fa-newspaper"></i></div>
+                            <div class="drawer-nav-icon"><i class="fa-solid fa-bullhorn"></i></div>
                             <div class="drawer-nav-text">
                                 <span class="drawer-nav-title">Warta &amp; Agenda</span>
                                 <span class="drawer-nav-desc">Informasi kegiatan dan prestasi</span>
                             </div>
-                            <i class="fa-solid fa-chevron-right drawer-chevron"></i>
+                            <i class="fa-solid fa-angle-right drawer-chevron"></i>
                         </a>
 
                         <a href="{{ route('web.kontak') }}" class="drawer-nav-item {{ request()->routeIs('web.kontak') ? 'active' : '' }}">
-                            <div class="drawer-nav-icon"><i class="fa-solid fa-location-dot"></i></div>
+                            <div class="drawer-nav-icon"><i class="fa-solid fa-map-location-dot"></i></div>
                             <div class="drawer-nav-text">
                                 <span class="drawer-nav-title">Kontak &amp; Peta Kampus</span>
                                 <span class="drawer-nav-desc">Alamat, peta &amp; saluran telepon</span>
                             </div>
-                            <i class="fa-solid fa-chevron-right drawer-chevron"></i>
+                            <i class="fa-solid fa-angle-right drawer-chevron"></i>
                         </a>
                     </div>
                 </div>
