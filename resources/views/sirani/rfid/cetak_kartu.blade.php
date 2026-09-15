@@ -163,12 +163,12 @@
       pointer-events: none;
     }
 
-    /* ── Card Header (Pemerintah + Dinas + Sekolah) ── */
+    /* ── Card Header (Pemerintah + Dinas + Sekolah — Center Format Kop Surat) ── */
     .card-header {
-      padding: 2.2mm 3mm 1.8mm;
+      padding: 1.8mm 2.5mm 1.4mm;
       display: flex;
       align-items: center;
-      gap: 2.5mm;
+      gap: 1.8mm;
       position: relative;
     }
 
@@ -202,27 +202,37 @@
       object-fit: contain;
     }
 
+    .card-logo-spacer {
+      width: 10.5mm;
+      height: 10.5mm;
+      flex-shrink: 0;
+    }
+
     .card-header-text {
       flex: 1;
-      text-align: left;
+      text-align: center;
       line-height: 1.15;
       min-width: 0;
+      padding: 0 0.5mm;
     }
 
     .card-instansi {
-      font-size: 4.4pt;
+      font-size: 4.3pt;
       font-weight: 700;
       color: #e2e8f0;
       text-transform: uppercase;
-      letter-spacing: .04em;
+      letter-spacing: .03em;
+      line-height: 1.15;
     }
 
     .card-dinas {
       font-size: 4.6pt;
       font-weight: 800;
-      color: #cbd5e1;
+      color: #f1f5f9;
       text-transform: uppercase;
       letter-spacing: .02em;
+      line-height: 1.15;
+      margin-top: 0.1mm;
     }
 
     .card-school-name {
@@ -231,32 +241,65 @@
       color: #ffffff;
       letter-spacing: .02em;
       text-transform: uppercase;
+      line-height: 1.15;
       margin-top: 0.2mm;
     }
 
-    .card-badge-wrap {
-      margin-top: 0.4mm;
+    .card-school-address {
+      font-size: 3.3pt;
+      font-weight: 500;
+      color: rgba(255, 255, 255, 0.85);
+      letter-spacing: .01em;
+      line-height: 1.15;
+      margin-top: 0.2mm;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
-    /* Badge Guru: Soft Pastel Sky Blue */
+    /* ── Label Judul Kartu di Luar Border Header (Center) ── */
+    .card-badge-row {
+      text-align: center;
+      padding: 0.9mm 2.8mm 0.3mm;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 2.2mm;
+      background: #ffffff;
+      flex-shrink: 0;
+    }
+
+    .card-badge-row::before,
+    .card-badge-row::after {
+      content: "";
+      height: 0.6px;
+      flex: 1;
+      background: #cbd5e1;
+    }
+
+    /* Badge Guru & Siswa */
     .card-title-badge {
-      display: inline-block;
-      font-size: 4.3pt;
-      font-weight: 800;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 4.8pt;
+      font-weight: 900;
       color: #0284c7;
       background: #f0f9ff;
-      border: 0.5px solid #bae6fd;
-      padding: 0.2mm 1.5mm;
-      border-radius: 0.8mm;
+      border: 0.8px solid #bae6fd;
+      padding: 0.3mm 2.5mm;
+      border-radius: 1mm;
       text-transform: uppercase;
-      letter-spacing: .04em;
+      letter-spacing: .08em;
+      white-space: nowrap;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
     }
 
     /* Badge Siswa: Soft Pastel Mint */
     .card-title-badge-siswa {
       background: #f0fdfa;
       color: #0f766e;
-      border: 0.5px solid #99f6e4;
+      border-color: #5eead4;
     }
 
     /* ── Card Body (Foto + Data + QR Code Grid) ── */
@@ -265,7 +308,7 @@
       align-items: center;
       gap: 2.4mm;
       flex: 1;
-      padding: 1.6mm 2.8mm 1.2mm;
+      padding: 0.8mm 2.8mm 1.2mm;
       min-height: 0;
       background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
     }
@@ -614,7 +657,7 @@
     @endphp
 
     <div class="id-card">
-      {{-- Card Header: Kop 3 Tingkat Resmi --}}
+      {{-- Card Header: Kop 3 Tingkat Resmi Format Kop Surat (Center Tanpa Logo Provinsi) --}}
       <div class="card-header {{ $isSiswa ? 'card-header-siswa' : 'card-header-guru' }}">
         <div class="card-logo-wrap">
           <img src="{{ $sekolah->logo_sekolah_url }}" alt="Logo" class="card-logo" onerror="this.src='/img/logo.png';" />
@@ -623,10 +666,14 @@
           <div class="card-instansi">{{ $sekolah->nama_instansi_atas ?: 'PEMERINTAH PROVINSI LAMPUNG' }}</div>
           <div class="card-dinas">{{ $sekolah->nama_dinas ?: 'DINAS PENDIDIKAN DAN KEBUDAYAAN' }}</div>
           <div class="card-school-name">{{ $sekolah->nama_sekolah ?: 'SMK NEGERI 1 AIR NANINGAN' }}</div>
-          <div class="card-badge-wrap">
-            <span class="card-title-badge {{ $isSiswa ? 'card-title-badge-siswa' : '' }}">{{ $cardCategory }}</span>
-          </div>
+          <div class="card-school-address">{{ $sekolah->alamat ?: 'Jl. Makam Baturuguk, Pekon Karang Sari' }}, Kec. {{ $sekolah->kecamatan ?: 'Air Naningan' }}</div>
         </div>
+        <div class="card-logo-spacer"></div>
+      </div>
+
+      {{-- Judul / Kategori Kartu di Luar Border Header (Center) --}}
+      <div class="card-badge-row">
+        <span class="card-title-badge {{ $isSiswa ? 'card-title-badge-siswa' : '' }}">{{ $cardCategory }}</span>
       </div>
 
       {{-- Card Body: Foto + Data + QR Code --}}
