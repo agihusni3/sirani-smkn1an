@@ -737,6 +737,95 @@ class RfidController extends Controller
     }
 
     /**
+     * Feed Realtime Absen Terkini & Monitoring Siswa Gagal Absen / Belum Hadir
+     */
+    public function monitorFeed(Request $request): JsonResponse
+    {
+        $today = Carbon::today()->toDateString();
+
+        // 1. Aktivitas scan terkini (Hadir, Terlambat, Pulang)
+        $recentScans = Absensi::where('tanggal', $today)
+            ->where(function ($q) {
+                $q->whereNotNull('jam_masuk')->orWhereNotNull('jam_pulang');
+            })
+            ->orderBy('updated_at', 'desc')
+            ->limit(20)
+            ->with(['siswa.siswaRombels.rombel', 'guru'])
+            ->get()
+            ->map(function ($a) {
+                $isSiswa = $a->pemilik_type === 'siswa';
+                $person = $isSiswa ? $a->siswa : $a->guru;
+                $rombel = $isSiswa ? ($person?->siswaRombels?->first()?->rombel?->nama_rombel ?? '-') : ($person?->jabatan ?? 'Guru');
+                return [
+                    'id'         => $a->id,
+                    'nama'       => $person?->nama ?? '—',
+                    'type'       => $a->pemilik_type,
+                    'identitas'  => $isSiswa ? ('NISN: ' . ($person?->nisn ?: '-')) : ($person?->nip ? 'NIP: ' . $person->nip : 'Non-NIP'),
+                    'rombel'     => $rombel,
+                    'foto'       => $person?->foto_url ?? '/img/user-default.png',
+                    'status'     => $a->status,
+                    'jam_masuk'  => $a->jam_masuk ? substr($a->jam_masuk, 0, 5) : null,
+                    'jam_pulang' => $a->jam_pulang ? substr($a->jam_pulang, 0, 5) : null,
+                    'time'       => $a->updated_at ? $a->updated_at->format('H:i:s') : now()->format('H:i:s'),
+                ];
+            });
+
+        // 2. Log Percobaan Gagal Absen / Ditolak hari ini
+        $failedScans = \App\Services\RfidScanService::getFailedScansToday();
+
+        // 3. Siswa yang Belum Hadir / Belum Absen Hari Ini
+        $hadirSiswaIds = Absensi::where('tanggal', $today)
+            ->where('pemilik_type', 'siswa')
+            ->whereNotNull('jam_masuk')
+            ->pluck('pemilik_id')
+            ->toArray();
+
+        $belumHadir = Siswa::whereIn('status', ['aktif', 'pkl'])
+            ->whereNotIn('id', $hadirSiswaIds)
+            ->with(['siswaRombels' => function ($q) {
+                $q->where('status_keanggotaan', 'aktif')->with('rombel');
+            }])
+            ->get()
+            ->map(function ($s) {
+                $hpClean = preg_replace('/[^0-9]/', '', $s->no_hp_ortu ?? ($s->no_hp_siswa ?? ''));
+                if (str_starts_with($hpClean, '0')) $hpClean = '62' . substr($hpClean, 1);
+                return [
+                    'id'         => $s->id,
+                    'nama'       => $s->nama,
+                    'nisn'       => $s->nisn ?: $s->nis,
+                    'rombel'     => $s->siswaRombels->first()?->rombel?->nama_rombel ?? 'Tanpa Rombel',
+                    'foto'       => $s->foto_url,
+                    'no_hp_ortu' => $s->no_hp_ortu,
+                    'hp_clean'   => $hpClean,
+                ];
+            })
+            ->sortBy(function ($s) {
+                return ($s['rombel'] ?? '') . ' ' . ($s['nama'] ?? '');
+            })
+            ->values();
+
+        // 4. Statistik Ringkas
+        $totalHadir = Absensi::where('tanggal', $today)->where('status', 'hadir')->count();
+        $totalTerlambat = Absensi::where('tanggal', $today)->where('status', 'terlambat')->count();
+        $totalPulang = Absensi::where('tanggal', $today)->whereNotNull('jam_pulang')->count();
+
+        return response()->json([
+            'success'            => true,
+            'recent_scans'       => $recentScans,
+            'failed_scans'       => $failedScans,
+            'belum_hadir'        => $belumHadir,
+            'stats'              => [
+                'total_hadir'      => $totalHadir,
+                'total_terlambat'  => $totalTerlambat,
+                'total_pulang'     => $totalPulang,
+                'total_gagal'      => count($failedScans),
+                'total_belum_absen'=> count($belumHadir),
+            ],
+            'server_time'        => now()->format('H:i:s'),
+        ]);
+    }
+
+    /**
      * Pairing / Hubungkan Kartu RFID ke Siswa atau Guru (Admin/Piket)
      */
     public function pair(Request $request): JsonResponse

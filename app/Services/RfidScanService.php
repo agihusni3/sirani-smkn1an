@@ -26,6 +26,68 @@ class RfidScanService
      */
     public function scanRfid(string $uid, string $device = 'kios_rfid'): array
     {
+        $res = $this->executeScanRfid($uid, $device);
+
+        // Jika pemindaian gagal, ditolak, atau di luar ketentuan operasional, catat ke log pantau gagal hari ini
+        if (!$res['success'] || in_array($res['type'] ?? '', ['belum_waktunya_pulang', 'di_luar_jam_operasional', 'jam_tutup_terlewat', 'kartu_tidak_dikenal', 'siswa_nonaktif', 'guru_nonaktif', 'tanpa_jam_masuk', 'verifikasi_piket', 'invalid_input'])) {
+            static::recordFailedScan($uid, $res);
+        }
+
+        return $res;
+    }
+
+    /**
+     * Catat log pemindaian yang gagal / ditolak ke Cache hari ini untuk pemantauan real-time gerbang.
+     */
+    public static function recordFailedScan(string $uid, array $res): void
+    {
+        try {
+            $today = Carbon::today()->toDateString();
+            $key = 'rfid_failed_scans_' . $today;
+            $failedList = \Illuminate\Support\Facades\Cache::get($key, []);
+            if (!is_array($failedList)) $failedList = [];
+
+            $d = $res['data'] ?? null;
+            $entry = [
+                'id'        => uniqid('fail_'),
+                'time'      => now()->format('H:i:s'),
+                'timestamp' => now()->timestamp,
+                'uid'       => strtoupper(trim($uid)),
+                'type'      => $res['type'] ?? 'gagal',
+                'message'   => $res['message'] ?? 'Pemindaian ditolak sistem',
+                'nama'      => $d['nama'] ?? null,
+                'sub'       => $d['sub'] ?? ($d['rombel_atau_jabatan'] ?? null),
+                'identitas' => $d['identitas'] ?? null,
+                'foto'      => $d['foto'] ?? ($d['foto_url'] ?? null),
+            ];
+
+            array_unshift($failedList, $entry);
+            $failedList = array_slice($failedList, 0, 80); // simpan maks 80 kegagalan terakhir
+            \Illuminate\Support\Facades\Cache::put($key, $failedList, now()->endOfDay());
+        } catch (\Throwable $e) {
+            // Abaikan kesalahan cache
+        }
+    }
+
+    /**
+     * Dapatkan daftar pemindaian yang gagal / ditolak hari ini.
+     */
+    public static function getFailedScansToday(): array
+    {
+        try {
+            $today = Carbon::today()->toDateString();
+            $list = \Illuminate\Support\Facades\Cache::get('rfid_failed_scans_' . $today, []);
+            return is_array($list) ? $list : [];
+        } catch (\Throwable $e) {
+            return [];
+        }
+    }
+
+    /**
+     * Eksekusi inti verifikasi pemindaian RFID / Barcode.
+     */
+    protected function executeScanRfid(string $uid, string $device = 'kios_rfid'): array
+    {
         // ── PARAMETER 1: Sanitasi & Normalisasi Input Barcode / RFID ──
         // Bersihkan whitespace, kontrol karakter ASCII, dan prefix/suffix bawaan scanner USB
         $cleanUid = preg_replace('/[[:^print:]]/', '', trim($uid));

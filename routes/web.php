@@ -131,6 +131,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/smart-gate', [\App\Http\Controllers\RfidController::class, 'kiosk'])->name('rfid.kiosk');
         Route::get('/kios-rfid', [\App\Http\Controllers\RfidController::class, 'kiosk']);
         Route::get('/rfid', [\App\Http\Controllers\RfidController::class, 'kiosk']);
+        Route::get('/kiosk/monitor-feed', [\App\Http\Controllers\RfidController::class, 'monitorFeed'])->name('kiosk.monitor.feed');
     });
 
 
