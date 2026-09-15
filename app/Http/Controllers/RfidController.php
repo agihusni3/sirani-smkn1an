@@ -208,7 +208,33 @@ class RfidController extends Controller
                     $rq->where('rombel_id', $rombelId)->where('status_keanggotaan', 'aktif');
                 });
             }
-            $items = $siswaQuery->orderBy('nama')->get();
+
+            // Ambil dan urutkan berjenjang: Kelas (X -> XI -> XII, rombel A-Z) kemudian nama siswa A-Z
+            $rawItems = $siswaQuery->get();
+            $items = $rawItems->sort(function ($a, $b) {
+                $rombelA = $a->siswaRombels->first()?->rombel?->nama_rombel ?? '';
+                $rombelB = $b->siswaRombels->first()?->rombel?->nama_rombel ?? '';
+
+                $getWeight = function ($name) {
+                    if (preg_match('/^X\b/i', $name)) return 10;
+                    if (preg_match('/^XI\b/i', $name)) return 11;
+                    if (preg_match('/^XII\b/i', $name)) return 12;
+                    return 99;
+                };
+
+                $wA = $getWeight($rombelA);
+                $wB = $getWeight($rombelB);
+                if ($wA !== $wB) {
+                    return $wA <=> $wB;
+                }
+
+                $cmpRombel = strcasecmp($rombelA, $rombelB);
+                if ($cmpRombel !== 0) {
+                    return $cmpRombel;
+                }
+
+                return strcasecmp($a->nama, $b->nama);
+            })->values();
         } else {
             $guruQuery = Guru::where('status', 'aktif')->with('kartuRfid');
             if (!empty($selectedIds)) {

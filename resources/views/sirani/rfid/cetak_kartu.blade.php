@@ -165,10 +165,10 @@
 
     /* ── Card Header (Pemerintah + Dinas + Sekolah — Center Format Kop Surat) ── */
     .card-header {
-      padding: 1.8mm 2.5mm 1.4mm;
+      padding: 1.3mm 2.5mm 1.1mm;
       display: flex;
       align-items: center;
-      gap: 1.8mm;
+      gap: 1.6mm;
       position: relative;
     }
 
@@ -187,71 +187,74 @@
     }
 
     .card-logo-wrap {
-      width: 10.5mm;
-      height: 10.5mm;
+      width: 9.2mm;
+      height: 9.2mm;
       display: flex;
       align-items: center;
       justify-content: center;
       flex-shrink: 0;
-      filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.45));
+      filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.4));
     }
 
     .card-logo {
       width: 100%;
       height: 100%;
+      max-width: 9.2mm;
+      max-height: 9.2mm;
       object-fit: contain;
     }
 
     .card-logo-spacer {
-      width: 10.5mm;
-      height: 10.5mm;
+      width: 9.2mm;
+      height: 9.2mm;
       flex-shrink: 0;
     }
 
     .card-header-text {
       flex: 1;
       text-align: center;
-      line-height: 1.15;
+      line-height: 1.12;
       min-width: 0;
       padding: 0 0.5mm;
+      margin-top: -0.4mm; /* Menaikkan tulisan kop kartu agar proporsional */
     }
 
     .card-instansi {
-      font-size: 4.3pt;
+      font-size: 4.1pt;
       font-weight: 700;
       color: #e2e8f0;
       text-transform: uppercase;
       letter-spacing: .03em;
-      line-height: 1.15;
+      line-height: 1.12;
     }
 
     .card-dinas {
-      font-size: 4.6pt;
+      font-size: 4.4pt;
       font-weight: 800;
       color: #f1f5f9;
       text-transform: uppercase;
       letter-spacing: .02em;
-      line-height: 1.15;
+      line-height: 1.12;
       margin-top: 0.1mm;
     }
 
     .card-school-name {
-      font-size: 6.8pt;
+      font-size: 6.5pt;
       font-weight: 900;
       color: #ffffff;
       letter-spacing: .02em;
       text-transform: uppercase;
-      line-height: 1.15;
-      margin-top: 0.2mm;
+      line-height: 1.12;
+      margin-top: 0.15mm;
     }
 
     .card-school-address {
-      font-size: 3.3pt;
+      font-size: 3.2pt;
       font-weight: 500;
       color: rgba(255, 255, 255, 0.85);
       letter-spacing: .01em;
-      line-height: 1.15;
-      margin-top: 0.2mm;
+      line-height: 1.12;
+      margin-top: 0.15mm;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
