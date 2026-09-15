@@ -70,30 +70,44 @@
           Pantau catatan absensi, riwayat kehadiran harian, kartu pelajar digital, dan catatan pembinaan siswa SMKN 1 Air Naningan secara real-time.
         </p>
 
-        <div id="savedStudentsContainer" style="display:none;"></div>
+        @if($keyword)
+          {{-- JIKA SISWA TIDAK DITEMUKAN: MENGGANTIKAN BOX PENCARIAN --}}
+          <div style="background:var(--bg-subtle); border:1px solid var(--border); border-radius:var(--r-lg); padding:32px 20px; text-align:center; margin-bottom:20px;">
+            <i class="bi bi-person-x-fill" style="font-size:42px; color:var(--text-3); margin-bottom:10px; display:inline-block;"></i>
+            <h3 style="font-size:16.5px; font-weight:800; margin-bottom:6px; color:var(--text);">Data Siswa Tidak Ditemukan</h3>
+            <p style="font-size:13px; color:var(--text-2); max-width:480px; margin:0 auto 18px; line-height:1.5;">
+              Nomor Induk Siswa Nasional (NISN) <strong>"{{ $keyword }}"</strong> tidak terdaftar pada pangkalan data aktif sekolah. Pastikan nomor yang Anda masukkan sudah sesuai.
+            </p>
+            <a href="{{ route('portal.ortu.index') }}" class="btn-search" style="text-decoration:none; display:inline-flex; align-items:center; gap:6px; padding:9px 22px; border-radius:8px; font-size:13px;">
+              <i class="bi bi-arrow-repeat"></i> Coba NISN Lain
+            </a>
+          </div>
+        @else
+          <div id="savedStudentsContainer" style="display:none;"></div>
 
-        <div class="search-form-box">
-          <form method="GET" action="{{ route('portal.ortu.index') }}">
-            <div class="search-input-wrap">
-              <input
-                type="text"
-                name="keyword"
-                class="search-input"
-                value="{{ $keyword }}"
-                placeholder="Masukkan NISN Siswa (contoh: 0071234567)..."
-                autocomplete="off"
-                required
-                autofocus
-              />
-              <button type="submit" class="btn-search">
-                Cek Presensi
-              </button>
-            </div>
-            <div class="search-hints-row">
-              <span class="search-hint-pill">Pencarian menggunakan <strong>NISN Siswa</strong> yang terdaftar.</span>
-            </div>
-          </form>
-        </div>
+          <div class="search-form-box">
+            <form method="GET" action="{{ route('portal.ortu.index') }}">
+              <div class="search-input-wrap">
+                <input
+                  type="text"
+                  name="keyword"
+                  class="search-input"
+                  value="{{ $keyword }}"
+                  placeholder="Masukkan NISN Siswa (contoh: 0071234567)..."
+                  autocomplete="off"
+                  required
+                  autofocus
+                />
+                <button type="submit" class="btn-search">
+                  Cek Presensi
+                </button>
+              </div>
+              <div class="search-hints-row">
+                <span class="search-hint-pill">Pencarian menggunakan <strong>NISN Siswa</strong> yang terdaftar.</span>
+              </div>
+            </form>
+          </div>
+        @endif
 
         {{-- Highlight Layanan --}}
         <div class="portal-features-grid">
@@ -117,24 +131,9 @@
           </div>
         </div>
       </section>
-    @else
-      {{-- Siswa sudah terpilih, langsung tampilkan konten tanpa search bar --}}
     @endif
 
-    @if($keyword && !$siswa)
-      {{-- SISWA TIDAK DITEMUKAN --}}
-      <div style="background:var(--bg-card); border:1px solid var(--border); border-radius:var(--r-xl); padding:40px 20px; text-align:center; box-shadow:var(--shadow-sm);">
-        <i class="bi bi-person-x-fill" style="font-size:44px; color:var(--text-3); margin-bottom:12px; display:inline-block;"></i>
-        <h3 style="font-size:17px; font-weight:800; margin-bottom:6px; color:var(--text);">Data Siswa Tidak Ditemukan</h3>
-        <p style="font-size:13px; color:var(--text-2); max-width:480px; margin:0 auto 20px;">
-          Nomor Induk Siswa Nasional (NISN) <strong>"{{ $keyword }}"</strong> tidak terdaftar pada pangkalan data aktif sekolah. Pastikan nomor yang Anda masukkan sudah sesuai.
-        </p>
-        <a href="/cek-presensi" class="btn-search" style="text-decoration:none; display:inline-flex; padding:8px 18px;">
-          <i class="bi bi-arrow-repeat"></i> Coba NISN Lain
-        </a>
-      </div>
-
-    @elseif($siswa)
+    @if($siswa)
       {{-- HASIL DATA SISWA TERPILIH --}}
 
       {{-- 3 TAB NAVIGASI UTAMA ATAS SESUAI DESAIN --}}
