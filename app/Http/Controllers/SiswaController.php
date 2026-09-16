@@ -806,7 +806,7 @@ class SiswaController extends Controller
                     $noHpOrtu    = !empty($cleanRow[3]) ? $cleanRow[3] : null;
                     $noHpSiswa   = !empty($cleanRow[4]) && (str_starts_with($cleanRow[4], '08') || str_starts_with($cleanRow[4], '62') || str_starts_with($cleanRow[4], '8')) ? $cleanRow[4] : null;
                     $namaRombel  = !empty($cleanRow[4]) && !$noHpSiswa ? $cleanRow[4] : (!empty($cleanRow[5]) ? $cleanRow[5] : null);
-                    $status      = !empty($cleanRow[6]) ? $cleanRow[6] : (!empty($cleanRow[5]) && !$noHpSiswa ? $cleanRow[5] : 'aktif');
+                    $status      = !empty($cleanRow[6]) ? $cleanRow[6] : null;
                 }
 
                 if (empty($nisn) || empty($nama)) {
@@ -847,9 +847,15 @@ class SiswaController extends Controller
                     $namaOrtu = $namaIbu ?: $namaAyah;
                 }
 
-                // Sanitasi Status
+                // Sanitasi Status (Jika tidak ditentukan, pertahankan status siswa eksisting atau default 'aktif' untuk siswa baru)
                 $validStatuses = ['aktif', 'pkl', 'lulus', 'pindah', 'keluar'];
-                $status = in_array(strtolower($status ?? ''), $validStatuses) ? strtolower($status) : 'aktif';
+                $explicitStatus = null;
+                if (!empty($status)) {
+                    $cleanStatus = strtolower(trim((string)$status));
+                    if (in_array($cleanStatus, $validStatuses)) {
+                        $explicitStatus = $cleanStatus;
+                    }
+                }
 
                 // Format No HP cerdas (buang strip/spasi, normalisasi 62/8 -> 08)
                 $cleanPhoneHelper = function($ph) {
@@ -897,7 +903,7 @@ class SiswaController extends Controller
                         'asal_sekolah'  => $asalSekolah ?: $existingSiswa->asal_sekolah,
                         'no_hp_ortu'    => $noHpOrtu ?: $existingSiswa->no_hp_ortu,
                         'no_hp_siswa'   => $noHpSiswa ?: $existingSiswa->no_hp_siswa,
-                        'status'        => $status,
+                        'status'        => $explicitStatus ?: $existingSiswa->status,
                     ]);
                     $siswa = $existingSiswa;
                 } else {
@@ -924,7 +930,7 @@ class SiswaController extends Controller
                         'asal_sekolah'  => $asalSekolah ?: null,
                         'no_hp_ortu'    => $noHpOrtu ?: null,
                         'no_hp_siswa'   => $noHpSiswa ?: null,
-                        'status'        => $status,
+                        'status'        => $explicitStatus ?: 'aktif',
                     ]);
                 }
 
