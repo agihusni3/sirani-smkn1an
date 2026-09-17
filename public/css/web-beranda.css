@@ -333,38 +333,40 @@
 
     @media (max-width: 640px) {
         .hero-full-wrapper {
-            margin-top: 10px;
+            margin-top: 12px;
             margin-bottom: 24px;
-            border-radius: 18px;
+            border-radius: 20px;
         }
         .hero-full-slider {
-            min-height: 410px;
+            min-height: 440px;
+            height: auto;
         }
         .hero-full-content-box {
-            padding: 28px 18px 48px 18px !important;
+            padding: 32px 18px 48px 18px !important;
         }
         .hero-scrim-left,
         .hero-scrim-center,
         .hero-scrim-right {
             background: 
-                linear-gradient(180deg, rgba(15, 23, 42, 0.90) 0%, rgba(15, 23, 42, 0.68) 45%, rgba(15, 23, 42, 0.95) 100%) !important;
+                linear-gradient(180deg, rgba(15, 23, 42, 0.88) 0%, rgba(15, 23, 42, 0.65) 45%, rgba(15, 23, 42, 0.96) 100%) !important;
         }
         .hero-pill-badge {
-            font-size: 0.66rem !important;
-            padding: 3px 10px !important;
-            margin-bottom: 10px !important;
+            font-size: 0.7rem !important;
+            padding: 4px 12px !important;
+            margin-bottom: 12px !important;
         }
         .hero-banner-title {
-            font-size: 1.35rem !important;
+            font-size: clamp(1.4rem, 5.2vw, 1.7rem) !important;
             line-height: 1.25 !important;
             letter-spacing: -0.02em !important;
-            margin-bottom: 8px !important;
+            margin-bottom: 10px !important;
+            word-break: normal;
         }
         .hero-banner-sub {
-            font-size: 0.82rem !important;
-            line-height: 1.5 !important;
-            margin-bottom: 16px !important;
-            color: rgba(241, 245, 249, 0.9) !important;
+            font-size: 0.84rem !important;
+            line-height: 1.55 !important;
+            margin-bottom: 20px !important;
+            color: rgba(241, 245, 249, 0.92) !important;
             max-width: 100% !important;
         }
         .hero-text-align-left,
@@ -372,7 +374,7 @@
         .hero-text-align-right {
             max-width: 100% !important;
             text-align: left !important;
-            align-items: flex-start !important;
+            align-items: stretch !important;
             margin-left: 0 !important;
             margin-right: 0 !important;
         }
@@ -380,32 +382,33 @@
             width: 100%;
             display: flex;
             flex-direction: column;
-            align-items: flex-start !important;
-            gap: 8px !important;
+            align-items: stretch !important;
+            gap: 10px !important;
         }
-        .hero-text-align-center .hero-btn-group {
-            align-items: center !important;
-        }
-        .hero-text-align-right .hero-btn-group {
-            align-items: flex-end !important;
+        .hero-text-align-center .hero-btn-group,
+        .hero-text-align-right .hero-btn-group,
+        .hero-text-align-left .hero-btn-group {
+            align-items: stretch !important;
+            justify-content: stretch !important;
         }
         .btn-hero-solid, .btn-hero-glass {
-            display: inline-flex !important;
-            width: auto !important;
+            display: flex !important;
+            width: 100% !important;
             max-width: 100% !important;
             align-items: center;
             justify-content: center;
-            gap: 7px;
-            height: 38px;
-            padding: 0 18px !important;
-            font-size: 0.82rem !important;
+            gap: 8px;
+            height: 44px;
+            padding: 0 20px !important;
+            font-size: 0.86rem !important;
             font-weight: 700 !important;
-            border-radius: 9px !important;
-            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2) !important;
+            border-radius: 12px !important;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25) !important;
+            box-sizing: border-box !important;
         }
         .hero-slider-indicator-bar {
             bottom: 12px !important;
-            padding: 3px 12px !important;
+            padding: 4px 12px !important;
             gap: 8px !important;
         }
         .hero-indicator-dot {
@@ -674,95 +677,220 @@
         color: #0f172a;
     }
 
-    /* Mobile Accordion Stack */
+    /* Mobile Segmented Tabs & Indicators Hidden by default on Desktop */
+    .deck-mobile-nav,
+    .deck-mobile-indicators {
+        display: none;
+    }
+
+    /* Mobile Horizontal Card Deck with Snap (Replacing squashed 68px accordion) */
     @media (max-width: 900px) {
+        .deck-mobile-nav {
+            display: flex !important;
+            gap: 6px;
+            margin-bottom: 16px;
+            background: #e2e8f0;
+            padding: 4px;
+            border-radius: 12px;
+        }
+
+        .deck-mobile-tab {
+            flex: 1;
+            border: none;
+            background: transparent;
+            padding: 8px 10px;
+            font-size: 0.82rem;
+            font-weight: 700;
+            font-family: var(--font-main);
+            color: #64748b;
+            border-radius: 9px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .deck-mobile-tab.active {
+            background: #ffffff;
+            color: #0f172a;
+            box-shadow: 0 2px 8px rgba(15, 23, 42, 0.12);
+        }
+
         .expanding-deck {
-            flex-direction: column;
-            height: auto;
-            gap: 12px;
-            margin-top: 16px;
+            display: flex !important;
+            flex-direction: row !important;
+            overflow-x: auto !important;
+            scroll-snap-type: x mandatory !important;
+            -webkit-overflow-scrolling: touch !important;
+            gap: 14px !important;
+            height: auto !important;
+            margin-top: 0 !important;
+            padding: 4px 4px 12px 4px !important;
+            scrollbar-width: none !important;
+        }
+
+        .expanding-deck::-webkit-scrollbar {
+            display: none !important;
         }
 
         .deck-card {
-            flex: none;
-            height: 68px;
-            border-radius: 14px;
-            transition: height 0.45s cubic-bezier(0.16, 1, 0.3, 1), transform 0.3s ease;
-            box-shadow: 0 4px 14px -2px rgba(15, 23, 42, 0.18);
+            flex: 0 0 calc(100% - 24px) !important;
+            min-width: calc(100% - 24px) !important;
+            max-width: 380px !important;
+            height: 480px !important;
+            min-height: 480px !important;
+            border-radius: 20px !important;
+            scroll-snap-align: center !important;
+            position: relative !important;
+            overflow: hidden !important;
+            box-shadow: 0 12px 30px -6px rgba(15, 23, 42, 0.3) !important;
+            background: #0f172a !important;
+            border: 1px solid rgba(255, 255, 255, 0.12) !important;
         }
 
         .deck-card.active {
-            flex: none;
-            height: auto;
-            min-height: 400px;
-            border-radius: 16px;
+            flex: 0 0 calc(100% - 24px) !important;
+            min-width: calc(100% - 24px) !important;
+            height: 480px !important;
+            min-height: 480px !important;
+            border-radius: 20px !important;
         }
 
         .deck-collapsed-content {
-            flex-direction: row;
-            padding: 14px 18px;
-        }
-
-        .deck-collapsed-title {
-            writing-mode: horizontal-tb;
-            transform: none;
-            font-size: 0.85rem;
-            letter-spacing: 0.02em;
-            font-weight: 700;
-        }
-
-        .deck-collapsed-badge {
-            width: 34px;
-            height: 34px;
-            font-size: 0.88rem;
-            border-radius: 9px;
-        }
-
-        .deck-collapsed-index {
-            font-size: 0.95rem;
+            display: none !important;
         }
 
         .deck-expanded-content {
-            padding: 20px 16px;
+            position: absolute !important;
+            bottom: 0 !important;
+            left: 0 !important;
+            right: 0 !important;
+            padding: 24px 20px !important;
+            z-index: 3 !important;
+            opacity: 1 !important;
+            transform: none !important;
+            pointer-events: auto !important;
+            display: flex !important;
+            flex-direction: column !important;
+            justify-content: flex-end !important;
         }
 
         .deck-top-badge {
-            font-size: 0.66rem;
-            padding: 3px 9px;
-            margin-bottom: 8px;
+            font-size: 0.68rem !important;
+            padding: 4px 10px !important;
+            margin-bottom: 8px !important;
         }
 
         .deck-title {
-            font-size: 1.25rem;
-            line-height: 1.25;
-            margin-bottom: 6px;
+            font-size: 1.35rem !important;
+            font-weight: 800 !important;
+            line-height: 1.25 !important;
+            margin-bottom: 6px !important;
+            color: #ffffff !important;
         }
 
         .deck-desc {
-            font-size: 0.8rem;
-            line-height: 1.45;
-            margin-bottom: 12px;
+            font-size: 0.82rem !important;
+            line-height: 1.5 !important;
+            margin-bottom: 12px !important;
+            color: #e2e8f0 !important;
         }
 
         .deck-chips {
-            gap: 5px;
-            margin-bottom: 14px;
+            gap: 6px !important;
+            margin-bottom: 16px !important;
         }
 
         .deck-chip {
-            font-size: 0.7rem;
-            padding: 4px 9px;
-            border-radius: 6px;
+            font-size: 0.72rem !important;
+            padding: 4px 10px !important;
         }
 
         .deck-btn-cta {
-            height: 38px;
-            padding: 0 16px;
-            font-size: 0.82rem;
-            border-radius: 9px;
-            width: 100%;
-            justify-content: center;
+            width: 100% !important;
+            height: 42px !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            font-size: 0.84rem !important;
+            font-weight: 800 !important;
+            border-radius: 12px !important;
+            padding: 0 16px !important;
+            box-sizing: border-box !important;
         }
+
+        .deck-mobile-indicators {
+            display: flex !important;
+            justify-content: center !important;
+            align-items: center !important;
+            gap: 8px !important;
+            margin-top: 8px !important;
+            margin-bottom: 12px !important;
+        }
+
+        .deck-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 9999px;
+            background: #cbd5e1;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            cursor: pointer;
+        }
+
+        .deck-dot.active {
+            width: 22px;
+            background: #2563eb;
+        }
+    }
+
+    /* ── TEFA Header Wrap Base Styles ── */
+    .tefa-header-wrap {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        align-items: flex-end;
+        gap: 20px;
+    }
+    .tefa-tag-label {
+        font-family: var(--font-tech);
+        font-size: 0.78rem;
+        font-weight: 700;
+        color: #fbbf24;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+    }
+    .tefa-headline {
+        font-size: clamp(1.6rem, 3vw, 2.2rem);
+        font-weight: 800;
+        margin-top: 8px;
+    }
+    .tefa-sub-text {
+        font-size: 0.85rem;
+        color: #94a3b8;
+        max-width: 420px;
+        text-align: right;
+    }
+
+    /* ── Berita Section Base Styles ── */
+    .berita-header-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        margin-bottom: 24px;
+    }
+    .berita-view-all {
+        font-size: 0.88rem;
+        font-weight: 700;
+        color: var(--brand-blue);
+        text-decoration: none;
+    }
+    .berita-card-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        gap: 24px;
+        margin-bottom: 60px;
     }
 
     /* ── Teaching Factory Industrial Portfolio ── */
@@ -1037,24 +1165,38 @@
     }
 
     @media (max-width: 640px) {
-        /* Telemetry Mobile */
+        /* Telemetry Mobile: 2x2 Structured Mini-Card Tiles */
         .telemetry-strip {
             grid-template-columns: 1fr 1fr !important;
-            gap: 12px !important;
-            padding: 14px 16px !important;
+            gap: 10px !important;
+            padding: 12px !important;
             margin-bottom: 36px !important;
-            border-radius: 14px !important;
+            border-radius: 18px !important;
         }
         .telemetry-item {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 14px !important;
+            padding: 14px 12px !important;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 86px;
             border-right: none !important;
-            padding-right: 0 !important;
         }
         .telemetry-value {
-            font-size: 1.25rem !important;
-            margin-bottom: 2px !important;
+            font-size: 1.35rem !important;
+            font-weight: 800 !important;
+            line-height: 1.1;
+            margin-bottom: 6px !important;
         }
         .telemetry-desc {
-            font-size: 0.68rem !important;
+            font-size: 0.65rem !important;
+            font-weight: 700 !important;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            letter-spacing: 0.03em;
+            line-height: 1.35;
         }
 
         /* Section Headers Clean Mobile */
@@ -1078,74 +1220,131 @@
 
         /* TEFA Industrial Showcase Mobile */
         .tefa-strip {
-            padding: 24px 16px !important;
-            border-radius: 16px !important;
+            padding: 26px 18px !important;
+            border-radius: 20px !important;
             margin-bottom: 40px !important;
         }
+        .tefa-header-wrap {
+            flex-direction: column !important;
+            align-items: flex-start !important;
+            gap: 10px !important;
+        }
+        .tefa-headline {
+            font-size: 1.35rem !important;
+            line-height: 1.25 !important;
+        }
+        .tefa-sub-text {
+            text-align: left !important;
+            font-size: 0.82rem !important;
+            line-height: 1.5 !important;
+            max-width: 100% !important;
+        }
+        .tefa-grid {
+            grid-template-columns: 1fr !important;
+            gap: 18px !important;
+            margin-top: 20px !important;
+        }
+        .tefa-thumb-box {
+            height: 190px !important;
+        }
+        .tefa-body {
+            padding: 18px 16px !important;
+        }
+        .tefa-item-title {
+            font-size: 1.1rem !important;
+            line-height: 1.35 !important;
+        }
+        .tefa-item-desc {
+            font-size: 0.82rem !important;
+            line-height: 1.55 !important;
+            margin-bottom: 16px !important;
+        }
+        .tefa-footer-bar {
+            flex-direction: row !important;
+            justify-content: space-between !important;
+            align-items: center !important;
+            flex-wrap: wrap !important;
+            gap: 10px !important;
+        }
         .btn-tefa-cta {
-            height: 36px !important;
-            padding: 0 14px !important;
-            font-size: 0.78rem !important;
-            border-radius: 8px !important;
+            height: 38px !important;
+            padding: 0 16px !important;
+            font-size: 0.8rem !important;
+            border-radius: 9px !important;
         }
 
         /* PPDB Fast Banner Mobile */
         .ppdb-banner-box {
-            padding: 24px 16px !important;
-            border-radius: 16px !important;
+            padding: 28px 18px !important;
+            border-radius: 20px !important;
             margin-bottom: 40px !important;
         }
         .ppdb-benefit-pills {
             gap: 6px !important;
-            margin-bottom: 16px !important;
+            margin-bottom: 18px !important;
         }
         .ppdb-benefit-pill {
             font-size: 0.72rem !important;
-            padding: 3px 10px !important;
+            padding: 4px 10px !important;
         }
         .ppdb-content-relative h2 {
-            font-size: 1.3rem !important;
+            font-size: 1.35rem !important;
             line-height: 1.25 !important;
         }
         .ppdb-content-relative p {
             font-size: 0.82rem !important;
-            line-height: 1.45 !important;
-            margin-bottom: 16px !important;
+            line-height: 1.5 !important;
+            margin-bottom: 18px !important;
         }
         .ppdb-btn-group {
             display: flex !important;
             flex-direction: column !important;
-            align-items: flex-start !important;
-            gap: 8px !important;
+            align-items: stretch !important;
+            gap: 10px !important;
             width: 100% !important;
         }
-        .ppdb-banner-center .ppdb-btn-group {
-            align-items: center !important;
-        }
+        .ppdb-banner-center .ppdb-btn-group,
         .ppdb-banner-right .ppdb-btn-group {
-            align-items: flex-end !important;
+            align-items: stretch !important;
         }
-        .ppdb-btn-group .btn-hero-solid,
-        .ppdb-btn-group .btn-hero-glass,
+        .ppdb-btn-group .btn-industrial,
         .btn-ppdb-wa {
-            width: auto !important;
-            max-width: 100% !important;
-            display: inline-flex !important;
+            width: 100% !important;
+            height: 44px !important;
+            display: flex !important;
             align-items: center !important;
             justify-content: center !important;
-            height: 38px !important;
-            padding: 0 16px !important;
-            font-size: 0.82rem !important;
-            border-radius: 9px !important;
+            font-size: 0.86rem !important;
+            border-radius: 12px !important;
+            box-sizing: border-box !important;
         }
 
         /* General Industrial Buttons Mobile */
         .btn-industrial {
-            height: 36px !important;
-            padding: 0 14px !important;
-            font-size: 0.8rem !important;
-            border-radius: 8px !important;
+            height: 40px !important;
+            padding: 0 16px !important;
+            font-size: 0.82rem !important;
+            border-radius: 10px !important;
             display: inline-flex !important;
             align-items: center !important;
+            justify-content: center !important;
+        }
+
+        /* Berita / Warta Mobile */
+        .berita-header-row {
+            flex-direction: row !important;
+            justify-content: space-between !important;
+            align-items: center !important;
+            margin-bottom: 18px !important;
+            gap: 10px !important;
+        }
+        .berita-view-all {
+            font-size: 0.82rem !important;
+            white-space: nowrap;
+        }
+        .berita-card-grid {
+            grid-template-columns: 1fr !important;
+            gap: 18px !important;
+            margin-bottom: 40px !important;
         }
     }

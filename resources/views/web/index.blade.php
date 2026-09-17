@@ -142,12 +142,25 @@
             <span class="section-tag">PROGRAM KEAHLIAN UNGGULAN</span>
             <h2 class="section-title-large">Program Keahlian Berstandar Industri</h2>
             <p style="color: var(--text-muted); font-size: 0.95rem; max-width: 680px; margin-top: 6px;">
-                Arahkan kursor atau sentuh kartu kejuruan untuk melihat profil kurikulum, spesifikasi laboratorium, dan lisensi BNSP berstandar nasional.
+                Arahkan kursor atau pilih kejuruan untuk melihat profil kurikulum, spesifikasi laboratorium, dan lisensi BNSP berstandar nasional.
             </p>
         </div>
 
+        <!-- Mobile Segmented Tabs -->
+        <div class="deck-mobile-nav" role="tablist" aria-label="Pilih Konsentrasi Keahlian">
+            <button type="button" class="deck-mobile-tab active" data-deck-index="0" role="tab" aria-selected="true">
+                <span>💻 RPL</span>
+            </button>
+            <button type="button" class="deck-mobile-tab" data-deck-index="1" role="tab" aria-selected="false">
+                <span>🌿 APHP</span>
+            </button>
+            <button type="button" class="deck-mobile-tab" data-deck-index="2" role="tab" aria-selected="false">
+                <span>⚙️ TSM</span>
+            </button>
+        </div>
+
         <!-- The 3 Interactive Expanding Cards -->
-        <div class="expanding-deck" role="region" aria-label="Program Keahlian SMK">
+        <div class="expanding-deck" id="expandingDeckContainer" role="region" aria-label="Program Keahlian SMK">
             
             <!-- CARD 1: RPL (ACTIVE DEFAULT) -->
             <div class="deck-card active" tabindex="0" role="button" aria-expanded="true" aria-label="Rekayasa Perangkat Lunak">
@@ -252,20 +265,27 @@
             </div>
 
         </div>
+
+        <!-- Mobile Swipe Indicators -->
+        <div class="deck-mobile-indicators" aria-hidden="true">
+            <span class="deck-dot active" data-deck-index="0"></span>
+            <span class="deck-dot" data-deck-index="1"></span>
+            <span class="deck-dot" data-deck-index="2"></span>
+        </div>
     </section>
 
     <!-- ═══ 4. TEACHING FACTORY SHOWCASE (BUKTI NYATA KARYA SISWA) ═══ -->
     <div class="tefa-strip">
-        <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 20px;">
+        <div class="tefa-header-wrap">
             <div>
-                <span style="font-family: var(--font-tech); font-size: 0.78rem; font-weight: 700; color: #fbbf24; text-transform: uppercase; letter-spacing: 0.08em;">
+                <span class="tefa-tag-label">
                     TEACHING FACTORY (TEFA) &amp; BENGKEL PRODUKSI
                 </span>
-                <h2 style="font-size: clamp(1.6rem, 3vw, 2.2rem); font-weight: 800; margin-top: 8px;">
+                <h2 class="tefa-headline">
                     Produk &amp; Portofolio Nyata Karya Siswa
                 </h2>
             </div>
-            <span style="font-size: 0.85rem; color: #94a3b8; max-width: 420px; text-align: right;">
+            <span class="tefa-sub-text">
                 Pembuktian keahlian praktis berstandar komersial yang diproduksi langsung di workshop sekolah dan dinikmati masyarakat.
             </span>
         </div>
@@ -437,7 +457,7 @@
                 </div>
             @endif
 
-            <div style="display: flex; flex-wrap: wrap; gap: 12px; align-items: center; {{ $flexJustify }}">
+            <div class="ppdb-btn-group" style="display: flex; flex-wrap: wrap; gap: 12px; align-items: center; {{ $flexJustify }}">
                 @if(!empty($btn1Text) && !empty($btn1Url))
                     <a href="{{ $btn1Url }}" class="btn-industrial" style="background: #ffffff; color: #0f172a; font-weight: 800; padding: 13px 28px; border-radius: 12px; box-shadow: 0 10px 25px -4px rgba(0,0,0,0.3);">
                         <i class="fa-solid fa-file-signature"></i> {{ $btn1Text }}
@@ -461,17 +481,17 @@
     @endif
 
     <!-- ═══ 6. WARTA & ARTIKEL RESMI SEKOLAH ═══ -->
-    <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 24px;">
+    <div class="berita-header-row">
         <div>
             <span class="section-tag">WARTA &amp; INFORMASI</span>
-            <h2 style="font-size: 1.6rem; font-weight: 800; color: var(--text-dark);">Kabar Kegiatan &amp; Prestasi Kampus</h2>
+            <h2 class="section-title-large" style="margin-top: 4px;">Kabar Kegiatan &amp; Prestasi Kampus</h2>
         </div>
-        <a href="{{ route('web.berita.index') }}" style="font-size: 0.88rem; font-weight: 700; color: var(--brand-blue);">
+        <a href="{{ route('web.berita.index') }}" class="berita-view-all">
             Lihat Semua Warta →
         </a>
     </div>
 
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px; margin-bottom: 60px;">
+    <div class="berita-card-grid">
         @forelse($beritas->take(3) as $b)
             <div style="background: #ffffff; border: 1px solid var(--border-main); border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-card); display: flex; flex-direction: column; justify-content: space-between;">
                 <div>
@@ -597,37 +617,126 @@
         resetHeroTimer();
     }
 
-    // Interactive Expanding Panoramic Deck (Konsep 1: Otomatis Melebar Mulus saat Mouse Digeser)
-    function setActiveDeckCard(card) {
-        if (!card || card.classList.contains('active')) return;
-        const allCards = document.querySelectorAll('.deck-card');
-        allCards.forEach(c => {
-            c.classList.remove('active');
-            c.setAttribute('aria-expanded', 'false');
+    // ═══ Interactive Expanding Panoramic Deck (Desktop Hover + Mobile Snap & Tabs) ═══
+    const deckContainer = document.getElementById('expandingDeckContainer');
+    const deckCards = document.querySelectorAll('.deck-card');
+    const deckTabs = document.querySelectorAll('.deck-mobile-tab');
+    const deckDots = document.querySelectorAll('.deck-dot');
+
+    function setActiveDeckCard(card, index) {
+        if (!card) return;
+        deckCards.forEach((c) => {
+            if (c === card) {
+                c.classList.add('active');
+                c.setAttribute('aria-expanded', 'true');
+            } else {
+                c.classList.remove('active');
+                c.setAttribute('aria-expanded', 'false');
+            }
         });
-        card.classList.add('active');
-        card.setAttribute('aria-expanded', 'true');
+
+        if (index !== undefined) {
+            updateDeckMobileState(index);
+        }
     }
 
-    const deckCards = document.querySelectorAll('.deck-card');
-    deckCards.forEach(card => {
-        // Otomatis melebar mulus saat mouse digeser ke kartu (hover)
+    function updateDeckMobileState(index) {
+        deckTabs.forEach((tab, i) => {
+            if (i === index) {
+                tab.classList.add('active');
+                tab.setAttribute('aria-selected', 'true');
+            } else {
+                tab.classList.remove('active');
+                tab.setAttribute('aria-selected', 'false');
+            }
+        });
+        deckDots.forEach((dot, i) => {
+            if (i === index) {
+                dot.classList.add('active');
+            } else {
+                dot.classList.remove('active');
+            }
+        });
+    }
+
+    function scrollToDeckCard(index) {
+        if (!deckContainer || !deckCards[index]) return;
+        const targetCard = deckCards[index];
+        const containerLeft = deckContainer.getBoundingClientRect().left;
+        const cardLeft = targetCard.getBoundingClientRect().left;
+        deckContainer.scrollBy({
+            left: cardLeft - containerLeft - 10,
+            behavior: 'smooth'
+        });
+        setActiveDeckCard(targetCard, index);
+    }
+
+    deckCards.forEach((card, index) => {
+        // Desktop hover
         card.addEventListener('mouseenter', () => {
-            setActiveDeckCard(card);
+            if (window.innerWidth > 900) {
+                setActiveDeckCard(card, index);
+            }
         });
 
-        // Dukungan klik / sentuhan mobile
+        // Click / Touch
         card.addEventListener('click', () => {
-            setActiveDeckCard(card);
+            setActiveDeckCard(card, index);
         });
 
-        // Aksesibilitas keyboard (Enter / Spasi)
+        // Keyboard navigation
         card.addEventListener('keydown', (e) => {
             if (e.key === 'Enter' || e.key === ' ') {
                 e.preventDefault();
-                setActiveDeckCard(card);
+                setActiveDeckCard(card, index);
+                if (window.innerWidth <= 900) {
+                    scrollToDeckCard(index);
+                }
             }
         });
     });
+
+    // Mobile tabs click
+    deckTabs.forEach((tab) => {
+        tab.addEventListener('click', () => {
+            const index = parseInt(tab.getAttribute('data-deck-index'), 10);
+            scrollToDeckCard(index);
+        });
+    });
+
+    // Mobile dots click
+    deckDots.forEach((dot) => {
+        dot.addEventListener('click', () => {
+            const index = parseInt(dot.getAttribute('data-deck-index'), 10);
+            scrollToDeckCard(index);
+        });
+    });
+
+    // Mobile scroll listener to update active tab/dot as user swipes
+    if (deckContainer) {
+        let scrollTimeout = null;
+        deckContainer.addEventListener('scroll', () => {
+            if (window.innerWidth > 900) return;
+            if (scrollTimeout) cancelAnimationFrame(scrollTimeout);
+            scrollTimeout = requestAnimationFrame(() => {
+                const containerRect = deckContainer.getBoundingClientRect();
+                const containerCenter = containerRect.left + containerRect.width / 2;
+                let closestIndex = 0;
+                let minDistance = Infinity;
+
+                deckCards.forEach((card, i) => {
+                    const rect = card.getBoundingClientRect();
+                    const cardCenter = rect.left + rect.width / 2;
+                    const dist = Math.abs(containerCenter - cardCenter);
+                    if (dist < minDistance) {
+                        minDistance = dist;
+                        closestIndex = i;
+                    }
+                });
+
+                updateDeckMobileState(closestIndex);
+            });
+        }, { passive: true });
+    }
 </script>
 @endpush
