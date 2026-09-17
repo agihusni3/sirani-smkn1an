@@ -242,14 +242,27 @@
       </form>
     </div>
 
+    {{-- BANNER INFORMASI SIFAT TEMPORER TABEL OPERASIONAL HARIAN --}}
+    <div style="margin-bottom: 12px; padding: 10px 14px; background: #f0fdf4; border: 1px solid #bbf7d0; border-left: 4px solid #16a34a; border-radius: var(--r-sm); font-size: 12px; color: #166534; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <i class="bi bi-clock-history fs-5" style="color: #16a34a;"></i>
+        <div>
+          <strong>Tabel Operasional Harian:</strong> Daftar ini khusus memantau perizinan pada hari yang bersangkutan (temporer). Seluruh data izin &amp; sakit tersimpan permanen dan otomatis tercatat pada <strong>Riwayat Presensi Siswa</strong>.
+        </div>
+      </div>
+      <a href="{{ route('laporan.index') }}" class="btn btn-sm btn-success" style="font-size: 11px; font-weight: 700; padding: 3px 10px; text-decoration: none; border-radius: 6px;">
+        <i class="bi bi-journal-text me-1"></i> Buka Rekapitulasi Presensi
+      </a>
+    </div>
+
     {{-- RIWAYAT PERIZINAN MULTI-TAB --}}
     <div class="panel">
       <div class="izin-nav-tabs">
         <button class="izin-tab-btn {{ !request()->has('page_guru') ? 'active' : '' }}" id="tabBtnSiswa" onclick="switchRiwayatTab('tab-riwayat-siswa', this)">
-          <i class="bi bi-people-fill"></i> Riwayat Izin Siswa ({{ $izins->total() }})
+          <i class="bi bi-people-fill"></i> Izin Siswa ({{ $izins->total() }})
         </button>
         <button class="izin-tab-btn {{ request()->has('page_guru') ? 'active' : '' }}" id="tabBtnGuru" onclick="switchRiwayatTab('tab-riwayat-guru', this)">
-          <i class="bi bi-person-badge-fill"></i> Riwayat Izin Guru ({{ $izinGurus->total() }})
+          <i class="bi bi-person-badge-fill"></i> Izin Guru ({{ $izinGurus->total() }})
         </button>
       </div>
 
@@ -258,11 +271,20 @@
         <div style="padding:8px 12px; border-bottom:1px solid var(--border); background:var(--surface); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
           <div style="font-weight:800; font-size:12.5px; color:var(--text); display:flex; align-items:center; gap:6px;">
             <i class="bi bi-people-fill" style="color:#000000;"></i>
-            <span>Daftar Riwayat Perizinan Siswa</span>
+            <span>Daftar Perizinan Siswa ({{ \Carbon\Carbon::parse($tanggal)->translatedFormat('d M Y') }})</span>
+            <span class="badge" style="background:rgba(2, 132, 199, 0.1); color:#0284c7; font-size:10px; border:1px solid rgba(2, 132, 199, 0.2); font-weight:700;">Harian</span>
           </div>
-          <div style="position:relative; width:100%; max-width:230px;">
-            <i class="bi bi-search" style="position:absolute; left:10px; top:50%; transform:translateY(-50%); color:#000000; font-size:11px;"></i>
-            <input type="text" placeholder="Cari nama, NISN, jenis..." oninput="filterTableIzin('tableIzinSiswa', this.value)" style="width:100%; padding-left:28px; height:30px; font-size:11.5px; border-radius:var(--r-sm); background:var(--bg-2); border:1px solid var(--border-2);" />
+          <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+            <form method="GET" action="{{ url()->current() }}" style="display:flex; align-items:center; gap:4px;">
+              <input type="date" name="tanggal" value="{{ $tanggal }}" onchange="this.form.submit()" style="height:30px; font-size:11.5px; border-radius:var(--r-sm); background:var(--bg-2); border:1px solid var(--border-2); padding:2px 8px; font-family:var(--font-mono); font-weight:700;" title="Pilih tanggal">
+              @if($tanggal !== now()->toDateString())
+                <a href="{{ url()->current() }}" class="btn btn-sm btn-outline-secondary" style="height:30px; padding:3px 8px; font-size:11px; font-weight:700;" title="Kembali ke Hari Ini">Hari Ini</a>
+              @endif
+            </form>
+            <div style="position:relative; width:100%; max-width:180px;">
+              <i class="bi bi-search" style="position:absolute; left:10px; top:50%; transform:translateY(-50%); color:#000000; font-size:11px;"></i>
+              <input type="text" placeholder="Cari nama, NISN..." oninput="filterTableIzin('tableIzinSiswa', this.value)" style="width:100%; padding-left:28px; height:30px; font-size:11.5px; border-radius:var(--r-sm); background:var(--bg-2); border:1px solid var(--border-2);" />
+            </div>
           </div>
         </div>
 
@@ -366,11 +388,21 @@
         <div style="padding:8px 12px; border-bottom:1px solid var(--border); background:var(--surface); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
           <div style="font-weight:800; font-size:12.5px; color:var(--text); display:flex; align-items:center; gap:6px;">
             <i class="bi bi-person-badge-fill" style="color:#000000;"></i>
-            <span>Daftar Riwayat Perizinan Guru &amp; Pegawai</span>
+            <span>Daftar Perizinan Guru &amp; Pegawai ({{ \Carbon\Carbon::parse($tanggal)->translatedFormat('d M Y') }})</span>
+            <span class="badge" style="background:rgba(2, 132, 199, 0.1); color:#0284c7; font-size:10px; border:1px solid rgba(2, 132, 199, 0.2); font-weight:700;">Harian</span>
           </div>
-          <div style="position:relative; width:100%; max-width:230px;">
-            <i class="bi bi-search" style="position:absolute; left:10px; top:50%; transform:translateY(-50%); color:#000000; font-size:11px;"></i>
-            <input type="text" placeholder="Cari nama, NIP, jenis..." oninput="filterTableIzin('tableIzinGuru', this.value)" style="width:100%; padding-left:28px; height:30px; font-size:11.5px; border-radius:var(--r-sm); background:var(--bg-2); border:1px solid var(--border-2);" />
+          <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+            <form method="GET" action="{{ url()->current() }}" style="display:flex; align-items:center; gap:4px;">
+              <input type="hidden" name="page_guru" value="1">
+              <input type="date" name="tanggal" value="{{ $tanggal }}" onchange="this.form.submit()" style="height:30px; font-size:11.5px; border-radius:var(--r-sm); background:var(--bg-2); border:1px solid var(--border-2); padding:2px 8px; font-family:var(--font-mono); font-weight:700;" title="Pilih tanggal">
+              @if($tanggal !== now()->toDateString())
+                <a href="{{ url()->current() }}?page_guru=1" class="btn btn-sm btn-outline-secondary" style="height:30px; padding:3px 8px; font-size:11px; font-weight:700;" title="Kembali ke Hari Ini">Hari Ini</a>
+              @endif
+            </form>
+            <div style="position:relative; width:100%; max-width:180px;">
+              <i class="bi bi-search" style="position:absolute; left:10px; top:50%; transform:translateY(-50%); color:#000000; font-size:11px;"></i>
+              <input type="text" placeholder="Cari nama, NIP..." oninput="filterTableIzin('tableIzinGuru', this.value)" style="width:100%; padding-left:28px; height:30px; font-size:11.5px; border-radius:var(--r-sm); background:var(--bg-2); border:1px solid var(--border-2);" />
+            </div>
           </div>
         </div>
 

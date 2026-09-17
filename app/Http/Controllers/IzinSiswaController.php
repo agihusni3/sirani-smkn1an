@@ -38,10 +38,22 @@ class IzinSiswaController extends Controller
             ->orderBy('nama')
             ->get();
 
-        $izins = IzinSiswa::with('siswa')->orderBy('tanggal', 'desc')->paginate(10, ['*'], 'page_siswa')->withQueryString();
-        $izinGurus = IzinGuru::with('guru')->orderBy('tanggal', 'desc')->paginate(10, ['*'], 'page_guru')->withQueryString();
+        $tanggal = request('tanggal', now()->toDateString());
 
-        return view('sirani.izin_siswa', compact('siswas', 'gurus', 'izins', 'izinGurus'));
+        // Tabel operasional harian (temporer): Hanya menampilkan perizinan pada hari yang bersangkutan
+        $izins = IzinSiswa::with('siswa')
+            ->whereDate('tanggal', $tanggal)
+            ->orderBy('created_at', 'desc')
+            ->paginate(15, ['*'], 'page_siswa')
+            ->withQueryString();
+
+        $izinGurus = IzinGuru::with('guru')
+            ->whereDate('tanggal', $tanggal)
+            ->orderBy('created_at', 'desc')
+            ->paginate(15, ['*'], 'page_guru')
+            ->withQueryString();
+
+        return view('sirani.izin_siswa', compact('siswas', 'gurus', 'izins', 'izinGurus', 'tanggal'));
     }
 
     public function store(Request $request)

@@ -96,6 +96,14 @@
           <span>Buku Register SK</span>
         </div>
       </a>
+
+      <a href="{{ route('situan.surat-tugas.index') }}" class="situan-nav-link {{ request()->is('situan/surat-tugas*') ? 'active' : '' }}" title="Surat Perintah Tugas (SPT), SPPD &amp; Lembar Visum">
+        <div class="situan-nav-link-left">
+          <i class="bi bi-briefcase-fill"></i>
+          <span>Surat Tugas &amp; SPPD</span>
+        </div>
+        <span class="situan-nav-badge" style="background:#eff6ff; color:#2563eb; border-color:#bfdbfe;">3-in-1</span>
+      </a>
     </div>
 
     {{-- 3. Kepegawaian & Kearsipan Sentral --}}

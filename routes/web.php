@@ -42,6 +42,7 @@ use App\Http\Controllers\SituanPersuratanController;
 use App\Http\Controllers\SituanPelayananSuratController;
 use App\Http\Controllers\SituanKepegawaianController;
 use App\Http\Controllers\SituanEKabinetController;
+use App\Http\Controllers\SituanSuratTugasController;
 
 // ══ 1. Website Resmi Publik SMKN 1 Air Naningan (Dilindungi Pelacak Kunjungan Otomatis) ══
 Route::middleware('track.visitor')->group(function () {
@@ -179,6 +180,14 @@ Route::middleware('auth')->group(function () {
         Route::get('/situan/surat-keluar/{id}/cetak', [SituanPersuratanController::class, 'suratKeluarCetak'])->name('situan.surat-keluar.cetak');
         Route::get('/situan/buku-sk', [SituanPersuratanController::class, 'bukuSkIndex'])->name('situan.buku-sk.index');
         Route::post('/situan/buku-sk', [SituanPersuratanController::class, 'bukuSkStore'])->name('situan.buku-sk.store');
+
+        // Surat Perintah Tugas (SPT) & SPPD Terpadu
+        Route::get('/situan/surat-tugas', [SituanSuratTugasController::class, 'index'])->name('situan.surat-tugas.index');
+        Route::post('/situan/surat-tugas', [SituanSuratTugasController::class, 'store'])->name('situan.surat-tugas.store');
+        Route::delete('/situan/surat-tugas/{id}', [SituanSuratTugasController::class, 'destroy'])->name('situan.surat-tugas.destroy');
+        Route::get('/situan/surat-tugas/{id}/cetak-surat', [SituanSuratTugasController::class, 'cetakSuratTugas'])->name('situan.surat-tugas.cetak-surat');
+        Route::get('/situan/surat-tugas/{id}/cetak-sppd/{sppdId?}', [SituanSuratTugasController::class, 'cetakSppd'])->name('situan.surat-tugas.cetak-sppd');
+        Route::get('/situan/surat-tugas/{id}/cetak-paket', [SituanSuratTugasController::class, 'cetakPaket'])->name('situan.surat-tugas.cetak-paket');
 
         // Loket Pelayanan Mandiri Siswa
         Route::get('/situan/pelayanan', [SituanPelayananSuratController::class, 'index'])->name('situan.pelayanan.index');

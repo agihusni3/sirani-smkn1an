@@ -83,6 +83,11 @@ class SuratKeluar extends Model
         return $this->hasOne(KasusDisiplin::class, 'surat_keluar_id');
     }
 
+    public function suratTugas()
+    {
+        return $this->hasOne(SuratTugas::class, 'surat_keluar_id');
+    }
+
     /**
      * Konversi bulan angka ke Romawi untuk nomor surat dinas.
      */

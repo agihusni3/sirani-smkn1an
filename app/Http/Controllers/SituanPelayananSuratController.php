@@ -195,6 +195,13 @@ class SituanPelayananSuratController extends Controller
             $suratKeluar = SuratKeluar::with(['creator', 'pelayanans.siswa'])
                 ->where('kode_verifikasi_qr', $hash)
                 ->first();
+
+            if (!$suratKeluar) {
+                $suratTugas = \App\Models\SuratTugas::where('kode_verifikasi_qr', $hash)->first();
+                if ($suratTugas && $suratTugas->surat_keluar_id) {
+                    $suratKeluar = SuratKeluar::with(['creator', 'pelayanans.siswa'])->find($suratTugas->surat_keluar_id);
+                }
+            }
         }
 
         $sekolah = PengaturanSekolah::getAktif();

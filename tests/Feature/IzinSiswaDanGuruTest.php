@@ -68,4 +68,48 @@ class IzinSiswaDanGuruTest extends TestCase
         $delGuru->assertRedirect();
         $this->assertDatabaseMissing('izin_gurus', ['id' => $izinGuru->id]);
     }
+
+    public function test_tabel_izin_siswa_bersifat_temporer_harian_dan_presensi_tetap_tersimpan(): void
+    {
+        $today = now()->toDateString();
+        $yesterday = now()->subDay()->toDateString();
+
+        $siswaKemarin = Siswa::create([
+            'nis'    => '3002',
+            'nisn'   => '0098765432',
+            'nama'   => 'Siswa Hari Kemarin',
+            'status' => 'aktif',
+        ]);
+
+        // Izin kemarin
+        IzinSiswa::create([
+            'siswa_id'   => $siswaKemarin->id,
+            'jenis'      => 'sakit',
+            'tanggal'    => $yesterday,
+            'keterangan' => 'Sakit kemarin',
+        ]);
+
+        // Izin hari ini
+        IzinSiswa::create([
+            'siswa_id'   => $this->siswa->id,
+            'jenis'      => 'izin',
+            'tanggal'    => $today,
+            'keterangan' => 'Izin hari ini',
+        ]);
+
+        // Akses default (hari ini)
+        $response = $this->actingAs($this->admin)->get('/izin-siswa');
+        $response->assertOk();
+        $response->assertSee('Izin hari ini');
+        $response->assertDontSee('Sakit kemarin'); // Keterangan izin kemarin tidak muncul di tabel hari ini
+
+        // Akses filter kemarin
+        $responseKemarin = $this->actingAs($this->admin)->get('/izin-siswa?tanggal=' . $yesterday);
+        $responseKemarin->assertOk();
+        $responseKemarin->assertSee('Sakit kemarin');
+        $responseKemarin->assertDontSee('Izin hari ini');
+
+        // Pastikan di database kedua data tetap utuh tidak terhapus
+        $this->assertDatabaseCount('izin_siswas', 2);
+    }
 }
