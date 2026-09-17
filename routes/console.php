@@ -13,6 +13,9 @@ Artisan::command('inspire', function () {
 // 07:30 — Flagging belum hadir: kirim WA pengingat ke orang tua siswa & guru yang belum scan
 Schedule::command('piket:flagging-belum-hadir')->dailyAt('07:30')->weekdays();
 
+// 08:00 — Pengingat Pembinaan Disiplin: kirim WA pengingat harian ke pejabat BK/Wali Kelas kasus belum ditangani
+Schedule::command('disiplin:ingatkan-pembinaan')->dailyAt('08:00')->weekdays();
+
 // 09:00 — Kunci Status Alpha: siswa/guru yang masih belum hadir & tanpa keterangan → Alpha
 Schedule::command('piket:kunci-alpha')->dailyAt('09:00')->weekdays();
 

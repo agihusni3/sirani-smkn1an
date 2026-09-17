@@ -39,7 +39,7 @@ class FlaggingBelumHadirCommand extends Command
 
         $countSiswaSent = 0;
         foreach ($siswaBelumHadir as $siswa) {
-            $noHp = $siswa->no_hp_siswa ?: $siswa->no_hp_ortu;
+            $noHp = $siswa->no_hp_ortu ?: $siswa->no_hp_siswa;
             if (empty($noHp)) continue;
 
             $pesan = "Yth. Bapak/Ibu Wali dari ananda *{$siswa->nama}*,\n\n"
