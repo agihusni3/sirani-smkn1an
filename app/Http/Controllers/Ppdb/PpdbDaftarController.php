@@ -62,8 +62,9 @@ class PpdbDaftarController extends Controller
             'pekerjaan_ibu' => 'nullable|string|max:100',
             'pendidikan_ibu' => 'nullable|string|max:50',
             'no_hp_ibu' => 'nullable|string|max:25',
+            'nama_wali' => 'nullable|string|max:150',
             'no_hp_siswa' => 'required|string|max:20',
-            'no_hp_ortu' => 'nullable|string|max:20',
+            'no_hp_ortu' => 'required|string|max:20',
             'jurusan_pilihan_1_id' => 'required|exists:jurusans,id',
             'jurusan_pilihan_2_id' => 'nullable|different:jurusan_pilihan_1_id|exists:jurusans,id',
             'jalur_pendaftaran' => 'required|in:reguler,prestasi,afirmasi',
@@ -79,6 +80,7 @@ class PpdbDaftarController extends Controller
             'nisn.unique' => 'NISN ini sudah terdaftar dalam sistem PPDB. Silakan cek status pendaftaran Anda.',
             'nama_lengkap.required' => 'Nama lengkap calon siswa wajib diisi.',
             'nama_ibu.required' => 'Nama lengkap Ibu kandung wajib diisi.',
+            'no_hp_ortu.required' => 'Nomor WhatsApp Orang Tua / Wali wajib diisi.',
             'jurusan_pilihan_1_id.required' => 'Pilihan keahlian utama wajib dipilih.',
             'no_hp_siswa.required' => 'Nomor WhatsApp Siswa wajib diisi untuk menerima pengumuman hasil kelulusan.',
         ]);
@@ -106,8 +108,9 @@ class PpdbDaftarController extends Controller
         $p->pekerjaan_ibu = $validated['pekerjaan_ibu'] ?? null;
         $p->pendidikan_ibu = $validated['pendidikan_ibu'] ?? null;
         $p->no_hp_ibu = $validated['no_hp_ibu'] ?? null;
+        $p->nama_wali = $validated['nama_wali'] ?? null;
         $p->pekerjaan_ortu = ($validated['pekerjaan_ayah'] ?? null) ?: (($validated['pekerjaan_ibu'] ?? null) ?: null);
-        $p->no_hp_ortu = ($validated['no_hp_ortu'] ?? null) ?: (($validated['no_hp_ayah'] ?? null) ?: (($validated['no_hp_ibu'] ?? null) ?: ($validated['no_hp_siswa'] ?? null)));
+        $p->no_hp_ortu = $validated['no_hp_ortu'] ?? (($validated['no_hp_ayah'] ?? null) ?: (($validated['no_hp_ibu'] ?? null) ?: ($validated['no_hp_siswa'] ?? null)));
         $p->jurusan_id_1 = $validated['jurusan_pilihan_1_id'];
         $p->jurusan_id_2 = $validated['jurusan_pilihan_2_id'] ?? null;
         $p->jalur_pendaftaran = $validated['jalur_pendaftaran'];

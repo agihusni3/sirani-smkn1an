@@ -218,12 +218,14 @@
                 </div>
 
                 {{-- DUA KARTU: DATA AYAH & DATA IBU --}}
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px;">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; margin-bottom: 20px;">
                     
                     {{-- KARTU DATA AYAH KANDUNG --}}
                     <div style="background: var(--bg-surface-alt, #f8fafc); border: 1px solid var(--border-main); border-radius: var(--radius-sm); padding: 18px;">
                         <div style="margin-bottom: 14px; padding-bottom: 10px; border-bottom: 1px solid var(--border-main);">
-                            <h4 style="font-size: 0.95rem; font-weight: 800; color: var(--text-dark); margin: 0;">Data Ayah Kandung</h4>
+                            <h4 style="font-size: 0.95rem; font-weight: 800; color: #2563eb; margin: 0; display: flex; align-items: center; gap: 8px;">
+                                <i class="bi bi-person-badge"></i> Data Ayah Kandung
+                            </h4>
                         </div>
 
                         <div style="display: flex; flex-direction: column; gap: 12px;">
@@ -266,20 +268,15 @@
                                     <option value="Tidak Sekolah" {{ old('pendidikan_ayah') == 'Tidak Sekolah' ? 'selected' : '' }}>Tidak Sekolah</option>
                                 </select>
                             </div>
-
-                            <div>
-                                <label style="display: block; font-size: 0.82rem; font-weight: 700; color: var(--text-dark); margin-bottom: 6px;">
-                                    Nomor WhatsApp / HP Ayah (Opsional)
-                                </label>
-                                <input type="text" name="no_hp_ayah" value="{{ old('no_hp_ayah') }}" placeholder="08xxxxxxxxxx" style="width: 100%; padding: 10px 12px; font-size: 0.88rem;">
-                            </div>
                         </div>
                     </div>
 
                     {{-- KARTU DATA IBU KANDUNG --}}
                     <div style="background: var(--bg-surface-alt, #f8fafc); border: 1px solid var(--border-main); border-radius: var(--radius-sm); padding: 18px;">
                         <div style="margin-bottom: 14px; padding-bottom: 10px; border-bottom: 1px solid var(--border-main);">
-                            <h4 style="font-size: 0.95rem; font-weight: 800; color: var(--text-dark); margin: 0;">Data Ibu Kandung</h4>
+                            <h4 style="font-size: 0.95rem; font-weight: 800; color: #db2777; margin: 0; display: flex; align-items: center; gap: 8px;">
+                                <i class="bi bi-person-heart"></i> Data Ibu Kandung
+                            </h4>
                         </div>
 
                         <div style="display: flex; flex-direction: column; gap: 12px;">
@@ -322,14 +319,38 @@
                                     <option value="Tidak Sekolah" {{ old('pendidikan_ibu') == 'Tidak Sekolah' ? 'selected' : '' }}>Tidak Sekolah</option>
                                 </select>
                             </div>
-
-                            <div>
-                                <label style="display: block; font-size: 0.82rem; font-weight: 700; color: var(--text-dark); margin-bottom: 6px;">
-                                    Nomor WhatsApp / HP Ibu (Opsional)
-                                </label>
-                                <input type="text" name="no_hp_ibu" value="{{ old('no_hp_ibu') }}" placeholder="08xxxxxxxxxx" style="width: 100%; padding: 10px 12px; font-size: 0.88rem;">
-                            </div>
                         </div>
+                    </div>
+                </div>
+
+                {{-- KONTAK WHATSAPP ORANG TUA --}}
+                <div style="background: #f8fafc; border: 1px solid var(--border-main); border-radius: var(--radius-sm); padding: 16px; margin-bottom: 16px;">
+                    <div>
+                        <label style="display: block; font-size: 0.85rem; font-weight: 800; color: var(--text-dark); margin-bottom: 6px;">
+                            <i class="bi bi-whatsapp" style="color:#16a34a; margin-right:4px;"></i> Nomor WhatsApp Orang Tua / Wali <span style="color: #ef4444;">*</span>
+                        </label>
+                        <input type="text" name="no_hp_ortu" value="{{ old('no_hp_ortu') }}" required placeholder="08xxxxxxxxxx (Nomor aktif untuk informasi &amp; verifikasi sekolah)" style="width: 100%; padding: 11px 14px; font-size: 0.9rem; font-weight: 700;">
+                        <p style="font-size: 0.78rem; color: var(--text-muted); margin: 6px 0 0 0;">
+                            Nomor WhatsApp utama orang tua/wali yang digunakan sekolah untuk konfirmasi dan pengumuman resmi.
+                        </p>
+                    </div>
+                </div>
+
+                {{-- OPSI KHUSUS TINGGAL BERSAMA WALI --}}
+                <div style="border: 1px dashed var(--border-main); border-radius: var(--radius-sm); padding: 14px 16px; background: #ffffff;">
+                    <label style="display: flex; align-items: center; gap: 8px; margin: 0; cursor: pointer; font-size: 0.85rem; font-weight: 700; color: var(--text-dark);">
+                        <input type="checkbox" id="check_wali_ppdb" onchange="document.getElementById('box_wali_ppdb').style.display = this.checked ? 'block' : 'none'" {{ old('nama_wali') ? 'checked' : '' }} style="width: 16px; height: 16px; accent-color: var(--brand-blue); cursor: pointer;">
+                        <span>Calon siswa tinggal bersama Wali (Bukan tinggal bersama Orang Tua Kandung)</span>
+                    </label>
+
+                    <div id="box_wali_ppdb" style="display: {{ old('nama_wali') ? 'block' : 'none' }}; margin-top: 12px; padding-top: 12px; border-top: 1px solid #f1f5f9;">
+                        <label style="display: block; font-size: 0.82rem; font-weight: 700; color: var(--text-dark); margin-bottom: 6px;">
+                            Nama Lengkap Wali
+                        </label>
+                        <input type="text" name="nama_wali" value="{{ old('nama_wali') }}" placeholder="Contoh: Paman, Kakek, Nenek, Kakak Kandung..." style="width: 100%; padding: 10px 12px; font-size: 0.88rem;">
+                        <p style="font-size: 0.75rem; color: var(--text-muted); margin: 4px 0 0 0;">
+                            * Nomor kontak wali akan menggunakan Nomor WhatsApp Orang Tua di atas.
+                        </p>
                     </div>
                 </div>
             </div>

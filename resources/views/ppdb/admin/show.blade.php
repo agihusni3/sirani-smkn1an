@@ -135,19 +135,6 @@
                   <td style="padding:4px 0; color:var(--text-3);">Pendidikan</td>
                   <td style="padding:4px 0;">{{ $pendaftar->pendidikan_ayah ?: '-' }}</td>
                 </tr>
-                <tr>
-                  <td style="padding:4px 0; color:var(--text-3);">No HP / WhatsApp</td>
-                  <td style="padding:4px 0;">
-                    @if($pendaftar->no_hp_ayah)
-                      <strong>{{ $pendaftar->no_hp_ayah }}</strong>
-                      <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $pendaftar->no_hp_ayah) }}" target="_blank" style="margin-left:6px; color:#16a34a; font-size:11px; text-decoration:none;">
-                        <i class="bi bi-whatsapp"></i> Chat
-                      </a>
-                    @else
-                      -
-                    @endif
-                  </td>
-                </tr>
               </table>
             </div>
 
@@ -169,37 +156,47 @@
                   <td style="padding:4px 0; color:var(--text-3);">Pendidikan</td>
                   <td style="padding:4px 0;">{{ $pendaftar->pendidikan_ibu ?: '-' }}</td>
                 </tr>
-                <tr>
-                  <td style="padding:4px 0; color:var(--text-3);">No HP / WhatsApp</td>
-                  <td style="padding:4px 0;">
-                    @if($pendaftar->no_hp_ibu)
-                      <strong>{{ $pendaftar->no_hp_ibu }}</strong>
-                      <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $pendaftar->no_hp_ibu) }}" target="_blank" style="margin-left:6px; color:#16a34a; font-size:11px; text-decoration:none;">
-                        <i class="bi bi-whatsapp"></i> Chat
-                      </a>
-                    @else
-                      -
-                    @endif
-                  </td>
-                </tr>
               </table>
             </div>
           </div>
 
-          {{-- Kontak Notifikasi Siswa --}}
-          <div style="background:rgba(37, 99, 235, 0.06); border:1px solid rgba(37, 99, 235, 0.2); border-radius:6px; padding:10px 14px; display:flex; justify-content:space-between; align-items:center; font-size:12px;">
-            <div>
-              <span style="color:var(--text-3);">No. WhatsApp Siswa (Tujuan Notifikasi Seleksi / Kelulusan):</span>
-              <strong style="margin-left:6px; color:#2563eb;">{{ $pendaftar->no_hp_siswa ?: ($pendaftar->no_hp_ortu ?: '-') }}</strong>
+          @if($pendaftar->nama_wali)
+            <div style="background:#fffbeb; border:1px solid #fde68a; border-radius:6px; padding:8px 12px; margin-bottom:14px; font-size:12px; color:#92400e; display:flex; align-items:center; gap:8px;">
+              <i class="bi bi-info-circle-fill text-warning"></i>
+              <span>Tinggal Bersama Wali: <strong>{{ $pendaftar->nama_wali }}</strong></span>
             </div>
-            @php
-              $targetWa = $pendaftar->no_hp_siswa ?: $pendaftar->no_hp_ortu;
-            @endphp
-            @if($targetWa)
-              <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $targetWa) }}" target="_blank" class="btn btn-sm" style="background:#16a34a; color:#fff; font-size:11px; padding:4px 10px; border-radius:4px; text-decoration:none;">
-                <i class="bi bi-whatsapp"></i> Chat WhatsApp Siswa
-              </a>
-            @endif
+          @endif
+
+          {{-- Kontak Komunikasi WhatsApp --}}
+          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:10px;">
+            {{-- WhatsApp Ortu --}}
+            <div style="background:rgba(22, 163, 74, 0.06); border:1px solid rgba(22, 163, 74, 0.2); border-radius:6px; padding:10px 14px; display:flex; justify-content:space-between; align-items:center; font-size:12px;">
+              <div>
+                <span style="color:var(--text-3); display:block; font-size:11px;">No. WhatsApp Orang Tua / Wali:</span>
+                <strong style="color:#16a34a; font-size:13px;">{{ $pendaftar->no_hp_ortu ?: ($pendaftar->no_hp_ayah ?: ($pendaftar->no_hp_ibu ?: '-')) }}</strong>
+              </div>
+              @php
+                $waOrtu = $pendaftar->no_hp_ortu ?: ($pendaftar->no_hp_ayah ?: $pendaftar->no_hp_ibu);
+              @endphp
+              @if($waOrtu)
+                <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $waOrtu) }}" target="_blank" class="btn btn-sm" style="background:#16a34a; color:#fff; font-size:11px; padding:4px 10px; border-radius:4px; text-decoration:none;">
+                  <i class="bi bi-whatsapp"></i> Hubungi Ortu
+                </a>
+              @endif
+            </div>
+
+            {{-- WhatsApp Siswa --}}
+            <div style="background:rgba(37, 99, 235, 0.06); border:1px solid rgba(37, 99, 235, 0.2); border-radius:6px; padding:10px 14px; display:flex; justify-content:space-between; align-items:center; font-size:12px;">
+              <div>
+                <span style="color:var(--text-3); display:block; font-size:11px;">No. WhatsApp Siswa:</span>
+                <strong style="color:#2563eb; font-size:13px;">{{ $pendaftar->no_hp_siswa ?: '-' }}</strong>
+              </div>
+              @if($pendaftar->no_hp_siswa)
+                <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $pendaftar->no_hp_siswa) }}" target="_blank" class="btn btn-sm" style="background:#2563eb; color:#fff; font-size:11px; padding:4px 10px; border-radius:4px; text-decoration:none;">
+                  <i class="bi bi-whatsapp"></i> Hubungi Siswa
+                </a>
+              @endif
+            </div>
           </div>
         </div>
 
