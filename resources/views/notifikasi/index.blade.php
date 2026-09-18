@@ -404,40 +404,63 @@
 
 {{-- MODAL PRATINJAU PESAN WHATSAPP --}}
 <div class="modal-overlay" id="modalPreview">
-  <div class="modal-card" style="max-width:520px; padding:22px; background:#111B21; border:1px solid #2A3942; border-radius:14px; box-shadow:0 16px 40px rgba(0,0,0,0.7);">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; border-bottom:1px solid #2A3942; padding-bottom:12px;">
-      <div style="display:flex; align-items:center; gap:10px;">
-        <div style="width:38px; height:38px; border-radius:50%; background:#25D366; display:flex; align-items:center; justify-content:center; color:#FFFFFF; font-size:20px; box-shadow:0 2px 10px rgba(37,211,102,0.3);"> 
+  <div class="modal-card" style="max-width:540px; width:100%; padding:22px 24px; border-radius:16px; background:var(--bg-2); border:1px solid var(--border-2); box-shadow:0 25px 60px -15px rgba(0,0,0,0.3);">
+    {{-- Header Modal --}}
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; padding-bottom:14px; border-bottom:1px solid var(--border);">
+      <div style="display:flex; align-items:center; gap:12px; min-width:0;">
+        <div style="width:42px; height:42px; border-radius:12px; background:linear-gradient(135deg, #25D366 0%, #128C7E 100%); display:flex; align-items:center; justify-content:center; color:#FFFFFF; font-size:22px; box-shadow:0 4px 12px rgba(37,211,102,0.35); flex-shrink:0;"> 
           <i class="bi bi-whatsapp"></i>
         </div>
-        <div>
-          <div style="font-weight:800; font-size:14.5px; color:#E9EDEF;" id="modalPreviewNama">-</div>
-          <div style="font-size:11px; color:#8696A0; font-weight:700; letter-spacing:0.5px;" id="modalPreviewTujuan">-</div>
+        <div style="min-width:0;">
+          <div style="font-weight:900; font-size:16px; color:var(--text); line-height:1.2; letter-spacing:-0.2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" id="modalPreviewNama">-</div>
+          <div style="display:flex; align-items:center; gap:6px; margin-top:3px; flex-wrap:wrap;">
+            <span id="modalPreviewTujuan" style="font-size:10.5px; font-weight:800; padding:2px 8px; border-radius:6px; background:rgba(0,0,0,0.06); color:var(--text); text-transform:uppercase; letter-spacing:0.5px;">-</span>
+            <span style="font-size:11px; color:var(--text-3); font-weight:500;">• Pratinjau Pesan</span>
+          </div>
         </div>
       </div>
-      <button type="button" class="btn btn-sm" onclick="closeModal('modalPreview')" style="background:transparent; color:#8696A0; border:none; font-size:20px; cursor:pointer; padding:4px;"><i class="bi bi-x-lg"></i></button>
+      <button type="button" class="btn btn-sm btn-outline" onclick="closeModal('modalPreview')" style="width:32px; height:32px; border-radius:8px; border:1px solid var(--border-2); background:var(--bg-2); color:var(--text-2); display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:15px; padding:0; transition:all .15s ease;" title="Tutup">
+        <i class="bi bi-x-lg"></i>
+      </button>
     </div>
 
     {{-- Field Input No HP Tujuan jika belum terisi / ingin diubah --}}
-    <div style="margin-bottom:12px; background:#202C33; padding:8px 12px; border-radius:8px; border:1px solid #3B4A54; display:flex; align-items:center; gap:8px;">
-      <span style="font-size:12px; color:#8696A0; font-weight:700; white-space:nowrap;"><i class="bi bi-telephone"></i> No. WA:</span>
-      <input type="text" id="modalPreviewInputPhone" style="background:transparent !important; border:none !important; color:#25D366 !important; font-size:14px !important; font-weight:800 !important; font-family:monospace !important; width:100% !important; outline:none !important; height:28px !important; line-height:28px !important; padding:0 !important; box-shadow:none !important;" placeholder="08xxxxxxxxxx" oninput="updateModalDirectWa()" />
-      <span id="phoneNoticeBadge" style="font-size:10px; padding:2px 8px; border-radius:4px; font-weight:800; display:none; white-space:nowrap;"></span>
+    <div style="margin-bottom:14px; background:var(--surface); padding:10px 14px; border-radius:10px; border:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; gap:10px;">
+      <div style="display:flex; align-items:center; gap:10px; flex:1; min-width:0;">
+        <div style="width:30px; height:30px; border-radius:8px; background:rgba(37,211,102,0.12); color:#16A34A; display:flex; align-items:center; justify-content:center; font-size:14px; flex-shrink:0;">
+          <i class="bi bi-telephone-fill"></i>
+        </div>
+        <div style="flex:1; min-width:0;">
+          <div style="font-size:10px; font-weight:800; color:var(--text-3); text-transform:uppercase; letter-spacing:0.5px;">Nomor WhatsApp Tujuan</div>
+          <input type="text" id="modalPreviewInputPhone" style="background:transparent !important; border:none !important; color:#16A34A !important; font-size:15px !important; font-weight:800 !important; font-family:var(--font-mono, monospace) !important; width:100% !important; outline:none !important; height:24px !important; line-height:24px !important; padding:0 !important; box-shadow:none !important; margin:0 !important;" placeholder="08xxxxxxxxxx" oninput="updateModalDirectWa()" />
+        </div>
+      </div>
+      <span id="phoneNoticeBadge" style="font-size:10.5px; padding:3px 8px; border-radius:6px; font-weight:800; display:none; white-space:nowrap;"></span>
     </div>
 
     <div style="margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
-      <span style="font-size:11.5px; color:#8696A0; font-weight:600;"><i class="bi bi-pencil-square"></i> Isi Pesan WhatsApp (Dapat Diedit):</span>
-      <span style="font-size:10.5px; color:#8696A0;" id="charCountPreview">0 karakter</span>
+      <label for="modalPreviewPesan" style="font-size:12px; color:var(--text); font-weight:800; display:inline-flex; align-items:center; gap:6px; margin:0;">
+        <i class="bi bi-pencil-square" style="color:#25D366; font-size:13px;"></i> Isi Pesan WhatsApp
+        <span style="font-size:11px; color:var(--text-3); font-weight:500;">(Dapat Diedit)</span>
+      </label>
+      <span style="font-size:11px; color:var(--text-3); font-family:var(--font-mono); font-weight:600;" id="charCountPreview">0 karakter</span>
     </div>
 
-    <textarea id="modalPreviewPesan" rows="9" style="width:100% !important; background:#0B141A !important; color:#E9EDEF !important; border:1px solid #2A3942 !important; border-radius:10px !important; padding:12px !important; font-size:13px !important; line-height:1.6 !important; font-family:system-ui, -apple-system, sans-serif !important; resize:vertical !important; outline:none !important;" placeholder="Tulis isi pesan..."></textarea>
+    <div style="position:relative; background:var(--surface); border:1.5px solid var(--border); border-radius:12px; padding:12px 14px; transition:border-color .15s ease;">
+      <textarea id="modalPreviewPesan" rows="9" style="width:100% !important; background:transparent !important; color:var(--text) !important; border:none !important; padding:0 !important; font-size:13px !important; line-height:1.6 !important; font-family:system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important; resize:vertical !important; outline:none !important; box-shadow:none !important;" placeholder="Tulis isi pesan..."></textarea>
+    </div>
+    <div style="font-size:11px; color:var(--text-3); margin-top:6px; display:flex; align-items:center; gap:5px;">
+      <i class="bi bi-info-circle"></i> Pesan dapat langsung diedit di atas sebelum dikirimkan ke orang tua/wali siswa.
+    </div>
 
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-top:16px; border-top:1px solid #2A3942; padding-top:14px;">
-      <button type="button" class="btn btn-outline" onclick="closeModal('modalPreview')" style="color:#8696A0; border-color:#2A3942; background:transparent; font-size:12.5px;">Tutup</button>
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-top:16px; border-top:1px solid var(--border); padding-top:14px; flex-wrap:wrap; gap:10px;">
+      <button type="button" class="btn btn-outline" onclick="closeModal('modalPreview')" style="height:38px; padding:0 16px; font-size:12.5px; font-weight:700; color:var(--text-2); border:1px solid var(--border-2); background:var(--bg-2); border-radius:8px; cursor:pointer;">
+        Tutup
+      </button>
       
       <div style="display:flex; gap:8px;" id="modalActionButtons">
-        <a href="#" target="_blank" class="btn" id="btnModalDirectWa" style="background:#25D366; color:#FFFFFF; border:none; font-weight:800; text-decoration:none; padding:8px 18px; border-radius:6px; display:inline-flex; align-items:center; gap:7px; font-size:13px; box-shadow:0 2px 10px rgba(37,211,102,0.35);">
-          <i class="bi bi-whatsapp"></i> Chat WhatsApp (Kirim Pesan)
+        <a href="#" target="_blank" class="btn" id="btnModalDirectWa" style="height:38px; background:#25D366; color:#FFFFFF; border:none; font-weight:800; text-decoration:none; padding:0 18px; border-radius:8px; display:inline-flex; align-items:center; gap:8px; font-size:13px; box-shadow:0 3px 12px rgba(37,211,102,0.35); transition:all .15s ease;">
+          <i class="bi bi-whatsapp" style="font-size:16px;"></i> Chat WhatsApp (Kirim Pesan)
         </a>
       </div>
     </div>
@@ -762,8 +785,34 @@
 
   function previewPesanModal(notif) {
     activeNotif = notif;
-    document.getElementById('modalPreviewNama').innerText = notif.nama_ortu || (notif.siswa ? notif.siswa.nama : 'Penerima');
-    document.getElementById('modalPreviewTujuan').innerText = (notif.kategori || '').replace(/_/g, ' ').toUpperCase();
+    const recipientName = notif.nama_ortu || (notif.siswa ? ('Wali dari ' + notif.siswa.nama) : 'Penerima');
+    document.getElementById('modalPreviewNama').innerText = recipientName;
+    
+    const katEl = document.getElementById('modalPreviewTujuan');
+    const kat = (notif.kategori || '').toLowerCase();
+    katEl.innerText = (notif.kategori || '').replace(/_/g, ' ').toUpperCase();
+
+    if (kat === 'terlambat') {
+      katEl.style.background = 'rgba(245, 158, 11, 0.12)';
+      katEl.style.color = '#D97706';
+      katEl.style.border = '1px solid rgba(245, 158, 11, 0.3)';
+    } else if (kat === 'alpha' || kat === 'bolos') {
+      katEl.style.background = 'rgba(239, 68, 68, 0.12)';
+      katEl.style.color = '#DC2626';
+      katEl.style.border = '1px solid rgba(239, 68, 68, 0.3)';
+    } else if (kat === 'sakit') {
+      katEl.style.background = 'rgba(59, 130, 246, 0.12)';
+      katEl.style.color = '#2563EB';
+      katEl.style.border = '1px solid rgba(59, 130, 246, 0.3)';
+    } else if (kat === 'izin') {
+      katEl.style.background = 'rgba(99, 102, 241, 0.12)';
+      katEl.style.color = '#4F46E5';
+      katEl.style.border = '1px solid rgba(99, 102, 241, 0.3)';
+    } else {
+      katEl.style.background = 'rgba(16, 185, 129, 0.12)';
+      katEl.style.color = '#059669';
+      katEl.style.border = '1px solid rgba(16, 185, 129, 0.3)';
+    }
     
     const textarea = document.getElementById('modalPreviewPesan');
     let pesanAwal = notif.pesan || '';
