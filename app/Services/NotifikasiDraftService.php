@@ -63,20 +63,20 @@ class NotifikasiDraftService
         $rincianList = [];
         foreach ($riwayatPelanggaran as $p) {
             $tglFormat = Carbon::parse($p->tanggal)->translatedFormat('d/m/Y (l)');
-            $statusStr = $p->status === 'alpha' ? '❌ Alpha (Tanpa Keterangan)' : '🚫 Bolos (Pulang Sebelum Waktu)';
+            $statusStr = $p->status === 'alpha' ? 'Alpha (Tanpa Keterangan)' : 'Bolos (Pulang Sebelum Waktu)';
             $rincianList[] = "• {$tglFormat} : {$statusStr}";
         }
         $rincianPelanggaran = !empty($rincianList) ? implode("\n", $rincianList) : "• Tanggal {$tanggal} : Pelanggaran tercatat sistem";
 
         // Tingkat urgensi & rekomendasi tindakan dinamis
         if ($totalPelanggaran >= 5) {
-            $tingkatUrgensi = '🔴 KRITIS (SP-2 / Peringatan Keras Kesiswaan)';
+            $tingkatUrgensi = 'KRITIS (SP-2 / Peringatan Keras Kesiswaan)';
             $rekomendasiTindakan = 'Wajib Terbitkan Surat Panggilan Orang Tua Tahap 2 & Konseling Khusus BK';
         } elseif ($totalPelanggaran >= 3) {
-            $tingkatUrgensi = '⚠️ WASPADA (SP-1 / Panggilan Orang Tua Pertama)';
+            $tingkatUrgensi = 'WASPADA (SP-1 / Panggilan Orang Tua Pertama)';
             $rekomendasiTindakan = 'Terbitkan Surat Panggilan Orang Tua & Pembinaan Wali Kelas';
         } else {
-            $tingkatUrgensi = '🟡 PERINGATAN AWAL';
+            $tingkatUrgensi = 'PERINGATAN AWAL';
             $rekomendasiTindakan = 'Berikan teguran lisan & pantau kedisiplinan harian';
         }
 
@@ -88,7 +88,7 @@ class NotifikasiDraftService
             'izin'           => $setting->template_izin,
             'sakit'          => $setting->template_sakit,
             'bolos'          => $setting->template_bolos,
-            'panggilan_ortu' => "🚨 *SURAT PANGGILAN ORANG TUA / WALI SISWA*\n*SMK NEGERI 1 AIR NANINGAN*\n\nYth. Bapak/Ibu Orang Tua / Wali dari *{nama_siswa}* ({kelas}),\n\nBerdasarkan catatan evaluasi sistem presensi, ananda telah mencapai *akumulasi {total_pelanggaran}x ketidakhadiran tanpa keterangan (Alpha/Bolos)*:\n\n📋 *Rincian Catatan Ketidakhadiran:*\n{rincian_pelanggaran}\n\nSesuai tata tertib kedisiplinan sekolah, kami mengharapkan kehadiran Bapak/Ibu ke sekolah guna koordinasi dan bimbingan bersama Wali Kelas (*{nama_wali_kelas}*) dan Guru BK:\n\n• Agenda : Pembinaan Kedisiplinan & Presensi Siswa\n• Tempat : Ruang Bimbingan & Konseling (BK) SMKN 1 Air Naningan\n• Rekap Presensi : {link_portal}\n\nMohon konfirmasi kehadiran. Terima kasih.\n_Wali Kelas & Kesiswaan SMKN 1 Air Naningan_",
+            'panggilan_ortu' => "*SURAT PANGGILAN ORANG TUA / WALI SISWA*\n*SMK NEGERI 1 AIR NANINGAN*\n\nYth. Bapak/Ibu Orang Tua / Wali dari *{nama_siswa}* ({kelas}),\n\nBerdasarkan catatan evaluasi sistem presensi, ananda telah mencapai *akumulasi {total_pelanggaran}x ketidakhadiran tanpa keterangan (Alpha/Bolos)*:\n\n📋 *Rincian Catatan Ketidakhadiran:*\n{rincian_pelanggaran}\n\nSesuai tata tertib kedisiplinan sekolah, kami mengharapkan kehadiran Bapak/Ibu ke sekolah guna koordinasi dan bimbingan bersama Wali Kelas (*{nama_wali_kelas}*) dan Guru BK:\n\n• Agenda : Pembinaan Kedisiplinan & Presensi Siswa\n• Tempat : Ruang Bimbingan & Konseling (BK) SMKN 1 Air Naningan\n• Rekap Presensi : {link_portal}\n\nMohon konfirmasi kehadiran. Terima kasih.\n_Wali Kelas & Kesiswaan SMKN 1 Air Naningan_",
             default          => "Pemberitahuan kehadiran siswa {nama_siswa} ({kelas}): Status {kategori} pada {tanggal}.",
         };
 
@@ -215,16 +215,16 @@ class NotifikasiDraftService
         $rincianList = [];
         foreach ($riwayat as $p) {
             $tglFormat   = Carbon::parse($p->tanggal)->translatedFormat('d/m/Y (l)');
-            $statusStr   = $p->status === 'alpha' ? '❌ Alpha' : '🚫 Bolos';
+            $statusStr   = $p->status === 'alpha' ? 'Alpha' : 'Bolos';
             $rincianList[] = "• {$tglFormat} : {$statusStr}";
         }
         $rincianPelanggaran = !empty($rincianList)
             ? implode("\n", $rincianList)
-            : "• Tanggal {$tanggal} : 🚫 Bolos (Pulang Tanpa Izin)";
+            : "• Tanggal {$tanggal} : Bolos (Pulang Tanpa Izin)";
 
         // 6. Parse template bolos dari pengaturan
         $template = $setting->template_bolos
-            ?: "🚫 *PERINGATAN BOLOS — PULANG TANPA IZIN*\n*SMK NEGERI 1 AIR NANINGAN*\n\nYth. Bapak/Ibu Wali dari *{nama_siswa}*,\n\nKami informasikan ananda terdeteksi meninggalkan sekolah sebelum jam pulang resmi tanpa izin Guru Piket:\n\n• Tanggal : {tanggal}\n• Jam Evaluasi : {jam} WIB\n• Status : 🚫 *BOLOS (Pulang Tanpa Izin)*\n• Rombel : {kelas}\n• Total Pelanggaran : {total_pelanggaran}x (Alpha: {total_alpha}x, Bolos: {total_bolos}x)\n\n📋 *Riwayat 5 Pelanggaran Terakhir:*\n{rincian_pelanggaran}\n\nMohon perhatian dan konfirmasi dari Bapak/Ibu. Hubungi Wali Kelas ({nama_wali_kelas}) untuk koordinasi lebih lanjut.\n\n_SIRANI — SMKN 1 Air Naningan_";
+            ?: "*PERINGATAN BOLOS — PULANG TANPA IZIN*\n*SMK NEGERI 1 AIR NANINGAN*\n\nYth. Bapak/Ibu Wali dari *{nama_siswa}*,\n\nKami informasikan ananda terdeteksi meninggalkan sekolah sebelum jam pulang resmi tanpa izin Guru Piket:\n\n• Tanggal : {tanggal}\n• Jam Evaluasi : {jam} WIB\n• Status : 🚫 *BOLOS (Pulang Tanpa Izin)*\n• Rombel : {kelas}\n• Total Pelanggaran : {total_pelanggaran}x (Alpha: {total_alpha}x, Bolos: {total_bolos}x)\n\n📋 *Riwayat 5 Pelanggaran Terakhir:*\n{rincian_pelanggaran}\n\nMohon perhatian dan konfirmasi dari Bapak/Ibu. Hubungi Wali Kelas ({nama_wali_kelas}) untuk koordinasi lebih lanjut.\n\n_SIRANI — SMKN 1 Air Naningan_";
 
         $tglIndo = Carbon::parse($tanggal)->translatedFormat('d F Y');
         $jam     = Carbon::now()->format('H:i');
@@ -465,24 +465,24 @@ class NotifikasiDraftService
         $rincianList = [];
         foreach ($riwayatPelanggaran as $p) {
             $tglFormat = Carbon::parse($p->tanggal)->translatedFormat('d/m/Y (l)');
-            $statusStr = $p->status === 'alpha' ? '❌ Alpha' : '🚫 Bolos';
+            $statusStr = $p->status === 'alpha' ? 'Alpha' : 'Bolos';
             $rincianList[] = "• {$tglFormat} : {$statusStr}";
         }
         $rincianPelanggaran = !empty($rincianList) ? implode("\n", $rincianList) : "• Pelanggaran akumulasi kehadiran";
 
         // Tingkat urgensi & rekomendasi tindakan dinamis
         if ($totalPelanggaran >= 5) {
-            $tingkatUrgensi = '🔴 KRITIS (SP-2 / Panggilan Keras)';
+            $tingkatUrgensi = 'KRITIS (SP-2 / Panggilan Keras)';
             $rekomendasiTindakan = 'Wajib Terbitkan Surat Panggilan Orang Tua Tahap 2 & Konseling Khusus BK';
         } elseif ($totalPelanggaran >= 3) {
-            $tingkatUrgensi = '⚠️ WASPADA (SP-1 / Panggilan Pertama)';
+            $tingkatUrgensi = 'WASPADA (SP-1 / Panggilan Pertama)';
             $rekomendasiTindakan = 'Segera terbitkan Surat Panggilan Orang Tua fisik & koordinasi dengan BK';
         } else {
-            $tingkatUrgensi = '🟡 PERINGATAN AWAL';
+            $tingkatUrgensi = 'PERINGATAN AWAL';
             $rekomendasiTindakan = 'Berikan teguran lisan & motivasi kedisiplinan';
         }
 
-        $template = $setting->template_wali_kelas ?: "🚨 *PERINGATAN KESISWAAN SMKN 1 AIR NANINGAN*\nStatus: {tingkat_urgensi}\n\nYth. Bapak/Ibu Wali Kelas *{nama_wali_kelas}* ({kelas}),\n\nSiswa binaan Anda telah memenuhi ketentuan batas pelanggaran kehadiran:\n\n👤 *Data Siswa:*\n• Nama : *{nama_siswa}* (NISN: {nisn})\n• Kelas : {kelas} ({jurusan})\n• Kontak Ortu : {nama_ortu} ({no_hp_ortu})\n\n📊 *Akumulasi Pelanggaran: {total_pelanggaran}x Pelanggaran*\n• Alpha : {total_alpha}x\n• Bolos : {total_bolos}x\n• Terlambat : {total_terlambat}x\n\n📋 *Rincian Tanggal Ketidakhadiran:*\n{rincian_pelanggaran}\n\n⚠️ *Rekomendasi Tindakan:*\n{rekomendasi_tindakan}\n\n📄 Lembar Cetak Surat A4: {link_cetak_surat}\n📊 Dasbor Wali Kelas: {link_dasbor_wali}\n\n_Sistem Otomatis SIRANI SMKN 1 Air Naningan_";
+        $template = $setting->template_wali_kelas ?: "*PERINGATAN KESISWAAN SMKN 1 AIR NANINGAN*\nStatus: {tingkat_urgensi}\n\nYth. Bapak/Ibu Wali Kelas *{nama_wali_kelas}* ({kelas}),\n\nSiswa binaan Anda telah memenuhi ketentuan batas pelanggaran kehadiran:\n\n👤 *Data Siswa:*\n• Nama : *{nama_siswa}* (NISN: {nisn})\n• Kelas : {kelas} ({jurusan})\n• Kontak Ortu : {nama_ortu} ({no_hp_ortu})\n\n📊 *Akumulasi Pelanggaran: {total_pelanggaran}x Pelanggaran*\n• Alpha : {total_alpha}x\n• Bolos : {total_bolos}x\n• Terlambat : {total_terlambat}x\n\n📋 *Rincian Tanggal Ketidakhadiran:*\n{rincian_pelanggaran}\n\n⚠️ *Rekomendasi Tindakan:*\n{rekomendasi_tindakan}\n\n📄 Lembar Cetak Surat A4: {link_cetak_surat}\n📊 Dasbor Wali Kelas: {link_dasbor_wali}\n\n_Sistem Otomatis SIRANI SMKN 1 Air Naningan_";
 
         $replacements = [
             '{nama_wali_kelas}'      => $waliKelas->nama,
@@ -516,7 +516,7 @@ class NotifikasiDraftService
             'tanggal'           => Carbon::today()->toDateString(),
             'no_tujuan'         => $noHpWali,
             'nama_ortu'         => $waliKelas->nama . ' (Wali Kelas ' . $namaRombel . ')',
-            'judul'             => "🚨 Peringatan Kesiswaan Otomatis ke Wali Kelas: {$siswa->nama} ({$totalPelanggaran}x Pelanggaran)",
+            'judul'             => "Peringatan Kesiswaan Otomatis ke Wali Kelas: {$siswa->nama} ({$totalPelanggaran}x Pelanggaran)",
             'pesan'             => $pesanParsed,
             'status'            => 'terkirim',
             'dibuat_oleh'       => 'sistem_otomatis',
