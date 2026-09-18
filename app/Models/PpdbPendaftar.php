@@ -51,6 +51,9 @@ class PpdbPendaftar extends Model
         'berkas_ktp_ortu',
         'berkas_akta',
         'berkas_kip',
+        'berkas_pip',
+        'penerima_pip',
+        'nomor_pip',
         'berkas_sktm',
         'status',
         'jadwal_tes_tanggal',
@@ -316,8 +319,11 @@ class PpdbPendaftar extends Model
     public function getScanAktaAttribute() { return $this->attributes['berkas_akta'] ?? null; }
     public function setScanAktaAttribute($value) { $this->attributes['berkas_akta'] = $value; }
 
-    public function getScanKipAttribute() { return $this->attributes['berkas_kip'] ?? null; }
+    public function getScanKipAttribute() { return $this->attributes['berkas_kip'] ?? ($this->attributes['berkas_pip'] ?? null); }
     public function setScanKipAttribute($value) { $this->attributes['berkas_kip'] = $value; }
+
+    public function getScanPipAttribute() { return $this->attributes['berkas_pip'] ?? ($this->attributes['berkas_kip'] ?? null); }
+    public function setScanPipAttribute($value) { $this->attributes['berkas_pip'] = $value; }
 
     public function getScanSktmAttribute() { return $this->attributes['berkas_sktm'] ?? null; }
     public function setScanSktmAttribute($value) { $this->attributes['berkas_sktm'] = $value; }

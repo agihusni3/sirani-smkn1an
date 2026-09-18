@@ -57,6 +57,9 @@ class Siswa extends Model
         'no_hp_ortu',
         'no_hp_siswa',
         'foto',
+        'penerima_pip',
+        'nomor_pip',
+        'berkas_pip',
         'status',
     ];
 

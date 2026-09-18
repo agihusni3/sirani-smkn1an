@@ -181,6 +181,11 @@ class SiswaController extends Controller
             $fotoPath = $request->file('foto')->store('foto_siswa', 'public');
         }
 
+        $berkasPip = null;
+        if ($request->hasFile('berkas_pip')) {
+            $berkasPip = $request->file('berkas_pip')->store('berkas_pip', 'public');
+        }
+
         $namaOrtu = $request->input('nama_ortu') ?: ($request->input('nama_ayah') ?: ($request->input('nama_ibu') ?: 'Orang Tua Siswa'));
         $noHpOrtu = $request->input('no_hp_ortu') ?: ($request->input('no_hp_ayah') ?: ($request->input('no_hp_ibu') ?: null));
 
@@ -225,6 +230,9 @@ class SiswaController extends Controller
             'asal_sekolah'  => $request->input('asal_sekolah') ?: null,
             'no_hp_ortu'    => $noHpOrtu,
             'no_hp_siswa'   => $request->input('no_hp_siswa') ?: null,
+            'penerima_pip'  => $request->input('penerima_pip', 'Tidak') ?: 'Tidak',
+            'nomor_pip'     => $request->input('nomor_pip') ?: null,
+            'berkas_pip'    => $berkasPip,
             'foto'          => $fotoPath,
             'status'        => 'aktif',
         ]);
@@ -291,6 +299,14 @@ class SiswaController extends Controller
             $fotoPath = $request->file('foto')->store('foto_siswa', 'public');
         }
 
+        $berkasPip = $siswa->berkas_pip;
+        if ($request->hasFile('berkas_pip')) {
+            if ($siswa->berkas_pip && \Illuminate\Support\Facades\Storage::disk('public')->exists($siswa->berkas_pip)) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($siswa->berkas_pip);
+            }
+            $berkasPip = $request->file('berkas_pip')->store('berkas_pip', 'public');
+        }
+
         $namaOrtu = $request->input('nama_ortu') ?: ($request->input('nama_ayah') ?: ($request->input('nama_ibu') ?: ($siswa->nama_ortu ?: 'Orang Tua Siswa')));
         $desa = $request->input('desa_kelurahan') ?: $siswa->desa_kelurahan;
         $kec = $request->input('kecamatan') ?: $siswa->kecamatan;
@@ -333,6 +349,9 @@ class SiswaController extends Controller
             'asal_sekolah'  => $request->input('asal_sekolah') ?: null,
             'no_hp_ortu'    => $noHpOrtu,
             'no_hp_siswa'   => $request->input('no_hp_siswa') ?: null,
+            'penerima_pip'  => $request->input('penerima_pip', 'Tidak') ?: 'Tidak',
+            'nomor_pip'     => $request->input('nomor_pip') ?: null,
+            'berkas_pip'    => $berkasPip,
             'foto'          => $fotoPath,
             'status'        => $request->input('status'),
         ]);
@@ -427,6 +446,8 @@ class SiswaController extends Controller
                 'Nama Ortu / Wali',
                 'No HP / WhatsApp Ortu',
                 'No HP / WhatsApp Siswa',
+                'Penerima PIP (Ya/Tidak)',
+                'Nomor PIP / KIP',
                 'Asal Sekolah',
                 'Rombel Kelas',
                 'Status Keaktifan'
@@ -451,6 +472,8 @@ class SiswaController extends Controller
                     $s->nama_ortu ?? '-',
                     $s->no_hp_ortu ? '="' . $s->no_hp_ortu . '"' : '-',
                     $s->no_hp_siswa ? '="' . $s->no_hp_siswa . '"' : '-',
+                    ($s->penerima_pip && strtolower($s->penerima_pip) === 'ya') ? 'Ya' : 'Tidak',
+                    $s->nomor_pip ? '="' . $s->nomor_pip . '"' : '-',
                     $s->asal_sekolah ?? '-',
                     $sr->rombel->nama_rombel ?? '-',
                     strtoupper($s->status),
@@ -549,6 +572,8 @@ class SiswaController extends Controller
                 'Nama Orang Tua / Wali',
                 'No HP / WhatsApp Orang Tua',
                 'No HP WhatsApp Siswa',
+                'Penerima PIP (Ya/Tidak)',
+                'Nomor PIP (Opsional)',
                 'Asal Sekolah',
                 'Nama Kelas (Rombel)',
                 'Status (Aktif/PKL/Lulus)'
@@ -578,6 +603,8 @@ class SiswaController extends Controller
                 'Bpk. Subagio',
                 '081234567890',
                 '081398765432',
+                'Ya',
+                'KIP-2026-091234',
                 'SMPN 1 Air Naningan',
                 'X RPL',
                 'Aktif'
@@ -607,6 +634,8 @@ class SiswaController extends Controller
                 'Ibu Maryam',
                 '081234567894',
                 '',
+                'Tidak',
+                '',
                 'MTs Al-Falah',
                 'X APHP',
                 'Aktif'
@@ -635,6 +664,8 @@ class SiswaController extends Controller
                 'SD',
                 'Bpk. Herman',
                 '081234567895',
+                '',
+                'Tidak',
                 '',
                 'SMPN 2 Air Naningan',
                 'X TSM',
@@ -809,6 +840,12 @@ class SiswaController extends Controller
             } elseif (str_contains($cleanName, 'status') || str_contains($cleanName, 'keaktifan')) {
                 $headerMap['status'] = $colIdx;
                 $hasHeader = true;
+            } elseif ((str_contains($cleanName, 'nomor') || str_contains($cleanName, 'no')) && (str_contains($cleanName, 'pip') || str_contains($cleanName, 'kip'))) {
+                $headerMap['nomor_pip'] = $colIdx;
+                $hasHeader = true;
+            } elseif (str_contains($cleanName, 'pip') || str_contains($cleanName, 'kip')) {
+                $headerMap['penerima_pip'] = $colIdx;
+                $hasHeader = true;
             }
         }
 
@@ -937,6 +974,8 @@ class SiswaController extends Controller
                     $noHpSiswa    = isset($headerMap['no_hp_siswa']) ? ($cleanRow[$headerMap['no_hp_siswa']] ?? null) : null;
                     $namaRombel   = isset($headerMap['rombel']) ? ($cleanRow[$headerMap['rombel']] ?? null) : null;
                     $status       = isset($headerMap['status']) ? ($cleanRow[$headerMap['status']] ?? null) : null;
+                    $penerimaPip  = isset($headerMap['penerima_pip']) ? ($cleanRow[$headerMap['penerima_pip']] ?? null) : null;
+                    $nomorPip     = isset($headerMap['nomor_pip']) ? ($cleanRow[$headerMap['nomor_pip']] ?? null) : null;
                 } else {
                     // Positional default parsing
                     $nisn        = !empty($cleanRow[0]) ? $cleanRow[0] : null;
@@ -946,10 +985,18 @@ class SiswaController extends Controller
                     $noHpSiswa   = !empty($cleanRow[4]) && (str_starts_with($cleanRow[4], '08') || str_starts_with($cleanRow[4], '62') || str_starts_with($cleanRow[4], '8')) ? $cleanRow[4] : null;
                     $namaRombel  = !empty($cleanRow[4]) && !$noHpSiswa ? $cleanRow[4] : (!empty($cleanRow[5]) ? $cleanRow[5] : null);
                     $status      = !empty($cleanRow[6]) ? $cleanRow[6] : null;
+                    $penerimaPip = null;
+                    $nomorPip    = null;
                 }
 
                 if (empty($nisn) || empty($nama)) {
                     continue;
+                }
+
+                // Normalisasi Status Penerima PIP
+                if (!empty($penerimaPip)) {
+                    $pUpper = strtoupper(trim((string)$penerimaPip));
+                    $penerimaPip = ($pUpper === 'YA' || $pUpper === 'Y' || $pUpper === '1' || $pUpper === 'TRUE') ? 'Ya' : 'Tidak';
                 }
 
                 // Normalisasi Jenis Kelamin
@@ -1046,6 +1093,8 @@ class SiswaController extends Controller
                         'asal_sekolah'  => $asalSekolah ?: $existingSiswa->asal_sekolah,
                         'no_hp_ortu'    => $noHpOrtu ?: $existingSiswa->no_hp_ortu,
                         'no_hp_siswa'   => $noHpSiswa ?: $existingSiswa->no_hp_siswa,
+                        'penerima_pip'  => $penerimaPip ?: $existingSiswa->penerima_pip,
+                        'nomor_pip'     => $nomorPip ?: $existingSiswa->nomor_pip,
                         'status'        => $explicitStatus ?: $existingSiswa->status,
                     ]);
                     $siswa = $existingSiswa;
@@ -1077,6 +1126,8 @@ class SiswaController extends Controller
                         'asal_sekolah'  => $asalSekolah ?: null,
                         'no_hp_ortu'    => $noHpOrtu ?: null,
                         'no_hp_siswa'   => $noHpSiswa ?: null,
+                        'penerima_pip'  => $penerimaPip ?: 'Tidak',
+                        'nomor_pip'     => $nomorPip ?: null,
                         'status'        => $explicitStatus ?: 'aktif',
                     ]);
                 }

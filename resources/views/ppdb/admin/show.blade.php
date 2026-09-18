@@ -113,6 +113,21 @@
               <td style="padding:6px 0;"><span class="badge" style="background:#e0e7ff; color:#3730a3; padding:3px 8px; border-radius:4px;">{{ $pendaftar->organisasi_minat ?: '-' }}</span></td>
             </tr>
             <tr>
+              <td style="padding:6px 0; color:var(--text-3);">Penerima Bantuan PIP</td>
+              <td style="padding:6px 0;">
+                @if(strtolower((string)$pendaftar->penerima_pip) === 'ya')
+                  <span class="badge" style="background:#dcfce7; color:#15803d; font-weight:800; padding:3px 8px; border-radius:4px; border:1px solid #86efac; display:inline-flex; align-items:center; gap:4px;">
+                    <i class="bi bi-check-circle-fill"></i> Ya, Penerima PIP
+                  </span>
+                  @if($pendaftar->nomor_pip)
+                    <span style="margin-left:6px; font-size:11px; color:var(--text-2); font-weight:700;">No: {{ $pendaftar->nomor_pip }}</span>
+                  @endif
+                @else
+                  <span class="badge" style="background:#f1f5f9; color:#64748b; padding:3px 8px; border-radius:4px;">Tidak / Bukan Penerima</span>
+                @endif
+              </td>
+            </tr>
+            <tr>
               <td style="padding:6px 0; color:var(--text-3);">No. WhatsApp Siswa (Notifikasi Seleksi)</td>
               <td style="padding:6px 0;">
                 @if($pendaftar->no_hp_siswa)
@@ -289,15 +304,25 @@
             </div>
 
             {{-- KIP / PIP --}}
-            <div style="border:1px solid var(--border); border-radius:8px; padding:10px; text-align:center;">
-              <div style="font-size:11px; font-weight:700; color:var(--text-3); margin-bottom:6px;">Kartu KIP / PIP</div>
-              @if($pendaftar->scan_kip)
+            <div style="border:1px solid var(--border); border-radius:8px; padding:10px; text-align:center; {{ strtolower((string)$pendaftar->penerima_pip) === 'ya' ? 'border-color:#16a34a; background:rgba(22,163,74,0.03);' : '' }}">
+              <div style="font-size:11px; font-weight:700; color:var(--text-3); margin-bottom:6px; display:flex; align-items:center; justify-content:center; gap:4px;">
+                <span>Kartu / Berkas PIP</span>
+                @if(strtolower((string)$pendaftar->penerima_pip) === 'ya')
+                  <span style="font-size:9px; background:#dcfce7; color:#15803d; padding:1px 5px; border-radius:3px; font-weight:800;">Penerima</span>
+                @endif
+              </div>
+              @php
+                $berkasPip = $pendaftar->berkas_pip ?: ($pendaftar->scan_kip ?: null);
+              @endphp
+              @if($berkasPip)
                 <div style="height:120px; background:var(--surface); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px;">
-                  <i class="bi bi-credit-card-2-front-fill" style="font-size:32px; color:#10b981;"></i>
-                  <a href="{{ asset('storage/' . $pendaftar->scan_kip) }}" target="_blank" class="btn btn-sm" style="background:#0284c7; color:#fff; font-size:11px; padding:4px 8px;">Buka Kartu KIP</a>
+                  <i class="bi bi-credit-card-2-front-fill" style="font-size:32px; color:#16a34a;"></i>
+                  <a href="{{ asset('storage/' . $berkasPip) }}" target="_blank" class="btn btn-sm" style="background:#16a34a; color:#fff; font-size:11px; padding:4px 8px; font-weight:700;">Buka Berkas PIP</a>
                 </div>
               @else
-                <div style="height:120px; background:var(--surface); display:flex; align-items:center; justify-content:center; color:var(--text-3); font-size:11px;">Tidak Ada / Opsional</div>
+                <div style="height:120px; background:var(--surface); display:flex; align-items:center; justify-content:center; color:var(--text-3); font-size:11px;">
+                  {{ strtolower((string)$pendaftar->penerima_pip) === 'ya' ? 'Belum Diunggah' : 'Tidak Ada / Opsional' }}
+                </div>
               @endif
             </div>
 

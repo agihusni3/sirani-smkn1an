@@ -402,6 +402,32 @@
               </label>
               <input type="text" name="provinsi" value="Lampung" placeholder="Contoh: Lampung" style="width:100%; height:38px;" />
             </div>
+
+            <div class="form-group" style="margin-bottom:0; grid-column:1 / -1; background:#f8fafc; border:1px solid var(--border); border-radius:var(--r-sm); padding:12px;">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+                <label style="margin-bottom:0; font-weight:800; font-size:11.5px; text-transform:uppercase; color:var(--text); display:flex; align-items:center; gap:6px;">
+                  <i class="bi bi-award-fill" style="color:#f59e0b;"></i> Penerima Beasiswa PIP / KIP
+                </label>
+                <div style="display:flex; gap:16px; align-items:center;">
+                  <label style="display:flex; align-items:center; gap:5px; font-size:12px; font-weight:700; cursor:pointer;">
+                    <input type="radio" name="penerima_pip" value="Tidak" checked onchange="document.getElementById('tambah_box_pip').style.display = 'none'" style="accent-color:var(--brand-blue);" /> Tidak
+                  </label>
+                  <label style="display:flex; align-items:center; gap:5px; font-size:12px; font-weight:700; color:#15803d; cursor:pointer;">
+                    <input type="radio" name="penerima_pip" value="Ya" onchange="document.getElementById('tambah_box_pip').style.display = 'grid'" style="accent-color:#16a34a;" /> Ya, Penerima PIP
+                  </label>
+                </div>
+              </div>
+              <div id="tambah_box_pip" style="display:none; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:10px; margin-top:8px; padding-top:8px; border-top:1px dashed var(--border);">
+                <div>
+                  <label style="font-size:11px; font-weight:700; color:var(--text-2); display:block; margin-bottom:3px;">Nomor KIP / PIP (Opsional)</label>
+                  <input type="text" name="nomor_pip" placeholder="Contoh: KIP-12345678" style="width:100%; height:34px; font-size:12px;" />
+                </div>
+                <div>
+                  <label style="font-size:11px; font-weight:700; color:var(--text-2); display:block; margin-bottom:3px;">Upload Berkas / Kartu PIP</label>
+                  <input type="file" name="berkas_pip" accept="image/*,application/pdf" style="width:100%; height:34px; font-size:11px;" />
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -551,6 +577,11 @@
                         <strong style="color:var(--text); font-size:13.5px;">{{ $s->nama }}</strong>
                         @if($s->jenis_kelamin)
                           <span style="font-size:10px; font-weight:800; padding:1px 5px; border-radius:4px; {{ $s->jenis_kelamin === 'L' ? 'background:#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe;' : 'background:#fdf2f8; color:#db2777; border:1px solid #fbcfe8;' }}" title="{{ $s->jenis_kelamin === 'L' ? 'Laki-laki' : 'Perempuan' }}">{{ $s->jenis_kelamin }}</span>
+                        @endif
+                        @if(strtolower((string)$s->penerima_pip) === 'ya')
+                          <span style="font-size:9.5px; font-weight:800; background:#dcfce7; color:#15803d; border:1px solid #86efac; border-radius:4px; padding:1px 5px; display:inline-flex; align-items:center; gap:2px;" title="Penerima Beasiswa PIP{{ $s->nomor_pip ? ' (No: ' . $s->nomor_pip . ')' : '' }}">
+                            <i class="bi bi-award-fill" style="color:#f59e0b;"></i> PIP
+                          </span>
                         @endif
                       </div>
                       <div style="font-size:11.5px; color:var(--text-3); font-family:var(--font-mono); margin-top:2px; display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
@@ -917,6 +948,35 @@
                 <option value="keluar">Keluar / DO</option>
               </select>
             </div>
+
+            <div style="grid-column:1 / -1; background:#f8fafc; border:1px solid var(--border); border-radius:var(--r-sm); padding:12px;">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+                <label class="form-label" style="margin-bottom:0; font-weight:800; font-size:11.5px; text-transform:uppercase; color:var(--text); display:flex; align-items:center; gap:6px;">
+                  <i class="bi bi-award-fill" style="color:#f59e0b;"></i> Penerima Beasiswa PIP / KIP
+                </label>
+                <div style="display:flex; gap:16px; align-items:center;">
+                  <label style="display:flex; align-items:center; gap:5px; font-size:12px; font-weight:700; cursor:pointer;">
+                    <input type="radio" id="edit_penerima_pip_tidak" name="penerima_pip" value="Tidak" onchange="document.getElementById('edit_box_pip').style.display = 'none'" style="accent-color:var(--brand-blue);" /> Tidak
+                  </label>
+                  <label style="display:flex; align-items:center; gap:5px; font-size:12px; font-weight:700; color:#15803d; cursor:pointer;">
+                    <input type="radio" id="edit_penerima_pip_ya" name="penerima_pip" value="Ya" onchange="document.getElementById('edit_box_pip').style.display = 'grid'" style="accent-color:#16a34a;" /> Ya, Penerima PIP
+                  </label>
+                </div>
+              </div>
+              <div id="edit_box_pip" style="display:none; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:10px; margin-top:8px; padding-top:8px; border-top:1px dashed var(--border);">
+                <div>
+                  <label class="form-label" style="font-size:11px; font-weight:700; color:var(--text-2); display:block; margin-bottom:3px;">Nomor KIP / PIP</label>
+                  <input type="text" id="edit_nomor_pip" name="nomor_pip" class="input-field" placeholder="Contoh: KIP-12345678" style="width:100%; height:34px; font-size:12px;" />
+                </div>
+                <div>
+                  <label class="form-label" style="font-size:11px; font-weight:700; color:var(--text-2); display:flex; justify-content:space-between; margin-bottom:3px;">
+                    <span>Upload Berkas / Kartu PIP</span>
+                    <span id="edit_link_berkas_pip_container"></span>
+                  </label>
+                  <input type="file" name="berkas_pip" accept="image/*,application/pdf" class="input-field" style="width:100%; height:34px; font-size:11px;" />
+                </div>
+              </div>
+            </div>
             <div style="grid-column:1 / -1;">
               <label class="form-label" style="font-weight:700; font-size:11.5px; display:flex; justify-content:space-between; margin-bottom:4px;">
                 <span>Ganti Foto Profil</span>
@@ -1058,6 +1118,21 @@
     document.getElementById('edit_provinsi').value = siswa.provinsi || 'Lampung';
     document.getElementById('edit_asal_sekolah').value = siswa.asal_sekolah || '';
     document.getElementById('edit_status').value = siswa.status || 'aktif';
+
+    const isPip = (siswa.penerima_pip && siswa.penerima_pip.toLowerCase() === 'ya');
+    document.getElementById('edit_penerima_pip_ya').checked = isPip;
+    document.getElementById('edit_penerima_pip_tidak').checked = !isPip;
+    document.getElementById('edit_nomor_pip').value = siswa.nomor_pip || '';
+    document.getElementById('edit_box_pip').style.display = isPip ? 'grid' : 'none';
+
+    const linkPipContainer = document.getElementById('edit_link_berkas_pip_container');
+    if (linkPipContainer) {
+      if (siswa.berkas_pip) {
+        linkPipContainer.innerHTML = '<a href="/storage/' + siswa.berkas_pip + '" target="_blank" style="color:#16a34a; font-weight:700; font-size:11px; text-decoration:none;"><i class="bi bi-file-earmark-check"></i> Lihat Berkas</a>';
+      } else {
+        linkPipContainer.innerHTML = '';
+      }
+    }
 
     const imgPreview = document.getElementById('edit_siswa_foto_img');
     if (imgPreview) {

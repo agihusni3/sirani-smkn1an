@@ -77,6 +77,9 @@ class PpdbDaftarController extends Controller
             'scan_ijazah_skl' => 'nullable|file|mimes:jpeg,png,jpg,pdf|max:3072',
             'scan_ktp_ortu' => 'nullable|file|mimes:jpeg,png,jpg,pdf|max:3072',
             'scan_akta' => 'nullable|file|mimes:jpeg,png,jpg,pdf|max:3072',
+            'penerima_pip' => 'nullable|in:Ya,Tidak',
+            'nomor_pip' => 'nullable|string|max:50',
+            'berkas_pip' => 'nullable|file|mimes:jpeg,png,jpg,pdf|max:3072',
             'scan_kip' => 'nullable|file|mimes:jpeg,png,jpg,pdf|max:3072',
             'scan_sktm' => 'nullable|file|mimes:jpeg,png,jpg,pdf|max:3072',
         ], [
@@ -144,6 +147,9 @@ class PpdbDaftarController extends Controller
         $p->jalur_pendaftaran = $validated['jalur_pendaftaran'];
         $p->status = 'menunggu_verifikasi';
 
+        $p->penerima_pip = $request->input('penerima_pip', 'Tidak') ?: 'Tidak';
+        $p->nomor_pip = $request->input('nomor_pip');
+
         // Upload berkas jika ada
         if ($request->hasFile('pas_foto')) {
             $p->berkas_foto = $request->file('pas_foto')->store('ppdb/foto', 'public');
@@ -160,8 +166,14 @@ class PpdbDaftarController extends Controller
         if ($request->hasFile('scan_akta')) {
             $p->berkas_akta = $request->file('scan_akta')->store('ppdb/berkas', 'public');
         }
-        if ($request->hasFile('scan_kip')) {
-            $p->berkas_kip = $request->file('scan_kip')->store('ppdb/berkas', 'public');
+        if ($request->hasFile('berkas_pip')) {
+            $pathPip = $request->file('berkas_pip')->store('ppdb/berkas', 'public');
+            $p->berkas_pip = $pathPip;
+            $p->berkas_kip = $pathPip;
+        } elseif ($request->hasFile('scan_kip')) {
+            $pathKip = $request->file('scan_kip')->store('ppdb/berkas', 'public');
+            $p->berkas_kip = $pathKip;
+            $p->berkas_pip = $pathKip;
         }
         if ($request->hasFile('scan_sktm')) {
             $p->berkas_sktm = $request->file('scan_sktm')->store('ppdb/berkas', 'public');

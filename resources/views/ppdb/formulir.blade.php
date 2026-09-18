@@ -248,6 +248,48 @@
                         <input type="text" name="organisasi_minat" value="{{ old('organisasi_minat') }}" placeholder="Contoh: OSIS, Pramuka, PMR, Paskibra, Rohis, Seni, Olahraga" style="width: 100%; padding: 11px 14px; font-size: 0.9rem;">
                     </div>
                 </div>
+
+                {{-- KARTU STATUS PENERIMA PIP --}}
+                <div style="margin-top: 20px; background: #f8fafc; border: 1.5px solid var(--border-main); border-radius: var(--radius-sm); padding: 18px;">
+                    <label style="display: block; font-size: 0.88rem; font-weight: 800; color: var(--text-dark); margin-bottom: 6px;">
+                        <i class="bi bi-award-fill" style="color: #f59e0b; margin-right: 4px;"></i> Apakah Calon Siswa Penerima PIP (Program Indonesia Pintar) / KIP? <span style="color: #ef4444;">*</span>
+                    </label>
+                    <p style="font-size: 0.78rem; color: var(--text-muted); margin: 0 0 12px 0;">
+                        Pilih <strong>Ya</strong> jika memiliki Kartu Indonesia Pintar (KIP) atau terdaftar sebagai penerima bantuan beasiswa PIP dari pemerintah.
+                    </p>
+
+                    <div style="display: flex; gap: 24px; align-items: center;">
+                        <label style="display: flex; align-items: center; gap: 8px; font-size: 0.9rem; font-weight: 700; color: var(--text-dark); cursor: pointer;">
+                            <input type="radio" name="penerima_pip" value="Tidak" {{ old('penerima_pip', 'Tidak') === 'Tidak' ? 'checked' : '' }} onchange="togglePipSection(this.value)" style="width: 18px; height: 18px; accent-color: var(--brand-blue); cursor: pointer;">
+                            <span>Tidak</span>
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 8px; font-size: 0.9rem; font-weight: 700; color: #15803d; cursor: pointer;">
+                            <input type="radio" name="penerima_pip" value="Ya" {{ old('penerima_pip') === 'Ya' ? 'checked' : '' }} onchange="togglePipSection(this.value)" style="width: 18px; height: 18px; accent-color: #16a34a; cursor: pointer;">
+                            <span>Ya, Penerima PIP</span>
+                        </label>
+                    </div>
+
+                    {{-- BOX UPLOAD BERKAS PIP (Tampil jika Ya) --}}
+                    <div id="box_upload_pip" style="display: {{ old('penerima_pip') === 'Ya' ? 'block' : 'none' }}; margin-top: 14px; padding-top: 14px; border-top: 1px dashed var(--border-main);">
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px;">
+                            <div>
+                                <label style="display: block; font-size: 0.82rem; font-weight: 700; color: var(--text-dark); margin-bottom: 6px;">
+                                    Nomor Kartu KIP / PIP (Opsional)
+                                </label>
+                                <input type="text" name="nomor_pip" value="{{ old('nomor_pip') }}" placeholder="Contoh: KIP-12345678" style="width: 100%; padding: 10px 12px; font-size: 0.88rem;">
+                            </div>
+                            <div>
+                                <label style="display: block; font-size: 0.82rem; font-weight: 700; color: var(--text-dark); margin-bottom: 6px;">
+                                    Upload Berkas / Kartu PIP / KIP <span style="color: #ef4444;">*</span>
+                                </label>
+                                <input type="file" name="berkas_pip" accept="image/*,application/pdf" style="width: 100%; font-size: 0.82rem; color: var(--text-body);">
+                                <p style="font-size: 0.73rem; color: var(--text-muted); margin: 4px 0 0 0;">
+                                    Foto/Scan Kartu KIP, buku tabungan SimPel, atau bukti SK PIP (PDF/JPG/PNG, Maksimal 3MB)
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <!-- 3. DATA ORANG TUA -->
@@ -478,5 +520,18 @@
     </div>
 
 </div>
+
+<script>
+function togglePipSection(val) {
+    const box = document.getElementById('box_upload_pip');
+    if (box) {
+        box.style.display = val === 'Ya' ? 'block' : 'none';
+        const fileInput = box.querySelector('input[type="file"]');
+        if (fileInput && val !== 'Ya') {
+            fileInput.value = '';
+        }
+    }
+}
+</script>
 @endsection
 

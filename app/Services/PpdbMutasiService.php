@@ -47,6 +47,9 @@ class PpdbMutasiService
             $siswa->asal_sekolah = $pendaftar->asal_sekolah;
             $siswa->no_hp_ortu = $noHpOrtu;
             $siswa->no_hp_siswa = $pendaftar->no_hp_siswa;
+            $siswa->penerima_pip = $pendaftar->penerima_pip ?: 'Tidak';
+            $siswa->nomor_pip = $pendaftar->nomor_pip;
+            $siswa->berkas_pip = $pendaftar->berkas_pip ?: $pendaftar->berkas_kip;
             $siswa->status = 'aktif';
             if ($pendaftar->berkas_foto && empty($siswa->foto)) {
                 $siswa->foto = $pendaftar->berkas_foto;
