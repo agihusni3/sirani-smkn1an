@@ -6,10 +6,6 @@
   $isWakasis = $user ? $user->isWakaKesiswaan() : false;
   $isWakaKurikulum = $user ? $user->isWakaKurikulum() : false;
   $isWali = $user ? $user->isWaliKelas() : false;
-
-  $countGuru = \App\Models\Guru::where('status', 'aktif')->count();
-  $countSiswa = \App\Models\Siswa::whereIn('status', ['aktif', 'pkl'])->count();
-  $countRombel = \App\Models\Rombel::count();
 @endphp
 
 {{-- Backdrop Overlay for Mobile Drawer --}}
@@ -62,7 +58,6 @@
           <i class="bi bi-file-earmark-check-fill"></i>
           <span>Loket Surat Siswa</span>
         </div>
-        <span class="situan-nav-badge" style="background:#f0fdf4; color:#16a34a; border-color:#bbf7d0;">QR Valid</span>
       </a>
     </div>
 
@@ -102,7 +97,6 @@
           <i class="bi bi-briefcase-fill"></i>
           <span>Surat Tugas &amp; SPPD</span>
         </div>
-        <span class="situan-nav-badge" style="background:#eff6ff; color:#2563eb; border-color:#bfdbfe;">3-in-1</span>
       </a>
     </div>
 
@@ -117,7 +111,6 @@
             <i class="bi bi-mortarboard-fill"></i>
             <span>E-Kabinet Siswa</span>
           </div>
-          <span class="situan-nav-badge">Siswa</span>
         </a>
 
         <a href="{{ route('situan.ekabinet.ptk') }}" class="situan-nav-link {{ request()->is('situan/ekabinet/ptk') || (request()->is('situan/ekabinet*') && in_array(request('tab'), ['ptk', 'kelengkapan'])) ? 'active' : '' }}" title="Lemari Berkas Kepegawaian Guru &amp; Tenaga Kependidikan">
@@ -125,7 +118,6 @@
             <i class="bi bi-person-badge-fill"></i>
             <span>E-Kabinet PTK</span>
           </div>
-          <span class="situan-nav-badge">PTK</span>
         </a>
 
         <a href="{{ route('situan.ekabinet.lembaga') }}" class="situan-nav-link {{ request()->is('situan/ekabinet/lembaga') || (request()->is('situan/ekabinet*') && request('tab') === 'lembaga') ? 'active' : '' }}" title="Dokumen Lembaga, Akreditasi, Izin &amp; Aset Sekolah">
@@ -133,7 +125,6 @@
             <i class="bi bi-building"></i>
             <span>E-Kabinet Lembaga</span>
           </div>
-          <span class="situan-nav-badge">Sekolah</span>
         </a>
 
         <a href="{{ route('situan.ekabinet.mou') }}" class="situan-nav-link {{ request()->is('situan/ekabinet/mou') || (request()->is('situan/ekabinet*') && request('tab') === 'mou') ? 'active' : '' }}" title="Perjanjian Kerjasama &amp; MoU Kemitraan DUDI / Industri">
@@ -141,7 +132,6 @@
             <i class="bi bi-briefcase-fill"></i>
             <span>E-Kabinet MoU</span>
           </div>
-          <span class="situan-nav-badge">Mitra</span>
         </a>
       </div>
 
@@ -153,7 +143,6 @@
             <i class="bi bi-radar"></i>
             <span>Radar KGB &amp; Pangkat</span>
           </div>
-          <span class="situan-nav-badge" style="background:#eff6ff; color:#2563eb; border-color:#bfdbfe;">Berkala</span>
         </a>
 
         <a href="/guru" class="situan-nav-link {{ request()->is('guru*') ? 'active' : '' }}" title="Master Data Pendidik &amp; Tenaga Kependidikan">
@@ -161,7 +150,6 @@
             <i class="bi bi-person-badge-fill"></i>
             <span>Data Pokok PTK</span>
           </div>
-          <span class="situan-nav-badge">{{ $countGuru }}</span>
         </a>
       </div>
     @endif
@@ -175,11 +163,6 @@
           <i class="bi bi-people-fill"></i>
           <span>{{ $isWali && !$isAdmin && !$isStafTu ? 'Siswa Binaan' : 'Data Siswa & Alumni' }}</span>
         </div>
-        @if($isWali && !$isAdmin && !$isStafTu)
-          <span class="situan-nav-badge" style="background:#ecfdf5; color:#059669; border-color:#a7f3d0;">Wali</span>
-        @else
-          <span class="situan-nav-badge">{{ $countSiswa }}</span>
-        @endif
       </a>
 
       @if(!$isWali || $isAdmin || $isStafTu)
@@ -188,7 +171,6 @@
             <i class="bi bi-diagram-3-fill"></i>
             <span>Rombongan Belajar</span>
           </div>
-          <span class="situan-nav-badge">{{ $countRombel }}</span>
         </a>
       @endif
 
