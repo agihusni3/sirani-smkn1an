@@ -198,6 +198,9 @@ Route::middleware('auth')->group(function () {
         Route::get('/situan/pelayanan', [SituanPelayananSuratController::class, 'index'])->name('situan.pelayanan.index');
         Route::post('/situan/pelayanan/buat', [SituanPelayananSuratController::class, 'buatSurat'])->name('situan.pelayanan.buat');
         Route::get('/situan/pelayanan/{id}/cetak', [SituanPelayananSuratController::class, 'cetakSurat'])->name('situan.pelayanan.cetak');
+        Route::put('/situan/pelayanan/{id}', [SituanPelayananSuratController::class, 'update'])->name('situan.pelayanan.update');
+        Route::delete('/situan/pelayanan/{id}', [SituanPelayananSuratController::class, 'destroy'])->name('situan.pelayanan.destroy');
+        Route::post('/situan/pelayanan/{id}/generate-nomor', [SituanPelayananSuratController::class, 'generateNomorSurat'])->name('situan.pelayanan.generate-nomor');
 
         // E-Kepegawaian: Radar KGB, Pangkat & E-Arsip PTK
         Route::get('/situan/radar-kgb', [SituanKepegawaianController::class, 'radarKgbIndex'])->name('situan.radar-kgb.index');

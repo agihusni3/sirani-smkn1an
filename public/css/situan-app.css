@@ -1045,6 +1045,18 @@ body.situan-body {
   box-shadow: 0 3px 8px rgba(22, 163, 74, 0.25);
 }
 
+.situan-action-icon-btn.btn-view {
+  background: #f0fdf4;
+  color: #0d9488;
+  border-color: #99f6e4;
+}
+.situan-action-icon-btn.btn-view:hover {
+  background: #0d9488;
+  color: #ffffff;
+  border-color: #0d9488;
+  box-shadow: 0 3px 8px rgba(13, 148, 136, 0.25);
+}
+
 /* Agenda & Nomor Surat Badges */
 .situan-agenda-badge {
   display: inline-block;

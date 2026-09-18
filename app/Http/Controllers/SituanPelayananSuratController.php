@@ -219,4 +219,153 @@ class SituanPelayananSuratController extends Controller
 
         return view('situan.pelayanan.verifikasi_publik', compact('pelayanan', 'suratKeluar', 'hash', 'sekolah', 'namaKepsek', 'nipKepsek'));
     }
+
+    /**
+     * Perbarui data pelayanan surat siswa (Edit/Update).
+     */
+    public function update(Request $request, $id)
+    {
+        $request->validate([
+            'siswa_id'        => 'required|exists:siswas,id',
+            'jenis_pelayanan' => 'required|in:suket_aktif,suket_berkelakuan_baik,suket_mutasi_keluar,suket_skl,suket_pengantar_pkl',
+            'keperluan'       => 'required|string|max:255',
+            'tanggal_surat'   => 'required|date',
+            'alasan_mutasi'   => 'nullable|string|max:255',
+            'sekolah_tujuan'  => 'nullable|string|max:200',
+        ]);
+
+        $pelayanan = PelayananSurat::with(['suratKeluar'])->findOrFail($id);
+
+        $siswa = Siswa::with(['siswaRombels' => function ($q) {
+            $q->where('status_keanggotaan', 'aktif')->with('rombel');
+        }])->findOrFail($request->siswa_id);
+
+        $namaJenis = match ($request->jenis_pelayanan) {
+            'suket_aktif'            => 'Surat Keterangan Siswa Aktif',
+            'suket_berkelakuan_baik' => 'Surat Keterangan Berkelakuan Baik',
+            'suket_mutasi_keluar'    => 'Surat Rekomendasi Pindah Sekolah',
+            'suket_skl'              => 'Surat Keterangan Lulus Sementara',
+            'suket_pengantar_pkl'    => 'Surat Pengantar PKL Industri',
+            default                  => 'Surat Keterangan Kesiswaan',
+        };
+
+        $tanggal = Carbon::parse($request->tanggal_surat);
+        $kodeKlasifikasi = '422.4';
+
+        // Perbarui atau sinkronkan Surat Keluar
+        if ($pelayanan->suratKeluar) {
+            $pelayanan->suratKeluar->update([
+                'tujuan_surat'  => $siswa->nama . ' (NISN: ' . ($siswa->nisn ?: '-') . ')',
+                'perihal'       => "{$namaJenis} a.n {$siswa->nama} ({$request->keperluan})",
+                'tanggal_surat' => $request->tanggal_surat,
+            ]);
+        } else {
+            // Jika belum ada nomor agenda surat keluar (misal data legacy), buatkan otomatis
+            $generator = SuratKeluar::generateNomorSurat($kodeKlasifikasi, $tanggal);
+            $suratKeluar = SuratKeluar::create([
+                'nomor_agenda'        => $generator['nomor_agenda'],
+                'tahun_agenda'        => $generator['tahun_agenda'],
+                'kode_klasifikasi'    => $kodeKlasifikasi,
+                'nomor_surat_lengkap' => $generator['nomor_surat_lengkap'],
+                'tujuan_surat'        => $siswa->nama . ' (NISN: ' . ($siswa->nisn ?: '-') . ')',
+                'perihal'             => "{$namaJenis} a.n {$siswa->nama} ({$request->keperluan})",
+                'tanggal_surat'       => $request->tanggal_surat,
+                'penandatangan'       => 'Kepala Sekolah',
+                'jenis_surat'         => 'suket_siswa',
+                'created_by'          => auth()->id(),
+            ]);
+            $pelayanan->surat_keluar_id = $suratKeluar->id;
+        }
+
+        $rombelAktif = $siswa->siswaRombels->first()?->rombel?->nama_rombel ?? 'Tidak Terdaftar';
+        $snapshot = [
+            'nama'           => $siswa->nama,
+            'nis'            => $siswa->nis,
+            'nisn'           => $siswa->nisn,
+            'tempat_lahir'   => $siswa->tempat_lahir,
+            'tanggal_lahir'  => $siswa->tanggal_lahir ? Carbon::parse($siswa->tanggal_lahir)->translatedFormat('d F Y') : '-',
+            'jenis_kelamin'  => $siswa->jenis_kelamin === 'L' ? 'Laki-laki' : 'Perempuan',
+            'rombel'         => $rombelAktif,
+            'nama_ortu'      => $siswa->nama_ortu ?: ($siswa->nama_ayah ?: ($siswa->nama_ibu ?: '-')),
+            'alamat'         => $siswa->alamat ?: '-',
+            'keperluan'      => $request->keperluan,
+            'alasan_mutasi'  => $request->alasan_mutasi,
+            'sekolah_tujuan' => $request->sekolah_tujuan,
+        ];
+
+        $pelayanan->update([
+            'siswa_id'         => $siswa->id,
+            'jenis_pelayanan'  => $request->jenis_pelayanan,
+            'keperluan'        => $request->keperluan,
+            'payload_snapshot' => $snapshot,
+        ]);
+
+        AuditLog::catat('update', 'situan_pelayanan_surat', "Memperbarui data {$namaJenis} untuk {$siswa->nama}");
+
+        return redirect()->route('situan.pelayanan.index')
+            ->with('success', "Pelayanan surat untuk {$siswa->nama} berhasil diperbarui.");
+    }
+
+    /**
+     * Hapus pelayanan surat siswa beserta surat keluar terkait (Delete/Destroy).
+     */
+    public function destroy($id)
+    {
+        $pelayanan = PelayananSurat::with('suratKeluar')->findOrFail($id);
+        $namaSiswa = $pelayanan->siswa->nama ?? ($pelayanan->payload_snapshot['nama'] ?? 'Siswa');
+        $nomorSurat = $pelayanan->suratKeluar?->nomor_surat_lengkap ?? 'Tanpa Nomor Agenda';
+
+        if ($pelayanan->suratKeluar) {
+            $suratKeluar = $pelayanan->suratKeluar;
+            $pelayanan->delete();
+            $suratKeluar->delete();
+        } else {
+            $pelayanan->delete();
+        }
+
+        AuditLog::catat('delete', 'situan_pelayanan_surat', "Menghapus pelayanan surat ({$nomorSurat}) an {$namaSiswa}");
+
+        return redirect()->route('situan.pelayanan.index')
+            ->with('success', "Pelayanan surat untuk {$namaSiswa} ({$nomorSurat}) berhasil dihapus.");
+    }
+
+    /**
+     * Generate nomor agenda surat keluar otomatis jika sebelumnya pending/kosong.
+     */
+    public function generateNomorSurat($id)
+    {
+        $pelayanan = PelayananSurat::with(['siswa', 'suratKeluar'])->findOrFail($id);
+        if ($pelayanan->surat_keluar_id && $pelayanan->suratKeluar) {
+            return redirect()->route('situan.pelayanan.index')
+                ->with('info', "Surat ini sudah memiliki nomor agenda resmi: {$pelayanan->suratKeluar->nomor_surat_lengkap}");
+        }
+
+        $tanggal = $pelayanan->created_at ? Carbon::parse($pelayanan->created_at) : now();
+        $kodeKlasifikasi = '422.4';
+        $generator = SuratKeluar::generateNomorSurat($kodeKlasifikasi, $tanggal);
+
+        $namaSiswa = $pelayanan->siswa?->nama ?? ($pelayanan->payload_snapshot['nama'] ?? 'Siswa');
+        $nisn = $pelayanan->siswa?->nisn ?? ($pelayanan->payload_snapshot['nisn'] ?? '-');
+        $namaJenis = $pelayanan->jenis_label;
+
+        $suratKeluar = SuratKeluar::create([
+            'nomor_agenda'        => $generator['nomor_agenda'],
+            'tahun_agenda'        => $generator['tahun_agenda'],
+            'kode_klasifikasi'    => $kodeKlasifikasi,
+            'nomor_surat_lengkap' => $generator['nomor_surat_lengkap'],
+            'tujuan_surat'        => "{$namaSiswa} (NISN: {$nisn})",
+            'perihal'             => "{$namaJenis} a.n {$namaSiswa} ({$pelayanan->keperluan})",
+            'tanggal_surat'       => $tanggal->format('Y-m-d'),
+            'penandatangan'       => 'Kepala Sekolah',
+            'jenis_surat'         => 'suket_siswa',
+            'created_by'          => auth()->id(),
+        ]);
+
+        $pelayanan->update(['surat_keluar_id' => $suratKeluar->id]);
+
+        AuditLog::catat('create', 'situan_pelayanan_surat', "Generate nomor agenda resmi No. {$suratKeluar->nomor_surat_lengkap} untuk {$namaSiswa}");
+
+        return redirect()->route('situan.pelayanan.index')
+            ->with('success', "Nomor agenda resmi berhasil digenerate: {$suratKeluar->nomor_surat_lengkap}");
+    }
 }
