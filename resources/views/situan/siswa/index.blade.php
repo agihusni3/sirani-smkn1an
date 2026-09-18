@@ -248,10 +248,10 @@
           </div>
         </div>
 
-        {{-- Seksi 3: Orang Tua Kandung & Kontak Notifikasi Sekolah --}}
+        {{-- Seksi 3: Data Orang Tua Kandung & Kontak Notifikasi --}}
         <div style="margin-bottom:16px; padding-top:12px; border-top:1px dashed var(--border);">
           <div style="font-size:12px; font-weight:800; color:var(--text); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:10px; display:flex; align-items:center; gap:6px;">
-            <span style="width:6px; height:6px; border-radius:50%; background:var(--brand-amber, #d97706);"></span> Orang Tua Kandung &amp; Kontak Notifikasi
+            <span style="width:6px; height:6px; border-radius:50%; background:var(--brand-amber, #d97706);"></span> Data Orang Tua &amp; Kontak Notifikasi
           </div>
           
           <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap:14px; margin-bottom:12px;">
@@ -262,25 +262,16 @@
               </div>
               <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
                 <div style="grid-column:1 / -1;">
-                  <label style="margin-bottom:2px; font-weight:600; font-size:10.5px; color:var(--text-2);">Nama Ayah Kandung</label>
-                  <input type="text" id="tambah_nama_ayah" name="nama_ayah" placeholder="Nama ayah..." style="width:100%; height:34px; font-size:12px;" />
+                  <label style="margin-bottom:2px; font-weight:600; font-size:10.5px; color:var(--text-2);">Nama Lengkap Ayah Kandung</label>
+                  <input type="text" id="tambah_nama_ayah" name="nama_ayah" placeholder="Nama ayah kandung..." style="width:100%; height:34px; font-size:12px;" />
                 </div>
                 <div>
-                  <label style="margin-bottom:2px; font-weight:600; font-size:10.5px; color:var(--text-2);">Pekerjaan</label>
+                  <label style="margin-bottom:2px; font-weight:600; font-size:10.5px; color:var(--text-2);">Pekerjaan Ayah</label>
                   <input type="text" name="pekerjaan_ayah" placeholder="Petani, Wiraswasta, PNS..." style="width:100%; height:34px; font-size:12px;" />
                 </div>
                 <div>
-                  <label style="margin-bottom:2px; font-weight:600; font-size:10.5px; color:var(--text-2);">Pendidikan</label>
+                  <label style="margin-bottom:2px; font-weight:600; font-size:10.5px; color:var(--text-2);">Pendidikan Ayah</label>
                   <input type="text" name="pendidikan_ayah" placeholder="SD, SMP, SMA, S1..." style="width:100%; height:34px; font-size:12px;" />
-                </div>
-                <div style="grid-column:1 / -1;">
-                  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:2px;">
-                    <label style="font-weight:600; font-size:10.5px; color:var(--text-2); margin:0;">No HP / WhatsApp Ayah</label>
-                    <button type="button" onclick="setKontakUtama('ayah', 'tambah_')" style="font-size:10px; font-weight:700; padding:2px 7px; background:#eff6ff; color:#2563eb; border:1px solid #bfdbfe; border-radius:4px; cursor:pointer;" title="Salin nomor ini ke No WA Utama Notifikasi Sekolah">
-                      <i class="bi bi-arrow-down-short"></i> Jadikan WA Utama
-                    </button>
-                  </div>
-                  <input type="text" id="tambah_no_hp_ayah" name="no_hp_ayah" placeholder="08xxxxxxxxxx" style="width:100%; height:34px; font-size:12px;" oninput="autoSyncKontakUtama('ayah', 'tambah_')" />
                 </div>
               </div>
             </div>
@@ -292,40 +283,31 @@
               </div>
               <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
                 <div style="grid-column:1 / -1;">
-                  <label style="margin-bottom:2px; font-weight:600; font-size:10.5px; color:var(--text-2);">Nama Ibu Kandung</label>
-                  <input type="text" id="tambah_nama_ibu" name="nama_ibu" placeholder="Nama ibu..." style="width:100%; height:34px; font-size:12px;" />
+                  <label style="margin-bottom:2px; font-weight:600; font-size:10.5px; color:var(--text-2);">Nama Lengkap Ibu Kandung</label>
+                  <input type="text" id="tambah_nama_ibu" name="nama_ibu" placeholder="Nama ibu kandung..." style="width:100%; height:34px; font-size:12px;" />
                 </div>
                 <div>
-                  <label style="margin-bottom:2px; font-weight:600; font-size:10.5px; color:var(--text-2);">Pekerjaan</label>
+                  <label style="margin-bottom:2px; font-weight:600; font-size:10.5px; color:var(--text-2);">Pekerjaan Ibu</label>
                   <input type="text" name="pekerjaan_ibu" placeholder="IRT, Petani, Pedagang..." style="width:100%; height:34px; font-size:12px;" />
                 </div>
                 <div>
-                  <label style="margin-bottom:2px; font-weight:600; font-size:10.5px; color:var(--text-2);">Pendidikan</label>
+                  <label style="margin-bottom:2px; font-weight:600; font-size:10.5px; color:var(--text-2);">Pendidikan Ibu</label>
                   <input type="text" name="pendidikan_ibu" placeholder="SD, SMP, SMA, S1..." style="width:100%; height:34px; font-size:12px;" />
-                </div>
-                <div style="grid-column:1 / -1;">
-                  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:2px;">
-                    <label style="font-weight:600; font-size:10.5px; color:var(--text-2); margin:0;">No HP / WhatsApp Ibu</label>
-                    <button type="button" onclick="setKontakUtama('ibu', 'tambah_')" style="font-size:10px; font-weight:700; padding:2px 7px; background:#fdf2f8; color:#db2777; border:1px solid #fbcfe8; border-radius:4px; cursor:pointer;" title="Salin nomor ini ke No WA Utama Notifikasi Sekolah">
-                      <i class="bi bi-arrow-down-short"></i> Jadikan WA Utama
-                    </button>
-                  </div>
-                  <input type="text" id="tambah_no_hp_ibu" name="no_hp_ibu" placeholder="08xxxxxxxxxx" style="width:100%; height:34px; font-size:12px;" oninput="autoSyncKontakUtama('ibu', 'tambah_')" />
                 </div>
               </div>
             </div>
           </div>
 
-          {{-- Kontak Notifikasi Utama Sekolah & Kontak Pribadi Siswa --}}
+          {{-- Kontak WhatsApp Orang Tua & Siswa --}}
           <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:12px; margin-bottom:12px;">
             <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap:12px;">
               <div class="form-group" style="margin-bottom:0;">
                 <label style="margin-bottom:4px; font-weight:800; font-size:11px; text-transform:uppercase; color:#0f172a; display:flex; align-items:center; gap:5px;">
-                  <i class="bi bi-whatsapp text-success"></i> No. WA Utama Notifikasi Sekolah <span style="color:#ef4444;">*</span>
+                  <i class="bi bi-whatsapp text-success"></i> No. HP / WhatsApp Orang Tua <span style="color:#ef4444;">*</span>
                 </label>
-                <input type="text" id="tambah_no_hp_ortu" name="no_hp_ortu" placeholder="08xxxxxxxxxx" style="width:100%; height:36px; font-weight:700; font-size:12.5px;" />
+                <input type="text" id="tambah_no_hp_ortu" name="no_hp_ortu" placeholder="08xxxxxxxxxx" required style="width:100%; height:36px; font-weight:700; font-size:12.5px;" />
                 <div style="font-size:10.5px; color:#64748b; margin-top:4px;">
-                  Nomor yang menerima pesan WA otomatis dari sekolah (absen masuk/pulang, surat izin, info sekolah).
+                  Nomor utama orang tua/wali untuk menerima notifikasi otomatis (presensi, izin, dan pengumuman).
                 </div>
               </div>
 
@@ -349,19 +331,11 @@
             </label>
 
             <div id="tambah_box_wali" style="display:none; margin-top:10px; padding-top:10px; border-top:1px solid #f1f5f9;">
-              <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:10px;">
-                <div>
-                  <label style="font-weight:600; font-size:11px; color:var(--text-2); display:block; margin-bottom:3px;">Nama Lengkap Wali</label>
-                  <input type="text" id="tambah_nama_ortu" name="nama_ortu" placeholder="Nama wali (cth: Paman, Kakek, Kakak)..." style="width:100%; height:34px; font-size:12px;" />
-                </div>
-                <div>
-                  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:3px;">
-                    <label style="font-weight:600; font-size:11px; color:var(--text-2); margin:0;">No HP / WA Wali</label>
-                    <button type="button" onclick="setKontakUtama('wali', 'tambah_')" style="font-size:10px; font-weight:700; padding:2px 7px; background:#f0fdf4; color:#16a34a; border:1px solid #bbf7d0; border-radius:4px; cursor:pointer;">
-                      <i class="bi bi-arrow-up-short"></i> Jadikan WA Utama
-                    </button>
-                  </div>
-                  <input type="text" id="tambah_no_hp_wali" placeholder="08xxxxxxxxxx" style="width:100%; height:34px; font-size:12px;" oninput="autoSyncKontakUtama('wali', 'tambah_')" />
+              <div>
+                <label style="font-weight:600; font-size:11px; color:var(--text-2); display:block; margin-bottom:3px;">Nama Lengkap Wali</label>
+                <input type="text" id="tambah_nama_ortu" name="nama_ortu" placeholder="Nama wali (cth: Paman, Kakek, Nenek, Kakak)..." style="width:100%; height:34px; font-size:12px;" />
+                <div style="font-size:10px; color:#64748b; margin-top:3px;">
+                  * Nomor kontak notifikasi wali menggunakan nomor WhatsApp orang tua di atas.
                 </div>
               </div>
             </div>
@@ -781,10 +755,10 @@
           </div>
         </div>
 
-        {{-- Seksi 3: Orang Tua Kandung & Kontak Notifikasi Sekolah --}}
+        {{-- Seksi 3: Data Orang Tua Kandung & Kontak Notifikasi --}}
         <div style="padding-top:12px; border-top:1px dashed var(--border); margin-bottom:12px;">
           <div style="font-size:11.5px; font-weight:800; color:var(--text); text-transform:uppercase; letter-spacing:0.4px; margin-bottom:10px; display:flex; align-items:center; gap:6px;">
-            <span style="width:6px; height:6px; border-radius:50%; background:var(--brand-amber, #d97706);"></span> Orang Tua Kandung &amp; Kontak Notifikasi
+            <span style="width:6px; height:6px; border-radius:50%; background:var(--brand-amber, #d97706);"></span> Data Orang Tua &amp; Kontak Notifikasi
           </div>
 
           <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap:12px; margin-bottom:12px;">
@@ -794,17 +768,17 @@
                 <i class="bi bi-person-badge"></i> Data Ayah Kandung
               </div>
               <div style="display:flex; flex-direction:column; gap:6px;">
-                <input type="text" id="edit_nama_ayah" name="nama_ayah" placeholder="Nama ayah kandung..." class="input-field" style="width:100%; height:34px; font-size:12px;" />
-                <input type="text" id="edit_pekerjaan_ayah" name="pekerjaan_ayah" placeholder="Pekerjaan ayah..." class="input-field" style="width:100%; height:34px; font-size:12px;" />
-                <input type="text" id="edit_pendidikan_ayah" name="pendidikan_ayah" placeholder="Pendidikan ayah..." class="input-field" style="width:100%; height:34px; font-size:12px;" />
                 <div>
-                  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:2px;">
-                    <label style="font-weight:600; font-size:10px; color:var(--text-2); margin:0;">No HP / WA Ayah</label>
-                    <button type="button" onclick="setKontakUtama('ayah', 'edit_')" style="font-size:9.5px; font-weight:700; padding:1px 6px; background:#eff6ff; color:#2563eb; border:1px solid #bfdbfe; border-radius:4px; cursor:pointer;" title="Salin nomor ini ke No WA Utama Notifikasi Sekolah">
-                      <i class="bi bi-arrow-down-short"></i> Jadikan WA Utama
-                    </button>
-                  </div>
-                  <input type="text" id="edit_no_hp_ayah" name="no_hp_ayah" placeholder="No HP/WA ayah..." class="input-field" style="width:100%; height:34px; font-size:12px;" oninput="autoSyncKontakUtama('ayah', 'edit_')" />
+                  <label class="form-label" style="font-weight:600; font-size:10.5px; display:block; margin-bottom:2px;">Nama Lengkap Ayah Kandung</label>
+                  <input type="text" id="edit_nama_ayah" name="nama_ayah" placeholder="Nama ayah kandung..." class="input-field" style="width:100%; height:34px; font-size:12px;" />
+                </div>
+                <div>
+                  <label class="form-label" style="font-weight:600; font-size:10.5px; display:block; margin-bottom:2px;">Pekerjaan Ayah</label>
+                  <input type="text" id="edit_pekerjaan_ayah" name="pekerjaan_ayah" placeholder="Pekerjaan ayah..." class="input-field" style="width:100%; height:34px; font-size:12px;" />
+                </div>
+                <div>
+                  <label class="form-label" style="font-weight:600; font-size:10.5px; display:block; margin-bottom:2px;">Pendidikan Ayah</label>
+                  <input type="text" id="edit_pendidikan_ayah" name="pendidikan_ayah" placeholder="Pendidikan ayah..." class="input-field" style="width:100%; height:34px; font-size:12px;" />
                 </div>
               </div>
             </div>
@@ -815,32 +789,32 @@
                 <i class="bi bi-person-heart"></i> Data Ibu Kandung
               </div>
               <div style="display:flex; flex-direction:column; gap:6px;">
-                <input type="text" id="edit_nama_ibu" name="nama_ibu" placeholder="Nama ibu kandung..." class="input-field" style="width:100%; height:34px; font-size:12px;" />
-                <input type="text" id="edit_pekerjaan_ibu" name="pekerjaan_ibu" placeholder="Pekerjaan ibu..." class="input-field" style="width:100%; height:34px; font-size:12px;" />
-                <input type="text" id="edit_pendidikan_ibu" name="pendidikan_ibu" placeholder="Pendidikan ibu..." class="input-field" style="width:100%; height:34px; font-size:12px;" />
                 <div>
-                  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:2px;">
-                    <label style="font-weight:600; font-size:10px; color:var(--text-2); margin:0;">No HP / WA Ibu</label>
-                    <button type="button" onclick="setKontakUtama('ibu', 'edit_')" style="font-size:9.5px; font-weight:700; padding:1px 6px; background:#fdf2f8; color:#db2777; border:1px solid #fbcfe8; border-radius:4px; cursor:pointer;" title="Salin nomor ini ke No WA Utama Notifikasi Sekolah">
-                      <i class="bi bi-arrow-down-short"></i> Jadikan WA Utama
-                    </button>
-                  </div>
-                  <input type="text" id="edit_no_hp_ibu" name="no_hp_ibu" placeholder="No HP/WA ibu..." class="input-field" style="width:100%; height:34px; font-size:12px;" oninput="autoSyncKontakUtama('ibu', 'edit_')" />
+                  <label class="form-label" style="font-weight:600; font-size:10.5px; display:block; margin-bottom:2px;">Nama Lengkap Ibu Kandung</label>
+                  <input type="text" id="edit_nama_ibu" name="nama_ibu" placeholder="Nama ibu kandung..." class="input-field" style="width:100%; height:34px; font-size:12px;" />
+                </div>
+                <div>
+                  <label class="form-label" style="font-weight:600; font-size:10.5px; display:block; margin-bottom:2px;">Pekerjaan Ibu</label>
+                  <input type="text" id="edit_pekerjaan_ibu" name="pekerjaan_ibu" placeholder="Pekerjaan ibu..." class="input-field" style="width:100%; height:34px; font-size:12px;" />
+                </div>
+                <div>
+                  <label class="form-label" style="font-weight:600; font-size:10.5px; display:block; margin-bottom:2px;">Pendidikan Ibu</label>
+                  <input type="text" id="edit_pendidikan_ibu" name="pendidikan_ibu" placeholder="Pendidikan ibu..." class="input-field" style="width:100%; height:34px; font-size:12px;" />
                 </div>
               </div>
             </div>
           </div>
 
-          {{-- Kontak Notifikasi Utama Sekolah & Kontak Siswa --}}
+          {{-- Kontak WhatsApp Orang Tua & Siswa --}}
           <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:12px; margin-bottom:12px;">
             <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap:12px;">
               <div>
                 <label class="form-label" style="font-weight:800; font-size:11px; text-transform:uppercase; color:#0f172a; display:flex; align-items:center; gap:5px; margin-bottom:4px;">
-                  <i class="bi bi-whatsapp text-success"></i> No. WA Utama Notifikasi Sekolah <span style="color:#ef4444;">*</span>
+                  <i class="bi bi-whatsapp text-success"></i> No. HP / WhatsApp Orang Tua <span style="color:#ef4444;">*</span>
                 </label>
-                <input type="text" id="edit_no_hp_ortu" name="no_hp_ortu" placeholder="08xxxxxxxxxx" class="input-field" style="width:100%; height:36px; font-weight:700; font-size:12.5px;" />
+                <input type="text" id="edit_no_hp_ortu" name="no_hp_ortu" placeholder="08xxxxxxxxxx" required class="input-field" style="width:100%; height:36px; font-weight:700; font-size:12.5px;" />
                 <div style="font-size:10.5px; color:#64748b; margin-top:4px;">
-                  Nomor utama yang menerima pesan WA otomatis (kehadiran, keterlambatan, surat izin, dll).
+                  Nomor utama orang tua/wali untuk menerima pesan WA otomatis (kehadiran, keterlambatan, surat izin, dll).
                 </div>
               </div>
 
@@ -864,19 +838,11 @@
             </label>
 
             <div id="edit_box_wali" style="display:none; margin-top:10px; padding-top:10px; border-top:1px solid #f1f5f9;">
-              <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:10px;">
-                <div>
-                  <label class="form-label" style="font-weight:600; font-size:11px; display:block; margin-bottom:3px;">Nama Lengkap Wali</label>
-                  <input type="text" id="edit_nama_ortu" name="nama_ortu" placeholder="Nama wali (cth: Paman, Kakek, Kakak)..." class="input-field" style="width:100%; height:34px; font-size:12px;" />
-                </div>
-                <div>
-                  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:3px;">
-                    <label class="form-label" style="font-weight:600; font-size:11px; margin:0;">No HP / WA Wali</label>
-                    <button type="button" onclick="setKontakUtama('wali', 'edit_')" style="font-size:10px; font-weight:700; padding:2px 7px; background:#f0fdf4; color:#16a34a; border:1px solid #bbf7d0; border-radius:4px; cursor:pointer;">
-                      <i class="bi bi-arrow-up-short"></i> Jadikan WA Utama
-                    </button>
-                  </div>
-                  <input type="text" id="edit_no_hp_wali" placeholder="08xxxxxxxxxx" class="input-field" style="width:100%; height:34px; font-size:12px;" oninput="autoSyncKontakUtama('wali', 'edit_')" />
+              <div>
+                <label class="form-label" style="font-weight:600; font-size:11px; display:block; margin-bottom:3px;">Nama Lengkap Wali</label>
+                <input type="text" id="edit_nama_ortu" name="nama_ortu" placeholder="Nama wali (cth: Paman, Kakek, Nenek, Kakak)..." class="input-field" style="width:100%; height:34px; font-size:12px;" />
+                <div style="font-size:10px; color:#64748b; margin-top:3px;">
+                  * Nomor kontak notifikasi wali menggunakan nomor WhatsApp orang tua di atas.
                 </div>
               </div>
             </div>
@@ -991,35 +957,6 @@
     }
   }
 
-  function setKontakUtama(tipe, prefix) {
-    let sourceEl = null;
-    if (tipe === 'ayah') {
-      sourceEl = document.getElementById(prefix + 'no_hp_ayah');
-    } else if (tipe === 'ibu') {
-      sourceEl = document.getElementById(prefix + 'no_hp_ibu');
-    } else if (tipe === 'wali') {
-      sourceEl = document.getElementById(prefix + 'no_hp_wali');
-    }
-    const targetEl = document.getElementById(prefix + 'no_hp_ortu');
-    if (sourceEl && targetEl) {
-      targetEl.value = (sourceEl.value || '').trim();
-      targetEl.focus();
-      targetEl.style.transition = 'background-color 0.3s ease';
-      targetEl.style.backgroundColor = '#ecfdf5';
-      setTimeout(() => { targetEl.style.backgroundColor = ''; }, 600);
-    }
-  }
-
-  function autoSyncKontakUtama(tipe, prefix) {
-    const targetEl = document.getElementById(prefix + 'no_hp_ortu');
-    if (targetEl && !targetEl.value.trim()) {
-      let sourceEl = (tipe === 'wali') ? document.getElementById(prefix + 'no_hp_wali') : document.getElementById(prefix + 'no_hp_' + tipe);
-      if (sourceEl && sourceEl.value.trim()) {
-        targetEl.value = sourceEl.value.trim();
-      }
-    }
-  }
-
   function toggleWaliBox(prefix) {
     const chk = document.getElementById(prefix + 'check_wali');
     const box = document.getElementById(prefix + 'box_wali');
@@ -1027,9 +964,7 @@
       box.style.display = chk.checked ? 'block' : 'none';
       if (!chk.checked) {
         const namaOrtu = document.getElementById(prefix + 'nama_ortu');
-        const noHpWali = document.getElementById(prefix + 'no_hp_wali');
         if (namaOrtu) namaOrtu.value = '';
-        if (noHpWali) noHpWali.value = '';
       }
     }
   }
@@ -1047,11 +982,9 @@
     document.getElementById('edit_nama_ayah').value = siswa.nama_ayah || '';
     document.getElementById('edit_pekerjaan_ayah').value = siswa.pekerjaan_ayah || '';
     document.getElementById('edit_pendidikan_ayah').value = siswa.pendidikan_ayah || '';
-    document.getElementById('edit_no_hp_ayah').value = siswa.no_hp_ayah || '';
     document.getElementById('edit_nama_ibu').value = siswa.nama_ibu || '';
     document.getElementById('edit_pekerjaan_ibu').value = siswa.pekerjaan_ibu || '';
     document.getElementById('edit_pendidikan_ibu').value = siswa.pendidikan_ibu || '';
-    document.getElementById('edit_no_hp_ibu').value = siswa.no_hp_ibu || '';
 
     // Logika Khusus Wali vs Orang Tua Kandung
     const chkWali = document.getElementById('edit_check_wali');
@@ -1065,19 +998,13 @@
       if (chkWali) chkWali.checked = true;
       if (boxWali) boxWali.style.display = 'block';
       document.getElementById('edit_nama_ortu').value = siswa.nama_ortu || '';
-      if (siswa.no_hp_ortu && siswa.no_hp_ortu !== siswa.no_hp_ayah && siswa.no_hp_ortu !== siswa.no_hp_ibu) {
-        const noWaliEl = document.getElementById('edit_no_hp_wali');
-        if (noWaliEl) noWaliEl.value = siswa.no_hp_ortu;
-      }
     } else {
       if (chkWali) chkWali.checked = false;
       if (boxWali) boxWali.style.display = 'none';
       document.getElementById('edit_nama_ortu').value = '';
-      const noWaliEl = document.getElementById('edit_no_hp_wali');
-      if (noWaliEl) noWaliEl.value = '';
     }
 
-    // Kontak Notifikasi Utama Sekolah & Kontak Siswa
+    // Kontak WhatsApp Orang Tua & Siswa
     document.getElementById('edit_no_hp_ortu').value = siswa.no_hp_ortu || siswa.no_hp_ayah || siswa.no_hp_ibu || '';
     document.getElementById('edit_no_hp_siswa').value = siswa.no_hp_siswa || '';
     document.getElementById('edit_alamat').value = siswa.alamat || '';
