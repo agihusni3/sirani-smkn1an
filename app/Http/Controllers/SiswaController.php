@@ -181,8 +181,8 @@ class SiswaController extends Controller
             $fotoPath = $request->file('foto')->store('foto_siswa', 'public');
         }
 
-        $namaOrtu = $request->input('nama_ortu') ?: ($request->input('nama_ibu') ?: $request->input('nama_ayah') ?: null);
-        $noHpOrtu = $request->input('no_hp_ortu') ?: ($request->input('no_hp_ibu') ?: ($request->input('no_hp_ayah') ?: null));
+        $namaOrtu = $request->input('nama_ortu') ?: ($request->input('nama_ayah') ?: ($request->input('nama_ibu') ?: 'Orang Tua Siswa'));
+        $noHpOrtu = $request->input('no_hp_ortu') ?: ($request->input('no_hp_ayah') ?: ($request->input('no_hp_ibu') ?: null));
 
         $siswa = Siswa::create([
             'nisn'          => $request->input('nisn'),
@@ -273,8 +273,8 @@ class SiswaController extends Controller
             $fotoPath = $request->file('foto')->store('foto_siswa', 'public');
         }
 
-        $namaOrtu = $request->input('nama_ortu') ?: ($request->input('nama_ibu') ?: $request->input('nama_ayah') ?: $siswa->nama_ortu);
-        $noHpOrtu = $request->input('no_hp_ortu') ?: ($request->input('no_hp_ibu') ?: ($request->input('no_hp_ayah') ?: $siswa->no_hp_ortu));
+        $namaOrtu = $request->input('nama_ortu') ?: ($request->input('nama_ayah') ?: ($request->input('nama_ibu') ?: ($siswa->nama_ortu ?: 'Orang Tua Siswa')));
+        $noHpOrtu = $request->input('no_hp_ortu') ?: ($request->input('no_hp_ayah') ?: ($request->input('no_hp_ibu') ?: $siswa->no_hp_ortu));
 
         $siswa->update([
             'nisn'          => $request->input('nisn'),
