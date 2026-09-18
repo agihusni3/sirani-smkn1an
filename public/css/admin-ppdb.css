@@ -19,6 +19,23 @@
   align-items: center;
   gap: 14px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.ppdb-stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+  border-color: #94a3b8;
+}
+
+.ppdb-stat-card.active {
+  border-color: #4338ca;
+  background: #f8fafc;
+  box-shadow: 0 0 0 2px #4338ca, 0 6px 16px rgba(67, 56, 202, 0.12);
 }
 
 .ppdb-stat-val {
@@ -76,12 +93,23 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  transition: all 0.15s ease;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+  position: relative;
 }
 
 .ppdb-jurusan-card:hover {
-  border-color: #d97706;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  transform: translateY(-2px);
+  border-color: #4338ca;
+  box-shadow: 0 6px 16px rgba(67, 56, 202, 0.12);
+}
+
+.ppdb-jurusan-card.active {
+  border-color: #4338ca;
+  background: #f5f3ff;
+  box-shadow: 0 0 0 2px #4338ca, 0 4px 12px rgba(67, 56, 202, 0.15);
 }
 
 .status-tab-btn {

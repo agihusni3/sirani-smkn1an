@@ -21,9 +21,13 @@ class PpdbAdminController extends Controller
 
         if ($request->filled('status')) {
             $st = $request->status;
-            if ($st === 'menunggu') $st = 'menunggu_verifikasi';
-            if ($st === 'berkas_valid') $st = 'terverifikasi';
-            $query->where('status', $st);
+            if ($st === 'menunggu') {
+                $query->whereIn('status', ['menunggu', 'menunggu_verifikasi', 'draft']);
+            } elseif ($st === 'berkas_valid') {
+                $query->whereIn('status', ['terverifikasi', 'berkas_valid']);
+            } else {
+                $query->where('status', $st);
+            }
         }
 
         if ($request->filled('jurusan_id')) {

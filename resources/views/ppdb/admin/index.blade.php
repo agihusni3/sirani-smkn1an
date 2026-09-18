@@ -45,82 +45,137 @@
       </div>
     @endif
 
-    {{-- STATISTIK FUNNEL SELEKSI PPDB --}}
+    {{-- STATISTIK FUNNEL SELEKSI PPDB (DAPAT DIKLIK UNTUK FILTER DATA) --}}
     <div class="ppdb-stat-grid" style="margin-bottom:20px;">
-      <div class="ppdb-stat-card">
-        <div style="width:40px; height:40px; border-radius:10px; background:rgba(67,56,202,0.12); color:#4338ca; display:flex; align-items:center; justify-content:center; font-size:20px;">
+      @php
+        $isTotalActive = empty(request('status')) && empty(request('jurusan_id'));
+        $isMenungguActive = request('status') === 'menunggu';
+        $isBerkasValidActive = request('status') === 'berkas_valid';
+        $isDiterimaActive = request('status') === 'diterima';
+        $isDitolakActive = request('status') === 'ditolak';
+      @endphp
+
+      {{-- Total Pendaftar --}}
+      <a href="{{ route('admin.ppdb.index', request()->except(['status', 'page'])) }}#tabel-pendaftar"
+         class="ppdb-stat-card {{ $isTotalActive ? 'active' : '' }}"
+         title="Klik untuk menampilkan semua pendaftar">
+        <div style="width:40px; height:40px; border-radius:10px; background:rgba(67,56,202,0.12); color:#4338ca; display:flex; align-items:center; justify-content:center; font-size:20px; flex-shrink:0;">
           <i class="bi bi-people-fill"></i>
         </div>
         <div>
           <div class="ppdb-stat-val" style="color:#4338ca;">{{ $counts['total'] }}</div>
           <div style="font-size:11.5px; color:var(--text-3); font-weight:700;">Total Pendaftar</div>
         </div>
-      </div>
+        @if($isTotalActive)
+          <span style="position:absolute; top:10px; right:10px; width:8px; height:8px; border-radius:50%; background:#4338ca;" title="Filter aktif"></span>
+        @endif
+      </a>
 
-      <div class="ppdb-stat-card">
-        <div style="width:40px; height:40px; border-radius:10px; background:rgba(217,119,6,0.12); color:#d97706; display:flex; align-items:center; justify-content:center; font-size:20px;">
+      {{-- Menunggu Cek Berkas --}}
+      <a href="{{ $isMenungguActive ? route('admin.ppdb.index', request()->except(['status', 'page'])) : route('admin.ppdb.index', array_merge(request()->except(['page']), ['status' => 'menunggu'])) }}#tabel-pendaftar"
+         class="ppdb-stat-card {{ $isMenungguActive ? 'active' : '' }}"
+         title="{{ $isMenungguActive ? 'Klik untuk membatalkan filter' : 'Klik untuk memfilter pendaftar yang Menunggu Cek Berkas' }}">
+        <div style="width:40px; height:40px; border-radius:10px; background:rgba(217,119,6,0.12); color:#d97706; display:flex; align-items:center; justify-content:center; font-size:20px; flex-shrink:0;">
           <i class="bi bi-clock-history"></i>
         </div>
         <div>
           <div class="ppdb-stat-val" style="color:#d97706;">{{ $counts['menunggu'] }}</div>
           <div style="font-size:11.5px; color:var(--text-3); font-weight:700;">Menunggu Cek Berkas</div>
         </div>
-      </div>
+        @if($isMenungguActive)
+          <span style="position:absolute; top:10px; right:10px; width:8px; height:8px; border-radius:50%; background:#d97706;" title="Filter aktif"></span>
+        @endif
+      </a>
 
-      <div class="ppdb-stat-card">
-        <div style="width:40px; height:40px; border-radius:10px; background:rgba(2,132,199,0.12); color:#0284c7; display:flex; align-items:center; justify-content:center; font-size:20px;">
+      {{-- Berkas Valid --}}
+      <a href="{{ $isBerkasValidActive ? route('admin.ppdb.index', request()->except(['status', 'page'])) : route('admin.ppdb.index', array_merge(request()->except(['page']), ['status' => 'berkas_valid'])) }}#tabel-pendaftar"
+         class="ppdb-stat-card {{ $isBerkasValidActive ? 'active' : '' }}"
+         title="{{ $isBerkasValidActive ? 'Klik untuk membatalkan filter' : 'Klik untuk memfilter pendaftar dengan Berkas Valid' }}">
+        <div style="width:40px; height:40px; border-radius:10px; background:rgba(2,132,199,0.12); color:#0284c7; display:flex; align-items:center; justify-content:center; font-size:20px; flex-shrink:0;">
           <i class="bi bi-file-earmark-check-fill"></i>
         </div>
         <div>
           <div class="ppdb-stat-val" style="color:#0284c7;">{{ $counts['berkas_valid'] }}</div>
           <div style="font-size:11.5px; color:var(--text-3); font-weight:700;">Berkas Valid</div>
         </div>
-      </div>
+        @if($isBerkasValidActive)
+          <span style="position:absolute; top:10px; right:10px; width:8px; height:8px; border-radius:50%; background:#0284c7;" title="Filter aktif"></span>
+        @endif
+      </a>
 
-      <div class="ppdb-stat-card">
-        <div style="width:40px; height:40px; border-radius:10px; background:rgba(16,185,129,0.12); color:#10b981; display:flex; align-items:center; justify-content:center; font-size:20px;">
+      {{-- Siswa Diterima --}}
+      <a href="{{ $isDiterimaActive ? route('admin.ppdb.index', request()->except(['status', 'page'])) : route('admin.ppdb.index', array_merge(request()->except(['page']), ['status' => 'diterima'])) }}#tabel-pendaftar"
+         class="ppdb-stat-card {{ $isDiterimaActive ? 'active' : '' }}"
+         title="{{ $isDiterimaActive ? 'Klik untuk membatalkan filter' : 'Klik untuk memfilter pendaftar yang Diterima' }}">
+        <div style="width:40px; height:40px; border-radius:10px; background:rgba(16,185,129,0.12); color:#10b981; display:flex; align-items:center; justify-content:center; font-size:20px; flex-shrink:0;">
           <i class="bi bi-check-circle-fill"></i>
         </div>
         <div>
           <div class="ppdb-stat-val" style="color:#10b981;">{{ $counts['diterima'] }}</div>
           <div style="font-size:11.5px; color:var(--text-3); font-weight:700;">Siswa Diterima</div>
         </div>
-      </div>
+        @if($isDiterimaActive)
+          <span style="position:absolute; top:10px; right:10px; width:8px; height:8px; border-radius:50%; background:#10b981;" title="Filter aktif"></span>
+        @endif
+      </a>
 
-      <div class="ppdb-stat-card">
-        <div style="width:40px; height:40px; border-radius:10px; background:rgba(239,68,68,0.12); color:#ef4444; display:flex; align-items:center; justify-content:center; font-size:20px;">
+      {{-- Ditolak / Draf --}}
+      <a href="{{ $isDitolakActive ? route('admin.ppdb.index', request()->except(['status', 'page'])) : route('admin.ppdb.index', array_merge(request()->except(['page']), ['status' => 'ditolak'])) }}#tabel-pendaftar"
+         class="ppdb-stat-card {{ $isDitolakActive ? 'active' : '' }}"
+         title="{{ $isDitolakActive ? 'Klik untuk membatalkan filter' : 'Klik untuk memfilter pendaftar Ditolak / Draf' }}">
+        <div style="width:40px; height:40px; border-radius:10px; background:rgba(239,68,68,0.12); color:#ef4444; display:flex; align-items:center; justify-content:center; font-size:20px; flex-shrink:0;">
           <i class="bi bi-x-circle-fill"></i>
         </div>
         <div>
           <div class="ppdb-stat-val" style="color:#ef4444;">{{ $counts['ditolak'] }}</div>
           <div style="font-size:11.5px; color:var(--text-3); font-weight:700;">Ditolak / Draf</div>
         </div>
-      </div>
+        @if($isDitolakActive)
+          <span style="position:absolute; top:10px; right:10px; width:8px; height:8px; border-radius:50%; background:#ef4444;" title="Filter aktif"></span>
+        @endif
+      </a>
     </div>
 
-    {{-- PEMINATAN JURUSAN KEJURUAN --}}
+    {{-- PEMINATAN JURUSAN KEJURUAN (DAPAT DIKLIK UNTUK FILTER JURUSAN) --}}
     @if(isset($jurusanStats) && $jurusanStats->isNotEmpty())
-      <div style="margin-bottom:12px; font-size:12.5px; font-weight:800; color:var(--text); display:flex; align-items:center; gap:6px;">
-        <i class="bi bi-diagram-3-fill" style="color:#d97706;"></i> Peminatan Jurusan Kejuruan (Pilihan 1):
+      <div style="margin-bottom:12px; font-size:12.5px; font-weight:800; color:var(--text); display:flex; align-items:center; justify-content:space-between;">
+        <div style="display:flex; align-items:center; gap:6px;">
+          <i class="bi bi-diagram-3-fill" style="color:#d97706;"></i> Peminatan Jurusan Kejuruan (Pilihan 1):
+        </div>
+        @if(request('jurusan_id'))
+          <a href="{{ route('admin.ppdb.index', request()->except(['jurusan_id', 'page'])) }}#tabel-pendaftar" style="font-size:11.5px; color:#4338ca; text-decoration:none; font-weight:700;">
+            <i class="bi bi-x-circle"></i> Reset Filter Jurusan
+          </a>
+        @endif
       </div>
       <div class="ppdb-jurusan-strip">
         @foreach($jurusanStats as $js)
-          <div class="ppdb-jurusan-card">
+          @php
+            $isJurusanActive = request('jurusan_id') == $js['id'];
+          @endphp
+          <a href="{{ $isJurusanActive ? route('admin.ppdb.index', request()->except(['jurusan_id', 'page'])) : route('admin.ppdb.index', array_merge(request()->except(['page']), ['jurusan_id' => $js['id']])) }}#tabel-pendaftar"
+             class="ppdb-jurusan-card {{ $isJurusanActive ? 'active' : '' }}"
+             title="{{ $isJurusanActive ? 'Klik untuk membatalkan filter jurusan ' . $js['kode'] : 'Klik untuk memfilter pendaftar jurusan ' . $js['kode'] }}">
             <div>
-              <div style="font-size:13px; font-weight:900; color:var(--text);">{{ $js['kode'] }}</div>
+              <div style="font-size:13px; font-weight:900; color:var(--text); display:flex; align-items:center; gap:6px;">
+                {{ $js['kode'] }}
+                @if($isJurusanActive)
+                  <span style="font-size:9.5px; background:#4338ca; color:#ffffff; padding:1px 6px; border-radius:4px; font-weight:800;">Aktif</span>
+                @endif
+              </div>
               <div style="font-size:11px; color:var(--text-3);">{{ Str::limit($js['nama'], 26) }}</div>
             </div>
             <div style="text-align:right;">
               <span style="font-size:16px; font-weight:900; color:#4338ca; font-family:var(--font-mono);">{{ $js['peminat'] }}</span>
               <div style="font-size:10px; color:#10b981; font-weight:700;">{{ $js['diterima'] }} Diterima</div>
             </div>
-          </div>
+          </a>
         @endforeach
       </div>
     @endif
 
     {{-- STATUS TABS & FILTER PENCARIAN --}}
-    <div class="panel" style="background:var(--bg-2); border:1px solid var(--border); padding:14px 18px; margin-bottom:16px; border-radius:12px;">
+    <div id="tabel-pendaftar" class="panel" style="background:var(--bg-2); border:1px solid var(--border); padding:14px 18px; margin-bottom:16px; border-radius:12px;">
       
       {{-- Tab Navigasi Cepat --}}
       <div style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:14px; padding-bottom:12px; border-bottom:1px solid var(--border-2);">
