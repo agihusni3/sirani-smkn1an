@@ -37,14 +37,15 @@ class PpdbMutasiService
             $siswa->nama_ayah = $pendaftar->nama_ayah;
             $siswa->pekerjaan_ayah = $pendaftar->pekerjaan_ayah;
             $siswa->pendidikan_ayah = $pendaftar->pendidikan_ayah;
-            $siswa->no_hp_ayah = $pendaftar->no_hp_ayah ?: $pendaftar->no_hp_ortu;
+            $noHpOrtu = $pendaftar->no_hp_ortu ?: ($pendaftar->no_hp_ayah ?: ($pendaftar->no_hp_ibu ?: $pendaftar->no_hp_siswa));
+            $siswa->no_hp_ayah = $noHpOrtu;
             $siswa->nama_ibu = $pendaftar->nama_ibu;
             $siswa->pekerjaan_ibu = $pendaftar->pekerjaan_ibu;
             $siswa->pendidikan_ibu = $pendaftar->pendidikan_ibu;
-            $siswa->no_hp_ibu = $pendaftar->no_hp_ibu ?: $pendaftar->no_hp_ortu;
+            $siswa->no_hp_ibu = $noHpOrtu;
             $siswa->nama_ortu = $pendaftar->nama_wali ?: ($pendaftar->nama_ayah ?: ($pendaftar->nama_ibu ?: 'Orang Tua Siswa'));
             $siswa->asal_sekolah = $pendaftar->asal_sekolah;
-            $siswa->no_hp_ortu = $pendaftar->no_hp_ortu ?: ($pendaftar->no_hp_ayah ?: ($pendaftar->no_hp_ibu ?: $pendaftar->no_hp_siswa));
+            $siswa->no_hp_ortu = $noHpOrtu;
             $siswa->no_hp_siswa = $pendaftar->no_hp_siswa;
             $siswa->status = 'aktif';
             if ($pendaftar->berkas_foto && empty($siswa->foto)) {
