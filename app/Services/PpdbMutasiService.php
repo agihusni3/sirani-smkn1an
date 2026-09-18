@@ -30,6 +30,10 @@ class PpdbMutasiService
             $siswa->hobi = $pendaftar->hobi;
             $siswa->organisasi_minat = $pendaftar->organisasi_minat;
             $siswa->alamat = $pendaftar->alamat;
+            $siswa->desa_kelurahan = $pendaftar->desa_kelurahan;
+            $siswa->kecamatan = $pendaftar->kecamatan;
+            $siswa->kabupaten = $pendaftar->kabupaten;
+            $siswa->provinsi = $pendaftar->provinsi;
             $siswa->nama_ayah = $pendaftar->nama_ayah;
             $siswa->pekerjaan_ayah = $pendaftar->pekerjaan_ayah;
             $siswa->pendidikan_ayah = $pendaftar->pendidikan_ayah;

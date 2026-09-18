@@ -25,6 +25,10 @@ class PpdbPendaftar extends Model
         'hobi',
         'organisasi_minat',
         'alamat',
+        'desa_kelurahan',
+        'kecamatan',
+        'kabupaten',
+        'provinsi',
         'nama_ayah',
         'pekerjaan_ayah',
         'pendidikan_ayah',
@@ -283,7 +287,18 @@ class PpdbPendaftar extends Model
     public function getNomorPendaftaranAttribute() { return $this->attributes['no_pendaftaran'] ?? ''; }
     public function setNomorPendaftaranAttribute($value) { $this->attributes['no_pendaftaran'] = $value; }
 
-    public function getAlamatLengkapAttribute() { return $this->attributes['alamat'] ?? ''; }
+    public function getAlamatLengkapAttribute()
+    {
+        if (!empty($this->attributes['alamat'])) {
+            return $this->attributes['alamat'];
+        }
+        return trim(implode(', ', array_filter([
+            $this->desa_kelurahan ? 'Desa/Kel. ' . $this->desa_kelurahan : null,
+            $this->kecamatan ? 'Kec. ' . $this->kecamatan : null,
+            $this->kabupaten,
+            $this->provinsi ? 'Prov. ' . $this->provinsi : null,
+        ]))) ?: '-';
+    }
     public function setAlamatLengkapAttribute($value) { $this->attributes['alamat'] = $value; }
 
     public function getPasFotoAttribute() { return $this->attributes['berkas_foto'] ?? null; }

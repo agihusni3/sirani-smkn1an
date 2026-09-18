@@ -184,6 +184,20 @@ class SiswaController extends Controller
         $namaOrtu = $request->input('nama_ortu') ?: ($request->input('nama_ayah') ?: ($request->input('nama_ibu') ?: 'Orang Tua Siswa'));
         $noHpOrtu = $request->input('no_hp_ortu') ?: ($request->input('no_hp_ayah') ?: ($request->input('no_hp_ibu') ?: null));
 
+        $desa = $request->input('desa_kelurahan');
+        $kec = $request->input('kecamatan');
+        $kab = $request->input('kabupaten');
+        $prov = $request->input('provinsi');
+        $jalan = $request->input('alamat_jalan') ?: $request->input('alamat');
+
+        $alamatLengkap = trim(implode(', ', array_filter([
+            $jalan,
+            $desa ? 'Desa/Kel. ' . $desa : null,
+            $kec ? 'Kec. ' . $kec : null,
+            $kab,
+            $prov ? 'Prov. ' . $prov : null,
+        ])));
+
         $siswa = Siswa::create([
             'nisn'          => $request->input('nisn'),
             'nik'           => $request->input('nik') ?: null,
@@ -194,7 +208,11 @@ class SiswaController extends Controller
             'agama'         => $request->input('agama') ?: null,
             'hobi'          => $request->input('hobi') ?: null,
             'organisasi_minat' => $request->input('organisasi_minat') ?: null,
-            'alamat'        => $request->input('alamat') ?: null,
+            'alamat'        => $alamatLengkap ?: ($jalan ?: null),
+            'desa_kelurahan'=> $desa ?: null,
+            'kecamatan'     => $kec ?: null,
+            'kabupaten'     => $kab ?: null,
+            'provinsi'      => $prov ?: null,
             'nama_ayah'     => $request->input('nama_ayah') ?: null,
             'pekerjaan_ayah'=> $request->input('pekerjaan_ayah') ?: null,
             'pendidikan_ayah'=> $request->input('pendidikan_ayah') ?: null,
@@ -274,7 +292,19 @@ class SiswaController extends Controller
         }
 
         $namaOrtu = $request->input('nama_ortu') ?: ($request->input('nama_ayah') ?: ($request->input('nama_ibu') ?: ($siswa->nama_ortu ?: 'Orang Tua Siswa')));
-        $noHpOrtu = $request->input('no_hp_ortu') ?: ($request->input('no_hp_ayah') ?: ($request->input('no_hp_ibu') ?: $siswa->no_hp_ortu));
+        $desa = $request->input('desa_kelurahan') ?: $siswa->desa_kelurahan;
+        $kec = $request->input('kecamatan') ?: $siswa->kecamatan;
+        $kab = $request->input('kabupaten') ?: $siswa->kabupaten;
+        $prov = $request->input('provinsi') ?: $siswa->provinsi;
+        $jalan = $request->input('alamat_jalan') ?: $request->input('alamat');
+
+        $alamatLengkap = trim(implode(', ', array_filter([
+            $jalan,
+            $desa ? 'Desa/Kel. ' . $desa : null,
+            $kec ? 'Kec. ' . $kec : null,
+            $kab,
+            $prov ? 'Prov. ' . $prov : null,
+        ])));
 
         $siswa->update([
             'nisn'          => $request->input('nisn'),
@@ -286,7 +316,11 @@ class SiswaController extends Controller
             'agama'         => $request->input('agama') ?: null,
             'hobi'          => $request->input('hobi') ?: null,
             'organisasi_minat' => $request->input('organisasi_minat') ?: null,
-            'alamat'        => $request->input('alamat') ?: null,
+            'alamat'        => $alamatLengkap ?: ($request->input('alamat') ?: $siswa->alamat),
+            'desa_kelurahan'=> $desa ?: null,
+            'kecamatan'     => $kec ?: null,
+            'kabupaten'     => $kab ?: null,
+            'provinsi'      => $prov ?: null,
             'nama_ayah'     => $request->input('nama_ayah') ?: null,
             'pekerjaan_ayah'=> $request->input('pekerjaan_ayah') ?: null,
             'pendidikan_ayah'=> $request->input('pendidikan_ayah') ?: null,

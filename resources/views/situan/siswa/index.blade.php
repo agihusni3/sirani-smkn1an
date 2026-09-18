@@ -370,9 +370,37 @@
 
             <div class="form-group" style="margin-bottom:0; grid-column:1 / -1;">
               <label style="margin-bottom:4px; font-weight:700; font-size:11.5px; text-transform:uppercase; letter-spacing:0.3px; color:var(--text-2);">
-                Alamat Tempat Tinggal Lengkap
+                Nama Jalan / Dusun / RT-RW
               </label>
-              <input type="text" name="alamat" placeholder="Jalan, RT/RW, Dusun, Pekon / Desa..." style="width:100%; height:38px;" />
+              <input type="text" name="alamat_jalan" placeholder="Contoh: Jl. Raya Air Naningan RT 02 / RW 01, Dusun Talang Padang" style="width:100%; height:38px;" />
+            </div>
+
+            <div class="form-group" style="margin-bottom:0;">
+              <label style="margin-bottom:4px; font-weight:700; font-size:11.5px; text-transform:uppercase; letter-spacing:0.3px; color:var(--text-2);">
+                Desa / Kelurahan / Pekon
+              </label>
+              <input type="text" name="desa_kelurahan" placeholder="Contoh: Air Naningan" style="width:100%; height:38px;" />
+            </div>
+
+            <div class="form-group" style="margin-bottom:0;">
+              <label style="margin-bottom:4px; font-weight:700; font-size:11.5px; text-transform:uppercase; letter-spacing:0.3px; color:var(--text-2);">
+                Kecamatan
+              </label>
+              <input type="text" name="kecamatan" value="Air Naningan" placeholder="Contoh: Air Naningan" style="width:100%; height:38px;" />
+            </div>
+
+            <div class="form-group" style="margin-bottom:0;">
+              <label style="margin-bottom:4px; font-weight:700; font-size:11.5px; text-transform:uppercase; letter-spacing:0.3px; color:var(--text-2);">
+                Kabupaten / Kota
+              </label>
+              <input type="text" name="kabupaten" value="Kabupaten Tanggamus" placeholder="Contoh: Kabupaten Tanggamus" style="width:100%; height:38px;" />
+            </div>
+
+            <div class="form-group" style="margin-bottom:0;">
+              <label style="margin-bottom:4px; font-weight:700; font-size:11.5px; text-transform:uppercase; letter-spacing:0.3px; color:var(--text-2);">
+                Provinsi
+              </label>
+              <input type="text" name="provinsi" value="Lampung" placeholder="Contoh: Lampung" style="width:100%; height:38px;" />
             </div>
           </div>
         </div>
@@ -856,8 +884,24 @@
           </div>
           <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap:10px;">
             <div style="grid-column:1 / -1;">
-              <label class="form-label" style="font-weight:700; font-size:11.5px; display:block; margin-bottom:4px;">Alamat Tempat Tinggal Lengkap</label>
-              <input type="text" id="edit_alamat" name="alamat" class="input-field" style="width:100%; height:38px;" />
+              <label class="form-label" style="font-weight:700; font-size:11.5px; display:block; margin-bottom:4px;">Nama Jalan / Dusun / RT-RW</label>
+              <input type="text" id="edit_alamat_jalan" name="alamat_jalan" class="input-field" placeholder="Contoh: Jl. Raya Air Naningan RT 02 / RW 01" style="width:100%; height:38px;" />
+            </div>
+            <div>
+              <label class="form-label" style="font-weight:700; font-size:11.5px; display:block; margin-bottom:4px;">Desa / Kelurahan / Pekon</label>
+              <input type="text" id="edit_desa_kelurahan" name="desa_kelurahan" class="input-field" placeholder="Contoh: Air Naningan" style="width:100%; height:38px;" />
+            </div>
+            <div>
+              <label class="form-label" style="font-weight:700; font-size:11.5px; display:block; margin-bottom:4px;">Kecamatan</label>
+              <input type="text" id="edit_kecamatan" name="kecamatan" class="input-field" placeholder="Contoh: Air Naningan" style="width:100%; height:38px;" />
+            </div>
+            <div>
+              <label class="form-label" style="font-weight:700; font-size:11.5px; display:block; margin-bottom:4px;">Kabupaten / Kota</label>
+              <input type="text" id="edit_kabupaten" name="kabupaten" class="input-field" placeholder="Contoh: Kabupaten Tanggamus" style="width:100%; height:38px;" />
+            </div>
+            <div>
+              <label class="form-label" style="font-weight:700; font-size:11.5px; display:block; margin-bottom:4px;">Provinsi</label>
+              <input type="text" id="edit_provinsi" name="provinsi" class="input-field" placeholder="Contoh: Lampung" style="width:100%; height:38px;" />
             </div>
             <div>
               <label class="form-label" style="font-weight:700; font-size:11.5px; display:block; margin-bottom:4px;">Asal Sekolah (SMP/MTs)</label>
@@ -1007,7 +1051,11 @@
     // Kontak WhatsApp Orang Tua & Siswa
     document.getElementById('edit_no_hp_ortu').value = siswa.no_hp_ortu || siswa.no_hp_ayah || siswa.no_hp_ibu || '';
     document.getElementById('edit_no_hp_siswa').value = siswa.no_hp_siswa || '';
-    document.getElementById('edit_alamat').value = siswa.alamat || '';
+    document.getElementById('edit_alamat_jalan').value = siswa.alamat || '';
+    document.getElementById('edit_desa_kelurahan').value = siswa.desa_kelurahan || '';
+    document.getElementById('edit_kecamatan').value = siswa.kecamatan || 'Air Naningan';
+    document.getElementById('edit_kabupaten').value = siswa.kabupaten || 'Kabupaten Tanggamus';
+    document.getElementById('edit_provinsi').value = siswa.provinsi || 'Lampung';
     document.getElementById('edit_asal_sekolah').value = siswa.asal_sekolah || '';
     document.getElementById('edit_status').value = siswa.status || 'aktif';
 

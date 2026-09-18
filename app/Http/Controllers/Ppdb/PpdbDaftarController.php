@@ -53,7 +53,11 @@ class PpdbDaftarController extends Controller
             'tahun_lulus' => 'required|integer|min:2020|max:' . (date('Y') + 1),
             'hobi' => 'nullable|string|max:100',
             'organisasi_minat' => 'nullable|string|max:100',
-            'alamat_lengkap' => 'required|string',
+            'alamat_jalan' => 'nullable|string|max:255',
+            'desa_kelurahan' => 'required|string|max:100',
+            'kecamatan' => 'required|string|max:100',
+            'kabupaten' => 'required|string|max:100',
+            'provinsi' => 'required|string|max:100',
             'nama_ayah' => 'nullable|string|max:150',
             'pekerjaan_ayah' => 'nullable|string|max:100',
             'pendidikan_ayah' => 'nullable|string|max:50',
@@ -79,6 +83,10 @@ class PpdbDaftarController extends Controller
             'nisn.required' => 'NISN wajib diisi.',
             'nisn.unique' => 'NISN ini sudah terdaftar dalam sistem PPDB. Silakan cek status pendaftaran Anda.',
             'nama_lengkap.required' => 'Nama lengkap calon siswa wajib diisi.',
+            'desa_kelurahan.required' => 'Desa / Kelurahan / Pekon tempat tinggal wajib diisi.',
+            'kecamatan.required' => 'Kecamatan tempat tinggal wajib diisi.',
+            'kabupaten.required' => 'Kabupaten / Kota tempat tinggal wajib diisi.',
+            'provinsi.required' => 'Provinsi tempat tinggal wajib diisi.',
             'nama_ibu.required' => 'Nama lengkap Ibu kandung wajib diisi.',
             'no_hp_ortu.required' => 'Nomor WhatsApp Orang Tua / Wali wajib diisi.',
             'jurusan_pilihan_1_id.required' => 'Pilihan keahlian utama wajib dipilih.',
@@ -98,7 +106,26 @@ class PpdbDaftarController extends Controller
         $p->tahun_lulus = (string) $validated['tahun_lulus'];
         $p->hobi = $validated['hobi'] ?? null;
         $p->organisasi_minat = $validated['organisasi_minat'] ?? null;
-        $p->alamat = $validated['alamat_lengkap'];
+
+        $desa = $validated['desa_kelurahan'] ?? null;
+        $kec = $validated['kecamatan'] ?? null;
+        $kab = $validated['kabupaten'] ?? null;
+        $prov = $validated['provinsi'] ?? null;
+        $jalan = $validated['alamat_jalan'] ?? null;
+
+        $p->desa_kelurahan = $desa;
+        $p->kecamatan = $kec;
+        $p->kabupaten = $kab;
+        $p->provinsi = $prov;
+
+        $alamatLengkap = trim(implode(', ', array_filter([
+            $jalan,
+            $desa ? 'Desa/Kel. ' . $desa : null,
+            $kec ? 'Kec. ' . $kec : null,
+            $kab,
+            $prov ? 'Prov. ' . $prov : null,
+        ])));
+        $p->alamat = $alamatLengkap ?: ($request->input('alamat_lengkap') ?: '-');
         $p->no_hp_siswa = $validated['no_hp_siswa'];
         $p->nama_ayah = $validated['nama_ayah'] ?? null;
         $p->pekerjaan_ayah = $validated['pekerjaan_ayah'] ?? null;

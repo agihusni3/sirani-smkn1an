@@ -183,11 +183,53 @@
                     </div>
                 </div>
 
-                <div style="margin-top: 18px;">
-                    <label style="display: block; font-size: 0.85rem; font-weight: 700; color: var(--text-dark); margin-bottom: 8px;">
-                        Alamat Tempat Tinggal Lengkap <span style="color: #ef4444;">*</span>
-                    </label>
-                    <textarea name="alamat_lengkap" required rows="2" placeholder="Nama Jalan, RT/RW, Dusun, Pekon / Desa, Kecamatan, Kabupaten..." style="width: 100%; padding: 11px 14px; font-size: 0.9rem;">{{ old('alamat_lengkap') }}</textarea>
+                {{-- PEMISAHAN ALAMAT: JALAN/DUSUN, DESA/KELURAHAN, KECAMATAN, KABUPATEN, PROVINSI --}}
+                <div style="margin-top: 18px; padding-top: 18px; border-top: 1px dashed var(--border-main);">
+                    <div style="font-size: 0.92rem; font-weight: 800; color: var(--text-dark); margin-bottom: 12px; display: flex; align-items: center; gap: 6px;">
+                        <i class="bi bi-geo-alt-fill" style="color: #ef4444;"></i> Alamat Tempat Tinggal Calon Siswa
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px;">
+                        {{-- Jalan / Dusun / RT-RW --}}
+                        <div style="grid-column: 1 / -1;">
+                            <label style="display: block; font-size: 0.83rem; font-weight: 700; color: var(--text-dark); margin-bottom: 6px;">
+                                Nama Jalan / Dusun / RT-RW
+                            </label>
+                            <input type="text" name="alamat_jalan" value="{{ old('alamat_jalan') }}" placeholder="Contoh: Dusun Talang Jawa RT 02 / RW 01" style="width: 100%; padding: 10px 14px; font-size: 0.88rem;">
+                        </div>
+
+                        {{-- Desa / Kelurahan / Pekon --}}
+                        <div>
+                            <label style="display: block; font-size: 0.83rem; font-weight: 700; color: var(--text-dark); margin-bottom: 6px;">
+                                Desa / Kelurahan / Pekon <span style="color: #ef4444;">*</span>
+                            </label>
+                            <input type="text" name="desa_kelurahan" value="{{ old('desa_kelurahan') }}" required placeholder="Contoh: Air Naningan" style="width: 100%; padding: 10px 14px; font-size: 0.88rem;">
+                        </div>
+
+                        {{-- Kecamatan --}}
+                        <div>
+                            <label style="display: block; font-size: 0.83rem; font-weight: 700; color: var(--text-dark); margin-bottom: 6px;">
+                                Kecamatan <span style="color: #ef4444;">*</span>
+                            </label>
+                            <input type="text" name="kecamatan" value="{{ old('kecamatan', 'Air Naningan') }}" required placeholder="Contoh: Air Naningan" style="width: 100%; padding: 10px 14px; font-size: 0.88rem;">
+                        </div>
+
+                        {{-- Kabupaten / Kota --}}
+                        <div>
+                            <label style="display: block; font-size: 0.83rem; font-weight: 700; color: var(--text-dark); margin-bottom: 6px;">
+                                Kabupaten / Kota <span style="color: #ef4444;">*</span>
+                            </label>
+                            <input type="text" name="kabupaten" value="{{ old('kabupaten', 'Kabupaten Tanggamus') }}" required placeholder="Contoh: Kabupaten Tanggamus" style="width: 100%; padding: 10px 14px; font-size: 0.88rem;">
+                        </div>
+
+                        {{-- Provinsi --}}
+                        <div>
+                            <label style="display: block; font-size: 0.83rem; font-weight: 700; color: var(--text-dark); margin-bottom: 6px;">
+                                Provinsi <span style="color: #ef4444;">*</span>
+                            </label>
+                            <input type="text" name="provinsi" value="{{ old('provinsi', 'Lampung') }}" required placeholder="Contoh: Lampung" style="width: 100%; padding: 10px 14px; font-size: 0.88rem;">
+                        </div>
+                    </div>
                 </div>
 
                 {{-- Hobi & Minat Organisasi --}}

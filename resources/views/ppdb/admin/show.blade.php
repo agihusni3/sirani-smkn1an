@@ -83,8 +83,26 @@
               <td style="padding:6px 0;">{{ $pendaftar->asal_sekolah }} (Lulus: {{ $pendaftar->tahun_lulus }})</td>
             </tr>
             <tr>
-              <td style="padding:6px 0; color:var(--text-3);">Alamat Lengkap</td>
-              <td style="padding:6px 0;">{{ $pendaftar->alamat_lengkap }}</td>
+              <td style="padding:6px 0; color:var(--text-3);">Alamat Tempat Tinggal</td>
+              <td style="padding:6px 0;">
+                <div style="font-weight:700; color:var(--text);">{{ $pendaftar->alamat_lengkap }}</div>
+                @if($pendaftar->desa_kelurahan || $pendaftar->kecamatan || $pendaftar->kabupaten || $pendaftar->provinsi)
+                  <div style="margin-top:4px; font-size:11px; color:var(--text-3); display:flex; flex-wrap:wrap; gap:6px;">
+                    @if($pendaftar->desa_kelurahan)
+                      <span style="background:var(--surface); padding:2px 8px; border-radius:4px; border:1px solid var(--border);">Desa: <strong>{{ $pendaftar->desa_kelurahan }}</strong></span>
+                    @endif
+                    @if($pendaftar->kecamatan)
+                      <span style="background:var(--surface); padding:2px 8px; border-radius:4px; border:1px solid var(--border);">Kecamatan: <strong>{{ $pendaftar->kecamatan }}</strong></span>
+                    @endif
+                    @if($pendaftar->kabupaten)
+                      <span style="background:var(--surface); padding:2px 8px; border-radius:4px; border:1px solid var(--border);">Kabupaten: <strong>{{ $pendaftar->kabupaten }}</strong></span>
+                    @endif
+                    @if($pendaftar->provinsi)
+                      <span style="background:var(--surface); padding:2px 8px; border-radius:4px; border:1px solid var(--border);">Provinsi: <strong>{{ $pendaftar->provinsi }}</strong></span>
+                    @endif
+                  </div>
+                @endif
+              </td>
             </tr>
             <tr>
               <td style="padding:6px 0; color:var(--text-3);">Hobi Calon Siswa</td>
