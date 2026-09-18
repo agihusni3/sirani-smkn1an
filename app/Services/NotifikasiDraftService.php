@@ -537,4 +537,151 @@ class NotifikasiDraftService
 
         return $notifWali;
     }
+
+    /**
+     * Sinkronkan satu data presensi siswa dengan antrean notifikasi WhatsApp.
+     */
+    public static function sinkronkanPresensiSiswa(Siswa $siswa, string $tanggal, string $status, ?string $jam = null, ?string $keterangan = null): array
+    {
+        $status = strtolower($status);
+        $kategori = match ($status) {
+            'alpha'          => 'alpha',
+            'terlambat'      => 'terlambat',
+            'sakit'          => 'sakit',
+            'izin', 'dispen' => 'izin',
+            'bolos'          => 'bolos',
+            default          => null,
+        };
+
+        if ($status === 'hadir' || empty($kategori)) {
+            // Jika siswa tercatat HADIR, batalkan draf notifikasi ketidakhadiran yang masih pending
+            $affected = NotifikasiOrtu::where('siswa_id', $siswa->id)
+                ->whereDate('tanggal', $tanggal)
+                ->where('status', 'pending')
+                ->whereIn('kategori', ['alpha', 'terlambat', 'bolos', 'sakit', 'izin', 'panggilan_ortu'])
+                ->update([
+                    'status'            => 'dibatalkan',
+                    'diverifikasi_oleh' => 'Sistem (Sinkronisasi Hadir)',
+                    'waktu_verifikasi'  => now(),
+                    'catatan_error'     => 'Dibatalkan otomatis karena status presensi siswa tercatat HADIR.',
+                ]);
+            return ['action' => 'cancelled', 'count' => $affected];
+        }
+
+        // Cek apakah sudah ada notifikasi untuk siswa pada tanggal ini
+        $existing = NotifikasiOrtu::where('siswa_id', $siswa->id)
+            ->whereDate('tanggal', $tanggal)
+            ->whereIn('kategori', ['alpha', 'terlambat', 'bolos', 'sakit', 'izin', 'panggilan_ortu'])
+            ->first();
+
+        if ($existing) {
+            if ($existing->status === 'terkirim') {
+                return ['action' => 'already_sent', 'notifikasi' => $existing];
+            }
+
+            // Jika ada draf dengan kategori berbeda atau sebelumnya terbatalkan, perbarui dan aktifkan kembali
+            if ($existing->kategori !== $kategori || $existing->status === 'dibatalkan') {
+                $pesanBaru = self::parsePesan($siswa, $kategori, [
+                    'tanggal'    => $tanggal,
+                    'jam'        => $jam ?: ($existing->created_at ? Carbon::parse($existing->created_at)->format('H:i:s') : Carbon::now()->format('H:i:s')),
+                    'keterangan' => $keterangan ?: '-',
+                ]);
+
+                $rombel = $siswa->siswaRombels()->where('status_keanggotaan', 'aktif')->with('rombel')->first()?->rombel;
+                $namaRombel = $rombel ? $rombel->nama_rombel : '-';
+
+                $judul = match ($kategori) {
+                    'terlambat' => "Keterlambatan: {$siswa->nama} ({$namaRombel})",
+                    'alpha'     => "Ketidakhadiran Alpha: {$siswa->nama} ({$namaRombel})",
+                    'izin'      => "Perizinan Siswa: {$siswa->nama} ({$namaRombel})",
+                    'sakit'     => "Izin Sakit: {$siswa->nama} ({$namaRombel})",
+                    'bolos'     => "Peringatan Bolos: {$siswa->nama} ({$namaRombel})",
+                    default     => "Notifikasi Siswa: {$siswa->nama}",
+                };
+
+                $existing->update([
+                    'kategori'          => $kategori,
+                    'judul'             => $judul,
+                    'pesan'             => $pesanBaru,
+                    'status'            => 'pending',
+                    'no_tujuan'         => $siswa->no_hp_ortu ?: $existing->no_tujuan,
+                    'nama_ortu'         => $siswa->nama_ortu ?: $existing->nama_ortu,
+                    'catatan_error'     => null,
+                    'diverifikasi_oleh' => null,
+                    'waktu_verifikasi'  => null,
+                ]);
+
+                return ['action' => 'updated', 'notifikasi' => $existing];
+            }
+
+            return ['action' => 'unchanged', 'notifikasi' => $existing];
+        }
+
+        // Jika belum ada draf sama sekali, buatkan draf baru
+        $draft = self::buatDraft($siswa, $kategori, [
+            'tanggal'    => $tanggal,
+            'jam'        => $jam ?: Carbon::now()->format('H:i:s'),
+            'keterangan' => $keterangan ?: '-',
+        ], 'sistem_sinkronisasi');
+
+        return ['action' => $draft ? 'created' : 'skipped', 'notifikasi' => $draft];
+    }
+
+    /**
+     * Sinkronkan seluruh data presensi harian dengan antrean notifikasi WhatsApp.
+     */
+    public static function sinkronkanDariAbsensi(?string $tanggal = null): array
+    {
+        $tanggal = $tanggal ?: Carbon::today()->toDateString();
+
+        $absensis = Absensi::where('pemilik_type', 'siswa')
+            ->whereDate('tanggal', $tanggal)
+            ->with(['siswa.siswaRombels.rombel.waliKelas', 'siswa.siswaRombels.rombel.jurusan'])
+            ->get();
+
+        $stats = [
+            'total_absensi' => $absensis->count(),
+            'created'       => 0,
+            'updated'       => 0,
+            'cancelled'     => 0,
+        ];
+
+        foreach ($absensis as $abs) {
+            $siswa = $abs->siswa;
+            if (!$siswa) continue;
+
+            $res = self::sinkronkanPresensiSiswa(
+                $siswa,
+                $tanggal,
+                $abs->status,
+                $abs->jam_masuk,
+                $abs->keterangan
+            );
+
+            if (($res['action'] ?? '') === 'created') $stats['created']++;
+            elseif (($res['action'] ?? '') === 'updated') $stats['updated']++;
+            elseif (($res['action'] ?? '') === 'cancelled') $stats['cancelled']++;
+        }
+
+        // Batalkan draf pending jika siswa bersangkutan di absensi hari ini sudah tidak berstatus pelanggaran
+        $siswaPelanggaranIds = $absensis->whereIn('status', ['alpha', 'terlambat', 'bolos', 'sakit', 'izin'])
+            ->pluck('pemilik_id')
+            ->filter()
+            ->toArray();
+
+        $orphanedPending = NotifikasiOrtu::whereDate('tanggal', $tanggal)
+            ->where('status', 'pending')
+            ->whereIn('kategori', ['alpha', 'terlambat', 'bolos', 'sakit', 'izin'])
+            ->whereNotIn('siswa_id', $siswaPelanggaranIds)
+            ->update([
+                'status'            => 'dibatalkan',
+                'diverifikasi_oleh' => 'Sistem (Sinkronisasi Absensi)',
+                'waktu_verifikasi'  => now(),
+                'catatan_error'     => 'Dibatalkan otomatis karena tidak ada catatan ketidakhadiran di presensi.',
+            ]);
+
+        $stats['cancelled'] += $orphanedPending;
+
+        return $stats;
+    }
 }

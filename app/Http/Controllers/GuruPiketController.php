@@ -309,14 +309,11 @@ class GuruPiketController extends Controller
                     IzinSiswa::where('siswa_id', $siswaId)->where('tanggal', $absensi->tanggal)->delete();
                 }
 
-                // Sinkronisasi Buku Kasus Disiplin & Hapus Notifikasi Pending jika Hadir/Izin
+                // Sinkronisasi Buku Kasus Disiplin & Sinkronisasi Notifikasi Presensi WhatsApp
                 KasusDisiplin::syncFromPresensi($siswaId);
-                if (!in_array($status, ['alpha', 'terlambat', 'bolos'])) {
-                    NotifikasiOrtu::where('siswa_id', $siswaId)
-                        ->where('tanggal', $absensi->tanggal)
-                        ->where('status', 'pending')
-                        ->whereIn('kategori', ['alpha', 'terlambat', 'bolos', 'panggilan_ortu'])
-                        ->delete();
+                $siswaObj = Siswa::find($siswaId);
+                if ($siswaObj) {
+                    \App\Services\NotifikasiDraftService::sinkronkanPresensiSiswa($siswaObj, $absensi->tanggal, $status, $jamMasuk, $ketFinal);
                 }
             }
         }
@@ -428,15 +425,9 @@ class GuruPiketController extends Controller
             IzinSiswa::where('siswa_id', $siswa->id)->where('tanggal', $today)->delete();
         }
 
-        // Sinkronisasi Buku Kasus Disiplin & Hapus Notifikasi Pending jika Hadir/Izin
+        // Sinkronisasi Buku Kasus Disiplin & Sinkronisasi Notifikasi Presensi WhatsApp
         KasusDisiplin::syncFromPresensi($siswa->id);
-        if (!in_array($status, ['alpha', 'terlambat', 'bolos'])) {
-            NotifikasiOrtu::where('siswa_id', $siswa->id)
-                ->where('tanggal', $today)
-                ->where('status', 'pending')
-                ->whereIn('kategori', ['alpha', 'terlambat', 'bolos', 'panggilan_ortu'])
-                ->delete();
-        }
+        \App\Services\NotifikasiDraftService::sinkronkanPresensiSiswa($siswa, $today, $status, $jamMasuk, $ketFinal);
 
         return redirect()->back()->with('success', "Presensi ananda {$siswa->nama} berhasil divalidasi sebagai: " . strtoupper($status));
     }

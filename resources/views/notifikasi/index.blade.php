@@ -29,6 +29,16 @@
 
         <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
           @if(auth()->check() && (auth()->user()->isAdmin() || auth()->user()->isGuruPiket() || auth()->user()->isPiketHariIni()))
+            <form action="{{ route('notifikasi.sinkronkan-presensi') }}" method="POST" style="display:inline; margin:0;">
+              @csrf
+              @if(request('tanggal'))
+                <input type="hidden" name="tanggal" value="{{ request('tanggal') }}" />
+              @endif
+              <button type="submit" class="btn btn-sm btn-outline" style="height:32px; padding:0 10px; font-size:11px; font-weight:700; color:#2563EB; border:1px solid rgba(37,99,235,0.3); background:var(--bg-2); display:inline-flex; align-items:center; gap:4px; border-radius:6px; cursor:pointer;" title="Sinkronkan antrean notifikasi dengan data presensi siswa (Alpha, Terlambat, Sakit, Izin, Bolos)">
+                <i class="bi bi-arrow-repeat"></i> Sinkronkan Presensi{{ request('tanggal') ? ' (' . \Carbon\Carbon::parse(request('tanggal'))->format('d/m') . ')' : '' }}
+              </button>
+            </form>
+
             <form action="{{ route('notifikasi.bersihkan-kadaluarsa') }}" method="POST" onsubmit="return confirm('Bersihkan semua draf notifikasi yang sudah lewat hari atau kehadiran normal (masuk/pulang) dari antrean?');" style="display:inline; margin:0;">
               @csrf
               <button type="submit" class="btn btn-sm btn-outline" style="height:32px; padding:0 10px; font-size:11px; font-weight:700; color:var(--text-2); border:1px solid var(--border-2); background:var(--bg-2); display:inline-flex; align-items:center; gap:4px; border-radius:6px; cursor:pointer;" title="Batalkan otomatis draf usang hari kemarin atau rutin masuk/pulang">

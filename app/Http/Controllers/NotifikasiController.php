@@ -29,21 +29,25 @@ class NotifikasiController extends Controller
         $user  = auth()->user();
 
         // 0. AUTO-CLEANUP OTOMATIS:
-        // Batalkan otomatis semua draf pending yang sudah lewat hari atau kategori kehadiran rutin normal (masuk/pulang).
-        // Hal ini menjamin halaman notifikasi selalu bersih dan antrean tidak pernah menumpuk ratusan pesan usang.
+        // Batalkan otomatis draf pending untuk kehadiran rutin normal (masuk/pulang)
+        // atau draf kedisiplinan yang sudah usang (> 7 hari).
         NotifikasiOrtu::where('status', 'pending')
             ->where(function ($q) use ($today) {
                 $q->whereIn('kategori', ['masuk', 'pulang'])
-                  ->orWhereDate('tanggal', '<', $today);
+                  ->orWhereDate('tanggal', '<', Carbon::today()->subDays(7)->toDateString());
             })
             ->update([
                 'status'            => 'dibatalkan',
                 'diverifikasi_oleh' => 'Sistem (Auto-Expire)',
                 'waktu_verifikasi'  => now(),
-                'catatan_error'     => 'Dibersihkan otomatis oleh sistem (draf kadaluarsa / anomali kehadiran rutin)',
+                'catatan_error'     => 'Dibersihkan otomatis oleh sistem (draf kadaluarsa > 7 hari / kehadiran rutin)',
             ]);
 
-        // 0.1. SINKRONISASI TEMPLATE:
+        // 0.1. SINKRONISASI PRESENSI HARI INI SECARA OTOMATIS:
+        // Memastikan antrean notifikasi selalu sinkron dengan status presensi terkini (Alpha, Terlambat, Sakit, Izin, Bolos).
+        \App\Services\NotifikasiDraftService::sinkronkanDariAbsensi($today);
+
+        // 0.2. SINKRONISASI TEMPLATE:
         // Otomatis ubah pesan draf pending lama yang masih memakai teks hardcoded RFID ke template resmi terkini
         \App\Services\NotifikasiDraftService::sinkronkanDraftPending();
 
@@ -285,6 +289,21 @@ class NotifikasiController extends Controller
         ]);
 
         return back()->with('success', "Berhasil membersihkan {$affected} draf notifikasi dari antrean!");
+    }
+
+    /**
+     * Sinkronkan antrean notifikasi dengan data presensi siswa terkini.
+     */
+    public function sinkronkanPresensi(Request $request)
+    {
+        $tanggal = $request->input('tanggal') ?: Carbon::today()->toDateString();
+        $stats = \App\Services\NotifikasiDraftService::sinkronkanDariAbsensi($tanggal);
+
+        $tglFormatted = Carbon::parse($tanggal)->translatedFormat('d M Y');
+        return redirect()->back()->with(
+            'success',
+            "Sinkronisasi Presensi ({$tglFormatted}) selesai: {$stats['created']} draf baru dibuat, {$stats['updated']} draf diperbarui, {$stats['cancelled']} draf dibatalkan."
+        );
     }
 
     /**
