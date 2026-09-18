@@ -514,8 +514,8 @@
           <div>
             <label class="form-label" style="font-weight:700; font-size:11.5px; display:block; margin-bottom:4px; color:var(--text-2);">Status Operasional</label>
             <select name="is_active" class="input-field" style="width:100%; height:36px; font-size:12px;">
-              <option value="1" {{ $setting->is_active ? 'selected' : '' }}>🟢 Aktif (Live Dispatch)</option>
-              <option value="0" {{ !$setting->is_active ? 'selected' : '' }}>🔴 Nonaktif (Simpan Draf Saja)</option>
+              <option value="1" {{ $setting->is_active ? 'selected' : '' }}>Aktif (Live Dispatch)</option>
+              <option value="0" {{ !$setting->is_active ? 'selected' : '' }}>Nonaktif (Simpan Draf Saja)</option>
             </select>
           </div>
         </div>
@@ -544,27 +544,27 @@
         <div style="display:grid; grid-template-columns:1fr; gap:8px;">
           <label style="display:flex; align-items:center; gap:8px; font-size:12px; font-weight:700; color:var(--text); cursor:pointer;">
             <input type="checkbox" name="notif_alpha_aktif" value="1" {{ ($setting->notif_alpha_aktif ?? true) ? 'checked' : '' }} style="width:16px; height:16px;" />
-            <span>❌ Siswa Alpha (Tanpa Keterangan) <span style="font-size:10.5px; color:#DC2626; font-weight:600;">(Prioritas Utama)</span></span>
+            <span>Siswa Alpha (Tanpa Keterangan) <span style="font-size:10.5px; color:#DC2626; font-weight:600;">(Prioritas Utama)</span></span>
           </label>
 
           <label style="display:flex; align-items:center; gap:8px; font-size:12px; font-weight:700; color:var(--text); cursor:pointer;">
             <input type="checkbox" name="notif_bolos_aktif" value="1" {{ ($setting->notif_bolos_aktif ?? true) ? 'checked' : '' }} style="width:16px; height:16px;" />
-            <span>🚫 Siswa Bolos / Pulang Sebelum Waktu <span style="font-size:10.5px; color:#DC2626; font-weight:600;">(Prioritas Utama)</span></span>
+            <span>Siswa Bolos / Pulang Sebelum Waktu <span style="font-size:10.5px; color:#DC2626; font-weight:600;">(Prioritas Utama)</span></span>
           </label>
 
           <label style="display:flex; align-items:center; gap:8px; font-size:12px; font-weight:700; color:var(--text); cursor:pointer;">
             <input type="checkbox" name="notif_terlambat_aktif" value="1" {{ ($setting->notif_terlambat_aktif ?? true) ? 'checked' : '' }} style="width:16px; height:16px;" />
-            <span>⚠️ Siswa Terlambat Datang Sekolah</span>
+            <span>Siswa Terlambat Datang Sekolah</span>
           </label>
 
           <label style="display:flex; align-items:center; gap:8px; font-size:12px; font-weight:700; color:var(--text); cursor:pointer;">
             <input type="checkbox" name="notif_panggilan_aktif" value="1" {{ ($setting->notif_panggilan_aktif ?? true) ? 'checked' : '' }} style="width:16px; height:16px;" />
-            <span>🚨 Surat Panggilan Orang Tua (Akumulasi Alpha)</span>
+            <span>Surat Panggilan Orang Tua (Akumulasi Alpha)</span>
           </label>
 
           <label style="display:flex; align-items:center; gap:8px; font-size:12px; font-weight:700; color:var(--text); cursor:pointer;">
             <input type="checkbox" name="notif_izin_aktif" value="1" {{ ($setting->notif_izin_aktif ?? true) ? 'checked' : '' }} style="width:16px; height:16px;" />
-            <span>📋 Konfirmasi Surat Izin &amp; Sakit Resmi</span>
+            <span>Konfirmasi Surat Izin &amp; Sakit Resmi</span>
           </label>
 
           <div style="border-top:1px dashed var(--border); margin:4px 0;"></div>
@@ -572,7 +572,7 @@
           <label style="display:flex; align-items:flex-start; gap:8px; font-size:12px; font-weight:600; color:var(--text-2); cursor:pointer;">
             <input type="checkbox" name="notif_masuk_aktif" value="1" {{ ($setting->notif_masuk_aktif ?? false) ? 'checked' : '' }} style="width:16px; height:16px; margin-top:2px;" />
             <div>
-              <span>🟢 Siswa Masuk Tepat Waktu (Kehadiran Normal)</span>
+              <span>Siswa Masuk Tepat Waktu (Kehadiran Normal)</span>
               <div style="font-size:10.5px; color:var(--text-3); font-weight:400;">Nonaktifkan agar tidak menumpuk ratusan antrean harian saat siswa scan pagi.</div>
             </div>
           </label>
@@ -580,7 +580,7 @@
           <label style="display:flex; align-items:flex-start; gap:8px; font-size:12px; font-weight:600; color:var(--text-2); cursor:pointer;">
             <input type="checkbox" name="notif_pulang_aktif" value="1" {{ ($setting->notif_pulang_aktif ?? false) ? 'checked' : '' }} style="width:16px; height:16px; margin-top:2px;" />
             <div>
-              <span>🔵 Siswa Pulang Sekolah Normal</span>
+              <span>Siswa Pulang Sekolah Normal</span>
               <div style="font-size:10.5px; color:var(--text-3); font-weight:400;">Nonaktifkan agar tidak menumpuk ratusan antrean harian saat siswa scan jam pulang.</div>
             </div>
           </label>
