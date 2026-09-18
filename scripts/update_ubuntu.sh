@@ -35,10 +35,9 @@ git fetch origin main
 git checkout -B main origin/main 2>/dev/null || git checkout main 2>/dev/null || true
 git reset --hard origin/main
 
-# 2. Jalankan migrasi database & sinkronisasi data
-echo -e "\n${YELLOW}[2/4] Memeriksa migrasi database & sinkronisasi...${NC}"
+# 2. Jalankan migrasi database
+echo -e "\n${YELLOW}[2/4] Memeriksa migrasi database...${NC}"
 php artisan migrate --force || true
-php artisan sirani:sync-siswa 2>/dev/null || true
 php artisan sirani:bersihkan-notif 2>/dev/null || true
 
 # 3. Bersihkan & Segarkan Cache Laravel

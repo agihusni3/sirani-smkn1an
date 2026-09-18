@@ -152,7 +152,9 @@
       </div>
       <div class="brand-text">
         <div style="font-weight:900; font-size:16px; letter-spacing:-0.02em; color:#0f172a;">PPDB 2026</div>
-        <div style="font-size:10.5px; color:#64748b; font-weight:600;">Panitia Seleksi Calon Siswa</div>
+        <div style="font-size:10.5px; color:#64748b; font-weight:600;">
+          {{ auth()->user()?->canAccessPpdb() ? 'Panitia Seleksi Calon Siswa' : 'Meja Guru Pewawancara' }}
+        </div>
       </div>
     </div>
     <button type="button" class="sidebar-close-btn" id="sidebarCloseBtn" onclick="window.closeSmknSidebar()" aria-label="Tutup Menu">
@@ -160,18 +162,26 @@
     </button>
   </div>
 
-  {{-- 2. QUICK SWITCHER KE DCC --}}
+  {{-- 2. QUICK SWITCHER KE DCC / DASBOR GURU --}}
   <div style="margin-bottom:14px;">
-    <a href="{{ route('admin.portal') }}" class="btn" style="width:100%; display:flex; align-items:center; justify-content:center; gap:8px; padding:8px 12px; font-size:11.5px; font-weight:800; background:#0f172a; color:#ffffff; border:1px solid #1e293b; border-radius:8px; text-decoration:none; box-shadow:0 2px 6px rgba(15,23,42,0.1); box-sizing:border-box;" title="Buka Data Control Center (DCC) SMKN 1 AN">
-      <i class="bi bi-command" style="color:#38bdf8; font-size:13px;"></i>
-      <span>DCC SMKN 1 AN</span>
-    </a>
+    @if(auth()->user()?->canAccessPpdb())
+      <a href="{{ route('admin.portal') }}" class="btn" style="width:100%; display:flex; align-items:center; justify-content:center; gap:8px; padding:8px 12px; font-size:11.5px; font-weight:800; background:#0f172a; color:#ffffff; border:1px solid #1e293b; border-radius:8px; text-decoration:none; box-shadow:0 2px 6px rgba(15,23,42,0.1); box-sizing:border-box;" title="Buka Data Control Center (DCC) SMKN 1 AN">
+        <i class="bi bi-command" style="color:#38bdf8; font-size:13px;"></i>
+        <span>DCC SMKN 1 AN</span>
+      </a>
+    @else
+      <a href="/dashboard" class="btn" style="width:100%; display:flex; align-items:center; justify-content:center; gap:8px; padding:8px 12px; font-size:11.5px; font-weight:800; background:#0f172a; color:#ffffff; border:1px solid #1e293b; border-radius:8px; text-decoration:none; box-shadow:0 2px 6px rgba(15,23,42,0.1); box-sizing:border-box;" title="Kembali ke Dasbor Utama">
+        <i class="bi bi-arrow-left" style="color:#38bdf8; font-size:13px;"></i>
+        <span>Kembali ke Dasbor</span>
+      </a>
+    @endif
   </div>
 
   {{-- 3. KELOMPOK 1: MENU UTAMA --}}
   <div class="nav-section">
     <div class="nav-section-title">Menu Utama</div>
 
+    @if(auth()->user()?->canAccessPpdb())
     {{-- Dasbor --}}
     <a href="{{ route('admin.ppdb.index') }}" class="ppdb-nav-link {{ (request()->is('admin/ppdb') && empty($statusQuery) && empty($jurusanQuery) && !request()->is('admin/ppdb/log*') && !request()->is('admin/ppdb/seleksi*')) ? 'active' : '' }}">
       <div style="display:flex; align-items:center;">
@@ -188,6 +198,7 @@
       </div>
       <span class="ppdb-badge badge-blue">CBT</span>
     </a>
+    @endif
 
     {{-- Meja Wawancara Kejuruan --}}
     <a href="{{ route('admin.ppdb.wawancara') }}" class="ppdb-nav-link {{ request()->is('admin/ppdb/wawancara*') ? 'active' : '' }}" title="Meja Penilaian Wawancara &amp; Minat Kejuruan">
@@ -210,6 +221,7 @@
       @endif
     </a>
 
+    @if(auth()->user()?->canAccessPpdb())
     {{-- Presensi Ujian Barcode --}}
     <a href="{{ route('admin.ppdb.presensi.kios') }}" class="ppdb-nav-link {{ request()->is('admin/ppdb/presensi-ujian*') ? 'active' : '' }}" title="Kios Presensi Barcode 2D / QR Ujian PPDB">
       <div style="display:flex; align-items:center;">
@@ -226,9 +238,11 @@
         <span>Log Aktivitas</span>
       </div>
     </a>
+    @endif
   </div>
 
-  {{-- 4. KELOMPOK 2: TAHAPAN VERIFIKASI & SELEKSI BERKAS --}}
+  @if(auth()->user()?->canAccessPpdb())
+  {{-- 4. KELOMPOK 2: TAHAPAN VERIFIKASI & SELEKSI BERKAS (Khusus Panitia PPDB) --}}
   <div class="nav-section">
     <div class="nav-section-title">
       <span>Data Calon Siswa</span>
@@ -289,7 +303,7 @@
     </a>
   </div>
 
-  {{-- 5. KELOMPOK 3: PEMINATAN JURUSAN --}}
+  {{-- 5. KELOMPOK 3: PEMINATAN JURUSAN (Khusus Panitia PPDB) --}}
   <div class="nav-section">
     <div class="nav-section-title">Jurusan Pilihan</div>
 
@@ -308,6 +322,7 @@
       </a>
     @endforeach
   </div>
+  @endif
 
   {{-- 6. KELOMPOK 4: AKSES CEPAT PUBLIK & MODUL LAIN --}}
   <div class="nav-section" style="margin-top:auto; padding-top:12px; border-top:1px dashed #e2e8f0;">
@@ -327,12 +342,14 @@
       </div>
     </a>
 
+    @if(auth()->user()?->canAccessSituan())
     <a href="/situan" class="ppdb-nav-link" title="Buka Modul Tata Usaha SITUAN">
       <div style="display:flex; align-items:center;">
         <i class="bi bi-building ppdb-nav-icon"></i>
         <span>Modul SITUAN</span>
       </div>
     </a>
+    @endif
   </div>
 
 </aside>

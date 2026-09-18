@@ -11,7 +11,7 @@ use Illuminate\Http\Request;
 class PpdbGuruWawancaraController extends Controller
 {
     /**
-     * Pastikan user yang mengakses adalah Guru, Tenaga Pendidik, Panitia PPDB, atau Admin
+     * Pastikan user yang mengakses adalah Tim Panitia PPDB atau Guru yang ditugaskan sebagai Pewawancara
      */
     protected function authorizeGuru()
     {
@@ -20,8 +20,8 @@ class PpdbGuruWawancaraController extends Controller
             abort(401, 'Silakan login terlebih dahulu.');
         }
 
-        if (!$user->guru_id && !$user->isGuru() && !$user->isAdmin() && !in_array($user->role, ['panitia_ppdb', 'kepala_sekolah', 'waka_kesiswaan', 'guru_bk', 'kaprog'], true)) {
-            abort(403, 'Akses terbatas hanya untuk Guru Penguji Wawancara PPDB.');
+        if (!$user->canAccessWawancaraPpdb()) {
+            abort(403, 'Akses terbatas. Meja wawancara hanya dapat diakses oleh Panitia PPDB atau Guru yang ditugaskan sebagai Penguji Wawancara.');
         }
 
         return $user;
@@ -36,7 +36,9 @@ class PpdbGuruWawancaraController extends Controller
         $setting = PpdbUjianSetting::getAktif();
         $jurusans = Jurusan::all();
 
-        $tab = $request->query('tab', 'saya'); // 'saya' | 'semua'
+        $isPanitia = $user->canAccessPpdb();
+        // Guru biasa pewawancara dikunci pada tab 'saya' (hanya siswa binaan)
+        $tab = $isPanitia ? $request->query('tab', 'saya') : 'saya';
         $cari = $request->query('cari');
         $jurusanId = $request->query('jurusan_id');
 
@@ -105,9 +107,14 @@ class PpdbGuruWawancaraController extends Controller
      */
     public function simpanNilai(Request $request, $id)
     {
-        $this->authorizeGuru();
+        $user = $this->authorizeGuru();
 
         $pendaftar = PpdbPendaftar::findOrFail($id);
+
+        // Validasi penugasan jika bukan panitia PPDB
+        if (!$user->canAccessPpdb() && (int)$pendaftar->pewawancara_id !== (int)$user->id) {
+            abort(403, 'Akses ditolak. Anda hanya berhak menilai calon siswa yang ditugaskan kepada Anda.');
+        }
 
         $validated = $request->validate([
             'nilai_wawancara_motivasi' => 'required|numeric|min:0|max:100',
@@ -136,14 +143,20 @@ class PpdbGuruWawancaraController extends Controller
     /**
      * Cetak Lembar Hasil / Format Wawancara (A4)
      */
-    public function cetak($id)
+    public function cetak($id = null)
     {
-        $this->authorizeGuru();
+        $user = $this->authorizeGuru();
 
-        $pendaftar = PpdbPendaftar::with(['jurusan1', 'jurusan2', 'pewawancara'])->findOrFail($id);
+        $pendaftar = null;
+        if ($id) {
+            $pendaftar = PpdbPendaftar::with(['jurusan1', 'jurusan2', 'pewawancara'])->findOrFail($id);
+            if (!$user->canAccessPpdb() && (int)$pendaftar->pewawancara_id !== (int)$user->id) {
+                abort(403, 'Akses ditolak. Anda hanya berhak mencetak berkas wawancara calon siswa yang ditugaskan kepada Anda.');
+            }
+        }
+
         $jurusans = Jurusan::all();
         $setting = PpdbUjianSetting::getAktif();
-
         $sekolah = \App\Models\PengaturanSekolah::getAktif();
 
         return view('ppdb.admin.cetak_instrumen_wawancara', compact(
@@ -152,5 +165,16 @@ class PpdbGuruWawancaraController extends Controller
             'setting',
             'sekolah'
         ));
+    }
+
+    /**
+     * Tampilkan Lembar Piringan Tes Buta Warna Ishihara untuk Pewawancara
+     */
+    public function tesButaWarna()
+    {
+        $this->authorizeGuru();
+        $plates = PpdbAdminController::getDaftarPlateIshihara();
+        $sekolah = \App\Models\PengaturanSekolah::getAktif();
+        return view('ppdb.admin.tes_buta_warna', compact('plates', 'sekolah'));
     }
 }

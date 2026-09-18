@@ -28,6 +28,7 @@ class AdminPortalController extends Controller
         $canAccessSituan = $user ? $user->canAccessSituan() : false;
         $canAccessSirani = $user ? $user->canAccessSirani() : false;
         $canAccessPpdb   = $user ? $user->canAccessPpdb() : false;
+        $isPewawancaraPpdb = $user ? $user->isPewawancaraPpdb() : false;
         $canAccessWeb    = $user ? $user->canAccessWebHumas() : false;
 
         $today = Carbon::today()->toDateString();
@@ -119,6 +120,7 @@ class AdminPortalController extends Controller
             'canAccessSituan',
             'canAccessSirani',
             'canAccessPpdb',
+            'isPewawancaraPpdb',
             'canAccessWeb',
             'totalSiswa',
             'totalGuru',

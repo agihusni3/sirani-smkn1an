@@ -100,10 +100,10 @@
       </div>
 
       <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
-        <a href="{{ route('admin.ppdb.seleksi.tes_buta_warna') }}" target="_blank" class="btn btn-sm" style="background:rgba(255,255,255,0.12); color:#ffffff; font-weight:700; border-radius:8px; font-size:12px; padding:8px 14px; border:1px solid rgba(255,255,255,0.2); text-decoration:none; display:inline-flex; align-items:center; gap:6px;">
+        <a href="{{ route('admin.ppdb.wawancara.tes_buta_warna') }}" target="_blank" class="btn btn-sm" style="background:rgba(255,255,255,0.12); color:#ffffff; font-weight:700; border-radius:8px; font-size:12px; padding:8px 14px; border:1px solid rgba(255,255,255,0.2); text-decoration:none; display:inline-flex; align-items:center; gap:6px;">
           <i class="bi bi-eye text-warning"></i> Piringan Ishihara
         </a>
-        <a href="{{ route('admin.ppdb.seleksi.cetak_wawancara') }}" target="_blank" class="btn btn-sm" style="background:#f59e0b; color:#000000; font-weight:800; border-radius:8px; font-size:12px; padding:8px 16px; border:none; text-decoration:none; display:inline-flex; align-items:center; gap:6px; box-shadow:0 4px 10px rgba(245,158,11,0.3);">
+        <a href="{{ route('admin.ppdb.wawancara.cetak') }}" target="_blank" class="btn btn-sm" style="background:#f59e0b; color:#000000; font-weight:800; border-radius:8px; font-size:12px; padding:8px 16px; border:none; text-decoration:none; display:inline-flex; align-items:center; gap:6px; box-shadow:0 4px 10px rgba(245,158,11,0.3);">
           <i class="bi bi-printer"></i> Format Rubrik A4
         </a>
       </div>
@@ -117,7 +117,7 @@
     @endif
 
     @if(session('error'))
-      <div style="background:#fef2f2; border:1px solid #fecaca; color:#b91c1c; padding:12px 18px; margin-bottom:18px; border-radius:10px; font-size:13px; font-weight:700; display:flex; align-items:center; gap:8px;">
+      <div style="background:#fef2f2; border:1px solid #fecaca; color:#991b1b; padding:12px 18px; margin-bottom:18px; border-radius:10px; font-size:13px; font-weight:700; display:flex; align-items:center; gap:8px;">
         <i class="bi bi-exclamation-triangle-fill" style="font-size:16px;"></i> {{ session('error') }}
       </div>
     @endif
@@ -171,9 +171,11 @@
         <a href="{{ route('admin.ppdb.wawancara', ['tab' => 'saya', 'jurusan_id' => $jurusanId, 'cari' => $cari]) }}" class="btn-tab-w {{ $tab === 'saya' ? 'active' : '' }}">
           <i class="bi bi-person-badge"></i> Ditugaskan ke Saya ({{ $totalDitugaskan }})
         </a>
+        @if(auth()->user()?->canAccessPpdb())
         <a href="{{ route('admin.ppdb.wawancara', ['tab' => 'semua', 'jurusan_id' => $jurusanId, 'cari' => $cari]) }}" class="btn-tab-w {{ $tab === 'semua' ? 'active' : '' }}">
           <i class="bi bi-people-fill"></i> Semua Calon Siswa
         </a>
+        @endif
       </div>
 
       {{-- Search & Major Filter --}}

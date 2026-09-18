@@ -100,13 +100,21 @@ class SyncSiswaMasterCommand extends Command
                 ->orWhere('nisn', str_pad($cleanNisn, 10, '0', STR_PAD_LEFT))
                 ->first();
 
+            // Penentuan Status: jika siswa sudah ada di database, pertahankan status dinamisnya di SITUAN
+            // Jangan menimpa status operasional siswa (misal: pkl, lulus, pindah) kecuali jika di CSV spesifik 'pkl'
+            $cleanStatus = strtolower(trim($status));
+            $finalStatus = $siswa ? $siswa->status : ($cleanStatus ?: 'aktif');
+            if ($cleanStatus === 'pkl') {
+                $finalStatus = 'pkl';
+            }
+
             $data = [
                 'nisn'        => $nisn,
                 'nama'        => $nama,
                 'nama_ortu'   => $namaOrtu ?: ($siswa?->nama_ortu ?? 'Wali Siswa'),
                 'no_hp_ortu'  => $noHpOrtu ?: ($siswa?->no_hp_ortu ?? null),
                 'no_hp_siswa' => $noHpSiswa ?: ($siswa?->no_hp_siswa ?? null),
-                'status'      => strtolower($status) ?: 'aktif',
+                'status'      => $finalStatus,
             ];
 
             try {

@@ -61,17 +61,7 @@ class DeployController extends Controller
             // Abaikan jika symlink sudah ada
         }
 
-        // 3. Sinkronisasi Data Siswa jika perintah tersedia
-        try {
-            if (array_key_exists('sirani:sync-siswa', Artisan::all())) {
-                Artisan::call('sirani:sync-siswa');
-                $logs['sync_siswa'] = trim(Artisan::output());
-            }
-        } catch (\Throwable $e) {
-            $logs['sync_siswa_error'] = $e->getMessage();
-        }
-
-        // 4. Bersihkan & Segarkan Cache Laravel
+        // 3. Bersihkan & Segarkan Cache Laravel
         try {
             Artisan::call('optimize:clear');
             Artisan::call('config:cache');

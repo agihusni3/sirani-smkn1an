@@ -128,12 +128,21 @@
       </div>
     </a>
 
+    @if(auth()->user()?->canAccessPpdb())
     <a href="/admin/ppdb" class="nav-item">
       <div class="nav-left-part">
         <i class="bi bi-mortarboard-fill nav-icon" style="color:#3368a0;"></i>
         <span class="nav-text">Buka Modul PPDB 2026</span>
       </div>
     </a>
+    @elseif(auth()->user()?->isPewawancaraPpdb())
+    <a href="{{ route('admin.ppdb.wawancara') }}" class="nav-item">
+      <div class="nav-left-part">
+        <i class="bi bi-mic-fill nav-icon" style="color:#3368a0;"></i>
+        <span class="nav-text">Meja Wawancara PPDB</span>
+      </div>
+    </a>
+    @endif
   </div>
 
   <style>

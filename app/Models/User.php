@@ -435,11 +435,28 @@ class User extends Authenticatable
     }
 
     /**
-     * Cek apakah pengguna memiliki hak akses ke Modul PPDB Online.
+     * Cek apakah pengguna memiliki hak akses ke Modul PPDB Online (Tim Panitia PPDB).
      */
     public function canAccessPpdb(): bool
     {
         return $this->hasAnyRole(['admin', 'kepala_sekolah', 'panitia_ppdb', 'waka_kesiswaan']);
+    }
+
+    /**
+     * Cek apakah pengguna secara aktif ditugaskan sebagai pewawancara pada PPDB.
+     */
+    public function isPewawancaraPpdb(): bool
+    {
+        return \App\Models\PpdbPendaftar::where('pewawancara_id', $this->id)->exists();
+    }
+
+    /**
+     * Cek apakah pengguna boleh mengakses Meja Wawancara PPDB
+     * (Panitia PPDB atau Guru yang ditugaskan sebagai Penguji Wawancara).
+     */
+    public function canAccessWawancaraPpdb(): bool
+    {
+        return $this->canAccessPpdb() || $this->isPewawancaraPpdb();
     }
 
     /**

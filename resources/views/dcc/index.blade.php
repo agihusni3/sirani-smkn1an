@@ -149,19 +149,26 @@
       </div>
 
       {{-- Card 3: PPDB ONLINE 2026 --}}
-      <div class="module-card card-ppdb {{ $canAccessPpdb ? '' : 'is-locked' }}">
+      <div class="module-card card-ppdb {{ ($canAccessPpdb || $isPewawancaraPpdb) ? '' : 'is-locked' }}">
         <div>
           <div class="module-card-top">
             <div class="module-card-icon-halo">
               <i class="bi bi-mortarboard"></i>
             </div>
+            @if(!$canAccessPpdb && $isPewawancaraPpdb)
+              <span style="font-size:10.5px; font-weight:800; background:#fef3c7; color:#b45309; border:1px solid #fde68a; padding:3px 8px; border-radius:6px;">Penguji Wawancara</span>
+            @endif
           </div>
 
           <h3 class="module-card-name">PPDB ONLINE 2026</h3>
           <p class="module-card-subtitle">Penerimaan Peserta Didik Baru Terpadu</p>
 
           <p class="module-card-desc">
-            Portal terpadu pendaftaran calon siswa baru, verifikasi berkas formulir, pelaksanaan ujian seleksi CBT daring, hingga publikasi hasil kelulusan.
+            @if(!$canAccessPpdb && $isPewawancaraPpdb)
+              Portal penilaian wawancara calon siswa baru untuk penguji yang ditugaskan dalam seleksi minat kejuruan.
+            @else
+              Portal terpadu pendaftaran calon siswa baru, verifikasi berkas formulir, pelaksanaan ujian seleksi CBT daring, hingga publikasi hasil kelulusan.
+            @endif
           </p>
         </div>
 
@@ -169,6 +176,11 @@
           @if($canAccessPpdb)
             <a href="/admin/ppdb" class="btn-launch-primary">
               <span>Buka Modul PPDB</span>
+              <i class="bi bi-arrow-right-short" style="font-size: 18px;"></i>
+            </a>
+          @elseif($isPewawancaraPpdb)
+            <a href="{{ route('admin.ppdb.wawancara') }}" class="btn-launch-primary" style="background:linear-gradient(135deg, #d97706, #b45309);">
+              <span>Meja Wawancara PPDB</span>
               <i class="bi bi-arrow-right-short" style="font-size: 18px;"></i>
             </a>
           @else

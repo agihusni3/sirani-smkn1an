@@ -301,6 +301,31 @@
       </a>
     </div>
   @endif
+
+  {{-- 7b. PINTASAN KE MODUL PPDB (Panitia atau Guru Penguji Wawancara) --}}
+  @if($user && $user->canAccessPpdb())
+    <div class="nav-group" style="{{ ($user && $user->canAccessSituan()) ? 'padding-top:4px;' : 'margin-top:auto; padding-top:14px; border-top:1px solid var(--border);' }}">
+      <div class="nav-label">Penerimaan Siswa Baru</div>
+      <a href="{{ route('admin.ppdb.index') }}" class="nav-item" title="Buka Modul PPDB 2026">
+        <div class="nav-left-part">
+          <i class="bi bi-mortarboard-fill nav-icon" style="color:#d97706;"></i>
+          <span class="nav-text">Modul PPDB 2026</span>
+        </div>
+        <i class="bi bi-arrow-up-right" style="font-size:11px; color:var(--text-3);"></i>
+      </a>
+    </div>
+  @elseif($user && $user->isPewawancaraPpdb())
+    <div class="nav-group" style="{{ ($user && $user->canAccessSituan()) ? 'padding-top:4px;' : 'margin-top:auto; padding-top:14px; border-top:1px solid var(--border);' }}">
+      <div class="nav-label">Penerimaan Siswa Baru</div>
+      <a href="{{ route('admin.ppdb.wawancara') }}" class="nav-item" title="Buka Meja Wawancara PPDB 2026">
+        <div class="nav-left-part">
+          <i class="bi bi-mic-fill nav-icon" style="color:#d97706;"></i>
+          <span class="nav-text">Meja Wawancara PPDB</span>
+        </div>
+        <span class="nav-count-badge" style="background:#fef3c7; color:#b45309; border-color:#fde68a; font-size:10px;">Penguji</span>
+      </a>
+    </div>
+  @endif
 </aside>
 
 {{-- Mobile Bottom Bar Navigation with Clean Icons --}}
