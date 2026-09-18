@@ -410,17 +410,48 @@ class SiswaController extends Controller
             fprintf($file, chr(0xEF).chr(0xBB).chr(0xBF)); // BOM UTF-8
             fwrite($file, "sep=;\n");
 
-            fputcsv($file, ['No', 'NISN', 'Nama Siswa', 'Nama Ortu / Wali', 'No HP / WhatsApp Ortu', 'No HP / WhatsApp Siswa', 'Rombel Kelas', 'Status Keaktifan'], ';');
+            fputcsv($file, [
+                'No',
+                'NISN',
+                'NIK',
+                'Nama Siswa',
+                'Jenis Kelamin',
+                'Tempat Lahir',
+                'Tanggal Lahir',
+                'Agama',
+                'Alamat Lengkap',
+                'Desa / Kelurahan / Pekon',
+                'Kecamatan',
+                'Kabupaten / Kota',
+                'Provinsi',
+                'Nama Ortu / Wali',
+                'No HP / WhatsApp Ortu',
+                'No HP / WhatsApp Siswa',
+                'Asal Sekolah',
+                'Rombel Kelas',
+                'Status Keaktifan'
+            ], ';');
 
             foreach ($siswas as $idx => $s) {
                 $sr = $s->siswaRombels->firstWhere('status_keanggotaan', 'aktif');
                 fputcsv($file, [
                     $idx + 1,
                     $s->nisn ? '="' . $s->nisn . '"' : '-',
+                    $s->nik ? '="' . $s->nik . '"' : '-',
                     $s->nama,
+                    $s->jenis_kelamin ?? '-',
+                    $s->tempat_lahir ?? '-',
+                    $s->tanggal_lahir ? (is_string($s->tanggal_lahir) ? substr($s->tanggal_lahir, 0, 10) : $s->tanggal_lahir->format('Y-m-d')) : '-',
+                    $s->agama ?? '-',
+                    $s->alamat ?? '-',
+                    $s->desa_kelurahan ?? '-',
+                    $s->kecamatan ?? '-',
+                    $s->kabupaten ?? '-',
+                    $s->provinsi ?? '-',
                     $s->nama_ortu ?? '-',
                     $s->no_hp_ortu ? '="' . $s->no_hp_ortu . '"' : '-',
                     $s->no_hp_siswa ? '="' . $s->no_hp_siswa . '"' : '-',
+                    $s->asal_sekolah ?? '-',
                     $sr->rombel->nama_rombel ?? '-',
                     strtoupper($s->status),
                 ], ';');
@@ -479,7 +510,7 @@ class SiswaController extends Controller
     }
 
     /**
-     * Unduh Template CSV Format Siswa Resmi (Standar Dapodik).
+     * Unduh Template CSV Format Siswa Resmi (Standar Dapodik & SIRANI).
      */
     public function downloadTemplate()
     {
@@ -504,7 +535,11 @@ class SiswaController extends Controller
                 'Agama',
                 'Hobi Siswa',
                 'Organisasi Diminati',
-                'Alamat Lengkap',
+                'Nama Jalan / Dusun / RT-RW',
+                'Desa / Kelurahan / Pekon',
+                'Kecamatan',
+                'Kabupaten / Kota',
+                'Provinsi',
                 'Nama Ayah',
                 'Pekerjaan Ayah',
                 'Pendidikan Ayah',
@@ -532,6 +567,10 @@ class SiswaController extends Controller
                 'Membaca, Komputer',
                 'OSIS, Pramuka',
                 'Jl. Raya Air Naningan RT 02 Dusun 01',
+                'Air Naningan',
+                'Air Naningan',
+                'Kabupaten Tanggamus',
+                'Lampung',
                 'Bpk. Subagio',
                 'Petani / Pekebun',
                 'SMA / SMK',
@@ -558,7 +597,11 @@ class SiswaController extends Controller
                 'Islam',
                 'Memasak, Menjahit',
                 'PMR, Rohis',
-                'Pekon Datar Lebuay, Air Naningan',
+                'Jl. Melati RT 01 / RW 02',
+                'Datar Lebuay',
+                'Air Naningan',
+                'Kabupaten Tanggamus',
+                'Lampung',
                 'Bpk. Karsono',
                 'Wiraswasta',
                 'SMA / SMK',
@@ -585,7 +628,11 @@ class SiswaController extends Controller
                 'Islam',
                 'Otomotif, Olahraga',
                 'Paskibra, Futsal',
-                'Pekon Way Pring, Pugung',
+                'Dusun Way Pring',
+                'Way Pring',
+                'Pugung',
+                'Kabupaten Tanggamus',
+                'Lampung',
                 'Bpk. Herman',
                 'Buruh Harian',
                 'SMP',
@@ -681,6 +728,27 @@ class SiswaController extends Controller
                 $hasHeader = true;
             } elseif (str_contains($cleanName, 'agama')) {
                 $headerMap['agama'] = $colIdx;
+                $hasHeader = true;
+            } elseif (str_contains($cleanName, 'desa') || str_contains($cleanName, 'kelurahan') || str_contains($cleanName, 'pekon')) {
+                $headerMap['desa_kelurahan'] = $colIdx;
+                $hasHeader = true;
+            } elseif (str_contains($cleanName, 'kecamatan') || $cleanName === 'kec') {
+                $headerMap['kecamatan'] = $colIdx;
+                $hasHeader = true;
+            } elseif (str_contains($cleanName, 'kabupaten') || str_contains($cleanName, 'kota') || $cleanName === 'kab') {
+                $headerMap['kabupaten'] = $colIdx;
+                $hasHeader = true;
+            } elseif (str_contains($cleanName, 'provinsi') || str_contains($cleanName, 'propinsi') || $cleanName === 'prov') {
+                $headerMap['provinsi'] = $colIdx;
+                $hasHeader = true;
+            } elseif ($cleanName === 'rt') {
+                $headerMap['rt'] = $colIdx;
+                $hasHeader = true;
+            } elseif ($cleanName === 'rw') {
+                $headerMap['rw'] = $colIdx;
+                $hasHeader = true;
+            } elseif (str_contains($cleanName, 'dusun')) {
+                $headerMap['dusun'] = $colIdx;
                 $hasHeader = true;
             } elseif (str_contains($cleanName, 'alamat') || str_contains($cleanName, 'domisili') || str_contains($cleanName, 'tempattinggal') || str_contains($cleanName, 'jalan')) {
                 $headerMap['alamat'] = $colIdx;
@@ -791,7 +859,14 @@ class SiswaController extends Controller
                 $agama        = null;
                 $hobi         = null;
                 $organisasiMinat = null;
-                $alamat       = null;
+                $alamat        = null;
+                $desaKelurahan = null;
+                $kecamatan     = null;
+                $kabupaten     = null;
+                $provinsi      = null;
+                $rt            = null;
+                $rw            = null;
+                $dusun         = null;
                 $namaAyah     = null;
                 $pekerjaanAyah= null;
                 $pendidikanAyah= null;
@@ -818,6 +893,44 @@ class SiswaController extends Controller
                     $hobi         = isset($headerMap['hobi']) ? ($cleanRow[$headerMap['hobi']] ?? null) : null;
                     $organisasiMinat = isset($headerMap['organisasi_minat']) ? ($cleanRow[$headerMap['organisasi_minat']] ?? null) : null;
                     $alamat       = isset($headerMap['alamat']) ? ($cleanRow[$headerMap['alamat']] ?? null) : null;
+                    $desaKelurahan= isset($headerMap['desa_kelurahan']) ? ($cleanRow[$headerMap['desa_kelurahan']] ?? null) : null;
+                    $kecamatan    = isset($headerMap['kecamatan']) ? ($cleanRow[$headerMap['kecamatan']] ?? null) : null;
+                    $kabupaten    = isset($headerMap['kabupaten']) ? ($cleanRow[$headerMap['kabupaten']] ?? null) : null;
+                    $provinsi     = isset($headerMap['provinsi']) ? ($cleanRow[$headerMap['provinsi']] ?? null) : null;
+                    $rt           = isset($headerMap['rt']) ? ($cleanRow[$headerMap['rt']] ?? null) : null;
+                    $rw           = isset($headerMap['rw']) ? ($cleanRow[$headerMap['rw']] ?? null) : null;
+                    $dusun        = isset($headerMap['dusun']) ? ($cleanRow[$headerMap['dusun']] ?? null) : null;
+
+                    // Jika ada RT, RW, atau Dusun terpisah di Dapodik, gabungkan ke segmen jalan
+                    $jalanParts = [];
+                    if (!empty($alamat)) $jalanParts[] = $alamat;
+                    if (!empty($rt) || !empty($rw)) {
+                        $rtStr = !empty($rt) ? 'RT ' . str_pad($rt, 2, '0', STR_PAD_LEFT) : '';
+                        $rwStr = !empty($rw) ? 'RW ' . str_pad($rw, 2, '0', STR_PAD_LEFT) : '';
+                        $rtrw = trim($rtStr . ($rtStr && $rwStr ? ' / ' : '') . $rwStr);
+                        if ($rtrw && (!empty($alamat) && !str_contains(strtoupper($alamat), 'RT'))) {
+                            $jalanParts[] = $rtrw;
+                        }
+                    }
+                    if (!empty($dusun) && (!empty($alamat) && !str_contains(strtolower($alamat), strtolower($dusun)))) {
+                        $jalanParts[] = 'Dusun ' . $dusun;
+                    }
+                    if (!empty($jalanParts)) {
+                        $alamat = implode(', ', $jalanParts);
+                    }
+
+                    // Format string alamat lengkap gabungan
+                    $alamatLengkap = trim(implode(', ', array_filter([
+                        $alamat,
+                        $desaKelurahan ? 'Desa/Kel. ' . $desaKelurahan : null,
+                        $kecamatan ? 'Kec. ' . $kecamatan : null,
+                        $kabupaten,
+                        $provinsi ? 'Prov. ' . $provinsi : null,
+                    ])));
+                    if (!empty($alamatLengkap)) {
+                        $alamat = $alamatLengkap;
+                    }
+
                     $namaAyah     = isset($headerMap['nama_ayah']) ? ($cleanRow[$headerMap['nama_ayah']] ?? null) : null;
                     $pekerjaanAyah= isset($headerMap['pekerjaan_ayah']) ? ($cleanRow[$headerMap['pekerjaan_ayah']] ?? null) : null;
                     $pendidikanAyah= isset($headerMap['pendidikan_ayah']) ? ($cleanRow[$headerMap['pendidikan_ayah']] ?? null) : null;
@@ -925,6 +1038,10 @@ class SiswaController extends Controller
                         'hobi'          => $hobi ?: $existingSiswa->hobi,
                         'organisasi_minat' => $organisasiMinat ?: $existingSiswa->organisasi_minat,
                         'alamat'        => $alamat ?: $existingSiswa->alamat,
+                        'desa_kelurahan'=> $desaKelurahan ?: $existingSiswa->desa_kelurahan,
+                        'kecamatan'     => $kecamatan ?: $existingSiswa->kecamatan,
+                        'kabupaten'     => $kabupaten ?: $existingSiswa->kabupaten,
+                        'provinsi'      => $provinsi ?: $existingSiswa->provinsi,
                         'nama_ayah'     => $namaAyah ?: $existingSiswa->nama_ayah,
                         'pekerjaan_ayah'=> $pekerjaanAyah ?: $existingSiswa->pekerjaan_ayah,
                         'pendidikan_ayah'=> $pendidikanAyah ?: $existingSiswa->pendidikan_ayah,
@@ -952,6 +1069,10 @@ class SiswaController extends Controller
                         'hobi'          => $hobi ?: null,
                         'organisasi_minat' => $organisasiMinat ?: null,
                         'alamat'        => $alamat ?: null,
+                        'desa_kelurahan'=> $desaKelurahan ?: null,
+                        'kecamatan'     => $kecamatan ?: ($desaKelurahan || $kabupaten ? 'Air Naningan' : null),
+                        'kabupaten'     => $kabupaten ?: ($desaKelurahan ? 'Kabupaten Tanggamus' : null),
+                        'provinsi'      => $provinsi ?: ($desaKelurahan ? 'Lampung' : null),
                         'nama_ayah'     => $namaAyah ?: null,
                         'pekerjaan_ayah'=> $pekerjaanAyah ?: null,
                         'pendidikan_ayah'=> $pendidikanAyah ?: null,

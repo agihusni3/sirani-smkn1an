@@ -956,7 +956,7 @@
         Format Parser Otomatis Standar Dapodik
       </div>
       <div style="color:var(--text-2); font-size:11.5px; margin-bottom:10px;">
-        Sistem otomatis mengenali kolom Dapodik (NISN, NIK, Nama, JK, TTL, Agama, Alamat, Ayah, Ibu, No HP Ortu, No HP Siswa, Asal Sekolah, dan Kelas).
+        Sistem otomatis mengenali kolom Dapodik (NISN, NIK, Nama, JK, TTL, Agama, Jalan/RT/RW/Dusun, Desa/Kelurahan/Pekon, Kecamatan, Kabupaten, Provinsi, Ayah, Ibu, No HP Ortu, No HP Siswa, Asal Sekolah, dan Rombel Kelas).
       </div>
       <div>
         <a href="{{ route('siswa.template-csv') }}" class="btn btn-sm btn-outline" style="font-weight:800; font-size:11.5px; display:inline-flex; align-items:center; gap:6px; background:var(--surface); text-decoration:none; color:var(--text);">
