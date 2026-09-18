@@ -129,6 +129,25 @@ class SiswaController extends Controller
         return view('situan.siswa.index', compact('siswas', 'rombels', 'taAktif', 'search', 'rombelId', 'status', 'rfidStatus', 'statusPkl', 'sort', 'tab', 'statTotal', 'statAlumni', 'statPkl', 'statRombel', 'isWaliOnly', 'waliRombel'));
     }
 
+    /**
+     * Tampilkan atau arahkan detail siswa / fallback navigasi halaman.
+     */
+    public function show(Request $request, $id)
+    {
+        // 1. Cek apakah ID sesuai dengan data siswa
+        $siswa = Siswa::with(['siswaRombels.rombel', 'kartuRfid'])->find($id);
+        if ($siswa) {
+            return redirect()->route('siswa.index', ['q' => $siswa->nisn ?: $siswa->nama]);
+        }
+
+        // 2. Jika ID adalah angka dan dimaksudkan sebagai navigasi halaman (misal: /siswa/2 -> /siswa?page=2)
+        if (is_numeric($id) && (int) $id > 0 && (int) $id < 10000) {
+            return redirect()->route('siswa.index', array_merge($request->query(), ['page' => (int) $id]));
+        }
+
+        return redirect()->route('siswa.index')->with('error', 'Data siswa tidak ditemukan.');
+    }
+
     public function store(Request $request)
     {
         $currentUser = auth()->user();
@@ -308,6 +327,10 @@ class SiswaController extends Controller
         }
 
         $namaOrtu = $request->input('nama_ortu') ?: ($request->input('nama_ayah') ?: ($request->input('nama_ibu') ?: ($siswa->nama_ortu ?: 'Orang Tua Siswa')));
+        $noHpOrtu = $request->input('no_hp_ortu') ?: ($request->input('no_hp_ayah') ?: ($request->input('no_hp_ibu') ?: $siswa->no_hp_ortu));
+        $noHpAyah = $request->input('no_hp_ayah') ?: $noHpOrtu;
+        $noHpIbu  = $request->input('no_hp_ibu') ?: $noHpOrtu;
+
         $desa = $request->input('desa_kelurahan') ?: $siswa->desa_kelurahan;
         $kec = $request->input('kecamatan') ?: $siswa->kecamatan;
         $kab = $request->input('kabupaten') ?: $siswa->kabupaten;
@@ -340,14 +363,14 @@ class SiswaController extends Controller
             'nama_ayah'     => $request->input('nama_ayah') ?: null,
             'pekerjaan_ayah'=> $request->input('pekerjaan_ayah') ?: null,
             'pendidikan_ayah'=> $request->input('pendidikan_ayah') ?: null,
-            'no_hp_ayah'    => $noHpOrtu,
+            'no_hp_ayah'    => $noHpAyah ?: null,
             'nama_ibu'      => $request->input('nama_ibu') ?: null,
             'pekerjaan_ibu' => $request->input('pekerjaan_ibu') ?: null,
             'pendidikan_ibu'=> $request->input('pendidikan_ibu') ?: null,
-            'no_hp_ibu'     => $noHpOrtu,
+            'no_hp_ibu'     => $noHpIbu ?: null,
             'nama_ortu'     => $namaOrtu,
             'asal_sekolah'  => $request->input('asal_sekolah') ?: null,
-            'no_hp_ortu'    => $noHpOrtu,
+            'no_hp_ortu'    => $noHpOrtu ?: null,
             'no_hp_siswa'   => $request->input('no_hp_siswa') ?: null,
             'penerima_pip'  => $request->input('penerima_pip', 'Tidak') ?: 'Tidak',
             'nomor_pip'     => $request->input('nomor_pip') ?: null,
@@ -991,6 +1014,22 @@ class SiswaController extends Controller
 
                 if (empty($nisn) || empty($nama)) {
                     continue;
+                }
+
+                // Normalisasi format numerik ilmiah / eksponensial dari Microsoft Excel (misal: 1,80627E+15 atau 1.80627E+15)
+                $cleanNumericHelper = function ($val) {
+                    if (empty($val)) return null;
+                    $val = trim((string)$val);
+                    $normalized = str_replace(',', '.', $val);
+                    if (preg_match('/^[0-9]+(\.[0-9]+)?[eE]\+[0-9]+$/i', $normalized)) {
+                        return sprintf('%.0f', (float) $normalized);
+                    }
+                    return preg_replace('/[^0-9]/', '', $val) ?: $val;
+                };
+
+                $nisn = $cleanNumericHelper($nisn);
+                if (!empty($nik)) {
+                    $nik = $cleanNumericHelper($nik);
                 }
 
                 // Normalisasi Status Penerima PIP

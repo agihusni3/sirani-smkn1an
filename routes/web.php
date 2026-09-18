@@ -326,6 +326,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/siswa/template-csv', [SiswaController::class, 'downloadTemplate'])->name('siswa.template-csv');
         Route::get('/siswa/cetak-pdf', [SiswaController::class, 'cetakPdf'])->name('siswa.cetak-pdf');
         Route::get('/siswa/{id}/surat-bebas-masalah', [SuratKesiswaanController::class, 'cetakSuratBebasMasalah'])->name('siswa.surat-bebas-masalah');
+        Route::get('/siswa/{id}', [SiswaController::class, 'show'])->name('siswa.show')->where('id', '[0-9]+');
         Route::post('/siswa', [SiswaController::class, 'store'])->name('siswa.store')->middleware('role:admin,staf_tu,wali_kelas');
         Route::post('/siswa/import', [SiswaController::class, 'import'])->name('siswa.import')->middleware('role:admin,staf_tu,wali_kelas');
         Route::put('/siswa/{id}', [SiswaController::class, 'update'])->name('siswa.update')->middleware('role:admin,staf_tu,wali_kelas');
