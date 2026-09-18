@@ -96,7 +96,6 @@
           <i class="bi bi-upc-scan nav-icon"></i>
           <span class="nav-text">Smart Gate Presensi</span>
         </div>
-        <span class="nav-count-badge">Live</span>
       </a>
     @endif
 
@@ -107,7 +106,6 @@
           <i class="bi bi-person-check nav-icon" style="color:#0284c7;"></i>
           <span class="nav-text">Monitoring Absen Mandiri</span>
         </div>
-        <span class="nav-count-badge" style="background:#f0f9ff; color:#0284c7; border-color:#bae6fd;">Mandiri</span>
       </a>
     @endif
   </div>
@@ -149,28 +147,6 @@
             <i class="bi bi-journals nav-icon"></i>
             <span class="nav-text">Buku Kasus Disiplin</span>
           </div>
-          @php
-            $sidebarDisiplinQuery = \App\Models\KasusDisiplin::where('is_active', true)->where('status_tahap', '!=', 'selesai_pembinaan');
-            if ($isAdmin) {
-                $sidebarDisiplinCount = (clone $sidebarDisiplinQuery)->count();
-            } elseif ($isKepsek) {
-                $sidebarDisiplinCount = (clone $sidebarDisiplinQuery)->where('status_tahap', 'tahap_4_kepsek')->count();
-            } elseif ($isWakasis) {
-                $sidebarDisiplinCount = (clone $sidebarDisiplinQuery)->where('status_tahap', 'tahap_3_wakasis')->count();
-            } elseif ($isBK) {
-                $sidebarDisiplinCount = (clone $sidebarDisiplinQuery)->where('status_tahap', 'tahap_2_bk')->count();
-            } elseif ($isWali) {
-                $sidebarDisiplinCount = (clone $sidebarDisiplinQuery)
-                    ->forUser($user)
-                    ->where('status_tahap', 'tahap_1_wali_kelas')
-                    ->count();
-            } else {
-                $sidebarDisiplinCount = 0;
-            }
-          @endphp
-          @if($sidebarDisiplinCount > 0)
-            <span class="nav-count-badge">{{ $sidebarDisiplinCount }}</span>
-          @endif
         </a>
       @endif
 
@@ -183,7 +159,6 @@
             <i class="bi bi-person-badge-fill nav-icon" style="color:#0284c7;"></i>
             <span class="nav-text">Data PTK (Guru &amp; Staf)</span>
           </div>
-          <span class="nav-count-badge" style="background:#f0f9ff; color:#0284c7; border-color:#bae6fd;">PTK</span>
         </a>
       @endif
     </div>
@@ -222,7 +197,6 @@
             <i class="bi bi-shield-check nav-icon" style="color:#0ea5e9;"></i>
             <span class="nav-text">Pengawasan Guru</span>
           </div>
-          <span class="nav-count-badge" style="background:#e0f2fe; color:#0369a1; border-color:#bae6fd; font-weight:700;">Kepsek</span>
         </a>
       @endif
     </div>
@@ -283,7 +257,6 @@
           <i class="bi bi-person-vcard-fill nav-icon" style="color:#2563EB;"></i>
           <span class="nav-text">Biodata &amp; Berkas Saya</span>
         </div>
-        <span class="nav-count-badge" style="background:#eff6ff; color:#2563eb; border-color:#bfdbfe; font-size:10px;">E-Arsip</span>
       </a>
     </div>
   @endif
