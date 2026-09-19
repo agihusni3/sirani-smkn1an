@@ -219,27 +219,61 @@ class RfidScanService
                 $srId = null;
             }
 
+            // Helper terpusat untuk membungkus profil lengkap dari orang yang di-scan
+            $formatProfileData = function ($status, $jam = null, $jamMasuk = null, $jamPulang = null, $statusLabel = null) use ($person, $type, $rombelOrJabatan, $identitas, $timeNow) {
+                $jurusan = null;
+                $nisn = null;
+                $nis = null;
+                $nip = null;
+                $noHpOrtu = null;
+
+                if ($type === 'siswa') {
+                    $sr = $person->siswaRombels->first();
+                    $jurusan = $sr?->rombel?->jurusan?->nama_jurusan ?? ($sr?->rombel?->nama_rombel ?? '-');
+                    $nisn = $person->nisn;
+                    $nis = $person->nis;
+                    if (!empty($person->no_hp_ortu)) {
+                        $noHpOrtu = substr($person->no_hp_ortu, 0, 4) . '****' . substr($person->no_hp_ortu, -3);
+                    }
+                } else {
+                    $nip = $person->nip;
+                    $jurusan = $person->jabatan ?? 'Guru / PTK';
+                }
+
+                return [
+                    'nama'                => $person->nama,
+                    'tipe'                => $type,
+                    'tipe_label'          => ($type === 'siswa') ? 'SISWA AKTIF' : 'GURU / PTK',
+                    'sub'                 => $rombelOrJabatan,
+                    'identitas'           => $identitas,
+                    'rombel_atau_jabatan' => $rombelOrJabatan,
+                    'kelas'               => $rombelOrJabatan,
+                    'jurusan'             => $jurusan,
+                    'nisn'                => $nisn,
+                    'nis'                 => $nis,
+                    'nip'                 => $nip,
+                    'no_hp_ortu'          => $noHpOrtu,
+                    'foto'                => $person->foto_url,
+                    'foto_url'            => $person->foto_url,
+                    'status'              => $status,
+                    'status_label'        => $statusLabel ?: strtoupper(str_replace('_', ' ', $status)),
+                    'jam'                 => $jam ?: $timeNow,
+                    'jam_masuk'           => $jamMasuk,
+                    'jam_pulang'          => $jamPulang,
+                ];
+            };
+
             // ── PARAMETER 4: Validasi Kalender Akademik & Hari Libur ──
-            $libur = HariLibur::where('tanggal', $today)->first();
-            if ($libur) {
+            $isLibur = HariLibur::isLibur($today);
+            if ($isLibur) {
+                $liburModel = HariLibur::getLiburHariIni($today);
+                $keteranganLibur = $liburModel ? $liburModel->keterangan : (Carbon::parse($today)->isWeekend() ? 'Hari Libur Akhir Pekan' : 'Hari Libur Sekolah');
                 return [
                     'success' => true,
                     'status'  => 'info',
                     'type'    => 'hari_libur',
-                    'message' => "Hari ini libur: {$libur->keterangan}",
-                    'data'    => [
-                        'nama'                => $person->nama,
-                        'tipe'                => $type,
-                        'sub'                 => $rombelOrJabatan,
-                        'identitas'           => $identitas,
-                        'rombel_atau_jabatan' => $rombelOrJabatan,
-                        'foto'                => $person->foto_url,
-                        'foto_url'            => $person->foto_url,
-                        'status'              => 'libur',
-                        'jam'                 => $timeNow,
-                        'jam_masuk'           => null,
-                        'jam_pulang'          => null,
-                    ]
+                    'message' => "Hari ini libur: {$keteranganLibur}. Presensi tidak dicatat.",
+                    'data'    => $formatProfileData('libur', $timeNow, null, null, 'HARI LIBUR'),
                 ];
             }
 
@@ -271,19 +305,7 @@ class RfidScanService
                     'status'  => 'info',
                     'type'    => 'status_khusus',
                     'message' => "{$person->nama} tercatat berstatus {$statusLabel} hari ini. Hubungi petugas piket untuk verifikasi kehadiran.",
-                    'data'    => [
-                        'nama'                => $person->nama,
-                        'tipe'                => $type,
-                        'sub'                 => $rombelOrJabatan,
-                        'identitas'           => $identitas,
-                        'rombel_atau_jabatan' => $rombelOrJabatan,
-                        'foto'                => $person->foto_url,
-                        'foto_url'            => $person->foto_url,
-                        'status'              => $absensi->status,
-                        'jam'                 => $absensi->jam_masuk ?: $timeNow,
-                        'jam_masuk'           => $absensi->jam_masuk,
-                        'jam_pulang'          => $absensi->jam_pulang,
-                    ]
+                    'data'    => $formatProfileData($absensi->status, $absensi->jam_masuk ?: $timeNow, $absensi->jam_masuk, $absensi->jam_pulang, $statusLabel),
                 ];
             }
 
@@ -294,19 +316,7 @@ class RfidScanService
                     'status'  => 'warning',
                     'type'    => 'tercatat_alpha',
                     'message' => "Presensi ditolak. {$person->nama} tercatat Alpha (tidak ada rekaman jam masuk pagi). Silakan melapor ke Petugas Piket.",
-                    'data'    => [
-                        'nama'                => $person->nama,
-                        'tipe'                => $type,
-                        'sub'                 => $rombelOrJabatan,
-                        'identitas'           => $identitas,
-                        'rombel_atau_jabatan' => $rombelOrJabatan,
-                        'foto'                => $person->foto_url,
-                        'foto_url'            => $person->foto_url,
-                        'status'              => 'alpha',
-                        'jam'                 => $timeNow,
-                        'jam_masuk'           => null,
-                        'jam_pulang'          => null,
-                    ]
+                    'data'    => $formatProfileData('alpha', $timeNow, null, null, 'ALPHA'),
                 ];
             }
 
@@ -317,19 +327,7 @@ class RfidScanService
                     'status'  => 'info',
                     'type'    => 'cooldown_double_scan',
                     'message' => "Presensi {$person->nama} sudah berhasil tercatat baru saja. Silakan lanjutkan ke antrean berikutnya.",
-                    'data'    => [
-                        'nama'                => $person->nama,
-                        'tipe'                => $type,
-                        'sub'                 => $rombelOrJabatan,
-                        'identitas'           => $identitas,
-                        'rombel_atau_jabatan' => $rombelOrJabatan,
-                        'foto'                => $person->foto_url,
-                        'foto_url'            => $person->foto_url,
-                        'status'              => !empty($absensi->jam_pulang) ? 'selesai' : $absensi->status,
-                        'jam'                 => !empty($absensi->jam_pulang) ? $absensi->jam_pulang : ($absensi->jam_masuk ?: $timeNow),
-                        'jam_masuk'           => $absensi->jam_masuk,
-                        'jam_pulang'          => $absensi->jam_pulang,
-                    ]
+                    'data'    => $formatProfileData(!empty($absensi->jam_pulang) ? 'selesai' : $absensi->status, !empty($absensi->jam_pulang) ? $absensi->jam_pulang : ($absensi->jam_masuk ?: $timeNow), $absensi->jam_masuk, $absensi->jam_pulang),
                 ];
             }
 
@@ -340,19 +338,7 @@ class RfidScanService
                     'status'  => 'info',
                     'type'    => 'sudah_lengkap',
                     'message' => "Presensi hari ini sudah lengkap (Masuk: {$absensi->jam_masuk} WIB · Pulang: {$absensi->jam_pulang} WIB).",
-                    'data'    => [
-                        'nama'                => $person->nama,
-                        'tipe'                => $type,
-                        'sub'                 => $rombelOrJabatan,
-                        'identitas'           => $identitas,
-                        'rombel_atau_jabatan' => $rombelOrJabatan,
-                        'foto'                => $person->foto_url,
-                        'foto_url'            => $person->foto_url,
-                        'status'              => 'selesai',
-                        'jam'                 => $absensi->jam_pulang,
-                        'jam_masuk'           => $absensi->jam_masuk,
-                        'jam_pulang'          => $absensi->jam_pulang,
-                    ]
+                    'data'    => $formatProfileData('selesai', $absensi->jam_pulang, $absensi->jam_masuk, $absensi->jam_pulang, 'PRESENSI LENGKAP'),
                 ];
             }
 
@@ -485,19 +471,7 @@ class RfidScanService
                     'status'  => $isTerlambat ? 'warning' : 'success',
                     'type'    => 'jam_masuk',
                     'message' => $message,
-                    'data'    => [
-                        'nama'                => $person->nama,
-                        'tipe'                => $type,
-                        'sub'                 => $rombelOrJabatan,
-                        'identitas'           => $identitas,
-                        'rombel_atau_jabatan' => $rombelOrJabatan,
-                        'foto'                => $person->foto_url,
-                        'foto_url'            => $person->foto_url,
-                        'status'              => $statusKehadiran,
-                        'jam'                 => $timeNow,
-                        'jam_masuk'           => $absensi->jam_masuk,
-                        'jam_pulang'          => null,
-                    ]
+                    'data'    => $formatProfileData($statusKehadiran, $timeNow, $absensi->jam_masuk, null, $isTerlambat ? 'TERLAMBAT' : 'BERHASIL HADIR'),
                 ];
             }
 
@@ -513,19 +487,7 @@ class RfidScanService
                         'status'  => 'info',
                         'type'    => 'belum_waktunya_pulang',
                         'message' => "Anda sudah presensi masuk pukul {$absensi->jam_masuk} WIB. Kepulangan dimulai pukul " . substr($jamPulangMulai, 0, 5) . " WIB (Kurang {$selisihMenit} menit).",
-                        'data'    => [
-                            'nama'                => $person->nama,
-                            'tipe'                => $type,
-                            'sub'                 => $rombelOrJabatan,
-                            'identitas'           => $identitas,
-                            'rombel_atau_jabatan' => $rombelOrJabatan,
-                            'foto'                => $person->foto_url,
-                            'foto_url'            => $person->foto_url,
-                            'status'              => 'sudah_masuk',
-                            'jam'                 => $absensi->jam_masuk,
-                            'jam_masuk'           => $absensi->jam_masuk,
-                            'jam_pulang'          => null,
-                        ]
+                        'data'    => $formatProfileData('sudah_masuk', $absensi->jam_masuk, $absensi->jam_masuk, null, 'SUDAH MASUK'),
                     ];
                 }
 
@@ -555,19 +517,7 @@ class RfidScanService
                     'status'  => 'success',
                     'type'    => 'jam_pulang',
                     'message' => "Presensi Pulang Berhasil! Hati-hati di jalan. Pukul {$timeNow} WIB.",
-                    'data'    => [
-                        'nama'                => $person->nama,
-                        'tipe'                => $type,
-                        'sub'                 => $rombelOrJabatan,
-                        'identitas'           => $identitas,
-                        'rombel_atau_jabatan' => $rombelOrJabatan,
-                        'foto'                => $person->foto_url,
-                        'foto_url'            => $person->foto_url,
-                        'status'              => 'selesai',
-                        'jam'                 => $timeNow,
-                        'jam_masuk'           => $absensi->jam_masuk,
-                        'jam_pulang'          => $timeNow,
-                    ]
+                    'data'    => $formatProfileData('pulang', $timeNow, $absensi->jam_masuk, $timeNow, 'BERHASIL PULANG'),
                 ];
             }
 

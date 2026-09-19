@@ -122,49 +122,81 @@
           </div>
         </div>
 
-        <!-- ══ STATE 2: RESPONSE IDENTITAS LENGKAP (KETIKA SCAN BERHASIL) ══ -->
+        <!-- ══ STATE 2: RESPONSE IDENTITAS PROFIL LENGKAP (KETIKA SCAN BERHASIL) ══ -->
         <div id="responseState" class="kios-fade-enter" style="display:none;">
           <div class="identity-result-card" id="identityCard">
 
             {{-- Top Header Row --}}
             <div class="identity-top-bar">
-              <div class="result-badge-large hadir" id="resBadge">
-                <span id="resBadgeText">BERHASIL HADIR</span>
+              <div class="identity-badge-group">
+                <div class="result-badge-large hadir" id="resBadge">
+                  <i class="bi bi-check-circle-fill" id="resBadgeIcon"></i>
+                  <span id="resBadgeText">BERHASIL HADIR</span>
+                </div>
+                <span class="identity-role-pill" id="resRolePill">SISWA AKTIF</span>
               </div>
               <div class="identity-gate-label">
+                <span class="live-dot-pulse"></span>
                 <span>Smart Gate Presensi SMKN 1 Air Naningan</span>
               </div>
             </div>
 
-            {{-- Body: Foto & Identitas --}}
+            {{-- Body: Foto & Profil Lengkap --}}
             <div class="identity-body">
               <div class="identity-avatar-wrap" id="avatarWrap">
-                <img id="resPhoto" class="identity-avatar-img" src="/img/user-default.png" alt="Foto Profil" />
+                <img id="resPhoto" class="identity-avatar-img" src="/img/user-default.png" alt="Foto Profil" onerror="this.src='/img/user-default.png'" />
+                <div class="avatar-status-pip" id="avatarPip">
+                  <i class="bi bi-check" id="avatarPipIcon"></i>
+                </div>
               </div>
 
               <div class="identity-details">
                 <div class="identity-name-text" id="resName">-</div>
-                <div class="identity-sub-text" id="resSub">
-                  <span id="resSubTxt">-</span>
-                </div>
-                <div class="identity-time-pill" id="resTimePill">
-                  <span id="resTimeTxt">-</span>
+
+                <!-- Grid Informasi Profil Siswa / Guru -->
+                <div class="identity-meta-grid">
+                  <div class="identity-meta-item">
+                    <span class="meta-label" id="lblNisn">NISN / NIP</span>
+                    <span class="meta-value" id="resNisnNip">-</span>
+                  </div>
+                  <div class="identity-meta-item">
+                    <span class="meta-label" id="lblKelas">Kelas / Rombel</span>
+                    <span class="meta-value highlight" id="resKelas">-</span>
+                  </div>
+                  <div class="identity-meta-item">
+                    <span class="meta-label" id="lblJurusan">Program Keahlian</span>
+                    <span class="meta-value" id="resJurusan">-</span>
+                  </div>
+                  <div class="identity-meta-item">
+                    <span class="meta-label">Waktu Presensi</span>
+                    <span class="meta-value time" id="resTimeTxt">-</span>
+                  </div>
                 </div>
               </div>
             </div>
 
-            {{-- Pesan Notifikasi --}}
+            {{-- Pesan Notifikasi & Info WhatsApp --}}
             <div class="identity-notification-box" id="resMessageBox">
-              <span id="resMessageTxt">Presensi berhasil dicatat. Notifikasi otomatis dikirimkan ke orang tua.</span>
+              <div class="notification-main-text">
+                <i class="bi bi-info-circle-fill" id="resMsgIcon"></i>
+                <span id="resMessageTxt">Presensi berhasil dicatat. Selamat belajar!</span>
+              </div>
+              <div class="notification-wa-badge" id="resWaBox" style="display:none;">
+                <i class="bi bi-whatsapp"></i>
+                <span id="resWaTxt">Notifikasi WhatsApp terkirim ke Orang Tua</span>
+              </div>
             </div>
 
-            {{-- Auto-Reset Countdown Bar --}}
+            {{-- Auto-Reset Countdown Bar & Quick Button --}}
             <div class="countdown-section">
               <div class="countdown-track">
                 <div class="countdown-fill" id="countdownFill"></div>
               </div>
-              <div class="countdown-caption">
-                <span>Kembali ke mode pemindaian dalam <strong id="countdownSec">4</strong> detik...</span>
+              <div class="countdown-caption-bar">
+                <span>Kembali ke mode pemindaian dalam <strong id="countdownSec">5</strong> detik...</span>
+                <button type="button" class="btn-scan-next" onclick="returnToScanner()" title="Kembali ke pemindai sekarang">
+                  <i class="bi bi-arrow-repeat"></i> Scan Berikutnya
+                </button>
               </div>
             </div>
 
@@ -433,111 +465,191 @@
     const card = document.getElementById('identityCard');
     const badge = document.getElementById('resBadge');
     const badgeTxt = document.getElementById('resBadgeText');
+    const badgeIcon = document.getElementById('resBadgeIcon');
+    const rolePill = document.getElementById('resRolePill');
     const photo = document.getElementById('resPhoto');
     const avatarWrap = document.getElementById('avatarWrap');
+    const avatarPip = document.getElementById('avatarPip');
+    const avatarPipIcon = document.getElementById('avatarPipIcon');
     const nameEl = document.getElementById('resName');
-    const subTxt = document.getElementById('resSubTxt');
+    const resNisnNip = document.getElementById('resNisnNip');
+    const lblNisn = document.getElementById('lblNisn');
+    const resKelas = document.getElementById('resKelas');
+    const lblKelas = document.getElementById('lblKelas');
+    const resJurusan = document.getElementById('resJurusan');
     const timeTxt = document.getElementById('resTimeTxt');
-    const msgBox = document.getElementById('resMessageBox');
     const msgTxt = document.getElementById('resMessageTxt');
+    const msgIcon = document.getElementById('resMsgIcon');
+    const waBox = document.getElementById('resWaBox');
+    const waTxt = document.getElementById('resWaTxt');
     const countdownFill = document.getElementById('countdownFill');
 
     // Switch view
     scannerState.style.display = 'none';
     responseState.style.display = 'block';
 
-    if (res.success && res.data) {
-      playBeep('success');
+    if (res.data) {
+      playBeep(res.success ? 'success' : 'error');
       const d = res.data;
+      const isSiswa = (d.tipe === 'siswa');
       const st = (d.status || 'hadir').toLowerCase();
 
       photo.src = d.foto || d.foto_url || '/img/user-default.png';
       nameEl.textContent = d.nama || 'Pengguna';
+      if (rolePill) rolePill.textContent = d.tipe_label || (isSiswa ? 'SISWA AKTIF' : 'GURU / PTK');
 
-      const subInfo = (d.sub || d.rombel_atau_jabatan || '').trim();
-      const idInfo = (d.identitas || '').trim();
-      subTxt.textContent = subInfo ? `${subInfo} • ${idInfo}` : (idInfo || 'Warga Sekolah');
+      if (lblNisn) lblNisn.textContent = isSiswa ? 'NISN Siswa' : 'NIP / ID Pegawai';
+      if (resNisnNip) resNisnNip.textContent = d.nisn ? `${d.nisn}` : (d.nip ? `${d.nip}` : (d.identitas || '-'));
+
+      if (lblKelas) lblKelas.textContent = isSiswa ? 'Kelas / Rombel' : 'Jabatan';
+      if (resKelas) resKelas.textContent = d.kelas || d.sub || d.rombel_atau_jabatan || '-';
+
+      if (resJurusan) resJurusan.textContent = d.jurusan || (isSiswa ? 'Umum' : (d.sub || '-'));
 
       const jam = d.jam || d.jam_masuk || d.jam_pulang || '';
-      timeTxt.textContent = jam ? `Presensi Pukul ${jam} WIB` : 'Presensi Berhasil Dicatat';
+      if (timeTxt) timeTxt.textContent = jam ? `${jam} WIB` : 'Presensi Tercatat';
 
-      const curHour = new Date().getHours();
-      let salam = 'Selamat pagi';
-      if (curHour >= 11 && curHour < 15) {
-        salam = 'Selamat siang';
-      } else if (curHour >= 15 && curHour < 18) {
-        salam = 'Selamat sore';
-      } else if (curHour >= 18 || curHour < 5) {
-        salam = 'Halo';
+      if (waBox) {
+        if (d.no_hp_ortu) {
+          waBox.style.display = 'inline-flex';
+          if (waTxt) waTxt.textContent = `Notifikasi WhatsApp terkirim ke Orang Tua (${d.no_hp_ortu})`;
+        } else if (isSiswa) {
+          waBox.style.display = 'inline-flex';
+          if (waTxt) waTxt.textContent = 'Notifikasi WhatsApp otomatis terkirim ke Orang Tua';
+        } else {
+          waBox.style.display = 'none';
+        }
       }
 
+      // Greetings
+      const curHour = new Date().getHours();
+      let salam = 'Selamat pagi';
+      if (curHour >= 11 && curHour < 15) salam = 'Selamat siang';
+      else if (curHour >= 15 && curHour < 18) salam = 'Selamat sore';
+      else if (curHour >= 18 || curHour < 5) salam = 'Halo';
       const speechNama = (d.nama || '').split(',')[0].trim();
 
-      // Status variations
-      if (st === 'selesai' || res.type === 'sudah_lengkap') {
+      if (st === 'libur' || res.type === 'hari_libur') {
+        card.className = 'identity-result-card status-libur';
+        badge.className = 'result-badge-large libur';
+        badgeTxt.textContent = 'HARI LIBUR SEKOLAH';
+        if (badgeIcon) badgeIcon.className = 'bi bi-calendar-check-fill';
+        avatarWrap.style.borderColor = '#6366f1';
+        avatarWrap.style.boxShadow = '0 0 25px rgba(99,102,241,0.3)';
+        if (avatarPip) avatarPip.style.background = '#6366f1';
+        if (avatarPipIcon) avatarPipIcon.className = 'bi bi-calendar-check';
+        countdownFill.style.background = '#6366f1';
+        if (msgIcon) msgIcon.className = 'bi bi-info-circle-fill';
+        msgTxt.textContent = res.message || 'Hari ini sekolah libur. Data kartu terverifikasi aktif.';
+        speak(`${salam}, ${speechNama}. Hari ini libur sekolah.`);
+      } else if (st === 'selesai' || res.type === 'sudah_lengkap') {
         card.className = 'identity-result-card status-selesai';
         badge.className = 'result-badge-large selesai';
-        badgeTxt.textContent = 'PRESENSI SELESAI';
+        badgeTxt.textContent = 'PRESENSI LENGKAP';
+        if (badgeIcon) badgeIcon.className = 'bi bi-check-all';
         avatarWrap.style.borderColor = '#94A3B8';
         avatarWrap.style.boxShadow = '0 0 25px rgba(148,163,184,0.3)';
+        if (avatarPip) avatarPip.style.background = '#94A3B8';
+        if (avatarPipIcon) avatarPipIcon.className = 'bi bi-check';
         countdownFill.style.background = '#94A3B8';
-        msgTxt.textContent = res.message || 'Presensi hari ini sudah lengkap.';
+        if (msgIcon) msgIcon.className = 'bi bi-check-circle-fill';
+        msgTxt.textContent = res.message || 'Presensi hari ini sudah lengkap (Masuk & Pulang).';
         speak(`${salam}, ${speechNama}, presensi Anda hari ini sudah selesai.`);
-      } else if (st === 'sudah_masuk' || res.type === 'sudah_masuk' || res.type === 'belum_waktunya_pulang') {
+      } else if (st === 'sudah_masuk' || res.type === 'belum_waktunya_pulang') {
         card.className = 'identity-result-card status-info';
         badge.className = 'result-badge-large info';
         badgeTxt.textContent = (res.type === 'belum_waktunya_pulang') ? 'BELUM WAKTUNYA PULANG' : 'SUDAH PRESENSI MASUK';
+        if (badgeIcon) badgeIcon.className = 'bi bi-info-circle-fill';
         avatarWrap.style.borderColor = '#3B82F6';
         avatarWrap.style.boxShadow = '0 0 25px rgba(59,130,246,0.3)';
+        if (avatarPip) avatarPip.style.background = '#3B82F6';
+        if (avatarPipIcon) avatarPipIcon.className = 'bi bi-hourglass-split';
         countdownFill.style.background = '#3B82F6';
+        if (msgIcon) msgIcon.className = 'bi bi-info-circle-fill';
         msgTxt.textContent = res.message || 'Anda sudah melakukan presensi masuk.';
         speak(`${salam}, ${speechNama}, Anda sudah tercatat presensi masuk.`);
       } else if (st === 'terlambat') {
         card.className = 'identity-result-card status-terlambat';
         badge.className = 'result-badge-large terlambat';
         badgeTxt.textContent = 'TERLAMBAT';
+        if (badgeIcon) badgeIcon.className = 'bi bi-clock-history';
         avatarWrap.style.borderColor = 'var(--amber)';
         avatarWrap.style.boxShadow = '0 0 25px var(--amber-glow)';
+        if (avatarPip) avatarPip.style.background = 'var(--amber)';
+        if (avatarPipIcon) avatarPipIcon.className = 'bi bi-exclamation';
         countdownFill.style.background = 'var(--amber)';
+        if (msgIcon) msgIcon.className = 'bi bi-exclamation-triangle-fill';
         msgTxt.textContent = res.message || 'Presensi terlambat dicatat.';
         speak(`Perhatian, ${speechNama}, Anda tercatat terlambat.`);
       } else if (st === 'pulang') {
         card.className = 'identity-result-card status-pulang';
         badge.className = 'result-badge-large pulang';
         badgeTxt.textContent = 'BERHASIL PULANG';
+        if (badgeIcon) badgeIcon.className = 'bi bi-box-arrow-right';
         avatarWrap.style.borderColor = 'var(--cyan)';
         avatarWrap.style.boxShadow = '0 0 25px var(--cyan-glow)';
+        if (avatarPip) avatarPip.style.background = 'var(--cyan)';
+        if (avatarPipIcon) avatarPipIcon.className = 'bi bi-check';
         countdownFill.style.background = 'var(--cyan)';
+        if (msgIcon) msgIcon.className = 'bi bi-check-circle-fill';
         msgTxt.textContent = res.message || 'Presensi pulang berhasil dicatat. Hati-hati di jalan!';
         speak(`Terima kasih, ${speechNama}, presensi pulang berhasil. Hati-hati di jalan.`);
+      } else if (!res.success) {
+        card.className = 'identity-result-card status-error';
+        badge.className = 'result-badge-large error';
+        badgeTxt.textContent = (res.type === 'di_luar_jam_operasional' || res.type === 'jam_tutup_terlewat') ? 'DITUTUP' : 'DITOLAK';
+        if (badgeIcon) badgeIcon.className = 'bi bi-x-circle-fill';
+        avatarWrap.style.borderColor = 'var(--rose)';
+        avatarWrap.style.boxShadow = '0 0 25px var(--rose-glow)';
+        if (avatarPip) avatarPip.style.background = 'var(--rose)';
+        if (avatarPipIcon) avatarPipIcon.className = 'bi bi-x';
+        countdownFill.style.background = 'var(--rose)';
+        if (msgIcon) msgIcon.className = 'bi bi-exclamation-circle-fill';
+        msgTxt.textContent = res.message || 'Presensi tidak dapat diproses saat ini.';
+        speak(res.message ? res.message.split('.')[0] : 'Presensi tidak dapat diproses.');
       } else {
         card.className = 'identity-result-card status-hadir';
         badge.className = 'result-badge-large hadir';
         badgeTxt.textContent = 'BERHASIL HADIR';
+        if (badgeIcon) badgeIcon.className = 'bi bi-check-circle-fill';
         avatarWrap.style.borderColor = 'var(--emerald)';
         avatarWrap.style.boxShadow = '0 0 25px var(--emerald-glow)';
+        if (avatarPip) avatarPip.style.background = 'var(--emerald)';
+        if (avatarPipIcon) avatarPipIcon.className = 'bi bi-check';
         countdownFill.style.background = 'var(--emerald)';
-        msgTxt.textContent = res.message || 'Presensi masuk berhasil dicatat.';
-        speak(`${salam}, ${speechNama}, presensi berhasil.`);
+        if (msgIcon) msgIcon.className = 'bi bi-check-circle-fill';
+        msgTxt.textContent = res.message || 'Presensi masuk berhasil dicatat. Selamat belajar!';
+        speak(`${salam}, ${speechNama}, presensi berhasil. Selamat belajar.`);
       }
 
     } else {
+      // Pemindaian kartu tidak dikenal
       playBeep('error');
       card.className = 'identity-result-card status-error';
       badge.className = 'result-badge-large error';
-      badgeTxt.textContent = (res.type === 'di_luar_jam_operasional' || res.type === 'jam_tutup_terlewat') ? 'DITUTUP' : 'DITOLAK';
-      photo.src = (res.data && res.data.foto) ? res.data.foto : '/img/user-default.png';
+      badgeTxt.textContent = 'DITOLAK';
+      if (badgeIcon) badgeIcon.className = 'bi bi-x-circle-fill';
+      photo.src = '/img/user-default.png';
       avatarWrap.style.borderColor = 'var(--rose)';
       avatarWrap.style.boxShadow = '0 0 25px var(--rose-glow)';
+      if (avatarPip) avatarPip.style.background = 'var(--rose)';
+      if (avatarPipIcon) avatarPipIcon.className = 'bi bi-x';
       countdownFill.style.background = 'var(--rose)';
-      nameEl.textContent = (res.data && res.data.nama) ? res.data.nama : 'Pemindaian Gagal';
-      subTxt.textContent = (res.data && (res.data.sub || res.data.rombel_atau_jabatan)) ? `${res.data.sub || res.data.rombel_atau_jabatan} • ${res.data.identitas || ''}` : 'Sistem Smart Gate';
-      timeTxt.textContent = (res.data && res.data.jam) ? `Presensi Pukul ${res.data.jam} WIB` : 'Di Luar Ketentuan';
-      msgTxt.textContent = res.message || 'Kartu atau Barcode belum terdaftar di sistem.';
-      speak(res.message ? res.message.split('.')[0] : 'Presensi tidak dapat diproses.');
+      nameEl.textContent = 'Kartu / Barcode Tidak Dikenal';
+      if (rolePill) rolePill.textContent = 'TIDAK TERDAFTAR';
+      if (lblNisn) lblNisn.textContent = 'Status Kartu';
+      if (resNisnNip) resNisnNip.textContent = 'Belum Dipairing';
+      if (lblKelas) lblKelas.textContent = 'Tindakan';
+      if (resKelas) resKelas.textContent = 'Daftarkan di Menu RFID';
+      if (resJurusan) resJurusan.textContent = 'SIRANI Gate';
+      if (timeTxt) timeTxt.textContent = '--:-- WIB';
+      if (waBox) waBox.style.display = 'none';
+      if (msgIcon) msgIcon.className = 'bi bi-exclamation-octagon-fill';
+      msgTxt.textContent = res.message || 'Kartu atau Barcode belum terdaftar pada sistem SIRANI SMKN 1 Air Naningan.';
+      speak('Kartu atau kode barcode belum terdaftar.');
     }
 
-    startCountdown(4);
+    startCountdown(6);
   }
 
   // Countdown timer to return to scanner
@@ -549,14 +661,14 @@
     let remainMs = totalSec * 1000;
     const intervalMs = 100;
 
-    secTxt.textContent = totalSec;
-    fill.style.width = '100%';
+    if (secTxt) secTxt.textContent = totalSec;
+    if (fill) fill.style.width = '100%';
 
     countdownTimer = setInterval(() => {
       remainMs -= intervalMs;
       const pct = (remainMs / (totalSec * 1000)) * 100;
-      fill.style.width = Math.max(0, pct) + '%';
-      secTxt.textContent = Math.ceil(remainMs / 1000);
+      if (fill) fill.style.width = Math.max(0, pct) + '%';
+      if (secTxt) secTxt.textContent = Math.ceil(remainMs / 1000);
 
       if (remainMs <= 0) {
         clearInterval(countdownTimer);
