@@ -244,23 +244,6 @@
           </div>
         </div>
 
-        <!-- ══ LIVE ACTIVITY TICKER SPOTLIGHT ══ -->
-        <div class="kiosk-live-ticker" id="kioskLiveTicker" onclick="handleTickerClick()" title="Klik untuk beralih tab aktivitas">
-          <div class="ticker-pulse-icon">
-            <span class="ticker-dot"></span>
-            <i class="bi bi-broadcast"></i>
-          </div>
-          <div class="ticker-content" id="tickerContent">
-            <span class="ticker-label">ABSEN TERKINI:</span>
-            <span class="ticker-text" id="tickerText">Memuat aktivitas gerbang presensi...</span>
-          </div>
-          <div class="ticker-meta" id="tickerMeta">
-            <span class="ticker-stat" id="tickerStatHadir"><i class="bi bi-check-circle-fill"></i> <span id="tickerCountHadir">{{ $totalHadirHariIni ?? 0 }}</span> Hadir</span>
-            <span class="ticker-stat failed" id="tickerStatGagal" style="display:none;"><i class="bi bi-exclamation-octagon-fill"></i> <span id="tickerCountGagal">0</span> Gagal</span>
-            <span class="ticker-arrow"><i class="bi bi-chevron-right"></i></span>
-          </div>
-        </div>
-
         <!-- Tab Buttons Navigation -->
         <div class="monitor-tabs">
           <button type="button" class="monitor-tab-btn active" id="tabBtnLive" onclick="switchMonitorTab('live')">

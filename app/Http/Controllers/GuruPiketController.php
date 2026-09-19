@@ -34,13 +34,29 @@ class GuruPiketController extends Controller
         $isLibur    = \App\Models\HariLibur::isLibur($today);
         $liburDetail = \App\Models\HariLibur::getLiburHariIni($today);
 
-        // Guru piket yang bertugas hari ini beserta status pelaksanaan tugas
-        $guruPiketHariIni = JadwalPiket::where('hari', $hariHariIni)
-            ->with('guru')
-            ->get()
-            ->each(function ($gp) use ($today) {
-                $gp->status_piket = JadwalPiket::getStatusKehadiranPiket($gp->guru_id, $today);
+        $modeUjian = \App\Models\ModeUjian::getModeAktif($today);
+
+        // Jika Mode Ujian aktif dan menonaktifkan piket reguler, tampilkan Panitia STS sebagai petugas meja
+        if ($modeUjian && $modeUjian->nonaktifkan_piket_reguler) {
+            $panitiaGurus = $modeUjian->daftar_panitia;
+            $guruPiketHariIni = $panitiaGurus->map(function ($g) use ($today) {
+                $obj = new \stdClass();
+                $obj->id = 'panitia_' . $g->id;
+                $obj->guru = $g;
+                $obj->guru_id = $g->id;
+                $obj->keterangan = 'Panitia Pelaksana STS';
+                $obj->status_piket = JadwalPiket::getStatusKehadiranPiket($g->id, $today);
+                return $obj;
             });
+        } else {
+            // Guru piket yang bertugas hari ini beserta status pelaksanaan tugas
+            $guruPiketHariIni = JadwalPiket::where('hari', $hariHariIni)
+                ->with('guru')
+                ->get()
+                ->each(function ($gp) use ($today) {
+                    $gp->status_piket = JadwalPiket::getStatusKehadiranPiket($gp->guru_id, $today);
+                });
+        }
 
         // Rekap absensi siswa hari ini
         $absensiHariIni = Absensi::with(['siswa', 'siswaRombel.rombel'])
@@ -137,12 +153,26 @@ class GuruPiketController extends Controller
         $hariList = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat'];
         $jadwalPiketSeminggu = JadwalPiket::with('guru')->get()->groupBy('hari');
 
-        // Otorisasi: hanya guru piket hari ini (atau admin) yang berhak koreksi
+        // Otorisasi: hanya guru piket hari ini / Panitia STS (atau admin) yang berhak koreksi
         $currentUser = auth()->user();
         $canKoreksi = $currentUser && (
             $currentUser->isAdmin() || 
-            ($currentUser->guru && JadwalPiket::isGuruPiketHariIni($currentUser->guru->id, $today))
+            $currentUser->isPiketHariIni()
         );
+
+        // Daftar Siswa Ujian Susulan (Siswa izin/sakit selama rentang pekan ujian STS)
+        $siswaSusulan = collect();
+        if ($modeUjian) {
+            $siswaSusulan = IzinSiswa::with(['siswa.siswaRombels' => function ($q) use ($taAktif) {
+                    if ($taAktif) {
+                        $q->where('tahun_ajaran_id', $taAktif->id)->where('status_keanggotaan', 'aktif')->with('rombel');
+                    }
+                }])
+                ->whereBetween('tanggal', [$modeUjian->tanggal_mulai, $modeUjian->tanggal_selesai])
+                ->whereHas('siswa', fn($q) => $q->where('status', 'aktif'))
+                ->orderBy('tanggal', 'desc')
+                ->get();
+        }
 
         // ── REKAP SISWA BELUM SCAN PULANG ──
         // Siswa yang sudah absen masuk pagi tapi jam_pulang masih NULL
@@ -193,7 +223,9 @@ class GuruPiketController extends Controller
             'jadwalPiketSeminggu',
             'canKoreksi',
             'siswaBelumScanPulang',
-            'sudahLewatJamTutup'
+            'sudahLewatJamTutup',
+            'modeUjian',
+            'siswaSusulan'
         ));
     }
 
@@ -225,10 +257,10 @@ class GuruPiketController extends Controller
             return redirect()->back()->with('error', 'Koreksi presensi hanya diizinkan untuk data absensi pada hari ini (' . Carbon::today()->translatedFormat('d F Y') . '). Catatan hari sebelumnya tidak dapat diubah.');
         }
 
-        // 2. Hak Akses: Hanya Guru Piket yang terjadwal bertugas hari ini (atau Admin) yang berhak mengoreksi
+        // 2. Hak Akses: Guru Piket hari ini, Panitia STS, atau Admin
         $isAuthorized = $user && (
             $user->isAdmin() || 
-            ($user->guru && JadwalPiket::isGuruPiketHariIni($user->guru->id, $today))
+            $user->isPiketHariIni()
         );
 
         if (!$isAuthorized) {
@@ -351,10 +383,10 @@ class GuruPiketController extends Controller
         $user = auth()->user();
         $today = Carbon::today()->toDateString();
 
-        // 1. Hak Akses: Hanya Guru Piket yang terjadwal bertugas hari ini (atau Admin)
+        // 1. Hak Akses: Guru Piket hari ini, Panitia STS, atau Admin
         $isAuthorized = $user && (
             $user->isAdmin() || 
-            ($user->guru && JadwalPiket::isGuruPiketHariIni($user->guru->id, $today))
+            $user->isPiketHariIni()
         );
 
         if (!$isAuthorized) {
@@ -644,7 +676,7 @@ class GuruPiketController extends Controller
 
         $isAuthorized = $user && (
             $user->isAdmin() ||
-            ($user->guru && JadwalPiket::isGuruPiketHariIni($user->guru->id, $today))
+            $user->isPiketHariIni()
         );
         if (!$isAuthorized) {
             return redirect()->back()->with('error', 'Akses ditolak.');
@@ -671,7 +703,7 @@ class GuruPiketController extends Controller
 
         $isAuthorized = $user && (
             $user->isAdmin() ||
-            ($user->guru && JadwalPiket::isGuruPiketHariIni($user->guru->id, $today))
+            $user->isPiketHariIni()
         );
         if (!$isAuthorized) {
             return redirect()->back()->with('error', 'Akses ditolak.');

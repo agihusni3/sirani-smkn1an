@@ -89,6 +89,46 @@
       </div>
     </div>
 
+    {{-- ══ NOTIFIKASI MODE PEKAN UJIAN (STS / SAS) AKTIF ══ --}}
+    @if($modeUjian)
+      <div class="piket-exam-banner no-print" style="margin-bottom:14px; display:flex; align-items:center; justify-content:space-between; gap:16px; padding:14px 18px; border-radius:12px; background:linear-gradient(135deg, rgba(79, 70, 229, 0.10) 0%, rgba(147, 51, 234, 0.08) 100%); border:1.5px solid rgba(99, 102, 241, 0.35); box-shadow:0 3px 12px -2px rgba(99, 102, 241, 0.12);">
+        <div style="display:flex; align-items:center; gap:12px;">
+          <div style="width:40px; height:40px; border-radius:10px; background:linear-gradient(135deg, #4f46e5, #7c3aed); display:flex; align-items:center; justify-content:center; font-size:20px; color:#fff; flex-shrink:0; box-shadow:0 3px 8px rgba(79, 70, 229, 0.3);">
+            <i class="bi bi-mortarboard-fill"></i>
+          </div>
+          <div>
+            <div style="display:flex; align-items:center; gap:8px; margin-bottom:2px; flex-wrap:wrap;">
+              <strong style="font-size:14.5px; color:#3730a3; font-weight:800;">
+                PEKAN UJIAN AKTIF: {{ $modeUjian->nama_ujian }}
+              </strong>
+              <span style="font-size:11px; padding:2px 7px; border-radius:6px; background:#4f46e5; color:#fff; font-weight:700;">
+                {{ $modeUjian->tipe }}
+              </span>
+              <span style="font-size:12px; color:#4338ca; font-weight:600;">
+                ({{ \Carbon\Carbon::parse($modeUjian->tanggal_mulai)->locale('id')->isoFormat('D MMM') }} - {{ \Carbon\Carbon::parse($modeUjian->tanggal_selesai)->locale('id')->isoFormat('D MMM Y') }})
+              </span>
+            </div>
+            <div style="font-size:12.5px; color:#4b5563; line-height:1.4;">
+              <span style="color:#1e1b4b; font-weight:700;"><i class="bi bi-clock-fill text-indigo-600"></i> Jam Pulang Gerbang Ujian: {{ substr($modeUjian->jam_pulang_mulai, 0, 5) }} WIB</span>
+              • Piket reguler dinonaktifkan sementara dan digantikan oleh <strong style="color:#4338ca;">Panitia Pelaksana STS</strong> ({{ $guruPiketHariIni->count() }} Personel).
+            </div>
+          </div>
+        </div>
+        <div style="display:flex; align-items:center; gap:8px; flex-shrink:0;">
+          @if($siswaSusulan->isNotEmpty())
+            <button type="button" class="btn btn-sm" onclick="showTabSusulan()" style="background:rgba(239, 68, 68, 0.12); color:#dc2626; border:1px solid rgba(239, 68, 68, 0.3); padding:6px 12px; border-radius:8px; font-weight:700; font-size:11.5px; cursor:pointer;">
+              <i class="bi bi-clipboard2-check-fill"></i> {{ $siswaSusulan->count() }} Ujian Susulan
+            </button>
+          @endif
+          @if(auth()->user()->isAdmin() || auth()->user()->isWakaKurikulum())
+            <button type="button" class="btn btn-sm" onclick="openModal('modalKelolaModeUjian')" style="background:#4f46e5; color:#fff; border:none; padding:6px 12px; border-radius:8px; font-weight:700; font-size:11.5px; cursor:pointer;">
+              <i class="bi bi-gear-fill"></i> Atur STS
+            </button>
+          @endif
+        </div>
+      </div>
+    @endif
+
     {{-- ══ 2. STRIP PETUGAS PIKET HARI INI ══ --}}
     @if($guruPiketHariIni->isNotEmpty())
       @php
@@ -97,8 +137,8 @@
       @endphp
       <div class="piket-officers-banner no-print">
         <div class="piket-officers-label">
-          <span class="duty-pulsing-dot"></span>
-          <span>GURU PIKET HARI INI:</span>
+          <span class="duty-pulsing-dot" style="{{ $modeUjian ? 'background:#8b5cf6;' : '' }}"></span>
+          <span>{{ $modeUjian ? 'PANITIA PELAKSANA STS BERTUGAS:' : 'GURU PIKET HARI INI:' }}</span>
           <span class="piket-duty-summary">({{ $piketBertugas }}/{{ $totalPiket }} Bertugas)</span>
         </div>
         <div class="piket-officers-tags">
@@ -283,6 +323,12 @@
             <i class="bi bi-person-badge-fill"></i> Guru &amp; Pegawai
             <span class="piket-segmented-count">{{ $isLibur ? $absensiGuruHariIni->count() : ($guruBelumHadirList->count() + $absensiGuruHariIni->count()) }}</span>
           </button>
+          @if($modeUjian)
+          <button type="button" class="piket-segmented-btn piket-main-btn" id="btnViewSusulan" onclick="switchMainView('susulan', this)" style="border-left: 1px solid var(--border-2);">
+            <i class="bi bi-mortarboard-fill" style="color:#7c3aed;"></i> Ujian Susulan
+            <span class="piket-segmented-count" style="background:rgba(239, 68, 68, 0.15); color:#dc2626; font-weight:800;">{{ $siswaSusulan->count() }}</span>
+          </button>
+          @endif
         </div>
 
         <div class="piket-toolbar-btns">
@@ -296,6 +342,11 @@
           <button type="button" class="btn-gradient-izin" onclick="openModal('modalCatatIzinPiket')" data-tooltip="Catat surat keterangan perizinan atau sakit harian" title="Catat surat keterangan perizinan atau sakit harian">
             Catat Izin
           </button>
+          @if(auth()->user()->isAdmin() || auth()->user()->isWakaKurikulum())
+            <button type="button" class="btn-gradient-manual" onclick="openModal('modalKelolaModeUjian')" data-tooltip="Konfigurasi Mode Ujian STS / SAS & Panitia" title="Konfigurasi Mode Ujian STS / SAS & Panitia" style="background:linear-gradient(135deg, #4f46e5, #7c3aed); border-color:#6366f1;">
+              <i class="bi bi-mortarboard-fill" style="margin-right:4px;"></i> Mode STS
+            </button>
+          @endif
         </div>
       </div>
 
@@ -772,6 +823,111 @@
       </div>
     </div>
 
+    {{-- ══ 6. VIEW 3: TABEL SISWA BUTUH UJIAN SUSULAN (KHUSUS MODE UJIAN) ══ --}}
+    @if($modeUjian)
+    <div id="view-susulan" class="piket-view-pane" style="display:none;">
+      <div class="piket-table-container">
+        <div style="padding:14px 18px; background:linear-gradient(135deg, rgba(79, 70, 229, 0.06), rgba(124, 58, 237, 0.04)); border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+          <div>
+            <h3 style="margin:0; font-size:14.5px; font-weight:800; color:#3730a3; display:flex; align-items:center; gap:8px;">
+              <i class="bi bi-mortarboard-fill" style="color:#6366f1;"></i> Rekap Siswa Perlu Ujian Susulan — {{ $modeUjian->nama_ujian }}
+            </h3>
+            <div style="font-size:12px; color:var(--text-3); margin-top:2px;">
+              Data peserta didik yang tidak hadir (sakit / izin) selama rentang pekan ujian ({{ \Carbon\Carbon::parse($modeUjian->tanggal_mulai)->locale('id')->isoFormat('D MMM') }} s/d {{ \Carbon\Carbon::parse($modeUjian->tanggal_selesai)->locale('id')->isoFormat('D MMM Y') }}).
+            </div>
+          </div>
+          <div style="display:flex; gap:8px;">
+            <button type="button" class="btn btn-sm btn-outline" onclick="window.print()" style="font-size:12px; font-weight:700;">
+              <i class="bi bi-printer"></i> Cetak Rekap Susulan
+            </button>
+          </div>
+        </div>
+
+        <div class="table-responsive">
+          <table class="data-table" id="tableSusulanPiket">
+            <thead>
+              <tr>
+                <th style="width:40px; text-align:center;">No</th>
+                <th>Tanggal Tidak Hadir</th>
+                <th>Identitas Siswa</th>
+                <th>Kelas / Rombel</th>
+                <th>Kategori</th>
+                <th>Keterangan / Alasan</th>
+                <th>Dokumen / Surat</th>
+                <th style="text-align:center;">Aksi Panitia</th>
+              </tr>
+            </thead>
+            <tbody>
+              @forelse($siswaSusulan as $idx => $s)
+                @php
+                  $rombel = $s->siswa?->rombelAktif?->rombel?->nama ?? ($s->siswa?->siswaRombels?->first()?->rombel?->nama ?? '-');
+                  $badgeKategori = match($s->jenis_izin) {
+                    'sakit'  => 'badge-warning',
+                    'izin'   => 'badge-info',
+                    'dispen' => 'badge-primary',
+                    default  => 'badge-secondary',
+                  };
+                  $waOrtu = $s->siswa?->no_hp_ortu ?? $s->siswa?->no_hp ?? null;
+                  $waClean = $waOrtu ? preg_replace('/^0/', '62', preg_replace('/[^0-9]/', '', $waOrtu)) : '';
+                  $waPesan = rawurlencode("Halo Orang Tua/Wali dari {$s->siswa?->nama} ({$rombel}), kami dari Panitia STS SMKN 1 Air Naningan menginformasikan bahwa Ananda terdata {$s->jenis_izin} pada tanggal " . \Carbon\Carbon::parse($s->tanggal)->locale('id')->isoFormat('dddd, D MMMM Y') . ". Diharapkan Ananda segera menghubungi Panitia STS untuk koordinasi jadwal Ujian Susulan. Terima kasih.");
+                @endphp
+                <tr>
+                  <td style="font-family:var(--font-mono); font-size:11px; text-align:center;">{{ $idx + 1 }}</td>
+                  <td style="font-weight:700; font-size:12px; white-space:nowrap;">
+                    <i class="bi bi-calendar3" style="color:var(--text-3); margin-right:4px;"></i>{{ \Carbon\Carbon::parse($s->tanggal)->locale('id')->isoFormat('dddd, D MMM Y') }}
+                  </td>
+                  <td>
+                    <div style="font-weight:700; font-size:13px; color:var(--text);">{{ $s->siswa?->nama ?? 'Siswa' }}</div>
+                    <div style="font-size:11px; font-family:var(--font-mono); color:var(--text-3);">NISN: {{ $s->siswa?->nisn ?? '-' }}</div>
+                  </td>
+                  <td>
+                    <span style="display:inline-block; padding:2px 8px; border-radius:6px; background:var(--bg-3); font-weight:700; font-size:11.5px; color:var(--text);">
+                      {{ $rombel }}
+                    </span>
+                  </td>
+                  <td>
+                    <span class="badge {{ $badgeKategori }}" style="text-transform:uppercase; font-size:10px; font-weight:700;">
+                      {{ $s->jenis_izin }}
+                    </span>
+                  </td>
+                  <td style="font-size:12px; color:var(--text-2); max-width:240px;">
+                    {{ $s->keterangan ?: 'Tidak ada catatan tambahan' }}
+                  </td>
+                  <td>
+                    @if($s->file_surat)
+                      <a href="{{ asset('storage/' . $s->file_surat) }}" target="_blank" class="btn btn-xs btn-outline" style="font-size:11px; display:inline-flex; align-items:center; gap:4px; padding:3px 8px;">
+                        <i class="bi bi-paperclip"></i> Lihat Bukti
+                      </a>
+                    @else
+                      <span style="color:var(--text-3); font-size:11px; font-style:italic;">Tanpa lampiran</span>
+                    @endif
+                  </td>
+                  <td style="text-align:center; white-space:nowrap;">
+                    @if($waClean)
+                      <a href="https://wa.me/{{ $waClean }}?text={{ $waPesan }}" target="_blank" class="btn btn-sm" style="background:#25D366; color:#fff; font-size:11px; font-weight:700; padding:5px 10px; border-radius:6px; display:inline-flex; align-items:center; gap:5px; text-decoration:none;">
+                        <i class="bi bi-whatsapp"></i> Chat Ortu
+                      </a>
+                    @else
+                      <span style="font-size:11px; color:var(--text-3); font-style:italic;">No WA tdk ada</span>
+                    @endif
+                  </td>
+                </tr>
+              @empty
+                <tr>
+                  <td colspan="8" style="text-align:center; padding:36px; color:var(--text-3);">
+                    <i class="bi bi-check-circle-fill" style="font-size:32px; color:#10b981; display:block; margin-bottom:8px;"></i>
+                    <strong style="color:var(--text); font-size:14px;">Alhamdulillah, Belum Ada Siswa Yang Terdata Izin / Sakit</strong>
+                    <div style="font-size:12px; margin-top:3px;">Seluruh siswa tercatat hadir mengikuti rangkaian ujian {{ $modeUjian->nama_ujian }}.</div>
+                  </td>
+                </tr>
+              @endforelse
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    @endif
+
   </main>
 </div>
 
@@ -788,11 +944,12 @@
   }
   setInterval(updateLiveClock, 1000);
 
-  // ── Main View Switcher (Siswa vs Guru) ──
+  // ── Main View Switcher (Siswa vs Guru vs Susulan) ──
   function switchMainView(view, btn) {
     // Toggle views
     const siswaPane = document.getElementById('view-siswa');
     const guruPane  = document.getElementById('view-guru');
+    const susulanPane = document.getElementById('view-susulan');
     const chipsSiswa = document.getElementById('filterChipsSiswa');
     const chipsGuru  = document.getElementById('filterChipsGuru');
     const kpiSiswa = document.getElementById('kpiGridSiswa');
@@ -801,16 +958,19 @@
 
     if (siswaPane) siswaPane.style.display = view === 'siswa' ? '' : 'none';
     if (guruPane)  guruPane.style.display  = view === 'guru'  ? '' : 'none';
+    if (susulanPane) susulanPane.style.display = view === 'susulan' ? '' : 'none';
     if (chipsSiswa) chipsSiswa.style.display = view === 'siswa' ? 'flex' : 'none';
     if (chipsGuru)  chipsGuru.style.display  = view === 'guru'  ? 'flex' : 'none';
-    if (kpiSiswa) kpiSiswa.style.display = view === 'siswa' ? 'grid' : 'none';
+    if (kpiSiswa) kpiSiswa.style.display = (view === 'siswa' || view === 'susulan') ? 'grid' : 'none';
     if (kpiGuru)  kpiGuru.style.display  = view === 'guru'  ? 'grid' : 'none';
 
     _activeMainView = view; // track view aktif
 
     if (searchInput) {
       searchInput.value = '';
-      searchInput.placeholder = view === 'siswa' ? 'Cari nama, NISN, rombel...' : 'Cari nama guru, NIP, jabatan...';
+      if (view === 'siswa') searchInput.placeholder = 'Cari nama, NISN, rombel...';
+      else if (view === 'guru') searchInput.placeholder = 'Cari nama guru, NIP, jabatan...';
+      else searchInput.placeholder = 'Cari nama siswa ujian susulan, rombel...';
     }
 
     // Update button active state
@@ -826,6 +986,11 @@
       tableGuruPiket_paginator.setSearch('');
       tableGuruPiket_paginator.render();
     }
+  }
+
+  function showTabSusulan() {
+    const btn = document.getElementById('btnViewSusulan');
+    if (btn) switchMainView('susulan', btn);
   }
 
   // ── KPI Card Quick Filter (activates Siswa view + sets filter pill) ──
@@ -1145,6 +1310,12 @@
     const q = (document.getElementById('searchSiswaPiket')?.value || '').trim();
     if (_activeMainView === 'guru') {
       if (tableGuruPiket_paginator) tableGuruPiket_paginator.setSearch(q);
+    } else if (_activeMainView === 'susulan') {
+      const rows = document.querySelectorAll('#tableSusulanPiket tbody tr');
+      rows.forEach(tr => {
+        const text = tr.innerText.toLowerCase();
+        tr.style.display = text.includes(q.toLowerCase()) ? '' : 'none';
+      });
     } else {
       if (tableSiswaPiket_paginator) tableSiswaPiket_paginator.setSearch(q);
     }
@@ -1155,6 +1326,9 @@
     if (inp) { inp.value = ''; inp.focus(); }
     if (_activeMainView === 'guru') {
       if (tableGuruPiket_paginator) tableGuruPiket_paginator.setSearch('');
+    } else if (_activeMainView === 'susulan') {
+      const rows = document.querySelectorAll('#tableSusulanPiket tbody tr');
+      rows.forEach(tr => tr.style.display = '');
     } else {
       if (tableSiswaPiket_paginator) tableSiswaPiket_paginator.setSearch('');
     }
@@ -1884,6 +2058,121 @@
     </div>
   </div>
 </div>
+
+{{-- MODAL KELOLA MODE UJIAN (STS / SAS) --}}
+@if(auth()->user()->isAdmin() || auth()->user()->isWakaKurikulum())
+<div class="modal-overlay" id="modalKelolaModeUjian">
+  <div class="modal-card" style="max-width:680px; padding:24px;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; border-bottom:1px solid var(--border); padding-bottom:10px;">
+      <div>
+        <h3 style="font-size:16px; font-weight:900; color:var(--text); margin:0; display:flex; align-items:center; gap:8px;">
+          <i class="bi bi-mortarboard-fill" style="color:#4f46e5;"></i> Pengaturan Mode Pekan Ujian (STS / SAS)
+        </h3>
+        <div style="font-size:11.5px; color:var(--text-3); margin-top:2px;">Atur jam kepulangan Smart Gate dan dewan guru yang bertugas sebagai panitia ujian</div>
+      </div>
+      <button type="button" class="btn btn-sm btn-outline" onclick="closeModal('modalKelolaModeUjian')"><i class="bi bi-x-lg"></i></button>
+    </div>
+
+    <form action="{{ route('mode-ujian.simpan') }}" method="POST">
+      @csrf
+      @if($modeUjian)
+        <input type="hidden" name="id" value="{{ $modeUjian->id }}">
+      @endif
+
+      <div style="display:grid; grid-template-columns: 2fr 1fr; gap:14px; margin-bottom:14px;">
+        <div class="form-group">
+          <label style="font-size:11.5px; font-weight:800; text-transform:uppercase; color:var(--text); margin-bottom:5px; display:block;">
+            Nama Pelaksanaan Ujian <span style="color:var(--red);">*</span>
+          </label>
+          <input type="text" name="nama_ujian" value="{{ $modeUjian->nama_ujian ?? 'Sumatif Tengah Semester (STS) Ganjil TP 2026/2027' }}" required class="form-control" style="width:100%; height:38px; border-radius:6px; border:1px solid var(--border-2); padding:0 10px; font-size:13px;" />
+        </div>
+        <div class="form-group">
+          <label style="font-size:11.5px; font-weight:800; text-transform:uppercase; color:var(--text); margin-bottom:5px; display:block;">
+            Tipe Ujian <span style="color:var(--red);">*</span>
+          </label>
+          <select name="tipe" class="form-control" style="width:100%; height:38px; border-radius:6px; border:1px solid var(--border-2); padding:0 10px; font-size:13px;">
+            @php $currentTipe = $modeUjian->tipe ?? 'STS'; @endphp
+            <option value="STS" {{ $currentTipe === 'STS' ? 'selected' : '' }}>STS (Sumatif Tengah Semester)</option>
+            <option value="SAS" {{ $currentTipe === 'SAS' ? 'selected' : '' }}>SAS (Sumatif Akhir Semester)</option>
+            <option value="SAT" {{ $currentTipe === 'SAT' ? 'selected' : '' }}>SAT (Sumatif Akhir Tahun)</option>
+            <option value="USBK" {{ $currentTipe === 'USBK' ? 'selected' : '' }}>USBK / US</option>
+            <option value="Lainnya" {{ $currentTipe === 'Lainnya' ? 'selected' : '' }}>Lainnya</option>
+          </select>
+        </div>
+      </div>
+
+      <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:14px; margin-bottom:14px;">
+        <div class="form-group">
+          <label style="font-size:11.5px; font-weight:800; text-transform:uppercase; color:var(--text); margin-bottom:5px; display:block;">
+            Tanggal Mulai <span style="color:var(--red);">*</span>
+          </label>
+          <input type="date" name="tanggal_mulai" value="{{ $modeUjian->tanggal_mulai ?? '2026-09-21' }}" required class="form-control" style="width:100%; height:38px; border-radius:6px; border:1px solid var(--border-2); padding:0 10px; font-size:13px;" />
+        </div>
+        <div class="form-group">
+          <label style="font-size:11.5px; font-weight:800; text-transform:uppercase; color:var(--text); margin-bottom:5px; display:block;">
+            Tanggal Selesai <span style="color:var(--red);">*</span>
+          </label>
+          <input type="date" name="tanggal_selesai" value="{{ $modeUjian->tanggal_selesai ?? '2026-09-25' }}" required class="form-control" style="width:100%; height:38px; border-radius:6px; border:1px solid var(--border-2); padding:0 10px; font-size:13px;" />
+        </div>
+        <div class="form-group">
+          <label style="font-size:11.5px; font-weight:800; text-transform:uppercase; color:#4f46e5; margin-bottom:5px; display:block;">
+            <i class="bi bi-door-open-fill"></i> Jam Pulang Ujian <span style="color:var(--red);">*</span>
+          </label>
+          <input type="time" name="jam_pulang_mulai" value="{{ substr($modeUjian->jam_pulang_mulai ?? '11:30', 0, 5) }}" required class="form-control" style="width:100%; height:38px; border-radius:6px; border:1.5px solid #6366f1; padding:0 10px; font-size:14px; font-weight:800; color:#4f46e5;" />
+        </div>
+      </div>
+
+      <div style="background:rgba(79, 70, 229, 0.05); border:1px solid rgba(99, 102, 241, 0.2); border-radius:8px; padding:10px 14px; margin-bottom:14px;">
+        <label style="display:flex; align-items:center; gap:8px; margin:0; cursor:pointer; font-size:12.5px; font-weight:700; color:var(--text);">
+          <input type="checkbox" name="nonaktifkan_piket_reguler" value="1" {{ ($modeUjian?->nonaktifkan_piket_reguler ?? true) ? 'checked' : '' }} style="width:16px; height:16px; accent-color:#4f46e5;">
+          <span>Nonaktifkan Jadwal Guru Piket Reguler (Meja piket dialihkan penuh ke Panitia Pelaksana STS)</span>
+        </label>
+      </div>
+
+      {{-- Pilih Panitia Pelaksana STS --}}
+      <div style="margin-bottom:16px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+          <label style="font-size:11.5px; font-weight:800; text-transform:uppercase; color:var(--text); margin:0;">
+            Pilih Personel Panitia STS (Akses Operasional Meja Piket):
+          </label>
+          <input type="text" id="filterPanitiaGtk" placeholder="Cari guru..." oninput="filterChecklistPanitia(this.value)" style="height:28px; width:160px; font-size:11.5px; border-radius:6px; border:1px solid var(--border-2); padding:0 8px;">
+        </div>
+
+        @php
+          $selectedPanitiaIds = $modeUjian->panitia_guru_ids ?? [];
+        @endphp
+        <div style="max-height:180px; overflow-y:auto; border:1px solid var(--border-2); border-radius:8px; padding:8px 12px; background:var(--bg-2); display:grid; grid-template-columns:repeat(auto-fill, minmax(240px, 1fr)); gap:6px;" id="listPanitiaChecklist">
+          @foreach($semuaGuru as $g)
+            @php $checked = in_array($g->id, $selectedPanitiaIds); @endphp
+            <label class="panitia-item-label" style="display:flex; align-items:center; gap:8px; padding:4px 6px; border-radius:6px; cursor:pointer; font-size:12px; background:{{ $checked ? 'rgba(79, 70, 229, 0.08)' : 'transparent' }};">
+              <input type="checkbox" name="panitia_guru_ids[]" value="{{ $g->id }}" {{ $checked ? 'checked' : '' }} style="accent-color:#4f46e5;">
+              <span class="panitia-nama" style="font-weight:{{ $checked ? '700' : '500' }}; color:var(--text);">{{ $g->nama }}</span>
+            </label>
+          @endforeach
+        </div>
+      </div>
+
+      <div style="display:flex; justify-content:flex-end; gap:10px; border-top:1px solid var(--border); padding-top:14px;">
+        <button type="button" class="btn btn-outline" onclick="closeModal('modalKelolaModeUjian')">Batal</button>
+        <button type="submit" class="btn" style="background:#4f46e5; color:#fff; font-weight:800; padding:8px 18px; border-radius:6px; border:none; display:inline-flex; align-items:center; gap:6px; cursor:pointer;">
+          <i class="bi bi-check2-circle"></i> Simpan Pengaturan STS
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+@endif
+
+<script>
+  function filterChecklistPanitia(query) {
+    const q = (query || '').toLowerCase();
+    const items = document.querySelectorAll('#listPanitiaChecklist .panitia-item-label');
+    items.forEach(el => {
+      const name = el.querySelector('.panitia-nama')?.innerText.toLowerCase() || '';
+      el.style.display = name.includes(q) ? 'flex' : 'none';
+    });
+  }
+</script>
 
 <script>
   let currentIzinType = 'siswa';

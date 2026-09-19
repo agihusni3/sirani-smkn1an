@@ -264,10 +264,12 @@ Route::middleware('auth')->group(function () {
         Route::get('/pengawasan-guru/{guruId}/aktivitas', [PengawasanGuruController::class, 'detailAktivitas'])->name('pengawasan.guru.detail');
     });
 
-    // 3. Jadwal Piket Harian
+    // 3. Jadwal Piket Harian & Mode Ujian (STS / SAS)
     Route::get('/jadwal-piket', [JadwalPiketController::class, 'index'])->name('jadwal-piket.index')->middleware('role:admin,kepala_sekolah,waka_kesiswaan,waka_kurikulum,staf_tu');
     Route::post('/jadwal-piket', [JadwalPiketController::class, 'store'])->name('jadwal-piket.store')->middleware('role:admin,waka_kesiswaan,waka_kurikulum');
     Route::delete('/jadwal-piket/{id}', [JadwalPiketController::class, 'destroy'])->name('jadwal-piket.destroy')->middleware('role:admin,waka_kesiswaan,waka_kurikulum');
+    Route::post('/mode-ujian/simpan', [JadwalPiketController::class, 'simpanModeUjian'])->name('mode-ujian.simpan')->middleware('role:admin,waka_kesiswaan,waka_kurikulum');
+    Route::delete('/mode-ujian/{id}', [JadwalPiketController::class, 'hapusModeUjian'])->name('mode-ujian.destroy')->middleware('role:admin,waka_kesiswaan,waka_kurikulum');
 
     // 4. Buku Kasus & Penegakan Disiplin Siswa Berjenjang (Admin, Kepsek, Wakasis, BK, Wali Kelas)
     Route::middleware('role:admin,kepala_sekolah,waka_kesiswaan,guru_bk,wali_kelas')->group(function () {

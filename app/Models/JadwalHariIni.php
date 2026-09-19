@@ -42,7 +42,31 @@ class JadwalHariIni extends Model
 
         $jadwal = self::where('tanggal', $dateStr)->first();
         if ($jadwal) {
+            $modeUjian = ModeUjian::getModeAktif($dateStr);
+            if ($modeUjian && str_contains($jadwal->diubah_oleh ?? '', 'Sistem Otomatis')) {
+                $jadwal->update([
+                    'jam_masuk_toleransi' => $modeUjian->jam_masuk_toleransi,
+                    'jam_pulang_mulai'   => $modeUjian->jam_pulang_mulai,
+                    'jam_tutup_gerbang'   => $modeUjian->jam_tutup_gerbang,
+                    'keterangan'          => "Pekan Ujian: {$modeUjian->nama_ujian}",
+                    'diubah_oleh'         => "Mode Ujian Terintegrasi ({$modeUjian->nama_ujian})",
+                ]);
+            }
             return $jadwal;
+        }
+
+        // Cek apakah tanggal ini berada dalam Mode Ujian (STS / Ujian Sekolah)
+        $modeUjian = ModeUjian::getModeAktif($dateStr);
+        if ($modeUjian) {
+            return self::create([
+                'tanggal'             => $dateStr,
+                'jam_masuk_toleransi' => $modeUjian->jam_masuk_toleransi,
+                'jam_pulang_mulai'   => $modeUjian->jam_pulang_mulai,
+                'jam_tutup_gerbang'   => $modeUjian->jam_tutup_gerbang,
+                'keterangan'          => "Pekan Ujian: {$modeUjian->nama_ujian}",
+                'diubah_oleh'         => "Mode Ujian Terintegrasi ({$modeUjian->nama_ujian})",
+                'is_sesi_buka'        => true,
+            ]);
         }
 
         // Ambil konfigurasi jam operasional mingguan jika ada (Senin - Jumat)

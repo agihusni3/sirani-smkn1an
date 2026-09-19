@@ -355,6 +355,17 @@ class User extends Authenticatable
             return true;
         }
 
+        // Cek apakah Mode Ujian (STS) aktif dan guru ini adalah panitia pelaksana ujian
+        if ($this->guru && ModeUjian::isPanitiaAktif($this->guru->id)) {
+            return true;
+        }
+
+        // Jika mode ujian aktif dan menonaktifkan piket reguler, guru piket reguler tidak aktif
+        $modeAktif = ModeUjian::getModeAktif();
+        if ($modeAktif && $modeAktif->nonaktifkan_piket_reguler) {
+            return false;
+        }
+
         // Guru berstatus piket JIKA terdaftar bertugas di jadwal piket HARI INI
         if ($this->guru && \App\Models\JadwalPiket::isGuruPiketHariIni($this->guru->id)) {
             return true;
