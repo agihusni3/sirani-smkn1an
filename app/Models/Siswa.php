@@ -74,6 +74,25 @@ class Siswa extends Model
         return \App\Support\NamaFormatter::format($value ?? ($this->attributes['nama'] ?? ''));
     }
 
+    public function getNamaSiswaAttribute(): string
+    {
+        return $this->nama;
+    }
+
+    public function getRombelAttribute()
+    {
+        $sr = $this->relationLoaded('siswaRombels')
+            ? $this->siswaRombels->firstWhere('status_keanggotaan', 'aktif')
+            : $this->siswaRombels()->where('status_keanggotaan', 'aktif')->first();
+        return $sr ? $sr->rombel : null;
+    }
+
+    public function getRombelIdAttribute(): ?int
+    {
+        $r = $this->rombel;
+        return $r ? (int)$r->id : null;
+    }
+
     public function getNamaOrtuAttribute(): ?string
     {
         return $this->attributes['nama_ortu'] 

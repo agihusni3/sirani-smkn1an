@@ -43,6 +43,8 @@ use App\Http\Controllers\SituanPelayananSuratController;
 use App\Http\Controllers\SituanKepegawaianController;
 use App\Http\Controllers\SituanEKabinetController;
 use App\Http\Controllers\SituanSuratTugasController;
+use App\Http\Controllers\Cbt\CbtAdminController;
+use App\Http\Controllers\Cbt\CbtSiswaController;
 
 // ══ 1. Website Resmi Publik SMKN 1 Air Naningan (Dilindungi Pelacak Kunjungan Otomatis) ══
 Route::middleware('track.visitor')->group(function () {
@@ -526,6 +528,48 @@ Route::middleware('auth')->group(function () {
     Route::get('/ppdb/admin', function () {
         return redirect()->route('admin.ppdb.index');
     })->name('ppdb.admin.index');
+
+    // ══ 17. DCC Asesmen & Belajar Tuntas (CBT SMKN 1 Air Naningan) ══
+    Route::prefix('admin/cbt')->name('admin.cbt.')->group(function () {
+        Route::get('/', [CbtAdminController::class, 'dashboard'])->name('dashboard');
+        
+        // Bank Soal
+        Route::get('/bank', [CbtAdminController::class, 'bankSoalIndex'])->name('bank.index');
+        Route::post('/bank', [CbtAdminController::class, 'bankSoalStore'])->name('bank.store');
+        Route::get('/bank/{id}/edit', [CbtAdminController::class, 'bankSoalEdit'])->name('bank.edit');
+        Route::put('/bank/{id}', [CbtAdminController::class, 'bankSoalUpdate'])->name('bank.update');
+        Route::delete('/bank/{id}', [CbtAdminController::class, 'bankSoalDestroy'])->name('bank.destroy');
+
+        // Butir Soal
+        Route::get('/bank/{bankId}/soal', [CbtAdminController::class, 'soalIndex'])->name('soal.index');
+        Route::get('/bank/{bankId}/soal/create', [CbtAdminController::class, 'soalCreate'])->name('soal.create');
+        Route::post('/bank/{bankId}/soal', [CbtAdminController::class, 'soalStore'])->name('soal.store');
+        Route::get('/bank/{bankId}/soal/{soalId}/edit', [CbtAdminController::class, 'soalEdit'])->name('soal.edit');
+        Route::put('/bank/{bankId}/soal/{soalId}', [CbtAdminController::class, 'soalUpdate'])->name('soal.update');
+        Route::delete('/bank/{bankId}/soal/{soalId}', [CbtAdminController::class, 'soalDestroy'])->name('soal.destroy');
+        Route::post('/bank/{bankId}/soal/import-csv', [CbtAdminController::class, 'importSoalCsv'])->name('soal.import_csv');
+
+        // Jadwal & Sesi Ujian
+        Route::get('/jadwal', [CbtAdminController::class, 'jadwalIndex'])->name('jadwal.index');
+        Route::get('/jadwal/create', [CbtAdminController::class, 'jadwalCreate'])->name('jadwal.create');
+        Route::post('/jadwal', [CbtAdminController::class, 'jadwalStore'])->name('jadwal.store');
+        Route::post('/jadwal/{id}/toggle-status', [CbtAdminController::class, 'toggleJadwalStatus'])->name('jadwal.toggle_status');
+        Route::post('/jadwal/{id}/refresh-token', [CbtAdminController::class, 'refreshToken'])->name('jadwal.refresh_token');
+        Route::delete('/jadwal/{id}', [CbtAdminController::class, 'jadwalDestroy'])->name('jadwal.destroy');
+
+        // 1-Click Remedial
+        Route::get('/jadwal/{jadwalId}/remedial', [CbtAdminController::class, 'createRemedial'])->name('remedial.create');
+        Route::post('/jadwal/{jadwalId}/remedial', [CbtAdminController::class, 'storeRemedial'])->name('remedial.store');
+
+        // Live Proctoring & Rekap Nilai
+        Route::get('/jadwal/{jadwalId}/proctor', [CbtAdminController::class, 'proctorIndex'])->name('proctor.index');
+        Route::post('/proctor/{pesertaId}/reset-login', [CbtAdminController::class, 'proctorResetLogin'])->name('proctor.reset_login');
+        Route::post('/proctor/{pesertaId}/force-finish', [CbtAdminController::class, 'proctorForceFinish'])->name('proctor.force_finish');
+        Route::get('/jadwal/{jadwalId}/rekap-nilai', [CbtAdminController::class, 'rekapNilai'])->name('rekap.nilai');
+
+        // Cetak Kartu Peserta
+        Route::get('/cetak-kartu', [CbtAdminController::class, 'cetakKartu'])->name('cetak.kartu');
+    });
 });
 
 // Format Cetak Surat Resmi Kesiswaan
@@ -534,4 +578,18 @@ Route::get('/surat/cetak/{id?}', [SuratKesiswaanController::class, 'cetak'])->na
 
 // Verifikasi Keabsahan Surat Resmi via QR Code (Akses Publik Tanpa Login)
 Route::get('/verifikasi-surat/{hash}', [SituanPelayananSuratController::class, 'verifikasiSuratPublik'])->name('situan.verifikasi-surat');
+
+// ══ 18. Portal CBT Siswa (Login NISN & Pengerjaan Ujian) ══
+Route::prefix('cbt')->name('cbt.siswa.')->group(function () {
+    Route::get('/login', [CbtSiswaController::class, 'loginForm'])->name('login');
+    Route::post('/login', [CbtSiswaController::class, 'loginSubmit'])->name('login.submit');
+    Route::get('/logout', [CbtSiswaController::class, 'logout'])->name('logout');
+    Route::get('/dashboard', [CbtSiswaController::class, 'dashboard'])->name('dashboard');
+    Route::post('/verifikasi/{jadwalId}', [CbtSiswaController::class, 'verifikasiToken'])->name('verifikasi_token');
+    Route::get('/ujian/{jadwalId}', [CbtSiswaController::class, 'lembarUjian'])->name('lembar_ujian');
+    Route::post('/autosave', [CbtSiswaController::class, 'autosaveJawaban'])->name('autosave');
+    Route::post('/log-aktivitas', [CbtSiswaController::class, 'logAktivitas'])->name('log_aktivitas');
+    Route::post('/selesai/{jadwalId}', [CbtSiswaController::class, 'selesaiUjian'])->name('selesai');
+    Route::get('/hasil/{jadwalId}', [CbtSiswaController::class, 'hasilUjian'])->name('hasil');
+});
 
