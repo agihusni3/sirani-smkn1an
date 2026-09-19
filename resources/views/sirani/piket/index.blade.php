@@ -89,7 +89,7 @@
       </div>
     </div>
 
-    {{-- ══ NOTIFIKASI MODE PEKAN UJIAN (STS / SAS) AKTIF ══ --}}
+    {{-- ══ NOTIFIKASI MODE PEKAN SUMATIF (STS / SAS) AKTIF ══ --}}
     @if($modeUjian)
       <div class="piket-exam-banner no-print" style="margin-bottom:14px; display:flex; align-items:center; justify-content:space-between; gap:16px; padding:14px 18px; border-radius:12px; background:linear-gradient(135deg, rgba(79, 70, 229, 0.10) 0%, rgba(147, 51, 234, 0.08) 100%); border:1.5px solid rgba(99, 102, 241, 0.35); box-shadow:0 3px 12px -2px rgba(99, 102, 241, 0.12);">
         <div style="display:flex; align-items:center; gap:12px;">
@@ -99,7 +99,7 @@
           <div>
             <div style="display:flex; align-items:center; gap:8px; margin-bottom:2px; flex-wrap:wrap;">
               <strong style="font-size:14.5px; color:#3730a3; font-weight:800;">
-                PEKAN UJIAN AKTIF: {{ $modeUjian->nama_ujian }}
+                PEKAN SUMATIF AKTIF: {{ $modeUjian->nama_ujian }}
               </strong>
               <span style="font-size:11px; padding:2px 7px; border-radius:6px; background:#4f46e5; color:#fff; font-weight:700;">
                 {{ $modeUjian->tipe }}
@@ -109,8 +109,8 @@
               </span>
             </div>
             <div style="font-size:12.5px; color:#4b5563; line-height:1.4;">
-              <span style="color:#1e1b4b; font-weight:700;"><i class="bi bi-clock-fill text-indigo-600"></i> Jam Pulang Gerbang Ujian: {{ substr($modeUjian->jam_pulang_mulai, 0, 5) }} WIB</span>
-              • Piket reguler dinonaktifkan sementara dan digantikan oleh <strong style="color:#4338ca;">Panitia Pelaksana STS</strong> ({{ $guruPiketHariIni->count() }} Personel).
+              <span style="color:#1e1b4b; font-weight:700;"><i class="bi bi-clock-fill text-indigo-600"></i> Jam Pulang Gerbang Sumatif: {{ substr($modeUjian->jam_pulang_mulai, 0, 5) }} WIB</span>
+              • Piket reguler dinonaktifkan sementara dan digantikan oleh <strong style="color:#4338ca;">Panitia Pelaksana Sumatif</strong> ({{ $guruPiketHariIni->count() }} Personel).
             </div>
           </div>
         </div>
@@ -122,7 +122,7 @@
           @endif
           @if(auth()->user()->isAdmin() || auth()->user()->isWakaKurikulum())
             <button type="button" class="btn btn-sm" onclick="openModal('modalKelolaModeUjian')" style="background:#4f46e5; color:#fff; border:none; padding:6px 12px; border-radius:8px; font-weight:700; font-size:11.5px; cursor:pointer;">
-              <i class="bi bi-gear-fill"></i> Atur STS
+              <i class="bi bi-gear-fill"></i> Atur Sumatif
             </button>
           @endif
         </div>
@@ -138,7 +138,7 @@
       <div class="piket-officers-banner no-print">
         <div class="piket-officers-label">
           <span class="duty-pulsing-dot" style="{{ $modeUjian ? 'background:#8b5cf6;' : '' }}"></span>
-          <span>{{ $modeUjian ? 'PANITIA PELAKSANA STS BERTUGAS:' : 'GURU PIKET HARI INI:' }}</span>
+          <span>{{ $modeUjian ? 'PANITIA PELAKSANA SUMATIF BERTUGAS:' : 'GURU PIKET HARI INI:' }}</span>
           <span class="piket-duty-summary">({{ $piketBertugas }}/{{ $totalPiket }} Bertugas)</span>
         </div>
         <div class="piket-officers-tags">
@@ -343,8 +343,8 @@
             Catat Izin
           </button>
           @if(auth()->user()->isAdmin() || auth()->user()->isWakaKurikulum())
-            <button type="button" class="btn-gradient-manual" onclick="openModal('modalKelolaModeUjian')" data-tooltip="Konfigurasi Mode Ujian STS / SAS & Panitia" title="Konfigurasi Mode Ujian STS / SAS & Panitia" style="background:linear-gradient(135deg, #4f46e5, #7c3aed); border-color:#6366f1;">
-              <i class="bi bi-mortarboard-fill" style="margin-right:4px;"></i> Mode STS
+            <button type="button" class="btn-gradient-manual" onclick="openModal('modalKelolaModeUjian')" data-tooltip="Konfigurasi Mode Pekan Sumatif (STS / SAS) & Panitia" title="Konfigurasi Mode Pekan Sumatif (STS / SAS) & Panitia" style="background:linear-gradient(135deg, #4f46e5, #7c3aed); border-color:#6366f1;">
+              <i class="bi bi-mortarboard-fill" style="margin-right:4px;"></i> Mode Sumatif
             </button>
           @endif
         </div>
@@ -869,7 +869,7 @@
                   };
                   $waOrtu = $s->siswa?->no_hp_ortu ?? $s->siswa?->no_hp ?? null;
                   $waClean = $waOrtu ? preg_replace('/^0/', '62', preg_replace('/[^0-9]/', '', $waOrtu)) : '';
-                  $waPesan = rawurlencode("Halo Orang Tua/Wali dari {$s->siswa?->nama} ({$rombel}), kami dari Panitia STS SMKN 1 Air Naningan menginformasikan bahwa Ananda terdata {$s->jenis_izin} pada tanggal " . \Carbon\Carbon::parse($s->tanggal)->locale('id')->isoFormat('dddd, D MMMM Y') . ". Diharapkan Ananda segera menghubungi Panitia STS untuk koordinasi jadwal Ujian Susulan. Terima kasih.");
+                  $waPesan = rawurlencode("Halo Orang Tua/Wali dari {$s->siswa?->nama} ({$rombel}), kami dari Panitia Sumatif SMKN 1 Air Naningan menginformasikan bahwa Ananda terdata {$s->jenis_izin} pada tanggal " . \Carbon\Carbon::parse($s->tanggal)->locale('id')->isoFormat('dddd, D MMMM Y') . ". Diharapkan Ananda segera berkoordinasi dengan Panitia Sumatif untuk jadwal Ujian Susulan. Terima kasih.");
                 @endphp
                 <tr>
                   <td style="font-family:var(--font-mono); font-size:11px; text-align:center;">{{ $idx + 1 }}</td>
@@ -2059,16 +2059,16 @@
   </div>
 </div>
 
-{{-- MODAL KELOLA MODE UJIAN (STS / SAS) --}}
+{{-- MODAL KELOLA MODE SUMATIF (STS / SAS) --}}
 @if(auth()->user()->isAdmin() || auth()->user()->isWakaKurikulum())
 <div class="modal-overlay" id="modalKelolaModeUjian">
   <div class="modal-card" style="max-width:680px; padding:24px;">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; border-bottom:1px solid var(--border); padding-bottom:10px;">
       <div>
         <h3 style="font-size:16px; font-weight:900; color:var(--text); margin:0; display:flex; align-items:center; gap:8px;">
-          <i class="bi bi-mortarboard-fill" style="color:#4f46e5;"></i> Pengaturan Mode Pekan Ujian (STS / SAS)
+          <i class="bi bi-mortarboard-fill" style="color:#4f46e5;"></i> Pengaturan Mode Pekan Sumatif (STS / SAS)
         </h3>
-        <div style="font-size:11.5px; color:var(--text-3); margin-top:2px;">Atur jam kepulangan Smart Gate dan dewan guru yang bertugas sebagai panitia ujian</div>
+        <div style="font-size:11.5px; color:var(--text-3); margin-top:2px;">Atur jam kepulangan Smart Gate dan dewan guru yang bertugas sebagai panitia ujian sumatif</div>
       </div>
       <button type="button" class="btn btn-sm btn-outline" onclick="closeModal('modalKelolaModeUjian')"><i class="bi bi-x-lg"></i></button>
     </div>
@@ -2125,15 +2125,15 @@
       <div style="background:rgba(79, 70, 229, 0.05); border:1px solid rgba(99, 102, 241, 0.2); border-radius:8px; padding:10px 14px; margin-bottom:14px;">
         <label style="display:flex; align-items:center; gap:8px; margin:0; cursor:pointer; font-size:12.5px; font-weight:700; color:var(--text);">
           <input type="checkbox" name="nonaktifkan_piket_reguler" value="1" {{ ($modeUjian?->nonaktifkan_piket_reguler ?? true) ? 'checked' : '' }} style="width:16px; height:16px; accent-color:#4f46e5;">
-          <span>Nonaktifkan Jadwal Guru Piket Reguler (Meja piket dialihkan penuh ke Panitia Pelaksana STS)</span>
+          <span>Nonaktifkan Jadwal Guru Piket Reguler (Meja piket dialihkan penuh ke Panitia Pelaksana Sumatif)</span>
         </label>
       </div>
 
-      {{-- Pilih Panitia Pelaksana STS --}}
+      {{-- Pilih Panitia Pelaksana Sumatif --}}
       <div style="margin-bottom:16px;">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
           <label style="font-size:11.5px; font-weight:800; text-transform:uppercase; color:var(--text); margin:0;">
-            Pilih Personel Panitia STS (Akses Operasional Meja Piket):
+            Pilih Personel Panitia Sumatif (Akses Operasional Meja Piket):
           </label>
           <input type="text" id="filterPanitiaGtk" placeholder="Cari guru..." oninput="filterChecklistPanitia(this.value)" style="height:28px; width:160px; font-size:11.5px; border-radius:6px; border:1px solid var(--border-2); padding:0 8px;">
         </div>
@@ -2155,7 +2155,7 @@
       <div style="display:flex; justify-content:flex-end; gap:10px; border-top:1px solid var(--border); padding-top:14px;">
         <button type="button" class="btn btn-outline" onclick="closeModal('modalKelolaModeUjian')">Batal</button>
         <button type="submit" class="btn" style="background:#4f46e5; color:#fff; font-weight:800; padding:8px 18px; border-radius:6px; border:none; display:inline-flex; align-items:center; gap:6px; cursor:pointer;">
-          <i class="bi bi-check2-circle"></i> Simpan Pengaturan STS
+          <i class="bi bi-check2-circle"></i> Simpan Pengaturan Sumatif
         </button>
       </div>
     </form>

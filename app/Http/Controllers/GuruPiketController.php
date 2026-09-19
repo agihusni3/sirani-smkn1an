@@ -36,7 +36,7 @@ class GuruPiketController extends Controller
 
         $modeUjian = \App\Models\ModeUjian::getModeAktif($today);
 
-        // Jika Mode Ujian aktif dan menonaktifkan piket reguler, tampilkan Panitia STS sebagai petugas meja
+        // Jika Mode Ujian aktif dan menonaktifkan piket reguler, tampilkan Panitia Sumatif sebagai petugas meja
         if ($modeUjian && $modeUjian->nonaktifkan_piket_reguler) {
             $panitiaGurus = $modeUjian->daftar_panitia;
             $guruPiketHariIni = $panitiaGurus->map(function ($g) use ($today) {
@@ -44,7 +44,7 @@ class GuruPiketController extends Controller
                 $obj->id = 'panitia_' . $g->id;
                 $obj->guru = $g;
                 $obj->guru_id = $g->id;
-                $obj->keterangan = 'Panitia Pelaksana STS';
+                $obj->keterangan = 'Panitia Pelaksana Sumatif';
                 $obj->status_piket = JadwalPiket::getStatusKehadiranPiket($g->id, $today);
                 return $obj;
             });
@@ -153,14 +153,14 @@ class GuruPiketController extends Controller
         $hariList = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat'];
         $jadwalPiketSeminggu = JadwalPiket::with('guru')->get()->groupBy('hari');
 
-        // Otorisasi: hanya guru piket hari ini / Panitia STS (atau admin) yang berhak koreksi
+        // Otorisasi: hanya guru piket hari ini / Panitia Sumatif (atau admin) yang berhak koreksi
         $currentUser = auth()->user();
         $canKoreksi = $currentUser && (
             $currentUser->isAdmin() || 
             $currentUser->isPiketHariIni()
         );
 
-        // Daftar Siswa Ujian Susulan (Siswa izin/sakit selama rentang pekan ujian STS)
+        // Daftar Siswa Ujian Susulan (Siswa izin/sakit selama rentang pekan ujian Sumatif)
         $siswaSusulan = collect();
         if ($modeUjian) {
             $siswaSusulan = IzinSiswa::with(['siswa.siswaRombels' => function ($q) use ($taAktif) {
