@@ -677,12 +677,13 @@ class RfidController extends Controller
      */
     public function kiosk()
     {
+        $today = Carbon::today()->toDateString();
+        $isLibur = HariLibur::isLibur($today);
+        $liburDetail = HariLibur::getLiburHariIni($today);
         $jadwal = JadwalHariIni::getJadwalAktif();
         $hariIni = Carbon::now()->locale('id')->isoFormat('dddd, D MMMM Y');
-        $libur = HariLibur::where('tanggal', Carbon::today()->toDateString())->first();
+        $libur = $liburDetail;
         $pengumumanKios = Pengumuman::where('tampilkan_di_kios', true)->latest()->first();
-
-        $today = Carbon::today()->toDateString();
 
         // Hitung statistik hari ini
         $totalSiswaAktif = Siswa::whereIn('status', ['aktif', 'pkl'])->count();
@@ -690,6 +691,7 @@ class RfidController extends Controller
         $totalHadirHariIni = Absensi::where('tanggal', $today)->where('status', 'hadir')->count();
         $totalTerlambatHariIni = Absensi::where('tanggal', $today)->where('status', 'terlambat')->count();
         $totalPulangHariIni = Absensi::where('tanggal', $today)->whereNotNull('jam_pulang')->count();
+        $totalBelumHadirHariIni = $isLibur ? 0 : max(0, $totalSiswaAktif - ($totalHadirHariIni + $totalTerlambatHariIni));
 
         // Ambil 5 scan terakhir hari ini
         $initialRecentScans = Absensi::where('tanggal', $today)
@@ -703,12 +705,14 @@ class RfidController extends Controller
             'jadwal',
             'hariIni',
             'libur',
+            'isLibur',
             'pengumumanKios',
             'totalSiswaAktif',
             'totalKartuRfid',
             'totalHadirHariIni',
             'totalTerlambatHariIni',
             'totalPulangHariIni',
+            'totalBelumHadirHariIni',
             'initialRecentScans'
         ));
     }
@@ -807,35 +811,40 @@ class RfidController extends Controller
         $failedScans = \App\Services\RfidScanService::getFailedScansToday();
 
         // 3. Siswa yang Belum Hadir / Belum Absen Hari Ini
-        $hadirSiswaIds = Absensi::where('tanggal', $today)
-            ->where('pemilik_type', 'siswa')
-            ->whereNotNull('jam_masuk')
-            ->pluck('pemilik_id')
-            ->toArray();
+        $isLibur = \App\Models\HariLibur::isLibur($today);
+        if ($isLibur) {
+            $belumHadir = collect();
+        } else {
+            $hadirSiswaIds = Absensi::where('tanggal', $today)
+                ->where('pemilik_type', 'siswa')
+                ->whereNotNull('jam_masuk')
+                ->pluck('pemilik_id')
+                ->toArray();
 
-        $belumHadir = Siswa::whereIn('status', ['aktif', 'pkl'])
-            ->whereNotIn('id', $hadirSiswaIds)
-            ->with(['siswaRombels' => function ($q) {
-                $q->where('status_keanggotaan', 'aktif')->with('rombel');
-            }])
-            ->get()
-            ->map(function ($s) {
-                $hpClean = preg_replace('/[^0-9]/', '', $s->no_hp_ortu ?? ($s->no_hp_siswa ?? ''));
-                if (str_starts_with($hpClean, '0')) $hpClean = '62' . substr($hpClean, 1);
-                return [
-                    'id'         => $s->id,
-                    'nama'       => $s->nama,
-                    'nisn'       => $s->nisn ?: $s->nis,
-                    'rombel'     => $s->siswaRombels->first()?->rombel?->nama_rombel ?? 'Tanpa Rombel',
-                    'foto'       => $s->foto_url,
-                    'no_hp_ortu' => $s->no_hp_ortu,
-                    'hp_clean'   => $hpClean,
-                ];
-            })
-            ->sortBy(function ($s) {
-                return ($s['rombel'] ?? '') . ' ' . ($s['nama'] ?? '');
-            })
-            ->values();
+            $belumHadir = Siswa::whereIn('status', ['aktif', 'pkl'])
+                ->whereNotIn('id', $hadirSiswaIds)
+                ->with(['siswaRombels' => function ($q) {
+                    $q->where('status_keanggotaan', 'aktif')->with('rombel');
+                }])
+                ->get()
+                ->map(function ($s) {
+                    $hpClean = preg_replace('/[^0-9]/', '', $s->no_hp_ortu ?? ($s->no_hp_siswa ?? ''));
+                    if (str_starts_with($hpClean, '0')) $hpClean = '62' . substr($hpClean, 1);
+                    return [
+                        'id'         => $s->id,
+                        'nama'       => $s->nama,
+                        'nisn'       => $s->nisn ?: $s->nis,
+                        'rombel'     => $s->siswaRombels->first()?->rombel?->nama_rombel ?? 'Tanpa Rombel',
+                        'foto'       => $s->foto_url,
+                        'no_hp_ortu' => $s->no_hp_ortu,
+                        'hp_clean'   => $hpClean,
+                    ];
+                })
+                ->sortBy(function ($s) {
+                    return ($s['rombel'] ?? '') . ' ' . ($s['nama'] ?? '');
+                })
+                ->values();
+        }
 
         // 4. Statistik Ringkas
         $totalHadir = Absensi::where('tanggal', $today)->where('status', 'hadir')->count();
@@ -844,15 +853,17 @@ class RfidController extends Controller
 
         return response()->json([
             'success'            => true,
+            'is_libur'           => $isLibur,
             'recent_scans'       => $recentScans,
             'failed_scans'       => $failedScans,
             'belum_hadir'        => $belumHadir,
             'stats'              => [
-                'total_hadir'      => $totalHadir,
-                'total_terlambat'  => $totalTerlambat,
-                'total_pulang'     => $totalPulang,
-                'total_gagal'      => count($failedScans),
-                'total_belum_absen'=> count($belumHadir),
+                'total_hadir'       => $totalHadir,
+                'total_terlambat'   => $totalTerlambat,
+                'total_pulang'      => $totalPulang,
+                'total_gagal'       => count($failedScans),
+                'total_belum_absen' => $isLibur ? 0 : count($belumHadir),
+                'is_libur'          => $isLibur,
             ],
             'server_time'        => now()->format('H:i:s'),
         ]);

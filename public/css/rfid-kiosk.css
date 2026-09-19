@@ -181,26 +181,27 @@
       margin: 0 auto;
     }
 
-    /* 2-Column Split Grid: Left = Live Monitor, Right = Scanner */
+    /* 2-Column Split Grid: Left = Scanner, Right = Live Monitor */
     .kiosk-layout-grid {
       display: grid;
-      grid-template-columns: 1.15fr 0.85fr;
+      grid-template-columns: 0.95fr 1.05fr;
       gap: 24px;
       width: 100%;
       align-items: stretch;
     }
 
-    .kiosk-col-left {
-      display: flex;
-      flex-direction: column;
-      min-width: 0;
-    }
-
-    .kiosk-col-right {
+    .kiosk-col-left, .kiosk-col-scanner {
       display: flex;
       flex-direction: column;
       min-width: 0;
       justify-content: center;
+    }
+
+    .kiosk-col-right, .kiosk-col-monitor {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      height: 100%;
     }
 
     /* Left Panel: Embedded Monitor Card */
@@ -1251,8 +1252,11 @@
         grid-template-columns: 1fr;
         gap: 20px;
       }
-      .kiosk-col-right {
-        order: -1;
+      .kiosk-col-left, .kiosk-col-scanner {
+        order: 1;
+      }
+      .kiosk-col-right, .kiosk-col-monitor {
+        order: 2;
       }
       .scanner-main-card {
         min-height: 480px;
