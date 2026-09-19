@@ -124,10 +124,25 @@
       </div>
     @endif
 
+    {{-- ══ NOTIFIKASI HARI LIBUR SEKOLAH ══ --}}
+    @if($isLibur)
+      <div class="piket-holiday-banner no-print" style="margin-bottom:18px; display:flex; align-items:center; gap:14px; padding:14px 18px; border-radius:12px; background:rgba(239, 68, 68, 0.08); border:1px solid rgba(239, 68, 68, 0.22); color:#991b1b;">
+        <div style="width:40px; height:40px; border-radius:10px; background:rgba(239, 68, 68, 0.15); display:flex; align-items:center; justify-content:center; font-size:20px; color:#dc2626; flex-shrink:0;">
+          <i class="bi bi-calendar-x-fill"></i>
+        </div>
+        <div style="flex:1; font-size:13px; line-height:1.45;">
+          <strong style="font-size:14px; display:block; margin-bottom:2px; color:#b91c1c;">
+            Hari Ini Libur Sekolah: {{ $liburDetail->nama_libur ?? (\App\Models\HariLibur::isWeekend($today) ? 'Libur Akhir Pekan (' . now()->locale('id')->isoFormat('dddd') . ')' : 'Libur Terjadwal') }}
+          </strong>
+          <span>Seluruh peserta didik dan dewan guru bebas kewajiban presensi. Status Alpha otomatis dinonaktifkan untuk hari libur / akhir pekan.</span>
+        </div>
+      </div>
+    @endif
+
     {{-- ══ 3. KPI ANALYTICS GRID (6 KARTU RAPI) ══ --}}
     @php
       $isAfter0900 = now()->format('H:i') >= '09:00';
-      $alphaCount = max(0, $totalSiswaAktif - ($hadirTepat + $terlambat + $izinCount));
+      $alphaCount = $isLibur ? 0 : max(0, $totalSiswaAktif - ($hadirTepat + $terlambat + $izinCount));
     @endphp
     {{-- KPI Grid Peserta Didik --}}
     <div class="piket-kpi-grid no-print" id="kpiGridSiswa">
@@ -138,7 +153,7 @@
           <i class="bi bi-pie-chart-fill" style="color:#059669;"></i>
         </div>
         <div class="piket-kpi-value" style="color:#059669;">{{ $persenKehadiran }}%</div>
-        <div class="piket-kpi-sub">{{ $hadirTepat + $terlambat }} dari {{ $totalSiswaAktif }} siswa</div>
+        <div class="piket-kpi-sub">{{ $isLibur ? 'Hari Libur Sekolah' : ($hadirTepat + $terlambat) . ' dari ' . $totalSiswaAktif . ' siswa' }}</div>
       </div>
 
       <!-- 2. Hadir Tepat Waktu -->
@@ -174,11 +189,11 @@
       <!-- 5. Alpha / Belum Scan -->
       <div class="piket-kpi-card" onclick="selectSiswaFilter('belum_hadir')">
         <div class="piket-kpi-top">
-          <span>{{ $isAfter0900 ? 'Alpha / Belum Hadir' : 'Belum Scan' }}</span>
-          <i class="bi bi-exclamation-octagon-fill" style="color:#DC2626;"></i>
+          <span>{{ $isLibur ? 'Alpha / Belum Hadir' : ($isAfter0900 ? 'Alpha / Belum Hadir' : 'Belum Scan') }}</span>
+          <i class="bi bi-exclamation-octagon-fill" style="color:{{ $alphaCount > 0 ? '#DC2626' : 'var(--text-3)' }};"></i>
         </div>
         <div class="piket-kpi-value" style="color:{{ $alphaCount > 0 ? '#DC2626' : 'inherit' }};">{{ $alphaCount }}</div>
-        <div class="piket-kpi-sub">{{ $isAfter0900 ? 'Status terkunci (09:00)' : 'Otomatis Alpha 09:00' }}</div>
+        <div class="piket-kpi-sub">{{ $isLibur ? 'Hari Libur (Bebas Presensi)' : ($isAfter0900 ? 'Status terkunci (09:00)' : 'Otomatis Alpha 09:00') }}</div>
       </div>
 
       <!-- 6. Belum Scan Pulang -->
@@ -203,7 +218,7 @@
           <i class="bi bi-pie-chart-fill" style="color:#059669;"></i>
         </div>
         <div class="piket-kpi-value" style="color:#059669;">{{ $guruPersenKehadiran }}%</div>
-        <div class="piket-kpi-sub">{{ $guruHadirTotal }} dari {{ $totalGuruAktif }} guru</div>
+        <div class="piket-kpi-sub">{{ $isLibur ? 'Hari Libur Sekolah' : $guruHadirTotal . ' dari ' . $totalGuruAktif . ' guru' }}</div>
       </div>
 
       <!-- 2. Hadir Tepat Waktu Guru -->
@@ -239,11 +254,11 @@
       <!-- 5. Belum Hadir / Alpha Guru -->
       <div class="piket-kpi-card" onclick="selectGuruFilter('belum_hadir')">
         <div class="piket-kpi-top">
-          <span>{{ $isAfter0900 ? 'Alpha / Belum Hadir' : 'Belum Hadir' }}</span>
-          <i class="bi bi-exclamation-octagon-fill" style="color:#DC2626;"></i>
+          <span>{{ $isLibur ? 'Belum Hadir' : ($isAfter0900 ? 'Alpha / Belum Hadir' : 'Belum Hadir') }}</span>
+          <i class="bi bi-exclamation-octagon-fill" style="color:{{ $guruBelumHadirCount > 0 ? '#DC2626' : 'var(--text-3)' }};"></i>
         </div>
         <div class="piket-kpi-value" style="color:{{ $guruBelumHadirCount > 0 ? '#DC2626' : 'inherit' }};">{{ $guruBelumHadirCount }}</div>
-        <div class="piket-kpi-sub">{{ $isAfter0900 ? 'Status terkunci (09:00)' : 'Otomatis Alpha 09:00' }}</div>
+        <div class="piket-kpi-sub">{{ $isLibur ? 'Hari Libur (Bebas Presensi)' : ($isAfter0900 ? 'Status terkunci (09:00)' : 'Otomatis Alpha 09:00') }}</div>
       </div>
 
       <!-- 6. Sudah Scan Pulang Guru -->
@@ -253,8 +268,6 @@
           <i class="bi bi-door-closed-fill" style="color:#06B6D4;"></i>
         </div>
         <div class="piket-kpi-value" style="color:#0891B2;">{{ $guruSudahPulang }}</div>
-        <div class="piket-kpi-sub">Telah scan pulang</div>
-      </div>
     </div>
 
     {{-- ══ 4. UNIFIED CONTROL TOOLBAR ══ --}}
@@ -264,11 +277,11 @@
         <div class="piket-segmented-tabs">
           <button type="button" class="piket-segmented-btn piket-main-btn active" id="btnViewSiswa" onclick="switchMainView('siswa', this)">
             <i class="bi bi-people-fill"></i> Peserta Didik
-            <span class="piket-segmented-count">{{ $totalSiswaAktif }}</span>
+            <span class="piket-segmented-count">{{ $isLibur ? $absensiHariIni->count() : $totalSiswaAktif }}</span>
           </button>
           <button type="button" class="piket-segmented-btn piket-main-btn" id="btnViewGuru" onclick="switchMainView('guru', this)">
             <i class="bi bi-person-badge-fill"></i> Guru &amp; Pegawai
-            <span class="piket-segmented-count">{{ $guruBelumHadirList->count() + $absensiGuruHariIni->count() }}</span>
+            <span class="piket-segmented-count">{{ $isLibur ? $absensiGuruHariIni->count() : ($guruBelumHadirList->count() + $absensiGuruHariIni->count()) }}</span>
           </button>
         </div>
 
@@ -291,7 +304,7 @@
         <div id="filterChipsSiswa" class="piket-chips-strip filter-pills">
           <button type="button" class="piket-chip filter-pill active" data-filter="all" onclick="filterSiswaTable('all', this)">
             <span>Semua</span>
-            <span class="piket-chip-badge">{{ $totalSiswaAktif }}</span>
+            <span class="piket-chip-badge">{{ $isLibur ? $absensiHariIni->count() : $totalSiswaAktif }}</span>
           </button>
           <button type="button" class="piket-chip filter-pill" data-filter="hadir" onclick="filterSiswaTable('hadir', this)">
             <span>Hadir Tepat</span>
@@ -306,7 +319,7 @@
             <span class="piket-chip-badge">{{ $izinCount }}</span>
           </button>
           <button type="button" class="piket-chip filter-pill" data-filter="belum_hadir" onclick="filterSiswaTable('belum_hadir', this)">
-            <span>{{ $isAfter0900 ? 'Alpha / Belum Hadir' : 'Belum Scan' }}</span>
+            <span>{{ $isLibur ? 'Alpha / Belum Hadir' : ($isAfter0900 ? 'Alpha / Belum Hadir' : 'Belum Scan') }}</span>
             <span class="piket-chip-badge" style="color:{{ $alphaCount > 0 ? '#DC2626' : 'inherit' }}; font-weight:800;">
               {{ $alphaCount }}
             </span>
@@ -321,7 +334,7 @@
         <div id="filterChipsGuru" class="piket-chips-strip filter-pills" style="display:none;">
           <button type="button" class="piket-chip filter-pill active" data-filter="all" onclick="filterGuruTable('all', this)">
             <span>Semua Guru</span>
-            <span class="piket-chip-badge">{{ $totalGuruAktif }}</span>
+            <span class="piket-chip-badge">{{ $isLibur ? $absensiGuruHariIni->count() : $totalGuruAktif }}</span>
           </button>
           <button type="button" class="piket-chip filter-pill" data-filter="hadir" onclick="filterGuruTable('hadir', this)">
             <span>Hadir Tepat</span>
@@ -332,7 +345,7 @@
             <span class="piket-chip-badge">{{ $guruTerlambat }}</span>
           </button>
           <button type="button" class="piket-chip filter-pill" data-filter="belum_hadir" onclick="filterGuruTable('belum_hadir', this)">
-            <span>{{ $isAfter0900 ? 'Alpha / Belum Hadir' : 'Belum Hadir' }}</span>
+            <span>{{ $isLibur ? 'Belum Hadir' : ($isAfter0900 ? 'Alpha / Belum Hadir' : 'Belum Hadir') }}</span>
             <span class="piket-chip-badge" style="color:{{ $guruBelumHadirCount > 0 ? '#DC2626' : 'inherit' }}; font-weight:800;">
               {{ $guruBelumHadirCount }}
             </span>
@@ -522,6 +535,27 @@
                   </td>
                 </tr>
               @endforeach
+
+              {{-- 3. Empty State jika tidak ada data presensi --}}
+              @if($absensiHariIni->isEmpty() && $siswaBelumHadirList->isEmpty())
+                <tr class="empty-row">
+                  <td colspan="7" style="text-align:center; padding: 48px 20px;">
+                    <div style="width: 54px; height: 54px; border-radius: 50%; background: rgba(239, 68, 68, 0.08); color: #dc2626; display: inline-flex; align-items: center; justify-content: center; font-size: 26px; margin-bottom: 12px;">
+                      <i class="bi bi-calendar-x"></i>
+                    </div>
+                    <div style="font-weight: 800; font-size: 15px; color: var(--text);">
+                      {{ $isLibur ? 'Hari Ini Libur Sekolah' : 'Tidak Ada Data Presensi Siswa' }}
+                    </div>
+                    <div style="font-size: 12.5px; color: var(--text-3); max-width: 480px; margin: 6px auto 0; line-height: 1.5;">
+                      @if($isLibur)
+                        Tidak ada jadwal KBM atau kewajiban presensi pada hari libur / akhir pekan. Seluruh siswa bebas presensi tanpa sanksi Alpha.
+                      @else
+                        Belum ada peserta didik yang melakukan presensi masuk untuk hari ini.
+                      @endif
+                    </div>
+                  </td>
+                </tr>
+              @endif
             </tbody>
           </table>
         </div>
@@ -529,7 +563,11 @@
         {{-- Pagination Bar Siswa --}}
         <div class="piket-pagination-bar" id="paginationSiswaBar" style="padding:12px 18px; border-top:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; background:var(--surface);">
           <div style="font-size:12px; color:var(--text-2); font-weight:600;" id="paginationSiswaInfo">
-            Menampilkan 1 - 20 dari {{ $totalSiswaAktif }} data
+            @if($isLibur && $absensiHariIni->isEmpty())
+              <span style="color:var(--text-3); font-style:italic;">Kondisi libur sekolah (0 data presensi)</span>
+            @else
+              Menampilkan 1 - 20 dari {{ $isLibur ? $absensiHariIni->count() : $totalSiswaAktif }} data
+            @endif
           </div>
           <div class="custom-pagination">
             <div class="pagination-wrapper" id="paginationSiswaControls"></div>
@@ -693,6 +731,27 @@
                   </td>
                 </tr>
               @endforeach
+
+              {{-- 3. Empty State jika tidak ada data presensi guru --}}
+              @if($absensiGuruHariIni->isEmpty() && $guruBelumHadirList->isEmpty())
+                <tr class="empty-row">
+                  <td colspan="7" style="text-align:center; padding: 48px 20px;">
+                    <div style="width: 54px; height: 54px; border-radius: 50%; background: rgba(239, 68, 68, 0.08); color: #dc2626; display: inline-flex; align-items: center; justify-content: center; font-size: 26px; margin-bottom: 12px;">
+                      <i class="bi bi-calendar-x"></i>
+                    </div>
+                    <div style="font-weight: 800; font-size: 15px; color: var(--text);">
+                      {{ $isLibur ? 'Hari Ini Libur Sekolah' : 'Tidak Ada Data Presensi Guru' }}
+                    </div>
+                    <div style="font-size: 12.5px; color: var(--text-3); max-width: 480px; margin: 6px auto 0; line-height: 1.5;">
+                      @if($isLibur)
+                        Dewan Guru &amp; Tenaga Kependidikan bebas presensi pada hari libur / akhir pekan.
+                      @else
+                        Belum ada guru atau pegawai yang melakukan presensi masuk untuk hari ini.
+                      @endif
+                    </div>
+                  </td>
+                </tr>
+              @endif
             </tbody>
           </table>
         </div>
@@ -700,7 +759,11 @@
         {{-- Pagination Bar Guru --}}
         <div class="piket-pagination-bar" id="paginationGuruBar" style="padding:12px 18px; border-top:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; background:var(--surface);">
           <div style="font-size:12px; color:var(--text-2); font-weight:600;" id="paginationGuruInfo">
-            Menampilkan 1 - 20 dari {{ $guruBelumHadirList->count() + $absensiGuruHariIni->count() }} data
+            @if($isLibur && $absensiGuruHariIni->isEmpty())
+              <span style="color:var(--text-3); font-style:italic;">Kondisi libur sekolah (0 data presensi)</span>
+            @else
+              Menampilkan 1 - 20 dari {{ $isLibur ? $absensiGuruHariIni->count() : $totalGuruAktif }} data
+            @endif
           </div>
           <div class="custom-pagination">
             <div class="pagination-wrapper" id="paginationGuruControls"></div>
@@ -947,6 +1010,13 @@
       // Hide all rows first
       allRows.forEach(row => { row.style.display = 'none'; });
 
+      // Toggle empty-row visibility
+      const table = document.getElementById(this.tableId);
+      const emptyRow = table ? table.querySelector('tbody tr.empty-row') : null;
+      if (emptyRow) {
+        emptyRow.style.display = totalItems === 0 ? '' : 'none';
+      }
+
       // Show matching rows in the current page slice
       matchingRows.forEach((row, idx) => {
         if (idx >= startIndex && idx < endIndex) {
@@ -962,7 +1032,7 @@
       const infoEl = document.getElementById(this.infoId);
       if (infoEl) {
         if (totalItems === 0) {
-          infoEl.innerHTML = '<span style="color:var(--text-3);">Tidak ada data yang sesuai</span>';
+          infoEl.innerHTML = '<span style="color:var(--text-3); font-style:italic;">Tidak ada data presensi</span>';
         } else {
           const showStart = startIndex + 1;
           const showEnd = Math.min(endIndex, totalItems);
@@ -973,6 +1043,10 @@
       // Render Pagination Buttons
       const controlsEl = document.getElementById(this.controlsId);
       if (controlsEl) {
+        if (totalItems === 0) {
+          controlsEl.innerHTML = '';
+          return;
+        }
         const paginatorVarName = `${this.tableId}_paginator`;
         let html = '';
 

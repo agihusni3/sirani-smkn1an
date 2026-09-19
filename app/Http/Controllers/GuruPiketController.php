@@ -64,7 +64,7 @@ class GuruPiketController extends Controller
         $terlambat       = $absensiHariIni->where('status', 'terlambat')->count();
         $hadirTotal      = $hadirTepat + $terlambat;
         $sudahPulang     = $absensiHariIni->whereNotNull('jam_pulang')->count();
-        $persenKehadiran = $totalSiswaAktif > 0 ? round(($hadirTotal / $totalSiswaAktif) * 100, 1) : 0;
+        $persenKehadiran = ($totalSiswaAktif > 0 && !$isLibur) ? round(($hadirTotal / $totalSiswaAktif) * 100, 1) : ($isLibur && $hadirTotal > 0 ? round(($hadirTotal / $totalSiswaAktif) * 100, 1) : 0);
 
         // Izin hari ini
         $izinHariIni = IzinSiswa::with(['siswa.siswaRombels' => function ($q) use ($taAktif) {
@@ -84,7 +84,7 @@ class GuruPiketController extends Controller
             $absensiHariIni->whereIn('status', ['sakit', 'izin', 'dispen', 'dispensasi', 'cuti', 'dinas_luar'])->pluck('pemilik_id')->toArray()
         )));
         $izinCount = count($izinSiswaIds);
-        $belumAbsen = max(0, $totalSiswaAktif - $absensiHariIni->count());
+        $belumAbsen = $isLibur ? 0 : max(0, $totalSiswaAktif - $absensiHariIni->count());
 
         // Data untuk form presensi manual
         $semuaSiswa = Siswa::where('status', 'aktif')
@@ -101,9 +101,14 @@ class GuruPiketController extends Controller
             ->get();
 
         // Siswa belum hadir dan belum izin (potensi alpha / bolos)
-        $siswaBelumHadirList = $semuaSiswa->filter(function ($s) use ($hadirSiswaIds, $izinSiswaIds) {
-            return !in_array($s->id, $hadirSiswaIds) && !in_array($s->id, $izinSiswaIds);
-        });
+        // Pada hari libur atau akhir pekan, siswa bebas presensi sehingga list belum hadir dikosongkan
+        if ($isLibur) {
+            $siswaBelumHadirList = collect();
+        } else {
+            $siswaBelumHadirList = $semuaSiswa->filter(function ($s) use ($hadirSiswaIds, $izinSiswaIds) {
+                return !in_array($s->id, $hadirSiswaIds) && !in_array($s->id, $izinSiswaIds);
+            });
+        }
 
         // Siswa terlambat hari ini
         $siswaTerlambatList = $absensiHariIni->where('status', 'terlambat');
@@ -116,13 +121,17 @@ class GuruPiketController extends Controller
         $guruIzinSakit       = $absensiGuruHariIni->whereIn('status', ['izin', 'sakit', 'cuti', 'dispen'])->count();
         $guruHadirTotal      = $guruHadirTepat + $guruTerlambat;
         $guruSudahPulang     = $absensiGuruHariIni->whereNotNull('jam_pulang')->count();
-        $guruBelumHadirCount = max(0, $totalGuruAktif - $absensiGuruHariIni->count());
-        $guruPersenKehadiran = $totalGuruAktif > 0 ? round(($guruHadirTotal / $totalGuruAktif) * 100, 1) : 0;
+        $guruBelumHadirCount = $isLibur ? 0 : max(0, $totalGuruAktif - $absensiGuruHariIni->count());
+        $guruPersenKehadiran = ($totalGuruAktif > 0 && !$isLibur) ? round(($guruHadirTotal / $totalGuruAktif) * 100, 1) : ($isLibur && $guruHadirTotal > 0 ? round(($guruHadirTotal / $totalGuruAktif) * 100, 1) : 0);
 
         $hadirGuruIds = $absensiGuruHariIni->pluck('pemilik_id')->toArray();
-        $guruBelumHadirList = $semuaGuru->filter(function ($g) use ($hadirGuruIds) {
-            return !in_array($g->id, $hadirGuruIds);
-        });
+        if ($isLibur) {
+            $guruBelumHadirList = collect();
+        } else {
+            $guruBelumHadirList = $semuaGuru->filter(function ($g) use ($hadirGuruIds) {
+                return !in_array($g->id, $hadirGuruIds);
+            });
+        }
 
         // Jadwal piket seminggu
         $hariList = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat'];
@@ -641,6 +650,10 @@ class GuruPiketController extends Controller
             return redirect()->back()->with('error', 'Akses ditolak.');
         }
 
+        if (\App\Models\HariLibur::isLibur($today)) {
+            return redirect()->back()->with('error', 'Hari ini adalah hari libur sekolah. Penguncian status Alpha dilewati.');
+        }
+
         \Artisan::call('piket:kunci-alpha', ['tanggal' => $today]);
         $output = trim(\Artisan::output());
 
@@ -662,6 +675,10 @@ class GuruPiketController extends Controller
         );
         if (!$isAuthorized) {
             return redirect()->back()->with('error', 'Akses ditolak.');
+        }
+
+        if (\App\Models\HariLibur::isLibur($today)) {
+            return redirect()->back()->with('error', 'Hari ini adalah hari libur sekolah. Pengiriman WA pengingat dilewati.');
         }
 
         \Artisan::call('piket:flagging-belum-hadir', ['tanggal' => $today]);
