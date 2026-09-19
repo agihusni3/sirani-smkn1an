@@ -633,7 +633,7 @@ class DashboardController extends Controller
             ->with(['siswa.siswaRombels.rombel'])
             ->orderBy('created_at', 'desc')
             ->get();
-        $piketBelumHadirCount = max(0, $totalSiswaActive - ($siswaHadir + $siswaTerlambat + $siswaIzin + $totalSiswaPkl));
+        $piketBelumHadirCount = $isLiburHariIni ? 0 : max(0, $totalSiswaActive - ($siswaHadir + $siswaTerlambat + $siswaIzin + $totalSiswaPkl));
 
         // Siswa yang sudah absen masuk tapi belum scan pulang (hadir, terlambat, atau bolos)
         $siswaBelumPulangCount = Absensi::where('pemilik_type', 'siswa')

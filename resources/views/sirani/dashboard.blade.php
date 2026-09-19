@@ -85,7 +85,7 @@
             <span style="font-size:11px; font-weight:900; color:#ffffff; letter-spacing:0.5px; text-transform:uppercase; background:#16A34A; border-radius:6px; padding:1px 8px; display:inline-flex; align-items:center; gap:4px;">
               <i class="bi bi-shield-fill-check"></i> GURU PIKET AKTIF
             </span>
-          @elseif(($isGuruPiket || (isset($isPiketHariIni) && $isPiketHariIni)) && !$currentUser->isKepalaSekolah())
+          @elseif(!$isLiburHariIni && ($isGuruPiket || (isset($isPiketHariIni) && $isPiketHariIni)) && !$currentUser->isKepalaSekolah())
             <span style="font-size:12px; font-weight:900; color:#000000; letter-spacing:0.5px; text-transform:uppercase;">
               · BERTUGAS PIKET HARI INI
             </span>
@@ -132,83 +132,9 @@
     @if(session('error'))<div class="alert-error"><i class="bi bi-exclamation-triangle-fill" style="margin-right:6px;"></i>{{ session('error') }}</div>@endif
 
     <!-- ═══════════════════════════════════════════════════════════════════ -->
-    <!-- 1. RINGKASAN EKSEKUTIF KEHADIRAN (KPI STRIP) -->
+    <!-- OPERASIONAL KURIKULUM & KALENDER AKADEMIK (KHUSUS WAKA KURIKULUM) -->
     <!-- ═══════════════════════════════════════════════════════════════════ -->
     @if($isWakaKurikulum)
-      <div class="db-kpi-grid">
-        <!-- Persentase Kehadiran Guru -->
-        <div class="db-kpi-card" onclick="openDetailModal('guru', 'semua', 'Seluruh Kehadiran Guru & Pegawai Hari Ini')">
-          <div class="db-kpi-head">
-            <span class="db-kpi-title">Kehadiran Guru</span>
-            <div class="db-kpi-icon" style="background:var(--bg-3); color:#000000; border:1px solid var(--border-2);">
-              <i class="bi bi-person-badge-fill"></i>
-            </div>
-          </div>
-          <div class="db-kpi-val" style="color:#000000;">{{ $persenGuru }}%</div>
-          <div class="db-kpi-sub">{{ $guruTotalScan }} dari {{ $totalGuruActive }} Hadir</div>
-        </div>
-
-        <!-- Guru Hadir Tepat -->
-        <div class="db-kpi-card" onclick="openDetailModal('guru', 'hadir', 'Guru Hadir Tepat Waktu')">
-          <div class="db-kpi-head">
-            <span class="db-kpi-title">Guru Tepat Waktu</span>
-            <div class="db-kpi-icon" style="background:var(--bg-3); color:#000000; border:1px solid var(--border-2);">
-              <i class="bi bi-check2-circle"></i>
-            </div>
-          </div>
-          <div class="db-kpi-val" style="color:#000000;">{{ $guruHadir }} <span style="font-size:12px; font-weight:600; color:var(--text-3);">Guru</span></div>
-          <div class="db-kpi-sub">Siap mengajar KBM</div>
-        </div>
-
-        <!-- Guru Terlambat -->
-        <div class="db-kpi-card" onclick="openDetailModal('guru', 'terlambat', 'Guru Terlambat Hari Ini')">
-          <div class="db-kpi-head">
-            <span class="db-kpi-title">Guru Terlambat</span>
-            <div class="db-kpi-icon" style="background:var(--bg-3); color:#000000; border:1px solid var(--border-2);">
-              <i class="bi bi-clock-history"></i>
-            </div>
-          </div>
-          <div class="db-kpi-val" style="color:#000000;">{{ $guruTerlambat }} <span style="font-size:12px; font-weight:600; color:var(--text-3);">Guru</span></div>
-          <div class="db-kpi-sub">Setelah bel masuk</div>
-        </div>
-
-        <!-- Guru Izin / Dinas / Sakit -->
-        <div class="db-kpi-card" onclick="openDetailModal('guru', 'izin', 'Guru Izin / Dinas Luar Hari Ini')">
-          <div class="db-kpi-head">
-            <span class="db-kpi-title">Guru Izin / Dinas</span>
-            <div class="db-kpi-icon" style="background:var(--bg-3); color:#000000; border:1px solid var(--border-2);">
-              <i class="bi bi-envelope-paper-fill"></i>
-            </div>
-          </div>
-          <div class="db-kpi-val" style="color:#000000;">{{ $guruIzin }} <span style="font-size:12px; font-weight:600; color:var(--text-3);">Guru</span></div>
-          <div class="db-kpi-sub">Perlu guru infal</div>
-        </div>
-
-        <!-- Tingkat Kehadiran Siswa -->
-        <div class="db-kpi-card" onclick="openDetailModal('siswa', 'semua', 'Seluruh Kehadiran Siswa Hari Ini')">
-          <div class="db-kpi-head">
-            <span class="db-kpi-title">Kehadiran Siswa</span>
-            <div class="db-kpi-icon" style="background:var(--bg-3); color:#000000; border:1px solid var(--border-2);">
-              <i class="bi bi-people-fill"></i>
-            </div>
-          </div>
-          <div class="db-kpi-val" style="color:#000000;">{{ $persenSekolah }}%</div>
-          <div class="db-kpi-sub">Target KBM: &ge; 90%</div>
-        </div>
-
-        <!-- Siswa PKL -->
-        <div class="db-kpi-card" onclick="openDetailModal('siswa', 'pkl', 'Siswa Sedang PKL / Prakerin')">
-          <div class="db-kpi-head">
-            <span class="db-kpi-title">Siswa PKL</span>
-            <div class="db-kpi-icon" style="background:var(--bg-3); color:#000000; border:1px solid var(--border-2);">
-              <i class="bi bi-briefcase-fill"></i>
-            </div>
-          </div>
-          <div class="db-kpi-val" style="color:#000000;">{{ $totalSiswaPkl }} <span style="font-size:12px; font-weight:600; color:var(--text-3);">Siswa</span></div>
-          <div class="db-kpi-sub">Prakerin industri</div>
-        </div>
-      </div>
-
       <!-- Panel Khusus Operasional Kurikulum & Kalender Akademik -->
       <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 18px; margin-bottom: 24px;">
         <!-- Card 1: Jam Sekolah & Sesi Belajar Hari Ini -->
@@ -284,102 +210,12 @@
           </div>
         </div>
       </div>
-    @else
-      <div class="db-kpi-grid">
-        <!-- Persentase Kehadiran -->
-        <div class="db-kpi-card" onclick="openDetailModal('siswa', 'semua', 'Seluruh Kehadiran Siswa Hari Ini')">
-          <div class="db-kpi-head">
-            <span class="db-kpi-title">Tingkat Kehadiran</span>
-            <div class="db-kpi-icon" style="background:var(--bg-3); color:#000000; border:1px solid var(--border-2);">
-              <i class="bi bi-pie-chart-fill"></i>
-            </div>
-          </div>
-          <div class="db-kpi-val" style="color:#000000;">{{ $persenSekolah }}%</div>
-          <div class="db-kpi-sub">Target: &ge; 90%</div>
-        </div>
-
-        <!-- Siswa Hadir Tepat -->
-        <div class="db-kpi-card" onclick="openDetailModal('siswa', 'hadir', 'Siswa Hadir Tepat Waktu')">
-          <div class="db-kpi-head">
-            <span class="db-kpi-title">Hadir Tepat Waktu</span>
-            <div class="db-kpi-icon" style="background:var(--bg-3); color:#000000; border:1px solid var(--border-2);">
-              <i class="bi bi-check2-circle"></i>
-            </div>
-          </div>
-          <div class="db-kpi-val" style="color:#000000;">{{ $siswaHadir }} <span style="font-size:12px; font-weight:600; color:var(--text-3);">Siswa</span></div>
-          <div class="db-kpi-sub">Scan sebelum batas</div>
-        </div>
-
-        <!-- Siswa Terlambat -->
-        <div class="db-kpi-card" onclick="openDetailModal('siswa', 'terlambat', 'Siswa Terlambat Hari Ini')">
-          <div class="db-kpi-head">
-            <span class="db-kpi-title">Terlambat Gerbang</span>
-            <div class="db-kpi-icon" style="background:var(--bg-3); color:#000000; border:1px solid var(--border-2);">
-              <i class="bi bi-clock-history"></i>
-            </div>
-          </div>
-          <div class="db-kpi-val" style="color:#000000;">{{ $siswaTerlambat }} <span style="font-size:12px; font-weight:600; color:var(--text-3);">Siswa</span></div>
-          <div class="db-kpi-sub">Pos guru piket</div>
-        </div>
-
-        <!-- Siswa Izin / Sakit -->
-        <div class="db-kpi-card" onclick="openDetailModal('siswa', 'izin', 'Siswa Izin / Sakit Hari Ini')">
-          <div class="db-kpi-head">
-            <span class="db-kpi-title">Izin / Sakit</span>
-            <div class="db-kpi-icon" style="background:var(--bg-3); color:#000000; border:1px solid var(--border-2);">
-              <i class="bi bi-envelope-paper-fill"></i>
-            </div>
-          </div>
-          <div class="db-kpi-val" style="color:#000000;">{{ $siswaIzin }} <span style="font-size:12px; font-weight:600; color:var(--text-3);">Siswa</span></div>
-          <div class="db-kpi-sub">Keterangan sah</div>
-        </div>
-
-        <!-- Siswa PKL -->
-        <div class="db-kpi-card" onclick="openDetailModal('siswa', 'pkl', 'Siswa Sedang PKL / Prakerin')">
-          <div class="db-kpi-head">
-            <span class="db-kpi-title">Siswa PKL</span>
-            <div class="db-kpi-icon" style="background:var(--bg-3); color:#000000; border:1px solid var(--border-2);">
-              <i class="bi bi-briefcase-fill"></i>
-            </div>
-          </div>
-          <div class="db-kpi-val" style="color:#000000;">{{ $totalSiswaPkl }} <span style="font-size:12px; font-weight:600; color:var(--text-3);">Siswa</span></div>
-          <div class="db-kpi-sub">Prakerin industri</div>
-        </div>
-
-        <!-- Siswa Alpha / Belum Hadir -->
-        @php
-          $alphaCount = max(0, $totalSiswaActive - ($siswaHadir + $siswaTerlambat + $siswaIzin + $totalSiswaPkl));
-        @endphp
-        <div class="db-kpi-card" onclick="openDetailModal('siswa', 'alpha', 'Siswa Alpha / Belum Scan Hari Ini')">
-          <div class="db-kpi-head">
-            <span class="db-kpi-title">Alpha / Belum Scan</span>
-            <div class="db-kpi-icon" style="background:var(--bg-3); color:#000000; border:1px solid var(--border-2);">
-              <i class="bi bi-exclamation-octagon-fill"></i>
-            </div>
-          </div>
-          <div class="db-kpi-val" style="color:#000000;">{{ $alphaCount }} <span style="font-size:12px; font-weight:600; color:var(--text-3);">Siswa</span></div>
-          <div class="db-kpi-sub">Follow up wali kelas</div>
-        </div>
-
-        {{-- KPI: Belum Scan Pulang --}}
-        @php $jamTutupLabel = $sudahLewatJamTutup ? 'Dianggap Bolos' : 'Sementara'; @endphp
-        <div class="db-kpi-card" onclick="openDetailModal('siswa', 'belum_pulang', 'Siswa Belum Scan Pulang Hari Ini')" style="border:1.5px solid {{ $sudahLewatJamTutup ? '#000000' : 'var(--border)' }}; cursor:pointer;" title="Klik untuk melihat daftar siswa yang belum scan pulang">
-          <div class="db-kpi-head">
-            <span class="db-kpi-title">Belum Scan Pulang</span>
-            <div class="db-kpi-icon" style="background:var(--bg-3); color:#000000; border:1px solid var(--border-2);">
-              <i class="bi bi-door-open-fill"></i>
-            </div>
-          </div>
-          <div class="db-kpi-val" style="color:#000000;">{{ $siswaBelumPulangCount }} <span style="font-size:12px; font-weight:600; color:var(--text-3);">Siswa</span></div>
-          <div class="db-kpi-sub" style="color:{{ $sudahLewatJamTutup ? '#000000' : 'var(--text-3)' }}; font-weight:{{ $sudahLewatJamTutup ? '800' : '600' }};">{{ $jamTutupLabel }}</div>
-        </div>
-      </div>
     @endif
 
     <!-- ═══════════════════════════════════════════════════════════════════ -->
-    <!-- PANEL OPERASIONAL GURU PIKET HARI INI (AKTIF SAAT JADWAL PIKET) -->
+    <!-- PANEL OPERASIONAL GURU PIKET HARI INI (AKTIF SAAT HARI KERJA & JADWAL PIKET) -->
     <!-- ═══════════════════════════════════════════════════════════════════ -->
-    @if(($isGuruPiket || (isset($isPiketHariIni) && $isPiketHariIni) || (isset($isWaliSedangPiket) && $isWaliSedangPiket)) && !$currentUser->isKepalaSekolah())
+    @if(!$isLiburHariIni && ($isGuruPiket || (isset($isPiketHariIni) && $isPiketHariIni) || (isset($isWaliSedangPiket) && $isWaliSedangPiket)) && !$currentUser->isKepalaSekolah())
       <div class="panel" style="margin-bottom:24px; padding:0; overflow:hidden; border:2px solid #000000; border-radius:var(--r-md); background:var(--bg-2); box-shadow:var(--shadow-sm);">
         <div style="padding:14px 18px; border-bottom:1px solid var(--border); background:var(--surface); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
           <div style="font-size:14px; font-weight:800; color:#000000; display:flex; align-items:center; gap:8px;">
@@ -399,50 +235,9 @@
         </div>
 
         <div style="padding:18px;">
-          <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; margin-bottom:16px;">
-            <!-- Mini KPI 1: Siswa Terlambat Gerbang -->
-            <div style="background:var(--bg-3); border:1px solid var(--border-2); border-radius:var(--r-sm); padding:12px 14px;">
-              <div style="font-size:10.5px; font-weight:800; text-transform:uppercase; color:var(--text-3); letter-spacing:0.5px;">Siswa Terlambat Gerbang</div>
-              <div style="font-size:22px; font-weight:900; font-family:var(--font-mono); color:#000000; margin-top:2px;">
-                {{ $siswaTerlambat }} <span style="font-size:11.5px; font-weight:600; color:var(--text-3);">Siswa</span>
-              </div>
-              <div style="font-size:11px; color:var(--text-3); margin-top:2px;">Dicatat di Pos Piket</div>
-            </div>
-
-            <!-- Mini KPI 2: Siswa Izin / Dispen -->
-            <div style="background:var(--bg-3); border:1px solid var(--border-2); border-radius:var(--r-sm); padding:12px 14px;">
-              <div style="font-size:10.5px; font-weight:800; text-transform:uppercase; color:var(--text-3); letter-spacing:0.5px;">Perizinan / Dispen Aktif</div>
-              <div style="font-size:22px; font-weight:900; font-family:var(--font-mono); color:#000000; margin-top:2px;">
-                {{ $siswaIzin }} <span style="font-size:11.5px; font-weight:600; color:var(--text-3);">Surat</span>
-              </div>
-              <div style="font-size:11px; color:var(--text-3); margin-top:2px;">Keluar/Masuk Gerbang</div>
-            </div>
-
-            <!-- Mini KPI 3: Siswa Belum Scan -->
-            <div style="background:var(--bg-3); border:1px solid var(--border-2); border-radius:var(--r-sm); padding:12px 14px;">
-              <div style="font-size:10.5px; font-weight:800; text-transform:uppercase; color:var(--text-3); letter-spacing:0.5px;">Belum Scan Gerbang</div>
-              <div style="font-size:22px; font-weight:900; font-family:var(--font-mono); color:#000000; margin-top:2px;">
-                {{ $piketBelumHadirCount ?? 0 }} <span style="font-size:11.5px; font-weight:600; color:var(--text-3);">Siswa</span>
-              </div>
-              <div style="font-size:11px; color:var(--text-3); margin-top:2px;">Estimasi belum tap RFID / Barcode</div>
-            </div>
-
-            <!-- Mini KPI 4: Siswa Belum Scan Pulang -->
-            @php $labelPulang = $sudahLewatJamTutup ? 'Dianggap Bolos' : 'Belum Scan Pulang'; @endphp
-            <div onclick="openDetailModal('siswa', 'belum_pulang', 'Siswa Belum Scan Pulang Hari Ini')" style="background:var(--bg-3); border:{{ $sudahLewatJamTutup ? '1.5px solid #000000' : '1px solid var(--border-2)' }}; border-radius:var(--r-sm); padding:12px 14px; cursor:pointer; transition:all .15s;" title="Klik untuk melihat daftar siswa">
-              <div style="font-size:10.5px; font-weight:800; text-transform:uppercase; color:var(--text-3); letter-spacing:0.5px;">{{ $labelPulang }}</div>
-              <div style="font-size:22px; font-weight:900; font-family:var(--font-mono); color:#000000; margin-top:2px;">
-                {{ $siswaBelumPulangCount }} <span style="font-size:11.5px; font-weight:600; color:var(--text-3);">Siswa</span>
-              </div>
-              <div style="font-size:11px; color:{{ $sudahLewatJamTutup ? '#000000' : 'var(--text-3)' }}; font-weight:{{ $sudahLewatJamTutup ? '800' : '600' }}; margin-top:2px;">
-                {{ $sudahLewatJamTutup ? 'Klik untuk lihat daftar siswa →' : 'Sesi masih berlangsung' }}
-              </div>
-            </div>
-          </div>
-
           {{-- Quick Table Siswa Terlambat Hari Ini --}}
           @if(isset($piketSiswaTerlambatList) && $piketSiswaTerlambatList->count() > 0)
-            <div style="border-top:1px solid var(--border); padding-top:14px;">
+            <div>
               <div style="font-weight:800; font-size:12.5px; color:var(--text); margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
                 <span><i class="bi bi-clock-history" style="color:#D97706;"></i> Siswa Terlambat Hari Ini (Perlu Verifikasi Piket):</span>
                 <a href="/izin-siswa" style="font-size:11.5px; font-weight:700; color:var(--text-2); text-decoration:underline;">Lihat Semua Izin &amp; Dispen</a>
