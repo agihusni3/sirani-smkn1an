@@ -344,7 +344,7 @@
           </button>
           @if(auth()->user()->isAdmin() || auth()->user()->isWakaKurikulum())
             <button type="button" class="btn-gradient-manual" onclick="openModal('modalKelolaModeUjian')" data-tooltip="Konfigurasi Mode Pekan Sumatif (STS / SAS) & Panitia" title="Konfigurasi Mode Pekan Sumatif (STS / SAS) & Panitia" style="background:linear-gradient(135deg, #4f46e5, #7c3aed); border-color:#6366f1;">
-              <i class="bi bi-mortarboard-fill" style="margin-right:4px;"></i> Mode Sumatif
+              Mode Sumatif
             </button>
           @endif
         </div>
@@ -1346,16 +1346,24 @@
   function openModal(id) {
     const el = document.getElementById(id);
     if (el) {
-      el.classList.add('active');
+      el.classList.add('active', 'open');
       el.style.display = 'flex';
+      el.style.opacity = '1';
+      el.style.visibility = 'visible';
+      el.style.pointerEvents = 'auto';
+      document.body.style.overflow = 'hidden';
     }
   }
 
   function closeModal(id) {
     const el = document.getElementById(id);
     if (el) {
-      el.classList.remove('active');
+      el.classList.remove('active', 'open');
       el.style.display = 'none';
+      el.style.opacity = '0';
+      el.style.visibility = 'hidden';
+      el.style.pointerEvents = 'none';
+      document.body.style.overflow = '';
     }
   }
 
@@ -2061,7 +2069,7 @@
 
 {{-- MODAL KELOLA MODE SUMATIF (STS / SAS) --}}
 @if(auth()->user()->isAdmin() || auth()->user()->isWakaKurikulum())
-<div class="modal-overlay" id="modalKelolaModeUjian">
+<div class="modal-overlay" id="modalKelolaModeUjian" onclick="if(event.target===this) closeModal('modalKelolaModeUjian')">
   <div class="modal-card" style="max-width:680px; padding:24px;">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; border-bottom:1px solid var(--border); padding-bottom:10px;">
       <div>

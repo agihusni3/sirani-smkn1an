@@ -33,8 +33,7 @@
 
         <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
           @if($canManagePiket)
-            <button type="button" onclick="toggleModalModeUjian(true)" class="btn btn-sm" style="height:32px; padding:0 12px; font-size:11.5px; font-weight:800; display:inline-flex; align-items:center; gap:5px; border-radius:6px; cursor:pointer; background:linear-gradient(135deg, #4f46e5, #7c3aed); color:#fff; border:none; box-shadow:0 2px 6px rgba(79, 70, 229, 0.25);">
-              <i class="bi bi-mortarboard-fill"></i>
+            <button type="button" onclick="toggleModalModeUjian(true)" class="btn btn-sm" style="height:32px; padding:0 14px; font-size:11.5px; font-weight:800; display:inline-flex; align-items:center; border-radius:6px; cursor:pointer; background:linear-gradient(135deg, #4f46e5, #7c3aed); color:#fff; border:none; box-shadow:0 2px 6px rgba(79, 70, 229, 0.25);">
               <span>Mode Sumatif</span>
             </button>
             <button type="button" id="btnToggleFormPiket" onclick="toggleFormPiket()" class="btn btn-sm btn-gold" style="height:32px; padding:0 12px; font-size:11.5px; font-weight:800; display:inline-flex; align-items:center; gap:5px; border-radius:6px; cursor:pointer;">
@@ -203,8 +202,8 @@
 
 {{-- MODAL PENGATURAN MODE SUMATIF (STS / SAS) --}}
 @if($canManagePiket)
-<div class="modal-overlay" id="modalModeUjianJadwal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:9999; align-items:center; justify-content:center; backdrop-filter:blur(3px);">
-  <div class="modal-card" style="background:var(--bg-2); border-radius:12px; width:92%; max-width:680px; padding:24px; box-shadow:0 20px 25px -5px rgba(0,0,0,0.3); max-height:90vh; overflow-y:auto; border:1px solid var(--border);">
+<div class="modal-overlay" id="modalModeUjianJadwal" onclick="if(event.target===this) toggleModalModeUjian(false)" style="display:none; position:fixed; inset:0; width:100%; height:100%; background:rgba(10, 15, 29, 0.82); z-index:99999; align-items:center; justify-content:center; padding:20px; box-sizing:border-box; backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px);">
+  <div class="modal-card" style="background:var(--bg-2); border-radius:12px; width:92%; max-width:680px; padding:24px; box-shadow:0 25px 70px rgba(0,0,0,0.6); max-height:90vh; overflow-y:auto; border:1px solid var(--border);">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; border-bottom:1px solid var(--border); padding-bottom:10px;">
       <div>
         <h3 style="font-size:16px; font-weight:900; color:var(--text); margin:0; display:flex; align-items:center; gap:8px;">
@@ -309,7 +308,21 @@
   function toggleModalModeUjian(show) {
     const modal = document.getElementById('modalModeUjianJadwal');
     if (modal) {
-      modal.style.display = show ? 'flex' : 'none';
+      if (show) {
+        modal.classList.add('active', 'open');
+        modal.style.display = 'flex';
+        modal.style.opacity = '1';
+        modal.style.visibility = 'visible';
+        modal.style.pointerEvents = 'auto';
+        document.body.style.overflow = 'hidden';
+      } else {
+        modal.classList.remove('active', 'open');
+        modal.style.display = 'none';
+        modal.style.opacity = '0';
+        modal.style.visibility = 'hidden';
+        modal.style.pointerEvents = 'none';
+        document.body.style.overflow = '';
+      }
     }
   }
 
