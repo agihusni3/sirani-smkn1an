@@ -7,7 +7,7 @@
         $roleLabel = 'SUPERVISOR';
     }
   }
-  $currentRoute = Route::currentRouteName();
+  $currentRoute = (string)(Route::currentRouteName() ?? '');
 @endphp
 
 <header class="cbt-navbar-top">

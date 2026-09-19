@@ -101,7 +101,7 @@
                 KKTP: {{ $b->kktp_default }}
               </span>
               @if($b->jurusan)
-                <span class="badge bg-light text-secondary border">{{ $b->jurusan->singkatan ?? 'Umum' }}</span>
+                <span class="badge bg-light text-secondary border">{{ $b->jurusan->kode_jurusan ?? ($b->jurusan->kode ?? 'Umum') }}</span>
               @endif
             </div>
 
@@ -185,7 +185,7 @@
               <select name="jurusan_id" class="form-select" style="font-size:13px; border-radius:8px;">
                 <option value="">-- Semua Jurusan / Umum --</option>
                 @foreach($jurusans as $jur)
-                  <option value="{{ $jur->id }}">{{ $jur->nama_jurusan }} ({{ $jur->singkatan }})</option>
+                  <option value="{{ $jur->id }}">{{ $jur->nama_jurusan }} ({{ $jur->kode_jurusan ?? ($jur->kode ?? '') }})</option>
                 @endforeach
               </select>
             </div>

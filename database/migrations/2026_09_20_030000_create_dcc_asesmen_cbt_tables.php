@@ -11,6 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
+        Schema::dropIfExists('cbt_log_aktivitas');
+        Schema::dropIfExists('cbt_jawaban_siswas');
+        Schema::dropIfExists('cbt_peserta_ujians');
+        Schema::dropIfExists('cbt_jadwal_rombels');
+        Schema::dropIfExists('cbt_jadwal_ujians');
+        Schema::dropIfExists('cbt_soals');
+        Schema::dropIfExists('cbt_bank_soals');
+
         // 1. Bank Soal
         Schema::create('cbt_bank_soals', function (Blueprint $table) {
             $table->id();

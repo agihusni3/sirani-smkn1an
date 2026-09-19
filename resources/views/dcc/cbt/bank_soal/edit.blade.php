@@ -73,7 +73,7 @@
               <option value="">-- Semua Jurusan / Umum --</option>
               @foreach($jurusans as $jur)
                 <option value="{{ $jur->id }}" {{ old('jurusan_id', $bank->jurusan_id) == $jur->id ? 'selected' : '' }}>
-                  {{ $jur->nama_jurusan }} ({{ $jur->singkatan }})
+                  {{ $jur->nama_jurusan }} ({{ $jur->kode_jurusan ?? ($jur->kode ?? '') }})
                 </option>
               @endforeach
             </select>
