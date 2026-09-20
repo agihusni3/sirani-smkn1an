@@ -1,0 +1,1259 @@
+:root {
+  --ak-primary: #7c3aed;
+  --ak-primary-hover: #6d28d9;
+  --ak-primary-light: #f5f3ff;
+  --ak-primary-ring: rgba(124, 58, 237, 0.25);
+  --ak-indigo: #4f46e5;
+  --ak-emerald: #059669;
+  --ak-amber: #d97706;
+  --ak-rose: #e11d48;
+  --ak-dark: #0f172a;
+  --ak-slate-50: #f8fafc;
+  --ak-slate-100: #f1f5f9;
+  --ak-slate-200: #e2e8f0;
+  --ak-slate-300: #cbd5e1;
+  --ak-slate-600: #475569;
+  --ak-slate-800: #1e293b;
+  --ak-card-bg: #ffffff;
+  --ak-radius: 14px;
+  --ak-shadow-sm: 0 1px 3px rgba(0,0,0,0.05), 0 1px 2px rgba(0,0,0,0.03);
+  --ak-shadow: 0 4px 6px -1px rgba(0,0,0,0.06), 0 2px 4px -1px rgba(0,0,0,0.03);
+  --ak-shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.08), 0 4px 6px -2px rgba(0,0,0,0.04);
+}
+
+body.akademik-body {
+  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  background: #f8fafc;
+  color: var(--ak-slate-800);
+  margin: 0;
+  padding: 0;
+}
+
+.akademik-layout {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* Sidebar */
+.akademik-sidebar {
+  width: 260px;
+  background: #ffffff;
+  border-right: 1px solid var(--ak-slate-200);
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 100;
+  transition: transform 0.3s ease;
+}
+
+.akademik-sidebar-header {
+  padding: 20px 18px;
+  border-bottom: 1px solid var(--ak-slate-100);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.akademik-sidebar-close {
+  display: none;
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  width: 30px;
+  height: 30px;
+  align-items: center;
+  justify-content: center;
+  color: #64748b;
+  cursor: pointer;
+}
+
+.akademik-sidebar-close:hover {
+  background: #e2e8f0;
+  color: #0f172a;
+}
+
+.akademik-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  color: var(--ak-dark);
+}
+
+.akademik-brand-badge {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #7c3aed, #4f46e5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  font-size: 20px;
+  box-shadow: 0 4px 10px rgba(124, 58, 237, 0.3);
+}
+
+.akademik-brand-name {
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--ak-dark);
+}
+
+.akademik-brand-tag {
+  font-size: 11px;
+  color: var(--ak-slate-600);
+  font-weight: 500;
+}
+
+.akademik-dcc-pill {
+  margin: 12px 16px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: var(--ak-slate-100);
+  color: var(--ak-slate-600);
+  text-decoration: none;
+  font-size: 12px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: all 0.2s;
+}
+
+.akademik-dcc-pill:hover {
+  background: #ede9fe;
+  color: var(--ak-primary);
+}
+
+.akademik-nav-body {
+  padding: 10px 12px;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.akademik-nav-group {
+  margin-bottom: 20px;
+}
+
+.akademik-nav-group-title {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 800;
+  color: #94a3b8;
+  padding: 6px 12px;
+}
+
+.akademik-nav-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 9px 12px;
+  margin-bottom: 2px;
+  border-radius: 8px;
+  color: #475569;
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 600;
+  transition: all 0.15s ease-in-out;
+}
+
+.akademik-nav-link:hover {
+  background: var(--ak-slate-100);
+  color: var(--ak-primary);
+}
+
+.akademik-nav-link.active {
+  background: #f5f3ff;
+  color: var(--ak-primary);
+  font-weight: 700;
+}
+
+.akademik-nav-link-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.akademik-nav-link-left i {
+  font-size: 16px;
+}
+
+.akademik-nav-badge {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 999px;
+  background: var(--ak-primary);
+  color: #fff;
+}
+
+/* Main Content Area */
+.akademik-main {
+  flex: 1;
+  margin-left: 260px;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Header Topbar */
+.akademik-topbar {
+  height: 64px;
+  background: #ffffff;
+  border-bottom: 1px solid var(--ak-slate-200);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 28px;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+.akademik-topbar-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.akademik-menu-toggle {
+  display: none;
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  color: var(--ak-slate-600);
+}
+
+.akademik-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ak-slate-600);
+}
+
+.akademik-breadcrumb a {
+  text-decoration: none;
+  color: inherit;
+}
+
+.akademik-breadcrumb a:hover {
+  color: var(--ak-primary);
+}
+
+/* Content Container */
+.akademik-content {
+  padding: 24px 28px 40px;
+  flex: 1;
+}
+
+/* Page Header */
+.akademik-page-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.akademik-page-title {
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--ak-dark);
+  margin: 0;
+}
+
+.akademik-page-desc {
+  font-size: 13px;
+  color: var(--ak-slate-600);
+  margin-top: 4px;
+}
+
+/* ========================================================================== */
+/* Hero Welcome Banner                                                        */
+/* ========================================================================== */
+.akademik-hero {
+  background: linear-gradient(135deg, #2e1065 0%, #581c87 35%, #7c3aed 75%, #4f46e5 100%);
+  border-radius: 18px;
+  padding: 28px 32px;
+  color: #ffffff;
+  margin-bottom: 24px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 12px 30px -6px rgba(107, 33, 168, 0.35);
+}
+
+.akademik-hero::before {
+  content: '';
+  position: absolute;
+  top: -80px;
+  right: -80px;
+  width: 280px;
+  height: 280px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0) 70%);
+  pointer-events: none;
+}
+
+.akademik-hero::after {
+  content: '';
+  position: absolute;
+  bottom: -60px;
+  left: 30%;
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(168,85,247,0.25) 0%, rgba(168,85,247,0) 70%);
+  pointer-events: none;
+}
+
+.akademik-hero-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-bottom: 14px;
+  position: relative;
+  z-index: 2;
+}
+
+.akademik-hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.16);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(10px);
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: #ffffff;
+}
+
+.akademik-hero-title {
+  font-size: 24px;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  margin: 0 0 6px;
+  color: #ffffff;
+  position: relative;
+  z-index: 2;
+}
+
+.akademik-hero-desc {
+  font-size: 13.5px;
+  color: rgba(255, 255, 255, 0.9);
+  margin-bottom: 22px;
+  max-width: 720px;
+  line-height: 1.55;
+  position: relative;
+  z-index: 2;
+}
+
+.akademik-hero-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  position: relative;
+  z-index: 2;
+}
+
+.akademik-hero-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.akademik-hero-btn-primary {
+  background: #ffffff;
+  color: #581c87;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.18);
+}
+
+.akademik-hero-btn-primary:hover {
+  background: #f5f3ff;
+  color: #4c1d95;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.22);
+}
+
+.akademik-hero-btn-ghost {
+  background: rgba(255, 255, 255, 0.16);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(10px);
+}
+
+.akademik-hero-btn-ghost:hover {
+  background: rgba(255, 255, 255, 0.28);
+  color: #ffffff;
+  transform: translateY(-2px);
+}
+
+/* ========================================================================== */
+/* KPI Card Grid (6 Pillars)                                                  */
+/* ========================================================================== */
+.akademik-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 14px;
+  margin-bottom: 24px;
+}
+
+@media (max-width: 1200px) {
+  .akademik-kpi-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .akademik-kpi-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.akademik-kpi-card {
+  background: #ffffff;
+  border: 1px solid var(--ak-slate-200);
+  border-radius: var(--ak-radius);
+  padding: 16px 18px;
+  box-shadow: var(--ak-shadow-sm);
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  color: inherit;
+}
+
+.akademik-kpi-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 20px -4px rgba(124, 58, 237, 0.12);
+  border-color: #cbd5e1;
+}
+
+.akademik-kpi-val {
+  font-size: 24px;
+  font-weight: 900;
+  color: var(--ak-dark);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+.akademik-kpi-label {
+  font-size: 11.5px;
+  color: var(--ak-slate-600);
+  font-weight: 600;
+  margin-top: 5px;
+  line-height: 1.35;
+}
+
+.akademik-kpi-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.icon-violet  { background: #f5f3ff; color: #7c3aed; }
+.icon-indigo  { background: #e0e7ff; color: #4f46e5; }
+.icon-emerald { background: #ecfdf5; color: #059669; }
+.icon-amber   { background: #fef3c7; color: #d97706; }
+.icon-rose    { background: #ffe4e6; color: #e11d48; }
+.icon-cyan    { background: #cffafe; color: #0891b2; }
+.icon-blue    { background: #dbeafe; color: #2563eb; }
+
+/* ========================================================================== */
+/* Module Quick Hub (Pusat Akses Cepat Modul)                                 */
+/* ========================================================================== */
+.akademik-modules-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+@media (max-width: 1024px) {
+  .akademik-modules-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .akademik-modules-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.akademik-module-card {
+  background: #ffffff;
+  border: 1px solid var(--ak-slate-200);
+  border-radius: 14px;
+  padding: 16px 18px;
+  text-decoration: none;
+  color: inherit;
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  transition: all 0.2s ease;
+  box-shadow: var(--ak-shadow-sm);
+  position: relative;
+}
+
+.akademik-module-card:hover {
+  border-color: #c084fc;
+  box-shadow: 0 10px 22px -4px rgba(124, 58, 237, 0.16);
+  transform: translateY(-3px);
+}
+
+.akademik-module-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.akademik-module-title {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--ak-dark);
+  margin-bottom: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.akademik-module-desc {
+  font-size: 12px;
+  color: #64748b;
+  line-height: 1.45;
+  margin: 0;
+}
+
+/* Panels & Cards */
+.akademik-card {
+  background: #ffffff;
+  border: 1px solid var(--ak-slate-200);
+  border-radius: var(--ak-radius);
+  box-shadow: var(--ak-shadow-sm);
+  margin-bottom: 24px;
+  overflow: hidden;
+}
+
+.akademik-card-header {
+  padding: 16px 22px;
+  border-bottom: 1px solid var(--ak-slate-200);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #fafafa;
+}
+
+.akademik-card-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--ak-dark);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.akademik-card-body {
+  padding: 20px 22px;
+}
+
+/* Tables */
+.akademik-table-wrap {
+  overflow-x: auto;
+}
+
+.akademik-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  text-align: left;
+}
+
+.akademik-table th {
+  background: #f8fafc;
+  padding: 11px 16px;
+  font-weight: 700;
+  color: #475569;
+  border-bottom: 1px solid var(--ak-slate-200);
+  white-space: nowrap;
+}
+
+.akademik-table td {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--ak-slate-100);
+  vertical-align: middle;
+}
+
+.akademik-table tbody tr:hover {
+  background: #f8faff;
+}
+
+/* Badges */
+.ak-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.ak-badge-primary { background: #f5f3ff; color: #7c3aed; border: 1px solid #e9d5ff; }
+.ak-badge-success { background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0; }
+.ak-badge-warning { background: #fef3c7; color: #b45309; border: 1px solid #fde68a; }
+.ak-badge-danger { background: #ffe4e6; color: #e11d48; border: 1px solid #fecdd3; }
+.ak-badge-secondary { background: #f1f5f9; color: #475569; border: 1px solid #e2e8f0; }
+
+/* Buttons */
+.ak-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  border: 1px solid transparent;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.15s ease-in-out;
+}
+
+.ak-btn-primary {
+  background: var(--ak-primary);
+  color: #ffffff !important;
+}
+
+.ak-btn-primary:hover {
+  background: var(--ak-primary-hover);
+}
+
+.ak-btn-secondary {
+  background: #ffffff;
+  border-color: var(--ak-slate-200);
+  color: var(--ak-slate-600);
+}
+
+.ak-btn-secondary:hover {
+  background: var(--ak-slate-100);
+  color: var(--ak-dark);
+}
+
+.ak-btn-sm {
+  padding: 5px 9px;
+  font-size: 12px;
+  border-radius: 6px;
+}
+
+/* Form Styles */
+.ak-form-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+  color: #334155;
+  margin-bottom: 5px;
+}
+
+.ak-input, .ak-select, .ak-textarea {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid var(--ak-slate-300);
+  border-radius: 8px;
+  font-size: 13px;
+  color: var(--ak-dark);
+  background: #ffffff;
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  box-sizing: border-box;
+}
+
+.ak-input:focus, .ak-select:focus, .ak-textarea:focus {
+  border-color: var(--ak-primary);
+  box-shadow: 0 0 0 3px var(--ak-primary-ring);
+}
+
+/* Online Assessment Interface */
+.exam-container {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.exam-timer-bar {
+  background: #ffffff;
+  border: 1px solid var(--ak-slate-200);
+  border-radius: 12px;
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  position: sticky;
+  top: 70px;
+  z-index: 40;
+  box-shadow: var(--ak-shadow);
+}
+
+.exam-timer-val {
+  font-size: 20px;
+  font-weight: 800;
+  font-family: monospace;
+  color: var(--ak-rose);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.exam-soal-card {
+  background: #ffffff;
+  border: 1px solid var(--ak-slate-200);
+  border-radius: var(--ak-radius);
+  padding: 22px;
+  margin-bottom: 20px;
+  box-shadow: var(--ak-shadow-sm);
+}
+
+.exam-soal-no {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: #f5f3ff;
+  color: var(--ak-primary);
+  font-weight: 800;
+  border-radius: 8px;
+  margin-bottom: 12px;
+}
+
+.exam-opsi-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.exam-opsi-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border: 1px solid var(--ak-slate-200);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.exam-opsi-item:hover {
+  background: #fdf4ff;
+  border-color: #d8b4fe;
+}
+
+.exam-opsi-item input[type="radio"]:checked + .exam-opsi-text {
+  font-weight: 700;
+  color: var(--ak-primary);
+}
+
+/* Modal Base Styles */
+.modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+  outline: 0;
+  z-index: 1055;
+  background: rgba(15, 23, 42, 0.5);
+  backdrop-filter: blur(2px);
+}
+
+.modal.show, .modal.show-modal {
+  display: block;
+}
+
+.modal-dialog {
+  position: relative;
+  width: auto;
+  margin: 2rem auto;
+  max-width: 560px;
+  pointer-events: auto;
+  padding: 0 16px;
+}
+
+.modal-content {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  pointer-events: auto;
+  background-color: #fff;
+  background-clip: padding-box;
+  border: 1px solid var(--ak-slate-200);
+  border-radius: 16px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  outline: 0;
+}
+
+.modal-header {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 22px;
+  border-bottom: 1px solid var(--ak-slate-200);
+  border-top-left-radius: 16px;
+  border-top-right-radius: 16px;
+}
+
+.modal-body {
+  position: relative;
+  flex: 1 1 auto;
+  padding: 22px;
+}
+
+.modal-footer {
+  display: flex;
+  flex-wrap: wrap;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 14px 22px;
+  border-top: 1px solid var(--ak-slate-200);
+  gap: 10px;
+}
+
+/* Responsive */
+@media (max-width: 991px) {
+  .akademik-sidebar {
+    transform: translateX(-100%);
+  }
+  .akademik-sidebar.show {
+    transform: translateX(0);
+  }
+  .akademik-main {
+    margin-left: 0;
+  }
+  .akademik-menu-toggle {
+    display: block;
+  }
+}
+
+@media (min-width: 992px) {
+  .akademik-sidebar-header .btn-close,
+  .akademik-sidebar-header button[aria-label="Tutup"],
+  .akademik-sidebar-close {
+    display: none !important;
+  }
+}
+
+/* ==========================================================================
+   ROSTER TIMETABLE MATRIX (JADWAL PELAJARAN DCC)
+   ========================================================================== */
+.roster-card-wrapper {
+  background: #ffffff;
+  border-radius: var(--ak-radius);
+  border: 1px solid var(--ak-slate-200);
+  box-shadow: var(--ak-shadow-sm);
+  overflow: hidden;
+  margin-bottom: 24px;
+}
+
+.roster-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 11px;
+  vertical-align: middle;
+  text-align: center;
+  min-width: 1180px;
+}
+
+.roster-table th,
+.roster-table td {
+  border-right: 1px solid #e2e8f0;
+  border-bottom: 1px solid #e2e8f0;
+  padding: 0;
+}
+
+.roster-table tr:first-child th {
+  border-top: 1px solid #e2e8f0;
+}
+
+.roster-table th:first-child,
+.roster-table td:first-child {
+  border-left: 1px solid #e2e8f0;
+}
+
+/* Headers */
+.roster-th-dark {
+  background: #0f172a;
+  color: #ffffff;
+  font-weight: 800;
+  font-size: 11px;
+  letter-spacing: 0.5px;
+  padding: 10px 6px;
+  vertical-align: middle;
+}
+
+.roster-th-kelas-x {
+  background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
+  color: #ffffff;
+  font-weight: 800;
+  font-size: 11.5px;
+  padding: 9px 8px;
+  letter-spacing: 0.5px;
+}
+
+.roster-th-kelas-xi {
+  background: linear-gradient(135deg, #0284c7 0%, #0ea5e9 100%);
+  color: #ffffff;
+  font-weight: 800;
+  font-size: 11.5px;
+  padding: 9px 8px;
+  letter-spacing: 0.5px;
+}
+
+.roster-th-kelas-xii {
+  background: linear-gradient(135deg, #d97706 0%, #f59e0b 100%);
+  color: #ffffff;
+  font-weight: 800;
+  font-size: 11.5px;
+  padding: 9px 8px;
+  letter-spacing: 0.5px;
+}
+
+.roster-th-piket {
+  background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+  color: #ffffff;
+  font-weight: 800;
+  font-size: 11.5px;
+  padding: 9px 8px;
+  letter-spacing: 0.5px;
+  vertical-align: middle;
+}
+
+.roster-th-sub-aphp {
+  background: #fef3c7;
+  color: #92400e;
+  font-weight: 800;
+  font-size: 11px;
+  padding: 6px 4px;
+  border-bottom: 2px solid #f59e0b !important;
+}
+
+.roster-th-sub-rpl {
+  background: #e0f2fe;
+  color: #0369a1;
+  font-weight: 800;
+  font-size: 11px;
+  padding: 6px 4px;
+  border-bottom: 2px solid #0284c7 !important;
+}
+
+.roster-th-sub-tsm {
+  background: #ffedd5;
+  color: #c2410c;
+  font-weight: 800;
+  font-size: 11px;
+  padding: 6px 4px;
+  border-bottom: 2px solid #ea580c !important;
+}
+
+/* Day Side Header */
+.roster-day-side {
+  background: #f8fafc;
+  color: #0f172a;
+  font-weight: 900;
+  font-size: 12.5px;
+  letter-spacing: 2px;
+  vertical-align: middle;
+  padding: 8px 4px;
+  user-select: none;
+  border-right: 2px solid #cbd5e1 !important;
+}
+
+.roster-day-letters {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+/* Jam Ke & Pukul */
+.roster-cell-jam {
+  background: #f8fafc;
+  font-weight: 800;
+  color: #334155;
+  font-size: 11px;
+  padding: 6px 4px;
+}
+
+.roster-cell-pukul {
+  background: #f8fafc;
+  font-size: 9.5px;
+  color: #64748b;
+  font-weight: 600;
+  padding: 6px 4px;
+  white-space: nowrap;
+}
+
+/* Interactive Schedule Cell */
+.roster-cell-slot {
+  padding: 4px 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  position: relative;
+  min-width: 120px;
+  height: 42px;
+}
+
+.roster-cell-slot:hover {
+  filter: brightness(0.96);
+}
+
+.roster-cell-locked {
+  outline: 2px solid #f59e0b;
+  outline-offset: -2px;
+  background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%) !important;
+}
+
+.roster-slot-card {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  width: 100%;
+  height: 100%;
+  background: transparent !important;
+  border: none !important;
+}
+
+.roster-guru-badge {
+  display: inline;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  color: #0f172a;
+  font-weight: 900;
+  font-size: 11px;
+  min-width: unset;
+  height: auto;
+  padding: 0;
+  margin-right: 2px;
+  flex-shrink: 0;
+}
+
+.roster-mapel-name {
+  font-weight: 800;
+  font-size: 11px;
+  color: #0f172a;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 95px;
+  letter-spacing: -0.2px;
+  background: transparent !important;
+  border: none !important;
+}
+
+.roster-lock-badge {
+  font-size: 11px;
+  color: #d97706;
+  flex-shrink: 0;
+  animation: pulseLock 2s infinite ease-in-out;
+}
+
+@keyframes pulseLock {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.15); }
+}
+
+.roster-empty-slot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #94a3b8;
+  font-size: 10px;
+  font-weight: 600;
+  border: none !important;
+  background: transparent !important;
+  padding: 0;
+  height: 100%;
+}
+
+.roster-cell-slot:hover .roster-empty-slot {
+  color: var(--ak-primary);
+  border: none !important;
+  background: transparent !important;
+}
+
+/* Ceremony & Break Banners */
+.roster-banner-upacara {
+  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+  color: #ffffff;
+  font-weight: 800;
+  font-size: 11.5px;
+  letter-spacing: 1.5px;
+  padding: 8px 12px;
+  text-transform: uppercase;
+}
+
+.roster-banner-apel {
+  background: linear-gradient(135deg, #ea580c 0%, #c2410c 100%);
+  color: #ffffff;
+  font-weight: 800;
+  font-size: 11px;
+  letter-spacing: 1px;
+  padding: 8px 12px;
+  text-transform: uppercase;
+}
+
+.roster-banner-jumat {
+  background: linear-gradient(135deg, #059669 0%, #047857 100%);
+  color: #ffffff;
+  font-weight: 800;
+  font-size: 11px;
+  letter-spacing: 1px;
+  padding: 8px 12px;
+  text-transform: uppercase;
+}
+
+.roster-banner-istirahat {
+  background: linear-gradient(90deg, #fef2f2 0%, #fee2e2 50%, #fef2f2 100%);
+  color: #991b1b;
+  font-weight: 800;
+  font-size: 11px;
+  letter-spacing: 1.5px;
+  padding: 6px 12px;
+  border-top: 1px dashed #fca5a5;
+  border-bottom: 1px dashed #fca5a5;
+}
+
+/* PKL (Kelas XII) Vertical Bar */
+.roster-cell-pkl-aphp {
+  background: linear-gradient(180deg, #fef9c3 0%, #fef08a 100%);
+  color: #854d0e;
+  font-weight: 900;
+  font-size: 11px;
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  letter-spacing: 3px;
+  vertical-align: middle;
+  text-align: center;
+  padding: 14px 4px;
+  box-shadow: inset 0 0 8px rgba(0,0,0,0.03);
+}
+
+.roster-cell-pkl-rpl {
+  background: linear-gradient(180deg, #e0f2fe 0%, #bae6fd 100%);
+  color: #0369a1;
+  font-weight: 900;
+  font-size: 11px;
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  letter-spacing: 3px;
+  vertical-align: middle;
+  text-align: center;
+  padding: 14px 4px;
+  box-shadow: inset 0 0 8px rgba(0,0,0,0.03);
+}
+
+/* Piket Duty Cell */
+.roster-cell-piket {
+  text-align: left;
+  vertical-align: top;
+  background: #ffffff;
+  padding: 10px 12px;
+  font-size: 11px;
+  border-left: 2px solid #cbd5e1 !important;
+  width: 170px;
+  max-width: 180px;
+}
+
+.roster-piket-badge-waka {
+  display: inline-block;
+  padding: 2px 7px;
+  border-radius: 4px;
+  background: #fef3c7;
+  color: #92400e;
+  font-weight: 800;
+  font-size: 10px;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+.roster-piket-name-waka {
+  font-weight: 800;
+  font-size: 11.5px;
+  color: #0f172a;
+  margin-bottom: 8px;
+  line-height: 1.3;
+}
+
+.roster-piket-badge-guru {
+  display: inline-block;
+  padding: 2px 7px;
+  border-radius: 4px;
+  background: #dcfce7;
+  color: #166534;
+  font-weight: 800;
+  font-size: 10px;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+.roster-piket-list {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.roster-piket-item {
+  font-size: 10.5px;
+  color: #334155;
+  font-weight: 600;
+  line-height: 1.3;
+  display: flex;
+  align-items: flex-start;
+  gap: 4px;
+}
+

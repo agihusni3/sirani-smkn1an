@@ -78,7 +78,7 @@
             <i class="bi bi-graph-up me-1"></i> Grafik Pengunjung
           </a>
         @endif
-        <span class="portal-section-badge">4 Modul Ekosistem Terpadu</span>
+        <span class="portal-section-badge">5 Modul Ekosistem Terpadu</span>
       </div>
     </div>
 
@@ -221,6 +221,39 @@
               <span>Kunjungi Website Utama</span>
               <i class="bi bi-box-arrow-up-right" style="font-size: 11px;"></i>
             </a>
+          @endif
+        </div>
+      </div>
+
+      {{-- Card 5: AKADEMIK & KBM --}}
+      <div class="module-card card-akademik {{ $canAccessAkademik ? '' : 'is-locked' }}">
+        <div>
+          <div class="module-card-top">
+            <div class="module-card-icon-halo">
+              <i class="bi bi-journal-bookmark-fill"></i>
+            </div>
+            <span style="font-size:10.5px; font-weight:800; background:#f3e8ff; color:#7c3aed; border:1px solid #e9d5ff; padding:3px 8px; border-radius:6px;">Kurikulum Merdeka</span>
+          </div>
+
+          <h3 class="module-card-name">AKADEMIK &amp; KBM</h3>
+          <p class="module-card-subtitle">Kurikulum, Jurnal KBM, Penilaian &amp; PKL</p>
+
+          <p class="module-card-desc">
+            Manajemen Kurikulum Merdeka: distribusi jam mengajar, jurnal KBM harian, buku nilai &amp; leger, asesmen penilaian online, serta monitoring PKL mitra DU/DI.
+          </p>
+        </div>
+
+        <div class="module-actions">
+          @if($canAccessAkademik)
+            <a href="{{ route('akademik.dashboard') }}" class="btn-launch-primary">
+              <span>Buka Modul Akademik</span>
+              <i class="bi bi-arrow-right-short" style="font-size: 18px;"></i>
+            </a>
+          @else
+            <div class="btn-module-locked">
+              <i class="bi bi-lock-fill"></i>
+              <span>Akses Terbatas Akademik &amp; Guru</span>
+            </div>
           @endif
         </div>
       </div>

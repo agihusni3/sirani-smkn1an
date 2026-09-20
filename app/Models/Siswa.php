@@ -79,6 +79,16 @@ class Siswa extends Model
         return $this->nama;
     }
 
+    public function getNamaLengkapAttribute(): string
+    {
+        return $this->nama;
+    }
+
+    public function rombels(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    {
+        return $this->belongsToMany(Rombel::class, 'siswa_rombels', 'siswa_id', 'rombel_id');
+    }
+
     public function getRombelAttribute()
     {
         $sr = $this->relationLoaded('siswaRombels')

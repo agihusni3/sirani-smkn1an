@@ -30,6 +30,7 @@ class AdminPortalController extends Controller
         $canAccessPpdb   = $user ? $user->canAccessPpdb() : false;
         $isPewawancaraPpdb = $user ? $user->isPewawancaraPpdb() : false;
         $canAccessWeb    = $user ? $user->canAccessWebHumas() : false;
+        $canAccessAkademik = $user ? $user->canAccessAkademik() : false;
 
         $today = Carbon::today()->toDateString();
 
@@ -74,16 +75,6 @@ class AdminPortalController extends Controller
         // 5. Daftar Roadmap Modul Masa Depan (Rancang Bangun)
         $futureModules = [
             [
-                'id'          => 'akademik',
-                'name'        => 'AKADEMIK & KBM',
-                'subtitle'    => 'Kurikulum & Penilaian',
-                'icon'        => 'bi-journal-bookmark-fill',
-                'color'       => '#7c3aed',
-                'badge'       => 'Tahap Rancang',
-                'description' => 'Manajemen Kurikulum Merdeka: pembagian jam mengajar, perangkat ajar/modul, jurnal KBM harian, rekap nilai & rapor digital siswa.',
-                'lead'        => 'Waka Kurikulum & Tenaga Pendidik',
-            ],
-            [
                 'id'          => 'sarpras',
                 'name'        => 'SARPRAS & ASET',
                 'subtitle'    => 'Inventaris Bengkel & Lab',
@@ -122,6 +113,7 @@ class AdminPortalController extends Controller
             'canAccessPpdb',
             'isPewawancaraPpdb',
             'canAccessWeb',
+            'canAccessAkademik',
             'totalSiswa',
             'totalGuru',
             'totalRombel',

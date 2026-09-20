@@ -40,4 +40,9 @@ class Rombel extends Model
     {
         return $this->hasMany(SiswaRombel::class, 'rombel_id');
     }
+
+    public function siswas(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    {
+        return $this->belongsToMany(Siswa::class, 'siswa_rombels', 'rombel_id', 'siswa_id');
+    }
 }

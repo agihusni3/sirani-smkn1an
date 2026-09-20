@@ -591,6 +591,25 @@ a.portal-section-badge:hover {
   border-color: #0f172a;
 }
 
+/* 5. AKADEMIK & KBM — Theme: Violet */
+.card-akademik .module-card-icon-halo {
+  background: rgba(124, 58, 237, 0.12);
+  border: 1px solid rgba(124, 58, 237, 0.3);
+  color: #7c3aed;
+}
+.card-akademik:hover {
+  border-color: #7c3aed;
+}
+.card-akademik .btn-launch-primary {
+  background: #7c3aed;
+  border: 1px solid #6d28d9;
+  color: #ffffff !important;
+}
+.card-akademik .btn-launch-primary:hover {
+  background: #6d28d9;
+  border-color: #5b21b6;
+}
+
 /* Actions Deck */
 .module-actions {
   display: flex;

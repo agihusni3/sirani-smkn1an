@@ -229,6 +229,77 @@ Route::middleware('auth')->group(function () {
         Route::delete('/situan/ekabinet/mou/{id}', [SituanEKabinetController::class, 'destroyMou'])->name('situan.ekabinet.mou.destroy');
     });
 
+    // 0f. DCC AKADEMIK & KBM (Kurikulum Merdeka, Jurnal KBM, Penilaian & Asesmen Online, PKL, P5BK)
+    Route::middleware('role:admin,kepala_sekolah,waka_kurikulum,waka_kesiswaan,kaprog,wali_kelas,guru')->prefix('dcc/akademik')->group(function () {
+        // Dashboard
+        Route::get('/', [\App\Http\Controllers\Akademik\AkademikController::class, 'dashboard'])->name('akademik.dashboard');
+        Route::get('/dashboard', [\App\Http\Controllers\Akademik\AkademikController::class, 'dashboard']);
+
+        // Sub-Modul 1: Mata Pelajaran & Kurikulum
+        Route::get('/matpel', [\App\Http\Controllers\Akademik\AkademikMatpelController::class, 'index'])->name('akademik.matpel.index');
+        Route::post('/matpel', [\App\Http\Controllers\Akademik\AkademikMatpelController::class, 'store'])->name('akademik.matpel.store');
+        Route::put('/matpel/{id}', [\App\Http\Controllers\Akademik\AkademikMatpelController::class, 'update'])->name('akademik.matpel.update');
+        Route::delete('/matpel/{id}', [\App\Http\Controllers\Akademik\AkademikMatpelController::class, 'destroy'])->name('akademik.matpel.destroy');
+
+        // Sub-Modul 2: Distribusi Mengajar & Jadwal Pelajaran (Roster Wakakur)
+        Route::get('/jadwal', [\App\Http\Controllers\Akademik\AkademikJadwalController::class, 'index'])->name('akademik.jadwal.index');
+        Route::post('/jadwal', [\App\Http\Controllers\Akademik\AkademikJadwalController::class, 'store'])->name('akademik.jadwal.store');
+        Route::put('/jadwal/{id}', [\App\Http\Controllers\Akademik\AkademikJadwalController::class, 'update'])->name('akademik.jadwal.update');
+        Route::delete('/jadwal/{id}', [\App\Http\Controllers\Akademik\AkademikJadwalController::class, 'destroy'])->name('akademik.jadwal.destroy');
+        Route::post('/jadwal/slot', [\App\Http\Controllers\Akademik\AkademikJadwalController::class, 'storeSlot'])->name('akademik.jadwal.slot.store');
+        Route::post('/jadwal/blok', [\App\Http\Controllers\Akademik\AkademikJadwalController::class, 'storeBlok'])->name('akademik.jadwal.blok.store');
+        Route::post('/jadwal/piket', [\App\Http\Controllers\Akademik\AkademikJadwalController::class, 'storePiket'])->name('akademik.jadwal.piket.store');
+        Route::post('/jadwal/check-conflict', [\App\Http\Controllers\Akademik\AkademikJadwalController::class, 'checkConflict'])->name('akademik.jadwal.check-conflict');
+        Route::post('/jadwal/auto-generate', [\App\Http\Controllers\Akademik\AkademikJadwalController::class, 'autoGenerate'])->name('akademik.jadwal.auto-generate');
+        Route::post('/jadwal/clear', [\App\Http\Controllers\Akademik\AkademikJadwalController::class, 'clearJadwal'])->name('akademik.jadwal.clear');
+        Route::post('/jadwal/update-pukul', [\App\Http\Controllers\Akademik\AkademikJadwalController::class, 'updatePukul'])->name('akademik.jadwal.update-pukul');
+        Route::post('/jadwal/toggle-lock/{id}', [\App\Http\Controllers\Akademik\AkademikJadwalController::class, 'toggleLock'])->name('akademik.jadwal.toggle-lock');
+        Route::delete('/jadwal/slot/{id}', [\App\Http\Controllers\Akademik\AkademikJadwalController::class, 'destroySlot'])->name('akademik.jadwal.slot.destroy');
+        Route::get('/jadwal/cetak', [\App\Http\Controllers\Akademik\AkademikJadwalController::class, 'cetak'])->name('akademik.jadwal.cetak');
+
+        // Sub-Modul 3: Jurnal KBM Harian & Presensi Siswa
+        Route::get('/jurnal', [\App\Http\Controllers\Akademik\AkademikJurnalController::class, 'index'])->name('akademik.jurnal.index');
+        Route::get('/jurnal/create', [\App\Http\Controllers\Akademik\AkademikJurnalController::class, 'create'])->name('akademik.jurnal.create');
+        Route::post('/jurnal', [\App\Http\Controllers\Akademik\AkademikJurnalController::class, 'store'])->name('akademik.jurnal.store');
+        Route::get('/jurnal/{id}', [\App\Http\Controllers\Akademik\AkademikJurnalController::class, 'show'])->name('akademik.jurnal.show');
+        Route::delete('/jurnal/{id}', [\App\Http\Controllers\Akademik\AkademikJurnalController::class, 'destroy'])->name('akademik.jurnal.destroy');
+
+        // Sub-Modul 4: Penilaian Formatif, Sumatif & Leger
+        Route::get('/nilai', [\App\Http\Controllers\Akademik\AkademikNilaiController::class, 'index'])->name('akademik.nilai.index');
+        Route::get('/nilai/input/{distribusiId}', [\App\Http\Controllers\Akademik\AkademikNilaiController::class, 'inputNilai'])->name('akademik.nilai.input');
+        Route::post('/nilai/store/{distribusiId}', [\App\Http\Controllers\Akademik\AkademikNilaiController::class, 'storeNilai'])->name('akademik.nilai.store');
+        Route::get('/nilai/leger', [\App\Http\Controllers\Akademik\AkademikNilaiController::class, 'leger'])->name('akademik.nilai.leger');
+
+        // Sub-Modul 5: PKL & Kemitraan DU/DI
+        Route::get('/pkl', [\App\Http\Controllers\Akademik\AkademikPklController::class, 'index'])->name('akademik.pkl.index');
+        Route::post('/pkl/tempat', [\App\Http\Controllers\Akademik\AkademikPklController::class, 'storeTempat'])->name('akademik.pkl.tempat.store');
+        Route::post('/pkl/siswa', [\App\Http\Controllers\Akademik\AkademikPklController::class, 'storePenempatan'])->name('akademik.pkl.siswa.store');
+        Route::put('/pkl/siswa/{id}/nilai', [\App\Http\Controllers\Akademik\AkademikPklController::class, 'updateNilai'])->name('akademik.pkl.nilai');
+        Route::delete('/pkl/siswa/{id}', [\App\Http\Controllers\Akademik\AkademikPklController::class, 'destroySiswa'])->name('akademik.pkl.siswa.destroy');
+
+        // Sub-Modul 5b: Projek Penguatan Profil Pelajar Pancasila & Budaya Kerja (P5BK)
+        Route::get('/p5bk', [\App\Http\Controllers\Akademik\AkademikP5bkController::class, 'index'])->name('akademik.p5bk.index');
+        Route::post('/p5bk', [\App\Http\Controllers\Akademik\AkademikP5bkController::class, 'storeProyek'])->name('akademik.p5bk.store');
+        Route::get('/p5bk/{id}/penilaian', [\App\Http\Controllers\Akademik\AkademikP5bkController::class, 'penilaian'])->name('akademik.p5bk.penilaian');
+        Route::post('/p5bk/{id}/penilaian', [\App\Http\Controllers\Akademik\AkademikP5bkController::class, 'storeNilai'])->name('akademik.p5bk.nilai.store');
+        Route::delete('/p5bk/{id}', [\App\Http\Controllers\Akademik\AkademikP5bkController::class, 'destroyProyek'])->name('akademik.p5bk.destroy');
+
+        // Sub-Modul Asesmen Penilaian Berbasis Online (CBT / Ujian Daring)
+        Route::get('/asesmen', [\App\Http\Controllers\Akademik\AkademikAsesmenController::class, 'index'])->name('akademik.asesmen.index');
+        Route::get('/asesmen/create', [\App\Http\Controllers\Akademik\AkademikAsesmenController::class, 'create'])->name('akademik.asesmen.create');
+        Route::post('/asesmen', [\App\Http\Controllers\Akademik\AkademikAsesmenController::class, 'store'])->name('akademik.asesmen.store');
+        Route::get('/asesmen/{id}/soal', [\App\Http\Controllers\Akademik\AkademikAsesmenController::class, 'soal'])->name('akademik.asesmen.soal');
+        Route::post('/asesmen/{id}/soal', [\App\Http\Controllers\Akademik\AkademikAsesmenController::class, 'storeSoal'])->name('akademik.asesmen.soal.store');
+        Route::delete('/asesmen/{id}/soal/{soalId}', [\App\Http\Controllers\Akademik\AkademikAsesmenController::class, 'destroySoal'])->name('akademik.asesmen.soal.destroy');
+        Route::post('/asesmen/{id}/toggle', [\App\Http\Controllers\Akademik\AkademikAsesmenController::class, 'toggleStatus'])->name('akademik.asesmen.toggle');
+        Route::get('/asesmen/{id}/hasil', [\App\Http\Controllers\Akademik\AkademikAsesmenController::class, 'hasil'])->name('akademik.asesmen.hasil');
+        Route::post('/asesmen/{id}/push-nilai', [\App\Http\Controllers\Akademik\AkademikAsesmenController::class, 'pushToNilai'])->name('akademik.asesmen.push_nilai');
+        Route::get('/asesmen/{id}/kerjakan', [\App\Http\Controllers\Akademik\AkademikAsesmenController::class, 'kerjakan'])->name('akademik.asesmen.kerjakan');
+        Route::post('/asesmen/{id}/submit', [\App\Http\Controllers\Akademik\AkademikAsesmenController::class, 'submitJawaban'])->name('akademik.asesmen.submit');
+    });
+
+    Route::get('/akademik', fn() => redirect()->route('akademik.dashboard'));
+
     // 1. Modul SIRANI (Sistem Informasi Responsif Absensi & Kedisiplinan)
     Route::get('/sirani', [DashboardController::class, 'index'])
         ->name('sirani.index')

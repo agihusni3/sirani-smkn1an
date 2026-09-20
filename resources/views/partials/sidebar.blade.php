@@ -299,6 +299,20 @@
       </a>
     </div>
   @endif
+
+  {{-- 7c. PINTASAN KE MODUL AKADEMIK & KBM --}}
+  @if($user && $user->canAccessAkademik())
+    <div class="nav-group" style="padding-top:4px;">
+      <div class="nav-label">Kurikulum &amp; Pembelajaran</div>
+      <a href="{{ route('akademik.dashboard') }}" class="nav-item" title="Buka Modul DCC Akademik &amp; KBM">
+        <div class="nav-left-part">
+          <i class="bi bi-journal-bookmark-fill nav-icon" style="color:#7c3aed;"></i>
+          <span class="nav-text">Akademik &amp; KBM</span>
+        </div>
+        <i class="bi bi-arrow-up-right" style="font-size:11px; color:var(--text-3);"></i>
+      </a>
+    </div>
+  @endif
 </aside>
 
 {{-- Mobile Bottom Bar Navigation with Clean Icons --}}

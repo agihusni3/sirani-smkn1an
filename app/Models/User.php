@@ -477,4 +477,15 @@ class User extends Authenticatable
     {
         return $this->hasAnyRole(['admin', 'kepala_sekolah', 'humas', 'operator_web']);
     }
+
+    /**
+     * Cek apakah pengguna memiliki hak akses ke Modul DCC Akademik & KBM.
+     */
+    public function canAccessAkademik(): bool
+    {
+        return $this->hasAnyRole([
+            'admin', 'kepala_sekolah', 'waka_kurikulum', 'waka_kesiswaan',
+            'kaprog', 'wali_kelas', 'guru'
+        ]) || $this->guru_id !== null;
+    }
 }

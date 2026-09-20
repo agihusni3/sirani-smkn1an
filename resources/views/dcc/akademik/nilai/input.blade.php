@@ -1,0 +1,115 @@
+@extends('dcc.akademik.layout')
+
+@section('title', 'Input Nilai Siswa')
+@section('breadcrumb', 'Input Nilai Siswa')
+
+@section('content')
+<div class="akademik-page-head">
+  <div>
+    <h1 class="akademik-page-title">{{ $distribusi->mataPelajaran?->nama_mapel }}</h1>
+    <div class="akademik-page-desc">
+      Kelas <strong>{{ $distribusi->rombel?->nama_rombel }}</strong> · Semester {{ $distribusi->semester }} · Guru: {{ $distribusi->guru?->nama }}
+    </div>
+  </div>
+
+  <div style="display:flex; gap:10px;">
+    <a href="{{ route('akademik.nilai.index') }}" class="ak-btn ak-btn-secondary">
+      <i class="bi bi-arrow-left"></i>
+      <span>Kembali</span>
+    </a>
+    <a href="{{ route('akademik.nilai.leger', ['rombel_id' => $distribusi->rombel_id, 'semester' => $distribusi->semester]) }}" class="ak-btn ak-btn-secondary">
+      <i class="bi bi-table"></i>
+      <span>Leger Kelas Ini</span>
+    </a>
+  </div>
+</div>
+
+<form action="{{ route('akademik.nilai.store', $distribusi->id) }}" method="POST">
+  @csrf
+
+  <div class="akademik-card">
+    <div class="akademik-card-header">
+      <h3 class="akademik-card-title">
+        <i class="bi bi-pencil-square text-primary"></i>
+        <span>Lembar Penilaian Siswa ({{ $siswas->count() }} Siswa)</span>
+      </h3>
+      <span class="ak-badge ak-badge-primary">Skala 0 - 100</span>
+    </div>
+
+    <div class="akademik-card-body" style="padding:0;">
+      @if($siswas->isEmpty())
+        <div style="padding:40px; text-align:center; color:#64748b;">
+          Belum ada data siswa aktif di rombel ini.
+        </div>
+      @else
+        <div class="akademik-table-wrap">
+          <table class="akademik-table">
+            <thead>
+              <tr>
+                <th style="width:40px;">No</th>
+                <th style="min-width:180px;">Nama Siswa</th>
+                @foreach($namaPenilaians as $penilaian)
+                  <th style="min-width:100px; text-align:center;">
+                    <div style="font-size:12px;">{{ $penilaian }}</div>
+                    @if(str_contains(strtolower($penilaian), 'sumatif'))
+                      <span class="ak-badge ak-badge-warning" style="font-size:9px; padding:1px 5px;">Sumatif</span>
+                    @else
+                      <span class="ak-badge ak-badge-primary" style="font-size:9px; padding:1px 5px;">Formatif</span>
+                    @endif
+                  </th>
+                @endforeach
+                <th style="min-width:240px;">Deskripsi Capaian Kompetensi</th>
+              </tr>
+            </thead>
+            <tbody>
+              @foreach($siswas as $idx => $s)
+                @php
+                  $scores = $existingNilai->get($s->id)?->keyBy('nama_penilaian') ?? collect();
+                  $desc = $scores->first()?->deskripsi_capaian ?? '';
+                @endphp
+                <tr>
+                  <td>{{ $idx + 1 }}</td>
+                  <td>
+                    <div style="font-weight:700; color:var(--ak-dark);">{{ $s->nama_lengkap }}</div>
+                    <div style="font-size:11px; color:#64748b;">NISN: {{ $s->nisn ?? '-' }}</div>
+                  </td>
+                  @foreach($namaPenilaians as $penilaian)
+                    @php
+                      $currVal = $scores->get($penilaian)?->nilai ?? '';
+                    @endphp
+                    <td style="text-align:center;">
+                      <input type="number" step="0.1" min="0" max="100"
+                        name="nilai[{{ $s->id }}][{{ $penilaian }}]"
+                        value="{{ $currVal }}"
+                        class="ak-input"
+                        style="width:75px; text-align:center; font-weight:700; padding:6px;"
+                        placeholder="-">
+                    </td>
+                  @endforeach
+                  <td>
+                    <input type="text" name="deskripsi[{{ $s->id }}]"
+                      value="{{ $desc }}"
+                      class="ak-input"
+                      style="font-size:12px; padding:6px 10px;"
+                      placeholder="Contoh: Menunjukkan penguasaan sangat baik dalam...">
+                  </td>
+                </tr>
+              @endforeach
+            </tbody>
+          </table>
+        </div>
+
+        <div style="padding:18px 24px; border-top:1px solid var(--ak-slate-200); display:flex; justify-content:space-between; align-items:center; background:#fafafa;">
+          <div style="font-size:12px; color:#64748b;">
+            <i class="bi bi-info-circle me-1"></i> Nilai Akhir &amp; Leger akan otomatis dikalkulasi saat Anda menekan tombol Simpan.
+          </div>
+          <button type="submit" class="ak-btn ak-btn-primary">
+            <i class="bi bi-check2-circle"></i>
+            <span>Simpan Nilai &amp; Kalkulasi Leger</span>
+          </button>
+        </div>
+      @endif
+    </div>
+  </div>
+</form>
+@endsection
