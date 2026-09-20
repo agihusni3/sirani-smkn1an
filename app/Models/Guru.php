@@ -327,4 +327,45 @@ class Guru extends Model
     {
         return $this->hasMany(ArsipDokumenPtk::class, 'guru_id');
     }
+
+    /**
+     * Rincian tugas tambahan yang diemban guru beserta ekuivalensi jam (Permendikbud 15/2018)
+     */
+    public function getTugasTambahanListAttribute(): array
+    {
+        $list = [];
+
+        // 1. Dari kolom tugas_tambahan atau jabatan
+        $tugas = strtolower($this->tugas_tambahan ?? $this->jabatan ?? '');
+        if (str_contains($tugas, 'kepala sekolah') && !str_contains($tugas, 'wakil') && !str_contains($tugas, 'waka')) {
+            $list[] = ['nama' => 'Kepala Sekolah', 'jp' => 24, 'kategori' => 'Manajerial'];
+        } elseif (str_contains($tugas, 'waka') || str_contains($tugas, 'wakil')) {
+            $list[] = ['nama' => $this->tugas_tambahan ?: 'Wakil Kepala Sekolah', 'jp' => 12, 'kategori' => 'Pimpinan'];
+        } elseif (str_contains($tugas, 'kaprog') || str_contains($tugas, 'kepala program') || str_contains($tugas, 'ketua jurusan') || str_contains($tugas, 'kepala bengkel') || str_contains($tugas, 'kepala lab')) {
+            $list[] = ['nama' => $this->tugas_tambahan ?: 'Kepala Lab/Bengkel', 'jp' => 12, 'kategori' => 'Teknis'];
+        } elseif (str_contains($tugas, 'osis')) {
+            $list[] = ['nama' => 'Pembina OSIS', 'jp' => 2, 'kategori' => 'Kesiswaan'];
+        } elseif (str_contains($tugas, 'pembina') || str_contains($tugas, 'ekskul')) {
+            $list[] = ['nama' => $this->tugas_tambahan ?: 'Pembina Ekstrakurikuler', 'jp' => 2, 'kategori' => 'Kesiswaan'];
+        } elseif (str_contains($tugas, 'koordinator p5')) {
+            $list[] = ['nama' => 'Koordinator P5', 'jp' => 2, 'kategori' => 'Kurikulum'];
+        }
+
+        // 2. Dari Wali Kelas
+        $rombelWali = \App\Models\Rombel::where('wali_kelas_id', $this->id)->get();
+        foreach ($rombelWali as $rw) {
+            $list[] = ['nama' => 'Wali Kelas ' . $rw->nama_rombel, 'jp' => 2, 'kategori' => 'Wali Kelas'];
+        }
+
+        return $list;
+    }
+
+    /**
+     * Total jam ekuivalen dari seluruh tugas tambahan
+     */
+    public function getTotalEkuivalenTugasTambahanAttribute(): int
+    {
+        return collect($this->tugas_tambahan_list)->sum('jp');
+    }
 }
+

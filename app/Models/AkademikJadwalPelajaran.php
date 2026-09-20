@@ -24,6 +24,7 @@ class AkademikJadwalPelajaran extends Model
         'kegiatan_khusus',
         'is_locked',
         'warna_bg',
+        'resource_key',  // copy dari mapel untuk query cepat tanpa JOIN
     ];
 
     protected $casts = [

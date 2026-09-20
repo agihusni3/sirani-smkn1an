@@ -256,6 +256,10 @@ Route::middleware('auth')->group(function () {
         Route::post('/jadwal/toggle-lock/{id}', [\App\Http\Controllers\Akademik\AkademikJadwalController::class, 'toggleLock'])->name('akademik.jadwal.toggle-lock');
         Route::delete('/jadwal/slot/{id}', [\App\Http\Controllers\Akademik\AkademikJadwalController::class, 'destroySlot'])->name('akademik.jadwal.slot.destroy');
         Route::get('/jadwal/cetak', [\App\Http\Controllers\Akademik\AkademikJadwalController::class, 'cetak'])->name('akademik.jadwal.cetak');
+        Route::get('/jadwal/cetak-sk', [\App\Http\Controllers\Akademik\AkademikJadwalController::class, 'cetakSk'])->name('akademik.jadwal.cetak-sk');
+        Route::get('/jadwal/cetak-kelas', [\App\Http\Controllers\Akademik\AkademikJadwalController::class, 'cetakKelas'])->name('akademik.jadwal.cetak-kelas');
+        Route::get('/jadwal/cetak-lab', [\App\Http\Controllers\Akademik\AkademikJadwalController::class, 'cetakLab'])->name('akademik.jadwal.cetak-lab');
+        Route::get('/jadwal/rombel-alokasi/{rombelId}', [\App\Http\Controllers\Akademik\AkademikJadwalController::class, 'getRombelAlokasi'])->name('akademik.jadwal.rombel-alokasi');
 
         // Sub-Modul 3: Jurnal KBM Harian & Presensi Siswa
         Route::get('/jurnal', [\App\Http\Controllers\Akademik\AkademikJurnalController::class, 'index'])->name('akademik.jurnal.index');

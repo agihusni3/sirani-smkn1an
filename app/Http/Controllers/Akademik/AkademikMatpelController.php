@@ -80,6 +80,7 @@ class AkademikMatpelController extends Controller
             'tahun_ajaran_id' => 'required|exists:tahun_ajarans,id',
             'jurusan_id' => 'nullable|exists:jurusans,id',
             'deskripsi_cp' => 'nullable|string',
+            'resource_key' => 'nullable|string|max:50',
         ]);
 
         AkademikMataPelajaran::create([
@@ -92,6 +93,7 @@ class AkademikMatpelController extends Controller
             'tingkat' => $tingkatStr,
             'jumlah_jam_per_minggu' => $request->jumlah_jam_per_minggu,
             'deskripsi_cp' => $request->deskripsi_cp,
+            'resource_key' => $request->resource_key ?: null,
             'is_active' => true,
         ]);
 
@@ -125,6 +127,7 @@ class AkademikMatpelController extends Controller
             'jumlah_jam_per_minggu' => 'required|integer|min:1|max:20',
             'jurusan_id' => 'nullable|exists:jurusans,id',
             'deskripsi_cp' => 'nullable|string',
+            'resource_key' => 'nullable|string|max:50',
         ]);
 
         $mapel->update([
@@ -136,6 +139,7 @@ class AkademikMatpelController extends Controller
             'tingkat' => $tingkatStr,
             'jumlah_jam_per_minggu' => $request->jumlah_jam_per_minggu,
             'deskripsi_cp' => $request->deskripsi_cp,
+            'resource_key' => $request->resource_key ?: null,
             'is_active' => $request->has('is_active'),
         ]);
 

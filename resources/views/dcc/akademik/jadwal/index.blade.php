@@ -27,10 +27,39 @@
         </a>
       </div>
 
-      {{-- Tombol Cetak Format Resmi --}}
-      <a href="{{ route('akademik.jadwal.cetak', ['semester' => $semester]) }}" target="_blank" class="ak-btn ak-btn-secondary" style="font-size:12.5px;">
-        <i class="bi bi-printer me-1"></i> Cetak Jadwal Resmi
-      </a>
+      {{-- Dropdown Cetak Dokumen Resmi --}}
+      <div class="dropdown">
+        <button class="ak-btn ak-btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" style="font-size:12.5px; font-weight:700;">
+          <i class="bi bi-printer me-1"></i> Cetak Dokumen Resmi
+        </button>
+        <ul class="dropdown-menu dropdown-menu-end" style="border-radius:12px; box-shadow:0 10px 25px rgba(0,0,0,0.12); border:1px solid #e2e8f0; font-size:13px; min-width:260px; padding:6px 0;">
+          <li>
+            <a class="dropdown-item py-2" href="{{ route('akademik.jadwal.cetak-sk', ['semester' => $semester]) }}" target="_blank">
+              <i class="bi bi-file-earmark-text-fill text-primary me-2"></i> <b>SK Pembagian Tugas Guru</b>
+              <div style="font-size:11px; color:#64748b; margin-left:24px;">Format Resmi Lampiran SK Kepala Sekolah</div>
+            </a>
+          </li>
+          <li><hr class="dropdown-divider my-1"></li>
+          <li>
+            <a class="dropdown-item py-2" href="{{ route('akademik.jadwal.cetak', ['semester' => $semester]) }}" target="_blank">
+              <i class="bi bi-grid-3x3-gap-fill text-indigo me-2"></i> <b>Roster Jadwal Sekolah</b>
+              <div style="font-size:11px; color:#64748b; margin-left:24px;">Matriks Keseluruhan Rombel &amp; Guru</div>
+            </a>
+          </li>
+          <li>
+            <a class="dropdown-item py-2" href="{{ route('akademik.jadwal.cetak-kelas', ['semester' => $semester]) }}" target="_blank">
+              <i class="bi bi-mortarboard-fill text-success me-2"></i> <b>Jadwal per Rombel / Kelas</b>
+              <div style="font-size:11px; color:#64748b; margin-left:24px;">Siap Ditempel di Papan Pengumuman Kelas</div>
+            </a>
+          </li>
+          <li>
+            <a class="dropdown-item py-2" href="{{ route('akademik.jadwal.cetak-lab', ['semester' => $semester]) }}" target="_blank">
+              <i class="bi bi-display-fill text-info me-2"></i> <b>Jadwal Ruang Lab Komputer</b>
+              <div style="font-size:11px; color:#64748b; margin-left:24px;">Siap Ditempel di Pintu Masuk Lab</div>
+            </a>
+          </li>
+        </ul>
+      </div>
 
       {{-- Tombol Otomatisasi Jadwal 1-Klik --}}
       <button type="button" class="ak-btn" data-bs-toggle="modal" data-bs-target="#modalAutoScheduler" style="font-size:12.5px; background:linear-gradient(135deg, #059669, #10b981); color:#ffffff; border:none; box-shadow:0 4px 12px rgba(16,185,129,0.3); font-weight:700;">
@@ -477,6 +506,15 @@ function tambahIstirahat(hari) {
                       <span class="roster-mapel-name">
                         {{ $slot->singkatan_mapel ?? $slot->kegiatan_khusus }}
                       </span>
+                      @if($slot->resource_key === 'LAB_KOMPUTER')
+                        <span style="font-size:9px; background:#0284c7; color:#fff; padding:1px 4px; border-radius:3px; font-weight:800; white-space:nowrap;" title="Praktik di Lab Komputer">🖥️ LAB</span>
+                      @elseif($slot->resource_key === 'BENGKEL_TKR')
+                        <span style="font-size:9px; background:#d97706; color:#fff; padding:1px 4px; border-radius:3px; font-weight:800; white-space:nowrap;" title="Bengkel Otomotif">🔧 TKR</span>
+                      @elseif($slot->resource_key === 'DAPUR_TPHP')
+                        <span style="font-size:9px; background:#059669; color:#fff; padding:1px 4px; border-radius:3px; font-weight:800; white-space:nowrap;" title="Dapur Praktik">🍳 TPHP</span>
+                      @elseif($slot->resource_key)
+                        <span style="font-size:9px; background:#6366f1; color:#fff; padding:1px 4px; border-radius:3px; font-weight:800; white-space:nowrap;" title="{{ $slot->resource_key }}">🏛️ RUANG</span>
+                      @endif
                       @if($isLocked)
                         <span class="roster-lock-badge" title="Slot ini dikunci (KEEP)">🔒</span>
                       @endif
@@ -648,7 +686,7 @@ function tambahIstirahat(hari) {
         </div>
         <div>
           <label class="ak-form-label">Pilih Rombel / Kelas <span class="text-danger">*</span></label>
-          <select name="rombel_id" id="form_rombel" class="ak-select" required onchange="checkLiveConflict()">
+          <select name="rombel_id" id="form_rombel" class="ak-select" required onchange="onFormRombelChanged()">
             @foreach($rombels as $r)
               <option value="{{ $r->id }}">{{ $r->nama_rombel }}</option>
             @endforeach
@@ -658,20 +696,24 @@ function tambahIstirahat(hari) {
 
       <div style="display:grid; grid-template-columns: 1fr 1fr; gap:14px; margin-bottom:14px;">
         <div>
-          <label class="ak-form-label">Guru Pengampu <span class="text-danger">*</span></label>
+          <label class="ak-form-label">Mata Pelajaran (Dari SK Kurikulum) <span class="text-danger">*</span></label>
+          <select name="mata_pelajaran_id" id="form_mapel" class="ak-select" required onchange="onFormMapelChanged()">
+            <option value="">-- Pilih Mata Pelajaran --</option>
+            @foreach($mapels as $m)
+              <option value="{{ $m->id }}" data-resource="{{ $m->resource_key }}">
+                {{ $m->singkatan_mapel ?? $m->kode_mapel }} - {{ $m->nama_mapel }}
+                @if($m->resource_key) [{{ $m->resource_label }}] @endif
+              </option>
+            @endforeach
+          </select>
+          <div id="form_sk_info" style="display:none; font-size:11.5px; color:#15803d; background:#f0fdf4; border:1px solid #bbf7d0; border-radius:6px; padding:5px 10px; margin-top:6px; font-weight:700;"></div>
+        </div>
+        <div>
+          <label class="ak-form-label">Guru Pengampu (Otomatis dari SK) <span class="text-danger">*</span></label>
           <select name="guru_id" id="form_guru" class="ak-select" required onchange="checkLiveConflict()">
             <option value="">-- Pilih Guru --</option>
             @foreach($gurus as $g)
               <option value="{{ $g->id }}">[{{ $g->kode_nomor ?? '-' }}] {{ $g->nama }}</option>
-            @endforeach
-          </select>
-        </div>
-        <div>
-          <label class="ak-form-label">Mata Pelajaran <span class="text-danger">*</span></label>
-          <select name="mata_pelajaran_id" id="form_mapel" class="ak-select" required>
-            <option value="">-- Pilih Mata Pelajaran --</option>
-            @foreach($mapels as $m)
-              <option value="{{ $m->id }}">{{ $m->singkatan_mapel ?? $m->kode_mapel }} - {{ $m->nama_mapel }}</option>
             @endforeach
           </select>
         </div>
@@ -821,45 +863,320 @@ function tambahIstirahat(hari) {
 {{-- TAB 4: DISTRIBUSI MENGAJAR (BEBAN JJM GURU)                              --}}
 {{-- ========================================================================= --}}
 @if($tab === 'distribusi')
-{{-- Rekap JJM per Guru --}}
-<div class="akademik-card" style="margin-bottom:20px;">
-  <div class="akademik-card-header">
-    <h3 style="font-weight:800; font-size:15px; margin:0; color:var(--ak-dark);">
-      <i class="bi bi-clock-history text-primary me-1"></i> Rekap Jam Jabatan Mengajar (JJM) per Guru
-    </h3>
+@php
+  $subtab = request('subtab', 'matriks');
+@endphp
+
+{{-- Subtab Switcher & Header Controls --}}
+<div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:18px;">
+  <div style="display:inline-flex; background:#e2e8f0; border-radius:10px; padding:3px; gap:4px;">
+    <a href="{{ route('akademik.jadwal.index', ['tab' => 'distribusi', 'subtab' => 'matriks', 'semester' => $semester]) }}"
+       class="ak-btn {{ $subtab === 'matriks' ? 'ak-btn-primary' : '' }}"
+       style="font-size:12.5px; padding:7px 15px; border-radius:8px; font-weight:700; {{ $subtab !== 'matriks' ? 'background:transparent; color:#475569; border:none;' : '' }}">
+      <i class="bi bi-grid-3x3 me-1"></i> Matriks Mapel × Rombel
+    </a>
+    <a href="{{ route('akademik.jadwal.index', ['tab' => 'distribusi', 'subtab' => 'beban', 'semester' => $semester]) }}"
+       class="ak-btn {{ $subtab === 'beban' ? 'ak-btn-primary' : '' }}"
+       style="font-size:12.5px; padding:7px 15px; border-radius:8px; font-weight:700; {{ $subtab !== 'beban' ? 'background:transparent; color:#475569; border:none;' : '' }}">
+      <i class="bi bi-person-check-fill me-1"></i> Rekap Beban Guru &amp; Tugas Tambahan
+    </a>
+    <a href="{{ route('akademik.jadwal.index', ['tab' => 'distribusi', 'subtab' => 'daftar', 'semester' => $semester]) }}"
+       class="ak-btn {{ $subtab === 'daftar' ? 'ak-btn-primary' : '' }}"
+       style="font-size:12.5px; padding:7px 15px; border-radius:8px; font-weight:700; {{ $subtab !== 'daftar' ? 'background:transparent; color:#475569; border:none;' : '' }}">
+      <i class="bi bi-list-ul me-1"></i> Daftar Rinci Alokasi
+    </a>
   </div>
-  <div class="akademik-card-body" style="padding:14px 20px;">
-    @if($rekapJjm->isEmpty())
-      <div style="font-size:13px; color:#64748b;">Belum ada alokasi jam mengajar yang tercatat.</div>
-    @else
-      <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap:12px;">
-        @foreach($rekapJjm as $r)
-          <div style="background:#f8fafc; border:1px solid var(--ak-slate-200); border-radius:10px; padding:10px 14px; display:flex; justify-content:space-between; align-items:center;">
-            <div>
-              <div style="font-weight:700; font-size:13px; color:var(--ak-dark);">{{ $r->guru?->nama ?? '-' }}</div>
-              <div style="font-size:11px; color:#64748b;">{{ $r->total_rombel }} Rombel Diajar</div>
-            </div>
-            <div style="text-align:right;">
-              <span class="ak-badge {{ $r->total_jam >= 24 ? 'ak-badge-success' : 'ak-badge-primary' }}" style="font-size:12.5px; font-weight:800;">
-                {{ $r->total_jam }} JP/Mgg
-              </span>
-            </div>
-          </div>
-        @endforeach
-      </div>
-    @endif
+
+  <div style="display:flex; gap:8px; flex-wrap:wrap;">
+    <a href="{{ route('akademik.jadwal.cetak-sk', ['semester' => $semester]) }}" target="_blank" class="ak-btn ak-btn-secondary" style="font-size:12.5px; font-weight:700;">
+      <i class="bi bi-file-earmark-text-fill text-primary me-1"></i> Cetak SK Pembagian Tugas (Format Kepsek)
+    </a>
+    <button type="button" class="ak-btn ak-btn-primary" data-bs-toggle="modal" data-bs-target="#modalTambahDistribusi" style="font-size:12.5px; font-weight:700;">
+      <i class="bi bi-plus-circle me-1"></i> Tambah Alokasi Baru
+    </button>
   </div>
 </div>
 
-{{-- Tabel Detail Distribusi Mengajar --}}
+{{-- SUBTAB 1: MATRIKS MAPEL X ROMBEL --}}
+@if($subtab === 'matriks')
+<div class="akademik-card" style="margin-bottom:24px;">
+  <div class="akademik-card-header" style="background:linear-gradient(135deg, #f0fdf4, #dcfce7); border-bottom:1px solid #bbf7d0;">
+    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+      <div>
+        <h3 style="font-weight:900; font-size:16px; margin:0; color:#166534; display:flex; align-items:center; gap:8px;">
+          <i class="bi bi-grid-3x3 text-success"></i> Matriks Pemetaan Pembagian Tugas Mengajar
+        </h3>
+        <div style="font-size:12px; color:#15803d; margin-top:2px;">
+          Peta alokasi guru untuk setiap mata pelajaran dan rombel. Setiap kotak menunjukkan guru yang bertugas beserta status jam terjadwal.
+        </div>
+      </div>
+      <div style="display:flex; gap:6px; align-items:center; font-size:11.5px;">
+        <span style="background:#dcfce7; color:#15803d; padding:3px 8px; border-radius:6px; font-weight:700; border:1px solid #86efac;">🟢 Terpenuhi</span>
+        <span style="background:#fef3c7; color:#b45309; padding:3px 8px; border-radius:6px; font-weight:700; border:1px solid #fde68a;">🟡 Sisa Belum Terjadwal</span>
+        <span style="background:#fee2e2; color:#b91c1c; padding:3px 8px; border-radius:6px; font-weight:700; border:1px solid #fca5a5;">🔴 Belum Ada Guru</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="akademik-card-body" style="padding:0; overflow-x:auto;">
+    <table class="akademik-table" style="font-size:12px;">
+      <thead>
+        <tr>
+          <th style="width:35px; text-align:center;">No</th>
+          <th style="min-width:180px;">Mata Pelajaran</th>
+          <th style="width:70px; text-align:center;">Beban JP</th>
+          <th style="width:90px; text-align:center;">Ruang/Lab</th>
+          @foreach($rombels as $rb)
+            <th style="min-width:140px; text-align:center; background:#f8fafc;">
+              <div style="font-weight:800; color:var(--ak-dark);">{{ $rb->nama_rombel }}</div>
+              <div style="font-size:10px; font-weight:600; color:#64748b;">Tingkat {{ $rb->tingkat }}</div>
+            </th>
+          @endforeach
+        </tr>
+      </thead>
+      <tbody>
+        @php
+          $no = 1;
+          $totalJpPerRombel = [];
+          foreach($rombels as $rb) { $totalJpPerRombel[$rb->id] = 0; }
+        @endphp
+        @foreach($mapels as $m)
+          <tr>
+            <td style="text-align:center; font-weight:700;">{{ $no++ }}</td>
+            <td>
+              <div style="font-weight:800; color:var(--ak-dark);">{{ $m->nama_mapel }}</div>
+              <div style="font-size:10.5px; color:#64748b;">
+                <code>{{ $m->kode_mapel }}</code> · <span class="text-capitalize">{{ $m->jenis }}</span>
+              </div>
+            </td>
+            <td style="text-align:center; font-weight:800; color:var(--ak-primary);">
+              {{ $m->jumlah_jam_per_minggu }} JP
+            </td>
+            <td style="text-align:center;">
+              @if($m->resource_key === 'LAB_KOMPUTER')
+                <span class="ak-badge" style="background:#e0f2fe; color:#0369a1; border:1px solid #bae6fd; font-size:10px; font-weight:800;">🖥️ LAB</span>
+              @elseif($m->resource_key)
+                <span class="ak-badge" style="background:#fef3c7; color:#92400e; border:1px solid #fde68a; font-size:10px; font-weight:800;">{{ $m->resource_label }}</span>
+              @else
+                <span style="font-size:11px; color:#94a3b8;">Kelas</span>
+              @endif
+            </td>
+
+            @foreach($rombels as $rb)
+              @php
+                $dist = $matrixDistribusi[$m->id][$rb->id] ?? null;
+                if ($dist) {
+                  $totalJpPerRombel[$rb->id] += (int) $dist->total_jam_per_minggu;
+                }
+                // Cek apakah mapel ini sesuai tingkat rombel
+                $isApplicable = in_array(strtoupper($rb->tingkat), $m->tingkat_array)
+                  || ($rb->tingkat == '10' && in_array('X', $m->tingkat_array))
+                  || ($rb->tingkat == '11' && in_array('XI', $m->tingkat_array))
+                  || ($rb->tingkat == '12' && in_array('XII', $m->tingkat_array));
+                
+                // Cek kesesuaian jurusan untuk mapel kejuruan
+                if ($m->jurusan_id && $rb->jurusan_id && $m->jurusan_id != $rb->jurusan_id) {
+                  $isApplicable = false;
+                }
+              @endphp
+
+              <td style="vertical-align:middle; padding:6px; {{ $dist ? 'background:#f0fdf4;' : ($isApplicable ? 'background:#fff;' : 'background:#f8fafc;') }}">
+                @if($dist)
+                  <div style="background:#fff; border:1.5px solid #86efac; border-radius:8px; padding:6px 8px; box-shadow:0 1px 3px rgba(0,0,0,0.04);">
+                    <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:4px;">
+                      <div style="font-weight:800; font-size:11.5px; color:#0f172a; line-height:1.2;">
+                        {{ $dist->guru?->nama ?? '-' }}
+                      </div>
+                      <span class="ak-badge ak-badge-primary" style="font-size:10px; font-weight:800; padding:1px 5px;">
+                        {{ $dist->total_jam_per_minggu }} JP
+                      </span>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-top:4px;">
+                      @if($dist->sisa_jam == 0)
+                        <span style="font-size:10px; color:#16a34a; font-weight:800;">
+                          <i class="bi bi-check2-circle"></i> Terjadwal Penuh
+                        </span>
+                      @else
+                        <span style="font-size:10px; color:#d97706; font-weight:800;">
+                          <i class="bi bi-clock"></i> Sisa {{ $dist->sisa_jam }} JP
+                        </span>
+                      @endif
+                      <form action="{{ route('akademik.jadwal.destroy', $dist->id) }}" method="POST" onsubmit="return confirm('Hapus alokasi {{ $m->nama_mapel }} untuk {{ $rb->nama_rombel }}?')" style="margin:0;">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="btn btn-link p-0 text-danger" style="font-size:11px;" title="Hapus Alokasi">
+                          <i class="bi bi-x-circle"></i>
+                        </button>
+                      </form>
+                    </div>
+                  </div>
+                @elseif($isApplicable)
+                  <div style="text-align:center;">
+                    <button type="button" class="btn btn-sm btn-outline-danger"
+                            onclick="openQuickAssign({{ $m->id }}, '{{ addslashes($m->nama_mapel) }}', {{ $rb->id }}, '{{ addslashes($rb->nama_rombel) }}', {{ $m->jumlah_jam_per_minggu }})"
+                            style="font-size:10.5px; padding:3px 8px; border-radius:6px; font-weight:700;">
+                      <i class="bi bi-plus-lg"></i> Tugaskan Guru
+                    </button>
+                  </div>
+                @else
+                  <div style="text-align:center; color:#cbd5e1; font-size:11px;">-</div>
+                @endif
+              </td>
+            @endforeach
+          </tr>
+        @endforeach
+      </tbody>
+      <tfoot>
+        <tr style="background:#f8fafc; font-weight:900; border-top:2px solid var(--ak-slate-300);">
+          <td colspan="4" style="text-align:right; padding:10px; font-size:12.5px;">
+            TOTAL JAM KBM TERPETAKAN :
+          </td>
+          @foreach($rombels as $rb)
+            @php $totalJam = $totalJpPerRombel[$rb->id] ?? 0; @endphp
+            <td style="text-align:center; padding:10px;">
+              <span class="ak-badge {{ $totalJam >= 44 ? 'ak-badge-success' : ($totalJam > 0 ? 'ak-badge-warning' : 'ak-badge-secondary') }}" style="font-size:12px; font-weight:900;">
+                {{ $totalJam }} JP / Mgg
+              </span>
+            </td>
+          @endforeach
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+</div>
+@endif
+
+{{-- SUBTAB 2: REKAP BEBAN GURU (PERMENDIKBUD 15/2018 & DAPODIK) --}}
+@if($subtab === 'beban')
+{{-- KPI Summary Cards --}}
+<div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap:14px; margin-bottom:20px;">
+  <div class="akademik-card" style="padding:16px; border-left:4px solid #3b82f6;">
+    <div style="font-size:12px; font-weight:700; color:#64748b; text-transform:uppercase;">Total Guru Aktif</div>
+    <div style="font-size:24px; font-weight:900; color:var(--ak-dark); margin-top:4px;">{{ $rekapBebanGuru->count() }} Guru</div>
+    <div style="font-size:11px; color:#3b82f6; margin-top:2px;">SMK Negeri 1 Air Naningan</div>
+  </div>
+  <div class="akademik-card" style="padding:16px; border-left:4px solid #10b981;">
+    <div style="font-size:12px; font-weight:700; color:#64748b; text-transform:uppercase;">Memenuhi Beban (24–40 JP)</div>
+    <div style="font-size:24px; font-weight:900; color:#059669; margin-top:4px;">
+      {{ $rekapBebanGuru->where('status', 'memenuhi')->count() }} Guru
+    </div>
+    <div style="font-size:11px; color:#10b981; margin-top:2px;">Syarat Sertifikasi / Info GTK Terpenuhi ✅</div>
+  </div>
+  <div class="akademik-card" style="padding:16px; border-left:4px solid #f59e0b;">
+    <div style="font-size:12px; font-weight:700; color:#64748b; text-transform:uppercase;">Kurang Jam (&lt; 24 JP)</div>
+    <div style="font-size:24px; font-weight:900; color:#d97706; margin-top:4px;">
+      {{ $rekapBebanGuru->where('status', 'kurang')->count() }} Guru
+    </div>
+    <div style="font-size:11px; color:#f59e0b; margin-top:2px;">Butuh penambahan jam / tugas tambahan</div>
+  </div>
+  <div class="akademik-card" style="padding:16px; border-left:4px solid #8b5cf6;">
+    <div style="font-size:12px; font-weight:700; color:#64748b; text-transform:uppercase;">Total Jam Pelajaran Terbagi</div>
+    <div style="font-size:24px; font-weight:900; color:#6d28d9; margin-top:4px;">
+      {{ $rekapBebanGuru->sum('jtm_murni') }} JP
+    </div>
+    <div style="font-size:11px; color:#8b5cf6; margin-top:2px;">Jam Tatap Muka Murni (JTM)</div>
+  </div>
+</div>
+
+<div class="akademik-card">
+  <div class="akademik-card-header" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+    <div>
+      <h3 style="font-weight:800; font-size:15px; margin:0; color:var(--ak-dark);">
+        <i class="bi bi-award-fill text-primary me-1"></i> Rekapitulasi Pemenuhan Beban Kerja Guru &amp; Tugas Tambahan
+      </h3>
+      <div style="font-size:11.5px; color:#64748b; margin-top:2px;">
+        Berdasarkan Permendikbud Nomor 15 Tahun 2018. Standar beban kerja guru: <b>24 s/d 40 JP Tatap Muka Ekuivalen</b> per minggu.
+      </div>
+    </div>
+  </div>
+  <div class="akademik-card-body" style="padding:0;">
+    <div class="akademik-table-wrap">
+      <table class="akademik-table">
+        <thead>
+          <tr>
+            <th style="width:40px; text-align:center;">No</th>
+            <th style="width:50px; text-align:center;">Kode</th>
+            <th>Nama Guru &amp; Identitas</th>
+            <th>Mata Pelajaran yang Diampu</th>
+            <th style="width:70px; text-align:center;">JTM Murni</th>
+            <th>Tugas Tambahan (Ekuivalensi Jam)</th>
+            <th style="width:80px; text-align:center;">Total Eqv</th>
+            <th style="width:130px; text-align:center;">Status Beban</th>
+          </tr>
+        </thead>
+        <tbody>
+          @foreach($rekapBebanGuru as $idx => $bg)
+            <tr>
+              <td style="text-align:center; font-weight:700;">{{ $idx + 1 }}</td>
+              <td style="text-align:center;">
+                <span class="roster-guru-badge">{{ $bg->guru->kode_nomor ?? '-' }}</span>
+              </td>
+              <td>
+                <div style="font-weight:800; color:var(--ak-dark);">{{ $bg->guru->nama }}</div>
+                <div style="font-size:11px; color:#64748b;">
+                  NIP: {{ $bg->guru->nip ?? 'Non-NIP' }} · {{ $bg->guru->golongan_pangkat ?? 'GTT' }}
+                </div>
+              </td>
+              <td>
+                @if($bg->mapels->isEmpty())
+                  <span style="font-size:11.5px; color:#94a3b8; font-style:italic;">Belum ada mapel diampu</span>
+                @else
+                  <div style="font-size:12px; font-weight:600; color:var(--ak-primary);">
+                    {{ $bg->mapels->implode(', ') }}
+                  </div>
+                  <div style="font-size:10.5px; color:#64748b;">{{ $bg->total_rombel }} Rombel Diajar</div>
+                @endif
+              </td>
+              <td style="text-align:center; font-weight:800; font-size:13px;">
+                {{ $bg->jtm_murni }} JP
+              </td>
+              <td>
+                @if(empty($bg->tugas_tambahan))
+                  <span style="font-size:11.5px; color:#94a3b8; font-style:italic;">-</span>
+                @else
+                  <div style="display:flex; flex-direction:column; gap:2px;">
+                    @foreach($bg->tugas_tambahan as $tt)
+                      <span style="font-size:11.5px; font-weight:600; color:var(--ak-dark);">
+                        • {{ $tt['nama'] }} <b class="text-primary">(+{{ $tt['jp'] }} JP)</b>
+                      </span>
+                    @endforeach
+                  </div>
+                @endif
+              </td>
+              <td style="text-align:center; font-weight:900; font-size:14px; background:#f8fafc; color:var(--ak-dark);">
+                {{ $bg->total_ekuivalen }} JP
+              </td>
+              <td style="text-align:center;">
+                @if($bg->status === 'memenuhi')
+                  <span class="ak-badge ak-badge-success" style="font-size:11px; font-weight:800; padding:4px 8px;">
+                    <i class="bi bi-check-circle me-1"></i> MEMENUHI
+                  </span>
+                @elseif($bg->status === 'lebih')
+                  <span class="ak-badge ak-badge-danger" style="font-size:11px; font-weight:800; padding:4px 8px;">
+                    <i class="bi bi-exclamation-octagon me-1"></i> OVERLOAD ({{ $bg->total_ekuivalen }} JP)
+                  </span>
+                @else
+                  <span class="ak-badge ak-badge-warning" style="font-size:11px; font-weight:800; padding:4px 8px;">
+                    <i class="bi bi-exclamation-triangle me-1"></i> KURANG ({{ 24 - $bg->total_ekuivalen }} JP)
+                  </span>
+                @endif
+              </td>
+            </tr>
+          @endforeach
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+@endif
+
+{{-- SUBTAB 3: DAFTAR RINCI ALOKASI (EXISTING LIST) --}}
+@if($subtab === 'daftar')
 <div class="akademik-card">
   <div class="akademik-card-header" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
     <h3 style="font-weight:800; font-size:15px; margin:0; color:var(--ak-dark);">
-      Daftar Alokasi Pengampu &amp; Mata Pelajaran
+      Daftar Alokasi Pengampu &amp; Mata Pelajaran (Rincian)
     </h3>
-    <button type="button" class="ak-btn ak-btn-primary" data-bs-toggle="modal" data-bs-target="#modalTambahDistribusi">
-      <i class="bi bi-plus-circle me-1"></i> Tambah Distribusi
-    </button>
   </div>
   <div class="akademik-card-body" style="padding:0;">
     <div class="akademik-table-wrap">
@@ -1024,6 +1341,7 @@ function tambahIstirahat(hari) {
   </div>
 </div>
 @endif
+@endif
 
 {{-- ========================================================================= --}}
 {{-- MODAL: FORMULASI BLOK JAM (FAST BATCH SCHEDULER)                          --}}
@@ -1056,7 +1374,7 @@ function tambahIstirahat(hari) {
             </div>
             <div>
               <label class="ak-form-label">Rombel / Kelas <span class="text-danger">*</span></label>
-              <select name="rombel_id" id="m_rombel" class="ak-select" required onchange="checkModalConflict()">
+              <select name="rombel_id" id="m_rombel" class="ak-select" required onchange="onModalRombelChanged()">
                 @foreach($rombels as $r)
                   <option value="{{ $r->id }}">{{ $r->nama_rombel }}</option>
                 @endforeach
@@ -1066,20 +1384,24 @@ function tambahIstirahat(hari) {
 
           <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px; margin-bottom:12px;">
             <div>
+              <label class="ak-form-label">Mata Pelajaran (Dari SK) <span class="text-danger">*</span></label>
+              <select name="mata_pelajaran_id" id="m_mapel" class="ak-select" required onchange="onModalMapelChanged()">
+                <option value="">-- Pilih Mapel --</option>
+                @foreach($mapels as $m)
+                  <option value="{{ $m->id }}" data-resource="{{ $m->resource_key }}">
+                    {{ $m->singkatan_mapel ?? $m->kode_mapel }} - {{ $m->nama_mapel }}
+                    @if($m->resource_key) [{{ $m->resource_label }}] @endif
+                  </option>
+                @endforeach
+              </select>
+              <div id="m_sk_info" style="display:none; font-size:11.5px; color:#15803d; background:#f0fdf4; border:1px solid #bbf7d0; border-radius:6px; padding:4px 8px; margin-top:4px; font-weight:700;"></div>
+            </div>
+            <div>
               <label class="ak-form-label">Guru Pengampu <span class="text-danger">*</span></label>
               <select name="guru_id" id="m_guru" class="ak-select" required onchange="checkModalConflict()">
                 <option value="">-- Pilih Guru --</option>
                 @foreach($gurus as $g)
                   <option value="{{ $g->id }}">[{{ $g->kode_nomor ?? '-' }}] {{ $g->nama }}</option>
-                @endforeach
-              </select>
-            </div>
-            <div>
-              <label class="ak-form-label">Mata Pelajaran <span class="text-danger">*</span></label>
-              <select name="mata_pelajaran_id" id="m_mapel" class="ak-select" required>
-                <option value="">-- Pilih Mapel --</option>
-                @foreach($mapels as $m)
-                  <option value="{{ $m->id }}">{{ $m->singkatan_mapel ?? $m->kode_mapel }} - {{ $m->nama_mapel }}</option>
                 @endforeach
               </select>
             </div>
@@ -1141,7 +1463,7 @@ function tambahIstirahat(hari) {
         <div class="modal-body">
           <div style="margin-bottom:12px;">
             <label class="ak-form-label">Guru Pengampu</label>
-            <select name="guru_id" id="slot_guru_id" class="ak-select">
+            <select name="guru_id" id="slot_guru_id" class="ak-select" onchange="checkSlotConflict()">
               <option value="">-- Tanpa Guru / Kosongkan --</option>
               @foreach($gurus as $g)
                 <option value="{{ $g->id }}">[{{ $g->kode_nomor ?? '-' }}] {{ $g->nama }}</option>
@@ -1150,16 +1472,25 @@ function tambahIstirahat(hari) {
           </div>
           <div style="margin-bottom:12px;">
             <label class="ak-form-label">Mata Pelajaran</label>
-            <select name="mata_pelajaran_id" id="slot_mapel_id" class="ak-select">
+            <select name="mata_pelajaran_id" id="slot_mapel_id" class="ak-select" onchange="checkSlotConflict()">
               <option value="">-- Tanpa Mapel / Kosongkan --</option>
               @foreach($mapels as $m)
-                <option value="{{ $m->id }}">{{ $m->singkatan_mapel ?? $m->kode_mapel }} - {{ $m->nama_mapel }}</option>
+                <option value="{{ $m->id }}">
+                  {{ $m->singkatan_mapel ?? $m->kode_mapel }} - {{ $m->nama_mapel }}
+                  @if($m->resource_key) [{{ $m->resource_label }}] @endif
+                </option>
               @endforeach
             </select>
           </div>
           <div style="margin-bottom:12px;">
             <label class="ak-form-label">Kegiatan Khusus (Opsional)</label>
             <input type="text" name="kegiatan_khusus" id="slot_kegiatan" class="ak-input" placeholder="Misal: UPACARA, APEL, TEFA, PKL...">
+          </div>
+
+          {{-- Slot Conflict Alert Container --}}
+          <div id="slotConflictAlert" style="display:none; margin-bottom:14px; padding:10px 14px; background:#fee2e2; border:1.5px solid #f87171; border-radius:8px; color:#b91c1c; font-size:12.5px; font-weight:700;">
+            <i class="bi bi-exclamation-triangle-fill me-1"></i>
+            <span id="slotConflictMessage"></span>
           </div>
 
           {{-- Kunci Slot (Keep) --}}
@@ -1418,6 +1749,56 @@ function tambahIstirahat(hari) {
   </div>
 </div>
 
+{{-- MODAL: QUICK ASSIGN GURU DARI MATRIKS MAPEL X ROMBEL --}}
+<div class="modal fade" id="modalQuickAssignDistribusi" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content" style="border-radius:14px;">
+      <form action="{{ route('akademik.jadwal.store') }}" method="POST">
+        @csrf
+        <input type="hidden" name="tahun_ajaran_id" value="{{ $ta?->id ?? 1 }}">
+        <input type="hidden" name="semester" value="{{ $semester }}">
+        <input type="hidden" name="mata_pelajaran_id" id="qa_mapel_id">
+        <input type="hidden" name="rombel_ids[]" id="qa_rombel_id">
+        <div class="modal-header">
+          <h5 class="modal-title" style="font-weight:800; font-size:16px;">
+            <i class="bi bi-person-plus-fill text-primary me-1"></i> Tugaskan Guru Pengampu
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div style="background:#f1f5f9; padding:10px 14px; border-radius:8px; margin-bottom:14px; border:1px solid #cbd5e1;">
+            <div style="font-size:11px; color:#64748b; text-transform:uppercase; font-weight:700;">Mata Pelajaran:</div>
+            <div id="qa_mapel_name" style="font-weight:800; font-size:13.5px; color:var(--ak-dark); margin-top:1px;"></div>
+            <div style="font-size:11px; color:#64748b; text-transform:uppercase; font-weight:700; margin-top:6px;">Rombel / Kelas Sasaran:</div>
+            <div id="qa_rombel_name" style="font-weight:800; font-size:13.5px; color:var(--ak-primary); margin-top:1px;"></div>
+          </div>
+          <div style="margin-bottom:12px;">
+            <label class="ak-form-label">Pilih Guru Pengampu <span class="text-danger">*</span></label>
+            <select name="guru_id" class="ak-select" required>
+              <option value="">-- Pilih Guru --</option>
+              @foreach($gurus as $g)
+                <option value="{{ $g->id }}">[{{ $g->kode_nomor ?? '-' }}] {{ $g->nama }} ({{ $g->nip ?? 'Non-NIP' }})</option>
+              @endforeach
+            </select>
+          </div>
+          <div style="margin-bottom:12px;">
+            <label class="ak-form-label">Beban Jam per Minggu (JP) <span class="text-danger">*</span></label>
+            <input type="number" name="total_jam_per_minggu" id="qa_total_jam" class="ak-input" min="1" max="20" required>
+          </div>
+          <div style="margin-bottom:12px;">
+            <label class="ak-form-label">Catatan Tambahan (Opsional)</label>
+            <input type="text" name="catatan" class="ak-input" placeholder="Misal: Teori di Kelas, Praktik di Lab Komputer...">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="ak-btn ak-btn-secondary" data-bs-dismiss="modal">Batal</button>
+          <button type="submit" class="ak-btn ak-btn-primary">Simpan Alokasi SK</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
 <script>
 let currentActiveSlotId = 0;
 
@@ -1452,6 +1833,9 @@ function openSlotModal(hari, jam, rombelId, rombelName, guruId, mapelId, kegiata
   const modalEl = document.getElementById('modalEditSlot');
   const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
   modal.show();
+
+  // Cek potensi bentrok awal
+  checkSlotConflict();
 }
 
 function toggleLockCurrentSlot() {
@@ -1500,6 +1884,7 @@ function deleteCurrentSlot() {
 
 function checkLiveConflict() {
   const guru = document.getElementById('form_guru')?.value;
+  const mapel = document.getElementById('form_mapel')?.value;
   const hari = document.getElementById('form_hari')?.value;
   const rombel = document.getElementById('form_rombel')?.value;
   const jamMulai = document.getElementById('form_jam_mulai')?.value;
@@ -1507,7 +1892,10 @@ function checkLiveConflict() {
   const alertBox = document.getElementById('conflictAlert');
   const alertMsg = document.getElementById('conflictMessage');
 
-  if (!guru || !hari || !rombel || !alertBox) return;
+  if ((!guru && !mapel) || !hari || !rombel || !alertBox) {
+    if (alertBox) alertBox.style.display = 'none';
+    return;
+  }
 
   fetch("{{ route('akademik.jadwal.check-conflict') }}", {
     method: 'POST',
@@ -1519,6 +1907,7 @@ function checkLiveConflict() {
       tahun_ajaran_id: {{ $ta?->id ?? 1 }},
       semester: {{ $semester }},
       guru_id: guru,
+      mata_pelajaran_id: mapel,
       hari: hari,
       rombel_id: rombel,
       jam_mulai: jamMulai,
@@ -1541,6 +1930,7 @@ function checkLiveConflict() {
 
 function checkModalConflict() {
   const guru = document.getElementById('m_guru')?.value;
+  const mapel = document.getElementById('m_mapel')?.value;
   const hari = document.getElementById('m_hari')?.value;
   const rombel = document.getElementById('m_rombel')?.value;
   const jamMulai = document.getElementById('m_jam_mulai')?.value;
@@ -1548,7 +1938,10 @@ function checkModalConflict() {
   const alertBox = document.getElementById('modalConflictAlert');
   const alertMsg = document.getElementById('modalConflictMessage');
 
-  if (!guru || !hari || !rombel || !alertBox) return;
+  if ((!guru && !mapel) || !hari || !rombel || !alertBox) {
+    if (alertBox) alertBox.style.display = 'none';
+    return;
+  }
 
   fetch("{{ route('akademik.jadwal.check-conflict') }}", {
     method: 'POST',
@@ -1560,6 +1953,7 @@ function checkModalConflict() {
       tahun_ajaran_id: {{ $ta?->id ?? 1 }},
       semester: {{ $semester }},
       guru_id: guru,
+      mata_pelajaran_id: mapel,
       hari: hari,
       rombel_id: rombel,
       jam_mulai: jamMulai,
@@ -1579,6 +1973,186 @@ function checkModalConflict() {
     alertBox.style.display = 'none';
   });
 }
+
+function checkSlotConflict() {
+  const guru = document.getElementById('slot_guru_id')?.value;
+  const mapel = document.getElementById('slot_mapel_id')?.value;
+  const hari = document.getElementById('slot_hari')?.value;
+  const rombel = document.getElementById('slot_rombel_id')?.value;
+  const jam = document.getElementById('slot_jam')?.value;
+  const alertBox = document.getElementById('slotConflictAlert');
+  const alertMsg = document.getElementById('slotConflictMessage');
+
+  if ((!guru && !mapel) || !hari || !rombel || !alertBox) {
+    if (alertBox) alertBox.style.display = 'none';
+    return;
+  }
+
+  fetch("{{ route('akademik.jadwal.check-conflict') }}", {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-CSRF-TOKEN': '{{ csrf_token() }}'
+    },
+    body: JSON.stringify({
+      tahun_ajaran_id: {{ $ta?->id ?? 1 }},
+      semester: {{ $semester }},
+      guru_id: guru,
+      mata_pelajaran_id: mapel,
+      hari: hari,
+      rombel_id: rombel,
+      jam_mulai: jam,
+      jam_selesai: jam
+    })
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.conflict) {
+      alertMsg.innerText = data.message;
+      alertBox.style.display = 'block';
+    } else {
+      alertBox.style.display = 'none';
+    }
+  })
+  .catch(() => {
+    if (alertBox) alertBox.style.display = 'none';
+  });
+}
+
+// Quick Assign Modal Handler (Matriks Mapel x Rombel)
+function openQuickAssign(mapelId, mapelName, rombelId, rombelName, defaultJp) {
+  document.getElementById('qa_mapel_id').value = mapelId;
+  document.getElementById('qa_rombel_id').value = rombelId;
+  document.getElementById('qa_mapel_name').innerText = mapelName;
+  document.getElementById('qa_rombel_name').innerText = rombelName;
+  document.getElementById('qa_total_jam').value = defaultJp || 2;
+
+  const modalEl = document.getElementById('modalQuickAssignDistribusi');
+  const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+  modal.show();
+}
+
+// Dynamic Auto-fill Rombel & SK Mapel Handler (Form Blok Cepat)
+let formRombelCache = {};
+function onFormRombelChanged() {
+  const rombelId = document.getElementById('form_rombel')?.value;
+  if (!rombelId) return;
+
+  fetch(`/dcc/akademik/jadwal/rombel-alokasi/${rombelId}?semester={{ $semester }}&tahun_ajaran_id={{ $ta?->id ?? 1 }}`)
+    .then(res => res.json())
+    .then(data => {
+      if (data.success && data.alokasi && data.alokasi.length > 0) {
+        formRombelCache = {};
+        const mapelSel = document.getElementById('form_mapel');
+        if (mapelSel) {
+          mapelSel.innerHTML = '<option value="">-- Pilih Mata Pelajaran (Dari SK) --</option>';
+          data.alokasi.forEach(item => {
+            formRombelCache[item.mata_pelajaran_id] = item;
+            const opt = document.createElement('option');
+            opt.value = item.mata_pelajaran_id;
+            let statusBadge = item.is_lengkap ? ' [✅ Selesai]' : ` [Sisa ${item.sisa_jam} JP]`;
+            if (item.resource_key) statusBadge += ` [${item.resource_label}]`;
+            opt.textContent = `${item.singkatan_mapel} - ${item.nama_mapel}${statusBadge}`;
+            mapelSel.appendChild(opt);
+          });
+        }
+      }
+    })
+    .catch(() => {});
+
+  checkLiveConflict();
+}
+
+function onFormMapelChanged() {
+  const mapelId = document.getElementById('form_mapel')?.value;
+  const item = formRombelCache[mapelId];
+  const infoBox = document.getElementById('form_sk_info');
+
+  if (item) {
+    // Otomatis pilih Guru pengampu dari SK
+    const guruSel = document.getElementById('form_guru');
+    if (guruSel && item.guru_id) {
+      guruSel.value = item.guru_id;
+    }
+
+    // Tampilkan status alokasi
+    if (infoBox) {
+      infoBox.style.display = 'block';
+      infoBox.innerHTML = `📋 <b>SK Wakakur:</b> Diampu oleh <u>${item.nama_guru}</u> (${item.jam_terjadwal}/${item.total_jam} JP terjadwal · Sisa <b>${item.sisa_jam} JP</b>)`;
+    }
+
+    // Otomatis hitung jam selesai jika sisa jam > 0
+    const jamMulai = parseInt(document.getElementById('form_jam_mulai')?.value || '1');
+    const jamSelesaiSel = document.getElementById('form_jam_selesai');
+    if (jamSelesaiSel && item.sisa_jam > 0) {
+      const blockSize = Math.min(item.sisa_jam, 4);
+      jamSelesaiSel.value = Math.min(11, jamMulai + blockSize - 1);
+    }
+  } else {
+    if (infoBox) infoBox.style.display = 'none';
+  }
+
+  checkLiveConflict();
+}
+
+// Modal Blok Jam Dynamic Handlers
+let modalRombelCache = {};
+function onModalRombelChanged() {
+  const rombelId = document.getElementById('m_rombel')?.value;
+  if (!rombelId) return;
+
+  fetch(`/dcc/akademik/jadwal/rombel-alokasi/${rombelId}?semester={{ $semester }}&tahun_ajaran_id={{ $ta?->id ?? 1 }}`)
+    .then(res => res.json())
+    .then(data => {
+      if (data.success && data.alokasi && data.alokasi.length > 0) {
+        modalRombelCache = {};
+        const mapelSel = document.getElementById('m_mapel');
+        if (mapelSel) {
+          mapelSel.innerHTML = '<option value="">-- Pilih Mapel (Dari SK) --</option>';
+          data.alokasi.forEach(item => {
+            modalRombelCache[item.mata_pelajaran_id] = item;
+            const opt = document.createElement('option');
+            opt.value = item.mata_pelajaran_id;
+            let statusBadge = item.is_lengkap ? ' [✅ Selesai]' : ` [Sisa ${item.sisa_jam} JP]`;
+            if (item.resource_key) statusBadge += ` [${item.resource_label}]`;
+            opt.textContent = `${item.singkatan_mapel} - ${item.nama_mapel}${statusBadge}`;
+            mapelSel.appendChild(opt);
+          });
+        }
+      }
+    })
+    .catch(() => {});
+
+  checkModalConflict();
+}
+
+function onModalMapelChanged() {
+  const mapelId = document.getElementById('m_mapel')?.value;
+  const item = modalRombelCache[mapelId];
+  const infoBox = document.getElementById('m_sk_info');
+
+  if (item) {
+    const guruSel = document.getElementById('m_guru');
+    if (guruSel && item.guru_id) {
+      guruSel.value = item.guru_id;
+    }
+    if (infoBox) {
+      infoBox.style.display = 'block';
+      infoBox.innerHTML = `📋 Diampu: <u>${item.nama_guru}</u> (Sisa <b>${item.sisa_jam} JP</b>)`;
+    }
+  } else {
+    if (infoBox) infoBox.style.display = 'none';
+  }
+
+  checkModalConflict();
+}
+
+// Inisialisasi awal saat halaman dibuka
+document.addEventListener('DOMContentLoaded', function() {
+  if (document.getElementById('form_rombel')) {
+    onFormRombelChanged();
+  }
+});
 </script>
 <script>
 // Konfirmasi hapus jadwal massal dengan detail

@@ -6,8 +6,21 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class AkademikMataPelajaran extends Model {
     protected $table = 'akademik_mata_pelajarans';
-    protected $fillable = ['tahun_ajaran_id','jurusan_id','kode_mapel','nama_mapel','jenis','fase','tingkat','jumlah_jam_per_minggu','deskripsi_cp','is_active'];
+    protected $fillable = ['tahun_ajaran_id','jurusan_id','kode_mapel','nama_mapel','jenis','fase','tingkat','jumlah_jam_per_minggu','deskripsi_cp','is_active','resource_key','singkatan_mapel'];
     protected $casts = ['is_active' => 'boolean'];
+
+    /**
+     * Daftar resource terbatas yang tersedia di sekolah.
+     * Tambahkan resource baru di sini jika ada lab/ruangan baru.
+     */
+    const RESOURCES = [
+        'LAB_KOMPUTER' => '🖥️ Lab Komputer',
+        'LAB_IPA'      => '🔬 Lab IPA',
+        'LAB_BAHASA'   => '🎧 Lab Bahasa',
+        'AULA'         => '🏛️ Aula / Gedung Serbaguna',
+        'BENGKEL_TKR'  => '🔧 Bengkel TKR',
+        'DAPUR_TPHP'   => '🍳 Dapur Praktik TPHP',
+    ];
 
     public function tahunAjaran(): BelongsTo { return $this->belongsTo(TahunAjaran::class, 'tahun_ajaran_id'); }
     public function jurusan(): BelongsTo { return $this->belongsTo(Jurusan::class, 'jurusan_id'); }
@@ -27,6 +40,12 @@ class AkademikMataPelajaran extends Model {
         };
     }
     public function getFaseLabelAttribute(): string { return $this->fase === 'E' ? 'Fase E (Kelas X)' : 'Fase F (Kelas XI–XII)'; }
+
+    /** Label resource yang dibutuhkan mapel ini */
+    public function getResourceLabelAttribute(): string {
+        if (!$this->resource_key) return '—';
+        return self::RESOURCES[$this->resource_key] ?? $this->resource_key;
+    }
 
     public function getTingkatArrayAttribute(): array {
         if (empty($this->tingkat)) return ['X', 'XI', 'XII'];

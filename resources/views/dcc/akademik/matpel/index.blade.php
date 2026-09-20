@@ -84,6 +84,7 @@
               <th>Kode</th>
               <th>Nama Mata Pelajaran</th>
               <th>Jenis</th>
+              <th>Ruangan / Lab</th>
               <th>Tingkat Kelas</th>
               <th>Guru Pengampu</th>
               <th>Beban JP</th>
@@ -109,6 +110,15 @@
                     <span class="ak-badge ak-badge-warning">P5BK</span>
                   @else
                     <span class="ak-badge ak-badge-success">PKL</span>
+                  @endif
+                </td>
+                <td>
+                  @if($m->resource_key)
+                    <span class="ak-badge" style="background:#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe; font-size:11px; font-weight:700;">
+                      {{ $m->resource_label }}
+                    </span>
+                  @else
+                    <span style="font-size:11.5px; color:#94a3b8;">Kelas Biasa</span>
                   @endif
                 </td>
                 <td>
@@ -217,6 +227,18 @@
                           </div>
                         </div>
                         <div style="margin-bottom:12px;">
+                          <label class="ak-form-label">Kebutuhan Ruangan / Lab Khusus (Proteksi Bentrok)</label>
+                          <select name="resource_key" class="ak-select">
+                            <option value="">Kelas Reguler (Tidak Butuh Lab Khusus)</option>
+                            @foreach(\App\Models\AkademikMataPelajaran::RESOURCES as $k => $lbl)
+                              <option value="{{ $k }}" {{ $m->resource_key == $k ? 'selected' : '' }}>{{ $lbl }}</option>
+                            @endforeach
+                          </select>
+                          <div style="font-size:11px; color:#64748b; margin-top:4px;">
+                            💡 Jika disetel ke <b>Lab Komputer</b>, sistem otomatis menolak &amp; mencegah jadwal kelas lain memakai lab di jam yang sama.
+                          </div>
+                        </div>
+                        <div style="margin-bottom:12px;">
                           <label class="ak-form-label">Ringkasan Capaian Pembelajaran (CP)</label>
                           <textarea name="deskripsi_cp" class="ak-textarea" rows="3">{{ $m->deskripsi_cp }}</textarea>
                         </div>
@@ -303,6 +325,18 @@
                   <option value="{{ $j->id }}">{{ $j->nama_jurusan }}</option>
                 @endforeach
               </select>
+            </div>
+          </div>
+          <div style="margin-bottom:12px;">
+            <label class="ak-form-label">Kebutuhan Ruangan / Lab Khusus (Proteksi Bentrok)</label>
+            <select name="resource_key" class="ak-select">
+              <option value="">Kelas Reguler (Tidak Butuh Lab Khusus)</option>
+              @foreach(\App\Models\AkademikMataPelajaran::RESOURCES as $k => $lbl)
+                <option value="{{ $k }}">{{ $lbl }}</option>
+              @endforeach
+            </select>
+            <div style="font-size:11px; color:#64748b; margin-top:4px;">
+              💡 Jika disetel ke <b>Lab Komputer</b>, sistem otomatis menolak &amp; mencegah jadwal kelas lain memakai lab di jam yang sama.
             </div>
           </div>
           <div style="margin-bottom:12px;">

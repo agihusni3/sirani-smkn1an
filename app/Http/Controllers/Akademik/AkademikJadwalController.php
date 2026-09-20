@@ -162,10 +162,48 @@ class AkademikJadwalController extends Controller
             }
         }
 
+        // 4. Matriks Distribusi: [mata_pelajaran_id][rombel_id] => AkademikDistribusiMengajar
+        $allDistribusiList = AkademikDistribusiMengajar::with(['guru', 'mataPelajaran', 'rombel'])
+            ->where('semester', $semester)
+            ->when($ta, fn($q) => $q->where('tahun_ajaran_id', $ta->id))
+            ->get();
+
+        $matrixDistribusi = [];
+        foreach ($allDistribusiList as $dist) {
+            $matrixDistribusi[$dist->mata_pelajaran_id][$dist->rombel_id] = $dist;
+        }
+
+        // 5. Rekap Beban Mengajar & Tugas Tambahan Seluruh Guru (Standar Permendikbud 15/2018 & Dapodik)
+        $rekapBebanGuru = $gurus->map(function ($guru) use ($allDistribusiList) {
+            $guruDists = $allDistribusiList->where('guru_id', $guru->id);
+            $jtmMurni = $guruDists->sum('total_jam_per_minggu');
+            $tugasTambahan = $guru->tugas_tambahan_list;
+            $eqTugasTambahan = $guru->total_ekuivalen_tugas_tambahan;
+            $totalEkuivalen = $jtmMurni + $eqTugasTambahan;
+
+            $status = 'kurang';
+            if ($totalEkuivalen >= 24 && $totalEkuivalen <= 40) {
+                $status = 'memenuhi';
+            } elseif ($totalEkuivalen > 40) {
+                $status = 'lebih';
+            }
+
+            return (object) [
+                'guru' => $guru,
+                'jtm_murni' => $jtmMurni,
+                'total_rombel' => $guruDists->pluck('rombel_id')->unique()->count(),
+                'tugas_tambahan' => $tugasTambahan,
+                'ekuivalen_tugas' => $eqTugasTambahan,
+                'total_ekuivalen' => $totalEkuivalen,
+                'status' => $status,
+                'mapels' => $guruDists->pluck('mataPelajaran.nama_mapel')->filter()->unique()->values(),
+            ];
+        })->sortByDesc('total_ekuivalen')->values();
+
         return view('dcc.akademik.jadwal.index', compact(
             'distribusis', 'ta', 'gurus', 'rombels', 'mapels', 'semester', 'rekapJjm',
             'tahunAjarans', 'tab', 'hariFilter', 'slotsMatrix', 'guruPikets',
-            'jadwalWaktu', 'jadwalWaktuFull'
+            'jadwalWaktu', 'jadwalWaktuFull', 'matrixDistribusi', 'rekapBebanGuru'
         ));
     }
 
@@ -224,7 +262,30 @@ class AkademikJadwalController extends Controller
             }
         }
 
-        // 2. TERAPKAN BLOK JADWAL
+        // 2. DETEKSI BENTROK RESOURCE / LAB (misal: Lab Komputer hanya 1)
+        if ($mapel && $mapel->resource_key && !$force) {
+            $resourceLabel = \App\Models\AkademikMataPelajaran::RESOURCES[$mapel->resource_key] ?? $mapel->resource_key;
+            $resourceConflicts = AkademikJadwalPelajaran::with('rombel', 'mataPelajaran')
+                ->where('tahun_ajaran_id', $taId)
+                ->where('semester', $semester)
+                ->where('hari', $hari)
+                ->where('resource_key', $mapel->resource_key)
+                ->where('rombel_id', '!=', $rombelId)
+                ->whereBetween('jam_ke', [$jamMulai, $jamSelesai])
+                ->get();
+
+            if ($resourceConflicts->isNotEmpty()) {
+                $conflictDetail = $resourceConflicts->map(function ($c) {
+                    return "{$c->rombel?->nama_rombel} Jam Ke-{$c->jam_ke} ({$c->singkatan_mapel})";
+                })->unique()->implode(', ');
+
+                return redirect()->back()
+                    ->withInput()
+                    ->with('error', "🏫 BENTROK RUANGAN! {$resourceLabel} sudah dipakai oleh: {$conflictDetail} pada {$hari}. Ubah jadwal kelas lain dulu, atau geser jam mapel ini.");
+            }
+        }
+
+        // 3. TERAPKAN BLOK JADWAL
         $appliedCount = 0;
         for ($j = $jamMulai; $j <= $jamSelesai; $j++) {
             AkademikJadwalPelajaran::updateOrCreate(
@@ -242,14 +303,18 @@ class AkademikJadwalController extends Controller
                     'singkatan_mapel' => $mapel?->singkatan_mapel ?? $mapel?->nama_mapel,
                     'kegiatan_khusus' => $kegiatan,
                     'is_locked' => $request->boolean('is_locked'),
+                    'resource_key' => $mapel?->resource_key,  // simpan untuk cek cepat
                 ]
             );
             $appliedCount++;
         }
 
+        $resourceInfo = ($mapel && $mapel->resource_key)
+            ? ' [' . (\App\Models\AkademikMataPelajaran::RESOURCES[$mapel->resource_key] ?? $mapel->resource_key) . ']'
+            : '';
         $label = $mapel ? $mapel->nama_mapel : ($kegiatan ?? 'Kegiatan');
         return redirect()->route('akademik.jadwal.index', ['tab' => 'roster', 'semester' => $semester, 'hari' => $hari])
-            ->with('success', "Berhasil menjadwalkan {$label} untuk {$rombel->nama_rombel} pada {$hari} (Jam {$jamMulai} s/d {$jamSelesai} - {$appliedCount} JP).");
+            ->with('success', "Berhasil menjadwalkan {$label}{$resourceInfo} untuk {$rombel->nama_rombel} pada {$hari} (Jam {$jamMulai} s/d {$jamSelesai} - {$appliedCount} JP).");
     }
 
     /**
@@ -284,7 +349,25 @@ class AkademikJadwalController extends Controller
 
             if ($conflict) {
                 return redirect()->back()
-                    ->with('error', "⚠️ BENTROK! Guru {$guru->nama} sudah terjadwal di {$conflict->rombel?->nama_rombel} pada {$request->hari} Jam Ke-{$request->jam_ke}.");
+                    ->with('error', "⚠️ BENTROK GURU! Guru {$guru->nama} sudah terjadwal di {$conflict->rombel?->nama_rombel} pada {$request->hari} Jam Ke-{$request->jam_ke}.");
+            }
+        }
+
+        // Cek Bentrok Ruangan / Lab (misal: Lab Komputer hanya ada 1)
+        if ($mapel && $mapel->resource_key && !$request->boolean('force')) {
+            $resConflict = AkademikJadwalPelajaran::with('rombel')
+                ->where('tahun_ajaran_id', $request->tahun_ajaran_id)
+                ->where('semester', $request->semester)
+                ->where('hari', strtoupper($request->hari))
+                ->where('resource_key', $mapel->resource_key)
+                ->where('rombel_id', '!=', $request->rombel_id)
+                ->where('jam_ke', $request->jam_ke)
+                ->first();
+
+            if ($resConflict) {
+                $resLabel = \App\Models\AkademikMataPelajaran::RESOURCES[$mapel->resource_key] ?? $mapel->resource_key;
+                return redirect()->back()
+                    ->with('error', "🏫 BENTROK RUANGAN! {$resLabel} sedang digunakan oleh {$resConflict->rombel?->nama_rombel} ({$resConflict->singkatan_mapel}) pada {$request->hari} Jam Ke-{$request->jam_ke}.");
             }
         }
 
@@ -303,6 +386,7 @@ class AkademikJadwalController extends Controller
                 'singkatan_mapel' => $mapel?->singkatan_mapel ?? $mapel?->nama_mapel,
                 'kegiatan_khusus' => $request->kegiatan_khusus,
                 'is_locked' => $request->boolean('is_locked'),
+                'resource_key' => $mapel?->resource_key,
             ]
         );
 
@@ -387,12 +471,16 @@ class AkademikJadwalController extends Controller
 
         $occupiedSlots = [];
         $guruBusy = [];
+        $resourceBusy = [];
         $rombelSubjectsScheduled = [];
 
         foreach ($existingSlots as $slot) {
             $occupiedSlots[$slot->hari][$slot->jam_ke][$slot->rombel_id] = true;
             if ($slot->guru_id) {
                 $guruBusy[$slot->hari][$slot->jam_ke][$slot->guru_id] = true;
+            }
+            if ($slot->resource_key) {
+                $resourceBusy[$slot->hari][$slot->jam_ke][$slot->resource_key] = true;
             }
             if ($slot->rombel_id && $slot->mata_pelajaran_id) {
                 $rombelSubjectsScheduled[$slot->rombel_id][$slot->mata_pelajaran_id] =
@@ -488,14 +576,20 @@ class AkademikJadwalController extends Controller
                         for ($offset = 0; $offset <= $maxOffset; $offset++) {
                             $candidateJams = array_slice($sesi, $offset, $blockSize);
 
-                            // Periksa bentrok rombel & guru
+                            // Periksa bentrok rombel, guru, dan ruangan/lab (misal: Lab Komputer hanya 1)
                             $canPlace = true;
+                            $mapelResource = $dist->mataPelajaran?->resource_key;
+
                             foreach ($candidateJams as $jam) {
                                 if (!empty($occupiedSlots[$hari][$jam][$rombelId])) {
                                     $canPlace = false;
                                     break;
                                 }
                                 if ($guruId && !empty($guruBusy[$hari][$jam][$guruId])) {
+                                    $canPlace = false;
+                                    break;
+                                }
+                                if ($mapelResource && !empty($resourceBusy[$hari][$jam][$mapelResource])) {
                                     $canPlace = false;
                                     break;
                                 }
@@ -518,12 +612,16 @@ class AkademikJadwalController extends Controller
                                             'kode_guru' => $dist->guru?->kode_nomor ? (string)$dist->guru->kode_nomor : null,
                                             'singkatan_mapel' => $dist->mataPelajaran?->singkatan_mapel ?? $dist->mataPelajaran?->nama_mapel,
                                             'is_locked' => false,
+                                            'resource_key' => $mapelResource,
                                         ]
                                     );
 
                                     $occupiedSlots[$hari][$jam][$rombelId] = true;
                                     if ($guruId) {
                                         $guruBusy[$hari][$jam][$guruId] = true;
+                                    }
+                                    if ($mapelResource) {
+                                        $resourceBusy[$hari][$jam][$mapelResource] = true;
                                     }
                                     $placedCount++;
                                 }
@@ -771,36 +869,69 @@ class AkademikJadwalController extends Controller
     public function checkConflict(Request $request)
     {
         $guruId = $request->guru_id;
-        $hari = strtoupper($request->hari);
+        $mapelId = $request->mata_pelajaran_id;
+        $hari = strtoupper($request->hari ?? '');
         $rombelId = $request->rombel_id;
         $jamMulai = (int) $request->jam_mulai;
         $jamSelesai = (int) $request->jam_selesai;
         $taId = $request->tahun_ajaran_id;
         $semester = $request->semester ?? 1;
 
-        if (!$guruId || !$hari) {
+        if (!$hari) {
             return response()->json(['conflict' => false]);
         }
 
-        $conflicts = AkademikJadwalPelajaran::with('rombel')
-            ->where('tahun_ajaran_id', $taId)
-            ->where('semester', $semester)
-            ->where('hari', $hari)
-            ->where('guru_id', $guruId)
-            ->where('rombel_id', '!=', $rombelId)
-            ->whereBetween('jam_ke', [$jamMulai, $jamSelesai])
-            ->get();
+        // 1. Cek bentrok guru (1 guru tidak boleh mengajar di 2 kelas di jam yang sama)
+        if ($guruId) {
+            $conflicts = AkademikJadwalPelajaran::with('rombel')
+                ->where('tahun_ajaran_id', $taId)
+                ->where('semester', $semester)
+                ->where('hari', $hari)
+                ->where('guru_id', $guruId)
+                ->where('rombel_id', '!=', $rombelId)
+                ->whereBetween('jam_ke', [$jamMulai, $jamSelesai])
+                ->get();
 
-        if ($conflicts->isNotEmpty()) {
-            $details = $conflicts->map(function ($c) {
-                return "Jam Ke-{$c->jam_ke} ({$c->rombel?->nama_rombel})";
-            })->implode(', ');
+            if ($conflicts->isNotEmpty()) {
+                $details = $conflicts->map(function ($c) {
+                    return "Jam Ke-{$c->jam_ke} ({$c->rombel?->nama_rombel})";
+                })->implode(', ');
 
-            $guru = Guru::find($guruId);
-            return response()->json([
-                'conflict' => true,
-                'message' => "⚠️ PERINGATAN: Guru {$guru?->nama} sudah terjadwal di: {$details}",
-            ]);
+                $guru = Guru::find($guruId);
+                return response()->json([
+                    'conflict' => true,
+                    'type' => 'guru',
+                    'message' => "⚠️ PERINGATAN BENTROK GURU: {$guru?->nama} sudah terjadwal di: {$details}",
+                ]);
+            }
+        }
+
+        // 2. Cek bentrok Ruangan / Lab (misal Lab Komputer hanya ada 1 di sekolah)
+        if ($mapelId) {
+            $mapel = AkademikMataPelajaran::find($mapelId);
+            if ($mapel && $mapel->resource_key) {
+                $resLabel = \App\Models\AkademikMataPelajaran::RESOURCES[$mapel->resource_key] ?? $mapel->resource_key;
+                $resConflicts = AkademikJadwalPelajaran::with('rombel')
+                    ->where('tahun_ajaran_id', $taId)
+                    ->where('semester', $semester)
+                    ->where('hari', $hari)
+                    ->where('resource_key', $mapel->resource_key)
+                    ->where('rombel_id', '!=', $rombelId)
+                    ->whereBetween('jam_ke', [$jamMulai, $jamSelesai])
+                    ->get();
+
+                if ($resConflicts->isNotEmpty()) {
+                    $details = $resConflicts->map(function ($c) {
+                        return "{$c->rombel?->nama_rombel} Jam Ke-{$c->jam_ke} ({$c->singkatan_mapel})";
+                    })->unique()->implode(', ');
+
+                    return response()->json([
+                        'conflict' => true,
+                        'type' => 'ruangan',
+                        'message' => "🏫 PERINGATAN BENTROK RUANGAN: {$resLabel} sudah dipakai oleh: {$details}! Pilih jam lain atau geser jadwal kelas lain.",
+                    ]);
+                }
+            }
         }
 
         return response()->json(['conflict' => false]);
@@ -843,6 +974,206 @@ class AkademikJadwalController extends Controller
         return view('dcc.akademik.jadwal.cetak', compact(
             'ta', 'semester', 'gurus', 'rombels', 'mapels', 'slotsMatrix', 'guruPikets'
         ));
+    }
+
+    /**
+     * Cetak Lampiran SK Pembagian Tugas Mengajar & Tugas Tambahan Resmi
+     * Format Surat Keputusan Kepala SMKN 1 Air Naningan (Standar Kemdikbudristek & Dapodik)
+     */
+    public function cetakSk(?Request $request = null)
+    {
+        $request = $request ?? request() ?? new Request();
+        $ta = TahunAjaran::where('is_active', true)->first();
+        if ($request->filled('tahun_ajaran_id')) {
+            $ta = TahunAjaran::find($request->tahun_ajaran_id) ?? $ta;
+        }
+        $semester = (int) $request->get('semester', 1);
+
+        $sekolah = \App\Models\PengaturanSekolah::first();
+        $gurus = Guru::where('status', 'aktif')->orderBy('kode_nomor')->orderBy('nama')->get();
+        $rombels = Rombel::with('waliKelas')->orderBy('tingkat')->orderBy('nama_rombel')->get();
+        $mapels = AkademikMataPelajaran::where('is_active', true)
+            ->when($ta, fn($q) => $q->where('tahun_ajaran_id', $ta->id))
+            ->orderBy('kode_mapel')->get();
+
+        $allDistribusi = AkademikDistribusiMengajar::with(['mataPelajaran', 'rombel'])
+            ->where('semester', $semester)
+            ->when($ta, fn($q) => $q->where('tahun_ajaran_id', $ta->id))
+            ->get();
+
+        // Rekap per guru untuk tabel SK
+        $dataGuruSk = $gurus->map(function ($guru) use ($allDistribusi, $rombels) {
+            $dists = $allDistribusi->where('guru_id', $guru->id);
+            $jtmMurni = $dists->sum('total_jam_per_minggu');
+            $tugasTambahan = $guru->tugas_tambahan_list;
+            $eqTugas = $guru->total_ekuivalen_tugas_tambahan;
+            $totalEkuivalen = $jtmMurni + $eqTugas;
+
+            // Rincian per mapel & kelas
+            $rincianMapel = $dists->groupBy('mata_pelajaran_id')->map(function ($items) {
+                $first = $items->first();
+                return [
+                    'nama_mapel' => $first->mataPelajaran?->nama_mapel,
+                    'kode_mapel' => $first->mataPelajaran?->kode_mapel,
+                    'kelas_list' => $items->pluck('rombel.nama_rombel')->implode(', '),
+                    'jam_per_rombel' => $first->total_jam_per_minggu,
+                    'total_jam' => $items->sum('total_jam_per_minggu'),
+                ];
+            })->values();
+
+            return (object) [
+                'guru' => $guru,
+                'jtm_murni' => $jtmMurni,
+                'rincian_mapel' => $rincianMapel,
+                'tugas_tambahan' => $tugasTambahan,
+                'ekuivalen_tugas' => $eqTugas,
+                'total_ekuivalen' => $totalEkuivalen,
+            ];
+        });
+
+        // Daftar Wali Kelas
+        $daftarWali = $rombels->map(function ($r) {
+            return (object) [
+                'rombel' => $r->nama_rombel,
+                'tingkat' => $r->tingkat,
+                'wali' => $r->waliKelas,
+            ];
+        });
+
+        return view('dcc.akademik.jadwal.cetak_sk', compact(
+            'ta', 'semester', 'sekolah', 'dataGuruSk', 'daftarWali', 'rombels'
+        ));
+    }
+
+    /**
+     * Cetak Jadwal Pelajaran per Rombel / Kelas (Untuk Dinding Kelas)
+     */
+    public function cetakKelas(?Request $request = null)
+    {
+        $request = $request ?? request() ?? new Request();
+        $ta = TahunAjaran::where('is_active', true)->first();
+        if ($request->filled('tahun_ajaran_id')) {
+            $ta = TahunAjaran::find($request->tahun_ajaran_id) ?? $ta;
+        }
+        $semester = (int) $request->get('semester', 1);
+
+        $sekolah = \App\Models\PengaturanSekolah::first();
+        $rombels = Rombel::with('waliKelas')->orderBy('tingkat')->orderBy('nama_rombel')->get();
+        $selectedRombelId = $request->get('rombel_id');
+
+        $activeRombels = $selectedRombelId
+            ? $rombels->where('id', $selectedRombelId)
+            : $rombels;
+
+        $allSlots = AkademikJadwalPelajaran::with(['guru', 'mataPelajaran', 'rombel'])
+            ->where('semester', $semester)
+            ->when($ta, fn($q) => $q->where('tahun_ajaran_id', $ta->id))
+            ->get();
+
+        $slotsMatrix = [];
+        foreach ($allSlots as $s) {
+            $slotsMatrix[$s->rombel_id][$s->hari][$s->jam_ke] = $s;
+        }
+
+        $jadwalWaktu = AkademikJadwalWaktu::defaultSchedule();
+        $customWaktus = AkademikJadwalWaktu::where('tahun_ajaran_id', $ta?->id)
+            ->where('semester', $semester)->where('tipe', 'jam')->get();
+        foreach ($customWaktus as $w) {
+            $jadwalWaktu[$w->hari][$w->jam_ke] = $w->pukul;
+        }
+
+        return view('dcc.akademik.jadwal.cetak_kelas', compact(
+            'ta', 'semester', 'sekolah', 'rombels', 'activeRombels', 'slotsMatrix', 'jadwalWaktu', 'selectedRombelId'
+        ));
+    }
+
+    /**
+     * Cetak Jadwal Pemakaian Ruang Khusus / Lab Komputer
+     */
+    public function cetakLab(?Request $request = null)
+    {
+        $request = $request ?? request() ?? new Request();
+        $ta = TahunAjaran::where('is_active', true)->first();
+        if ($request->filled('tahun_ajaran_id')) {
+            $ta = TahunAjaran::find($request->tahun_ajaran_id) ?? $ta;
+        }
+        $semester = (int) $request->get('semester', 1);
+        $resourceKey = $request->get('resource_key', 'LAB_KOMPUTER');
+        $resourceLabel = \App\Models\AkademikMataPelajaran::RESOURCES[$resourceKey] ?? '🖥️ Lab Komputer';
+
+        $sekolah = \App\Models\PengaturanSekolah::first();
+        $allSlots = AkademikJadwalPelajaran::with(['guru', 'mataPelajaran', 'rombel'])
+            ->where('semester', $semester)
+            ->where('resource_key', $resourceKey)
+            ->when($ta, fn($q) => $q->where('tahun_ajaran_id', $ta->id))
+            ->get();
+
+        $labMatrix = [];
+        foreach ($allSlots as $s) {
+            $labMatrix[$s->hari][$s->jam_ke] = $s;
+        }
+
+        $jadwalWaktu = AkademikJadwalWaktu::defaultSchedule();
+        $customWaktus = AkademikJadwalWaktu::where('tahun_ajaran_id', $ta?->id)
+            ->where('semester', $semester)->where('tipe', 'jam')->get();
+        foreach ($customWaktus as $w) {
+            $jadwalWaktu[$w->hari][$w->jam_ke] = $w->pukul;
+        }
+
+        return view('dcc.akademik.jadwal.cetak_lab', compact(
+            'ta', 'semester', 'sekolah', 'resourceKey', 'resourceLabel', 'labMatrix', 'jadwalWaktu'
+        ));
+    }
+
+    /**
+     * AJAX: Ambil Alokasi Distribusi Mengajar dari Rombel Tertentu
+     * Mempermudah form pembuatan jadwal: otomatis mengisi guru & mengunci sisa JP!
+     */
+    public function getRombelAlokasi($rombelId, ?Request $request = null)
+    {
+        $request = $request ?? request() ?? new Request();
+        $ta = TahunAjaran::where('is_active', true)->first();
+        $taId = $request->get('tahun_ajaran_id', $ta?->id ?? 1);
+        $semester = (int) $request->get('semester', 1);
+
+        $distribusis = AkademikDistribusiMengajar::with(['mataPelajaran', 'guru'])
+            ->where('tahun_ajaran_id', $taId)
+            ->where('semester', $semester)
+            ->where('rombel_id', $rombelId)
+            ->get();
+
+        $data = $distribusis->map(function ($d) use ($taId, $semester, $rombelId) {
+            $scheduledCount = AkademikJadwalPelajaran::where('tahun_ajaran_id', $taId)
+                ->where('semester', $semester)
+                ->where('rombel_id', $rombelId)
+                ->where('mata_pelajaran_id', $d->mata_pelajaran_id)
+                ->where('guru_id', $d->guru_id)
+                ->count();
+
+            $sisa = max(0, (int) $d->total_jam_per_minggu - $scheduledCount);
+
+            return [
+                'distribusi_id' => $d->id,
+                'mata_pelajaran_id' => $d->mata_pelajaran_id,
+                'nama_mapel' => $d->mataPelajaran?->nama_mapel,
+                'singkatan_mapel' => $d->mataPelajaran?->singkatan_mapel ?? $d->mataPelajaran?->kode_mapel,
+                'resource_key' => $d->mataPelajaran?->resource_key,
+                'resource_label' => $d->mataPelajaran?->resource_label,
+                'guru_id' => $d->guru_id,
+                'nama_guru' => $d->guru?->nama,
+                'kode_guru' => $d->guru?->kode_nomor,
+                'total_jam' => (int) $d->total_jam_per_minggu,
+                'jam_terjadwal' => $scheduledCount,
+                'sisa_jam' => $sisa,
+                'is_lengkap' => $sisa === 0,
+            ];
+        });
+
+        return response()->json([
+            'success' => true,
+            'rombel_id' => $rombelId,
+            'alokasi' => $data,
+        ]);
     }
 
     /**
