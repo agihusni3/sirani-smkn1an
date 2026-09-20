@@ -4,6 +4,8 @@
 @section('breadcrumb', 'Mata Pelajaran')
 
 @section('content')
+@include('dcc.akademik.partials.workflow_stepper', ['currentStep' => 1])
+
 <div class="akademik-page-head">
   <div>
     <h1 class="akademik-page-title">Mata Pelajaran &amp; Capaian Pembelajaran</h1>
@@ -143,8 +145,19 @@
                 </td>
                 <td style="font-weight:700;">{{ $m->jumlah_jam_per_minggu }} JP</td>
                 <td>{{ $m->jurusan?->nama_jurusan ?? 'Semua Jurusan' }}</td>
-                <td style="max-width:200px; font-size:12px; color:#475569;">
-                  {{ Str::limit($m->deskripsi_cp ?? 'Belum ada ringkasan CP', 60) }}
+                <td style="max-width:280px; font-size:12px; color:#475569;">
+                  @if($m->deskripsi_cp)
+                    <div style="display:flex; flex-direction:column; gap:4px;">
+                      <span style="font-size:10px; font-weight:800; color:#0369a1; background:#e0f2fe; padding:1px 6px; border-radius:4px; width:fit-content;">
+                        {{ $m->fase_label }}
+                      </span>
+                      <span style="line-height:1.4; color:#334155;" title="{{ $m->deskripsi_cp }}">
+                        {{ Str::limit($m->deskripsi_cp, 90) }}
+                      </span>
+                    </div>
+                  @else
+                    <span style="color:#94a3b8; font-style:italic;">Belum ada ringkasan CP</span>
+                  @endif
                 </td>
                 <td style="text-align:center;">
                   <div style="display:flex; justify-content:center; gap:6px;">
@@ -261,6 +274,22 @@
       </div>
     @endif
   </div>
+</div>
+
+{{-- Panduan Lanjut ke Langkah 2 --}}
+<div style="background:linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); border:1.5px solid #bfdbfe; border-radius:12px; padding:16px 20px; margin-bottom:24px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+  <div>
+    <div style="font-weight:800; font-size:14px; color:#1e40af; display:flex; align-items:center; gap:6px;">
+      <i class="bi bi-arrow-right-circle-fill"></i> Langkah 1 Selesai: Struktur Mata Pelajaran &amp; CP Telah Siap!
+    </div>
+    <div style="font-size:12px; color:#1d4ed8; margin-top:2px;">
+      Langkah selanjutnya adalah menugaskan guru pengampu per rombel dan memverifikasi pemenuhan beban 24–40 JP di SK Pembagian Tugas.
+    </div>
+  </div>
+  <a href="{{ route('akademik.jadwal.index', ['tab' => 'distribusi']) }}" class="ak-btn ak-btn-primary" style="font-size:12.5px; font-weight:700;">
+    <span>Lanjut ke Langkah 2: SK Pembagian Tugas</span>
+    <i class="bi bi-arrow-right ms-1"></i>
+  </a>
 </div>
 
 {{-- Modal Tambah Mapel --}}

@@ -24,6 +24,9 @@ class AkademikJadwalController extends Controller
 
         $semester = (int) $request->get('semester', 1);
         $tab = $request->get('tab', 'roster'); // roster, formulasi, distribusi, piket
+        if ($tab === 'jadwal') {
+            $tab = 'roster';
+        }
         $hariFilter = $request->get('hari', ''); // SENIN, SELASA, etc. or all
 
         // Master Data

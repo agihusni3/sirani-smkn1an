@@ -39,7 +39,22 @@ class AkademikMataPelajaran extends Model {
             default => ucfirst($this->jenis),
         };
     }
-    public function getFaseLabelAttribute(): string { return $this->fase === 'E' ? 'Fase E (Kelas X)' : 'Fase F (Kelas XI–XII)'; }
+    public function getFaseLabelAttribute(): string {
+        $fase = strtoupper(trim($this->fase ?? ''));
+        if ($fase === 'E' && !in_array('XI', $this->tingkat_array) && !in_array('XII', $this->tingkat_array)) {
+            return 'Fase E (Kelas X)';
+        }
+        if ($fase === 'F' && !in_array('X', $this->tingkat_array)) {
+            return 'Fase F (Kelas XI–XII)';
+        }
+        if (str_contains($fase, 'E') && str_contains($fase, 'F')) {
+            return 'Fase E & F (Kelas X–XII)';
+        }
+        if (in_array('X', $this->tingkat_array) && (in_array('XI', $this->tingkat_array) || in_array('XII', $this->tingkat_array))) {
+            return 'Fase E & F (Kelas X–XII)';
+        }
+        return in_array('X', $this->tingkat_array) ? 'Fase E (Kelas X)' : 'Fase F (Kelas XI–XII)';
+    }
 
     /** Label resource yang dibutuhkan mapel ini */
     public function getResourceLabelAttribute(): string {

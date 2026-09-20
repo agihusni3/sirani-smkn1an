@@ -76,9 +76,25 @@
           </div>
         </div>
 
+        @if($selectedDistribusi->mataPelajaran?->deskripsi_cp)
+          <div style="background:#f0fdf4; border:1.5px solid #bbf7d0; border-radius:8px; padding:12px 14px; margin-bottom:16px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; flex-wrap:wrap; gap:6px;">
+              <span style="font-size:11px; font-weight:800; color:#166534; text-transform:uppercase; display:inline-flex; align-items:center; gap:5px;">
+                <i class="bi bi-bullseye text-success"></i> Capaian Pembelajaran (CP) — {{ $selectedDistribusi->mataPelajaran->fase_label }}
+              </span>
+              <button type="button" class="btn btn-sm btn-outline-success" style="font-size:11px; padding:2px 10px; font-weight:700; border-radius:6px;" onclick="copyCpToMateri()">
+                <i class="bi bi-clipboard-plus me-1"></i> Rujuk ke Materi Ajar
+              </button>
+            </div>
+            <div id="textDeskripsiCp" style="font-size:12px; color:#1e293b; line-height:1.5;">
+              {{ $selectedDistribusi->mataPelajaran->deskripsi_cp }}
+            </div>
+          </div>
+        @endif
+
         <div style="margin-bottom:16px;">
           <label class="ak-form-label">Materi Pokok / Pembahasan <span class="text-danger">*</span></label>
-          <textarea name="materi_ajar" class="ak-textarea" rows="3" placeholder="Tuliskan pokok materi / modul ajar / kompetensi yang diajarkan pada sesi ini..." required></textarea>
+          <textarea name="materi_ajar" id="input_materi_ajar" class="ak-textarea" rows="3" placeholder="Tuliskan pokok materi / modul ajar / kompetensi yang diajarkan pada sesi ini..." required></textarea>
         </div>
 
         <div style="display:grid; grid-template-columns: 1fr 1fr; gap:16px;">
@@ -175,6 +191,20 @@
 <script>
   function setAllStatus(val) {
     document.querySelectorAll('.radio-status-' + val).forEach(el => el.checked = true);
+  }
+
+  function copyCpToMateri() {
+    const cpText = document.getElementById('textDeskripsiCp')?.innerText?.trim();
+    const materiEl = document.getElementById('input_materi_ajar');
+    if (cpText && materiEl) {
+      const snippet = cpText.length > 150 ? cpText.substring(0, 145) + '...' : cpText;
+      if (materiEl.value.trim() === '') {
+        materiEl.value = 'Materi berbasis CP: ' + snippet;
+      } else {
+        materiEl.value += '\nTarget CP: ' + snippet;
+      }
+      materiEl.focus();
+    }
   }
 </script>
 @endpush

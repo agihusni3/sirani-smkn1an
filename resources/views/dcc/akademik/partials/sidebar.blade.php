@@ -50,21 +50,35 @@
       </a>
     </div>
 
-    {{-- Kurikulum & Pengajaran --}}
+    {{-- Alur Kerja Waka Kurikulum (SOP Resmi) --}}
     <div class="akademik-nav-group">
-      <div class="akademik-nav-group-title">Kurikulum &amp; Jadwal</div>
+      <div class="akademik-nav-group-title">Alur Kerja Kurikulum (Wakakur)</div>
       
       <a href="{{ route('akademik.matpel.index') }}" class="akademik-nav-link {{ request()->routeIs('akademik.matpel.*') ? 'active' : '' }}">
         <div class="akademik-nav-link-left">
-          <i class="bi bi-book"></i>
-          <span>Mata Pelajaran &amp; CP</span>
+          <i class="bi bi-1-circle-fill" style="font-size:15px; color:#2563eb;"></i>
+          <span>1. Mata Pelajaran &amp; CP</span>
         </div>
       </a>
 
-      <a href="{{ route('akademik.jadwal.index') }}" class="akademik-nav-link {{ request()->routeIs('akademik.jadwal.*') ? 'active' : '' }}">
+      <a href="{{ route('akademik.jadwal.index', ['tab' => 'distribusi']) }}" class="akademik-nav-link {{ (request()->routeIs('akademik.jadwal.*') && request('tab') === 'distribusi') ? 'active' : '' }}">
         <div class="akademik-nav-link-left">
-          <i class="bi bi-calendar3-week"></i>
-          <span>Distribusi Mengajar</span>
+          <i class="bi bi-2-circle-fill" style="font-size:15px; color:#4f46e5;"></i>
+          <span>2. SK Pembagian Tugas</span>
+        </div>
+      </a>
+
+      <a href="{{ route('akademik.jadwal.index', ['tab' => 'jadwal']) }}" class="akademik-nav-link {{ (request()->routeIs('akademik.jadwal.*') && (in_array(request('tab', 'jadwal'), ['jadwal', 'roster', 'formulasi', 'pukul']))) ? 'active' : '' }}">
+        <div class="akademik-nav-link-left">
+          <i class="bi bi-3-circle-fill" style="font-size:15px; color:#059669;"></i>
+          <span>3. Jadwal Roster (Kelas &amp; Lab)</span>
+        </div>
+      </a>
+
+      <a href="{{ route('akademik.jadwal.index', ['tab' => 'piket']) }}" class="akademik-nav-link {{ (request()->routeIs('akademik.jadwal.*') && request('tab') === 'piket') ? 'active' : '' }}">
+        <div class="akademik-nav-link-left">
+          <i class="bi bi-4-circle-fill" style="font-size:15px; color:#d97706;"></i>
+          <span>4. Jadwal Guru Piket</span>
         </div>
       </a>
     </div>
