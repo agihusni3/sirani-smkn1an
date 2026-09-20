@@ -76,19 +76,27 @@
   </div>
 @endif
 
-{{-- TAB PUKUL: Atur Waktu KBM (aktif diluar tag roster) --}}
+{{-- TAB PUKUL: Atur Waktu KBM + Istirahat (Fully Flexible) --}}
 @if($tab === 'pukul')
 <div class="akademik-card" style="margin-bottom:24px;">
   <div class="akademik-card-header" style="background:linear-gradient(135deg,#fffbeb,#fef9ee); border-bottom:1px solid #fde68a;">
     <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
       <div>
         <h3 style="font-weight:900; font-size:16px; margin:0; color:#92400e; display:flex; align-items:center; gap:8px;">
-          <i class="bi bi-clock-history text-warning"></i> Atur Pukul (Jam Pelajaran) KBM
+          <i class="bi bi-clock-history text-warning"></i> Atur Pukul KBM & Jam Istirahat
         </h3>
-        <div style="font-size:12px; color:#b45309; margin-top:2px;">Wakakur dapat mengubah waktu (pukul) setiap slot jam pelajaran per hari. Klik Simpan untuk menyimpan konfigurasi.</div>
+        <div style="font-size:12px; color:#b45309; margin-top:2px;">
+          Ubah pukul dan nama setiap slot jam pelajaran <b>maupun jam istirahat</b> secara bebas. Perubahan langsung disimpan ke roster.
+        </div>
       </div>
-      <div style="display:flex; gap:8px;">
-        <form action="{{ route('akademik.jadwal.update-pukul') }}" method="POST" style="margin:0;" onsubmit="return confirm('Reset semua pukul ke standar resmi SMKN 1 Air Naningan?')">
+      <div style="display:flex; gap:8px; flex-wrap:wrap;">
+        {{-- Info legend --}}
+        <div style="display:flex; gap:6px; align-items:center; font-size:11.5px;">
+          <span style="background:#dbeafe; color:#1e40af; padding:3px 8px; border-radius:6px; font-weight:700;">🎓 Jam KBM</span>
+          <span style="background:#fee2e2; color:#991b1b; padding:3px 8px; border-radius:6px; font-weight:700;">☕ Istirahat</span>
+          <span style="background:#f0fdf4; color:#15803d; padding:3px 8px; border-radius:6px; font-weight:700;">📢 Khusus</span>
+        </div>
+        <form action="{{ route('akademik.jadwal.update-pukul') }}" method="POST" style="margin:0;" onsubmit="return confirm('⚠️ Reset SEMUA pukul dan istirahat ke standar resmi SMKN 1 Air Naningan?\n\nSemua perubahan manual akan hilang!')">
           @csrf
           <input type="hidden" name="tahun_ajaran_id" value="{{ $ta?->id ?? 1 }}">
           <input type="hidden" name="semester" value="{{ $semester }}">
@@ -100,92 +108,188 @@
       </div>
     </div>
   </div>
+
   <div class="akademik-card-body" style="padding:0; overflow-x:auto;">
-    <form action="{{ route('akademik.jadwal.update-pukul') }}" method="POST">
+    <form action="{{ route('akademik.jadwal.update-pukul') }}" method="POST" id="formAturPukul">
       @csrf
       <input type="hidden" name="tahun_ajaran_id" value="{{ $ta?->id ?? 1 }}">
       <input type="hidden" name="semester" value="{{ $semester }}">
-      @php
-        $hariKbm = ['SENIN', 'SELASA', 'RABU', 'KAMIS', 'JUMAT'];
-        $maxJamPerHari = ['SENIN' => 11, 'SELASA' => 11, 'RABU' => 11, 'KAMIS' => 11, 'JUMAT' => 5];
-        $wIdx = 0;
-      @endphp
-      <table style="width:100%; border-collapse:collapse; font-size:12.5px;">
-        <thead>
-          <tr style="background:#f8fafc;">
-            <th style="padding:10px 14px; text-align:left; border-bottom:2px solid #e2e8f0; font-weight:800; color:#334155; width:70px;">HARI</th>
-            <th style="padding:10px 14px; text-align:center; border-bottom:2px solid #e2e8f0; font-weight:800; color:#334155; width:50px;">JAM KE-</th>
-            <th style="padding:10px 14px; text-align:left; border-bottom:2px solid #e2e8f0; font-weight:800; color:#92400e;">PUKUL (Edit bebas)</th>
-            <th style="padding:10px 14px; text-align:left; border-bottom:2px solid #e2e8f0; font-weight:700; color:#64748b;">Default Resmi</th>
-          </tr>
-        </thead>
-        <tbody>
-          @foreach($hariKbm as $hKbm)
-            @php $maxJam = $maxJamPerHari[$hKbm]; @endphp
-            {{-- Jam 0 (Upacara/Apel) --}}
-            <tr style="background:#f0fdf4;">
-              <td rowspan="{{ $maxJam + 1 }}" style="padding:10px 14px; border-bottom:1px solid #e2e8f0; font-weight:900; color:#1e40af; vertical-align:middle; font-size:13px; border-right:2px solid #e2e8f0;">{{ $hKbm }}</td>
-              <td style="padding:8px 14px; border-bottom:1px solid #e2e8f0; text-align:center; font-weight:700; color:#16a34a;">0</td>
-              <td style="padding:6px 14px; border-bottom:1px solid #e2e8f0;">
-                <input type="hidden" name="waktu_data[{{ $hKbm }}][0]" value="{{ $jadwalWaktu[$hKbm][0] ?? '' }}">
-                <span style="font-size:12px; color:#64748b; font-style:italic;">{{ $jadwalWaktu[$hKbm][0] ?? 'Upacara/Apel/Mengaji' }}</span>
-              </td>
-              <td style="padding:8px 14px; border-bottom:1px solid #e2e8f0; color:#94a3b8; font-size:11.5px;">—</td>
+
+      @php $globalRowIdx = 0; @endphp
+
+      @foreach($jadwalWaktuFull as $hKbm => $rows)
+      <div style="margin-bottom:0;">
+        {{-- Header Hari --}}
+        <div style="padding:10px 20px; background:linear-gradient(135deg,#1e3a8a,#1e40af); color:#fff; display:flex; align-items:center; gap:12px; position:sticky; top:0; z-index:5;">
+          <span style="font-weight:900; font-size:14px; letter-spacing:1px;">{{ $hKbm }}</span>
+          <span style="font-size:11.5px; opacity:0.8;">{{ count($rows) }} baris · klik label untuk ganti nama</span>
+          <button type="button" onclick="tambahIstirahat('{{ $hKbm }}')" style="margin-left:auto; background:rgba(255,255,255,0.2); border:1px solid rgba(255,255,255,0.4); color:#fff; padding:4px 12px; border-radius:6px; font-size:11.5px; font-weight:700; cursor:pointer;">
+            <i class="bi bi-plus-circle me-1"></i> + Istirahat
+          </button>
+        </div>
+
+        <table style="width:100%; border-collapse:collapse; font-size:12.5px;">
+          <thead>
+            <tr style="background:#f8fafc; border-bottom:2px solid #e2e8f0;">
+              <th style="padding:8px 14px; text-align:center; width:50px; color:#64748b; font-weight:700;">JAM</th>
+              <th style="padding:8px 14px; text-align:left; width:220px; color:#64748b; font-weight:700;">LABEL / KETERANGAN</th>
+              <th style="padding:8px 14px; text-align:left; color:#92400e; font-weight:800;">PUKUL <span style="font-weight:400; color:#94a3b8;">(format: HH.MM - HH.MM)</span></th>
+              <th style="padding:8px 14px; text-align:left; width:180px; color:#64748b; font-weight:700;">DEFAULT RESMI</th>
+              <th style="padding:8px 14px; text-align:center; width:50px; color:#64748b;"></th>
             </tr>
-            @for($jk = 1; $jk <= $maxJam; $jk++)
+          </thead>
+          <tbody id="tbody-{{ $hKbm }}">
+            @foreach($rows as $row)
               @php
-                $currentPukul = $jadwalWaktu[$hKbm][$jk] ?? '';
-                // Default per hari
+                $tipe    = $row['tipe'] ?? 'jam';
+                $jamKe   = $row['jam_ke'] ?? 0;
+                $urutan  = $row['urutan'] ?? $loop->index;
+                $label   = $row['label'] ?? ($tipe === 'istirahat' ? 'Istirahat' : 'Jam ' . $jamKe);
+                $pukul   = $row['pukul'] ?? '';
+
+                // Default reference pukul (dari defaultScheduleFull)
+                $defaultFull = \App\Models\AkademikJadwalWaktu::defaultScheduleFull();
                 $defaultPukul = '';
-                if ($hKbm === 'SENIN') {
-                  $map = [1=>'08.15-08.55',2=>'08.55-09.35',3=>'09.35-10.00',4=>'10.20-11.00',5=>'11.00-11.40',6=>'11.40-12.20',7=>'12.20-12.40',8=>'13.10-13.50',9=>'13.50-14.30',10=>'14.30-15.10',11=>'15.10-15.50'];
-                } elseif ($hKbm === 'JUMAT') {
-                  $map = [1=>'08.00-08.40',2=>'08.40-09.20',3=>'09.20-09.40',4=>'10.00-10.40',5=>'10.40-11.20'];
-                } else {
-                  $map = [1=>'07.30-08.10',2=>'08.10-08.50',3=>'08.50-09.30',4=>'09.30-09.50',5=>'10.05-10.45',6=>'10.45-11.25',7=>'11.25-12.05',8=>'12.05-12.25',9=>'12.55-13.35',10=>'13.35-14.15',11=>'14.15-14.55'];
+                foreach (($defaultFull[$hKbm] ?? []) as $dRow) {
+                  if ($dRow['tipe'] === $tipe && $dRow['jam_ke'] == $jamKe) {
+                    $defaultPukul = $dRow['pukul'];
+                    break;
+                  }
                 }
-                $defaultPukul = $map[$jk] ?? '';
-                $isIstirahat1 = ($jk == 4 && $hKbm !== 'JUMAT') || ($jk == 3 && $hKbm === 'JUMAT') || ($jk == 3 && $hKbm === 'SENIN');
-                $isIstirahat2 = ($jk == 8 && $hKbm !== 'JUMAT');
+
+                // Warna baris per tipe
+                $bgRow = match($tipe) {
+                  'istirahat' => '#fff1f2',
+                  'khusus'    => '#f0fdf4',
+                  default     => ($loop->odd ? '#ffffff' : '#f8fafc'),
+                };
+                $badgeStyle = match($tipe) {
+                  'istirahat' => 'background:#fee2e2; color:#991b1b; border:1px solid #fca5a5;',
+                  'khusus'    => 'background:#dcfce7; color:#15803d; border:1px solid #86efac;',
+                  default     => 'background:#dbeafe; color:#1e40af; border:1px solid #93c5fd;',
+                };
+                $rowId = $globalRowIdx;
               @endphp
-              @if($isIstirahat1 && !($hKbm === 'SENIN' && $jk == 3))
-                <tr style="background:#fee2e2;">
-                  <td style="padding:6px 14px; border-bottom:1px solid #fecaca; text-align:center; font-weight:700; color:#991b1b;">—</td>
-                  <td colspan="2" style="padding:6px 14px; border-bottom:1px solid #fecaca; color:#991b1b; font-weight:700; font-size:11.5px;">
-                    ☕ ISTIRAHAT PERTAMA
-                  </td>
-                </tr>
-              @elseif($isIstirahat2)
-                <tr style="background:#fee2e2;">
-                  <td style="padding:6px 14px; border-bottom:1px solid #fecaca; text-align:center; font-weight:700; color:#991b1b;">—</td>
-                  <td colspan="2" style="padding:6px 14px; border-bottom:1px solid #fecaca; color:#991b1b; font-weight:700; font-size:11.5px;">
-                    ☕ ISTIRAHAT KEDUA
-                  </td>
-                </tr>
-              @endif
-              <tr style="background:{{ $loop->odd ? '#ffffff' : '#f8fafc' }};">
-                <td style="padding:8px 14px; border-bottom:1px solid #e2e8f0; text-align:center; font-weight:800; color:#0369a1;">{{ $jk }}</td>
-                <td style="padding:6px 14px; border-bottom:1px solid #e2e8f0;">
-                  <input type="text" name="waktu_data[{{ $hKbm }}][{{ $jk }}]" value="{{ $currentPukul ?: $defaultPukul }}"
-                    style="border:1.5px solid #cbd5e1; border-radius:6px; padding:5px 10px; font-size:12px; font-weight:700; width:165px; color:#1e40af; font-family:monospace;"
-                    placeholder="HH.MM-HH.MM">
+              <tr style="background:{{ $bgRow }}; border-bottom:1px solid #e2e8f0;" id="row-{{ $rowId }}" data-tipe="{{ $tipe }}">
+                {{-- Hidden fields --}}
+                <input type="hidden" name="rows[{{ $rowId }}][hari]" value="{{ $hKbm }}">
+                <input type="hidden" name="rows[{{ $rowId }}][jam_ke]" value="{{ $jamKe }}">
+                <input type="hidden" name="rows[{{ $rowId }}][tipe]" value="{{ $tipe }}">
+                <input type="hidden" name="rows[{{ $rowId }}][urutan]" value="{{ $urutan }}">
+
+                <td style="padding:8px 14px; text-align:center;">
+                  <span style="padding:3px 9px; border-radius:6px; font-size:11.5px; font-weight:800; {{ $badgeStyle }}">
+                    @if($tipe === 'istirahat') ☕ @elseif($tipe === 'khusus') 📢 @else {{ $jamKe }} @endif
+                  </span>
                 </td>
-                <td style="padding:8px 14px; border-bottom:1px solid #e2e8f0; color:#94a3b8; font-size:11.5px; font-family:monospace;">{{ $defaultPukul }}</td>
+                <td style="padding:6px 14px;">
+                  <input type="text" name="rows[{{ $rowId }}][label]" value="{{ $label }}"
+                    style="border:1.5px solid {{ $tipe === 'istirahat' ? '#fca5a5' : ($tipe === 'khusus' ? '#86efac' : '#bfdbfe') }}; border-radius:6px; padding:5px 10px; font-size:12px; font-weight:700; width:100%; color:{{ $tipe === 'istirahat' ? '#991b1b' : ($tipe === 'khusus' ? '#15803d' : '#1e40af') }}; background:{{ $tipe === 'istirahat' ? '#fff1f2' : ($tipe === 'khusus' ? '#f0fdf4' : '#eff6ff') }};"
+                    placeholder="Label / keterangan baris">
+                </td>
+                <td style="padding:6px 14px;">
+                  <input type="text" name="rows[{{ $rowId }}][pukul]" value="{{ $pukul }}"
+                    style="border:1.5px solid #cbd5e1; border-radius:6px; padding:5px 10px; font-size:13px; font-weight:800; width:180px; color:#1e293b; font-family:monospace; letter-spacing:0.5px;"
+                    placeholder="07.15 - 08.00">
+                </td>
+                <td style="padding:8px 14px; color:#94a3b8; font-size:11px; font-family:monospace;">
+                  {{ $defaultPukul ?: '—' }}
+                </td>
+                <td style="padding:6px 14px; text-align:center;">
+                  @if($tipe === 'istirahat')
+                    <button type="button" onclick="hapusBaris({{ $rowId }})"
+                      style="background:none; border:1px solid #f87171; color:#ef4444; border-radius:6px; padding:3px 8px; cursor:pointer; font-size:11px;" title="Hapus baris istirahat ini">
+                      <i class="bi bi-trash"></i>
+                    </button>
+                  @endif
+                </td>
               </tr>
-            @endfor
-          @endforeach
-        </tbody>
-      </table>
-      <div style="padding:14px 20px; background:#f8fafc; border-top:1px solid #e2e8f0; display:flex; justify-content:flex-end; gap:10px;">
-        <a href="{{ route('akademik.jadwal.index', ['tab'=>'roster','semester'=>$semester]) }}" class="ak-btn ak-btn-secondary">Batal</a>
-        <button type="submit" class="ak-btn ak-btn-primary" style="font-weight:800;">
-          <i class="bi bi-floppy-fill me-1"></i> Simpan Semua Pukul
-        </button>
+              @php $globalRowIdx++; @endphp
+            @endforeach
+          </tbody>
+        </table>
+      </div>
+      @endforeach
+
+      <div style="padding:16px 20px; background:#f8fafc; border-top:2px solid #e2e8f0; display:flex; justify-content:space-between; align-items:center;">
+        <div style="font-size:12px; color:#64748b;">
+          <i class="bi bi-info-circle me-1"></i> Pukul istirahat tidak mempengaruhi slot KBM, hanya tampilan di roster dan cetak.
+        </div>
+        <div style="display:flex; gap:10px;">
+          <a href="{{ route('akademik.jadwal.index', ['tab'=>'roster','semester'=>$semester]) }}" class="ak-btn ak-btn-secondary">Batal</a>
+          <button type="submit" class="ak-btn ak-btn-primary" style="font-weight:800; font-size:13px; padding:10px 22px;">
+            <i class="bi bi-floppy-fill me-1"></i> Simpan Semua Konfigurasi
+          </button>
+        </div>
       </div>
     </form>
   </div>
 </div>
+
+<script>
+// Hapus baris istirahat dari tampilan (row akan di-remove dan tidak ikut submit)
+function hapusBaris(rowId) {
+  if (!confirm('Hapus baris istirahat ini dari jadwal hari ini?')) return;
+  const row = document.getElementById('row-' + rowId);
+  if (row) {
+    // Set inputs to empty agar server skip baris ini
+    row.querySelectorAll('input[name$="[pukul]"]').forEach(i => i.value = '');
+    row.style.opacity = '0.3';
+    row.style.textDecoration = 'line-through';
+    row.style.pointerEvents = 'none';
+    // Disable inputs
+    row.querySelectorAll('input').forEach(i => i.disabled = true);
+    row.style.display = 'none';
+  }
+}
+
+// Tambah baris istirahat baru untuk hari tertentu
+let newRowCounter = {{ $globalRowIdx ?? 999 }};
+function tambahIstirahat(hari) {
+  const tbody = document.getElementById('tbody-' + hari);
+  if (!tbody) return;
+
+  const idx = newRowCounter++;
+  const tr = document.createElement('tr');
+  tr.id = 'row-' + idx;
+  tr.dataset.tipe = 'istirahat';
+  tr.style.cssText = 'background:#fff1f2; border-bottom:1px solid #fecaca;';
+
+  tr.innerHTML = `
+    <input type="hidden" name="rows[${idx}][hari]" value="${hari}">
+    <input type="hidden" name="rows[${idx}][jam_ke]" value="-9">
+    <input type="hidden" name="rows[${idx}][tipe]" value="istirahat">
+    <input type="hidden" name="rows[${idx}][urutan]" value="999">
+    <td style="padding:8px 14px; text-align:center;">
+      <span style="padding:3px 9px; border-radius:6px; font-size:11.5px; font-weight:800; background:#fee2e2; color:#991b1b; border:1px solid #fca5a5;">☕</span>
+    </td>
+    <td style="padding:6px 14px;">
+      <input type="text" name="rows[${idx}][label]" value="Istirahat"
+        style="border:1.5px solid #fca5a5; border-radius:6px; padding:5px 10px; font-size:12px; font-weight:700; width:100%; color:#991b1b; background:#fff1f2;"
+        placeholder="Nama istirahat (mis: Sholat Dzuhur)">
+    </td>
+    <td style="padding:6px 14px;">
+      <input type="text" name="rows[${idx}][pukul]" value=""
+        style="border:1.5px solid #cbd5e1; border-radius:6px; padding:5px 10px; font-size:13px; font-weight:800; width:180px; color:#1e293b; font-family:monospace;"
+        placeholder="12.40 - 13.10" required>
+    </td>
+    <td style="padding:8px 14px; color:#94a3b8; font-size:11px;">Baru</td>
+    <td style="padding:6px 14px; text-align:center;">
+      <button type="button" onclick="hapusBaris(${idx})"
+        style="background:none; border:1px solid #f87171; color:#ef4444; border-radius:6px; padding:3px 8px; cursor:pointer; font-size:11px;">
+        <i class="bi bi-trash"></i>
+      </button>
+    </td>
+  `;
+
+  // Append ke akhir tbody hari ini
+  tbody.appendChild(tr);
+  // Focus input pukul
+  tr.querySelector('input[name$="[pukul]"]')?.focus();
+}
+</script>
 @endif
+
 
 @if(session('error'))
   <div class="alert alert-danger alert-dismissible fade show" role="alert" style="border-radius:10px; font-weight:600;">

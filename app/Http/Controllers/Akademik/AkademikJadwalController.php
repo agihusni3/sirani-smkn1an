@@ -122,16 +122,50 @@ class AkademikJadwalController extends Controller
         $defaultSchedule = AkademikJadwalWaktu::defaultSchedule();
         $customWaktus = AkademikJadwalWaktu::where('tahun_ajaran_id', $ta?->id)
             ->where('semester', $semester)
+            ->orderBy('hari')->orderBy('urutan')->orderBy('jam_ke')
             ->get();
 
+        // jadwalWaktu: hanya jam KBM [hari][jam_ke] => pukul (untuk roster matriks)
         $jadwalWaktu = $defaultSchedule;
-        foreach ($customWaktus as $w) {
+        foreach ($customWaktus->where('tipe', 'jam') as $w) {
             $jadwalWaktu[$w->hari][$w->jam_ke] = $w->pukul;
+        }
+
+        // jadwalWaktuFull: semua baris per hari termasuk istirahat (untuk tab Atur Pukul)
+        $defaultFull = AkademikJadwalWaktu::defaultScheduleFull();
+        $jadwalWaktuFull = $defaultFull;
+
+        // Override dengan data custom yang tersimpan di DB
+        if ($customWaktus->isNotEmpty()) {
+            foreach (array_keys($defaultFull) as $hari) {
+                $dbRows = $customWaktus->where('hari', $hari)->sortBy('urutan');
+                if ($dbRows->count() >= count($defaultFull[$hari])) {
+                    // Ada data custom lengkap — gunakan dari DB
+                    $jadwalWaktuFull[$hari] = $dbRows->map(fn($r) => [
+                        'tipe'   => $r->tipe ?? 'jam',
+                        'jam_ke' => $r->jam_ke,
+                        'urutan' => $r->urutan,
+                        'label'  => $r->label ?? ($r->tipe === 'istirahat' ? 'Istirahat' : 'Jam ' . $r->jam_ke),
+                        'pukul'  => $r->pukul,
+                    ])->values()->toArray();
+                } else {
+                    // Data parsial — merge default dengan override dari DB
+                    foreach ($jadwalWaktuFull[$hari] as &$row) {
+                        $dbRow = $customWaktus->where('hari', $hari)->where('jam_ke', $row['jam_ke'])->first();
+                        if ($dbRow) {
+                            $row['pukul'] = $dbRow->pukul;
+                            if ($dbRow->label) $row['label'] = $dbRow->label;
+                        }
+                    }
+                    unset($row);
+                }
+            }
         }
 
         return view('dcc.akademik.jadwal.index', compact(
             'distribusis', 'ta', 'gurus', 'rombels', 'mapels', 'semester', 'rekapJjm',
-            'tahunAjarans', 'tab', 'hariFilter', 'slotsMatrix', 'guruPikets', 'jadwalWaktu'
+            'tahunAjarans', 'tab', 'hariFilter', 'slotsMatrix', 'guruPikets',
+            'jadwalWaktu', 'jadwalWaktuFull'
         ));
     }
 
@@ -578,7 +612,8 @@ class AkademikJadwalController extends Controller
     }
 
     /**
-     * Atur & Simpan Pukul (Jam Pelajaran) oleh Waka Kurikulum
+     * Atur & Simpan Pukul (Jam + Istirahat) oleh Waka Kurikulum
+     * Mendukung simpan semua baris termasuk istirahat yang labelnya bisa diubah
      */
     public function updatePukul(Request $request)
     {
@@ -590,67 +625,110 @@ class AkademikJadwalController extends Controller
         $taId = $request->tahun_ajaran_id;
         $semester = $request->semester;
 
-        // Opsi 1: Reset ke default resmi
+        // ============================
+        // OPSI 1: Reset ke default resmi (semua data custom dihapus)
+        // ============================
         if ($request->boolean('reset_default')) {
-            $defaults = AkademikJadwalWaktu::defaultSchedule();
-            foreach ($defaults as $hari => $jams) {
-                foreach ($jams as $jam => $pukul) {
-                    AkademikJadwalWaktu::updateOrCreate(
-                        ['tahun_ajaran_id' => $taId, 'semester' => $semester, 'hari' => $hari, 'jam_ke' => $jam],
-                        ['pukul' => $pukul]
-                    );
+            AkademikJadwalWaktu::where('tahun_ajaran_id', $taId)
+                ->where('semester', $semester)
+                ->delete();
+
+            // Simpan ulang berdasarkan defaultScheduleFull (termasuk istirahat)
+            $defaultFull = AkademikJadwalWaktu::defaultScheduleFull();
+            foreach ($defaultFull as $hari => $rows) {
+                foreach ($rows as $row) {
+                    AkademikJadwalWaktu::create([
+                        'tahun_ajaran_id' => $taId,
+                        'semester'        => $semester,
+                        'hari'            => $hari,
+                        'jam_ke'          => $row['jam_ke'],
+                        'pukul'           => $row['pukul'],
+                        'tipe'            => $row['tipe'],
+                        'label'           => $row['label'],
+                        'urutan'          => $row['urutan'],
+                    ]);
+                    // Sinkronkan pukul ke tabel jadwal pelajaran (hanya jam KBM)
+                    if ($row['tipe'] === 'jam') {
+                        AkademikJadwalPelajaran::where('tahun_ajaran_id', $taId)
+                            ->where('semester', $semester)
+                            ->where('hari', $hari)
+                            ->where('jam_ke', $row['jam_ke'])
+                            ->update(['pukul' => $row['pukul']]);
+                    }
+                }
+            }
+            return redirect()->back()->with('success', '✅ Jadwal waktu berhasil direset ke standar resmi SMKN 1 Air Naningan (termasuk jam istirahat).');
+        }
+
+        // ============================
+        // OPSI 2: Bulk save dari form Atur Pukul (rows[] per hari)
+        // rows = array of {hari, jam_ke, pukul, tipe, label, urutan}
+        // ============================
+        if ($request->has('rows') && is_array($request->rows)) {
+            // Hapus dulu semua data custom hari & semester ini
+            AkademikJadwalWaktu::where('tahun_ajaran_id', $taId)
+                ->where('semester', $semester)
+                ->delete();
+
+            $count = 0;
+            foreach ($request->rows as $row) {
+                $hari   = strtoupper($row['hari'] ?? '');
+                $jamKe  = (int) ($row['jam_ke'] ?? 0);
+                $pukul  = trim($row['pukul'] ?? '');
+                $tipe   = $row['tipe'] ?? 'jam';
+                $label  = trim($row['label'] ?? '');
+                $urutan = (int) ($row['urutan'] ?? $count);
+
+                if (empty($hari) || empty($pukul)) continue;
+
+                AkademikJadwalWaktu::create([
+                    'tahun_ajaran_id' => $taId,
+                    'semester'        => $semester,
+                    'hari'            => $hari,
+                    'jam_ke'          => $jamKe,
+                    'pukul'           => $pukul,
+                    'tipe'            => $tipe,
+                    'label'           => $label ?: null,
+                    'urutan'          => $urutan,
+                ]);
+
+                // Sinkronkan pukul ke slot jadwal pelajaran (hanya jam KBM)
+                if ($tipe === 'jam' && $jamKe >= 0) {
                     AkademikJadwalPelajaran::where('tahun_ajaran_id', $taId)
                         ->where('semester', $semester)
                         ->where('hari', $hari)
-                        ->where('jam_ke', $jam)
+                        ->where('jam_ke', $jamKe)
                         ->update(['pukul' => $pukul]);
                 }
-            }
-            return redirect()->back()->with('success', 'Jam dan pukul jadwal berhasil dipulihkan ke standar resmi SMKN 1 Air Naningan.');
-        }
-
-        // Opsi 2: Single update via modal / AJAX cepat
-        if ($request->filled('hari') && $request->has('jam_ke') && $request->filled('pukul')) {
-            $hari = strtoupper($request->hari);
-            $jamKe = (int) $request->jam_ke;
-            $pukul = trim($request->pukul);
-
-            AkademikJadwalWaktu::updateOrCreate(
-                ['tahun_ajaran_id' => $taId, 'semester' => $semester, 'hari' => $hari, 'jam_ke' => $jamKe],
-                ['pukul' => $pukul]
-            );
-
-            AkademikJadwalPelajaran::where('tahun_ajaran_id', $taId)
-                ->where('semester', $semester)
-                ->where('hari', $hari)
-                ->where('jam_ke', $jamKe)
-                ->update(['pukul' => $pukul]);
-
-            if ($request->ajax() || $request->wantsJson()) {
-                return response()->json(['success' => true, 'pukul' => $pukul]);
+                $count++;
             }
 
-            return redirect()->back()->with('success', "Waktu untuk {$hari} Jam Ke-{$jamKe} berhasil diatur menjadi {$pukul}.");
+            return redirect()->route('akademik.jadwal.index', ['tab' => 'pukul', 'semester' => $semester])
+                ->with('success', "✅ Berhasil menyimpan {$count} baris konfigurasi waktu KBM (termasuk istirahat).");
         }
 
-        // Opsi 3: Bulk update form
+        // ============================
+        // OPSI 3: Legacy waktu_data[hari][jam] = pukul (backward compat)
+        // ============================
         if ($request->has('waktu_data') && is_array($request->waktu_data)) {
+            $count = 0;
             foreach ($request->waktu_data as $hari => $jams) {
                 foreach ($jams as $jam => $pukul) {
                     if (!empty($pukul)) {
                         AkademikJadwalWaktu::updateOrCreate(
                             ['tahun_ajaran_id' => $taId, 'semester' => $semester, 'hari' => strtoupper($hari), 'jam_ke' => (int) $jam],
-                            ['pukul' => trim($pukul)]
+                            ['pukul' => trim($pukul), 'tipe' => 'jam']
                         );
                         AkademikJadwalPelajaran::where('tahun_ajaran_id', $taId)
                             ->where('semester', $semester)
                             ->where('hari', strtoupper($hari))
                             ->where('jam_ke', (int) $jam)
                             ->update(['pukul' => trim($pukul)]);
+                        $count++;
                     }
                 }
             }
-            return redirect()->back()->with('success', 'Seluruh konfigurasi pukul KBM berhasil disimpan.');
+            return redirect()->back()->with('success', "✅ Konfigurasi pukul KBM berhasil disimpan ({$count} slot).");
         }
 
         return redirect()->back()->with('error', 'Tidak ada data pukul yang diubah.');
