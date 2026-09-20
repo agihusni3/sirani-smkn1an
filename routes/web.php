@@ -260,6 +260,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/jadwal/cetak-kelas', [\App\Http\Controllers\Akademik\AkademikJadwalController::class, 'cetakKelas'])->name('akademik.jadwal.cetak-kelas');
         Route::get('/jadwal/cetak-lab', [\App\Http\Controllers\Akademik\AkademikJadwalController::class, 'cetakLab'])->name('akademik.jadwal.cetak-lab');
         Route::get('/jadwal/rombel-alokasi/{rombelId}', [\App\Http\Controllers\Akademik\AkademikJadwalController::class, 'getRombelAlokasi'])->name('akademik.jadwal.rombel-alokasi');
+        Route::post('/jadwal/update-tugas-tambahan', [\App\Http\Controllers\Akademik\AkademikJadwalController::class, 'updateTugasTambahan'])->name('akademik.jadwal.update-tugas-tambahan');
 
         // Sub-Modul 3: Jurnal KBM Harian & Presensi Siswa
         Route::get('/jurnal', [\App\Http\Controllers\Akademik\AkademikJurnalController::class, 'index'])->name('akademik.jurnal.index');

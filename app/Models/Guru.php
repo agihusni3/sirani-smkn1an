@@ -99,21 +99,44 @@ class Guru extends Model
      */
     public function getListMapelAttribute(): array
     {
-        if (empty($this->mapel_diampu)) {
-            return [];
+        if (!empty($this->mapel_diampu)) {
+            return array_values(array_filter(array_map('trim', explode(',', $this->mapel_diampu))));
         }
-        return array_values(array_filter(array_map('trim', explode(',', $this->mapel_diampu))));
+
+        // Sinkronisasi otomatis dari SK Pembagian Tugas Wakakur (AkademikDistribusiMengajar)
+        try {
+            $fromDist = $this->distribusiMengajars()->with('mataPelajaran')->get()->pluck('mataPelajaran.nama_mapel')->filter()->unique()->values()->all();
+            if (!empty($fromDist)) {
+                return $fromDist;
+            }
+        } catch (\Throwable $e) {}
+
+        return [];
     }
 
     /**
-     * Dapatkan daftar tugas tambahan dalam bentuk array.
+     * Dapatkan daftar tugas tambahan dalam bentuk array (Sinkron dengan Permendikbud 15/2018 & SITUAN/SIRANI).
      */
     public function getListTugasTambahanAttribute(): array
     {
-        if (empty($this->tugas_tambahan)) {
-            return [];
+        return collect($this->tugas_tambahan_list)->pluck('nama')->all();
+    }
+
+    /**
+     * Dapatkan total JJM (Jam Mengajar Mingguan).
+     * Jika di profil manual belum diset, otomatis hitung dari SK Pembagian Tugas Wakakur.
+     */
+    public function getJjmAttribute(?int $value): int
+    {
+        if (!empty($value) && $value > 0) {
+            return $value;
         }
-        return array_values(array_filter(array_map('trim', explode(',', $this->tugas_tambahan))));
+
+        try {
+            return (int) $this->distribusiMengajars()->sum('total_jam_per_minggu');
+        } catch (\Throwable $e) {
+            return 0;
+        }
     }
 
     /**
@@ -328,33 +351,136 @@ class Guru extends Model
         return $this->hasMany(ArsipDokumenPtk::class, 'guru_id');
     }
 
+    public function distribusiMengajars(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(AkademikDistribusiMengajar::class, 'guru_id');
+    }
+
+    public function jadwalPelajarans(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(AkademikJadwalPelajaran::class, 'guru_id');
+    }
+
     /**
      * Rincian tugas tambahan yang diemban guru beserta ekuivalensi jam (Permendikbud 15/2018)
      */
     public function getTugasTambahanListAttribute(): array
     {
         $list = [];
+        $addedKeys = [];
 
-        // 1. Dari kolom tugas_tambahan atau jabatan
-        $tugas = strtolower($this->tugas_tambahan ?? $this->jabatan ?? '');
-        if (str_contains($tugas, 'kepala sekolah') && !str_contains($tugas, 'wakil') && !str_contains($tugas, 'waka')) {
-            $list[] = ['nama' => 'Kepala Sekolah', 'jp' => 24, 'kategori' => 'Manajerial'];
-        } elseif (str_contains($tugas, 'waka') || str_contains($tugas, 'wakil')) {
-            $list[] = ['nama' => $this->tugas_tambahan ?: 'Wakil Kepala Sekolah', 'jp' => 12, 'kategori' => 'Pimpinan'];
-        } elseif (str_contains($tugas, 'kaprog') || str_contains($tugas, 'kepala program') || str_contains($tugas, 'ketua jurusan') || str_contains($tugas, 'kepala bengkel') || str_contains($tugas, 'kepala lab')) {
-            $list[] = ['nama' => $this->tugas_tambahan ?: 'Kepala Lab/Bengkel', 'jp' => 12, 'kategori' => 'Teknis'];
-        } elseif (str_contains($tugas, 'osis')) {
-            $list[] = ['nama' => 'Pembina OSIS', 'jp' => 2, 'kategori' => 'Kesiswaan'];
-        } elseif (str_contains($tugas, 'pembina') || str_contains($tugas, 'ekskul')) {
-            $list[] = ['nama' => $this->tugas_tambahan ?: 'Pembina Ekstrakurikuler', 'jp' => 2, 'kategori' => 'Kesiswaan'];
-        } elseif (str_contains($tugas, 'koordinator p5')) {
-            $list[] = ['nama' => 'Koordinator P5', 'jp' => 2, 'kategori' => 'Kurikulum'];
+        // 1. Parsing dari kolom tugas_tambahan atau jabatan
+        $rawTugas = $this->tugas_tambahan ?? '';
+        // Jika tugas_tambahan kosong tapi jabatan adalah Kepala Sekolah atau Waka, gunakan jabatan
+        if (empty($rawTugas) && !empty($this->jabatan)) {
+            $lowJab = strtolower($this->jabatan);
+            if (str_contains($lowJab, 'kepala sekolah') || str_contains($lowJab, 'waka') || str_contains($lowJab, 'pembina')) {
+                $rawTugas = $this->jabatan;
+            }
         }
 
-        // 2. Dari Wali Kelas
+        // Pisahkan jika ada beberapa tugas tambahan dipisah koma atau titik koma
+        $tokens = array_filter(array_map('trim', preg_split('/[,;\n]+/', $rawTugas)));
+
+        foreach ($tokens as $token) {
+            $low = strtolower($token);
+            if (empty($low)) continue;
+
+            $nama = $token;
+            $jp = 2;
+            $kategori = 'Penugasan Khusus';
+
+            if (str_contains($low, 'kepala sekolah') && !str_contains($low, 'wakil') && !str_contains($low, 'waka')) {
+                $nama = 'Kepala Sekolah';
+                $jp = 24;
+                $kategori = 'Manajerial';
+            } elseif (str_contains($low, 'waka') || str_contains($low, 'wakil')) {
+                $nama = ucwords($token);
+                $jp = 12;
+                $kategori = 'Pimpinan';
+            } elseif (str_contains($low, 'kaprog') || str_contains($low, 'kepala program') || str_contains($low, 'ketua program') || str_contains($low, 'ketua jurusan')) {
+                $nama = ucwords($token);
+                $jp = 12;
+                $kategori = 'Ketua Program';
+            } elseif (str_contains($low, 'kepala bengkel') || str_contains($low, 'kepala lab') || str_contains($low, 'kepala laboratorium')) {
+                $nama = ucwords($token);
+                $jp = 12;
+                $kategori = 'Kepala Bengkel/Lab';
+            } elseif (str_contains($low, 'perpustakaan') || str_contains($low, 'perpus')) {
+                $nama = 'Kepala Perpustakaan Sekolah';
+                $jp = 12;
+                $kategori = 'Perpustakaan';
+            } elseif (str_contains($low, 'unit produksi') || str_contains($low, 'blud')) {
+                $nama = ucwords($token);
+                $jp = 6;
+                $kategori = 'Unit Produksi';
+            } elseif (str_contains($low, 'osis')) {
+                $nama = 'Pembina OSIS';
+                $jp = 2;
+                $kategori = 'Kesiswaan';
+            } elseif (str_contains($low, 'pramuka')) {
+                $nama = 'Pembina Pramuka';
+                $jp = 2;
+                $kategori = 'Kesiswaan';
+            } elseif (str_contains($low, 'pmr') || str_contains($low, 'palang merah')) {
+                $nama = 'Pembina PMR / UKS';
+                $jp = 2;
+                $kategori = 'Kesiswaan';
+            } elseif (str_contains($low, 'rohis') || str_contains($low, 'keagamaan')) {
+                $nama = 'Pembina Rohani Islam (Rohis)';
+                $jp = 2;
+                $kategori = 'Kesiswaan';
+            } elseif (str_contains($low, 'pembina') || str_contains($low, 'ekskul') || str_contains($low, 'ekstrakurikuler') || str_contains($low, 'club')) {
+                $nama = ucwords($token);
+                $jp = 2;
+                $kategori = 'Kesiswaan';
+            } elseif (str_contains($low, 'p5') || str_contains($low, 'profil pelajar')) {
+                $nama = 'Koordinator Projek Penguatan Profil Pelajar Pancasila (P5)';
+                $jp = 2;
+                $kategori = 'Kurikulum';
+            } elseif (str_contains($low, 'pkl') || str_contains($low, 'prakerin') || str_contains($low, 'bkk') || str_contains($low, 'bursa kerja')) {
+                $nama = ucwords($token);
+                $jp = 2;
+                $kategori = 'Hubinmas / BKK';
+            } elseif (str_contains($low, 'spmi') || str_contains($low, 'tpmps') || str_contains($low, 'penjaminan mutu')) {
+                $nama = 'Tim Penjaminan Mutu Pendidikan Sekolah (TPMPS)';
+                $jp = 2;
+                $kategori = 'Manajemen Mutu';
+            } elseif (str_contains($low, 'piket')) {
+                $nama = 'Guru Piket';
+                $jp = 1;
+                $kategori = 'Operasional';
+            } elseif (str_contains($low, 'wali kelas') || str_contains($low, 'walas')) {
+                $nama = ucwords($token);
+                $jp = 2;
+                $kategori = 'Wali Kelas';
+            }
+
+            $uniqueKey = strtolower($nama);
+            if (!isset($addedKeys[$uniqueKey])) {
+                $addedKeys[$uniqueKey] = true;
+                $list[] = [
+                    'nama' => $nama,
+                    'jp' => $jp,
+                    'kategori' => $kategori,
+                ];
+            }
+        }
+
+        // 2. Dari Tabel Rombels (Wali Kelas Resmi)
         $rombelWali = \App\Models\Rombel::where('wali_kelas_id', $this->id)->get();
         foreach ($rombelWali as $rw) {
-            $list[] = ['nama' => 'Wali Kelas ' . $rw->nama_rombel, 'jp' => 2, 'kategori' => 'Wali Kelas'];
+            $namaWali = 'Wali Kelas ' . $rw->nama_rombel;
+            $uniqueKey = strtolower($namaWali);
+            // Hindari duplikasi jika sudah terdeteksi di teks tugas_tambahan
+            if (!isset($addedKeys[$uniqueKey])) {
+                $addedKeys[$uniqueKey] = true;
+                $list[] = [
+                    'nama' => $namaWali,
+                    'jp' => 2,
+                    'kategori' => 'Wali Kelas',
+                ];
+            }
         }
 
         return $list;

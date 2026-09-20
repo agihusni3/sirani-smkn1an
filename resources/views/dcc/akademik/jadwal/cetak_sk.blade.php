@@ -325,5 +325,76 @@
     </div>
   </div>
 
+  {{-- ============================================================ --}}
+  {{-- HALAMAN BARU: LAMPIRAN II (PEMBAGIAN TUGAS TAMBAHAN & WALI KELAS) --}}
+  {{-- ============================================================ --}}
+  <div class="page-break"></div>
+
+  <div class="lampiran-header">
+    <b>LAMPIRAN II : KEPUTUSAN KEPALA SMKN 1 AIR NANINGAN</b><br>
+    NOMOR : {{ $sekolah->nomor_sk_pembagian_tugas ?? '800/012/SMK.01/2026' }}<br>
+    TANGGAL : {{ \Carbon\Carbon::now()->translatedFormat('d F Y') }}<br>
+    TENTANG : PEMBAGIAN TUGAS TAMBAHAN GURU (WAKIL KEPALA SEKOLAH, KEPALA PROGRAM KEAHLIAN, KEPALA BENGKEL/LAB, KEPALA PERPUSTAKAAN, PEMBINA OSIS/EKSTRAKURIKULER, KOORDINATOR P5, &amp; WALI KELAS) SEMESTER {{ $semester == 1 ? 'GANJIL' : 'GENAP' }} TAHUN PELAJARAN {{ $ta?->tahun_ajaran ?? '2025/2026' }}
+  </div>
+
+  <table class="sk-table" style="margin-top:14px;">
+    <thead>
+      <tr>
+        <th style="width:30px;">NO</th>
+        <th style="width:190px;">NAMA GURU / NIP</th>
+        <th style="width:80px;">GOL/PANGKAT</th>
+        <th style="width:160px;">JABATAN / PENUGASAN UTAMA</th>
+        <th>TUGAS TAMBAHAN YANG DITUGASKAN</th>
+        <th style="width:110px;">KATEGORI</th>
+        <th style="width:65px;">EKUIVALENSI (JP)</th>
+      </tr>
+    </thead>
+    <tbody>
+      @php $noTt = 1; @endphp
+      @foreach($dataGuruSk as $g)
+        @if(!empty($g->tugas_tambahan))
+          @php $cnt = count($g->tugas_tambahan); @endphp
+          @foreach($g->tugas_tambahan as $tIdx => $tt)
+            <tr>
+              @if($tIdx === 0)
+                <td rowspan="{{ $cnt }}" style="text-align:center;">{{ $noTt++ }}</td>
+                <td rowspan="{{ $cnt }}">
+                  <b>{{ $g->guru->nama }}</b>
+                  @if($g->guru->nip)<div style="font-size:8.5pt; color:#334155;">NIP: {{ $g->guru->nip }}</div>@endif
+                </td>
+                <td rowspan="{{ $cnt }}" style="text-align:center;">
+                  {{ $g->guru->golongan_pangkat ?? 'GTT' }}
+                </td>
+                <td rowspan="{{ $cnt }}">
+                  {{ $g->guru->jabatan ?? 'Guru Mata Pelajaran' }}
+                </td>
+              @endif
+              <td>
+                <b>{{ $tt['nama'] }}</b>
+              </td>
+              <td style="text-align:center; font-size:8.5pt;">
+                {{ $tt['kategori'] ?? 'Tugas Tambahan' }}
+              </td>
+              <td style="text-align:center; font-weight:800; font-size:10pt;">
+                +{{ $tt['jp'] }} JP
+              </td>
+            </tr>
+          @endforeach
+        @endif
+      @endforeach
+    </tbody>
+  </table>
+
+  {{-- Tanda Tangan Lampiran II --}}
+  <div class="tanda-tangan">
+    <div class="ttd-box">
+      Air Naningan, {{ \Carbon\Carbon::now()->translatedFormat('d F Y') }}<br>
+      <b>Kepala SMK Negeri 1 Air Naningan,</b>
+      <br><br><br><br>
+      <b><u>{{ $sekolah->nama_kepala_sekolah ?? 'Aprida, S.Si.' }}</u></b><br>
+      NIP. {{ $sekolah->nip_kepala_sekolah ?? '197904172008012019' }}
+    </div>
+  </div>
+
 </body>
 </html>

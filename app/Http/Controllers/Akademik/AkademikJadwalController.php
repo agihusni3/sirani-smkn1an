@@ -1322,4 +1322,39 @@ class AkademikJadwalController extends Controller
         return redirect()->route('akademik.jadwal.index', ['tab' => 'distribusi'])
             ->with('success', 'Alokasi pengampu berhasil dihapus.');
     }
+
+    /**
+     * Update Tugas Tambahan Guru (Waka, Kaprog, Ka. Bengkel/Lab, Pembina, Koordinator P5, dll.)
+     * Langsung dari modul Wakakur / Pembagian Tugas
+     */
+    public function updateTugasTambahan(Request $request)
+    {
+        $request->validate([
+            'guru_id' => 'required|exists:gurus,id',
+            'tugas_tambahan' => 'nullable|string|max:255',
+            'sk_tugas_tambahan' => 'nullable|string|max:150',
+        ]);
+
+        $guru = Guru::findOrFail($request->guru_id);
+        $guru->tugas_tambahan = $request->filled('tugas_tambahan') ? trim($request->tugas_tambahan) : null;
+        $guru->sk_tugas_tambahan = $request->filled('sk_tugas_tambahan') ? trim($request->sk_tugas_tambahan) : null;
+        $guru->save();
+
+        if ($request->expectsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => "Tugas tambahan {$guru->nama} berhasil disimpan.",
+                'guru' => [
+                    'id' => $guru->id,
+                    'nama' => $guru->nama,
+                    'tugas_tambahan' => $guru->tugas_tambahan,
+                    'tugas_tambahan_list' => $guru->tugas_tambahan_list,
+                    'total_ekuivalen' => $guru->total_ekuivalen_tugas_tambahan,
+                ]
+            ]);
+        }
+
+        return redirect()->back()
+            ->with('success', "Tugas tambahan untuk {$guru->nama} berhasil diperbarui.");
+    }
 }

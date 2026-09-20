@@ -1102,6 +1102,7 @@ function tambahIstirahat(hari) {
             <th>Tugas Tambahan (Ekuivalensi Jam)</th>
             <th style="width:80px; text-align:center;">Total Eqv</th>
             <th style="width:130px; text-align:center;">Status Beban</th>
+            <th style="width:110px; text-align:center;">Aksi</th>
           </tr>
         </thead>
         <tbody>
@@ -1160,6 +1161,14 @@ function tambahIstirahat(hari) {
                     <i class="bi bi-exclamation-triangle me-1"></i> KURANG ({{ 24 - $bg->total_ekuivalen }} JP)
                   </span>
                 @endif
+              </td>
+              <td style="text-align:center;">
+                <button type="button" class="btn btn-sm btn-outline-primary"
+                  onclick="openModalTugasTambahan({{ $bg->guru->id }}, '{{ addslashes($bg->guru->nama) }}', '{{ addslashes($bg->guru->tugas_tambahan ?? '') }}', '{{ addslashes($bg->guru->sk_tugas_tambahan ?? '') }}')"
+                  style="font-size:11px; padding:3px 8px; border-radius:6px; font-weight:700; display:inline-flex; align-items:center; gap:4px;"
+                  title="Atur Tugas Tambahan & Ekuivalensi JP">
+                  <i class="bi bi-pencil-square"></i> Atur Tugas
+                </button>
               </td>
             </tr>
           @endforeach
@@ -1799,6 +1808,105 @@ function tambahIstirahat(hari) {
   </div>
 </div>
 
+{{-- MODAL: ATUR TUGAS TAMBAHAN & EKUIVALENSI BEBAN GURU --}}
+<div class="modal fade" id="modalTugasTambahan" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content" style="border-radius:14px;">
+      <form action="{{ route('akademik.jadwal.update-tugas-tambahan') }}" method="POST">
+        @csrf
+        <input type="hidden" name="guru_id" id="tt_guru_id">
+        <div class="modal-header" style="background:linear-gradient(135deg, #f8fafc, #edf2f7); border-bottom:1px solid #e2e8f0;">
+          <h5 class="modal-title" style="font-weight:800; font-size:16px; color:var(--ak-dark); display:flex; align-items:center; gap:8px;">
+            <i class="bi bi-briefcase-fill text-primary"></i> Atur Tugas Tambahan &amp; Ekuivalensi Jam (Permendikbud 15/2018)
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body" style="padding:20px;">
+          <div style="background:#eef2ff; border:1.5px solid #c7d2fe; padding:12px 16px; border-radius:10px; margin-bottom:16px;">
+            <div style="font-size:11px; font-weight:800; color:#4338ca; text-transform:uppercase;">Guru Pendidik:</div>
+            <div id="tt_guru_nama" style="font-size:16px; font-weight:900; color:#1e1b4b; margin-top:2px;"></div>
+            <div style="font-size:11.5px; color:#475569; margin-top:4px;">
+              *Tugas tambahan akan dihitung ekuivalensi jamnya secara otomatis untuk mencukupi beban <b>24–40 JP/minggu</b>. Wali kelas dari rombel yang diampu sudah otomatis terhitung (+2 JP).
+            </div>
+          </div>
+
+          <div style="margin-bottom:16px;">
+            <label class="ak-form-label" style="font-size:12px; font-weight:800; color:#334155; margin-bottom:8px; display:block;">
+              ⚡ Preset Cepat Tugas Tambahan SMK (Klik untuk Pilih / Batalkan):
+            </label>
+            <div style="display:flex; flex-wrap:wrap; gap:6px;">
+              <span class="tt-preset-chip" data-task="Waka Kurikulum" onclick="toggleTugasChip('Waka Kurikulum')">📌 Waka Kurikulum (+12 JP)</span>
+              <span class="tt-preset-chip" data-task="Waka Kesiswaan" onclick="toggleTugasChip('Waka Kesiswaan')">📌 Waka Kesiswaan (+12 JP)</span>
+              <span class="tt-preset-chip" data-task="Waka Sarpras" onclick="toggleTugasChip('Waka Sarpras')">📌 Waka Sarpras (+12 JP)</span>
+              <span class="tt-preset-chip" data-task="Waka Hubin" onclick="toggleTugasChip('Waka Hubin')">📌 Waka Hubin (+12 JP)</span>
+              <span class="tt-preset-chip" data-task="Kepala Program Keahlian RPL" onclick="toggleTugasChip('Kepala Program Keahlian RPL')">💻 Kaprog RPL (+12 JP)</span>
+              <span class="tt-preset-chip" data-task="Kepala Program Keahlian APHP" onclick="toggleTugasChip('Kepala Program Keahlian APHP')">🌾 Kaprog APHP (+12 JP)</span>
+              <span class="tt-preset-chip" data-task="Kepala Program Keahlian TSM" onclick="toggleTugasChip('Kepala Program Keahlian TSM')">🛵 Kaprog TSM (+12 JP)</span>
+              <span class="tt-preset-chip" data-task="Kepala Lab Komputer" onclick="toggleTugasChip('Kepala Lab Komputer')">🖥️ Ka. Lab Komputer (+12 JP)</span>
+              <span class="tt-preset-chip" data-task="Kepala Bengkel Otomotif" onclick="toggleTugasChip('Kepala Bengkel Otomotif')">🔧 Ka. Bengkel Otomotif (+12 JP)</span>
+              <span class="tt-preset-chip" data-task="Kepala Lab APHP" onclick="toggleTugasChip('Kepala Lab APHP')">🧪 Ka. Lab APHP (+12 JP)</span>
+              <span class="tt-preset-chip" data-task="Kepala Perpustakaan Sekolah" onclick="toggleTugasChip('Kepala Perpustakaan Sekolah')">📚 Ka. Perpustakaan (+12 JP)</span>
+              <span class="tt-preset-chip" data-task="Pembina OSIS" onclick="toggleTugasChip('Pembina OSIS')">🎗️ Pembina OSIS (+2 JP)</span>
+              <span class="tt-preset-chip" data-task="Pembina Pramuka" onclick="toggleTugasChip('Pembina Pramuka')">⚜️ Pembina Pramuka (+2 JP)</span>
+              <span class="tt-preset-chip" data-task="Pembina PMR" onclick="toggleTugasChip('Pembina PMR')">🩹 Pembina PMR (+2 JP)</span>
+              <span class="tt-preset-chip" data-task="Pembina Rohis" onclick="toggleTugasChip('Pembina Rohis')">🕌 Pembina Rohis (+2 JP)</span>
+              <span class="tt-preset-chip" data-task="Koordinator Projek Penguatan Profil Pelajar Pancasila (P5)" onclick="toggleTugasChip('Koordinator Projek Penguatan Profil Pelajar Pancasila (P5)')">🌟 Koordinator P5 (+2 JP)</span>
+              <span class="tt-preset-chip" data-task="Koordinator BKK / PKL" onclick="toggleTugasChip('Koordinator BKK / PKL')">🤝 Koordinator BKK/PKL (+2 JP)</span>
+              <span class="tt-preset-chip" data-task="Guru Piket" onclick="toggleTugasChip('Guru Piket')">🕒 Guru Piket (+1 JP)</span>
+            </div>
+          </div>
+
+          <div style="margin-bottom:14px;">
+            <label class="ak-form-label">Daftar Tugas Tambahan (Pisahkan dengan koma jika lebih dari satu)</label>
+            <input type="text" name="tugas_tambahan" id="tt_tugas_tambahan" class="ak-input" style="font-weight:600; font-size:13px;" placeholder="Contoh: Waka Sarpras, Kepala Lab Komputer" oninput="updateTugasChipsActiveState()">
+            <div style="font-size:11px; color:#64748b; margin-top:3px;">
+              Anda dapat mengetik langsung tugas spesifik atau klik tombol preset di atas.
+            </div>
+          </div>
+
+          <div style="margin-bottom:14px;">
+            <label class="ak-form-label">Nomor SK Penugasan / SK Kepala Sekolah (Opsional)</label>
+            <input type="text" name="sk_tugas_tambahan" id="tt_sk_tugas_tambahan" class="ak-input" placeholder="Contoh: 800/015/SMK.01/2026">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="ak-btn ak-btn-secondary" data-bs-dismiss="modal">Batal</button>
+          <button type="submit" class="ak-btn ak-btn-primary">
+            <i class="bi bi-save me-1"></i> Simpan Tugas Tambahan
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<style>
+.tt-preset-chip {
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 20px;
+  background: #f8fafc;
+  color: #334155;
+  border: 1px solid #cbd5e1;
+  user-select: none;
+  transition: all 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+}
+.tt-preset-chip:hover {
+  background: #e0e7ff;
+  border-color: #6366f1;
+  color: #4338ca;
+}
+.tt-preset-chip.active {
+  background: #4f46e5 !important;
+  color: #ffffff !important;
+  border-color: #4338ca !important;
+}
+</style>
+
 <script>
 let currentActiveSlotId = 0;
 
@@ -2153,6 +2261,49 @@ document.addEventListener('DOMContentLoaded', function() {
     onFormRombelChanged();
   }
 });
+
+function openModalTugasTambahan(guruId, guruNama, tugasTambahan, skTugas) {
+  document.getElementById('tt_guru_id').value = guruId;
+  document.getElementById('tt_guru_nama').innerText = guruNama;
+  document.getElementById('tt_tugas_tambahan').value = tugasTambahan || '';
+  document.getElementById('tt_sk_tugas_tambahan').value = skTugas || '';
+  
+  updateTugasChipsActiveState();
+  
+  const modalEl = document.getElementById('modalTugasTambahan');
+  const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+  modal.show();
+}
+
+function toggleTugasChip(chipName) {
+  const input = document.getElementById('tt_tugas_tambahan');
+  let currentVal = input.value.trim();
+  let items = currentVal ? currentVal.split(',').map(s => s.trim()).filter(Boolean) : [];
+  
+  const existingIdx = items.findIndex(item => item.toLowerCase() === chipName.toLowerCase());
+  if (existingIdx >= 0) {
+    items.splice(existingIdx, 1);
+  } else {
+    items.push(chipName);
+  }
+  input.value = items.join(', ');
+  updateTugasChipsActiveState();
+}
+
+function updateTugasChipsActiveState() {
+  const input = document.getElementById('tt_tugas_tambahan');
+  if (!input) return;
+  const currentVal = input.value.toLowerCase();
+  const chips = document.querySelectorAll('.tt-preset-chip');
+  chips.forEach(chip => {
+    const chipText = chip.getAttribute('data-task').toLowerCase();
+    if (currentVal.includes(chipText)) {
+      chip.classList.add('active');
+    } else {
+      chip.classList.remove('active');
+    }
+  });
+}
 </script>
 <script>
 // Konfirmasi hapus jadwal massal dengan detail
