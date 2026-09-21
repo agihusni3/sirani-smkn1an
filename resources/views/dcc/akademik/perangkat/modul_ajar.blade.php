@@ -21,8 +21,8 @@
 
   @if($activePerangkat && ($activePerangkat->guru_id == auth()->user()->guru_id || $isAdminOrWaka))
     <button type="button" class="ak-btn ak-btn-primary" data-bs-toggle="modal" data-bs-target="#modalTambahModul">
-      <i class="bi bi-plus-lg"></i>
-      <span>+ Tambah Modul Ajar / LKPD</span>
+      <i class="bi bi-plus-lg me-1"></i>
+      <span>Tambah Modul Ajar</span>
     </button>
   @endif
 </div>
@@ -30,31 +30,14 @@
 @include('dcc.akademik.perangkat.partials.selector')
 
 @if($activePerangkat)
-  {{-- Header Info Modul --}}
-  <div class="akademik-card" style="margin-bottom:20px; padding:16px 20px;">
-    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
-      <div>
-        <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px;">
-          <span class="ak-badge ak-badge-primary" style="font-size:12px; font-weight:800;">
-            Kelas {{ $activePerangkat->tingkat }} · Fase {{ $activePerangkat->fase }}
-          </span>
-          <span class="ak-badge ak-badge-secondary" style="font-size:12px;">
-            Semester {{ $activePerangkat->semester == 1 ? '1 (Ganjil)' : '2 (Genap)' }}
-          </span>
-          <span class="ak-badge ak-badge-info" style="font-size:12px;">
-            {{ $activePerangkat->mataPelajaran?->nama_mapel }}
-          </span>
-        </div>
-        <div style="font-size:13px; color:#64748b;">
-          Pendidik: <b>{{ $activePerangkat->guru?->nama }}</b>
-        </div>
-      </div>
-
-      <div>
-        <span class="badge" style="background:#e0f2fe; color:#0369a1; font-size:13px; padding:6px 14px; font-weight:800;">
-          {{ $modulAjars->count() }} Modul Ajar Tersedia
-        </span>
-      </div>
+  {{-- Header Daftar Modul --}}
+  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; flex-wrap:wrap; gap:10px;">
+    <div style="font-size:15px; font-weight:800; color:var(--ak-dark); display:flex; align-items:center; gap:8px;">
+      <i class="bi bi-collection text-primary"></i>
+      Daftar Modul Ajar &amp; LKPD
+      <span class="badge" style="background:#e0f2fe; color:#0369a1; font-size:12px; font-weight:700;">
+        {{ $modulAjars->count() }} Modul
+      </span>
     </div>
   </div>
 

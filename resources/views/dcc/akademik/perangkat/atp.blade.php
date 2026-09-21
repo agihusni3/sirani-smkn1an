@@ -21,8 +21,8 @@
 
   @if($activePerangkat && ($activePerangkat->guru_id == auth()->user()->guru_id || $isAdminOrWaka))
     <button type="button" class="ak-btn ak-btn-primary" data-bs-toggle="modal" data-bs-target="#modalTambahAtp">
-      <i class="bi bi-plus-lg"></i>
-      <span>+ Tambah Butir TP / ATP</span>
+      <i class="bi bi-plus-lg me-1"></i>
+      <span>Tambah Butir TP</span>
     </button>
   @endif
 </div>
@@ -30,56 +30,36 @@
 @include('dcc.akademik.perangkat.partials.selector')
 
 @if($activePerangkat)
-  {{-- Header Info Mapel & Total JP --}}
-  <div class="akademik-card" style="margin-bottom:20px; padding:16px 20px;">
-    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
-      <div>
-        <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px;">
-          <span class="ak-badge ak-badge-primary" style="font-size:12px; font-weight:800;">
-            Kelas {{ $activePerangkat->tingkat }} · Fase {{ $activePerangkat->fase }}
-          </span>
-          <span class="ak-badge ak-badge-secondary" style="font-size:12px;">
-            Semester {{ $activePerangkat->semester == 1 ? '1 (Ganjil)' : '2 (Genap)' }}
-          </span>
-          <span class="ak-badge ak-badge-info" style="font-size:12px;">
-            {{ $activePerangkat->mataPelajaran?->nama_mapel }}
-          </span>
-        </div>
-        <div style="font-size:13px; color:#64748b;">
-          Pendidik: <b>{{ $activePerangkat->guru?->nama }}</b> · NIP: {{ $activePerangkat->guru?->nip ?? '-' }}
-        </div>
-      </div>
-
-      <div style="display:flex; gap:12px; align-items:center;">
-        <div style="text-align:right;">
-          <div style="font-size:11.5px; font-weight:700; color:#64748b; text-transform:uppercase;">Akumulasi Beban ATP</div>
-          <div style="font-size:22px; font-weight:900; color:var(--ak-primary);">
-            {{ $totalJp }} <span style="font-size:13px; font-weight:700; color:#64748b;">JP Terjadwal</span>
-          </div>
-        </div>
-        <div style="border-left:1px solid #e2e8f0; height:36px;"></div>
-        <div style="text-align:right;">
-          <div style="font-size:11.5px; font-weight:700; color:#64748b; text-transform:uppercase;">Jumlah Butir TP</div>
-          <div style="font-size:22px; font-weight:900; color:#059669;">
-            {{ $atpItems->count() }} <span style="font-size:13px; font-weight:700; color:#64748b;">Tujuan</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
   {{-- Tabel Alur Tujuan Pembelajaran (ATP) --}}
-  <div class="akademik-card">
-    <div class="akademik-card-header" style="background:#f8fafc; display:flex; justify-content:space-between; align-items:center;">
-      <h3 class="akademik-card-title" style="font-size:15px;">
-        <i class="bi bi-table text-primary me-2"></i>
-        Matriks Rincian Alur Tujuan Pembelajaran (ATP)
-      </h3>
-      @if($atpItems->isNotEmpty() && ($activePerangkat->guru_id == auth()->user()->guru_id || $isAdminOrWaka))
-        <button type="button" class="ak-btn ak-btn-primary ak-btn-sm" data-bs-toggle="modal" data-bs-target="#modalTambahAtp" style="font-size:12px;">
-          <i class="bi bi-plus-lg me-1"></i> Tambah TP
-        </button>
-      @endif
+  <div class="akademik-card" style="border-top:4px solid var(--ak-primary);">
+    <div class="akademik-card-header" style="background:#f8fafc; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; padding:12px 20px;">
+      <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+        <h3 class="akademik-card-title" style="font-size:15px; margin:0;">
+          <i class="bi bi-table text-primary me-2"></i>
+          Matriks Alur Tujuan Pembelajaran (ATP)
+        </h3>
+        <span class="ak-badge ak-badge-primary" style="font-size:11.5px; font-weight:800;">
+          Fase {{ $activePerangkat->fase }}
+        </span>
+      </div>
+
+      <div style="display:flex; align-items:center; gap:14px; flex-wrap:wrap;">
+        <div style="display:flex; align-items:center; gap:10px; font-size:12.5px;">
+          <span style="color:#64748b;">
+            Beban ATP: <strong style="color:var(--ak-primary); font-size:14px; font-weight:800;">{{ $totalJp }} JP</strong>
+          </span>
+          <span style="color:#cbd5e1;">&bull;</span>
+          <span style="color:#64748b;">
+            Jumlah: <strong style="color:#059669; font-size:14px; font-weight:800;">{{ $atpItems->count() }} Tujuan</strong>
+          </span>
+        </div>
+
+        @if($atpItems->isNotEmpty() && ($activePerangkat->guru_id == auth()->user()->guru_id || $isAdminOrWaka))
+          <button type="button" class="ak-btn ak-btn-primary ak-btn-sm" data-bs-toggle="modal" data-bs-target="#modalTambahAtp" style="font-size:12px; padding:5px 12px; font-weight:700;">
+            <i class="bi bi-plus-lg me-1"></i> Tambah TP
+          </button>
+        @endif
+      </div>
     </div>
 
     <div class="akademik-card-body" style="padding:0;">

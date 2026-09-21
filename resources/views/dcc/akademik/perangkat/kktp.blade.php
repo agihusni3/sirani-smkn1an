@@ -21,8 +21,8 @@
 
   @if($activePerangkat && ($activePerangkat->guru_id == auth()->user()->guru_id || $isAdminOrWaka))
     <button type="button" class="ak-btn ak-btn-primary" data-bs-toggle="modal" data-bs-target="#modalTambahKktp">
-      <i class="bi bi-plus-lg"></i>
-      <span>+ Atur Kriteria KKTP</span>
+      <i class="bi bi-plus-lg me-1"></i>
+      <span>Atur Kriteria KKTP</span>
     </button>
   @endif
 </div>

@@ -80,7 +80,7 @@
         @if($missingDists->isNotEmpty())
           <div class="dropdown">
             <button class="ak-btn ak-btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" style="font-size:11.5px; padding:5px 10px; font-weight:700;">
-              <i class="bi bi-plus-lg me-1"></i> + Buat Perangkat Mapel Lain
+              <i class="bi bi-plus-lg me-1"></i> Buat Perangkat Mapel Lain
             </button>
             <ul class="dropdown-menu dropdown-menu-end" style="font-size:12px; border-radius:10px; box-shadow:0 10px 25px rgba(0,0,0,0.1);">
               @foreach($missingDists as $dist)
