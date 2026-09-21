@@ -6,233 +6,156 @@
 @section('content')
 
 {{-- ========================================================================== --}}
-{{-- 1. HERO WELCOME BANNER                                                     --}}
+{{-- 1. HERO WELCOME BANNER (SAMBUTAN WAKA KURIKULUM)                           --}}
 {{-- ========================================================================== --}}
 <div class="akademik-hero">
   <div class="akademik-hero-top">
     <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
       <span class="akademik-hero-badge">
-        <i class="bi bi-mortarboard-fill"></i> Kurikulum Merdeka SMK
+        <i class="bi bi-person-check-fill"></i> Tim Kurikulum &amp; Manajemen KBM
       </span>
       <span class="akademik-hero-badge">
-        <i class="bi bi-calendar-event"></i> Tahun Ajaran {{ $ta?->tahun_ajaran ?? '2026/2027' }} · Ganjil
+        <i class="bi bi-calendar-event"></i> Tahun Ajaran {{ $ta?->nama ?? $ta?->tahun_ajaran ?? '2026/2027' }} · Ganjil
       </span>
       <span class="akademik-hero-badge" style="background:rgba(255,255,255,0.22);">
         <i class="bi bi-clock-history"></i> {{ \Carbon\Carbon::now()->locale('id')->isoFormat('dddd, D MMMM Y') }}
       </span>
     </div>
 
-    <div style="display:flex; align-items:center; gap:8px;">
-      <span style="font-size:12px; font-weight:700; color:rgba(255,255,255,0.9); display:flex; align-items:center; gap:6px;">
-        <span style="display:inline-block; width:8px; height:8px; border-radius:50%; background:#34d399; box-shadow:0 0 10px #34d399;"></span>
-        Ekosistem DCC Aktif
-      </span>
+    <div>
+      @if($kalender)
+        @if($kalender->is_locked)
+          <span class="akademik-hero-badge" style="background:#10b981; color:#fff;">
+            <i class="bi bi-shield-check me-1"></i> Kaldik Resmi Ditetapkan
+          </span>
+        @else
+          <span class="akademik-hero-badge" style="background:#f59e0b; color:#fff;">
+            <i class="bi bi-pencil-square me-1"></i> Draf Kalender Akademik
+          </span>
+        @endif
+      @endif
     </div>
   </div>
 
   <h1 class="akademik-hero-title">
-    Pusat Kendali Akademik &amp; KBM Terpadu
+    Selamat Datang, {{ auth()->user()?->name ?? 'Waka Kurikulum' }}
   </h1>
   <p class="akademik-hero-desc">
-    Sistem Manajemen Pembelajaran SMKN 1 Air Naningan yang mengintegrasikan Roster Jadwal Wakakur, Jurnal KBM Harian Guru, Asesmen Ujian Daring (CBT), Buku Nilai &amp; Leger, PKL Industri, serta Penilaian Karakter P5BK.
+    Pusat kendali dan monitoring operasional kurikulum SMKN 1 Air Naningan. Pantau penetapan kalender pendidikan, distribusi beban mengajar guru, matriks roster mingguan, dan keterisian jurnal KBM harian secara terpadu.
   </p>
 
   <div class="akademik-hero-actions">
-    <a href="{{ route('akademik.jurnal.create') }}" class="akademik-hero-btn akademik-hero-btn-primary">
-      <i class="bi bi-plus-circle-fill"></i>
-      <span>Isi Jurnal KBM Hari Ini</span>
+    <a href="{{ route('akademik.kalender.index') }}" class="akademik-hero-btn akademik-hero-btn-primary">
+      <i class="bi bi-calendar-range"></i>
+      <span>Kalender Pendidikan (Kaldik)</span>
     </a>
-    <a href="{{ route('akademik.jadwal.index') }}" class="akademik-hero-btn akademik-hero-btn-ghost">
-      <i class="bi bi-calendar3-week"></i>
-      <span>Roster Jadwal Wakakur</span>
+    <a href="{{ route('akademik.jadwal.index', ['tab' => 'distribusi']) }}" class="akademik-hero-btn akademik-hero-btn-ghost">
+      <i class="bi bi-file-earmark-person"></i>
+      <span>SK &amp; Beban Mengajar</span>
     </a>
-    <a href="{{ route('akademik.asesmen.index') }}" class="akademik-hero-btn akademik-hero-btn-ghost">
-      <i class="bi bi-laptop"></i>
-      <span>Asesmen Online (CBT)</span>
+    <a href="{{ route('akademik.jadwal.index', ['tab' => 'jadwal']) }}" class="akademik-hero-btn akademik-hero-btn-ghost">
+      <i class="bi bi-clock-history"></i>
+      <span>Roster Jadwal Kelas</span>
     </a>
-    <a href="{{ route('akademik.nilai.leger') }}" class="akademik-hero-btn akademik-hero-btn-ghost">
-      <i class="bi bi-table"></i>
-      <span>Leger Nilai Kelas</span>
+    <a href="{{ route('akademik.perangkat.supervisi-meja') }}" class="akademik-hero-btn akademik-hero-btn-ghost">
+      <i class="bi bi-patch-check"></i>
+      <span>Supervisi Perangkat</span>
     </a>
   </div>
 </div>
 
 {{-- ========================================================================== --}}
-{{-- 2. KPI STATS GRID (6 PILAR UTAMA)                                          --}}
+{{-- 2. AGENDA KALDIK TERDEKAT / SEDANG BERJALAN (INFORMASI PENTING WAKAKUR)    --}}
+{{-- ========================================================================== --}}
+@if($agendaKaldikTerdekat)
+  <div style="background:#ffffff; border:1px solid #e2e8f0; border-left:4px solid #6366f1; border-radius:12px; padding:14px 18px; margin-bottom:20px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; box-shadow:0 2px 4px rgba(0,0,0,0.03);">
+    <div style="display:flex; align-items:center; gap:12px; min-width:0;">
+      <div style="width:40px; height:40px; border-radius:10px; background:#eff2fe; color:#4f46e5; display:flex; align-items:center; justify-content:center; font-size:18px; flex-shrink:0;">
+        <i class="bi bi-calendar-event-fill"></i>
+      </div>
+      <div style="min-width:0;">
+        <div style="font-size:11px; font-weight:800; text-transform:uppercase; color:#6366f1; letter-spacing:0.04em;">
+          Agenda Kurikulum Berjalan / Terdekat
+        </div>
+        <div style="font-size:14px; font-weight:800; color:var(--ak-dark); margin-top:2px;">
+          {{ $agendaKaldikTerdekat->keterangan }}
+          <span class="badge" style="background:{{ $agendaKaldikTerdekat->warna ?: '#f59e0b' }}; color:#ffffff; font-size:10px; font-weight:800; padding:2px 6px; margin-left:6px;">
+            {{ strtoupper($agendaKaldikTerdekat->kategori) }}
+          </span>
+        </div>
+        <div style="font-size:12px; color:#64748b; margin-top:1px;">
+          <i class="bi bi-clock me-1"></i>
+          {{ $agendaKaldikTerdekat->formatRentangTanggal() ?: ('Pekan ' . $agendaKaldikTerdekat->minggu_ke . ' (' . $agendaKaldikTerdekat->bulan . ')') }}
+          · {{ $agendaKaldikTerdekat->jenis === 'efektif' ? 'KBM Tetap Berjalan' : 'Memotong Jam Tatap Muka KBM' }}
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <a href="{{ route('akademik.kalender.index') }}" class="ak-btn ak-btn-secondary" style="font-size:12px; padding:6px 14px; font-weight:700;">
+        Lihat Seluruh Kaldik <i class="bi bi-arrow-right ms-1"></i>
+      </a>
+    </div>
+  </div>
+@endif
+
+{{-- ========================================================================== --}}
+{{-- 3. INDIKATOR KUNCI KURIKULUM & KBM (KPI STRATEGIS WAKAKUR)                 --}}
 {{-- ========================================================================== --}}
 <div class="akademik-kpi-grid">
-  {{-- 1. Mapel Aktif --}}
-  <a href="{{ route('akademik.matpel.index') }}" class="akademik-kpi-card" title="Kelola Mata Pelajaran">
+  {{-- 1. Rincian Pekan Efektif (Kaldik) --}}
+  <a href="{{ route('akademik.kalender.index') }}" class="akademik-kpi-card" title="Kelola Kalender Pendidikan & Rincian Pekan Efektif">
     <div>
-      <div class="akademik-kpi-val">{{ $totalMapel }}</div>
-      <div class="akademik-kpi-label">Mata Pelajaran Aktif</div>
-    </div>
-    <div class="akademik-kpi-icon icon-violet">
-      <i class="bi bi-journal-bookmark-fill"></i>
-    </div>
-  </a>
-
-  {{-- 2. Alokasi Mengajar --}}
-  <a href="{{ route('akademik.jadwal.index', ['tab' => 'distribusi']) }}" class="akademik-kpi-card" title="Distribusi Beban Mengajar (JJM)">
-    <div>
-      <div class="akademik-kpi-val">{{ $totalDistribusi }}</div>
-      <div class="akademik-kpi-label">Alokasi Beban Jam (JJM)</div>
+      <div class="akademik-kpi-val" style="color:#4f46e5;">
+        {{ $kalender?->pekan_efektif ?? 18 }} 
+        <span style="font-size:13px; font-weight:700; color:#64748b;">/ {{ $kalender?->total_pekan ?? 25 }} Pekan</span>
+      </div>
+      <div class="akademik-kpi-label">Pekan Efektif KBM (RPE)</div>
     </div>
     <div class="akademik-kpi-icon icon-indigo">
-      <i class="bi bi-calendar3-week"></i>
+      <i class="bi bi-calendar-range"></i>
     </div>
   </a>
 
-  {{-- 3. Jurnal KBM Hari Ini --}}
-  <a href="{{ route('akademik.jurnal.index') }}" class="akademik-kpi-card" title="Jurnal KBM Harian">
+  {{-- 2. Mata Pelajaran Kurikulum --}}
+  <a href="{{ route('akademik.matpel.index') }}" class="akademik-kpi-card" title="Kelola Mata Pelajaran Kurikulum">
     <div>
-      <div class="akademik-kpi-val" style="color:#059669;">{{ $jurnalHariIni }}</div>
-      <div class="akademik-kpi-label">Jurnal Terisi Hari Ini</div>
+      <div class="akademik-kpi-val">
+        {{ $totalMapel }} 
+        <span style="font-size:13px; font-weight:700; color:#64748b;">Mapel</span>
+      </div>
+      <div class="akademik-kpi-label">Mata Pelajaran Aktif ({{ $totalDistribusi }} Sesi)</div>
+    </div>
+    <div class="akademik-kpi-icon icon-violet">
+      <i class="bi bi-book"></i>
+    </div>
+  </a>
+
+  {{-- 3. Guru Pengajar Ber-SK --}}
+  <a href="{{ route('akademik.jadwal.index', ['tab' => 'distribusi']) }}" class="akademik-kpi-card" title="Distribusi Beban Mengajar Guru">
+    <div>
+      <div class="akademik-kpi-val" style="color:#059669;">
+        {{ $totalGuruMengajar }} 
+        <span style="font-size:13px; font-weight:700; color:#64748b;">/ {{ $totalGuru }} Guru</span>
+      </div>
+      <div class="akademik-kpi-label">Guru Terplot Beban Ajar</div>
     </div>
     <div class="akademik-kpi-icon icon-emerald">
-      <i class="bi bi-check2-circle"></i>
+      <i class="bi bi-file-earmark-person"></i>
     </div>
   </a>
 
-  {{-- 4. Asesmen Online CBT --}}
-  <a href="{{ route('akademik.asesmen.index') }}" class="akademik-kpi-card" title="Asesmen Penilaian Online">
+  {{-- 4. Keterisian Jurnal KBM Hari Ini --}}
+  <a href="{{ route('akademik.jurnal.index') }}" class="akademik-kpi-card" title="Monitoring Keterisian Jurnal Guru Hari Ini">
     <div>
-      <div class="akademik-kpi-val" style="color:#2563eb;">{{ $asesmenAktif }}</div>
-      <div class="akademik-kpi-label">Asesmen Online Aktif</div>
-    </div>
-    <div class="akademik-kpi-icon icon-blue">
-      <i class="bi bi-laptop"></i>
-    </div>
-  </a>
-
-  {{-- 5. Nilai & Leger Siswa --}}
-  <a href="{{ route('akademik.nilai.index') }}" class="akademik-kpi-card" title="Input & Rekap Nilai Siswa">
-    <div>
-      <div class="akademik-kpi-val" style="color:#0891b2;">{{ $totalNilai }}</div>
-      <div class="akademik-kpi-label">Nilai Siswa Terinput</div>
+      <div class="akademik-kpi-val" style="color:#0284c7;">
+        {{ $jurnalHariIni }} 
+        <span style="font-size:13px; font-weight:700; color:#64748b;">/ {{ $totalJadwalHariIni }} Sesi</span>
+      </div>
+      <div class="akademik-kpi-label">Jurnal KBM Terisi Hari Ini</div>
     </div>
     <div class="akademik-kpi-icon icon-cyan">
-      <i class="bi bi-award-fill"></i>
-    </div>
-  </a>
-
-  {{-- 6. Siswa PKL DU/DI --}}
-  <a href="{{ route('akademik.pkl.index') }}" class="akademik-kpi-card" title="Praktik Kerja Lapangan (PKL)">
-    <div>
-      <div class="akademik-kpi-val" style="color:#d97706;">{{ $siswaPklAktif }}</div>
-      <div class="akademik-kpi-label">Siswa Magang / PKL</div>
-    </div>
-    <div class="akademik-kpi-icon icon-amber">
-      <i class="bi bi-buildings-fill"></i>
-    </div>
-  </a>
-</div>
-
-{{-- ========================================================================== --}}
-{{-- 3. PUSAT AKSES CEPAT MODUL (6 PILAR AKADEMIK)                              --}}
-{{-- ========================================================================== --}}
-<div style="margin-bottom:12px; display:flex; justify-content:space-between; align-items:center;">
-  <h2 style="font-size:16px; font-weight:800; color:var(--ak-dark); margin:0; display:flex; align-items:center; gap:8px;">
-    <i class="bi bi-grid-fill text-primary"></i>
-    Pilar Layanan Akademik &amp; KBM SMK
-  </h2>
-  <span style="font-size:12px; color:#64748b;">Akses langsung fitur operasional harian</span>
-</div>
-
-<div class="akademik-modules-grid">
-  {{-- Modul 1: Jadwal & Roster Pelajaran --}}
-  <a href="{{ route('akademik.jadwal.index') }}" class="akademik-module-card">
-    <div class="akademik-module-icon icon-violet">
-      <i class="bi bi-calendar-week-fill"></i>
-    </div>
-    <div style="flex:1;">
-      <div class="akademik-module-title">
-        <span>Jadwal Pelajaran (Roster)</span>
-        <i class="bi bi-arrow-right-short" style="font-size:18px; color:var(--ak-primary);"></i>
-      </div>
-      <p class="akademik-module-desc">
-        Matriks jadwal mingguan kelas X, XI, XII, formulasi cepat blok jam, live anti-bentrok, &amp; cetak resmi Wakakur.
-      </p>
-    </div>
-  </a>
-
-  {{-- Modul 2: Jurnal KBM Harian & Presensi --}}
-  <a href="{{ route('akademik.jurnal.index') }}" class="akademik-module-card">
-    <div class="akademik-module-icon icon-emerald">
-      <i class="bi bi-journal-text"></i>
-    </div>
-    <div style="flex:1;">
-      <div class="akademik-module-title">
-        <span>Jurnal KBM &amp; Presensi</span>
-        <i class="bi bi-arrow-right-short" style="font-size:18px; color:#059669;"></i>
-      </div>
-      <p class="akademik-module-desc">
-        Pencatatan materi sesi KBM tatap muka, kehadiran siswa per jam pelajaran (H/I/S/A), dan refleksi guru.
-      </p>
-    </div>
-  </a>
-
-  {{-- Modul 3: Asesmen Penilaian Online (CBT) --}}
-  <a href="{{ route('akademik.asesmen.index') }}" class="akademik-module-card">
-    <div class="akademik-module-icon icon-indigo">
-      <i class="bi bi-laptop"></i>
-    </div>
-    <div style="flex:1;">
-      <div class="akademik-module-title">
-        <span>Asesmen Online (CBT)</span>
-        <span class="ak-badge ak-badge-primary" style="font-size:10px; padding:2px 6px;">CBT</span>
-      </div>
-      <p class="akademik-module-desc">
-        Ujian daring real-time, bank soal pilihan ganda, hitung nilai otomatis, dan 1-klik transfer nilai ke leger.
-      </p>
-    </div>
-  </a>
-
-  {{-- Modul 4: Buku Nilai & Leger Kelas --}}
-  <a href="{{ route('akademik.nilai.index') }}" class="akademik-module-card">
-    <div class="akademik-module-icon icon-cyan">
-      <i class="bi bi-table"></i>
-    </div>
-    <div style="flex:1;">
-      <div class="akademik-module-title">
-        <span>Buku Nilai &amp; Leger Kelas</span>
-        <i class="bi bi-arrow-right-short" style="font-size:18px; color:#0891b2;"></i>
-      </div>
-      <p class="akademik-module-desc">
-        Rekap nilai formatif 1..3, sumatif STS/SAS, otomatisasi predikat capaian kompetensi, &amp; cetak leger kelas.
-      </p>
-    </div>
-  </a>
-
-  {{-- Modul 5: Praktik Kerja Lapangan (PKL) --}}
-  <a href="{{ route('akademik.pkl.index') }}" class="akademik-module-card">
-    <div class="akademik-module-icon icon-amber">
-      <i class="bi bi-buildings-fill"></i>
-    </div>
-    <div style="flex:1;">
-      <div class="akademik-module-title">
-        <span>Praktik Kerja Lapangan</span>
-        <i class="bi bi-arrow-right-short" style="font-size:18px; color:#d97706;"></i>
-      </div>
-      <p class="akademik-module-desc">
-        Manajemen mitra industri (DU/DI), penempatan siswa magang tingkat XII, dan penilaian pembimbing lapangan.
-      </p>
-    </div>
-  </a>
-
-  {{-- Modul 6: Projek Penguatan Karakter P5BK --}}
-  <a href="{{ route('akademik.p5bk.index') }}" class="akademik-module-card">
-    <div class="akademik-module-icon icon-rose">
-      <i class="bi bi-stars"></i>
-    </div>
-    <div style="flex:1;">
-      <div class="akademik-module-title">
-        <span>Projek Karakter P5BK</span>
-        <i class="bi bi-arrow-right-short" style="font-size:18px; color:#e11d48;"></i>
-      </div>
-      <p class="akademik-module-desc">
-        Penilaian 6 Dimensi Profil Pelajar Pancasila &amp; etos budaya kerja industri khas vokasi SMK Negeri 1 Air Naningan.
-      </p>
+      <i class="bi bi-journal-check"></i>
     </div>
   </a>
 </div>

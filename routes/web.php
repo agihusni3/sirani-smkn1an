@@ -277,6 +277,7 @@ Route::middleware('auth')->group(function () {
             Route::post('/jadwal/update-pukul', [\App\Http\Controllers\Akademik\AkademikJadwalController::class, 'updatePukul'])->name('akademik.jadwal.update-pukul');
             Route::post('/jadwal/toggle-lock/{id}', [\App\Http\Controllers\Akademik\AkademikJadwalController::class, 'toggleLock'])->name('akademik.jadwal.toggle-lock');
             Route::post('/jadwal/update-tugas-tambahan', [\App\Http\Controllers\Akademik\AkademikJadwalController::class, 'updateTugasTambahan'])->name('akademik.jadwal.update-tugas-tambahan');
+            Route::post('/jadwal/sync-kode-hierarki', [\App\Http\Controllers\Akademik\AkademikJadwalController::class, 'syncKodeHierarki'])->name('akademik.jadwal.sync-kode-hierarki');
             Route::get('/jadwal/master-tugas', [\App\Http\Controllers\Akademik\AkademikJadwalController::class, 'getMasterTugas'])->name('akademik.jadwal.master-tugas.index');
             Route::post('/jadwal/master-tugas', [\App\Http\Controllers\Akademik\AkademikJadwalController::class, 'storeMasterTugas'])->name('akademik.jadwal.master-tugas.store');
             Route::put('/jadwal/master-tugas/{id}', [\App\Http\Controllers\Akademik\AkademikJadwalController::class, 'updateMasterTugas'])->name('akademik.jadwal.master-tugas.update');
@@ -328,14 +329,15 @@ Route::middleware('auth')->group(function () {
 
         // Sub-Modul 3: Jurnal KBM Harian & Presensi Siswa
         Route::get('/jurnal', [\App\Http\Controllers\Akademik\AkademikJurnalController::class, 'index'])->name('akademik.jurnal.index');
-        Route::get('/jurnal/{id}', [\App\Http\Controllers\Akademik\AkademikJurnalController::class, 'show'])->name('akademik.jurnal.show');
-        Route::middleware('role:admin,waka_kurikulum,guru')->group(function () {
+        Route::middleware('role:admin,waka_kurikulum,guru,waka_sarpras,waka_hubin,waka_kesiswaan,kepala_sekolah,wali_kelas,guru_bk')->group(function () {
             Route::get('/jurnal/create', [\App\Http\Controllers\Akademik\AkademikJurnalController::class, 'create'])->name('akademik.jurnal.create');
             Route::post('/jurnal', [\App\Http\Controllers\Akademik\AkademikJurnalController::class, 'store'])->name('akademik.jurnal.store');
         });
+        Route::get('/jurnal/{id}', [\App\Http\Controllers\Akademik\AkademikJurnalController::class, 'show'])->name('akademik.jurnal.show')->whereNumber('id');
         Route::delete('/jurnal/{id}', [\App\Http\Controllers\Akademik\AkademikJurnalController::class, 'destroy'])
             ->name('akademik.jurnal.destroy')
-            ->middleware('role:admin,waka_kurikulum');
+            ->middleware('role:admin,waka_kurikulum')
+            ->whereNumber('id');
 
         // Sub-Modul 4: Penilaian Formatif, Sumatif & Leger
         Route::middleware('role:admin,waka_kurikulum,guru')->group(function () {
@@ -387,12 +389,16 @@ Route::middleware('auth')->group(function () {
             Route::post('/asesmen/{id}/soal', [\App\Http\Controllers\Akademik\AkademikAsesmenController::class, 'storeSoal'])->name('akademik.asesmen.soal.store');
             Route::delete('/asesmen/{id}/soal/{soalId}', [\App\Http\Controllers\Akademik\AkademikAsesmenController::class, 'destroySoal'])->name('akademik.asesmen.soal.destroy');
             Route::post('/asesmen/{id}/toggle', [\App\Http\Controllers\Akademik\AkademikAsesmenController::class, 'toggleStatus'])->name('akademik.asesmen.toggle');
+            Route::post('/asesmen/{id}/refresh-token', [\App\Http\Controllers\Akademik\AkademikAsesmenController::class, 'refreshToken'])->name('akademik.asesmen.refresh_token');
+            Route::post('/asesmen/{id}/reset-siswa/{siswaId}', [\App\Http\Controllers\Akademik\AkademikAsesmenController::class, 'resetSiswa'])->name('akademik.asesmen.reset_siswa');
             Route::post('/asesmen/{id}/push-nilai', [\App\Http\Controllers\Akademik\AkademikAsesmenController::class, 'pushToNilai'])->name('akademik.asesmen.push_nilai');
         });
 
-        // Pengerjaan Ujian Siswa (dan Simulasi Guru/Admin)
+        // Pengerjaan Ujian Siswa & Anti-Cheat Session
         Route::get('/asesmen/{id}/kerjakan', [\App\Http\Controllers\Akademik\AkademikAsesmenController::class, 'kerjakan'])->name('akademik.asesmen.kerjakan');
         Route::post('/asesmen/{id}/submit', [\App\Http\Controllers\Akademik\AkademikAsesmenController::class, 'submitJawaban'])->name('akademik.asesmen.submit');
+        Route::post('/asesmen/{id}/log-pelanggaran', [\App\Http\Controllers\Akademik\AkademikAsesmenController::class, 'logPelanggaran'])->name('akademik.asesmen.log_pelanggaran');
+        Route::post('/asesmen/{id}/autosave', [\App\Http\Controllers\Akademik\AkademikAsesmenController::class, 'autosaveJawaban'])->name('akademik.asesmen.autosave');
     });
 
     Route::get('/akademik', fn() => redirect()->route('akademik.dashboard'));

@@ -166,6 +166,14 @@
         </div>
 
         @if($canEditJadwal)
+        {{-- Sinkron Kode Guru Hirarki --}}
+        <form action="{{ route('akademik.jadwal.sync-kode-hierarki') }}" method="POST" style="margin:0;">
+          @csrf
+          <button type="submit" class="ak-btn" style="font-size:12.5px; font-weight:700; background:#f0fdf4; color:#15803d; border:1px solid #bbf7d0;" title="Sinkronkan nomor urut kode guru otomatis sesuai hirarki struktural sekolah (Kepsek #1, Wakakur #2, Wakasis #3, Waka Sarpras #4, Waka Hubin #5, Kaprog #6+, dst)">
+            <i class="bi bi-diagram-3-fill me-1"></i> Sinkron Hirarki Guru
+          </button>
+        </form>
+
         {{-- Tombol Otomatisasi Jadwal 1-Klik --}}
         <button type="button" class="ak-btn" data-bs-toggle="modal" data-bs-target="#modalAutoScheduler" style="font-size:12.5px; background:linear-gradient(135deg, #059669, #10b981); color:#ffffff; border:none; box-shadow:0 4px 12px rgba(16,185,129,0.3); font-weight:700;">
           <i class="bi bi-magic me-1"></i> ✨ Otomatisasi Jadwal (1-Klik)
@@ -502,25 +510,39 @@ function tambahIstirahat(hari) {
     @endphp
 
     <table class="roster-table">
+      <colgroup>
+        <col style="width: 4%;">
+        <col style="width: 3.5%;">
+        <col style="width: 7.5%;">
+        <col style="width: 10%;">
+        <col style="width: 10%;">
+        <col style="width: 10%;">
+        <col style="width: 10%;">
+        <col style="width: 10%;">
+        <col style="width: 10%;">
+        <col style="width: 5%;">
+        <col style="width: 5%;">
+        <col style="width: 15%;">
+      </colgroup>
       <thead>
         <tr>
-          <th rowspan="2" class="roster-th-dark" style="width:48px;">HARI</th>
-          <th rowspan="2" class="roster-th-dark" style="width:38px;">JAM</th>
-          <th rowspan="2" class="roster-th-dark" style="width:78px;">PUKUL</th>
+          <th rowspan="2" class="roster-th-dark">HARI</th>
+          <th rowspan="2" class="roster-th-dark">JAM</th>
+          <th rowspan="2" class="roster-th-dark">PUKUL</th>
           <th colspan="3" class="roster-th-kelas-x">KELAS X / PROGRAM KEAHLIAN</th>
           <th colspan="3" class="roster-th-kelas-xi">KELAS XI / PROGRAM KEAHLIAN</th>
           <th colspan="2" class="roster-th-kelas-xii">KELAS XII / PKL</th>
-          <th rowspan="2" class="roster-th-piket" style="width:175px;"><i class="bi bi-shield-check me-1"></i> PETUGAS PIKET</th>
+          <th rowspan="2" class="roster-th-piket"><i class="bi bi-shield-check me-1"></i> PETUGAS PIKET</th>
         </tr>
         <tr>
-          <th class="roster-th-sub-aphp" style="width:115px;">APHP</th>
-          <th class="roster-th-sub-rpl" style="width:115px;">RPL</th>
-          <th class="roster-th-sub-tsm" style="width:115px;">TSM</th>
-          <th class="roster-th-sub-aphp" style="width:115px;">APHP</th>
-          <th class="roster-th-sub-rpl" style="width:115px;">RPL</th>
-          <th class="roster-th-sub-tsm" style="width:115px;">TSM</th>
-          <th class="roster-th-sub-aphp" style="width:70px;">APHP</th>
-          <th class="roster-th-sub-rpl" style="width:70px;">RPL</th>
+          <th class="roster-th-sub-aphp">APHP</th>
+          <th class="roster-th-sub-rpl">RPL</th>
+          <th class="roster-th-sub-tsm">TSM</th>
+          <th class="roster-th-sub-aphp">APHP</th>
+          <th class="roster-th-sub-rpl">RPL</th>
+          <th class="roster-th-sub-tsm">TSM</th>
+          <th class="roster-th-sub-aphp">APHP</th>
+          <th class="roster-th-sub-rpl">RPL</th>
         </tr>
       </thead>
       <tbody>
@@ -557,18 +579,24 @@ function tambahIstirahat(hari) {
             </td>
             {{-- Petugas Piket --}}
             <td rowspan="{{ $totalDayRows }}" class="roster-cell-piket">
-              <div class="roster-piket-badge-waka">Waka Piket</div>
-              <div class="roster-piket-name-waka">{{ $piket?->wakaPiket?->nama ?? '-' }}</div>
-              <div class="roster-piket-badge-guru">Guru Piket</div>
-              <div class="roster-piket-list">
-                @forelse($piket?->guru_list ?? [] as $gp)
-                  <div class="roster-piket-item">
-                    <i class="bi bi-person-check-fill text-success" style="font-size:11px; margin-top:2px;"></i>
-                    <span>{{ $gp->nama }}</span>
-                  </div>
-                @empty
-                  <div style="font-style:italic; color:#94a3b8; font-size:10.5px;">Belum diatur</div>
-                @endforelse
+              <div class="roster-piket-mini-card">
+                <div class="roster-piket-badge-waka">Waka Piket</div>
+                <div class="roster-piket-name-waka" title="{{ $piket?->wakaPiket?->nama ?? '-' }}">
+                  {{ $piket?->wakaPiket?->nama ?? '-' }}
+                </div>
+              </div>
+              <div class="roster-piket-mini-card">
+                <div class="roster-piket-badge-guru">Guru Piket</div>
+                <div class="roster-piket-list">
+                  @forelse($piket?->guru_list ?? [] as $gp)
+                    <div class="roster-piket-item" title="{{ $gp->nama }}">
+                      <i class="bi bi-person-check-fill text-success" style="font-size:10.5px; flex-shrink:0;"></i>
+                      <span>{{ $gp->nama }}</span>
+                    </div>
+                  @empty
+                    <div style="font-style:italic; color:#94a3b8; font-size:10.5px;">Belum diatur</div>
+                  @endforelse
+                </div>
               </div>
             </td>
           </tr>
@@ -674,11 +702,8 @@ function tambahIstirahat(hari) {
 
               {{-- Kelas XII (PKL) spanning full day --}}
               @if($jam === 1)
-                <td rowspan="{{ $pklRowSpan }}" class="roster-cell-pkl-aphp">
-                  P R A K T I K &nbsp; K E R J A &nbsp; L A P A N G A N
-                </td>
-                <td rowspan="{{ $pklRowSpan }}" class="roster-cell-pkl-rpl">
-                  P R A K T I K &nbsp; K E R J A &nbsp; L A P A N G A N
+                <td rowspan="{{ $pklRowSpan }}" colspan="2" class="roster-cell-pkl-unified">
+                  PRAKTIK &nbsp; KERJA &nbsp; LAPANGAN &nbsp; (PKL)
                 </td>
               @endif
             </tr>
@@ -701,77 +726,106 @@ function tambahIstirahat(hari) {
 </div>
 
 @if($canEditJadwal)
-{{-- Panel Hapus Jadwal Massal --}}
-<div class="akademik-card" style="margin-bottom:20px; border:1.5px solid #fee2e2;">
-  <div class="akademik-card-header" style="background:linear-gradient(135deg,#fef2f2,#fff5f5); border-bottom:1px solid #fecaca;">
-    <h4 style="font-weight:800; font-size:13.5px; margin:0; color:#b91c1c; display:flex; align-items:center; gap:8px;">
-      <i class="bi bi-trash3-fill"></i> Hapus / Reset Jadwal
-    </h4>
-    <div style="font-size:11.5px; color:#dc2626; margin-top:2px;">Hapus slot jadwal berdasarkan hari atau kelas. Slot yang dikunci (🔒 KEEP) tidak akan terhapus.</div>
-  </div>
-  <div class="akademik-card-body" style="padding:14px 20px;">
-    <form action="{{ route('akademik.jadwal.clear') }}" method="POST" onsubmit="return confirmHapus(this)">
-      @csrf
-      <input type="hidden" name="tahun_ajaran_id" value="{{ $ta?->id ?? 1 }}">
-      <input type="hidden" name="semester" value="{{ $semester }}">
-      <div style="display:flex; gap:12px; align-items:flex-end; flex-wrap:wrap;">
-        <div>
-          <label style="font-size:11.5px; font-weight:700; color:#64748b; display:block; margin-bottom:4px;">Filter Hari (Opsional)</label>
-          <select name="hari" class="ak-select" style="min-width:130px; font-size:12.5px;">
-            <option value="">Semua Hari</option>
-            <option value="SENIN">SENIN</option>
-            <option value="SELASA">SELASA</option>
-            <option value="RABU">RABU</option>
-            <option value="KAMIS">KAMIS</option>
-            <option value="JUMAT">JUMAT</option>
-          </select>
+{{-- Tombol Ringkas Opsi Reset Jadwal --}}
+<div style="display:flex; justify-content:flex-end; margin-top:8px; margin-bottom:16px;">
+  <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="collapse" data-bs-target="#panelResetJadwal" style="font-size:11.5px; font-weight:700; border-radius:6px; display:inline-flex; align-items:center; gap:6px;">
+    <i class="bi bi-trash3"></i> Opsi Hapus / Reset Jadwal
+  </button>
+</div>
+
+<div class="collapse" id="panelResetJadwal" style="margin-bottom:20px;">
+  <div class="akademik-card" style="border:1.5px solid #fee2e2;">
+    <div class="akademik-card-header" style="background:linear-gradient(135deg,#fef2f2,#fff5f5); border-bottom:1px solid #fecaca; padding:10px 16px;">
+      <h4 style="font-weight:800; font-size:13px; margin:0; color:#b91c1c; display:flex; align-items:center; gap:8px;">
+        <i class="bi bi-trash3-fill"></i> Hapus / Reset Jadwal
+      </h4>
+      <div style="font-size:11px; color:#dc2626; margin-top:2px;">Hapus slot jadwal berdasarkan hari atau kelas. Slot yang dikunci (🔒 KEEP) tidak akan terhapus.</div>
+    </div>
+    <div class="akademik-card-body" style="padding:12px 16px;">
+      <form action="{{ route('akademik.jadwal.clear') }}" method="POST" onsubmit="return confirmHapus(this)">
+        @csrf
+        <input type="hidden" name="tahun_ajaran_id" value="{{ $ta?->id ?? 1 }}">
+        <input type="hidden" name="semester" value="{{ $semester }}">
+        <div style="display:flex; gap:12px; align-items:flex-end; flex-wrap:wrap;">
+          <div>
+            <label style="font-size:11px; font-weight:700; color:#64748b; display:block; margin-bottom:3px;">Filter Hari (Opsional)</label>
+            <select name="hari" class="ak-select" style="min-width:130px; font-size:12px;">
+              <option value="">Semua Hari</option>
+              <option value="SENIN">SENIN</option>
+              <option value="SELASA">SELASA</option>
+              <option value="RABU">RABU</option>
+              <option value="KAMIS">KAMIS</option>
+              <option value="JUMAT">JUMAT</option>
+            </select>
+          </div>
+          <div>
+            <label style="font-size:11px; font-weight:700; color:#64748b; display:block; margin-bottom:3px;">Filter Kelas (Opsional)</label>
+            <select name="rombel_id" class="ak-select" style="min-width:150px; font-size:12px;">
+              <option value="">Semua Kelas</option>
+              @foreach($rombels as $r)
+                <option value="{{ $r->id }}">{{ $r->nama_rombel }}</option>
+              @endforeach
+            </select>
+          </div>
+          <div style="display:flex; align-items:center; gap:8px;">
+            <label style="font-size:11.5px; font-weight:700; cursor:pointer; display:flex; align-items:center; gap:6px; color:#92400e; background:#fffbeb; border:1px solid #fde68a; padding:5px 10px; border-radius:6px;">
+              <input type="checkbox" name="keep_locked" value="1" checked style="width:14px; height:14px;">
+              Pertahankan Slot Terkunci 🔒
+            </label>
+          </div>
+          <button type="submit" class="ak-btn" style="background:linear-gradient(135deg,#dc2626,#ef4444); color:#fff; font-weight:700; font-size:12px; border:none; padding:7px 16px;">
+            <i class="bi bi-trash3 me-1"></i> Hapus Jadwal
+          </button>
         </div>
-        <div>
-          <label style="font-size:11.5px; font-weight:700; color:#64748b; display:block; margin-bottom:4px;">Filter Kelas (Opsional)</label>
-          <select name="rombel_id" class="ak-select" style="min-width:150px; font-size:12.5px;">
-            <option value="">Semua Kelas</option>
-            @foreach($rombels as $r)
-              <option value="{{ $r->id }}">{{ $r->nama_rombel }}</option>
-            @endforeach
-          </select>
-        </div>
-        <div style="display:flex; align-items:center; gap:8px;">
-          <label style="font-size:12px; font-weight:700; cursor:pointer; display:flex; align-items:center; gap:6px; color:#92400e; background:#fffbeb; border:1px solid #fde68a; padding:6px 12px; border-radius:8px;">
-            <input type="checkbox" name="keep_locked" value="1" checked style="width:15px; height:15px;">
-            Pertahankan Slot Terkunci 🔒
-          </label>
-        </div>
-        <button type="submit" class="ak-btn" style="background:linear-gradient(135deg,#dc2626,#ef4444); color:#fff; font-weight:700; font-size:12.5px; border:none; box-shadow:0 4px 12px rgba(220,38,38,0.3); display:flex; align-items:center; gap:6px;">
-          <i class="bi bi-trash3"></i> Hapus Jadwal
-        </button>
-      </div>
-    </form>
+      </form>
+    </div>
   </div>
 </div>
 @endif
 
-{{-- Panel Legenda Guru & Legenda Mapel --}}
-<div style="display:grid; grid-template-columns: 1fr 2fr; gap:16px; margin-bottom:24px;">
-  {{-- Legenda Guru (1 - 24) --}}
+{{-- Panel Legenda Guru (Hirarki Struktural) & Legenda Mapel --}}
+<div style="display:grid; grid-template-columns: 1.3fr 1fr; gap:16px; margin-bottom:24px;">
+  {{-- Legenda Guru (Hirarki Struktural) --}}
   <div class="akademik-card">
-    <div class="akademik-card-header" style="background:#f8fafc;">
-      <h4 style="font-weight:800; font-size:13.5px; margin:0; color:var(--ak-dark);">
-        <i class="bi bi-person-lines-fill text-primary me-1"></i> Daftar Kode Nomor Guru (1 - 24)
+    <div class="akademik-card-header" style="background:#f8fafc; display:flex; justify-content:space-between; align-items:center; padding:10px 14px;">
+      <h4 style="font-weight:800; font-size:13px; margin:0; color:var(--ak-dark); display:flex; align-items:center; gap:6px;">
+        <i class="bi bi-diagram-3-fill text-primary"></i> Daftar Kode Guru Sesuai Hirarki Struktural (1 - {{ $gurus->count() }})
       </h4>
+      <span style="font-size:11px; color:#64748b; font-weight:600;">Otomatis Mengikuti Jabatan</span>
     </div>
-    <div class="akademik-card-body" style="padding:10px; max-height:280px; overflow-y:auto;">
-      <table class="table table-sm table-striped mb-0" style="font-size:11px;">
-        <thead>
+    <div class="akademik-card-body" style="padding:0; max-height:360px; overflow-y:auto;">
+      <table class="table table-sm table-hover mb-0" style="font-size:11.5px; vertical-align:middle;">
+        <thead style="background:#f1f5f9; position:sticky; top:0; z-index:2;">
           <tr>
-            <th style="width:40px; text-align:center;">Kode</th>
-            <th>Nama Lengkap Guru</th>
+            <th style="width:48px; text-align:center;">Kode</th>
+            <th>Nama Pendidik & Tenaga Kependidikan</th>
+            <th style="width:200px;">Jabatan / Peran Struktural</th>
           </tr>
         </thead>
         <tbody>
           @foreach($gurus as $g)
+            @php
+              $roleBadgeStyle = match(true) {
+                $g->kode_nomor === 1 => 'background:#fef3c7; color:#92400e; border:1px solid #fde68a;',
+                $g->kode_nomor >= 2 && $g->kode_nomor <= 5 => 'background:#e0e7ff; color:#3730a3; border:1px solid #c7d2fe;',
+                $g->kode_nomor >= 6 && $g->kode_nomor <= 8 => 'background:#dcfce7; color:#166534; border:1px solid #bbf7d0;',
+                $g->kode_nomor >= 9 && $g->kode_nomor <= 13 => 'background:#ede9fe; color:#5b21b6; border:1px solid #ddd6fe;',
+                $g->kode_nomor >= 14 && $g->kode_nomor <= 18 => 'background:#ffedd5; color:#9a3412; border:1px solid #fed7aa;',
+                default => 'background:#f1f5f9; color:#475569; border:1px solid #e2e8f0;',
+              };
+            @endphp
             <tr>
-              <td style="text-align:center; font-weight:900; color:var(--ak-primary);">{{ $g->kode_nomor ?? '-' }}</td>
-              <td style="font-weight:600;">{{ $g->nama }}</td>
+              <td style="text-align:center;">
+                <span class="roster-guru-badge">{{ $g->kode_nomor ?? '-' }}</span>
+              </td>
+              <td style="font-weight:700; color:#1e293b;">
+                {{ $g->nama }}
+              </td>
+              <td>
+                <span style="display:inline-block; font-size:10.5px; font-weight:700; padding:2px 8px; border-radius:12px; white-space:nowrap; {{ $roleBadgeStyle }}">
+                  {{ $g->peran_struktural }}
+                </span>
+              </td>
             </tr>
           @endforeach
         </tbody>
@@ -781,51 +835,21 @@ function tambahIstirahat(hari) {
 
   {{-- Legenda Mata Pelajaran --}}
   <div class="akademik-card">
-    <div class="akademik-card-header" style="background:#f8fafc;">
-      <h4 style="font-weight:800; font-size:13.5px; margin:0; color:var(--ak-dark);">
-        <i class="bi bi-book-half text-success me-1"></i> Daftar Singkatan Mata Pelajaran
+    <div class="akademik-card-header" style="background:#f8fafc; padding:10px 14px;">
+      <h4 style="font-weight:800; font-size:13px; margin:0; color:var(--ak-dark); display:flex; align-items:center; gap:6px;">
+        <i class="bi bi-book-half text-success"></i> Daftar Singkatan Mata Pelajaran
       </h4>
     </div>
-    <div class="akademik-card-body" style="padding:12px; max-height:280px; overflow-y:auto;">
-      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; font-size:11px;">
+    <div class="akademik-card-body" style="padding:12px; max-height:360px; overflow-y:auto;">
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; font-size:11px;">
         @foreach($mapels as $m)
-          <div style="display:flex; align-items:center; gap:6px; padding:4px 6px; background:#f8fafc; border-radius:6px; border:1px solid #e2e8f0;">
-            <code style="font-weight:900; color:#0369a1; font-size:11px;">{{ $m->singkatan_mapel ?? $m->kode_mapel }}</code>
-            <span style="font-weight:600; color:#334155; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ $m->nama_mapel }}</span>
+          <div style="display:flex; align-items:center; gap:6px; padding:5px 8px; background:#f8fafc; border-radius:6px; border:1px solid #e2e8f0;">
+            <code style="font-weight:900; color:#0369a1; font-size:11px; flex-shrink:0;">{{ $m->singkatan_mapel ?? $m->kode_mapel }}</code>
+            <span style="font-weight:600; color:#334155; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="{{ $m->nama_mapel }}">{{ $m->nama_mapel }}</span>
           </div>
         @endforeach
       </div>
     </div>
-  </div>
-</div>
-
-{{-- Banner Navigasi / Cetak --}}
-<div class="akademik-card" style="margin-top:24px; background:linear-gradient(135deg, #f0fdf4, #dcfce7); border:1px solid #bbf7d0; padding:20px 24px; border-radius:14px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px;">
-  <div>
-    <div style="font-weight:900; font-size:16px; color:#166534; display:flex; align-items:center; gap:8px;">
-      <i class="bi bi-check-circle-fill text-success"></i> Jadwal Roster KBM {{ $ta?->tahun_ajaran ?? '2025/2026' }}
-    </div>
-    <div style="font-size:13px; color:#14532d; margin-top:4px; max-width:650px;">
-      @if($canEditJadwal)
-        Setelah jadwal mingguan kelas dan lab tersusun rapi tanpa bentrok, lengkapi administrasi KBM dengan mengatur petugas pada <b>Langkah 4: Penugasan Jadwal Guru Piket</b>.
-      @else
-        Dokumen jadwal KBM resmi dapat dicetak atau disimpan langsung dalam format PDF untuk pegangan mengajar.
-      @endif
-    </div>
-  </div>
-  <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
-    <a href="{{ route('akademik.jadwal.cetak', ['semester' => $semester]) }}" target="_blank" class="ak-btn ak-btn-secondary" style="font-size:13px; font-weight:700;">
-      <i class="bi bi-printer me-1"></i> Cetak Roster Sekolah
-    </a>
-    @if($canEditJadwal)
-    <a href="{{ route('akademik.jadwal.index', ['tab' => 'piket', 'semester' => $semester]) }}" class="ak-btn" style="background:#15803d; color:#ffffff; font-size:13px; font-weight:700; padding:10px 22px; border-radius:8px; text-decoration:none; box-shadow:0 4px 14px rgba(21,128,61,0.35);">
-      Lanjut ke Langkah 4: Guru Piket <i class="bi bi-arrow-right ms-1"></i>
-    </a>
-    @else
-    <a href="{{ route('akademik.jadwal.index', ['tab' => 'piket', 'semester' => $semester]) }}" class="ak-btn ak-btn-secondary" style="font-size:13px; font-weight:700;">
-      <i class="bi bi-shield-check me-1"></i> Lihat Petugas Piket
-    </a>
-    @endif
   </div>
 </div>
 @endif

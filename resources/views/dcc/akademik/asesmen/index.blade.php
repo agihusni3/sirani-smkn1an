@@ -86,7 +86,19 @@
                 <td>{{ $asesmens->firstItem() + $idx }}</td>
                 <td>
                   <div style="font-weight:700; color:var(--ak-dark); font-size:14px;">{{ $a->judul }}</div>
-                  <div style="font-size:11px; color:#64748b;">KKM / Standar Lulus: <strong>{{ $a->passing_grade }}</strong></div>
+                  <div style="display:flex; align-items:center; gap:6px; margin-top:4px; flex-wrap:wrap;">
+                    <span style="font-size:11px; color:#64748b;">KKM: <strong>{{ $a->passing_grade }}</strong></span>
+                    @if($a->anti_cheat_mode)
+                      <span class="ak-badge ak-badge-danger" style="font-size:9.5px; padding:2px 6px;">
+                        <i class="bi bi-shield-lock-fill me-1"></i>Anti-Curang
+                      </span>
+                    @endif
+                    @if($a->token_ujian)
+                      <span class="ak-badge ak-badge-secondary" style="font-size:9.5px; padding:2px 6px; font-family:monospace;">
+                        <i class="bi bi-key me-1"></i>{{ $a->token_ujian }}
+                      </span>
+                    @endif
+                  </div>
                 </td>
                 <td>
                   <div style="font-weight:700; color:var(--ak-primary);">{{ $a->distribusi?->mataPelajaran?->nama_mapel ?? '-' }}</div>

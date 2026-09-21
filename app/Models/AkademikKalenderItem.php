@@ -16,11 +16,41 @@ class AkademikKalenderItem extends Model
         'bulan',
         'minggu_ke',
         'minggu_ke_semester',
+        'tanggal_mulai',
+        'tanggal_selesai',
         'jenis',
         'kategori',
         'keterangan',
         'warna',
     ];
+
+    protected $casts = [
+        'tanggal_mulai' => 'date',
+        'tanggal_selesai' => 'date',
+    ];
+
+    public function formatRentangTanggal(): string
+    {
+        if (!$this->tanggal_mulai) {
+            return '';
+        }
+        if (!$this->tanggal_selesai || $this->tanggal_mulai->equalTo($this->tanggal_selesai)) {
+            return $this->tanggal_mulai->translatedFormat('d F Y');
+        }
+        if ($this->tanggal_mulai->format('Y-m') === $this->tanggal_selesai->format('Y-m')) {
+            return $this->tanggal_mulai->format('d') . ' - ' . $this->tanggal_selesai->translatedFormat('d F Y');
+        }
+        return $this->tanggal_mulai->translatedFormat('d M Y') . ' - ' . $this->tanggal_selesai->translatedFormat('d M Y');
+    }
+
+    public function isDateCovered(string $date): bool
+    {
+        if (!$this->tanggal_mulai) return false;
+        $d = substr($date, 0, 10);
+        $start = $this->tanggal_mulai->format('Y-m-d');
+        $end = ($this->tanggal_selesai ? $this->tanggal_selesai->format('Y-m-d') : $start);
+        return $d >= $start && $d <= $end;
+    }
 
     public function kalender()
     {

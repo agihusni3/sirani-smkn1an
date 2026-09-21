@@ -84,6 +84,7 @@ class Guru extends Model
         'tmt_kgb_terakhir',
         'tmt_pangkat_terakhir',
         'jurusan_pendidikan',
+        'kode_nomor',
     ];
 
     protected $casts = [
@@ -92,7 +93,7 @@ class Guru extends Model
         'tmt_kerja'     => 'date',
     ];
 
-    protected $appends = ['foto_url', 'label_kepegawaian', 'nama_lengkap_gelar', 'list_mapel', 'list_tugas_tambahan'];
+    protected $appends = ['foto_url', 'label_kepegawaian', 'nama_lengkap_gelar', 'list_mapel', 'list_tugas_tambahan', 'peran_struktural'];
 
     /**
      * Dapatkan daftar mata pelajaran yang diampu dalam bentuk array.
@@ -509,6 +510,164 @@ class Guru extends Model
     public function getTotalEkuivalenTugasTambahanAttribute(): int
     {
         return collect($this->tugas_tambahan_list)->sum('jp');
+    }
+
+    /**
+     * Label peran struktural sekolah resmi untuk legenda roster & jadwal.
+     */
+    public function getPeranStrukturalAttribute(): string
+    {
+        $text = strtolower(($this->jabatan ?? '') . ' ' . ($this->tugas_tambahan ?? '') . ' ' . ($this->jenis_ptk ?? ''));
+        $role = strtolower($this->user ? ($this->user->role ?? '') : '');
+        $roles = ($this->user && is_array($this->user->roles)) ? array_map('strtolower', $this->user->roles) : [];
+
+        if (str_contains($text, 'kepala sekolah') || $role === 'kepala_sekolah' || in_array('kepala_sekolah', $roles)) {
+            return 'Kepala Sekolah';
+        }
+        if (str_contains($text, 'waka kurikulum') || str_contains($text, 'bidang kurikulum') || $role === 'waka_kurikulum' || in_array('waka_kurikulum', $roles)) {
+            return 'Waka Kurikulum';
+        }
+        if (str_contains($text, 'waka kesiswaan') || str_contains($text, 'bidang kesiswaan') || $role === 'waka_kesiswaan' || in_array('waka_kesiswaan', $roles)) {
+            return 'Waka Kesiswaan';
+        }
+        if (str_contains($text, 'waka sarpras') || str_contains($text, 'sarana prasarana') || $role === 'waka_sarpras' || in_array('waka_sarpras', $roles)) {
+            return 'Waka Sarpras';
+        }
+        if (str_contains($text, 'waka hubin') || str_contains($text, 'hubungan industri') || str_contains($text, 'humas') || $role === 'waka_hubin' || in_array('waka_hubin', $roles)) {
+            return 'Waka Hubin';
+        }
+        if (!empty($this->tugas_tambahan)) {
+            return $this->tugas_tambahan;
+        }
+        if (!empty($this->jabatan) && !str_contains(strtolower($this->jabatan), 'guru mata pelajaran')) {
+            return $this->jabatan;
+        }
+
+        $mapel = !empty($this->list_mapel) ? implode(', ', array_slice($this->list_mapel, 0, 2)) : '';
+        return $mapel ? "Guru {$mapel}" : 'Guru Mata Pelajaran';
+    }
+
+    /**
+     * Hitung bobot hierarki struktural pendidik (Kepsek=1, Wakakur=2, Wakasis=3, Sarpras=4, Hubin=5, Kaprog=6, Bengkel/Lab=7, Pembina=8, BK=9, Wali=10, Guru=11).
+     */
+    public static function hitungSkorStruktural($g): array
+    {
+        $text = strtolower(($g->jabatan ?? '') . ' ' . ($g->tugas_tambahan ?? '') . ' ' . ($g->jenis_ptk ?? ''));
+        $role = strtolower($g->user ? ($g->user->role ?? '') : '');
+        $roles = ($g->user && is_array($g->user->roles)) ? array_map('strtolower', $g->user->roles) : [];
+
+        // 1. Kepsek selalu No 1
+        if (str_contains($text, 'kepala sekolah') || $role === 'kepala_sekolah' || in_array('kepala_sekolah', $roles)) {
+            return [1, 0, $g->nama];
+        }
+
+        // 2. Wakakur selalu No 2
+        if (str_contains($text, 'waka kurikulum') || str_contains($text, 'bidang kurikulum') || $role === 'waka_kurikulum' || in_array('waka_kurikulum', $roles)) {
+            return [2, 0, $g->nama];
+        }
+
+        // 3. Wakasis selalu No 3
+        if (str_contains($text, 'waka kesiswaan') || str_contains($text, 'bidang kesiswaan') || $role === 'waka_kesiswaan' || in_array('waka_kesiswaan', $roles)) {
+            return [3, 0, $g->nama];
+        }
+
+        // 4. Waka Sarpras selalu No 4
+        if (str_contains($text, 'waka sarpras') || str_contains($text, 'sarana prasarana') || str_contains($text, 'sarana dan prasarana') || $role === 'waka_sarpras' || in_array('waka_sarpras', $roles)) {
+            return [4, 0, $g->nama];
+        }
+
+        // 5. Waka Hubin selalu No 5
+        if (str_contains($text, 'waka hubin') || str_contains($text, 'hubungan industri') || str_contains($text, 'hubinmas') || str_contains($text, 'humas') || $role === 'waka_hubin' || in_array('waka_hubin', $roles)) {
+            return [5, 0, $g->nama];
+        }
+
+        // 6. Kaprog (Ketua Program Keahlian / Jurusan)
+        if (str_contains($text, 'kepala program') || str_contains($text, 'ketua program') || str_contains($text, 'kaprog') || str_contains($text, 'ketua jurusan') || $role === 'kaprog' || in_array('kaprog', $roles)) {
+            $sub = 9;
+            if (str_contains($text, 'rpl')) $sub = 1;
+            elseif (str_contains($text, 'aphp')) $sub = 2;
+            elseif (str_contains($text, 'tsm') || str_contains($text, 'otomotif')) $sub = 3;
+            return [6, $sub, $g->nama];
+        }
+
+        // 7. Kepala Bengkel / Lab / Perpustakaan / Koordinator BKK
+        if (str_contains($text, 'kepala bengkel') || str_contains($text, 'kepala lab') || str_contains($text, 'perpustakaan') || str_contains($text, 'koordinator bkk')) {
+            $sub = 9;
+            if (str_contains($text, 'bengkel')) $sub = 1;
+            elseif (str_contains($text, 'lab komputer')) $sub = 2;
+            elseif (str_contains($text, 'lab aphp')) $sub = 3;
+            elseif (str_contains($text, 'perpustakaan')) $sub = 4;
+            elseif (str_contains($text, 'bkk') || str_contains($text, 'pkl')) $sub = 5;
+            return [7, $sub, $g->nama];
+        }
+
+        // 8. Pembina & Koordinator P5
+        if (str_contains($text, 'pembina osis')) return [8, 1, $g->nama];
+        if (str_contains($text, 'koordinator projek') || str_contains($text, 'p5')) return [8, 2, $g->nama];
+        if (str_contains($text, 'pembina pramuka')) return [8, 3, $g->nama];
+        if (str_contains($text, 'pembina pmr')) return [8, 4, $g->nama];
+        if (str_contains($text, 'pembina rohis')) return [8, 5, $g->nama];
+        if (str_contains($text, 'pembina english')) return [8, 6, $g->nama];
+        if (str_contains($text, 'pembina')) return [8, 7, $g->nama];
+
+        // 9. Guru BK
+        if (str_contains($text, 'bimbingan konseling') || str_contains($text, 'guru bk') || $role === 'guru_bk' || in_array('guru_bk', $roles)) {
+            return [9, 0, $g->nama];
+        }
+
+        // 10. Wali Kelas
+        if (str_contains($text, 'wali kelas') || $role === 'wali_kelas' || in_array('wali_kelas', $roles)) {
+            return [10, 0, $g->nama];
+        }
+
+        // 11. Guru Mata Pelajaran / GTK Lainnya
+        return [11, 0, $g->nama];
+    }
+
+    /**
+     * Sinkronisasi seluruh kode nomor guru (1, 2, 3...) sesuai hierarki jabatan struktural.
+     * Siapa pun yang menjabat akan otomatis menduduki kode nomor sesuai aturan ini.
+     * Sekaligus menyinkronkan kode_guru di tabel slot akademik_jadwal_pelajarans.
+     */
+    public static function sinkronisasiKodeHierarki(): array
+    {
+        $gurus = static::with('user')->where('status', 'aktif')->get();
+
+        $sorted = $gurus->sort(function ($a, $b) {
+            $sa = static::hitungSkorStruktural($a);
+            $sb = static::hitungSkorStruktural($b);
+            if ($sa[0] !== $sb[0]) return $sa[0] <=> $sb[0];
+            if ($sa[1] !== $sb[1]) return $sa[1] <=> $sb[1];
+            return strcasecmp($sa[2], $sb[2]);
+        })->values();
+
+        $updates = [];
+        foreach ($sorted as $idx => $guru) {
+            $nomorBaru = $idx + 1;
+            if ($guru->kode_nomor !== $nomorBaru) {
+                $guru->updateQuietly(['kode_nomor' => $nomorBaru]);
+                $updates[] = [
+                    'id' => $guru->id,
+                    'nama' => $guru->nama,
+                    'kode_nomor' => $nomorBaru,
+                ];
+            }
+        }
+
+        // Sinkronkan ke akademik_jadwal_pelajarans jika tabel ada
+        if (\Illuminate\Support\Facades\Schema::hasTable('akademik_jadwal_pelajarans')) {
+            try {
+                $guruCodes = static::whereNotNull('kode_nomor')->pluck('kode_nomor', 'id');
+                foreach ($guruCodes as $gId => $kNomor) {
+                    \App\Models\AkademikJadwalPelajaran::where('guru_id', $gId)
+                        ->update(['kode_guru' => (string)$kNomor]);
+                }
+            } catch (\Throwable $e) {
+                \Log::warning('Gagal sinkron kode_guru di akademik_jadwal_pelajarans: ' . $e->getMessage());
+            }
+        }
+
+        return $updates;
     }
 }
 

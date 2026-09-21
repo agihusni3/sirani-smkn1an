@@ -20,19 +20,45 @@ class AkademikController extends Controller
         $ta = TahunAjaran::where('is_active', true)->first();
         $user = auth()->user();
 
-        // KPI Cards
-        $totalMapel      = AkademikMataPelajaran::where('is_active', true)->count();
+        // Data Kalender Pendidikan & RPE
+        $kalender = $ta ? \App\Models\AkademikKalender::with('items')
+            ->where('tahun_ajaran_id', $ta->id)
+            ->where('semester', 1)
+            ->first() : null;
+
+        // Agenda khusus terdekat / berjalan dari Kaldik untuk Wakakur
+        $todayStr = today()->format('Y-m-d');
+        $agendaKaldikTerdekat = null;
+        if ($kalender) {
+            $specialItems = $kalender->items->where('jenis', '!=', 'efektif');
+            // Prioritas: yang mencakup hari ini atau tanggal mulai >= hari ini
+            $agendaKaldikTerdekat = $specialItems->first(function ($it) use ($todayStr) {
+                return $it->isDateCovered($todayStr);
+            }) ?: $specialItems->first(function ($it) use ($todayStr) {
+                return $it->tanggal_mulai && $it->tanggal_mulai->format('Y-m-d') >= $todayStr;
+            });
+
+            if (!$agendaKaldikTerdekat) {
+                $namaBulanIndo = [
+                    1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April',
+                    5 => 'Mei', 6 => 'Juni', 7 => 'Juli', 8 => 'Agustus',
+                    9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember',
+                ];
+                $bulanIni = $namaBulanIndo[(int)today()->month] ?? 'September';
+                $agendaKaldikTerdekat = $specialItems->firstWhere('bulan', $bulanIni) ?: $specialItems->first();
+            }
+        }
+
+        // KPI Indikator Kurikulum & GTK
+        $totalMapel = AkademikMataPelajaran::where('is_active', true)->count();
         $totalDistribusi = AkademikDistribusiMengajar::count();
-        $totalGuru       = \App\Models\Guru::where('status', 'aktif')->count();
-        $totalRombel     = \App\Models\Rombel::where('is_active', true)->count();
-        $totalNilai      = \App\Models\AkademikNilai::count();
+        $totalGuru = \App\Models\Guru::where('status', 'aktif')->count();
+        $totalGuruMengajar = AkademikDistribusiMengajar::distinct('guru_id')->count('guru_id');
+        $totalRombel = \App\Models\Rombel::where('is_active', true)->count();
+        $totalNilai = \App\Models\AkademikNilai::count();
 
         // Jurnal hari ini
         $jurnalHariIni = AkademikJurnalKbm::whereDate('tanggal', today())->count();
-
-        // Guru belum isi jurnal hari ini
-        $distribusiHariIni = AkademikDistribusiMengajar::whereHas('mataPelajaran', fn($q) => $q->where('is_active', true))->count();
-        $belumIsiJurnal = max(0, $distribusiHariIni - $jurnalHariIni);
 
         // Asesmen aktif
         $asesmenAktif = AkademikAsesmenOnline::where('is_active', true)
@@ -64,6 +90,10 @@ class AkademikController extends Controller
             ->limit(12)
             ->get();
 
+        $totalJadwalHariIni = \App\Models\AkademikJadwalPelajaran::where('hari', $hariAktif)
+            ->whereNotNull('mata_pelajaran_id')
+            ->count();
+
         // Petugas Piket Hari Ini
         $piketHariIni = \App\Models\AkademikGuruPiket::with('wakaPiket')
             ->where('hari', $hariAktif)
@@ -80,8 +110,9 @@ class AkademikController extends Controller
             ->latest()->limit(4)->get();
 
         return view('dcc.akademik.dashboard', compact(
-            'ta', 'totalMapel', 'totalDistribusi', 'totalGuru', 'totalRombel', 'totalNilai',
-            'jurnalHariIni', 'belumIsiJurnal', 'asesmenAktif', 'siswaPklAktif',
+            'ta', 'kalender', 'agendaKaldikTerdekat',
+            'totalMapel', 'totalDistribusi', 'totalGuru', 'totalGuruMengajar', 'totalRombel', 'totalNilai',
+            'jurnalHariIni', 'totalJadwalHariIni', 'asesmenAktif', 'siswaPklAktif',
             'hariAktif', 'jadwalHariIni', 'piketHariIni', 'daftarHariKbm',
             'jurnalTerbaru', 'asesmenMendatang'
         ));

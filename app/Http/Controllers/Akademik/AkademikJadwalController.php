@@ -40,8 +40,12 @@ class AkademikJadwalController extends Controller
 
         $hariFilter = $request->get('hari', ''); // SENIN, SELASA, etc. or all
 
-        // Master Data
+        // Master Data (Pastikan kode nomor guru selalu mengikuti aturan hirarki struktural sekolah)
         $gurus = Guru::where('status', 'aktif')->orderBy('kode_nomor')->orderBy('nama')->get();
+        if ($gurus->whereNull('kode_nomor')->isNotEmpty()) {
+            Guru::sinkronisasiKodeHierarki();
+            $gurus = Guru::where('status', 'aktif')->orderBy('kode_nomor')->orderBy('nama')->get();
+        }
         $rombels = Rombel::orderBy('tingkat')->orderBy('nama_rombel')->get();
         $mapels = AkademikMataPelajaran::where(function($q) {
                 $q->where('is_active', true)->orWhereNull('is_active');
@@ -1503,5 +1507,27 @@ class AkademikJadwalController extends Controller
         }
 
         return redirect()->back()->with('success', "Tugas '{$nama}' berhasil dihapus.");
+    }
+
+    /**
+     * Sinkronkan nomor kode guru sesuai aturan hirarki struktural sekolah (Kepsek=1, Wakakur=2, Wakasis=3, Sarpras=4, Hubin=5, Kaprog=6, dll)
+     */
+    public function syncKodeHierarki(Request $request)
+    {
+        $updates = Guru::sinkronisasiKodeHierarki();
+        $pesan = 'Nomor kode guru berhasil disinkronkan secara hierarkis (Kepsek #1, Wakakur #2, Wakasis #3, Waka Sarpras #4, Waka Hubin #5, Kaprog #6+, Bengkel/Lab, Pembina, dst).';
+        if (!empty($updates)) {
+            $pesan .= ' (' . count($updates) . ' pendidik disesuaikan).';
+        }
+
+        if ($request->expectsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => $pesan,
+                'updates' => $updates,
+            ]);
+        }
+
+        return redirect()->back()->with('success', $pesan);
     }
 }

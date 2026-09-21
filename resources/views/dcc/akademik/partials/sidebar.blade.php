@@ -61,7 +61,7 @@
       <div class="akademik-nav-group-title">Utama</div>
       <a href="{{ route('akademik.dashboard') }}" class="akademik-nav-link {{ request()->routeIs('akademik.dashboard') ? 'active' : '' }}">
         <div class="akademik-nav-link-left">
-          <i class="bi bi-grid-1x2-fill"></i>
+          <i class="bi bi-grid-1x2"></i>
           <span>Dasbor Akademik</span>
         </div>
       </a>
@@ -73,7 +73,7 @@
 
       <a href="{{ route('akademik.kalender.index') }}" class="akademik-nav-link {{ request()->routeIs('akademik.kalender.*') ? 'active' : '' }}">
         <div class="akademik-nav-link-left">
-          <i class="bi bi-calendar2-week-fill" style="font-size:15px; color:#0284c7;"></i>
+          <i class="bi bi-calendar-range"></i>
           <span>Kalender Pendidikan (Kaldik)</span>
         </div>
       </a>
@@ -81,8 +81,8 @@
       @if($canManageMatpel)
       <a href="{{ route('akademik.matpel.index') }}" class="akademik-nav-link {{ request()->routeIs('akademik.matpel.*') ? 'active' : '' }}">
         <div class="akademik-nav-link-left">
-          <i class="bi bi-1-circle-fill" style="font-size:15px; color:#2563eb;"></i>
-          <span>1. Mata Pelajaran</span>
+          <i class="bi bi-book"></i>
+          <span>Mata Pelajaran</span>
         </div>
       </a>
       @endif
@@ -90,24 +90,24 @@
       @if($canManageSk)
       <a href="{{ route('akademik.jadwal.index', ['tab' => 'distribusi']) }}" class="akademik-nav-link {{ (request()->routeIs('akademik.jadwal.*') && request('tab') === 'distribusi') ? 'active' : '' }}">
         <div class="akademik-nav-link-left">
-          <i class="bi bi-2-circle-fill" style="font-size:15px; color:#4f46e5;"></i>
-          <span>2. SK Pembagian Tugas</span>
+          <i class="bi bi-file-earmark-person"></i>
+          <span>SK Pembagian Tugas</span>
         </div>
       </a>
       @endif
 
       <a href="{{ route('akademik.jadwal.index', ['tab' => 'jadwal']) }}" class="akademik-nav-link {{ (request()->routeIs('akademik.jadwal.*') && (in_array(request('tab', 'jadwal'), ['jadwal', 'roster', 'formulasi', 'pukul']))) ? 'active' : '' }}">
         <div class="akademik-nav-link-left">
-          <i class="bi bi-3-circle-fill" style="font-size:15px; color:#059669;"></i>
-          <span>3. Jadwal Roster (Kelas &amp; Lab)</span>
+          <i class="bi bi-clock-history"></i>
+          <span>Jadwal Roster (Kelas &amp; Lab)</span>
         </div>
       </a>
 
       @if($canViewPiket)
       <a href="{{ route('akademik.jadwal.index', ['tab' => 'piket']) }}" class="akademik-nav-link {{ (request()->routeIs('akademik.jadwal.*') && request('tab') === 'piket') ? 'active' : '' }}">
         <div class="akademik-nav-link-left">
-          <i class="bi bi-4-circle-fill" style="font-size:15px; color:#d97706;"></i>
-          <span>4. Jadwal Guru Piket</span>
+          <i class="bi bi-shield-check"></i>
+          <span>Jadwal Guru Piket</span>
         </div>
       </a>
       @endif
@@ -120,43 +120,43 @@
 
       <a href="{{ route('akademik.perangkat.cp') }}" class="akademik-nav-link {{ request()->routeIs('akademik.perangkat.cp') ? 'active' : '' }}">
         <div class="akademik-nav-link-left">
-          <i class="bi bi-bookmark-star" style="font-size:15px; color:#0284c7;"></i>
-          <span>1. Capaian Pembelajaran (CP)</span>
+          <i class="bi bi-bullseye"></i>
+          <span>Capaian Pembelajaran (CP)</span>
         </div>
       </a>
 
       <a href="{{ route('akademik.perangkat.atp') }}" class="akademik-nav-link {{ request()->routeIs('akademik.perangkat.atp') ? 'active' : '' }}">
         <div class="akademik-nav-link-left">
-          <i class="bi bi-list-ol" style="font-size:15px; color:#2563eb;"></i>
-          <span>2. Tujuan &amp; Alur (TP / ATP)</span>
+          <i class="bi bi-signpost-split"></i>
+          <span>Tujuan &amp; Alur (TP / ATP)</span>
         </div>
       </a>
 
       <a href="{{ route('akademik.perangkat.prota-promes') }}" class="akademik-nav-link {{ request()->routeIs('akademik.perangkat.prota-promes') ? 'active' : '' }}">
         <div class="akademik-nav-link-left">
-          <i class="bi bi-calendar3" style="font-size:15px; color:#059669;"></i>
-          <span>3. Prota &amp; Promes</span>
+          <i class="bi bi-calendar-week"></i>
+          <span>Prota &amp; Promes</span>
         </div>
       </a>
 
       <a href="{{ route('akademik.perangkat.modul') }}" class="akademik-nav-link {{ request()->routeIs('akademik.perangkat.modul') ? 'active' : '' }}">
         <div class="akademik-nav-link-left">
-          <i class="bi bi-journal-richtext" style="font-size:15px; color:#7c3aed;"></i>
-          <span>4. Modul Ajar &amp; LKPD</span>
+          <i class="bi bi-journal-text"></i>
+          <span>Modul Ajar &amp; LKPD</span>
         </div>
       </a>
 
       <a href="{{ route('akademik.perangkat.kktp') }}" class="akademik-nav-link {{ request()->routeIs('akademik.perangkat.kktp') ? 'active' : '' }}">
         <div class="akademik-nav-link-left">
-          <i class="bi bi-speedometer2" style="font-size:15px; color:#ea580c;"></i>
-          <span>5. Kriteria Ketuntasan (KKTP)</span>
+          <i class="bi bi-sliders"></i>
+          <span>Kriteria Ketuntasan (KKTP)</span>
         </div>
       </a>
 
       <a href="{{ route('akademik.perangkat.supervisi-meja') }}" class="akademik-nav-link {{ request()->routeIs('akademik.perangkat.supervisi-meja') ? 'active' : '' }}">
         <div class="akademik-nav-link-left">
-          <i class="bi bi-shield-check" style="font-size:15px; color:#dc2626;"></i>
-          <span>6. Supervisi &amp; Pengesahan</span>
+          <i class="bi bi-patch-check"></i>
+          <span>Supervisi &amp; Pengesahan</span>
         </div>
       </a>
     </div>
@@ -184,7 +184,7 @@
       @if($canManageNilai)
       <a href="{{ route('akademik.nilai.index') }}" class="akademik-nav-link {{ request()->routeIs('akademik.nilai.index') || request()->routeIs('akademik.nilai.input') ? 'active' : '' }}">
         <div class="akademik-nav-link-left">
-          <i class="bi bi-clipboard2-data"></i>
+          <i class="bi bi-clipboard2-check"></i>
           <span>Input Nilai Formatif &amp; Sumatif</span>
         </div>
       </a>
@@ -220,7 +220,7 @@
       @if($canManagePkl)
       <a href="{{ route('akademik.pkl.index') }}" class="akademik-nav-link {{ request()->routeIs('akademik.pkl.*') ? 'active' : '' }}">
         <div class="akademik-nav-link-left">
-          <i class="bi bi-briefcase"></i>
+          <i class="bi bi-buildings"></i>
           <span>Praktik Kerja Lapangan (PKL)</span>
         </div>
       </a>

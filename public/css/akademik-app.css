@@ -141,7 +141,7 @@ body.akademik-body {
 }
 
 .akademik-nav-group {
-  margin-bottom: 20px;
+  margin-bottom: 18px;
 }
 
 .akademik-nav-group-title {
@@ -151,41 +151,67 @@ body.akademik-body {
   font-weight: 800;
   color: #94a3b8;
   padding: 6px 12px;
+  margin-bottom: 2px;
 }
 
 .akademik-nav-link {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 9px 12px;
+  padding: 8.5px 12px;
   margin-bottom: 2px;
   border-radius: 8px;
   color: #475569;
   text-decoration: none;
-  font-size: 13px;
+  font-size: 12.5px;
   font-weight: 600;
   transition: all 0.15s ease-in-out;
 }
 
 .akademik-nav-link:hover {
-  background: var(--ak-slate-100);
-  color: var(--ak-primary);
+  background: #f1f5f9;
+  color: #0f172a;
+}
+
+.akademik-nav-link:hover .akademik-nav-link-left i {
+  color: #4f46e5;
+  transform: translateX(1px);
 }
 
 .akademik-nav-link.active {
-  background: #f5f3ff;
-  color: var(--ak-primary);
+  background: #eff2fe;
+  color: #3730a3;
   font-weight: 700;
+  box-shadow: inset 3px 0 0 #4f46e5;
+}
+
+.akademik-nav-link.active .akademik-nav-link-left i {
+  color: #4f46e5;
 }
 
 .akademik-nav-link-left {
   display: flex;
   align-items: center;
   gap: 10px;
+  min-width: 0;
 }
 
 .akademik-nav-link-left i {
   font-size: 16px;
+  color: #64748b;
+  width: 20px;
+  text-align: center;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.15s ease;
+}
+
+.akademik-nav-link-left span {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .akademik-nav-badge {
@@ -193,7 +219,7 @@ body.akademik-body {
   font-weight: 700;
   padding: 2px 6px;
   border-radius: 999px;
-  background: var(--ak-primary);
+  background: #6366f1;
   color: #fff;
 }
 
@@ -430,20 +456,20 @@ body.akademik-body {
 /* ========================================================================== */
 .akademik-kpi-grid {
   display: grid;
-  grid-template-columns: repeat(6, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 14px;
   margin-bottom: 24px;
 }
 
-@media (max-width: 1200px) {
+@media (max-width: 1024px) {
   .akademik-kpi-grid {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 
 @media (max-width: 640px) {
   .akademik-kpi-grid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: 1fr;
   }
 }
 
@@ -921,12 +947,13 @@ body.akademik-body {
 
 .roster-table {
   width: 100%;
+  table-layout: fixed;
   border-collapse: separate;
   border-spacing: 0;
   font-size: 11px;
   vertical-align: middle;
   text-align: center;
-  min-width: 1180px;
+  min-width: 1120px;
 }
 
 .roster-table th,
@@ -934,6 +961,7 @@ body.akademik-body {
   border-right: 1px solid #e2e8f0;
   border-bottom: 1px solid #e2e8f0;
   padding: 0;
+  box-sizing: border-box;
 }
 
 .roster-table tr:first-child th {
@@ -952,7 +980,7 @@ body.akademik-body {
   font-weight: 800;
   font-size: 11px;
   letter-spacing: 0.5px;
-  padding: 10px 6px;
+  padding: 8px 4px;
   vertical-align: middle;
 }
 
@@ -961,7 +989,7 @@ body.akademik-body {
   color: #ffffff;
   font-weight: 800;
   font-size: 11.5px;
-  padding: 9px 8px;
+  padding: 8px 6px;
   letter-spacing: 0.5px;
 }
 
@@ -970,7 +998,7 @@ body.akademik-body {
   color: #ffffff;
   font-weight: 800;
   font-size: 11.5px;
-  padding: 9px 8px;
+  padding: 8px 6px;
   letter-spacing: 0.5px;
 }
 
@@ -979,7 +1007,7 @@ body.akademik-body {
   color: #ffffff;
   font-weight: 800;
   font-size: 11.5px;
-  padding: 9px 8px;
+  padding: 8px 6px;
   letter-spacing: 0.5px;
 }
 
@@ -988,7 +1016,7 @@ body.akademik-body {
   color: #ffffff;
   font-weight: 800;
   font-size: 11.5px;
-  padding: 9px 8px;
+  padding: 8px 6px;
   letter-spacing: 0.5px;
   vertical-align: middle;
 }
@@ -1060,12 +1088,15 @@ body.akademik-body {
 
 /* Interactive Schedule Cell */
 .roster-cell-slot {
-  padding: 4px 6px;
+  padding: 3px 4px;
   cursor: pointer;
   transition: all 0.15s ease;
   position: relative;
-  min-width: 120px;
-  height: 42px;
+  height: 38px;
+  max-height: 38px;
+  box-sizing: border-box;
+  vertical-align: middle;
+  overflow: hidden;
 }
 
 .roster-cell-slot:hover {
@@ -1081,7 +1112,7 @@ body.akademik-body {
 }
 
 .roster-cell-readonly:hover .roster-empty-slot {
-  color: #94a3b8 !important;
+  color: #cbd5e1 !important;
 }
 
 .roster-cell-locked {
@@ -1094,7 +1125,7 @@ body.akademik-body {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 5px;
+  gap: 4px;
   width: 100%;
   height: 100%;
   background: transparent !important;
@@ -1102,18 +1133,19 @@ body.akademik-body {
 }
 
 .roster-guru-badge {
-  display: inline;
-  background: transparent !important;
-  border: none !important;
-  box-shadow: none !important;
-  color: #0f172a;
-  font-weight: 900;
-  font-size: 11px;
-  min-width: unset;
-  height: auto;
-  padding: 0;
-  margin-right: 2px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #0f172a !important;
+  color: #ffffff !important;
+  font-weight: 800;
+  font-size: 10.5px;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 4px;
+  border-radius: 4px;
   flex-shrink: 0;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.12);
 }
 
 .roster-mapel-name {
@@ -1123,14 +1155,12 @@ body.akademik-body {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 95px;
+  max-width: 75px;
   letter-spacing: -0.2px;
-  background: transparent !important;
-  border: none !important;
 }
 
 .roster-lock-badge {
-  font-size: 11px;
+  font-size: 10px;
   color: #d97706;
   flex-shrink: 0;
   animation: pulseLock 2s infinite ease-in-out;
@@ -1146,18 +1176,17 @@ body.akademik-body {
   align-items: center;
   justify-content: center;
   color: #94a3b8;
-  font-size: 10px;
+  font-size: 10.5px;
   font-weight: 600;
-  border: none !important;
-  background: transparent !important;
-  padding: 0;
+  gap: 2px;
   height: 100%;
+  transition: all 0.15s ease;
+  user-select: none;
 }
 
 .roster-cell-slot:hover .roster-empty-slot {
   color: var(--ak-primary);
-  border: none !important;
-  background: transparent !important;
+  font-weight: 700;
 }
 
 /* Ceremony & Break Banners */
@@ -1165,9 +1194,9 @@ body.akademik-body {
   background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
   color: #ffffff;
   font-weight: 800;
-  font-size: 11.5px;
-  letter-spacing: 1.5px;
-  padding: 8px 12px;
+  font-size: 11px;
+  letter-spacing: 1.2px;
+  padding: 6px 10px;
   text-transform: uppercase;
 }
 
@@ -1175,9 +1204,9 @@ body.akademik-body {
   background: linear-gradient(135deg, #ea580c 0%, #c2410c 100%);
   color: #ffffff;
   font-weight: 800;
-  font-size: 11px;
+  font-size: 10.5px;
   letter-spacing: 1px;
-  padding: 8px 12px;
+  padding: 6px 10px;
   text-transform: uppercase;
 }
 
@@ -1185,9 +1214,9 @@ body.akademik-body {
   background: linear-gradient(135deg, #059669 0%, #047857 100%);
   color: #ffffff;
   font-weight: 800;
-  font-size: 11px;
+  font-size: 10.5px;
   letter-spacing: 1px;
-  padding: 8px 12px;
+  padding: 6px 10px;
   text-transform: uppercase;
 }
 
@@ -1195,40 +1224,52 @@ body.akademik-body {
   background: linear-gradient(90deg, #fef2f2 0%, #fee2e2 50%, #fef2f2 100%);
   color: #991b1b;
   font-weight: 800;
-  font-size: 11px;
-  letter-spacing: 1.5px;
-  padding: 6px 12px;
+  font-size: 10.5px;
+  letter-spacing: 1.2px;
+  padding: 5px 10px;
   border-top: 1px dashed #fca5a5;
   border-bottom: 1px dashed #fca5a5;
 }
 
-/* PKL (Kelas XII) Vertical Bar */
-.roster-cell-pkl-aphp {
-  background: linear-gradient(180deg, #fef9c3 0%, #fef08a 100%);
-  color: #854d0e;
-  font-weight: 900;
+/* PKL (Kelas XII) Unified Column */
+.roster-cell-pkl-unified {
+  background: linear-gradient(180deg, #fef9c3 0%, #fef08a 40%, #e0f2fe 100%);
+  color: #78350f;
+  font-weight: 800;
   font-size: 11px;
   writing-mode: vertical-rl;
   transform: rotate(180deg);
-  letter-spacing: 3px;
+  letter-spacing: 2px;
   vertical-align: middle;
   text-align: center;
-  padding: 14px 4px;
+  padding: 10px 4px;
   box-shadow: inset 0 0 8px rgba(0,0,0,0.03);
+}
+
+.roster-cell-pkl-aphp {
+  background: linear-gradient(180deg, #fef9c3 0%, #fef08a 100%);
+  color: #854d0e;
+  font-weight: 800;
+  font-size: 10.5px;
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  letter-spacing: 2px;
+  vertical-align: middle;
+  text-align: center;
+  padding: 10px 2px;
 }
 
 .roster-cell-pkl-rpl {
   background: linear-gradient(180deg, #e0f2fe 0%, #bae6fd 100%);
   color: #0369a1;
-  font-weight: 900;
-  font-size: 11px;
+  font-weight: 800;
+  font-size: 10.5px;
   writing-mode: vertical-rl;
   transform: rotate(180deg);
-  letter-spacing: 3px;
+  letter-spacing: 2px;
   vertical-align: middle;
   text-align: center;
-  padding: 14px 4px;
-  box-shadow: inset 0 0 8px rgba(0,0,0,0.03);
+  padding: 10px 2px;
 }
 
 /* Piket Duty Cell */
@@ -1236,58 +1277,67 @@ body.akademik-body {
   text-align: left;
   vertical-align: top;
   background: #ffffff;
-  padding: 10px 12px;
+  padding: 8px 10px;
   font-size: 11px;
   border-left: 2px solid #cbd5e1 !important;
-  width: 170px;
-  max-width: 180px;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.roster-piket-mini-card {
+  margin-bottom: 8px;
 }
 
 .roster-piket-badge-waka {
   display: inline-block;
-  padding: 2px 7px;
+  padding: 2px 6px;
   border-radius: 4px;
   background: #fef3c7;
   color: #92400e;
   font-weight: 800;
-  font-size: 10px;
+  font-size: 9.5px;
   text-transform: uppercase;
-  margin-bottom: 4px;
+  margin-bottom: 3px;
 }
 
 .roster-piket-name-waka {
   font-weight: 800;
-  font-size: 11.5px;
+  font-size: 11px;
   color: #0f172a;
-  margin-bottom: 8px;
-  line-height: 1.3;
+  line-height: 1.25;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .roster-piket-badge-guru {
   display: inline-block;
-  padding: 2px 7px;
+  padding: 2px 6px;
   border-radius: 4px;
   background: #dcfce7;
   color: #166534;
   font-weight: 800;
-  font-size: 10px;
+  font-size: 9.5px;
   text-transform: uppercase;
-  margin-bottom: 4px;
+  margin-bottom: 3px;
 }
 
 .roster-piket-list {
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 2.5px;
 }
 
 .roster-piket-item {
   font-size: 10.5px;
   color: #334155;
   font-weight: 600;
-  line-height: 1.3;
+  line-height: 1.25;
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 

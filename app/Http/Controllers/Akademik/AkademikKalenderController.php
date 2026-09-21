@@ -16,7 +16,7 @@ class AkademikKalenderController extends Controller
     public function index(Request $request)
     {
         $user = auth()->user();
-        $canManage = $user && ($user->isAdmin() || $user->isWakaKurikulum() || $user->hasRole('admin') || $user->hasRole('waka_kurikulum'));
+        $canManage = $user && ($user->isAdmin() || $user->isWakaKurikulum() || $user->hasAvailableRole('waka_kurikulum'));
 
         $tahunAjarans = TahunAjaran::orderBy('id', 'desc')->get();
         $taAktif = TahunAjaran::where('is_active', true)->first() ?: $tahunAjarans->first();
@@ -103,10 +103,39 @@ class AkademikKalenderController extends Controller
                         $dateRange = ($minD == $maxD) ? "{$minD} {$mc['name']}" : "{$minD} - {$maxD} {$mc['name']}";
                     }
 
+                    $daysData = [];
+                    foreach ($days as $dayIdx => $dayNum) {
+                        if ($dayNum === null) {
+                            $daysData[] = null;
+                            continue;
+                        }
+
+                        $dateStr = sprintf('%04d-%02d-%02d', $mc['year'], $mc['m'], $dayNum);
+
+                        // Cek apakah ada agenda spesifik tanggal yang meng-cover tanggal ini
+                        $specificItem = $kalender ? $kalender->items->first(function ($it) use ($dateStr) {
+                            return $it->isDateCovered($dateStr);
+                        }) : null;
+
+                        $resolvedItem = $specificItem;
+                        if (!$resolvedItem && $kItem && !$kItem->tanggal_mulai) {
+                            $resolvedItem = $kItem;
+                        }
+
+                        $daysData[] = [
+                            'day_num' => $dayNum,
+                            'date_str' => $dateStr,
+                            'is_weekend' => ($dayIdx >= 5),
+                            'agenda_item' => $resolvedItem,
+                            'has_specific_date' => (bool) $specificItem,
+                        ];
+                    }
+
                     $weeksData[] = [
                         'week_number' => $wIdx + 1,
                         'kaldik_item' => $kItem,
                         'days' => $days,
+                        'days_data' => $daysData,
                         'date_range' => $dateRange,
                     ];
                 }
@@ -158,7 +187,7 @@ class AkademikKalenderController extends Controller
     }
 
     /**
-     * Update butir pekan kalender (efektif/non-efektif, kategori, agenda)
+     * Update butir pekan kalender (efektif/non-efektif, kategori, agenda, rentang tanggal)
      */
     public function updateItem(Request $request, $id)
     {
@@ -173,7 +202,21 @@ class AkademikKalenderController extends Controller
             'kategori' => 'required|string|max:30',
             'keterangan' => 'nullable|string|max:255',
             'warna' => 'nullable|string|max:30',
+            'tanggal_mulai' => 'nullable|date',
+            'tanggal_selesai' => 'nullable|date',
+            'is_single_day' => 'nullable',
         ]);
+
+        $tglMulai = $validated['tanggal_mulai'] ?? null;
+        $tglSelesai = $validated['tanggal_selesai'] ?? null;
+        if ($tglMulai) {
+            if (!empty($request->is_single_day) || empty($tglSelesai) || $tglSelesai < $tglMulai) {
+                $tglSelesai = $tglMulai;
+            }
+        } else {
+            $tglMulai = null;
+            $tglSelesai = null;
+        }
 
         // Tetapkan warna default sesuai kategori jika tidak diisi
         $warna = $validated['warna'] ?? match ($validated['kategori']) {
@@ -188,6 +231,8 @@ class AkademikKalenderController extends Controller
         };
 
         $item->update([
+            'tanggal_mulai' => $tglMulai,
+            'tanggal_selesai' => $tglSelesai,
             'jenis' => $validated['jenis'],
             'kategori' => $validated['kategori'],
             'keterangan' => $validated['keterangan'],
@@ -205,7 +250,8 @@ class AkademikKalenderController extends Controller
             ]);
         }
 
-        return back()->with('success', "Pekan ke-{$item->minggu_ke} ({$item->bulan}) berhasil diperbarui.");
+        $rentangText = $item->formatRentangTanggal() ? " ({$item->formatRentangTanggal()})" : "";
+        return back()->with('success', "Pekan ke-{$item->minggu_ke} ({$item->bulan}){$rentangText} berhasil diperbarui.");
     }
 
     /**
@@ -240,15 +286,18 @@ class AkademikKalenderController extends Controller
     }
 
     /**
-     * Tambah atau petakan agenda baru ke kalender (CREATE/MAP)
+     * Tambah atau petakan agenda baru ke kalender (CREATE/MAP presisi tanggal & 1 hari)
      */
     public function storeAgenda(Request $request)
     {
         $validated = $request->validate([
             'tahun_ajaran_id' => 'required|exists:tahun_ajarans,id',
             'semester' => 'required|in:1,2',
-            'bulan' => 'required|string|max:20',
-            'minggu_ke' => 'required|integer|min:1|max:5',
+            'tanggal_mulai' => 'nullable|date',
+            'tanggal_selesai' => 'nullable|date',
+            'is_single_day' => 'nullable',
+            'bulan' => 'nullable|string|max:20',
+            'minggu_ke' => 'nullable|integer|min:1|max:5',
             'jenis' => 'required|in:efektif,non_efektif',
             'kategori' => 'required|string|max:30',
             'keterangan' => 'required|string|max:255',
@@ -270,6 +319,31 @@ class AkademikKalenderController extends Controller
             return back()->with('error', 'Kalender telah dikunci resmi oleh Waka Kurikulum.');
         }
 
+        $namaBulanIndo = [
+            1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April',
+            5 => 'Mei', 6 => 'Juni', 7 => 'Juli', 8 => 'Agustus',
+            9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember',
+        ];
+
+        $tglMulai = $validated['tanggal_mulai'] ?? null;
+        $tglSelesai = $validated['tanggal_selesai'] ?? null;
+        $isSingleDay = !empty($request->is_single_day);
+
+        if ($tglMulai) {
+            if ($isSingleDay || empty($tglSelesai) || $tglSelesai < $tglMulai) {
+                $tglSelesai = $tglMulai;
+            }
+
+            $startCarbon = \Carbon\Carbon::parse($tglMulai);
+            $bulan = $namaBulanIndo[(int)$startCarbon->month] ?? ($validated['bulan'] ?? 'Juli');
+            $firstDay = \Carbon\Carbon::createFromDate($startCarbon->year, $startCarbon->month, 1);
+            $startDayOfWeek = $firstDay->dayOfWeekIso;
+            $mingguKe = min(5, max(1, (int) ceil(($startCarbon->day + $startDayOfWeek - 1) / 7)));
+        } else {
+            $bulan = $validated['bulan'] ?? 'Juli';
+            $mingguKe = (int)($validated['minggu_ke'] ?? 1);
+        }
+
         $warna = $validated['warna'] ?? match ($validated['kategori']) {
             'mpls' => '#f59e0b',
             'sts' => '#8b5cf6',
@@ -282,25 +356,31 @@ class AkademikKalenderController extends Controller
         };
 
         // Cari apakah item untuk bulan dan minggu_ke sudah ada
-        $item = AkademikKalenderItem::where('akademik_kalender_id', $kalender->id)
-            ->where('bulan', $validated['bulan'])
-            ->where('minggu_ke', $validated['minggu_ke'])
+        $existingItem = AkademikKalenderItem::where('akademik_kalender_id', $kalender->id)
+            ->where('bulan', $bulan)
+            ->where('minggu_ke', $mingguKe)
             ->first();
 
-        if ($item) {
-            $item->update([
+        // Jika item sudah ada dan merupakan KBM standar tanpa tanggal khusus, timpa item tersebut
+        if ($existingItem && ($existingItem->kategori === 'kbm' || !$existingItem->tanggal_mulai)) {
+            $existingItem->update([
+                'tanggal_mulai' => $tglMulai,
+                'tanggal_selesai' => $tglSelesai,
                 'jenis' => $validated['jenis'],
                 'kategori' => $validated['kategori'],
                 'keterangan' => $validated['keterangan'],
                 'warna' => $warna,
             ]);
+            $savedItem = $existingItem;
         } else {
-            $globalWeek = $kalender->items()->count() + 1;
-            $item = AkademikKalenderItem::create([
+            $globalWeek = $existingItem ? $existingItem->minggu_ke_semester : ($kalender->items()->count() + 1);
+            $savedItem = AkademikKalenderItem::create([
                 'akademik_kalender_id' => $kalender->id,
-                'bulan' => $validated['bulan'],
-                'minggu_ke' => $validated['minggu_ke'],
+                'bulan' => $bulan,
+                'minggu_ke' => $mingguKe,
                 'minggu_ke_semester' => $globalWeek,
+                'tanggal_mulai' => $tglMulai,
+                'tanggal_selesai' => $tglSelesai,
                 'jenis' => $validated['jenis'],
                 'kategori' => $validated['kategori'],
                 'keterangan' => $validated['keterangan'],
@@ -310,7 +390,8 @@ class AkademikKalenderController extends Controller
 
         $kalender->hitungUlangPekan();
 
-        return back()->with('success', "Agenda \"{$validated['keterangan']}\" berhasil dipetakan ke Pekan {$validated['minggu_ke']} {$validated['bulan']}.");
+        $rentangText = $savedItem->formatRentangTanggal() ? " ({$savedItem->formatRentangTanggal()})" : "";
+        return back()->with('success', "Agenda \"{$validated['keterangan']}\"{$rentangText} berhasil dipetakan ke Pekan {$mingguKe} {$bulan}.");
     }
 
     /**
@@ -325,6 +406,8 @@ class AkademikKalenderController extends Controller
         }
 
         $item->update([
+            'tanggal_mulai' => null,
+            'tanggal_selesai' => null,
             'jenis' => 'efektif',
             'kategori' => 'kbm',
             'keterangan' => "KBM Efektif Pekan {$item->minggu_ke}",

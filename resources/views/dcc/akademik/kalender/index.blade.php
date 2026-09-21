@@ -75,6 +75,15 @@
     height: 30px;
     vertical-align: middle;
   }
+  .kaldik-cal-table td.day-cell {
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .kaldik-cal-table td.day-cell:hover {
+    box-shadow: inset 0 0 0 1.5px #6366f1;
+    border-radius: 4px;
+    filter: brightness(0.95);
+  }
   .kaldik-col-mg {
     width: 32px;
     font-weight: 800;
@@ -96,6 +105,10 @@
     font-weight: 700;
     font-size: 11px;
     color: #1e293b;
+    transition: transform 0.1s ease;
+  }
+  .kaldik-cal-table td.day-cell:hover .kaldik-day-num {
+    transform: scale(1.15);
   }
   .kaldik-day-num.efektif {
     background: #eff6ff;
@@ -336,20 +349,38 @@
                     style="background:{{ $warna }}; color:#ffffff; font-weight:900;" 
                     title="Klik untuk ubah agenda pekan ini: {{ $kItem?->keterangan }}"
                     @if($canManage && !$kalender->is_locked && $kItem)
-                      onclick="openEditPekanModal({{ $kItem->id }}, '{{ $kItem->bulan }}', {{ $kItem->minggu_ke }}, '{{ $kItem->jenis }}', '{{ $kItem->kategori }}', '{{ addslashes($kItem->keterangan ?? '') }}')"
+                      onclick="openEditPekanModal({{ $kItem->id }}, '{{ $kItem->bulan }}', {{ $kItem->minggu_ke }}, '{{ $kItem->jenis }}', '{{ $kItem->kategori }}', '{{ addslashes($kItem->keterangan ?? '') }}', '{{ $kItem->tanggal_mulai?->format('Y-m-d') ?? '' }}', '{{ $kItem->tanggal_selesai?->format('Y-m-d') ?? '' }}')"
                     @endif>
                   M{{ $wData['week_number'] }}
                 </td>
 
                 {{-- Kolom 7 Hari --}}
-                @foreach($wData['days'] as $dayIdx => $dayNum)
-                  @php
-                    $isWeekend = ($dayIdx >= 5);
-                  @endphp
-                  <td class="{{ $isWeekend ? 'sun' : '' }}" style="{{ $dayNum && !$isEfektif ? 'background:' . $warna . '15;' : '' }}">
-                    @if($dayNum)
-                      @if(!$isEfektif)
-                        <span class="kaldik-day-num non-efektif" style="background:{{ $warna }};" title="{{ $kItem?->keterangan }}">
+                @foreach($wData['days_data'] as $dayIdx => $dInfo)
+                  @if($dInfo === null)
+                    <td class="{{ $dayIdx >= 5 ? 'sun' : '' }}"></td>
+                  @else
+                    @php
+                      $dayNum = $dInfo['day_num'];
+                      $dateStr = $dInfo['date_str'];
+                      $isWeekend = $dInfo['is_weekend'];
+                      $dItem = $dInfo['agenda_item'];
+                      $hasSpecific = $dInfo['has_specific_date'];
+                      $dayEfektif = $dItem ? $dItem->isEfektif() : true;
+                      $dayColor = $dItem ? ($dItem->warna ?: ($dayEfektif ? '#2563eb' : '#f59e0b')) : '#2563eb';
+                      $dayTitle = $dItem ? ($dItem->keterangan . ($dItem->formatRentangTanggal() ? ' (' . $dItem->formatRentangTanggal() . ')' : '')) : ($isWeekend ? 'Akhir Pekan' : 'KBM Efektif');
+                    @endphp
+                    <td class="day-cell {{ $isWeekend ? 'sun' : '' }}" 
+                        style="{{ !$dayEfektif ? 'background:' . $dayColor . '18;' : '' }}"
+                        title="{{ $dayTitle }} · Klik untuk atur tanggal ini"
+                        @if($canManage && !$kalender->is_locked)
+                          @if($hasSpecific && $dItem)
+                            onclick="openEditPekanModal({{ $dItem->id }}, '{{ $dItem->bulan }}', {{ $dItem->minggu_ke }}, '{{ $dItem->jenis }}', '{{ $dItem->kategori }}', '{{ addslashes($dItem->keterangan ?? '') }}', '{{ $dItem->tanggal_mulai?->format('Y-m-d') ?? '' }}', '{{ $dItem->tanggal_selesai?->format('Y-m-d') ?? '' }}')"
+                          @else
+                            onclick="openTambahAgendaTanggal('{{ $dateStr }}')"
+                          @endif
+                        @endif>
+                      @if(!$dayEfektif)
+                        <span class="kaldik-day-num non-efektif" style="background:{{ $dayColor }};" title="{{ $dayTitle }}">
                           {{ $dayNum }}
                         </span>
                       @else
@@ -357,8 +388,8 @@
                           {{ $dayNum }}
                         </span>
                       @endif
-                    @endif
-                  </td>
+                    </td>
+                  @endif
                 @endforeach
               </tr>
             @endforeach
@@ -378,12 +409,19 @@
                     M{{ $item->minggu_ke }}
                   </span>
                   <div style="min-width:0;">
-                    <span class="badge" style="background:{{ $itemColor }}; color:#ffffff; font-size:8px; font-weight:800; padding:1px 4px;">
-                      {{ $item->getLabelSingkat() }}
-                    </span>
-                    <span style="font-size:11px; font-weight:700; color:var(--ak-dark); margin-left:3px;" title="{{ $item->keterangan }}">
-                      {{ $item->keterangan }}
-                    </span>
+                    <div style="display:flex; align-items:center; gap:4px; flex-wrap:wrap;">
+                      <span class="badge" style="background:{{ $itemColor }}; color:#ffffff; font-size:8px; font-weight:800; padding:1px 4px;">
+                        {{ $item->getLabelSingkat() }}
+                      </span>
+                      <span style="font-size:11px; font-weight:700; color:var(--ak-dark);" title="{{ $item->keterangan }}">
+                        {{ $item->keterangan }}
+                      </span>
+                    </div>
+                    @if($item->tanggal_mulai)
+                      <div style="font-size:9.5px; color:#475569; font-weight:700; margin-top:1px;">
+                        <i class="bi bi-calendar-event me-1"></i>{{ $item->formatRentangTanggal() }}
+                      </div>
+                    @endif
                   </div>
                 </div>
 
@@ -393,7 +431,7 @@
                             class="ak-btn ak-btn-secondary" 
                             style="padding:1px 5px; font-size:10px; height:20px;" 
                             title="Edit"
-                            onclick="openEditPekanModal({{ $item->id }}, '{{ $item->bulan }}', {{ $item->minggu_ke }}, '{{ $item->jenis }}', '{{ $item->kategori }}', '{{ addslashes($item->keterangan ?? '') }}')">
+                            onclick="openEditPekanModal({{ $item->id }}, '{{ $item->bulan }}', {{ $item->minggu_ke }}, '{{ $item->jenis }}', '{{ $item->kategori }}', '{{ addslashes($item->keterangan ?? '') }}', '{{ $item->tanggal_mulai?->format('Y-m-d') ?? '' }}', '{{ $item->tanggal_selesai?->format('Y-m-d') ?? '' }}')">
                       <i class="bi bi-pencil"></i>
                     </button>
                     <form action="{{ route('akademik.kalender.reset-item', $item->id) }}" method="POST" style="margin:0;" onsubmit="return confirm('Reset pekan ini kembali ke KBM Efektif?')">
@@ -456,7 +494,16 @@
                 <tr>
                   <td style="text-align:center; font-weight:800;">{{ $loop->iteration }}</td>
                   <td>
-                    <b>{{ $it->bulan }}</b> (Pekan {{ $it->minggu_ke }})
+                    @if($it->tanggal_mulai)
+                      <div style="font-weight:800; color:var(--ak-dark);">
+                        <i class="bi bi-calendar-event text-primary me-1"></i>{{ $it->formatRentangTanggal() }}
+                      </div>
+                      <div style="font-size:10.5px; color:#64748b;">
+                        {{ $it->bulan }} · Pekan {{ $it->minggu_ke }}
+                      </div>
+                    @else
+                      <b>{{ $it->bulan }}</b> (Pekan {{ $it->minggu_ke }})
+                    @endif
                   </td>
                   <td style="text-align:center;">
                     <span class="badge" style="background:{{ $itemColor }}; color:#ffffff; font-weight:800; font-size:10px;">
@@ -480,7 +527,7 @@
                                 class="ak-btn ak-btn-secondary" 
                                 style="font-size:10.5px; padding:2px 6px;" 
                                 title="Edit"
-                                onclick="openEditPekanModal({{ $it->id }}, '{{ $it->bulan }}', {{ $it->minggu_ke }}, '{{ $it->jenis }}', '{{ $it->kategori }}', '{{ addslashes($it->keterangan ?? '') }}')">
+                                onclick="openEditPekanModal({{ $it->id }}, '{{ $it->bulan }}', {{ $it->minggu_ke }}, '{{ $it->jenis }}', '{{ $it->kategori }}', '{{ addslashes($it->keterangan ?? '') }}', '{{ $it->tanggal_mulai?->format('Y-m-d') ?? '' }}', '{{ $it->tanggal_selesai?->format('Y-m-d') ?? '' }}')">
                           <i class="bi bi-pencil"></i>
                         </button>
                         <form action="{{ route('akademik.kalender.reset-item', $it->id) }}" method="POST" style="margin:0;" onsubmit="return confirm('Reset agenda ini kembali ke KBM Efektif?')">
@@ -551,7 +598,7 @@
   </div>
 @endif
 
-{{-- Modal 1: Edit Status Pekan --}}
+{{-- Modal 1: Edit Status Pekan / Agenda --}}
 <div class="modal fade" id="modalEditPekan" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content" style="border-radius:14px; border:none; box-shadow:0 20px 25px -5px rgba(0,0,0,0.1);">
@@ -559,13 +606,40 @@
         @csrf
         <div class="modal-header" style="border-bottom:1px solid #e2e8f0; padding:12px 16px;">
           <h5 class="modal-title" style="font-size:14px; font-weight:800; color:var(--ak-dark);" id="modalEditPekanTitle">
-            Edit Status Pekan
+            Edit Status Pekan / Agenda
           </h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
-        <div class="modal-body" style="padding:14px 16px; display:flex; flex-direction:column; gap:10px;">
+        <div class="modal-body" style="padding:14px 16px; display:flex; flex-direction:column; gap:12px;">
+          {{-- Presisi Tanggal / Rentang --}}
+          <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:12px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+              <label style="font-size:11.5px; font-weight:800; color:#334155; margin:0;">
+                <i class="bi bi-calendar2-range text-primary me-1"></i> Presisi Tanggal (Opsional):
+              </label>
+              <label style="display:inline-flex; align-items:center; gap:6px; font-size:11.5px; font-weight:700; color:#4338ca; cursor:pointer; margin:0; background:#e0e7ff; padding:2px 8px; border-radius:6px;">
+                <input type="checkbox" id="editIsSingleDay" name="is_single_day" value="1" onchange="toggleSingleDay('edit')">
+                <span>1 Hari Saja</span>
+              </label>
+            </div>
+
+            <div id="editGridTanggal" style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+              <div>
+                <label id="editLabelMulai" style="font-size:11px; font-weight:700; color:#64748b; margin-bottom:3px; display:block;">Tanggal Mulai:</label>
+                <input type="date" name="tanggal_mulai" id="editTanggalMulai" class="ak-input" style="font-size:12px; height:36px;" onchange="handleTanggalChange('edit')">
+              </div>
+              <div id="editColSelesai">
+                <label style="font-size:11px; font-weight:700; color:#64748b; margin-bottom:3px; display:block;">Tanggal Selesai:</label>
+                <input type="date" name="tanggal_selesai" id="editTanggalSelesai" class="ak-input" style="font-size:12px; height:36px;" onchange="handleTanggalChange('edit')">
+              </div>
+            </div>
+            <div id="editTanggalHelper" style="font-size:10.5px; color:#64748b; margin-top:5px;">
+              *Kosongkan tanggal jika agenda berlaku untuk seluruh pekan secara umum.
+            </div>
+          </div>
+
           <div>
-            <label style="font-size:11.5px; font-weight:700; color:#475569; margin-bottom:3px; display:block;">Jenis Pekan:</label>
+            <label style="font-size:11.5px; font-weight:700; color:#475569; margin-bottom:3px; display:block;">Jenis Pekan / KBM:</label>
             <select name="jenis" id="inputJenis" class="ak-input" style="font-size:12px;" onchange="handleJenisChange()">
               <option value="efektif">Efektif (KBM Tatap Muka Aktif)</option>
               <option value="non_efektif">Non-Efektif (Asesmen, MPLS, Agenda Khusus, Libur)</option>
@@ -604,7 +678,7 @@
   </div>
 </div>
 
-{{-- Modal 2: Tambah Agenda Baru --}}
+{{-- Modal 2: Tambah Agenda Baru (Presisi Rentang Tanggal & 1 Hari) --}}
 <div class="modal fade" id="modalTambahAgenda" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content" style="border-radius:14px; border:none; box-shadow:0 20px 25px -5px rgba(0,0,0,0.1);">
@@ -620,7 +694,36 @@
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
 
-        <div class="modal-body" style="padding:14px 16px; display:flex; flex-direction:column; gap:10px;">
+        <div class="modal-body" style="padding:14px 16px; display:flex; flex-direction:column; gap:12px;">
+          {{-- Pilihan Tanggal & Mode 1 Hari --}}
+          <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:12px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+              <label style="font-size:11.5px; font-weight:800; color:#334155; margin:0;">
+                <i class="bi bi-calendar2-range text-primary me-1"></i> Tanggal Pelaksanaan:
+              </label>
+              <label style="display:inline-flex; align-items:center; gap:6px; font-size:11.5px; font-weight:700; color:#4338ca; cursor:pointer; margin:0; background:#e0e7ff; padding:2px 8px; border-radius:6px;">
+                <input type="checkbox" id="tambahIsSingleDay" name="is_single_day" value="1" onchange="toggleSingleDay('tambah')">
+                <span>1 Hari Saja</span>
+              </label>
+            </div>
+
+            <div id="tambahGridTanggal" style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+              <div>
+                <label id="tambahLabelMulai" style="font-size:11px; font-weight:700; color:#64748b; margin-bottom:3px; display:block;">Tanggal Mulai:</label>
+                <input type="date" name="tanggal_mulai" id="tambahTanggalMulai" class="ak-input" style="font-size:12px; height:36px;" onchange="handleTanggalChange('tambah')">
+              </div>
+              <div id="tambahColSelesai">
+                <label style="font-size:11px; font-weight:700; color:#64748b; margin-bottom:3px; display:block;">Tanggal Selesai:</label>
+                <input type="date" name="tanggal_selesai" id="tambahTanggalSelesai" class="ak-input" style="font-size:12px; height:36px;" onchange="handleTanggalChange('tambah')">
+              </div>
+            </div>
+
+            <div id="tambahTanggalHelper" style="font-size:11px; color:#4f46e5; font-weight:700; margin-top:6px; display:none;">
+              <i class="bi bi-check2-circle me-1"></i> <span id="tambahTanggalHelperText"></span>
+            </div>
+          </div>
+
+          {{-- Alokasi Bulan & Pekan --}}
           <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
             <div>
               <label style="font-size:11.5px; font-weight:700; color:#475569; margin-bottom:3px; display:block;">Pilih Bulan:</label>
@@ -645,7 +748,7 @@
 
             <div>
               <label style="font-size:11.5px; font-weight:700; color:#475569; margin-bottom:3px; display:block;">Pekan ke-:</label>
-              <select name="minggu_ke" class="ak-input" style="font-size:12px;" required>
+              <select name="minggu_ke" id="tambahMingguKe" class="ak-input" style="font-size:12px;" required>
                 <option value="1">Pekan 1 (M1)</option>
                 <option value="2">Pekan 2 (M2)</option>
                 <option value="3">Pekan 3 (M3)</option>
@@ -659,7 +762,6 @@
             <label style="font-size:11.5px; font-weight:700; color:#475569; margin-bottom:3px; display:block;">Kategori Kegiatan:</label>
             <select name="kategori" id="tambahKategori" class="ak-input" style="font-size:12px;" required onchange="handleTambahKategoriChange()">
               <option value="mpls">MPLS &amp; Masa Orientasi Jurusan</option>
-              <option value="kbm">KBM Efektif Tatap Muka</option>
               <option value="sts">Sumatif Tengah Semester (STS)</option>
               <option value="sas">Sumatif Akhir Semester (SAS / ASAS)</option>
               <option value="sat">Sumatif Akhir Tahun (SAT)</option>
@@ -667,13 +769,14 @@
               <option value="pkl">Praktik Kerja Lapangan (PKL)</option>
               <option value="rapor">Pengolahan Nilai &amp; Pembagian Rapor</option>
               <option value="libur">Hari Libur Semester / Nasional</option>
+              <option value="kbm">KBM Efektif Tatap Muka</option>
               <option value="lainnya">Agenda Khusus Lainnya</option>
             </select>
           </div>
 
           <div>
             <label style="font-size:11.5px; font-weight:700; color:#475569; margin-bottom:3px; display:block;">Nama Agenda / Keterangan:</label>
-            <input type="text" name="keterangan" id="tambahKeterangan" class="ak-input" style="font-size:12px;" placeholder="Contoh: Sumatif Tengah Semester (STS)" required>
+            <input type="text" name="keterangan" id="tambahKeterangan" class="ak-input" style="font-size:12px;" placeholder="Contoh: HUT RI ke-81 / Sumatif Tengah Semester (STS)" required>
           </div>
 
           <div>
@@ -698,7 +801,96 @@
 
 @push('scripts')
 <script>
-  function openEditPekanModal(id, bulan, mingguKe, jenis, kategori, keterangan) {
+  const namaBulanMap = {
+    1: 'Januari', 2: 'Februari', 3: 'Maret', 4: 'April',
+    5: 'Mei', 6: 'Juni', 7: 'Juli', 8: 'Agustus',
+    9: 'September', 10: 'Oktober', 11: 'November', 12: 'Desember'
+  };
+
+  function toggleSingleDay(prefix) {
+    const isSingle = document.getElementById(prefix + 'IsSingleDay').checked;
+    const colSelesai = document.getElementById(prefix + 'ColSelesai');
+    const grid = document.getElementById(prefix + 'GridTanggal');
+    const labelMulai = document.getElementById(prefix + 'LabelMulai');
+    const tglMulai = document.getElementById(prefix + 'TanggalMulai');
+    const tglSelesai = document.getElementById(prefix + 'TanggalSelesai');
+
+    if (isSingle) {
+      if (colSelesai) colSelesai.style.display = 'none';
+      if (grid) grid.style.gridTemplateColumns = '1fr';
+      if (labelMulai) labelMulai.innerText = 'Pilih Tanggal:';
+      if (tglMulai && tglSelesai && tglMulai.value) {
+        tglSelesai.value = tglMulai.value;
+      }
+    } else {
+      if (colSelesai) colSelesai.style.display = 'block';
+      if (grid) grid.style.gridTemplateColumns = '1fr 1fr';
+      if (labelMulai) labelMulai.innerText = 'Tanggal Mulai:';
+    }
+  }
+
+  function handleTanggalChange(prefix) {
+    const isSingle = document.getElementById(prefix + 'IsSingleDay').checked;
+    const tglMulai = document.getElementById(prefix + 'TanggalMulai').value;
+    const tglSelesaiInput = document.getElementById(prefix + 'TanggalSelesai');
+
+    if (isSingle && tglMulai) {
+      tglSelesaiInput.value = tglMulai;
+    }
+
+    if (!tglMulai) return;
+
+    const parts = tglMulai.split('-');
+    if (parts.length === 3) {
+      const year = parseInt(parts[0]);
+      const month = parseInt(parts[1]);
+      const day = parseInt(parts[2]);
+
+      const bulanName = namaBulanMap[month];
+      const bulanSelect = document.getElementById(prefix + 'Bulan');
+      if (bulanSelect && bulanName) {
+        bulanSelect.value = bulanName;
+      }
+
+      // Hitung pekan dalam bulan
+      const firstDay = new Date(year, month - 1, 1);
+      let startDayOfWeek = firstDay.getDay(); // 0: Sun, 1: Mon
+      if (startDayOfWeek === 0) startDayOfWeek = 7;
+      const weekNum = Math.min(5, Math.max(1, Math.ceil((day + startDayOfWeek - 1) / 7)));
+
+      const mingguSelect = document.getElementById(prefix + 'MingguKe');
+      if (mingguSelect) {
+        mingguSelect.value = weekNum;
+      }
+
+      const helper = document.getElementById(prefix + 'TanggalHelper');
+      const helperText = document.getElementById(prefix + 'TanggalHelperText');
+      if (helper && helperText) {
+        helper.style.display = 'block';
+        helperText.innerText = 'Dialokasikan ke Bulan ' + (bulanName || '') + ' (Pekan ' + weekNum + ')';
+      }
+    }
+  }
+
+  function openTambahAgendaTanggal(dateStr) {
+    document.getElementById('tambahTanggalMulai').value = dateStr;
+    document.getElementById('tambahTanggalSelesai').value = dateStr;
+    document.getElementById('tambahIsSingleDay').checked = true;
+    toggleSingleDay('tambah');
+    handleTanggalChange('tambah');
+    openTambahAgendaModal();
+  }
+
+  function openTambahAgendaBulan(bulan) {
+    document.getElementById('tambahBulan').value = bulan;
+    document.getElementById('tambahTanggalMulai').value = '';
+    document.getElementById('tambahTanggalSelesai').value = '';
+    document.getElementById('tambahIsSingleDay').checked = false;
+    toggleSingleDay('tambah');
+    openTambahAgendaModal();
+  }
+
+  function openEditPekanModal(id, bulan, mingguKe, jenis, kategori, keterangan, tglMulai = '', tglSelesai = '') {
     const form = document.getElementById('formEditPekan');
     form.action = "{{ url('dcc/akademik/kalender/item') }}/" + id;
     
@@ -707,6 +899,21 @@
     document.getElementById('inputKategori').value = kategori;
     document.getElementById('inputKeterangan').value = keterangan;
 
+    const editMulai = document.getElementById('editTanggalMulai');
+    const editSelesai = document.getElementById('editTanggalSelesai');
+    const editSingle = document.getElementById('editIsSingleDay');
+
+    if (tglMulai) {
+      editMulai.value = tglMulai;
+      editSelesai.value = tglSelesai || tglMulai;
+      editSingle.checked = (tglMulai === (tglSelesai || tglMulai));
+    } else {
+      editMulai.value = '';
+      editSelesai.value = '';
+      editSingle.checked = false;
+    }
+    toggleSingleDay('edit');
+
     const modal = new bootstrap.Modal(document.getElementById('modalEditPekan'));
     modal.show();
   }
@@ -714,11 +921,6 @@
   function openTambahAgendaModal() {
     const modal = new bootstrap.Modal(document.getElementById('modalTambahAgenda'));
     modal.show();
-  }
-
-  function openTambahAgendaBulan(bulan) {
-    document.getElementById('tambahBulan').value = bulan;
-    openTambahAgendaModal();
   }
 
   function handleJenisChange() {

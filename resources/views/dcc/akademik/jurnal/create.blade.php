@@ -30,17 +30,24 @@
     <form action="{{ route('akademik.jurnal.create') }}" method="GET" id="formPilihDistribusi">
       <div style="max-width:600px;">
         <label class="ak-form-label">Jadwal Mapel &amp; Rombel</label>
-        <select name="distribusi_id" class="ak-select" onchange="this.form.submit()" required>
-          <option value="">-- Pilih Mata Pelajaran &amp; Rombel --</option>
-          @foreach($distribusis as $d)
-            <option value="{{ $d->id }}" {{ (request('distribusi_id') == $d->id || ($selectedDistribusi && $selectedDistribusi->id == $d->id)) ? 'selected' : '' }}>
-              {{ $d->rombel?->nama_rombel }} — {{ $d->mataPelajaran?->nama_mapel }} ({{ $d->guru?->nama }})
-            </option>
-          @endforeach
-        </select>
-        <span style="font-size:12px; color:#64748b; margin-top:4px; display:block;">
-          Pilih salah satu jadwal mengajar untuk memuat daftar siswa rombel bersangkutan.
-        </span>
+        @if($distribusis->isEmpty())
+          <div class="alert alert-warning d-flex align-items-center gap-2 mb-0" style="border-radius:8px; font-size:12.5px; font-weight:600;">
+            <i class="bi bi-exclamation-triangle-fill text-warning"></i>
+            <span>Belum ada jadwal alokasi mengajar untuk akun Anda pada SK Pembagian Tugas Tahun Ajaran ini. Silakan hubungi Waka Kurikulum atau Administrator.</span>
+          </div>
+        @else
+          <select name="distribusi_id" class="ak-select" onchange="this.form.submit()" required>
+            <option value="">-- Pilih Mata Pelajaran &amp; Rombel --</option>
+            @foreach($distribusis as $d)
+              <option value="{{ $d->id }}" {{ (request('distribusi_id') == $d->id || ($selectedDistribusi && $selectedDistribusi->id == $d->id)) ? 'selected' : '' }}>
+                {{ $d->rombel?->nama_rombel }} — {{ $d->mataPelajaran?->nama_mapel }} ({{ $d->guru?->nama }})
+              </option>
+            @endforeach
+          </select>
+          <span style="font-size:12px; color:#64748b; margin-top:4px; display:block;">
+            Pilih salah satu jadwal mengajar untuk memuat daftar siswa rombel bersangkutan.
+          </span>
+        @endif
       </div>
     </form>
   </div>
