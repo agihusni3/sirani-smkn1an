@@ -8,27 +8,19 @@
 @section('breadcrumb', $tab === 'distribusi' ? 'SK Pembagian Tugas' : ($tab === 'piket' ? 'Jadwal Guru Piket' : 'Jadwal Pelajaran'))
 
 @section('content')
-{{-- Stepper Alur Kerja Kurikulum (1: Mapel & CP -> 2: SK Pembagian Tugas -> 3: Roster Jadwal -> 4: Guru Piket) --}}
-@include('dcc.akademik.partials.workflow_stepper', ['currentStep' => $currentStep])
 
-{{-- Header Card Terpisah Sesuai Tahapan Alur --}}
+{{-- Header Card SK Pembagian Tugas --}}
 @if($tab === 'distribusi')
   @php $subtab = request('subtab', 'matriks'); @endphp
-  {{-- ========================================================================= --}}
-  {{-- LANGKAH 2: SK PEMBAGIAN TUGAS GURU & TUGAS TAMBAHAN                       --}}
-  {{-- ========================================================================= --}}
   <div class="akademik-card" style="margin-bottom:20px;">
-    <div class="akademik-card-header" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+    <div class="akademik-card-header" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; padding:16px 20px; background:#ffffff;">
       <div>
-        <div style="display:inline-flex; align-items:center; gap:6px; background:#eff6ff; color:#1d4ed8; padding:3px 10px; border-radius:20px; font-size:11.5px; font-weight:800; margin-bottom:6px; border:1px solid #bfdbfe;">
-          <i class="bi bi-diagram-3-fill"></i> Langkah 2 dari 4 (Alur Waka Kurikulum)
-        </div>
-        <h2 style="font-weight:900; font-size:20px; color:var(--ak-dark); margin:0; display:flex; align-items:center; gap:8px;">
-          <i class="bi bi-person-lines-fill text-primary"></i>
+        <h2 style="font-weight:800; font-size:18px; color:#000000; margin:0; display:flex; align-items:center; gap:8px;">
+          <i class="bi bi-person-lines-fill"></i>
           SK Pembagian Tugas Mengajar &amp; Tugas Tambahan Guru
         </h2>
-        <div style="font-size:12.5px; color:#64748b; margin-top:3px;">
-          Tahun Ajaran <b>{{ $ta?->tahun_ajaran ?? '2025/2026' }}</b> · Semester <b>{{ $semester == 1 ? '1 (Ganjil)' : '2 (Genap)' }}</b> — Dasar penentuan guru pengampu tiap rombel &amp; mapel serta verifikasi beban 24–40 JP.
+        <div style="font-size:12px; color:#6b7280; margin-top:3px;">
+          Tahun Ajaran <b>{{ $ta?->tahun_ajaran ?? '2025/2026' }}</b> · Semester <b>{{ $semester == 1 ? '1 (Ganjil)' : '2 (Genap)' }}</b>
         </div>
       </div>
       <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
@@ -44,33 +36,28 @@
 
         {{-- Cetak SK Resmi --}}
         <a href="{{ route('akademik.jadwal.cetak-sk', ['semester' => $semester]) }}" target="_blank" class="ak-btn ak-btn-secondary" style="font-size:12.5px; font-weight:700; white-space:nowrap;">
-          <i class="bi bi-file-earmark-text-fill text-primary me-1"></i> Cetak Dokumen SK (PDF)
+          <i class="bi bi-file-earmark-text me-1"></i> Cetak Dokumen SK (PDF)
         </a>
 
         {{-- Tambah Alokasi Baru --}}
         <button type="button" class="ak-btn ak-btn-primary" data-bs-toggle="modal" data-bs-target="#modalTambahDistribusi" style="font-size:12.5px; font-weight:700; white-space:nowrap;">
-          <i class="bi bi-plus-circle me-1"></i> + Tambah Alokasi Baru
+          <i class="bi bi-plus-lg me-1"></i> Tambah Alokasi
         </button>
-
-        {{-- Lanjut ke Langkah 3 --}}
-        <a href="{{ route('akademik.jadwal.index', ['tab' => 'roster', 'semester' => $semester]) }}" class="ak-btn" style="font-size:12.5px; background:linear-gradient(135deg, #1e40af, #3b82f6); color:#ffffff; font-weight:700; border:none; box-shadow:0 4px 12px rgba(59,130,246,0.3); white-space:nowrap;">
-          Lanjut ke Langkah 3: Roster <i class="bi bi-arrow-right ms-1"></i>
-        </a>
       </div>
     </div>
 
     {{-- Subtab Distribusi Langsung di Header Card --}}
-    <div style="display:flex; border-bottom:1px solid #e2e8f0; background:#f8fafc; padding:0 16px; overflow-x:auto;">
+    <div style="display:flex; border-bottom:1px solid #e5e7eb; background:#f9fafb; padding:0 16px; overflow-x:auto;">
       <a href="{{ route('akademik.jadwal.index', ['tab' => 'distribusi', 'subtab' => 'matriks', 'semester' => $semester]) }}"
-         style="padding:12px 18px; font-size:13px; font-weight:700; text-decoration:none; display:inline-flex; align-items:center; gap:6px; white-space:nowrap; border-bottom: 2.5px solid {{ $subtab == 'matriks' ? 'var(--ak-primary)' : 'transparent' }}; color: {{ $subtab == 'matriks' ? 'var(--ak-primary)' : '#64748b' }};">
+         style="padding:12px 18px; font-size:13px; font-weight:700; text-decoration:none; display:inline-flex; align-items:center; gap:6px; white-space:nowrap; border-bottom: 2.5px solid {{ $subtab == 'matriks' ? '#000000' : 'transparent' }}; color: {{ $subtab == 'matriks' ? '#000000' : '#6b7280' }};">
         <i class="bi bi-grid-3x3"></i> Matriks Mapel × Rombel
       </a>
       <a href="{{ route('akademik.jadwal.index', ['tab' => 'distribusi', 'subtab' => 'beban', 'semester' => $semester]) }}"
-         style="padding:12px 18px; font-size:13px; font-weight:700; text-decoration:none; display:inline-flex; align-items:center; gap:6px; white-space:nowrap; border-bottom: 2.5px solid {{ $subtab == 'beban' ? 'var(--ak-primary)' : 'transparent' }}; color: {{ $subtab == 'beban' ? 'var(--ak-primary)' : '#64748b' }};">
-        <i class="bi bi-person-check-fill"></i> Rekap Beban Guru &amp; Tugas Tambahan
+         style="padding:12px 18px; font-size:13px; font-weight:700; text-decoration:none; display:inline-flex; align-items:center; gap:6px; white-space:nowrap; border-bottom: 2.5px solid {{ $subtab == 'beban' ? '#000000' : 'transparent' }}; color: {{ $subtab == 'beban' ? '#000000' : '#6b7280' }};">
+        <i class="bi bi-person-check"></i> Rekap Beban Guru &amp; Tugas Tambahan
       </a>
       <a href="{{ route('akademik.jadwal.index', ['tab' => 'distribusi', 'subtab' => 'daftar', 'semester' => $semester]) }}"
-         style="padding:12px 18px; font-size:13px; font-weight:700; text-decoration:none; display:inline-flex; align-items:center; gap:6px; white-space:nowrap; border-bottom: 2.5px solid {{ $subtab == 'daftar' ? 'var(--ak-primary)' : 'transparent' }}; color: {{ $subtab == 'daftar' ? 'var(--ak-primary)' : '#64748b' }};">
+         style="padding:12px 18px; font-size:13px; font-weight:700; text-decoration:none; display:inline-flex; align-items:center; gap:6px; white-space:nowrap; border-bottom: 2.5px solid {{ $subtab == 'daftar' ? '#000000' : 'transparent' }}; color: {{ $subtab == 'daftar' ? '#000000' : '#6b7280' }};">
         <i class="bi bi-list-ul"></i> Daftar Rinci Alokasi
       </a>
     </div>
@@ -78,19 +65,16 @@
 
 @elseif($tab === 'piket')
   {{-- ========================================================================= --}}
-  {{-- LANGKAH 4: PENUGASAN JADWAL GURU PIKET                                    --}}
+  {{-- PENUGASAN JADWAL GURU PIKET                                               --}}
   {{-- ========================================================================= --}}
   <div class="akademik-card" style="margin-bottom:20px;">
-    <div class="akademik-card-header" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+    <div class="akademik-card-header" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; padding:16px 20px; background:#ffffff;">
       <div>
-        <div style="display:inline-flex; align-items:center; gap:6px; background:#f0fdf4; color:#15803d; padding:3px 10px; border-radius:20px; font-size:11.5px; font-weight:800; margin-bottom:6px; border:1px solid #bbf7d0;">
-          <i class="bi bi-check2-circle"></i> Langkah 4 dari 4 (Alur Waka Kurikulum)
-        </div>
-        <h2 style="font-weight:900; font-size:20px; color:var(--ak-dark); margin:0; display:flex; align-items:center; gap:8px;">
-          <i class="bi bi-person-badge-fill text-success"></i>
+        <h2 style="font-weight:800; font-size:18px; color:#000; margin:0; display:flex; align-items:center; gap:8px;">
+          <i class="bi bi-person-badge"></i>
           Penugasan Jadwal Waka &amp; Guru Piket Harian
         </h2>
-        <div style="font-size:12.5px; color:#64748b; margin-top:3px;">
+        <div style="font-size:12px; color:#6b7280; margin-top:3px;">
           Tahun Ajaran <b>{{ $ta?->tahun_ajaran ?? '2025/2026' }}</b> · Semester <b>{{ $semester == 1 ? '1 (Ganjil)' : '2 (Genap)' }}</b> — Pengawasan kehadiran guru, keterlambatan siswa, dan ketertiban KBM harian.
         </div>
       </div>
@@ -123,19 +107,16 @@
 
 @else
   {{-- ========================================================================= --}}
-  {{-- LANGKAH 3: PENYUSUNAN JADWAL PELAJARAN (ROSTER MINGGUAN)                   --}}
+  {{-- PENYUSUNAN JADWAL PELAJARAN (ROSTER MINGGUAN)                             --}}
   {{-- ========================================================================= --}}
   <div class="akademik-card" style="margin-bottom:20px;">
-    <div class="akademik-card-header" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+    <div class="akademik-card-header" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; padding:16px 20px; background:#ffffff;">
       <div>
-        <div style="display:inline-flex; align-items:center; gap:6px; background:#eff6ff; color:#1d4ed8; padding:3px 10px; border-radius:20px; font-size:11.5px; font-weight:800; margin-bottom:6px; border:1px solid #bfdbfe;">
-          <i class="bi bi-calendar-event"></i> Langkah 3 dari 4 (Alur Waka Kurikulum)
-        </div>
-        <h2 style="font-weight:900; font-size:20px; color:var(--ak-dark); margin:0; display:flex; align-items:center; gap:8px;">
-          <i class="bi bi-calendar3-week text-primary"></i>
+        <h2 style="font-weight:800; font-size:18px; color:#000; margin:0; display:flex; align-items:center; gap:8px;">
+          <i class="bi bi-calendar3-week"></i>
           Penyusunan Jadwal Pelajaran (Roster Mingguan)
         </h2>
-        <div style="font-size:12.5px; color:#64748b; margin-top:3px;">
+        <div style="font-size:12px; color:#6b7280; margin-top:3px;">
           Tahun Ajaran <b>{{ $ta?->tahun_ajaran ?? '2025/2026' }}</b> · Semester <b>{{ $semester == 1 ? '1 (Ganjil)' : '2 (Genap)' }}</b> — Disusun berdasarkan SK Pembagian Tugas dengan proteksi anti-bentrok guru &amp; lab.
         </div>
       </div>
@@ -1482,27 +1463,6 @@ function tambahIstirahat(hari) {
     <div style="padding:16px 20px;">
       {{ $distribusis->links() }}
     </div>
-  </div>
-</div>
-@endif
-
-{{-- Banner Navigasi ke Langkah 3: Roster Jadwal --}}
-<div class="akademik-card" style="margin-top:24px; background:linear-gradient(135deg, #eff6ff, #dbeafe); border:1px solid #bfdbfe; padding:20px 24px; border-radius:14px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px;">
-  <div>
-    <div style="font-weight:900; font-size:16px; color:#1e40af; display:flex; align-items:center; gap:8px;">
-      <i class="bi bi-check-circle-fill text-primary"></i> Langkah 2 Sudah Lengkap?
-    </div>
-    <div style="font-size:13px; color:#1e3a8a; margin-top:4px; max-width:650px;">
-      Jika seluruh rombel telah memiliki guru pengampu dan tugas tambahan sudah divalidasi (beban 24–40 JP), lanjutkan ke <b>Langkah 3: Penyusunan Jadwal Pelajaran (Roster)</b> untuk menyusun jadwal mingguan bebas bentrok.
-    </div>
-  </div>
-  <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
-    <a href="{{ route('akademik.jadwal.cetak-sk', ['semester' => $semester]) }}" target="_blank" class="ak-btn ak-btn-secondary" style="font-size:13px; font-weight:700;">
-      <i class="bi bi-printer me-1"></i> Cetak Dokumen SK
-    </a>
-    <a href="{{ route('akademik.jadwal.index', ['tab' => 'roster', 'semester' => $semester]) }}" class="ak-btn ak-btn-primary" style="font-size:13px; font-weight:700; padding:10px 22px; box-shadow:0 4px 14px rgba(37,99,235,0.35);">
-      Lanjut ke Langkah 3: Roster <i class="bi bi-arrow-right ms-1"></i>
-    </a>
   </div>
 </div>
 @endif

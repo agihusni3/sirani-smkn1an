@@ -4,7 +4,6 @@
 @section('breadcrumb', 'Mata Pelajaran')
 
 @section('content')
-@include('dcc.akademik.partials.workflow_stepper', ['currentStep' => 1])
 
 <div class="akademik-page-head">
   <div>
