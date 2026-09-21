@@ -139,8 +139,13 @@ class AkademikMatpelController extends Controller
             'tingkat' => $tingkatStr,
             'jumlah_jam_per_minggu' => $request->jumlah_jam_per_minggu,
             'deskripsi_cp' => $request->deskripsi_cp,
+            'resource_key' => $request->resource_key ?: null,
             'is_active' => $request->has('is_active') ? $request->boolean('is_active') : ($mapel->is_active ?? true),
         ]);
+
+        // Sinkronkan juga resource_key ke jadwal yang sudah di-generate untuk mapel ini
+        \App\Models\AkademikJadwalPelajaran::where('mata_pelajaran_id', $mapel->id)
+            ->update(['resource_key' => $request->resource_key ?: null]);
 
         return redirect()->back()->with('success', 'Mata Pelajaran berhasil diperbarui.');
     }
