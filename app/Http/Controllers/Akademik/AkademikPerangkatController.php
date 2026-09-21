@@ -647,24 +647,53 @@ class AkademikPerangkatController extends Controller
      */
     public function cp(Request $request)
     {
-        $ctx = $this->resolvePerangkatContext($request);
+        $ctx             = $this->resolvePerangkatContext($request);
         $activePerangkat = $ctx['activePerangkat'];
+        $user            = $ctx['user'];
+        $isAdminOrWaka   = $ctx['isAdminOrWaka'];
+        $semester        = $ctx['semester'];
+
+        // ─── Override $mapels: Guru hanya melihat mapel yang ditugaskan ───
+        if ($user->guru_id && !$isAdminOrWaka) {
+            // Kumpulkan mata_pelajaran_id dari perangkat yang dimiliki guru ini
+            $mapelIdsPerangkat = AkademikPerangkatAjar::where('guru_id', $user->guru_id)
+                ->where('semester', $semester)
+                ->pluck('mata_pelajaran_id');
+
+            // Kumpulkan juga dari distribusi mengajar aktif semester ini
+            $mapelIdsDist = AkademikDistribusiMengajar::where('guru_id', $user->guru_id)
+                ->where('semester', $semester)
+                ->pluck('mata_pelajaran_id');
+
+            // Gabung & deduplikasi
+            $assignedMapelIds = $mapelIdsPerangkat->merge($mapelIdsDist)->unique()->values();
+
+            $mapels = AkademikMataPelajaran::where('is_active', true)
+                ->whereIn('id', $assignedMapelIds)
+                ->orderBy('nama_mapel')
+                ->get();
+        } else {
+            // Admin / Wakakur tetap melihat semua mapel aktif
+            $mapels = $ctx['mapels'];
+        }
+
+        // Override context mapels
+        $ctx['mapels'] = $mapels;
 
         $selectedMapelId = $request->get('mapel_id', $activePerangkat?->mata_pelajaran_id);
-        $selectedMapel = null;
+        $selectedMapel   = null;
         if ($selectedMapelId) {
             $selectedMapel = AkademikMataPelajaran::find($selectedMapelId);
         }
         if (!$selectedMapel && $activePerangkat) {
             $selectedMapel = $activePerangkat->mataPelajaran;
         }
-        if (!$selectedMapel && $ctx['mapels']->isNotEmpty()) {
-            $selectedMapel = $ctx['mapels']->first();
+        if (!$selectedMapel && $mapels->isNotEmpty()) {
+            $selectedMapel = $mapels->first();
         }
 
-        $user = $ctx['user'];
         $isOwner = $user->guru_id && $activePerangkat && $user->guru_id === $activePerangkat->guru_id;
-        $canEdit = $ctx['isAdminOrWaka'] || $isOwner;
+        $canEdit = $isAdminOrWaka || $isOwner;
 
         // Acuan standar nasional SK BSKAP 032/2024
         $templateCpText = '';
@@ -683,13 +712,14 @@ class AkademikPerangkatController extends Controller
         }
 
         return view('dcc.akademik.perangkat.cp', array_merge($ctx, [
-            'selectedMapel' => $selectedMapel,
-            'isOwner' => $isOwner,
-            'canEdit' => $canEdit,
-            'templateCpText' => $templateCpText,
+            'selectedMapel'    => $selectedMapel,
+            'isOwner'          => $isOwner,
+            'canEdit'          => $canEdit,
+            'templateCpText'   => $templateCpText,
             'templateElemenCp' => $templateElemenCp,
         ]));
     }
+
 
     /**
      * Menu 2: Tujuan & Alur Pembelajaran (TP & ATP)
