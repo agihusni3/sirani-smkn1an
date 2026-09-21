@@ -267,6 +267,21 @@ Route::middleware('auth')->group(function () {
         Route::put('/jadwal/master-tugas/{id}', [\App\Http\Controllers\Akademik\AkademikJadwalController::class, 'updateMasterTugas'])->name('akademik.jadwal.master-tugas.update');
         Route::delete('/jadwal/master-tugas/{id}', [\App\Http\Controllers\Akademik\AkademikJadwalController::class, 'destroyMasterTugas'])->name('akademik.jadwal.master-tugas.destroy');
 
+        // Sub-Modul 2b: Perangkat Pembelajaran Kurikulum Merdeka (CP, ATP, Prota/Promes, Modul Ajar, KKTP & Supervisi)
+        Route::get('/perangkat', [\App\Http\Controllers\Akademik\AkademikPerangkatController::class, 'index'])->name('akademik.perangkat.index');
+        Route::post('/perangkat', [\App\Http\Controllers\Akademik\AkademikPerangkatController::class, 'store'])->name('akademik.perangkat.store');
+        Route::get('/perangkat/{id}', [\App\Http\Controllers\Akademik\AkademikPerangkatController::class, 'show'])->name('akademik.perangkat.show');
+        Route::put('/perangkat/{id}/info', [\App\Http\Controllers\Akademik\AkademikPerangkatController::class, 'updateInfo'])->name('akademik.perangkat.update-info');
+        Route::post('/perangkat/{id}/atp', [\App\Http\Controllers\Akademik\AkademikPerangkatController::class, 'storeAtp'])->name('akademik.perangkat.atp.store');
+        Route::delete('/perangkat/{id}/atp/{atpId}', [\App\Http\Controllers\Akademik\AkademikPerangkatController::class, 'destroyAtp'])->name('akademik.perangkat.atp.destroy');
+        Route::post('/perangkat/{id}/modul', [\App\Http\Controllers\Akademik\AkademikPerangkatController::class, 'storeModul'])->name('akademik.perangkat.modul.store');
+        Route::delete('/perangkat/{id}/modul/{modulId}', [\App\Http\Controllers\Akademik\AkademikPerangkatController::class, 'destroyModul'])->name('akademik.perangkat.modul.destroy');
+        Route::post('/perangkat/{id}/kktp', [\App\Http\Controllers\Akademik\AkademikPerangkatController::class, 'storeKktp'])->name('akademik.perangkat.kktp.store');
+        Route::post('/perangkat/{id}/ajukan', [\App\Http\Controllers\Akademik\AkademikPerangkatController::class, 'ajukan'])->name('akademik.perangkat.ajukan');
+        Route::post('/perangkat/{id}/supervisi', [\App\Http\Controllers\Akademik\AkademikPerangkatController::class, 'supervisiAction'])->name('akademik.perangkat.supervisi');
+        Route::get('/perangkat/{id}/cetak-pengesahan', [\App\Http\Controllers\Akademik\AkademikPerangkatController::class, 'cetakPengesahan'])->name('akademik.perangkat.cetak-pengesahan');
+        Route::delete('/perangkat/{id}', [\App\Http\Controllers\Akademik\AkademikPerangkatController::class, 'destroy'])->name('akademik.perangkat.destroy');
+
         // Sub-Modul 3: Jurnal KBM Harian & Presensi Siswa
         Route::get('/jurnal', [\App\Http\Controllers\Akademik\AkademikJurnalController::class, 'index'])->name('akademik.jurnal.index');
         Route::get('/jurnal/create', [\App\Http\Controllers\Akademik\AkademikJurnalController::class, 'create'])->name('akademik.jurnal.create');

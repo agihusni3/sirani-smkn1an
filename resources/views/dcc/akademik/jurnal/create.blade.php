@@ -92,6 +92,31 @@
           </div>
         @endif
 
+        {{-- Integrasi Perangkat Pembelajaran: Rujuk Tujuan Pembelajaran (ATP) --}}
+        @if(isset($atpList) && $atpList->isNotEmpty())
+          <div style="background:#f0fdf4; border:1.5px solid #86efac; border-radius:8px; padding:12px 16px; margin-bottom:16px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; flex-wrap:wrap; gap:6px;">
+              <span style="font-size:11.5px; font-weight:800; color:#166534; text-transform:uppercase; display:inline-flex; align-items:center; gap:6px;">
+                <i class="bi bi-patch-check-fill text-success"></i> Rujuk Tujuan Pembelajaran (ATP) Perangkat Ajar
+              </span>
+              <span class="badge" style="background:#dcfce7; color:#166534; font-size:11px;">Kurikulum Merdeka</span>
+            </div>
+            <select class="ak-select" id="select_tp_rujukan" onchange="applyTpRujukan(this)" style="background:#ffffff; border-color:#86efac; font-size:13px;">
+              <option value="">-- Pilih Butir TP (Materi Otomatis Terisi) --</option>
+              @foreach($atpList as $tp)
+                <option value="{{ $tp->id }}"
+                  data-materi="{{ $tp->materi_pokok }} — {{ $tp->tujuan_pembelajaran }}"
+                  data-profil="{{ $tp->profil_pancasila }}">
+                  {{ $tp->kode_tp }}: {{ $tp->materi_pokok }} ({{ $tp->alokasi_jp }} JP)
+                </option>
+              @endforeach
+            </select>
+            <div style="font-size:11.5px; color:#15803d; margin-top:4px;">
+              Memilih TP akan otomatis mengisi materi pokok pembelajaran pada form di bawah.
+            </div>
+          </div>
+        @endif
+
         <div style="margin-bottom:16px;">
           <label class="ak-form-label">Materi Pokok / Pembahasan <span class="text-danger">*</span></label>
           <textarea name="materi_ajar" id="input_materi_ajar" class="ak-textarea" rows="3" placeholder="Tuliskan pokok materi / modul ajar / kompetensi yang diajarkan pada sesi ini..." required></textarea>
@@ -204,6 +229,18 @@
         materiEl.value += '\nTarget CP: ' + snippet;
       }
       materiEl.focus();
+    }
+  }
+
+  function applyTpRujukan(el) {
+    const selected = el.options[el.selectedIndex];
+    if (selected && selected.value) {
+      const materi = selected.getAttribute('data-materi');
+      const materiEl = document.getElementById('input_materi_ajar');
+      if (materi && materiEl) {
+        materiEl.value = materi;
+        materiEl.focus();
+      }
     }
   }
 </script>

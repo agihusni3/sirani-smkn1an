@@ -76,6 +76,9 @@ class AkademikJurnalController extends Controller
         $selectedDistribusi = null;
         $siswas = collect();
         $pertemuanKe = 1;
+        $perangkatAjar = null;
+        $atpList = collect();
+        $modulList = collect();
 
         if ($request->filled('distribusi_id')) {
             $selectedDistribusi = AkademikDistribusiMengajar::with(['rombel', 'mataPelajaran'])->find($request->distribusi_id);
@@ -87,10 +90,23 @@ class AkademikJurnalController extends Controller
 
                 $lastPertemuan = AkademikJurnalKbm::where('distribusi_id', $selectedDistribusi->id)->max('pertemuan_ke');
                 $pertemuanKe = ($lastPertemuan ?? 0) + 1;
+
+                // Cari dokumen Perangkat Pembelajaran yang cocok
+                $perangkatAjar = \App\Models\AkademikPerangkatAjar::with(['atpItems', 'modulAjars'])
+                    ->where('guru_id', $selectedDistribusi->guru_id)
+                    ->where('mata_pelajaran_id', $selectedDistribusi->mata_pelajaran_id)
+                    ->where('tingkat', $selectedDistribusi->rombel?->tingkat ?? 'X')
+                    ->where('semester', $selectedDistribusi->semester ?? 1)
+                    ->first();
+
+                if ($perangkatAjar) {
+                    $atpList = $perangkatAjar->atpItems;
+                    $modulList = $perangkatAjar->modulAjars;
+                }
             }
         }
 
-        return view('dcc.akademik.jurnal.create', compact('distribusis', 'selectedDistribusi', 'siswas', 'pertemuanKe'));
+        return view('dcc.akademik.jurnal.create', compact('distribusis', 'selectedDistribusi', 'siswas', 'pertemuanKe', 'perangkatAjar', 'atpList', 'modulList'));
     }
 
     public function store(Request $request)

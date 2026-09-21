@@ -361,6 +361,11 @@ class Guru extends Model
         return $this->hasMany(AkademikJadwalPelajaran::class, 'guru_id');
     }
 
+    public function perangkatAjars(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(AkademikPerangkatAjar::class, 'guru_id');
+    }
+
     /**
      * Rincian tugas tambahan yang diemban guru beserta ekuivalensi jam (Permendikbud 15/2018)
      */

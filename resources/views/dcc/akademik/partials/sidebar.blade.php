@@ -85,7 +85,15 @@
 
     {{-- Pembelajaran Harian --}}
     <div class="akademik-nav-group">
-      <div class="akademik-nav-group-title">Proses KBM Harian</div>
+      <div class="akademik-nav-group-title">Pembelajaran &amp; KBM</div>
+
+      <a href="{{ route('akademik.perangkat.index') }}" class="akademik-nav-link {{ request()->routeIs('akademik.perangkat.*') ? 'active' : '' }}">
+        <div class="akademik-nav-link-left">
+          <i class="bi bi-folder-check" style="font-size:16px; color:#0284c7;"></i>
+          <span>Perangkat Pembelajaran</span>
+        </div>
+        <span class="akademik-nav-badge" style="background:#e0f2fe; color:#0369a1; font-weight:700;">Kurmer</span>
+      </a>
 
       <a href="{{ route('akademik.jurnal.index') }}" class="akademik-nav-link {{ request()->routeIs('akademik.jurnal.*') ? 'active' : '' }}">
         <div class="akademik-nav-link-left">
