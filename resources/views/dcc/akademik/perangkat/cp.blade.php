@@ -117,7 +117,11 @@
     </div>
     <div class="akademik-card-body" style="padding:0;">
       @if(!empty($activeCpText))
-        <div style="padding:22px 26px; font-size:13.5px; line-height:1.85; color:#1e293b; text-align:justify; background:#fff;">{!! nl2br(e($activeCpText)) !!}</div>
+        <div style="padding:22px 26px; background:#fff;">
+          @foreach(array_filter(array_map('trim', explode("\n", $activeCpText))) as $para)
+            <p style="font-size:13.5px; line-height:1.85; color:#1e293b; text-align:justify; margin-bottom:10px;">{{ $para }}</p>
+          @endforeach
+        </div>
       @else
         <div style="padding:40px; text-align:center; color:#94a3b8;">
           <i class="bi bi-journal-x" style="font-size:36px; display:block; margin-bottom:12px; opacity:0.5;"></i>
@@ -141,7 +145,11 @@
         <i class="bi bi-bullseye text-primary"></i> Rasional &amp; Tujuan Mata Pelajaran
       </h3>
     </div>
-    <div class="akademik-card-body" style="padding:22px 26px; font-size:13.5px; line-height:1.85; color:#334155; text-align:justify;">{!! nl2br(e($activePerangkat->rasional_tujuan)) !!}</div>
+    <div class="akademik-card-body" style="padding:22px 26px;">
+      @foreach(array_filter(array_map('trim', explode("\n", $activePerangkat->rasional_tujuan))) as $para)
+        <p style="font-size:13.5px; line-height:1.85; color:#334155; text-align:justify; margin-bottom:10px;">{{ $para }}</p>
+      @endforeach
+    </div>
   </div>
   @endif
 
