@@ -83,11 +83,11 @@ class DeployController extends Controller
         $logs['php_xml'] = class_exists(\DOMDocument::class);
         $logs['php_gd']  = extension_loaded('gd');
 
-        // Ambil 30 baris terakhir log laravel jika ada
+        // Ambil baris error terakhir jika ada
         $logPath = storage_path('logs/laravel.log');
         if (file_exists($logPath)) {
-            exec('tail -n 35 ' . escapeshellarg($logPath), $recentLogLines);
-            $logs['recent_log'] = $recentLogLines;
+            exec('grep -A 10 "production.ERROR" ' . escapeshellarg($logPath) . ' | tail -n 25', $recentErrors);
+            $logs['last_error'] = !empty($recentErrors) ? $recentErrors : 'No recent ERROR in log';
         }
 
         return response()->json([

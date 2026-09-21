@@ -887,9 +887,11 @@ class AkademikPerangkatController extends Controller
         ]);
         $table->addRow();
 
+        $canAddWordImage = extension_loaded('gd') && function_exists('imagecreatefrompng');
+
         // Logo Kiri: Provinsi
         $cell1 = $table->addCell(1300, ['valign' => 'center']);
-        if ($provPath && file_exists($provPath)) {
+        if ($canAddWordImage && $provPath && file_exists($provPath)) {
             try {
                 $cell1->addImage($provPath, [
                     'width' => $compact ? 44 : 50,
@@ -933,7 +935,7 @@ class AkademikPerangkatController extends Controller
 
         // Logo Kanan: Sekolah
         $cell3 = $table->addCell(1300, ['valign' => 'center']);
-        if ($sekolahPath && file_exists($sekolahPath)) {
+        if ($canAddWordImage && $sekolahPath && file_exists($sekolahPath)) {
             try {
                 $cell3->addImage($sekolahPath, [
                     'width' => $compact ? 44 : 50,
