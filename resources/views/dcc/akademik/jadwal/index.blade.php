@@ -1466,6 +1466,7 @@ function tambahIstirahat(hari) {
   </div>
 </div>
 @endif
+@endif
 
 {{-- ========================================================================= --}}
 {{-- MODAL: FORMULASI BLOK JAM (FAST BATCH SCHEDULER)                          --}}
