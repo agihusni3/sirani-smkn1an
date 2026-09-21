@@ -223,6 +223,91 @@ class AkademikPerangkatController extends Controller
     }
 
     /**
+     * Simpan / Perbarui Capaian Pembelajaran (CP) oleh Guru Pengampu
+     */
+    public function storeCp(Request $request, $id)
+    {
+        $perangkat = AkademikPerangkatAjar::findOrFail($id);
+        $user = auth()->user();
+
+        // Validasi hak akses: guru pemilik atau admin / wakakurikulum
+        if ($user->isGuru() && !$user->isAdmin() && !$user->isWakaKurikulum() && $user->guru_id != $perangkat->guru_id) {
+            return back()->with('error', 'Anda hanya dapat mengedit Capaian Pembelajaran pada perangkat milik akun guru Anda.');
+        }
+
+        $validated = $request->validate([
+            'capaian_pembelajaran' => 'required|string',
+            'rasional_tujuan' => 'nullable|string',
+            'elemen_cp' => 'nullable|array',
+            'elemen_cp.*.nama' => 'nullable|string',
+            'elemen_cp.*.deskripsi' => 'nullable|string',
+        ]);
+
+        // Filter elemen CP yang tidak kosong
+        $elemenList = [];
+        if (!empty($validated['elemen_cp'])) {
+            foreach ($validated['elemen_cp'] as $elem) {
+                $nama = trim($elem['nama'] ?? '');
+                $deskripsi = trim($elem['deskripsi'] ?? '');
+                if ($nama !== '' || $deskripsi !== '') {
+                    $elemenList[] = [
+                        'nama' => $nama,
+                        'deskripsi' => $deskripsi,
+                    ];
+                }
+            }
+        }
+
+        $perangkat->update([
+            'capaian_pembelajaran' => $validated['capaian_pembelajaran'],
+            'rasional_tujuan' => $validated['rasional_tujuan'] ?? null,
+            'elemen_cp' => $elemenList,
+        ]);
+
+        return back()->with('success', 'Capaian Pembelajaran (CP) dan Elemen Kompetensi berhasil disimpan oleh Guru!');
+    }
+
+    /**
+     * Salin Template Resmi SK BSKAP 032/2024 ke Dokumen Guru
+     */
+    public function copyTemplateCp(Request $request, $id)
+    {
+        $perangkat = AkademikPerangkatAjar::with('mataPelajaran')->findOrFail($id);
+        $user = auth()->user();
+
+        if ($user->isGuru() && !$user->isAdmin() && !$user->isWakaKurikulum() && $user->guru_id != $perangkat->guru_id) {
+            return back()->with('error', 'Anda tidak memiliki hak akses pada dokumen perangkat ajar ini.');
+        }
+
+        $mapel = $perangkat->mataPelajaran;
+        if (!$mapel) {
+            return back()->with('error', 'Mata pelajaran tidak ditemukan.');
+        }
+
+        // Ambil acuan CP master sesuai fase
+        $cpText = '';
+        if ($perangkat->fase === 'E' && !empty($mapel->capaian_pembelajaran_fase_e)) {
+            $cpText = $mapel->capaian_pembelajaran_fase_e;
+        } elseif ($perangkat->fase === 'F' && !empty($mapel->capaian_pembelajaran_fase_f)) {
+            $cpText = $mapel->capaian_pembelajaran_fase_f;
+        } else {
+            $cpText = $mapel->deskripsi_cp ?? $mapel->capaian_pembelajaran_fase_e ?? $mapel->capaian_pembelajaran_fase_f ?? '';
+        }
+
+        $elemenList = [];
+        if (!empty($mapel->elemen_cp)) {
+            $elemenList = is_array($mapel->elemen_cp) ? $mapel->elemen_cp : (json_decode($mapel->elemen_cp, true) ?? []);
+        }
+
+        $perangkat->update([
+            'capaian_pembelajaran' => $cpText ?: 'Peserta didik mampu menguasai capaian kompetensi mata pelajaran ' . $mapel->nama_mapel . ' sesuai Kurikulum Merdeka Fase ' . $perangkat->fase . '.',
+            'elemen_cp' => $elemenList,
+        ]);
+
+        return back()->with('success', 'Template Capaian Pembelajaran standar resmi berhasil disalin ke dokumen Anda. Silakan disesuaikan jika diperlukan.');
+    }
+
+    /**
      * Tambah / Edit Butir Alur Tujuan Pembelajaran (ATP)
      */
     public function storeAtp(Request $request, $id)
@@ -557,18 +642,46 @@ class AkademikPerangkatController extends Controller
     public function cp(Request $request)
     {
         $ctx = $this->resolvePerangkatContext($request);
-        
-        $selectedMapelId = $request->get('mapel_id', $ctx['activePerangkat']?->mata_pelajaran_id);
+        $activePerangkat = $ctx['activePerangkat'];
+
+        $selectedMapelId = $request->get('mapel_id', $activePerangkat?->mata_pelajaran_id);
         $selectedMapel = null;
         if ($selectedMapelId) {
             $selectedMapel = AkademikMataPelajaran::find($selectedMapelId);
+        }
+        if (!$selectedMapel && $activePerangkat) {
+            $selectedMapel = $activePerangkat->mataPelajaran;
         }
         if (!$selectedMapel && $ctx['mapels']->isNotEmpty()) {
             $selectedMapel = $ctx['mapels']->first();
         }
 
+        $user = $ctx['user'];
+        $isOwner = $user->guru_id && $activePerangkat && $user->guru_id === $activePerangkat->guru_id;
+        $canEdit = $ctx['isAdminOrWaka'] || $isOwner;
+
+        // Acuan standar nasional SK BSKAP 032/2024
+        $templateCpText = '';
+        if ($activePerangkat && $activePerangkat->fase === 'E') {
+            $templateCpText = $selectedMapel?->capaian_pembelajaran_fase_e;
+        } elseif ($activePerangkat && $activePerangkat->fase === 'F') {
+            $templateCpText = $selectedMapel?->capaian_pembelajaran_fase_f;
+        }
+        if (empty($templateCpText)) {
+            $templateCpText = $selectedMapel?->deskripsi_cp ?? '';
+        }
+
+        $templateElemenCp = [];
+        if ($selectedMapel && !empty($selectedMapel->elemen_cp)) {
+            $templateElemenCp = is_array($selectedMapel->elemen_cp) ? $selectedMapel->elemen_cp : (json_decode($selectedMapel->elemen_cp, true) ?? []);
+        }
+
         return view('dcc.akademik.perangkat.cp', array_merge($ctx, [
             'selectedMapel' => $selectedMapel,
+            'isOwner' => $isOwner,
+            'canEdit' => $canEdit,
+            'templateCpText' => $templateCpText,
+            'templateElemenCp' => $templateElemenCp,
         ]));
     }
 

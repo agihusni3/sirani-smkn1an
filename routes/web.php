@@ -294,6 +294,8 @@ Route::middleware('auth')->group(function () {
         Route::middleware('role:admin,waka_kurikulum,guru')->group(function () {
             Route::post('/perangkat', [\App\Http\Controllers\Akademik\AkademikPerangkatController::class, 'store'])->name('akademik.perangkat.store');
             Route::put('/perangkat/{id}/info', [\App\Http\Controllers\Akademik\AkademikPerangkatController::class, 'updateInfo'])->name('akademik.perangkat.update-info');
+            Route::post('/perangkat/{id}/cp', [\App\Http\Controllers\Akademik\AkademikPerangkatController::class, 'storeCp'])->name('akademik.perangkat.cp.store');
+            Route::post('/perangkat/{id}/cp/salin-template', [\App\Http\Controllers\Akademik\AkademikPerangkatController::class, 'copyTemplateCp'])->name('akademik.perangkat.cp.salin-template');
             Route::post('/perangkat/{id}/atp', [\App\Http\Controllers\Akademik\AkademikPerangkatController::class, 'storeAtp'])->name('akademik.perangkat.atp.store');
             Route::delete('/perangkat/{id}/atp/{atpId}', [\App\Http\Controllers\Akademik\AkademikPerangkatController::class, 'destroyAtp'])->name('akademik.perangkat.atp.destroy');
             Route::post('/perangkat/{id}/modul', [\App\Http\Controllers\Akademik\AkademikPerangkatController::class, 'storeModul'])->name('akademik.perangkat.modul.store');

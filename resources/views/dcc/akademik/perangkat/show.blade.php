@@ -153,29 +153,99 @@
 {{-- TAB 1: CAPAIAN PEMBELAJARAN (CP) --}}
 @if($activeTab === 'cp')
 <div class="akademik-card">
-  <div class="akademik-card-header">
+  <div class="akademik-card-header" style="display:flex; justify-content:space-between; align-items:center;">
     <h3 class="akademik-card-title">
       <i class="bi bi-bookmark-star text-primary"></i>
-      <span>Capaian Pembelajaran (CP) Resmi — Fase {{ $perangkat->fase }}</span>
+      <span>Capaian Pembelajaran (CP) — Fase {{ $perangkat->fase }} (Kelas {{ $perangkat->tingkat }})</span>
     </h3>
-    <span class="ak-badge ak-badge-secondary">BSKAP Kemendikbudristek No. 032/H/KR/2024</span>
+    <div style="display:flex; align-items:center; gap:8px;">
+      @if(!empty($perangkat->capaian_pembelajaran))
+        <span class="badge" style="background:#ecfdf5; color:#065f46; border:1px solid #a7f3d0; font-size:11.5px; font-weight:700;">
+          <i class="bi bi-person-check-fill me-1"></i> Rumusan Guru
+        </span>
+      @else
+        <span class="ak-badge ak-badge-secondary">Referensi SK BSKAP 032/2024</span>
+      @endif
+
+      @if($isOwner || $isAdminOrWaka)
+        <a href="{{ route('akademik.perangkat.cp', ['perangkat_id' => $perangkat->id, 'semester' => $perangkat->semester]) }}" class="ak-btn ak-btn-primary ak-btn-sm" style="font-size:12px;">
+          <i class="bi bi-pencil-square me-1"></i> Edit CP Guru
+        </a>
+      @endif
+    </div>
   </div>
   <div class="akademik-card-body">
-    @if($perangkat->mataPelajaran?->deskripsi_cp)
+    @php
+      $cpText = $perangkat->resolved_cp;
+      $elemenList = $perangkat->resolved_elemen_cp;
+    @endphp
+
+    @if(!empty($cpText))
       <div style="background:#f8fafc; border-left:4px solid #0284c7; border-radius:8px; padding:18px 20px; line-height:1.7; font-size:13.5px; color:#1e293b; margin-bottom:20px;">
-        {!! nl2br(e($perangkat->mataPelajaran->deskripsi_cp)) !!}
+        {!! nl2br(e($cpText)) !!}
       </div>
     @else
       <div style="text-align:center; padding:30px; color:#94a3b8;">
         <i class="bi bi-info-circle" style="font-size:32px; display:block; margin-bottom:8px;"></i>
-        Deskripsi Capaian Pembelajaran untuk mata pelajaran ini belum disinkronkan dari database master.
+        Deskripsi Capaian Pembelajaran belum diinput oleh guru.
+        @if($isOwner || $isAdminOrWaka)
+          <div style="margin-top:10px;">
+            <a href="{{ route('akademik.perangkat.cp', ['perangkat_id' => $perangkat->id, 'semester' => $perangkat->semester]) }}" class="ak-btn ak-btn-primary ak-btn-sm">
+              <i class="bi bi-pencil-square me-1"></i> Input Capaian Pembelajaran Sekarang
+            </a>
+          </div>
+        @endif
+      </div>
+    @endif
+
+    @if(!empty($perangkat->rasional_tujuan))
+      <div style="margin-bottom:20px; background:#fff; border:1px solid #e2e8f0; border-radius:8px; padding:14px 18px;">
+        <h4 style="font-size:12.5px; font-weight:800; color:#334155; margin-bottom:6px; text-transform:uppercase;">
+          <i class="bi bi-bullseye text-primary me-1"></i> Rasional &amp; Tujuan Mata Pelajaran:
+        </h4>
+        <div style="font-size:13px; color:#475569; line-height:1.6;">
+          {!! nl2br(e($perangkat->rasional_tujuan)) !!}
+        </div>
+      </div>
+    @endif
+
+    {{-- Elemen CP --}}
+    @if(!empty($elemenList) && count($elemenList) > 0)
+      <div style="margin-bottom:20px;">
+        <h4 style="font-size:13px; font-weight:800; color:#334155; margin-bottom:8px;">
+          <i class="bi bi-diagram-3 text-primary me-1"></i> Elemen Kompetensi Capaian Pembelajaran:
+        </h4>
+        <div class="akademik-table-wrap">
+          <table class="akademik-table">
+            <thead>
+              <tr>
+                <th style="width:40px; text-align:center;">#</th>
+                <th style="width:240px;">Nama Elemen</th>
+                <th>Deskripsi Capaian Pembelajaran Elemen</th>
+              </tr>
+            </thead>
+            <tbody>
+              @foreach($elemenList as $idx => $el)
+                <tr>
+                  <td style="text-align:center; font-weight:700; color:#94a3b8;">{{ $loop->iteration }}</td>
+                  <td style="font-weight:700; color:var(--ak-dark); font-size:13px;">
+                    {{ is_array($el) ? ($el['nama'] ?? $el['elemen'] ?? '-') : $el }}
+                  </td>
+                  <td style="font-size:12.5px; color:#334155; line-height:1.55;">
+                    {{ is_array($el) ? ($el['deskripsi'] ?? $el['capaian'] ?? '-') : '-' }}
+                  </td>
+                </tr>
+              @endforeach
+            </tbody>
+          </table>
+        </div>
       </div>
     @endif
 
     <div style="background:#f0fdf4; border:1px solid #bbf7d0; border-radius:8px; padding:14px 18px; font-size:12.5px; color:#166534;">
       <strong><i class="bi bi-lightbulb me-1"></i> Prinsip Kurikulum Merdeka SMK:</strong>
       <div style="margin-top:4px;">
-        Capaian Pembelajaran (CP) adalah kompetensi pembelajaran yang harus dicapai peserta didik pada setiap tahap perkembangan untuk setiap mata pelajaran pada satuan pendidikan. CP ini diturunkan oleh Guru Mata Pelajaran menjadi butir-butir <strong>Alur Tujuan Pembelajaran (ATP)</strong> pada Tab 2.
+        Capaian Pembelajaran (CP) dirumuskan oleh Guru Pengampu mata pelajaran sebagai kompetensi pembelajaran yang harus dicapai peserta didik pada Fase {{ $perangkat->fase }}. CP ini kemudian diturunkan menjadi butir-butir <strong>Alur Tujuan Pembelajaran (ATP)</strong> pada Tab 2.
       </div>
     </div>
   </div>
