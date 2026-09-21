@@ -238,4 +238,126 @@ class AkademikKalenderController extends Controller
 
         return back()->with('success', 'Catatan kebijakan kurikulum berhasil disimpan.');
     }
+
+    /**
+     * Tambah atau petakan agenda baru ke kalender (CREATE/MAP)
+     */
+    public function storeAgenda(Request $request)
+    {
+        $validated = $request->validate([
+            'tahun_ajaran_id' => 'required|exists:tahun_ajarans,id',
+            'semester' => 'required|in:1,2',
+            'bulan' => 'required|string|max:20',
+            'minggu_ke' => 'required|integer|min:1|max:5',
+            'jenis' => 'required|in:efektif,non_efektif',
+            'kategori' => 'required|string|max:30',
+            'keterangan' => 'required|string|max:255',
+            'warna' => 'nullable|string|max:30',
+        ]);
+
+        $kalender = AkademikKalender::firstOrCreate(
+            ['tahun_ajaran_id' => $validated['tahun_ajaran_id'], 'semester' => $validated['semester']],
+            [
+                'total_pekan' => 25,
+                'pekan_efektif' => 18,
+                'pekan_cadangan' => 7,
+                'is_locked' => false,
+                'created_by' => auth()->id(),
+            ]
+        );
+
+        if ($kalender->is_locked && !auth()->user()->isAdmin()) {
+            return back()->with('error', 'Kalender telah dikunci resmi oleh Waka Kurikulum.');
+        }
+
+        $warna = $validated['warna'] ?? match ($validated['kategori']) {
+            'mpls' => '#f59e0b',
+            'sts' => '#8b5cf6',
+            'sas', 'sat' => '#ec4899',
+            'ukk' => '#f97316',
+            'rapor' => '#10b981',
+            'libur' => '#ef4444',
+            'pkl' => '#06b6d4',
+            default => ($validated['jenis'] === 'efektif' ? '#2563eb' : '#64748b'),
+        };
+
+        // Cari apakah item untuk bulan dan minggu_ke sudah ada
+        $item = AkademikKalenderItem::where('akademik_kalender_id', $kalender->id)
+            ->where('bulan', $validated['bulan'])
+            ->where('minggu_ke', $validated['minggu_ke'])
+            ->first();
+
+        if ($item) {
+            $item->update([
+                'jenis' => $validated['jenis'],
+                'kategori' => $validated['kategori'],
+                'keterangan' => $validated['keterangan'],
+                'warna' => $warna,
+            ]);
+        } else {
+            $globalWeek = $kalender->items()->count() + 1;
+            $item = AkademikKalenderItem::create([
+                'akademik_kalender_id' => $kalender->id,
+                'bulan' => $validated['bulan'],
+                'minggu_ke' => $validated['minggu_ke'],
+                'minggu_ke_semester' => $globalWeek,
+                'jenis' => $validated['jenis'],
+                'kategori' => $validated['kategori'],
+                'keterangan' => $validated['keterangan'],
+                'warna' => $warna,
+            ]);
+        }
+
+        $kalender->hitungUlangPekan();
+
+        return back()->with('success', "Agenda \"{$validated['keterangan']}\" berhasil dipetakan ke Pekan {$validated['minggu_ke']} {$validated['bulan']}.");
+    }
+
+    /**
+     * Reset pekan menjadi KBM Efektif normal (Hapus agenda khusus)
+     */
+    public function resetItem(Request $request, $id)
+    {
+        $item = AkademikKalenderItem::with('kalender')->findOrFail($id);
+
+        if ($item->kalender->is_locked && !auth()->user()->isAdmin()) {
+            return back()->with('error', 'Kalender telah dikunci resmi.');
+        }
+
+        $item->update([
+            'jenis' => 'efektif',
+            'kategori' => 'kbm',
+            'keterangan' => "KBM Efektif Pekan {$item->minggu_ke}",
+            'warna' => '#2563eb',
+        ]);
+
+        $item->kalender->hitungUlangPekan();
+
+        return back()->with('success', "Pekan ke-{$item->minggu_ke} ({$item->bulan}) berhasil direset menjadi KBM Efektif normal.");
+    }
+
+    /**
+     * Hapus butir pekan dari kalender
+     */
+    public function destroyItem(Request $request, $id)
+    {
+        $item = AkademikKalenderItem::with('kalender')->findOrFail($id);
+        $kalender = $item->kalender;
+
+        if ($kalender->is_locked && !auth()->user()->isAdmin()) {
+            return back()->with('error', 'Kalender telah dikunci resmi.');
+        }
+
+        $item->delete();
+
+        // Nomor urut ulang minggu_ke_semester
+        $seq = 1;
+        foreach ($kalender->items()->orderBy('id')->get() as $it) {
+            $it->update(['minggu_ke_semester' => $seq++]);
+        }
+
+        $kalender->hitungUlangPekan();
+
+        return back()->with('success', 'Butir pekan berhasil dihapus.');
+    }
 }

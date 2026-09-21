@@ -239,7 +239,10 @@ Route::middleware('auth')->group(function () {
         Route::get('/kalender', [\App\Http\Controllers\Akademik\AkademikKalenderController::class, 'index'])->name('akademik.kalender.index');
         Route::middleware('role:admin,waka_kurikulum')->group(function () {
             Route::post('/kalender/generate', [\App\Http\Controllers\Akademik\AkademikKalenderController::class, 'generate'])->name('akademik.kalender.generate');
+            Route::post('/kalender/agenda', [\App\Http\Controllers\Akademik\AkademikKalenderController::class, 'storeAgenda'])->name('akademik.kalender.store-agenda');
             Route::post('/kalender/item/{id}', [\App\Http\Controllers\Akademik\AkademikKalenderController::class, 'updateItem'])->name('akademik.kalender.update-item');
+            Route::post('/kalender/item/{id}/reset', [\App\Http\Controllers\Akademik\AkademikKalenderController::class, 'resetItem'])->name('akademik.kalender.reset-item');
+            Route::delete('/kalender/item/{id}', [\App\Http\Controllers\Akademik\AkademikKalenderController::class, 'destroyItem'])->name('akademik.kalender.destroy-item');
             Route::post('/kalender/{id}/toggle-lock', [\App\Http\Controllers\Akademik\AkademikKalenderController::class, 'toggleLock'])->name('akademik.kalender.toggle-lock');
             Route::post('/kalender/{id}/catatan', [\App\Http\Controllers\Akademik\AkademikKalenderController::class, 'updateCatatan'])->name('akademik.kalender.catatan');
         });
