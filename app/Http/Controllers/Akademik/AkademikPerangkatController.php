@@ -848,22 +848,48 @@ class AkademikPerangkatController extends Controller
      */
     private function resolveKopLogos($sekolah): array
     {
+        $provJpg = public_path('img/logo_prov_lampung.jpg');
         $storageProv = $sekolah->logo_provinsi ? storage_path('app/public/' . $sekolah->logo_provinsi) : null;
         $provPath = ($storageProv && file_exists($storageProv)) ? $storageProv : (
-            file_exists(public_path('img/logo_prov_lampung.png')) ? public_path('img/logo_prov_lampung.png') : (
-                file_exists(public_path('lampung.png')) ? public_path('lampung.png') : null
+            file_exists($provJpg) ? $provJpg : (
+                file_exists(public_path('img/logo_prov_lampung.png')) ? public_path('img/logo_prov_lampung.png') : (
+                    file_exists(public_path('lampung.png')) ? public_path('lampung.png') : null
+                )
             )
         );
 
+        $sekolahJpg = public_path('img/logo.jpg');
         $storageSekolah = $sekolah->logo_sekolah ? storage_path('app/public/' . $sekolah->logo_sekolah) : null;
         $sekolahPath = ($storageSekolah && file_exists($storageSekolah)) ? $storageSekolah : (
-            file_exists(public_path('img/logo.png')) ? public_path('img/logo.png') : (
-                file_exists(public_path('logo.png')) ? public_path('logo.png') : null
+            file_exists($sekolahJpg) ? $sekolahJpg : (
+                file_exists(public_path('img/logo.png')) ? public_path('img/logo.png') : (
+                    file_exists(public_path('logo.png')) ? public_path('logo.png') : null
+                )
             )
         );
 
-        $logoProvBase64 = ($provPath && file_exists($provPath)) ? 'data:image/png;base64,' . base64_encode(file_get_contents($provPath)) : null;
-        $logoSekolahBase64 = ($sekolahPath && file_exists($sekolahPath)) ? 'data:image/png;base64,' . base64_encode(file_get_contents($sekolahPath)) : null;
+        // Jika ekstensi PHP-GD tidak aktif, prioritaskan file JPEG agar DomPDF & Word tidak gagal
+        if (!function_exists('imagecreatefrompng')) {
+            if ($provPath && str_ends_with(strtolower($provPath), '.png') && file_exists($provJpg)) {
+                $provPath = $provJpg;
+            }
+            if ($sekolahPath && str_ends_with(strtolower($sekolahPath), '.png') && file_exists($sekolahJpg)) {
+                $sekolahPath = $sekolahJpg;
+            }
+        }
+
+        $getMime = function ($path) {
+            if (!$path) return 'image/jpeg';
+            $ext = strtolower(pathinfo($path, PATHINFO_EXTENSION));
+            return match ($ext) {
+                'png' => 'image/png',
+                'svg' => 'image/svg+xml',
+                default => 'image/jpeg',
+            };
+        };
+
+        $logoProvBase64 = ($provPath && file_exists($provPath)) ? 'data:' . $getMime($provPath) . ';base64,' . base64_encode(file_get_contents($provPath)) : null;
+        $logoSekolahBase64 = ($sekolahPath && file_exists($sekolahPath)) ? 'data:' . $getMime($sekolahPath) . ';base64,' . base64_encode(file_get_contents($sekolahPath)) : null;
 
         return [
             'provPath'          => $provPath,
@@ -887,11 +913,16 @@ class AkademikPerangkatController extends Controller
         ]);
         $table->addRow();
 
-        $canAddWordImage = extension_loaded('gd') && function_exists('imagecreatefrompng');
+        $canAddWordImage = function ($path) {
+            if (!$path || !file_exists($path)) return false;
+            if (extension_loaded('gd') && function_exists('imagecreatefrompng')) return true;
+            $ext = strtolower(pathinfo($path, PATHINFO_EXTENSION));
+            return in_array($ext, ['jpg', 'jpeg']) && @getimagesize($path) !== false;
+        };
 
         // Logo Kiri: Provinsi
         $cell1 = $table->addCell(1300, ['valign' => 'center']);
-        if ($canAddWordImage && $provPath && file_exists($provPath)) {
+        if ($canAddWordImage($provPath)) {
             try {
                 $cell1->addImage($provPath, [
                     'width' => $compact ? 44 : 50,
@@ -935,7 +966,7 @@ class AkademikPerangkatController extends Controller
 
         // Logo Kanan: Sekolah
         $cell3 = $table->addCell(1300, ['valign' => 'center']);
-        if ($canAddWordImage && $sekolahPath && file_exists($sekolahPath)) {
+        if ($canAddWordImage($sekolahPath)) {
             try {
                 $cell3->addImage($sekolahPath, [
                     'width' => $compact ? 44 : 50,
@@ -966,27 +997,32 @@ class AkademikPerangkatController extends Controller
      */
     public function exportCpPdf($id)
     {
-        $perangkat = AkademikPerangkatAjar::with([
-            'guru', 'mataPelajaran', 'distribusiMengajar.rombel',
-            'tahunAjaran', 'validator'
-        ])->findOrFail($id);
+        try {
+            $perangkat = AkademikPerangkatAjar::with([
+                'guru', 'mataPelajaran', 'distribusiMengajar.rombel',
+                'tahunAjaran', 'validator'
+            ])->findOrFail($id);
 
-        $sekolah = PengaturanSekolah::getAktif();
-        $logos = $this->resolveKopLogos($sekolah);
-        $logoProvBase64 = $logos['logoProvBase64'];
-        $logoSekolahBase64 = $logos['logoSekolahBase64'];
+            $sekolah = PengaturanSekolah::getAktif();
+            $logos = $this->resolveKopLogos($sekolah);
+            $logoProvBase64 = $logos['logoProvBase64'];
+            $logoSekolahBase64 = $logos['logoSekolahBase64'];
 
-        $activeCpText = $perangkat->resolved_cp;
-        $activeElemen = $perangkat->resolved_elemen_cp;
+            $activeCpText = $perangkat->resolved_cp;
+            $activeElemen = $perangkat->resolved_elemen_cp;
 
-        $pdf = Pdf::loadView('dcc.akademik.perangkat.export.pdf_cp', compact(
-            'perangkat', 'sekolah', 'logoProvBase64', 'logoSekolahBase64',
-            'activeCpText', 'activeElemen'
-        ))->setPaper('a4', 'portrait');
+            $pdf = Pdf::loadView('dcc.akademik.perangkat.export.pdf_cp', compact(
+                'perangkat', 'sekolah', 'logoProvBase64', 'logoSekolahBase64',
+                'activeCpText', 'activeElemen'
+            ))->setPaper('a4', 'portrait');
 
-        $filename = 'CP-' . Str::slug($perangkat->mataPelajaran?->nama_mapel ?? 'mapel') . '-Kelas' . $perangkat->tingkat . '-Fase' . $perangkat->fase . '-Smt' . $perangkat->semester . '.pdf';
+            $filename = 'CP-' . Str::slug($perangkat->mataPelajaran?->nama_mapel ?? 'mapel') . '-Kelas' . $perangkat->tingkat . '-Fase' . $perangkat->fase . '-Smt' . $perangkat->semester . '.pdf';
 
-        return $pdf->download($filename);
+            return $pdf->download($filename);
+        } catch (\Throwable $e) {
+            Log::error('Gagal exportCpPdf: ' . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine());
+            return back()->with('error', 'Gagal mengekspor dokumen PDF CP: ' . $e->getMessage());
+        }
     }
 
     /**
@@ -1126,29 +1162,34 @@ class AkademikPerangkatController extends Controller
      */
     public function exportPdf($id)
     {
-        $perangkat = AkademikPerangkatAjar::with([
-            'guru', 'mataPelajaran', 'distribusiMengajar.rombel',
-            'tahunAjaran', 'atpItems', 'modulAjars', 'kktpItems.atpItem', 'validator'
-        ])->findOrFail($id);
+        try {
+            $perangkat = AkademikPerangkatAjar::with([
+                'guru', 'mataPelajaran', 'distribusiMengajar.rombel',
+                'tahunAjaran', 'atpItems', 'modulAjars', 'kktpItems.atpItem', 'validator'
+            ])->findOrFail($id);
 
-        $sekolah = PengaturanSekolah::getAktif();
-        $logos   = $this->resolveKopLogos($sekolah);
-        $logoProvBase64    = $logos['logoProvBase64'];
-        $logoSekolahBase64 = $logos['logoSekolahBase64'];
+            $sekolah = PengaturanSekolah::getAktif();
+            $logos   = $this->resolveKopLogos($sekolah);
+            $logoProvBase64    = $logos['logoProvBase64'];
+            $logoSekolahBase64 = $logos['logoSekolahBase64'];
 
-        $qrToken    = $perangkat->generateQrToken();
-        $atpItems   = $perangkat->atpItems()->orderBy('urutan')->get();
-        $modulAjars = $perangkat->modulAjars()->with('atpItem')->orderBy('pertemuan_ke_mulai')->get();
-        $kktpItems  = $perangkat->kktpItems()->with('atpItem')->get();
+            $qrToken    = $perangkat->generateQrToken();
+            $atpItems   = $perangkat->atpItems()->orderBy('urutan')->get();
+            $modulAjars = $perangkat->modulAjars()->with('atpItem')->orderBy('pertemuan_ke_mulai')->get();
+            $kktpItems  = $perangkat->kktpItems()->with('atpItem')->get();
 
-        $pdf = Pdf::loadView('dcc.akademik.perangkat.export.pdf_lengkap', compact(
-            'perangkat', 'sekolah', 'qrToken', 'atpItems', 'modulAjars', 'kktpItems',
-            'logoProvBase64', 'logoSekolahBase64'
-        ))->setPaper('a4', 'portrait');
+            $pdf = Pdf::loadView('dcc.akademik.perangkat.export.pdf_lengkap', compact(
+                'perangkat', 'sekolah', 'qrToken', 'atpItems', 'modulAjars', 'kktpItems',
+                'logoProvBase64', 'logoSekolahBase64'
+            ))->setPaper('a4', 'portrait');
 
-        $filename = 'Perangkat-' . Str::slug($perangkat->mataPelajaran?->nama_mapel ?? 'mapel') . '-Kelas' . $perangkat->tingkat . '-Smt' . $perangkat->semester . '.pdf';
+            $filename = 'Perangkat-' . Str::slug($perangkat->mataPelajaran?->nama_mapel ?? 'mapel') . '-Kelas' . $perangkat->tingkat . '-Smt' . $perangkat->semester . '.pdf';
 
-        return $pdf->download($filename);
+            return $pdf->download($filename);
+        } catch (\Throwable $e) {
+            Log::error('Gagal exportPdf: ' . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine());
+            return back()->with('error', 'Gagal mengekspor dokumen PDF Perangkat: ' . $e->getMessage());
+        }
     }
 
     /**
