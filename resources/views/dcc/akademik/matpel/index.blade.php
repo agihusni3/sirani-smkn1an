@@ -210,6 +210,7 @@
                     <form action="{{ route('akademik.matpel.update', $m->id) }}" method="POST">
                       @csrf
                       @method('PUT')
+                      <input type="hidden" name="is_active" value="1">
                       <div class="modal-header">
                         <h5 class="modal-title" style="font-weight:800; font-size:16px;">Ubah Mata Pelajaran</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>

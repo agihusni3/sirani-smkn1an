@@ -262,6 +262,10 @@ Route::middleware('auth')->group(function () {
         Route::get('/jadwal/cetak-lab', [\App\Http\Controllers\Akademik\AkademikJadwalController::class, 'cetakLab'])->name('akademik.jadwal.cetak-lab');
         Route::get('/jadwal/rombel-alokasi/{rombelId}', [\App\Http\Controllers\Akademik\AkademikJadwalController::class, 'getRombelAlokasi'])->name('akademik.jadwal.rombel-alokasi');
         Route::post('/jadwal/update-tugas-tambahan', [\App\Http\Controllers\Akademik\AkademikJadwalController::class, 'updateTugasTambahan'])->name('akademik.jadwal.update-tugas-tambahan');
+        Route::get('/jadwal/master-tugas', [\App\Http\Controllers\Akademik\AkademikJadwalController::class, 'getMasterTugas'])->name('akademik.jadwal.master-tugas.index');
+        Route::post('/jadwal/master-tugas', [\App\Http\Controllers\Akademik\AkademikJadwalController::class, 'storeMasterTugas'])->name('akademik.jadwal.master-tugas.store');
+        Route::put('/jadwal/master-tugas/{id}', [\App\Http\Controllers\Akademik\AkademikJadwalController::class, 'updateMasterTugas'])->name('akademik.jadwal.master-tugas.update');
+        Route::delete('/jadwal/master-tugas/{id}', [\App\Http\Controllers\Akademik\AkademikJadwalController::class, 'destroyMasterTugas'])->name('akademik.jadwal.master-tugas.destroy');
 
         // Sub-Modul 3: Jurnal KBM Harian & Presensi Siswa
         Route::get('/jurnal', [\App\Http\Controllers\Akademik\AkademikJurnalController::class, 'index'])->name('akademik.jurnal.index');

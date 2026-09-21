@@ -139,8 +139,7 @@ class AkademikMatpelController extends Controller
             'tingkat' => $tingkatStr,
             'jumlah_jam_per_minggu' => $request->jumlah_jam_per_minggu,
             'deskripsi_cp' => $request->deskripsi_cp,
-            'resource_key' => $request->resource_key ?: null,
-            'is_active' => $request->has('is_active'),
+            'is_active' => $request->has('is_active') ? $request->boolean('is_active') : ($mapel->is_active ?? true),
         ]);
 
         return redirect()->back()->with('success', 'Mata Pelajaran berhasil diperbarui.');

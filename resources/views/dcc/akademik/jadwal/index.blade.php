@@ -1960,51 +1960,88 @@ function tambahIstirahat(hari) {
         @csrf
         <input type="hidden" name="guru_id" id="tt_guru_id">
         <div class="modal-header" style="background:linear-gradient(135deg, #f8fafc, #edf2f7); border-bottom:1px solid #e2e8f0;">
-          <h5 class="modal-title" style="font-weight:800; font-size:16px; color:var(--ak-dark); display:flex; align-items:center; gap:8px;">
-            <i class="bi bi-briefcase-fill text-primary"></i> Atur Tugas Tambahan &amp; Ekuivalensi Jam (Permendikbud 15/2018)
+          <h5 class="modal-title" style="font-weight:800; font-size:16px; color:var(--ak-dark); margin:0;">
+            Atur Tugas Tambahan &amp; Ekuivalensi Jam (Permendikbud 15/2018)
           </h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
         </div>
         <div class="modal-body" style="padding:20px;">
-          <div style="background:#eef2ff; border:1.5px solid #c7d2fe; padding:12px 16px; border-radius:10px; margin-bottom:16px;">
-            <div style="font-size:11px; font-weight:800; color:#4338ca; text-transform:uppercase;">Guru Pendidik:</div>
-            <div id="tt_guru_nama" style="font-size:16px; font-weight:900; color:#1e1b4b; margin-top:2px;"></div>
-            <div style="font-size:11.5px; color:#475569; margin-top:4px;">
-              *Tugas tambahan akan dihitung ekuivalensi jamnya secara otomatis untuk mencukupi beban <b>24–40 JP/minggu</b>. Wali kelas dari rombel yang diampu sudah otomatis terhitung (+2 JP).
+          <div style="background:#f0fdf4; border:1.5px solid #bbf7d0; padding:12px 16px; border-radius:10px; margin-bottom:16px;">
+            <div style="font-size:11px; font-weight:800; color:#15803d; text-transform:uppercase;">Guru Pendidik:</div>
+            <div id="tt_guru_nama" style="font-size:16px; font-weight:900; color:#14532d; margin-top:2px;"></div>
+            <div style="font-size:11.5px; color:#166534; margin-top:4px;">
+              Tugas tambahan dihitung ekuivalensi jamnya secara otomatis untuk mencukupi beban <b>24–40 JP/minggu</b>.
             </div>
           </div>
 
-          <div style="margin-bottom:16px;">
-            <label class="ak-form-label" style="font-size:12px; font-weight:800; color:#334155; margin-bottom:8px; display:block;">
-              ⚡ Preset Cepat Tugas Tambahan SMK (Klik untuk Pilih / Batalkan):
-            </label>
-            <div style="display:flex; flex-wrap:wrap; gap:6px;">
-              <span class="tt-preset-chip" data-task="Waka Kurikulum" onclick="toggleTugasChip('Waka Kurikulum')">📌 Waka Kurikulum (+12 JP)</span>
-              <span class="tt-preset-chip" data-task="Waka Kesiswaan" onclick="toggleTugasChip('Waka Kesiswaan')">📌 Waka Kesiswaan (+12 JP)</span>
-              <span class="tt-preset-chip" data-task="Waka Sarpras" onclick="toggleTugasChip('Waka Sarpras')">📌 Waka Sarpras (+12 JP)</span>
-              <span class="tt-preset-chip" data-task="Waka Hubin" onclick="toggleTugasChip('Waka Hubin')">📌 Waka Hubin (+12 JP)</span>
-              <span class="tt-preset-chip" data-task="Kepala Program Keahlian RPL" onclick="toggleTugasChip('Kepala Program Keahlian RPL')">💻 Kaprog RPL (+12 JP)</span>
-              <span class="tt-preset-chip" data-task="Kepala Program Keahlian APHP" onclick="toggleTugasChip('Kepala Program Keahlian APHP')">🌾 Kaprog APHP (+12 JP)</span>
-              <span class="tt-preset-chip" data-task="Kepala Program Keahlian TSM" onclick="toggleTugasChip('Kepala Program Keahlian TSM')">🛵 Kaprog TSM (+12 JP)</span>
-              <span class="tt-preset-chip" data-task="Kepala Lab Komputer" onclick="toggleTugasChip('Kepala Lab Komputer')">🖥️ Ka. Lab Komputer (+12 JP)</span>
-              <span class="tt-preset-chip" data-task="Kepala Bengkel Otomotif" onclick="toggleTugasChip('Kepala Bengkel Otomotif')">🔧 Ka. Bengkel Otomotif (+12 JP)</span>
-              <span class="tt-preset-chip" data-task="Kepala Lab APHP" onclick="toggleTugasChip('Kepala Lab APHP')">🧪 Ka. Lab APHP (+12 JP)</span>
-              <span class="tt-preset-chip" data-task="Kepala Perpustakaan Sekolah" onclick="toggleTugasChip('Kepala Perpustakaan Sekolah')">📚 Ka. Perpustakaan (+12 JP)</span>
-              <span class="tt-preset-chip" data-task="Pembina OSIS" onclick="toggleTugasChip('Pembina OSIS')">🎗️ Pembina OSIS (+2 JP)</span>
-              <span class="tt-preset-chip" data-task="Pembina Pramuka" onclick="toggleTugasChip('Pembina Pramuka')">⚜️ Pembina Pramuka (+2 JP)</span>
-              <span class="tt-preset-chip" data-task="Pembina PMR" onclick="toggleTugasChip('Pembina PMR')">🩹 Pembina PMR (+2 JP)</span>
-              <span class="tt-preset-chip" data-task="Pembina Rohis" onclick="toggleTugasChip('Pembina Rohis')">🕌 Pembina Rohis (+2 JP)</span>
-              <span class="tt-preset-chip" data-task="Koordinator Projek Penguatan Profil Pelajar Pancasila (P5)" onclick="toggleTugasChip('Koordinator Projek Penguatan Profil Pelajar Pancasila (P5)')">🌟 Koordinator P5 (+2 JP)</span>
-              <span class="tt-preset-chip" data-task="Koordinator BKK / PKL" onclick="toggleTugasChip('Koordinator BKK / PKL')">🤝 Koordinator BKK/PKL (+2 JP)</span>
-              <span class="tt-preset-chip" data-task="Guru Piket" onclick="toggleTugasChip('Guru Piket')">🕒 Guru Piket (+1 JP)</span>
+          {{-- Pilihan Tugas Tambahan & Tombol Buka Master CRUD --}}
+          <div style="margin-bottom:14px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; flex-wrap:wrap; gap:6px;">
+              <label class="ak-form-label" style="font-size:12px; font-weight:800; color:#334155; margin:0;">
+                Pilihan Tugas Tambahan (Klik untuk Pilih / Batalkan):
+              </label>
+              <button type="button" class="btn btn-sm btn-link p-0 text-decoration-none" onclick="toggleMasterCrudDrawer()" style="font-size:11.5px; font-weight:800; color:var(--ak-primary);">
+                <span id="btnTextMasterDrawer">Kelola Master &amp; Jam Dinamis &darr;</span>
+              </button>
+            </div>
+
+            <div id="tt_preset_container" style="display:flex; flex-wrap:wrap; gap:6px;">
+              @foreach($masterTugasTambahan as $mt)
+                <span class="tt-preset-chip" data-id="{{ $mt->id }}" data-task="{{ $mt->nama_tugas }}" data-jp="{{ $mt->ekuivalensi_jam }}" onclick="toggleTugasChip('{{ addslashes($mt->nama_tugas) }}')">
+                  {{ $mt->nama_tugas }} (+{{ $mt->ekuivalensi_jam }} JP)
+                </span>
+              @endforeach
+            </div>
+          </div>
+
+          {{-- DRAWER CRUD MASTER TUGAS TAMBAHAN (Dapat Tambah, Edit Jam, & Hapus Dinamis) --}}
+          <div id="masterCrudDrawer" style="display:none; margin-bottom:16px; background:#f8fafc; border:1px solid #cbd5e1; border-radius:10px; padding:14px;">
+            <div style="font-size:12px; font-weight:800; color:#0f172a; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center;">
+              <span>Kelola Master Tugas &amp; Ekuivalensi Jam Dinamis</span>
+              <button type="button" class="btn btn-sm btn-link p-0 text-decoration-none text-muted" onclick="toggleMasterCrudDrawer()" style="font-size:11px;">Tutup</button>
+            </div>
+
+            {{-- Form Tambah Tugas Baru ke Master --}}
+            <div style="display:flex; gap:8px; margin-bottom:10px; flex-wrap:wrap;">
+              <input type="text" id="new_master_nama" class="ak-input" placeholder="Nama Tugas Tambahan Baru..." style="flex:1; min-width:180px; height:34px; font-size:12px;">
+              <div style="display:flex; align-items:center; gap:4px;">
+                <input type="number" id="new_master_jp" class="ak-input" value="2" min="1" max="40" style="width:65px; height:34px; font-size:12px; text-align:center;" title="Ekuivalensi Jam (JP)">
+                <span style="font-size:11.5px; font-weight:700; color:#64748b;">JP</span>
+              </div>
+              <button type="button" onclick="submitAddMasterTugas()" class="ak-btn ak-btn-primary" style="height:34px; padding:0 12px; font-size:12px; font-weight:700;">
+                + Tambah ke Master
+              </button>
+            </div>
+
+            {{-- Tabel Daftar Master Tugas yang Ada --}}
+            <div style="max-height:160px; overflow-y:auto; border:1px solid #e2e8f0; border-radius:8px; background:#ffffff;">
+              <table style="width:100%; font-size:11.5px; border-collapse:collapse;">
+                <tbody id="master_tugas_tbody">
+                  @foreach($masterTugasTambahan as $mt)
+                    <tr id="row_mt_{{ $mt->id }}" style="border-bottom:1px solid #f1f5f9;">
+                      <td style="padding:6px 10px; font-weight:700; color:#334155;">{{ $mt->nama_tugas }}</td>
+                      <td style="padding:6px 10px; width:75px; text-align:center;">
+                        <span class="ak-badge ak-badge-info" style="font-size:10px; font-weight:800;">+{{ $mt->ekuivalensi_jam }} JP</span>
+                      </td>
+                      <td style="padding:6px 10px; width:95px; text-align:right;">
+                        <button type="button" class="btn btn-sm btn-link p-0 text-primary me-2" onclick="editMasterPrompt({{ $mt->id }}, '{{ addslashes($mt->nama_tugas) }}', {{ $mt->ekuivalensi_jam }})" style="font-size:11px; font-weight:700;">Ubah</button>
+                        <button type="button" class="btn btn-sm btn-link p-0 text-danger" onclick="deleteMasterTugas({{ $mt->id }}, '{{ addslashes($mt->nama_tugas) }}')" style="font-size:11px; font-weight:700;">Hapus</button>
+                      </td>
+                    </tr>
+                  @endforeach
+                </tbody>
+              </table>
+            </div>
+            <div style="font-size:10.5px; color:#64748b; margin-top:5px;">
+              Perubahan master akan langsung otomatis memperbarui ekuivalensi jam pada kartu pilihan dan perhitungan SK.
             </div>
           </div>
 
           <div style="margin-bottom:14px;">
-            <label class="ak-form-label">Daftar Tugas Tambahan (Pisahkan dengan koma jika lebih dari satu)</label>
-            <input type="text" name="tugas_tambahan" id="tt_tugas_tambahan" class="ak-input" style="font-weight:600; font-size:13px;" placeholder="Contoh: Waka Sarpras, Kepala Lab Komputer" oninput="updateTugasChipsActiveState()">
+            <label class="ak-form-label">Daftar Tugas Tambahan Guru Ini (Pisahkan dengan koma jika lebih dari satu)</label>
+            <input type="text" name="tugas_tambahan" id="tt_tugas_tambahan" class="ak-input" style="font-weight:600; font-size:13px;" placeholder="Pilih dari daftar di atas atau ketik langsung tugas spesifik" oninput="updateTugasChipsActiveState()">
             <div style="font-size:11px; color:#64748b; margin-top:3px;">
-              Anda dapat mengetik langsung tugas spesifik atau klik tombol preset di atas.
+              Klik pilihan di atas atau ketik manual. Anda juga dapat menentukan jam kustom dengan mengetik format <i>Nama Tugas (+X JP)</i>.
             </div>
           </div>
 
@@ -2016,7 +2053,7 @@ function tambahIstirahat(hari) {
         <div class="modal-footer">
           <button type="button" class="ak-btn ak-btn-secondary" data-bs-dismiss="modal">Batal</button>
           <button type="submit" class="ak-btn ak-btn-primary">
-            <i class="bi bi-save me-1"></i> Simpan Tugas Tambahan
+            Simpan Tugas Tambahan
           </button>
         </div>
       </form>
@@ -2447,6 +2484,176 @@ function updateTugasChipsActiveState() {
       chip.classList.remove('active');
     }
   });
+}
+
+function toggleMasterCrudDrawer() {
+  const drawer = document.getElementById('masterCrudDrawer');
+  const btnText = document.getElementById('btnTextMasterDrawer');
+  if (!drawer) return;
+  const isShown = (drawer.style.display !== 'none');
+  drawer.style.display = isShown ? 'none' : 'block';
+  if (btnText) {
+    btnText.innerHTML = isShown ? 'Kelola Master &amp; Jam Dinamis &darr;' : 'Tutup Panel Master &uarr;';
+  }
+}
+
+async function submitAddMasterTugas() {
+  const namaInput = document.getElementById('new_master_nama');
+  const jpInput = document.getElementById('new_master_jp');
+  const nama = namaInput?.value.trim();
+  const jp = parseInt(jpInput?.value || 2);
+
+  if (!nama) {
+    alert('Harap isi nama tugas tambahan terlebih dahulu.');
+    namaInput?.focus();
+    return;
+  }
+  if (!jp || jp < 1) {
+    alert('Ekuivalensi jam minimal 1 JP.');
+    jpInput?.focus();
+    return;
+  }
+
+  try {
+    const res = await fetch('{{ route("akademik.jadwal.master-tugas.store") }}', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify({ nama_tugas: nama, ekuivalensi_jam: jp })
+    });
+    const data = await res.json();
+    if (data.success && data.data) {
+      const item = data.data;
+      const container = document.getElementById('tt_preset_container');
+      if (container) {
+        const span = document.createElement('span');
+        span.className = 'tt-preset-chip';
+        span.setAttribute('data-id', item.id);
+        span.setAttribute('data-task', item.nama_tugas);
+        span.setAttribute('data-jp', item.ekuivalensi_jam);
+        span.onclick = function() { toggleTugasChip(item.nama_tugas); };
+        span.innerText = `${item.nama_tugas} (+${item.ekuivalensi_jam} JP)`;
+        container.appendChild(span);
+      }
+
+      const tbody = document.getElementById('master_tugas_tbody');
+      if (tbody) {
+        const tr = document.createElement('tr');
+        tr.id = `row_mt_${item.id}`;
+        tr.style.borderBottom = '1px solid #f1f5f9';
+        tr.innerHTML = `
+          <td style="padding:6px 10px; font-weight:700; color:#334155;">${escapeHtml(item.nama_tugas)}</td>
+          <td style="padding:6px 10px; width:75px; text-align:center;">
+            <span class="ak-badge ak-badge-info" style="font-size:10px; font-weight:800;">+${item.ekuivalensi_jam} JP</span>
+          </td>
+          <td style="padding:6px 10px; width:95px; text-align:right;">
+            <button type="button" class="btn btn-sm btn-link p-0 text-primary me-2" onclick="editMasterPrompt(${item.id}, '${escapeQuotes(item.nama_tugas)}', ${item.ekuivalensi_jam})" style="font-size:11px; font-weight:700;">Ubah</button>
+            <button type="button" class="btn btn-sm btn-link p-0 text-danger" onclick="deleteMasterTugas(${item.id}, '${escapeQuotes(item.nama_tugas)}')" style="font-size:11px; font-weight:700;">Hapus</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      }
+
+      namaInput.value = '';
+      jpInput.value = '2';
+      updateTugasChipsActiveState();
+    } else {
+      alert(data.message || 'Gagal menambahkan tugas.');
+    }
+  } catch (err) {
+    alert('Terjadi kesalahan koneksi.');
+  }
+}
+
+async function editMasterPrompt(id, currentNama, currentJp) {
+  const newNama = prompt('Nama Tugas Tambahan:', currentNama);
+  if (newNama === null) return;
+  const newJpStr = prompt(`Ekuivalensi Jam / JP untuk "${newNama}":`, currentJp);
+  if (newJpStr === null) return;
+  const newJp = parseInt(newJpStr);
+  if (isNaN(newJp) || newJp < 1) {
+    alert('Jumlah JP harus berupa angka positif.');
+    return;
+  }
+
+  try {
+    const res = await fetch(`/dcc/akademik/jadwal/master-tugas/${id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify({ nama_tugas: newNama.trim(), ekuivalensi_jam: newJp })
+    });
+    const data = await res.json();
+    if (data.success && data.data) {
+      const item = data.data;
+      const chip = document.querySelector(`.tt-preset-chip[data-id="${id}"]`);
+      if (chip) {
+        chip.setAttribute('data-task', item.nama_tugas);
+        chip.setAttribute('data-jp', item.ekuivalensi_jam);
+        chip.onclick = function() { toggleTugasChip(item.nama_tugas); };
+        chip.innerText = `${item.nama_tugas} (+${item.ekuivalensi_jam} JP)`;
+      }
+      const row = document.getElementById(`row_mt_${id}`);
+      if (row) {
+        row.innerHTML = `
+          <td style="padding:6px 10px; font-weight:700; color:#334155;">${escapeHtml(item.nama_tugas)}</td>
+          <td style="padding:6px 10px; width:75px; text-align:center;">
+            <span class="ak-badge ak-badge-info" style="font-size:10px; font-weight:800;">+${item.ekuivalensi_jam} JP</span>
+          </td>
+          <td style="padding:6px 10px; width:95px; text-align:right;">
+            <button type="button" class="btn btn-sm btn-link p-0 text-primary me-2" onclick="editMasterPrompt(${item.id}, '${escapeQuotes(item.nama_tugas)}', ${item.ekuivalensi_jam})" style="font-size:11px; font-weight:700;">Ubah</button>
+            <button type="button" class="btn btn-sm btn-link p-0 text-danger" onclick="deleteMasterTugas(${item.id}, '${escapeQuotes(item.nama_tugas)}')" style="font-size:11px; font-weight:700;">Hapus</button>
+          </td>
+        `;
+      }
+      updateTugasChipsActiveState();
+    } else {
+      alert(data.message || 'Gagal mengubah master tugas.');
+    }
+  } catch (err) {
+    alert('Terjadi kesalahan koneksi.');
+  }
+}
+
+async function deleteMasterTugas(id, nama) {
+  if (!confirm(`Hapus tugas "${nama}" dari daftar master?`)) return;
+
+  try {
+    const res = await fetch(`/dcc/akademik/jadwal/master-tugas/${id}`, {
+      method: 'DELETE',
+      headers: {
+        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+        'Accept': 'application/json'
+      }
+    });
+    const data = await res.json();
+    if (data.success) {
+      const chip = document.querySelector(`.tt-preset-chip[data-id="${id}"]`);
+      if (chip) chip.remove();
+      const row = document.getElementById(`row_mt_${id}`);
+      if (row) row.remove();
+      updateTugasChipsActiveState();
+    } else {
+      alert(data.message || 'Gagal menghapus tugas.');
+    }
+  } catch (err) {
+    alert('Terjadi kesalahan koneksi.');
+  }
+}
+
+function escapeHtml(str) {
+  const div = document.createElement('div');
+  div.innerText = str;
+  return div.innerHTML;
+}
+function escapeQuotes(str) {
+  return (str || '').replace(/'/g, "\\'");
 }
 </script>
 <script>

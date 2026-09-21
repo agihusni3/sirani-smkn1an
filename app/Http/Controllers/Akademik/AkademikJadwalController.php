@@ -7,6 +7,7 @@ use App\Models\AkademikDistribusiMengajar;
 use App\Models\AkademikGuruPiket;
 use App\Models\AkademikJadwalPelajaran;
 use App\Models\AkademikJadwalWaktu;
+use App\Models\AkademikMasterTugasTambahan;
 use App\Models\AkademikMataPelajaran;
 use App\Models\Guru;
 use App\Models\Rombel;
@@ -32,9 +33,22 @@ class AkademikJadwalController extends Controller
         // Master Data
         $gurus = Guru::where('status', 'aktif')->orderBy('kode_nomor')->orderBy('nama')->get();
         $rombels = Rombel::orderBy('tingkat')->orderBy('nama_rombel')->get();
-        $mapels = AkademikMataPelajaran::where('is_active', true)
-            ->when($ta, fn($q) => $q->where('tahun_ajaran_id', $ta->id))
-            ->orderBy('nama_mapel')->get();
+        $mapels = AkademikMataPelajaran::where(function($q) {
+                $q->where('is_active', true)->orWhereNull('is_active');
+            })
+            ->when($ta, function($q) use ($ta) {
+                $q->where(function($sub) use ($ta) {
+                    $sub->where('tahun_ajaran_id', $ta->id)
+                        ->orWhereNull('tahun_ajaran_id');
+                });
+            })
+            ->orderBy('kode_mapel')
+            ->orderBy('nama_mapel')
+            ->get();
+
+        if ($mapels->isEmpty()) {
+            $mapels = AkademikMataPelajaran::orderBy('kode_mapel')->orderBy('nama_mapel')->get();
+        }
 
         // 1. Matriks Roster Jadwal Mingguan
         $jadwalQuery = AkademikJadwalPelajaran::with(['guru', 'mataPelajaran', 'rombel'])
@@ -203,10 +217,13 @@ class AkademikJadwalController extends Controller
             ];
         })->sortByDesc('total_ekuivalen')->values();
 
+        $masterTugasTambahan = AkademikMasterTugasTambahan::where('is_active', true)->orderBy('urutan')->orderBy('nama_tugas')->get();
+
         return view('dcc.akademik.jadwal.index', compact(
             'distribusis', 'ta', 'gurus', 'rombels', 'mapels', 'semester', 'rekapJjm',
             'tahunAjarans', 'tab', 'hariFilter', 'slotsMatrix', 'guruPikets',
-            'jadwalWaktu', 'jadwalWaktuFull', 'matrixDistribusi', 'rekapBebanGuru'
+            'jadwalWaktu', 'jadwalWaktuFull', 'matrixDistribusi', 'rekapBebanGuru',
+            'masterTugasTambahan'
         ));
     }
 
@@ -969,9 +986,22 @@ class AkademikJadwalController extends Controller
 
         $gurus = Guru::where('status', 'aktif')->orderBy('kode_nomor')->orderBy('nama')->get();
         $rombels = Rombel::orderBy('tingkat')->orderBy('nama_rombel')->get();
-        $mapels = AkademikMataPelajaran::where('is_active', true)
-            ->when($ta, fn($q) => $q->where('tahun_ajaran_id', $ta->id))
-            ->orderBy('kode_mapel')->get();
+        $mapels = AkademikMataPelajaran::where(function($q) {
+                $q->where('is_active', true)->orWhereNull('is_active');
+            })
+            ->when($ta, function($q) use ($ta) {
+                $q->where(function($sub) use ($ta) {
+                    $sub->where('tahun_ajaran_id', $ta->id)
+                        ->orWhereNull('tahun_ajaran_id');
+                });
+            })
+            ->orderBy('kode_mapel')
+            ->orderBy('nama_mapel')
+            ->get();
+
+        if ($mapels->isEmpty()) {
+            $mapels = AkademikMataPelajaran::orderBy('kode_mapel')->orderBy('nama_mapel')->get();
+        }
 
         $allSlots = AkademikJadwalPelajaran::with(['guru', 'mataPelajaran', 'rombel'])
             ->where('semester', $semester)
@@ -1010,9 +1040,22 @@ class AkademikJadwalController extends Controller
         $sekolah = \App\Models\PengaturanSekolah::first();
         $gurus = Guru::where('status', 'aktif')->orderBy('kode_nomor')->orderBy('nama')->get();
         $rombels = Rombel::with('waliKelas')->orderBy('tingkat')->orderBy('nama_rombel')->get();
-        $mapels = AkademikMataPelajaran::where('is_active', true)
-            ->when($ta, fn($q) => $q->where('tahun_ajaran_id', $ta->id))
-            ->orderBy('kode_mapel')->get();
+        $mapels = AkademikMataPelajaran::where(function($q) {
+                $q->where('is_active', true)->orWhereNull('is_active');
+            })
+            ->when($ta, function($q) use ($ta) {
+                $q->where(function($sub) use ($ta) {
+                    $sub->where('tahun_ajaran_id', $ta->id)
+                        ->orWhereNull('tahun_ajaran_id');
+                });
+            })
+            ->orderBy('kode_mapel')
+            ->orderBy('nama_mapel')
+            ->get();
+
+        if ($mapels->isEmpty()) {
+            $mapels = AkademikMataPelajaran::orderBy('kode_mapel')->orderBy('nama_mapel')->get();
+        }
 
         $allDistribusi = AkademikDistribusiMengajar::with(['mataPelajaran', 'rombel'])
             ->where('semester', $semester)
@@ -1373,5 +1416,82 @@ class AkademikJadwalController extends Controller
 
         return redirect()->back()
             ->with('success', "Tugas tambahan untuk {$guru->nama} berhasil diperbarui.");
+    }
+
+    /**
+     * Master Tugas Tambahan CRUD (Daftar & Ekuivalensi Jam Dinamis)
+     */
+    public function getMasterTugas()
+    {
+        $items = AkademikMasterTugasTambahan::orderBy('urutan')->orderBy('nama_tugas')->get();
+        return response()->json($items);
+    }
+
+    public function storeMasterTugas(Request $request)
+    {
+        $request->validate([
+            'nama_tugas' => 'required|string|max:150',
+            'ekuivalensi_jam' => 'required|integer|min:1|max:40',
+            'kategori' => 'nullable|string|max:100',
+        ]);
+
+        $item = AkademikMasterTugasTambahan::create([
+            'nama_tugas' => trim($request->nama_tugas),
+            'ekuivalensi_jam' => (int) $request->ekuivalensi_jam,
+            'kategori' => $request->kategori ?: 'Tugas Tambahan',
+            'is_active' => true,
+        ]);
+
+        if ($request->expectsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => "Tugas '{$item->nama_tugas}' (+{$item->ekuivalensi_jam} JP) berhasil ditambahkan.",
+                'data' => $item,
+            ]);
+        }
+
+        return redirect()->back()->with('success', 'Master tugas tambahan berhasil ditambahkan.');
+    }
+
+    public function updateMasterTugas(Request $request, $id)
+    {
+        $request->validate([
+            'nama_tugas' => 'required|string|max:150',
+            'ekuivalensi_jam' => 'required|integer|min:1|max:40',
+            'kategori' => 'nullable|string|max:100',
+        ]);
+
+        $item = AkademikMasterTugasTambahan::findOrFail($id);
+        $item->update([
+            'nama_tugas' => trim($request->nama_tugas),
+            'ekuivalensi_jam' => (int) $request->ekuivalensi_jam,
+            'kategori' => $request->kategori ?: $item->kategori,
+        ]);
+
+        if ($request->expectsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => "Tugas '{$item->nama_tugas}' berhasil diperbarui.",
+                'data' => $item,
+            ]);
+        }
+
+        return redirect()->back()->with('success', 'Master tugas tambahan berhasil diperbarui.');
+    }
+
+    public function destroyMasterTugas(Request $request, $id)
+    {
+        $item = AkademikMasterTugasTambahan::findOrFail($id);
+        $nama = $item->nama_tugas;
+        $item->delete();
+
+        if ($request->expectsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => "Tugas '{$nama}' berhasil dihapus dari daftar master.",
+            ]);
+        }
+
+        return redirect()->back()->with('success', "Tugas '{$nama}' berhasil dihapus.");
     }
 }

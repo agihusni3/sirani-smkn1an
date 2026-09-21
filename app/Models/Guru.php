@@ -379,6 +379,20 @@ class Guru extends Model
             }
         }
 
+        // Ambil daftar master tugas tambahan dari database untuk ekuivalensi dinamis
+        static $cachedMasterTugas = null;
+        if ($cachedMasterTugas === null) {
+            try {
+                if (\Illuminate\Support\Facades\Schema::hasTable('akademik_master_tugas_tambahans')) {
+                    $cachedMasterTugas = \App\Models\AkademikMasterTugasTambahan::where('is_active', true)->get();
+                } else {
+                    $cachedMasterTugas = collect();
+                }
+            } catch (\Throwable $e) {
+                $cachedMasterTugas = collect();
+            }
+        }
+
         // Pisahkan jika ada beberapa tugas tambahan dipisah koma atau titik koma
         $tokens = array_filter(array_map('trim', preg_split('/[,;\n]+/', $rawTugas)));
 
@@ -387,73 +401,71 @@ class Guru extends Model
             if (empty($low)) continue;
 
             $nama = $token;
-            $jp = 2;
-            $kategori = 'Penugasan Khusus';
+            $jp = null;
+            $kategori = 'Tugas Tambahan';
 
-            if (str_contains($low, 'kepala sekolah') && !str_contains($low, 'wakil') && !str_contains($low, 'waka')) {
-                $nama = 'Kepala Sekolah';
-                $jp = 24;
-                $kategori = 'Manajerial';
-            } elseif (str_contains($low, 'waka') || str_contains($low, 'wakil')) {
-                $nama = ucwords($token);
-                $jp = 12;
-                $kategori = 'Pimpinan';
-            } elseif (str_contains($low, 'kaprog') || str_contains($low, 'kepala program') || str_contains($low, 'ketua program') || str_contains($low, 'ketua jurusan')) {
-                $nama = ucwords($token);
-                $jp = 12;
-                $kategori = 'Ketua Program';
-            } elseif (str_contains($low, 'kepala bengkel') || str_contains($low, 'kepala lab') || str_contains($low, 'kepala laboratorium')) {
-                $nama = ucwords($token);
-                $jp = 12;
-                $kategori = 'Kepala Bengkel/Lab';
-            } elseif (str_contains($low, 'perpustakaan') || str_contains($low, 'perpus')) {
-                $nama = 'Kepala Perpustakaan Sekolah';
-                $jp = 12;
-                $kategori = 'Perpustakaan';
-            } elseif (str_contains($low, 'unit produksi') || str_contains($low, 'blud')) {
-                $nama = ucwords($token);
-                $jp = 6;
-                $kategori = 'Unit Produksi';
-            } elseif (str_contains($low, 'osis')) {
-                $nama = 'Pembina OSIS';
+            // 1. Dukung format jam manual dinamis jika diketik: "Nama Tugas (+X JP)" atau "Nama Tugas (X JP)"
+            if (preg_match('/^(.*?)\s*\((\+?\d+)\s*jp\)$/i', $token, $mJp)) {
+                $nama = trim($mJp[1]);
+                $jp = (int) str_replace('+', '', $mJp[2]);
+            }
+
+            // 2. Cocokkan dengan Master Tugas Tambahan Dinamis di DB
+            if ($cachedMasterTugas && $cachedMasterTugas->isNotEmpty()) {
+                $matchedMaster = $cachedMasterTugas->first(function ($m) use ($nama) {
+                    return strcasecmp(trim($m->nama_tugas), trim($nama)) === 0;
+                });
+
+                if (!$matchedMaster) {
+                    $matchedMaster = $cachedMasterTugas->first(function ($m) use ($nama) {
+                        return str_contains(strtolower($nama), strtolower($m->nama_tugas))
+                            || str_contains(strtolower($m->nama_tugas), strtolower($nama));
+                    });
+                }
+
+                if ($matchedMaster) {
+                    $nama = $matchedMaster->nama_tugas;
+                    if ($jp === null) {
+                        $jp = (int) $matchedMaster->ekuivalensi_jam;
+                    }
+                    $kategori = $matchedMaster->kategori ?: 'Tugas Tambahan';
+                }
+            }
+
+            // 3. Fallback cerdas jika belum terdaftar di master DB
+            if ($jp === null) {
                 $jp = 2;
-                $kategori = 'Kesiswaan';
-            } elseif (str_contains($low, 'pramuka')) {
-                $nama = 'Pembina Pramuka';
-                $jp = 2;
-                $kategori = 'Kesiswaan';
-            } elseif (str_contains($low, 'pmr') || str_contains($low, 'palang merah')) {
-                $nama = 'Pembina PMR / UKS';
-                $jp = 2;
-                $kategori = 'Kesiswaan';
-            } elseif (str_contains($low, 'rohis') || str_contains($low, 'keagamaan')) {
-                $nama = 'Pembina Rohani Islam (Rohis)';
-                $jp = 2;
-                $kategori = 'Kesiswaan';
-            } elseif (str_contains($low, 'pembina') || str_contains($low, 'ekskul') || str_contains($low, 'ekstrakurikuler') || str_contains($low, 'club')) {
-                $nama = ucwords($token);
-                $jp = 2;
-                $kategori = 'Kesiswaan';
-            } elseif (str_contains($low, 'p5') || str_contains($low, 'profil pelajar')) {
-                $nama = 'Koordinator Projek Penguatan Profil Pelajar Pancasila (P5)';
-                $jp = 2;
-                $kategori = 'Kurikulum';
-            } elseif (str_contains($low, 'pkl') || str_contains($low, 'prakerin') || str_contains($low, 'bkk') || str_contains($low, 'bursa kerja')) {
-                $nama = ucwords($token);
-                $jp = 2;
-                $kategori = 'Hubinmas / BKK';
-            } elseif (str_contains($low, 'spmi') || str_contains($low, 'tpmps') || str_contains($low, 'penjaminan mutu')) {
-                $nama = 'Tim Penjaminan Mutu Pendidikan Sekolah (TPMPS)';
-                $jp = 2;
-                $kategori = 'Manajemen Mutu';
-            } elseif (str_contains($low, 'piket')) {
-                $nama = 'Guru Piket';
-                $jp = 1;
-                $kategori = 'Operasional';
-            } elseif (str_contains($low, 'wali kelas') || str_contains($low, 'walas')) {
-                $nama = ucwords($token);
-                $jp = 2;
-                $kategori = 'Wali Kelas';
+                if (str_contains($low, 'kepala sekolah') && !str_contains($low, 'wakil') && !str_contains($low, 'waka')) {
+                    $nama = 'Kepala Sekolah';
+                    $jp = 24;
+                    $kategori = 'Manajerial';
+                } elseif (str_contains($low, 'waka') || str_contains($low, 'wakil')) {
+                    $nama = ucwords($token);
+                    $jp = 12;
+                    $kategori = 'Pimpinan';
+                } elseif (str_contains($low, 'kaprog') || str_contains($low, 'kepala program') || str_contains($low, 'ketua program') || str_contains($low, 'ketua jurusan')) {
+                    $nama = ucwords($token);
+                    $jp = 12;
+                    $kategori = 'Ketua Program';
+                } elseif (str_contains($low, 'kepala bengkel') || str_contains($low, 'kepala lab') || str_contains($low, 'kepala laboratorium')) {
+                    $nama = ucwords($token);
+                    $jp = 12;
+                    $kategori = 'Kepala Bengkel/Lab';
+                } elseif (str_contains($low, 'perpustakaan') || str_contains($low, 'perpus')) {
+                    $nama = 'Kepala Perpustakaan Sekolah';
+                    $jp = 12;
+                    $kategori = 'Perpustakaan';
+                } elseif (str_contains($low, 'unit produksi') || str_contains($low, 'blud')) {
+                    $nama = ucwords($token);
+                    $jp = 6;
+                    $kategori = 'Unit Produksi';
+                } elseif (str_contains($low, 'piket')) {
+                    $nama = 'Guru Piket';
+                    $jp = 1;
+                    $kategori = 'Operasional';
+                } else {
+                    $nama = ucwords($nama);
+                }
             }
 
             $uniqueKey = strtolower($nama);
