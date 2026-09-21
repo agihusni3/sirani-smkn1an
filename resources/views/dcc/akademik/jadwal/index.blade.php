@@ -1,6 +1,9 @@
 @extends('dcc.akademik.layout')
 
 @php
+  $user = auth()->user();
+  $canEditJadwal = $canEditJadwal ?? ($user && ($user->isAdmin() || $user->isWakaKurikulum() || $user->hasAvailableRole('admin') || $user->hasAvailableRole('waka_kurikulum')));
+  $currentGuruId = $currentGuruId ?? ($user?->guru_id ?? ($user?->guru?->id ?? null));
   $currentStep = ($tab === 'distribusi' ? 2 : ($tab === 'piket' ? 4 : 3));
 @endphp
 
@@ -39,10 +42,12 @@
           <i class="bi bi-file-earmark-text me-1"></i> Cetak Dokumen SK (PDF)
         </a>
 
+        @if($canEditJadwal)
         {{-- Tambah Alokasi Baru --}}
         <button type="button" class="ak-btn ak-btn-primary" data-bs-toggle="modal" data-bs-target="#modalTambahDistribusi" style="font-size:12.5px; font-weight:700; white-space:nowrap;">
           <i class="bi bi-plus-lg me-1"></i> Tambah Alokasi
         </button>
+        @endif
       </div>
     </div>
 
@@ -87,6 +92,7 @@
             Sem 2 (Genap)
           </a>
         </div>
+        @if($canEditJadwal || ($user && ($user->isWakaKesiswaan() || $user->hasAvailableRole('waka_kesiswaan'))))
         <form action="{{ route('akademik.jadwal.piket.sync') }}" method="POST" style="margin:0;">
           @csrf
           <input type="hidden" name="tahun_ajaran_id" value="{{ $ta?->id ?? 1 }}">
@@ -95,6 +101,7 @@
             <i class="bi bi-arrow-repeat me-1"></i> Sinkronkan ke SIRANI
           </button>
         </form>
+        @endif
         <a href="{{ route('piket.index') }}" target="_blank" class="ak-btn ak-btn-secondary" style="font-size:12.5px; font-weight:700;" title="Buka layar operasional Meja Piket">
           <i class="bi bi-box-arrow-up-right me-1"></i> Buka Meja Piket SIRANI
         </a>
@@ -158,6 +165,7 @@
           </ul>
         </div>
 
+        @if($canEditJadwal)
         {{-- Tombol Otomatisasi Jadwal 1-Klik --}}
         <button type="button" class="ak-btn" data-bs-toggle="modal" data-bs-target="#modalAutoScheduler" style="font-size:12.5px; background:linear-gradient(135deg, #059669, #10b981); color:#ffffff; border:none; box-shadow:0 4px 12px rgba(16,185,129,0.3); font-weight:700;">
           <i class="bi bi-magic me-1"></i> ✨ Otomatisasi Jadwal (1-Klik)
@@ -167,6 +175,11 @@
         <button type="button" class="ak-btn ak-btn-primary" data-bs-toggle="modal" data-bs-target="#modalFormulasiBlok" style="font-size:12.5px; font-weight:700;">
           <i class="bi bi-lightning-charge-fill me-1"></i> + Formulasi Blok Jam
         </button>
+        @else
+        <span class="ak-badge ak-badge-secondary" style="font-size:12px; font-weight:700; padding:6px 12px; background:#f1f5f9; color:#475569; border:1px solid #cbd5e1;">
+          <i class="bi bi-eye me-1"></i> Mode Baca
+        </span>
+        @endif
       </div>
     </div>
 
@@ -176,6 +189,7 @@
          style="padding:12px 18px; font-size:13px; font-weight:700; text-decoration:none; display:inline-flex; align-items:center; gap:6px; white-space:nowrap; border-bottom: 2.5px solid {{ $tab == 'roster' ? 'var(--ak-primary)' : 'transparent' }}; color: {{ $tab == 'roster' ? 'var(--ak-primary)' : '#64748b' }};">
         <i class="bi bi-grid-3x3-gap-fill"></i> Matriks Roster Jadwal
       </a>
+      @if($canEditJadwal)
       <a href="{{ route('akademik.jadwal.index', ['tab' => 'formulasi', 'semester' => $semester]) }}"
          style="padding:12px 18px; font-size:13px; font-weight:700; text-decoration:none; display:inline-flex; align-items:center; gap:6px; white-space:nowrap; border-bottom: 2.5px solid {{ $tab == 'formulasi' ? 'var(--ak-primary)' : 'transparent' }}; color: {{ $tab == 'formulasi' ? 'var(--ak-primary)' : '#64748b' }};">
         <i class="bi bi-lightning-charge-fill"></i> Formulasi Blok Cepat
@@ -184,6 +198,7 @@
          style="padding:12px 18px; font-size:13px; font-weight:700; text-decoration:none; display:inline-flex; align-items:center; gap:6px; white-space:nowrap; border-bottom: 2.5px solid {{ $tab == 'pukul' ? '#f59e0b' : 'transparent' }}; color: {{ $tab == 'pukul' ? '#b45309' : '#64748b' }};">
         <i class="bi bi-clock-history"></i> Atur Pukul KBM &amp; Istirahat
       </a>
+      @endif
     </div>
   </div>
 @endif
@@ -428,20 +443,47 @@ function tambahIstirahat(hari) {
         Matriks Jadwal Pelajaran Mingguan
       </h3>
       <div style="font-size:12px; color:#64748b;">
-        Klik pada sel jadwal mana pun untuk mengubah atau mengosongkan slot secara instan.
+        @if($canEditJadwal)
+          Klik pada sel jadwal mana pun untuk mengubah atau mengosongkan slot secara instan.
+        @else
+          Mode Baca: Matriks jadwal KBM mingguan resmi seluruh rombel dan pendidik SMKN 1 Air Naningan.
+        @endif
       </div>
     </div>
-    {{-- Filter Hari --}}
-    <div style="display:flex; gap:6px; align-items:center; flex-wrap:wrap;">
-      <span style="font-size:12px; font-weight:700; color:#64748b;">Filter Hari:</span>
-      @php $hariArr = ['' => 'Semua Hari', 'SENIN' => 'Senin', 'SELASA' => 'Selasa', 'RABU' => 'Rabu', 'KAMIS' => 'Kamis', 'JUMAT' => 'Jumat']; @endphp
-      @foreach($hariArr as $key => $lbl)
-        <a href="{{ route('akademik.jadwal.index', ['tab' => 'roster', 'semester' => $semester, 'hari' => $key]) }}"
-           class="ak-btn {{ $hariFilter === $key ? 'ak-btn-primary' : 'ak-btn-secondary' }}"
-           style="font-size:11.5px; padding:4px 10px;">
-          {{ $lbl }}
-        </a>
-      @endforeach
+    {{-- Filter Hari & Sorot Guru --}}
+    <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+      <div style="display:flex; gap:6px; align-items:center;">
+        <span style="font-size:12px; font-weight:700; color:#64748b;">Filter Hari:</span>
+        @php $hariArr = ['' => 'Semua Hari', 'SENIN' => 'Senin', 'SELASA' => 'Selasa', 'RABU' => 'Rabu', 'KAMIS' => 'Kamis', 'JUMAT' => 'Jumat']; @endphp
+        @foreach($hariArr as $key => $lbl)
+          <a href="{{ route('akademik.jadwal.index', ['tab' => 'roster', 'semester' => $semester, 'hari' => $key]) }}"
+             class="ak-btn {{ $hariFilter === $key ? 'ak-btn-primary' : 'ak-btn-secondary' }}"
+             style="font-size:11.5px; padding:4px 10px;">
+            {{ $lbl }}
+          </a>
+        @endforeach
+      </div>
+
+      {{-- Sorot Guru Dropdown --}}
+      <div style="display:flex; align-items:center; gap:6px; background:#f8fafc; padding:3px 8px; border-radius:8px; border:1px solid #e2e8f0;">
+        <label for="filterHighlightGuru" style="font-size:11.5px; font-weight:700; color:#475569; white-space:nowrap; margin:0;">
+          <i class="bi bi-funnel-fill text-primary me-1"></i> Sorot Guru:
+        </label>
+        <select id="filterHighlightGuru" class="ak-select" onchange="highlightGuruSchedule(this.value)" style="font-size:11.5px; padding:3px 8px; width:auto; min-width:170px; height:28px;">
+          <option value="">-- Tampilkan Semua --</option>
+          @if($currentGuruId)
+            @php $me = $gurus->firstWhere('id', $currentGuruId); @endphp
+            @if($me)
+              <option value="{{ $me->id }}">⭐ Jadwal Saya ({{ $me->nama }})</option>
+            @endif
+          @endif
+          @foreach($gurus as $g)
+            @if($g->id != $currentGuruId)
+              <option value="{{ $g->id }}">[{{ $g->kode_nomor ?? '-' }}] {{ $g->nama }}</option>
+            @endif
+          @endforeach
+        </select>
+      </div>
     </div>
   </div>
 
@@ -584,10 +626,16 @@ function tambahIstirahat(hari) {
                   $isLocked = (bool)($slot?->is_locked);
                   $slotId = $slot?->id ?? 0;
                 @endphp
-                <td class="roster-cell-slot {{ $isLocked ? 'roster-cell-locked' : '' }}"
-                    style="background:{{ $isLocked ? '#fffbeb' : $item['bg'] }};"
+                <td class="roster-cell-slot {{ $isLocked ? 'roster-cell-locked' : '' }} {{ !$canEditJadwal ? 'roster-cell-readonly' : '' }}"
+                    style="background:{{ $isLocked ? '#fffbeb' : $item['bg'] }}; {{ !$canEditJadwal ? 'cursor:default;' : '' }}"
+                    @if($canEditJadwal)
                     onclick="openSlotModal('{{ $day }}', {{ $jam }}, {{ $rmb?->id ?? 0 }}, '{{ addslashes($rmb?->nama_rombel ?? '') }}', '{{ $slot?->guru_id ?? '' }}', '{{ $slot?->mata_pelajaran_id ?? '' }}', '{{ addslashes($slot?->kegiatan_khusus ?? '') }}', {{ $isLocked ? 'true' : 'false' }}, {{ $slotId }})"
-                    title="{{ $slot ? ($slot->guru?->nama . ' - ' . ($slot->mataPelajaran?->nama_mapel ?? $slot->singkatan_mapel) . ($isLocked ? ' [🔒 DIKUNCI / KEEP]' : '')) : 'Klik untuk atur slot ini' }}">
+                    title="{{ $slot ? ($slot->guru?->nama . ' - ' . ($slot->mataPelajaran?->nama_mapel ?? $slot->singkatan_mapel) . ($isLocked ? ' [🔒 DIKUNCI / KEEP]' : '')) : 'Klik untuk atur slot ini' }}"
+                    @else
+                    title="{{ $slot ? (($slot->guru?->nama ?? 'Guru') . ' - ' . ($slot->mataPelajaran?->nama_mapel ?? $slot->singkatan_mapel ?? $slot->kegiatan_khusus)) : 'Kosong' }}"
+                    @endif
+                    data-guru-id="{{ $slot?->guru_id ?? '' }}"
+                    data-kode-guru="{{ $slot?->kode_guru ?? '' }}">
                   @if($slot && ($slot->guru_id || $slot->singkatan_mapel || $slot->kegiatan_khusus))
                     <div class="roster-slot-card">
                       @if($slot->kode_guru)
@@ -605,15 +653,21 @@ function tambahIstirahat(hari) {
                       @elseif($slot->resource_key)
                         <span style="font-size:9px; background:#6366f1; color:#fff; padding:1px 4px; border-radius:3px; font-weight:800; white-space:nowrap;" title="{{ $slot->resource_key }}">{{ $slot->resource_key }}</span>
                       @endif
-                      @if($isLocked)
+                      @if($isLocked && $canEditJadwal)
                         <span class="roster-lock-badge" title="Slot ini dikunci (KEEP)">🔒</span>
                       @endif
                     </div>
                   @else
-                    <div class="roster-empty-slot">
-                      <i class="bi bi-plus-lg"></i>
-                      <span>Isi</span>
-                    </div>
+                    @if($canEditJadwal)
+                      <div class="roster-empty-slot">
+                        <i class="bi bi-plus-lg"></i>
+                        <span>Isi</span>
+                      </div>
+                    @else
+                      <div class="roster-empty-slot" style="color:#cbd5e1; font-size:12px;">
+                        <span>—</span>
+                      </div>
+                    @endif
                   @endif
                 </td>
               @endforeach
@@ -646,6 +700,7 @@ function tambahIstirahat(hari) {
   </div>
 </div>
 
+@if($canEditJadwal)
 {{-- Panel Hapus Jadwal Massal --}}
 <div class="akademik-card" style="margin-bottom:20px; border:1.5px solid #fee2e2;">
   <div class="akademik-card-header" style="background:linear-gradient(135deg,#fef2f2,#fff5f5); border-bottom:1px solid #fecaca;">
@@ -693,6 +748,7 @@ function tambahIstirahat(hari) {
     </form>
   </div>
 </div>
+@endif
 
 {{-- Panel Legenda Guru & Legenda Mapel --}}
 <div style="display:grid; grid-template-columns: 1fr 2fr; gap:16px; margin-bottom:24px;">
@@ -743,23 +799,33 @@ function tambahIstirahat(hari) {
   </div>
 </div>
 
-{{-- Banner Navigasi ke Langkah 4: Piket --}}
+{{-- Banner Navigasi / Cetak --}}
 <div class="akademik-card" style="margin-top:24px; background:linear-gradient(135deg, #f0fdf4, #dcfce7); border:1px solid #bbf7d0; padding:20px 24px; border-radius:14px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px;">
   <div>
     <div style="font-weight:900; font-size:16px; color:#166534; display:flex; align-items:center; gap:8px;">
-      <i class="bi bi-check-circle-fill text-success"></i> Jadwal Roster KBM Sudah Selesai?
+      <i class="bi bi-check-circle-fill text-success"></i> Jadwal Roster KBM {{ $ta?->tahun_ajaran ?? '2025/2026' }}
     </div>
     <div style="font-size:13px; color:#14532d; margin-top:4px; max-width:650px;">
-      Setelah jadwal mingguan kelas dan lab tersusun rapi tanpa bentrok, lengkapi administrasi KBM dengan mengatur petugas pada <b>Langkah 4: Penugasan Jadwal Guru Piket</b>.
+      @if($canEditJadwal)
+        Setelah jadwal mingguan kelas dan lab tersusun rapi tanpa bentrok, lengkapi administrasi KBM dengan mengatur petugas pada <b>Langkah 4: Penugasan Jadwal Guru Piket</b>.
+      @else
+        Dokumen jadwal KBM resmi dapat dicetak atau disimpan langsung dalam format PDF untuk pegangan mengajar.
+      @endif
     </div>
   </div>
   <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
     <a href="{{ route('akademik.jadwal.cetak', ['semester' => $semester]) }}" target="_blank" class="ak-btn ak-btn-secondary" style="font-size:13px; font-weight:700;">
       <i class="bi bi-printer me-1"></i> Cetak Roster Sekolah
     </a>
+    @if($canEditJadwal)
     <a href="{{ route('akademik.jadwal.index', ['tab' => 'piket', 'semester' => $semester]) }}" class="ak-btn" style="background:#15803d; color:#ffffff; font-size:13px; font-weight:700; padding:10px 22px; border-radius:8px; text-decoration:none; box-shadow:0 4px 14px rgba(21,128,61,0.35);">
       Lanjut ke Langkah 4: Guru Piket <i class="bi bi-arrow-right ms-1"></i>
     </a>
+    @else
+    <a href="{{ route('akademik.jadwal.index', ['tab' => 'piket', 'semester' => $semester]) }}" class="ak-btn ak-btn-secondary" style="font-size:13px; font-weight:700;">
+      <i class="bi bi-shield-check me-1"></i> Lihat Petugas Piket
+    </a>
+    @endif
   </div>
 </div>
 @endif
@@ -890,7 +956,9 @@ function tambahIstirahat(hari) {
           <th style="width:120px;">Hari</th>
           <th style="width:250px;">Waka Piket</th>
           <th>Daftar Guru Piket</th>
+          @if($canEditJadwal || ($user && ($user->isWakaKesiswaan() || $user->hasAvailableRole('waka_kesiswaan'))))
           <th style="width:90px; text-align:center;">Aksi</th>
+          @endif
         </tr>
       </thead>
       <tbody>
@@ -916,13 +984,16 @@ function tambahIstirahat(hari) {
                 @endforelse
               </div>
             </td>
+            @if($canEditJadwal || ($user && ($user->isWakaKesiswaan() || $user->hasAvailableRole('waka_kesiswaan'))))
             <td style="text-align:center;">
               <button type="button" class="ak-btn ak-btn-secondary ak-btn-sm" data-bs-toggle="modal" data-bs-target="#modalPiket{{ $d }}" title="Ubah Petugas Piket">
                 <i class="bi bi-pencil"></i> Ubah
               </button>
             </td>
+            @endif
           </tr>
 
+          @if($canEditJadwal || ($user && ($user->isWakaKesiswaan() || $user->hasAvailableRole('waka_kesiswaan'))))
           {{-- Modal Edit Piket --}}
           <div class="modal fade" id="modalPiket{{ $d }}" tabindex="-1" aria-hidden="true">
             <div class="modal-dialog">
@@ -969,6 +1040,7 @@ function tambahIstirahat(hari) {
               </div>
             </div>
           </div>
+          @endif
         @endforeach
       </tbody>
     </table>
@@ -1218,7 +1290,9 @@ function tambahIstirahat(hari) {
             <th>Tugas Tambahan (Ekuivalensi Jam)</th>
             <th style="width:80px; text-align:center;">Total Eqv</th>
             <th style="width:130px; text-align:center;">Status Beban</th>
+            @if($canEditJadwal)
             <th style="width:110px; text-align:center;">Aksi</th>
+            @endif
           </tr>
         </thead>
         <tbody>
@@ -1278,6 +1352,7 @@ function tambahIstirahat(hari) {
                   </span>
                 @endif
               </td>
+              @if($canEditJadwal)
               <td style="text-align:center;">
                 <button type="button" class="btn btn-sm btn-outline-primary"
                   onclick="openModalTugasTambahan({{ $bg->guru->id }}, '{{ addslashes($bg->guru->nama) }}', '{{ addslashes($bg->guru->tugas_tambahan ?? '') }}', '{{ addslashes($bg->guru->sk_tugas_tambahan ?? '') }}')"
@@ -1286,6 +1361,7 @@ function tambahIstirahat(hari) {
                   <i class="bi bi-pencil-square"></i> Atur Tugas
                 </button>
               </td>
+              @endif
             </tr>
           @endforeach
         </tbody>
@@ -1315,7 +1391,9 @@ function tambahIstirahat(hari) {
             <th>Semester</th>
             <th>Beban Mengajar</th>
             <th>Catatan</th>
+            @if($canEditJadwal)
             <th style="width:90px; text-align:center;">Aksi</th>
+            @endif
           </tr>
         </thead>
         <tbody>
@@ -1352,6 +1430,7 @@ function tambahIstirahat(hari) {
                 @endif
               </td>
               <td style="font-size:12px; color:#64748b;">{{ $d->catatan ?? '-' }}</td>
+              @if($canEditJadwal)
               <td style="text-align:center;">
                 <div style="display:flex; justify-content:center; gap:6px;">
                   <button type="button" class="ak-btn ak-btn-secondary ak-btn-sm" data-bs-toggle="modal" data-bs-target="#modalEditDistribusi{{ $d->id }}" title="Ubah Rombel / Beban Jam">
@@ -1449,10 +1528,11 @@ function tambahIstirahat(hari) {
                   </div>
                 </div>
               </td>
+              @endif
             </tr>
           @empty
             <tr>
-              <td colspan="8" style="text-align:center; padding:30px; color:#64748b;">
+              <td colspan="{{ $canEditJadwal ? 8 : 7 }}" style="text-align:center; padding:30px; color:#64748b;">
                 Belum ada data distribusi mengajar untuk semester ini.
               </td>
             </tr>
@@ -1468,6 +1548,7 @@ function tambahIstirahat(hari) {
 @endif
 @endif
 
+@if($canEditJadwal)
 {{-- ========================================================================= --}}
 {{-- MODAL: FORMULASI BLOK JAM (FAST BATCH SCHEDULER)                          --}}
 {{-- ========================================================================= --}}
@@ -2032,6 +2113,7 @@ function tambahIstirahat(hari) {
     </div>
   </div>
 </div>
+@endif
 
 <style>
 .tt-preset-chip {
@@ -2063,7 +2145,46 @@ function tambahIstirahat(hari) {
 <script>
 let currentActiveSlotId = 0;
 
+function highlightGuruSchedule(guruId) {
+  const cells = document.querySelectorAll('.roster-cell-slot');
+  if (!guruId) {
+    cells.forEach(c => {
+      c.style.opacity = '1';
+      c.style.outline = 'none';
+      c.style.boxShadow = 'none';
+    });
+    return;
+  }
+
+  cells.forEach(c => {
+    const cGuru = c.getAttribute('data-guru-id');
+    if (cGuru === String(guruId)) {
+      c.style.opacity = '1';
+      c.style.outline = '2.5px solid #2563eb';
+      c.style.outlineOffset = '-2px';
+      c.style.boxShadow = '0 4px 12px rgba(37,99,235,0.35)';
+      c.style.zIndex = '3';
+    } else {
+      c.style.opacity = '0.35';
+      c.style.outline = 'none';
+      c.style.boxShadow = 'none';
+      c.style.zIndex = '1';
+    }
+  });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  const filterGuru = document.getElementById('filterHighlightGuru');
+  if (filterGuru && filterGuru.value) {
+    highlightGuruSchedule(filterGuru.value);
+  }
+});
+
 function openSlotModal(hari, jam, rombelId, rombelName, guruId, mapelId, kegiatan, isLocked, slotId) {
+  @if(!$canEditJadwal)
+    return;
+  @endif
+
   currentActiveSlotId = slotId || 0;
   document.getElementById('slot_hari').value = hari;
   document.getElementById('slot_jam').value = jam;
@@ -2100,6 +2221,10 @@ function openSlotModal(hari, jam, rombelId, rombelName, guruId, mapelId, kegiata
 }
 
 function toggleLockCurrentSlot() {
+  @if(!$canEditJadwal)
+    return;
+  @endif
+
   if (!currentActiveSlotId) return;
   fetch(`/dcc/akademik/jadwal/toggle-lock/${currentActiveSlotId}`, {
     method: 'POST',
@@ -2120,6 +2245,10 @@ function toggleLockCurrentSlot() {
 }
 
 function deleteCurrentSlot() {
+  @if(!$canEditJadwal)
+    return;
+  @endif
+
   if (!currentActiveSlotId) return;
   if (!confirm('Kosongkan slot jam pelajaran ini?')) return;
 

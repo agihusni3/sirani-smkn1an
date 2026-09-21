@@ -28,6 +28,16 @@ class AkademikJadwalController extends Controller
         if ($tab === 'jadwal') {
             $tab = 'roster';
         }
+
+        $user = auth()->user();
+        $canEditJadwal = $user && ($user->isAdmin() || $user->isWakaKurikulum() || $user->hasAvailableRole('admin') || $user->hasAvailableRole('waka_kurikulum'));
+        $currentGuruId = $user?->guru_id ?? ($user?->guru?->id ?? null);
+
+        // Guru hanya memiliki akses baca (read-only): tab konfigurasi & formulasi dialihkan ke roster
+        if (!$canEditJadwal && in_array($tab, ['formulasi', 'pukul'])) {
+            $tab = 'roster';
+        }
+
         $hariFilter = $request->get('hari', ''); // SENIN, SELASA, etc. or all
 
         // Master Data
@@ -223,7 +233,7 @@ class AkademikJadwalController extends Controller
             'distribusis', 'ta', 'gurus', 'rombels', 'mapels', 'semester', 'rekapJjm',
             'tahunAjarans', 'tab', 'hariFilter', 'slotsMatrix', 'guruPikets',
             'jadwalWaktu', 'jadwalWaktuFull', 'matrixDistribusi', 'rekapBebanGuru',
-            'masterTugasTambahan'
+            'masterTugasTambahan', 'canEditJadwal', 'currentGuruId'
         ));
     }
 
