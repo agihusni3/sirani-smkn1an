@@ -52,6 +52,37 @@
       </a>
     @endif
 
+    {{-- Tombol Export PDF & DOCX (selalu tersedia) --}}
+    <div class="dropdown d-inline-block">
+      <button type="button" class="ak-btn" style="background:linear-gradient(135deg,#1d4ed8,#6d28d9); color:#fff; font-weight:700; border:none; display:flex; align-items:center; gap:6px;" data-bs-toggle="dropdown" aria-expanded="false">
+        <i class="bi bi-cloud-download"></i>
+        <span>Unduh Dokumen</span>
+        <i class="bi bi-chevron-down" style="font-size:11px;"></i>
+      </button>
+      <ul class="dropdown-menu dropdown-menu-end shadow-lg" style="border:none; border-radius:12px; min-width:220px; padding:8px;">
+        <li>
+          <a class="dropdown-item d-flex align-items-center gap-2 py-2 px-3 rounded-2" href="{{ route('akademik.perangkat.export-pdf', $perangkat->id) }}" target="_blank" style="font-weight:600; color:#dc2626;">
+            <i class="bi bi-file-earmark-pdf-fill" style="font-size:18px; color:#dc2626;"></i>
+            <div>
+              <div style="font-size:13px;">Unduh PDF</div>
+              <div style="font-size:10px; color:#888; font-weight:400;">Perangkat Lengkap (5 Bab)</div>
+            </div>
+          </a>
+        </li>
+        <li><hr class="dropdown-divider my-1"></li>
+        <li>
+          <a class="dropdown-item d-flex align-items-center gap-2 py-2 px-3 rounded-2" href="{{ route('akademik.perangkat.export-docx', $perangkat->id) }}" style="font-weight:600; color:#2563eb;">
+            <i class="bi bi-file-earmark-word-fill" style="font-size:18px; color:#2563eb;"></i>
+            <div>
+              <div style="font-size:13px;">Unduh DOCX (Word)</div>
+              <div style="font-size:10px; color:#888; font-weight:400;">Dapat diedit di Microsoft Word</div>
+            </div>
+          </a>
+        </li>
+      </ul>
+    </div>
+
+
     {{-- Tombol Supervisi Wakakur / Kepsek --}}
     @if($isAdminOrWaka)
       <button type="button" class="ak-btn ak-btn-secondary" data-bs-toggle="modal" data-bs-target="#modalSupervisi">
