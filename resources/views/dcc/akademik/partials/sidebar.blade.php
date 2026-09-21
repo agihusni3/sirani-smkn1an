@@ -70,6 +70,13 @@
     {{-- Alur Kerja Waka Kurikulum (SOP Resmi) --}}
     <div class="akademik-nav-group">
       <div class="akademik-nav-group-title">Alur Kerja Kurikulum (Wakakur)</div>
+
+      <a href="{{ route('akademik.kalender.index') }}" class="akademik-nav-link {{ request()->routeIs('akademik.kalender.*') ? 'active' : '' }}">
+        <div class="akademik-nav-link-left">
+          <i class="bi bi-calendar2-week-fill" style="font-size:15px; color:#0284c7;"></i>
+          <span>Kalender Pendidikan (Kaldik)</span>
+        </div>
+      </a>
       
       @if($canManageMatpel)
       <a href="{{ route('akademik.matpel.index') }}" class="akademik-nav-link {{ request()->routeIs('akademik.matpel.*') ? 'active' : '' }}">

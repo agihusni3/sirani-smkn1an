@@ -235,6 +235,15 @@ Route::middleware('auth')->group(function () {
         Route::get('/', [\App\Http\Controllers\Akademik\AkademikController::class, 'dashboard'])->name('akademik.dashboard');
         Route::get('/dashboard', [\App\Http\Controllers\Akademik\AkademikController::class, 'dashboard']);
 
+        // Sub-Modul 0: Kalender Pendidikan (Kaldik) & Penetapan RPE Sekolah (Read: Semua Role Akademik; CRUD: Admin & Waka Kurikulum)
+        Route::get('/kalender', [\App\Http\Controllers\Akademik\AkademikKalenderController::class, 'index'])->name('akademik.kalender.index');
+        Route::middleware('role:admin,waka_kurikulum')->group(function () {
+            Route::post('/kalender/generate', [\App\Http\Controllers\Akademik\AkademikKalenderController::class, 'generate'])->name('akademik.kalender.generate');
+            Route::post('/kalender/item/{id}', [\App\Http\Controllers\Akademik\AkademikKalenderController::class, 'updateItem'])->name('akademik.kalender.update-item');
+            Route::post('/kalender/{id}/toggle-lock', [\App\Http\Controllers\Akademik\AkademikKalenderController::class, 'toggleLock'])->name('akademik.kalender.toggle-lock');
+            Route::post('/kalender/{id}/catatan', [\App\Http\Controllers\Akademik\AkademikKalenderController::class, 'updateCatatan'])->name('akademik.kalender.catatan');
+        });
+
         // Sub-Modul 1: Mata Pelajaran & Kurikulum (Read: Kepsek, Wakakur, Kaprog, Guru; CRUD: Admin & Wakakur)
         Route::get('/matpel', [\App\Http\Controllers\Akademik\AkademikMatpelController::class, 'index'])->name('akademik.matpel.index')->middleware('role:admin,kepala_sekolah,waka_kurikulum,kaprog,guru');
         Route::middleware('role:admin,waka_kurikulum')->group(function () {

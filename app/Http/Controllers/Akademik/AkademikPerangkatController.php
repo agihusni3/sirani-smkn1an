@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Akademik;
 use App\Http\Controllers\Controller;
 use App\Models\AkademikAtpItem;
 use App\Models\AkademikDistribusiMengajar;
+use App\Models\AkademikKalender;
 use App\Models\AkademikKktpItem;
 use App\Models\AkademikMataPelajaran;
 use App\Models\AkademikModulAjar;
@@ -744,12 +745,30 @@ class AkademikPerangkatController extends Controller
     {
         $ctx = $this->resolvePerangkatContext($request);
         $atpItems = $ctx['activePerangkat']?->atpItems()->orderBy('urutan')->get() ?? collect([]);
-        
-        $rpePekanEfektif = $ctx['activePerangkat']?->rpe_pekan_efektif ?? 18;
-        $rpeCadangan = $ctx['activePerangkat']?->rpe_pekan_cadangan ?? 2;
-        $totalPekan = $rpePekanEfektif + $rpeCadangan;
+        $activePerangkat = $ctx['activePerangkat'];
 
-        $jamPerMinggu = $ctx['activePerangkat']?->distribusiMengajar?->total_jam_per_minggu ?? 4;
+        $kalender = null;
+        $kaldikItems = collect([]);
+        $isKaldikResmi = false;
+
+        if ($activePerangkat) {
+            $kalender = AkademikKalender::with('items')
+                ->where('tahun_ajaran_id', $activePerangkat->tahun_ajaran_id)
+                ->where('semester', $activePerangkat->semester)
+                ->first();
+
+            if ($kalender) {
+                $kaldikItems = $kalender->items;
+                $isKaldikResmi = (bool) $kalender->is_locked;
+            }
+        }
+        
+        // Gunakan pekan efektif Kaldik resmi jika ada, atau fallback ke pengaturan perangkat/default
+        $rpePekanEfektif = $kalender ? $kalender->pekan_efektif : ($activePerangkat?->rpe_pekan_efektif ?? 18);
+        $rpeCadangan = $kalender ? $kalender->pekan_cadangan : ($activePerangkat?->rpe_pekan_cadangan ?? 2);
+        $totalPekan = $kalender ? $kalender->total_pekan : ($rpePekanEfektif + $rpeCadangan);
+
+        $jamPerMinggu = $activePerangkat?->distribusiMengajar?->total_jam_per_minggu ?? 4;
         $totalJpSemester = $rpePekanEfektif * $jamPerMinggu;
 
         return view('dcc.akademik.perangkat.prota_promes', array_merge($ctx, [
@@ -759,6 +778,9 @@ class AkademikPerangkatController extends Controller
             'totalPekan' => $totalPekan,
             'jamPerMinggu' => $jamPerMinggu,
             'totalJpSemester' => $totalJpSemester,
+            'kalender' => $kalender,
+            'kaldikItems' => $kaldikItems,
+            'isKaldikResmi' => $isKaldikResmi,
         ]));
     }
 

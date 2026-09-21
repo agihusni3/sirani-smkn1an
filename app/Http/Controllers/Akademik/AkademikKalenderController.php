@@ -1,0 +1,156 @@
+<?php
+
+namespace App\Http\Controllers\Akademik;
+
+use App\Http\Controllers\Controller;
+use App\Models\AkademikKalender;
+use App\Models\AkademikKalenderItem;
+use App\Models\TahunAjaran;
+use Illuminate\Http\Request;
+
+class AkademikKalenderController extends Controller
+{
+    /**
+     * Tampilkan halaman Kalender Pendidikan & Penetapan RPE
+     */
+    public function index(Request $request)
+    {
+        $user = auth()->user();
+        $canManage = $user && ($user->isAdmin() || $user->isWakaKurikulum() || $user->hasRole('admin') || $user->hasRole('waka_kurikulum'));
+
+        $tahunAjarans = TahunAjaran::orderBy('id', 'desc')->get();
+        $taAktif = TahunAjaran::where('is_active', true)->first() ?: $tahunAjarans->first();
+
+        $tahunAjaranId = (int) $request->input('tahun_ajaran_id', $taAktif?->id ?? 0);
+        $semester = (int) $request->input('semester', 1);
+
+        $selectedTa = $tahunAjarans->firstWhere('id', $tahunAjaranId) ?: $taAktif;
+
+        $kalender = null;
+        $itemsByMonth = collect([]);
+
+        if ($selectedTa) {
+            $kalender = AkademikKalender::with('items')
+                ->where('tahun_ajaran_id', $selectedTa->id)
+                ->where('semester', $semester)
+                ->first();
+
+            if ($kalender) {
+                $itemsByMonth = $kalender->items->groupBy('bulan');
+            }
+        }
+
+        return view('dcc.akademik.kalender.index', [
+            'tahunAjarans' => $tahunAjarans,
+            'selectedTa' => $selectedTa,
+            'semester' => $semester,
+            'kalender' => $kalender,
+            'itemsByMonth' => $itemsByMonth,
+            'canManage' => $canManage,
+        ]);
+    }
+
+    /**
+     * Generate template default standar SMK (1 klik)
+     */
+    public function generate(Request $request)
+    {
+        $validated = $request->validate([
+            'tahun_ajaran_id' => 'required|exists:tahun_ajarans,id',
+            'semester' => 'required|in:1,2',
+        ]);
+
+        $kalender = AkademikKalender::generateDefaultSemester(
+            (int) $validated['tahun_ajaran_id'],
+            (int) $validated['semester'],
+            auth()->id()
+        );
+
+        return redirect()->route('akademik.kalender.index', [
+            'tahun_ajaran_id' => $validated['tahun_ajaran_id'],
+            'semester' => $validated['semester'],
+        ])->with('success', 'Berhasil membuat Template Kalender Pendidikan & Penetapan RPE standar SMK.');
+    }
+
+    /**
+     * Update butir pekan kalender (efektif/non-efektif, kategori, agenda)
+     */
+    public function updateItem(Request $request, $id)
+    {
+        $item = AkademikKalenderItem::with('kalender')->findOrFail($id);
+
+        if ($item->kalender->is_locked && !(auth()->user()->isAdmin())) {
+            return back()->with('error', 'Kalender Pendidikan telah dikunci resmi oleh Waka Kurikulum.');
+        }
+
+        $validated = $request->validate([
+            'jenis' => 'required|in:efektif,non_efektif',
+            'kategori' => 'required|string|max:30',
+            'keterangan' => 'nullable|string|max:255',
+            'warna' => 'nullable|string|max:30',
+        ]);
+
+        // Tetapkan warna default sesuai kategori jika tidak diisi
+        $warna = $validated['warna'] ?? match ($validated['kategori']) {
+            'mpls' => '#f59e0b',
+            'sts' => '#8b5cf6',
+            'sas', 'sat' => '#ec4899',
+            'ukk' => '#f97316',
+            'rapor' => '#10b981',
+            'libur' => '#ef4444',
+            'pkl' => '#06b6d4',
+            default => ($validated['jenis'] === 'efektif' ? '#2563eb' : '#64748b'),
+        };
+
+        $item->update([
+            'jenis' => $validated['jenis'],
+            'kategori' => $validated['kategori'],
+            'keterangan' => $validated['keterangan'],
+            'warna' => $warna,
+        ]);
+
+        $item->kalender->hitungUlangPekan();
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Status pekan berhasil diperbarui.',
+                'pekan_efektif' => $item->kalender->pekan_efektif,
+                'pekan_cadangan' => $item->kalender->pekan_cadangan,
+            ]);
+        }
+
+        return back()->with('success', "Pekan ke-{$item->minggu_ke} ({$item->bulan}) berhasil diperbarui.");
+    }
+
+    /**
+     * Kunci / Buka Kalender Pendidikan sebagai acuan resmi
+     */
+    public function toggleLock(Request $request, $id)
+    {
+        $kalender = AkademikKalender::findOrFail($id);
+        $kalender->is_locked = !$kalender->is_locked;
+        $kalender->save();
+
+        $status = $kalender->is_locked ? 'DIKUNCI sebagai Acuan Resmi Sekolah' : 'DIBUKA untuk penyesuaian';
+        return back()->with('success', "Kalender Pendidikan berhasil {$status}.");
+    }
+
+    /**
+     * Update catatan kebijakan kurikulum
+     */
+    public function updateCatatan(Request $request, $id)
+    {
+        $kalender = AkademikKalender::findOrFail($id);
+
+        $validated = $request->validate([
+            'catatan' => 'nullable|string|max:1000',
+        ]);
+
+        $kalender->update([
+            'catatan' => $validated['catatan'],
+        ]);
+
+        return back()->with('success', 'Catatan kebijakan kurikulum berhasil disimpan.');
+    }
+}
