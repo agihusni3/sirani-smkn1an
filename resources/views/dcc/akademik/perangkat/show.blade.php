@@ -212,8 +212,8 @@
     @endphp
 
     @if(!empty($cpText))
-      <div style="background:#f8fafc; border-left:4px solid #0284c7; border-radius:8px; padding:18px 20px; line-height:1.7; font-size:13.5px; color:#1e293b; margin-bottom:20px;">
-        {!! nl2br(e($cpText)) !!}
+      <div style="background:#f8fafc; border-left:4px solid #0284c7; border-radius:8px; padding:18px 20px; font-size:13.5px; color:#1e293b; margin-bottom:20px;">
+        {!! format_narasi_kbm($cpText) !!}
       </div>
     @else
       <div style="text-align:center; padding:30px; color:#94a3b8;">
@@ -234,8 +234,8 @@
         <h4 style="font-size:12.5px; font-weight:800; color:#334155; margin-bottom:6px; text-transform:uppercase;">
           <i class="bi bi-bullseye text-primary me-1"></i> Rasional &amp; Tujuan Mata Pelajaran:
         </h4>
-        <div style="font-size:13px; color:#475569; line-height:1.6;">
-          {!! nl2br(e($perangkat->rasional_tujuan)) !!}
+        <div style="font-size:13px; color:#475569;">
+          {!! format_narasi_kbm($perangkat->rasional_tujuan, ['line_height' => '1.7', 'margin_bottom' => '8px']) !!}
         </div>
       </div>
     @endif

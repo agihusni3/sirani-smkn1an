@@ -71,7 +71,7 @@
         </a>
       @endif
 
-      @if($isGuru && isset($myDistribusis) && $myDistribusis->isNotEmpty())
+      @if(!empty($isGuru) && isset($myDistribusis) && $myDistribusis->isNotEmpty())
         @php
           $missingDists = $myDistribusis->unique('mata_pelajaran_id')->filter(function($dist) use ($perangkatsList) {
             return !$perangkatsList->contains(fn($p) => $p->mata_pelajaran_id == $dist->mata_pelajaran_id && $p->tingkat == ($dist->rombel?->tingkat ?? 'X'));

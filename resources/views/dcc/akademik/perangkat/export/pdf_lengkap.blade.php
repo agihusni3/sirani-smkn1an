@@ -120,11 +120,11 @@
 </table>
 
 <div class="sub-title">B. Capaian Pembelajaran</div>
-<div style="text-align:justify; padding:8px 12px; border:1px solid #ccc; margin-bottom:12px; background:#fafafa;">{!! nl2br(e($perangkat->capaian_pembelajaran ?? $perangkat->mataPelajaran?->capaian_pembelajaran_fase_e ?? '—')) !!}</div>
+<div style="padding:8px 12px; border:1px solid #ccc; margin-bottom:12px; background:#fafafa; font-size:10pt;">{!! format_narasi_kbm($perangkat->capaian_pembelajaran ?? $perangkat->mataPelajaran?->capaian_pembelajaran_fase_e ?? '—', ['line_height' => '1.5', 'margin_bottom' => '8px']) !!}</div>
 
 @if($perangkat->rasional_tujuan)
 <div class="sub-title">C. Rasional &amp; Tujuan</div>
-<div style="text-align:justify; padding:8px 12px; border:1px solid #ccc; margin-bottom:12px; background:#fafafa;">{!! nl2br(e($perangkat->rasional_tujuan)) !!}</div>
+<div style="padding:8px 12px; border:1px solid #ccc; margin-bottom:12px; background:#fafafa; font-size:10pt;">{!! format_narasi_kbm($perangkat->rasional_tujuan, ['line_height' => '1.5', 'margin_bottom' => '8px']) !!}</div>
 @endif
 
 @php $elemenCp = is_array($perangkat->elemen_cp) ? $perangkat->elemen_cp : (json_decode($perangkat->elemen_cp ?? '[]', true) ?? []); @endphp
@@ -219,11 +219,11 @@
     <tr><td style="border:none!important;">Model Pembelajaran</td><td style="border:none!important;">:</td><td style="border:none!important;">{{ $modul->model_pembelajaran ?? '-' }}</td></tr>
     <tr><td style="border:none!important;">Metode Pembelajaran</td><td style="border:none!important;">:</td><td style="border:none!important;">{{ $modul->metode_pembelajaran ?? '-' }}</td></tr>
   </table>
-  @if($modul->pemahaman_bermakna) <div class="sub-title" style="font-size:9.5pt;">Pemahaman Bermakna</div><div style="padding:6px 10px; border:1px solid #ccc; margin-bottom:8px;">{!! nl2br(e($modul->pemahaman_bermakna)) !!}</div> @endif
-  @if($modul->pertanyaan_pemantik) <div class="sub-title" style="font-size:9.5pt;">Pertanyaan Pemantik</div><div style="padding:6px 10px; border:1px solid #ccc; margin-bottom:8px;">{!! nl2br(e($modul->pertanyaan_pemantik)) !!}</div> @endif
-  @if($modul->kegiatan_pendahuluan) <div class="sub-title" style="font-size:9.5pt;">Kegiatan Pendahuluan</div><div style="padding:6px 10px; border:1px solid #ccc; margin-bottom:8px;">{!! nl2br(e($modul->kegiatan_pendahuluan)) !!}</div> @endif
-  @if($modul->kegiatan_inti) <div class="sub-title" style="font-size:9.5pt;">Kegiatan Inti</div><div style="padding:6px 10px; border:1px solid #ccc; margin-bottom:8px;">{!! nl2br(e($modul->kegiatan_inti)) !!}</div> @endif
-  @if($modul->kegiatan_penutup) <div class="sub-title" style="font-size:9.5pt;">Kegiatan Penutup</div><div style="padding:6px 10px; border:1px solid #ccc; margin-bottom:8px;">{!! nl2br(e($modul->kegiatan_penutup)) !!}</div> @endif
+  @if($modul->pemahaman_bermakna) <div class="sub-title" style="font-size:9.5pt;">Pemahaman Bermakna</div><div style="padding:6px 10px; border:1px solid #ccc; margin-bottom:8px; font-size:9.5pt;">{!! format_narasi_kbm($modul->pemahaman_bermakna, ['line_height' => '1.5', 'margin_bottom' => '6px']) !!}</div> @endif
+  @if($modul->pertanyaan_pemantik) <div class="sub-title" style="font-size:9.5pt;">Pertanyaan Pemantik</div><div style="padding:6px 10px; border:1px solid #ccc; margin-bottom:8px; font-size:9.5pt;">{!! format_narasi_kbm($modul->pertanyaan_pemantik, ['line_height' => '1.5', 'margin_bottom' => '6px']) !!}</div> @endif
+  @if($modul->kegiatan_pendahuluan) <div class="sub-title" style="font-size:9.5pt;">Kegiatan Pendahuluan</div><div style="padding:6px 10px; border:1px solid #ccc; margin-bottom:8px; font-size:9.5pt;">{!! format_narasi_kbm($modul->kegiatan_pendahuluan, ['line_height' => '1.5', 'margin_bottom' => '6px']) !!}</div> @endif
+  @if($modul->kegiatan_inti) <div class="sub-title" style="font-size:9.5pt;">Kegiatan Inti</div><div style="padding:6px 10px; border:1px solid #ccc; margin-bottom:8px; font-size:9.5pt;">{!! format_narasi_kbm($modul->kegiatan_inti, ['line_height' => '1.5', 'margin_bottom' => '6px']) !!}</div> @endif
+  @if($modul->kegiatan_penutup) <div class="sub-title" style="font-size:9.5pt;">Kegiatan Penutup</div><div style="padding:6px 10px; border:1px solid #ccc; margin-bottom:8px; font-size:9.5pt;">{!! format_narasi_kbm($modul->kegiatan_penutup, ['line_height' => '1.5', 'margin_bottom' => '6px']) !!}</div> @endif
   @if(!$loop->last) <div class="page-break"></div> @endif
   @endforeach
 @else
