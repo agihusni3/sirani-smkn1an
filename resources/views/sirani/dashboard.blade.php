@@ -212,79 +212,7 @@
       </div>
     @endif
 
-    <!-- ═══════════════════════════════════════════════════════════════════ -->
-    <!-- PANEL OPERASIONAL GURU PIKET HARI INI (AKTIF SAAT HARI KERJA & JADWAL PIKET) -->
-    <!-- ═══════════════════════════════════════════════════════════════════ -->
-    @if(!$isLiburHariIni && ($isGuruPiket || (isset($isPiketHariIni) && $isPiketHariIni) || (isset($isWaliSedangPiket) && $isWaliSedangPiket)) && !$currentUser->isKepalaSekolah())
-      <div class="panel" style="margin-bottom:24px; padding:0; overflow:hidden; border:2px solid #000000; border-radius:var(--r-md); background:var(--bg-2); box-shadow:var(--shadow-sm);">
-        <div style="padding:14px 18px; border-bottom:1px solid var(--border); background:var(--surface); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
-          <div style="font-size:14px; font-weight:800; color:#000000; display:flex; align-items:center; gap:8px;">
-            <span>Meja Operasional Guru Piket Hari Ini</span>
-            <span style="font-size:12px; font-weight:800; color:#000000;">
-              (SEDANG BERTUGAS)
-            </span>
-          </div>
-          <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
-            <a href="/izin-siswa" class="btn btn-sm btn-gold" style="font-size:12px; font-weight:800; padding:6px 14px; text-decoration:none; display:inline-flex; align-items:center; gap:6px;">
-              <i class="bi bi-file-earmark-plus-fill"></i> + Input Izin / Dispen Siswa
-            </a>
-            <a href="/piket" class="btn btn-sm btn-outline" style="font-size:12px; font-weight:800; padding:6px 14px; text-decoration:none; display:inline-flex; align-items:center; gap:6px;">
-              <i class="bi bi-camera-fill"></i> Presensi Manual Gerbang
-            </a>
-          </div>
-        </div>
 
-        <div style="padding:18px;">
-          {{-- Quick Table Siswa Terlambat Hari Ini --}}
-          @if(isset($piketSiswaTerlambatList) && $piketSiswaTerlambatList->count() > 0)
-            <div>
-              <div style="font-weight:800; font-size:12.5px; color:var(--text); margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
-                <span><i class="bi bi-clock-history" style="color:#D97706;"></i> Siswa Terlambat Hari Ini (Perlu Verifikasi Piket):</span>
-                <a href="/izin-siswa" style="font-size:11.5px; font-weight:700; color:var(--text-2); text-decoration:underline;">Lihat Semua Izin &amp; Dispen</a>
-              </div>
-              <div style="overflow-x:auto;">
-                <table class="data-table" style="font-size:12px; margin:0; width:100%;">
-                  <thead>
-                    <tr style="background:var(--bg-3);">
-                      <th>Nama Siswa</th>
-                      <th>Kelas</th>
-                      <th style="text-align:center;">Jam Masuk</th>
-                      <th style="text-align:center;">Status</th>
-                      <th style="text-align:right;">Tindakan</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    @foreach($piketSiswaTerlambatList->take(5) as $terlambat)
-                      @php $sw = $terlambat->siswa; @endphp
-                      <tr>
-                        <td>
-                          <strong>{{ $sw->nama ?? '-' }}</strong>
-                          <div style="font-size:10.5px; color:var(--text-3); font-family:var(--font-mono);">NISN: {{ $sw->nisn ?? '-' }}</div>
-                        </td>
-                        <td>{{ $sw->rombel->nama_rombel ?? ($sw->siswaRombels->first()?->rombel->nama_rombel ?? '-') }}</td>
-                        <td style="text-align:center; font-family:var(--font-mono); font-weight:700;">
-                          {{ $terlambat->jam_masuk ? substr($terlambat->jam_masuk, 0, 5) . ' WIB' : '-' }}
-                        </td>
-                        <td style="text-align:center;">
-                          <span class="table-status-pill terlambat">
-                            <i class="bi bi-clock-fill"></i> Terlambat
-                          </span>
-                        </td>
-                        <td style="text-align:right;">
-                          <a href="/izin-siswa?siswa_id={{ $sw->id }}" class="btn btn-sm btn-outline" style="font-size:11px; font-weight:800; padding:2px 8px;">
-                            <i class="bi bi-file-earmark-plus"></i> Beri Izin/Dispen
-                          </a>
-                        </td>
-                      </tr>
-                    @endforeach
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          @endif
-        </div>
-      </div>
-    @endif
 
     {{-- ═══════════════════════════════════════════════════════════════════ --}}
     {{-- WIDGET RINGKASAN KELAS BINAAN (SEAMLESS UNTUK SETIAP WALI KELAS) --}}

@@ -308,6 +308,8 @@
           <i class="bi bi-door-closed-fill" style="color:#06B6D4;"></i>
         </div>
         <div class="piket-kpi-value" style="color:#0891B2;">{{ $guruSudahPulang }}</div>
+        <div class="piket-kpi-sub">Telah scan pulang</div>
+      </div>
     </div>
 
     {{-- ══ 4. UNIFIED CONTROL TOOLBAR ══ --}}
