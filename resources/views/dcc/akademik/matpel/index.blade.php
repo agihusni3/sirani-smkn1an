@@ -1,15 +1,15 @@
 @extends('dcc.akademik.layout')
 
-@section('title', 'Mata Pelajaran & Capaian Pembelajaran')
+@section('title', 'Mata Pelajaran')
 @section('breadcrumb', 'Mata Pelajaran')
 
 @section('content')
 
 <div class="akademik-page-head">
   <div>
-    <h1 class="akademik-page-title">Mata Pelajaran &amp; Capaian Pembelajaran</h1>
+    <h1 class="akademik-page-title">Mata Pelajaran</h1>
     <div class="akademik-page-desc">
-      Struktur kurikulum merdeka: Umum, Kejuruan, P5BK, dan PKL per Fase E (Kelas X) &amp; Fase F (Kelas XI - XII).
+      Master data mata pelajaran, kelompok kurikulum, tingkat kelas, beban JP, dan alokasi ruang KBM SMKN 1 Air Naningan.
     </div>
   </div>
 
@@ -19,7 +19,7 @@
   </button>
 </div>
 
-{{-- Panduan Kurikulum Merdeka --}}
+{{-- Panduan Struktur Kurikulum --}}
 <div class="akademik-card" style="margin-bottom:16px; background:linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%); border:1px solid #a7f3d0; border-radius:12px; padding:14px 18px;">
   <div style="display:flex; align-items:flex-start; gap:12px;">
     <div style="width:32px; height:32px; border-radius:8px; background:#10b981; color:#fff; display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0;">
@@ -28,8 +28,9 @@
     <div style="font-size:12px; color:#065f46; line-height:1.5;">
       <b>Panduan Struktur Kurikulum &amp; Penugasan Guru:</b>
       <ul style="margin:4px 0 0 0; padding-left:18px;">
-        <li><b>Beda Jenjang Beda Beban JP/CP:</b> Jika suatu mapel memiliki beban JP atau Fase CP yang berbeda antar jenjang (contoh: <i>Bahasa Indonesia Kelas X = 4 JP, Kelas XI = 3 JP, Kelas XII = 2 JP</i>), daftarkan sebagai <b>baris terpisah per tingkat kelas</b> agar alokasi jam dan capaian rapor Fase E/F akurat.</li>
-        <li><b>Beda Guru Tiap Kelas / Rombel:</b> Jika dalam 1 angkatan diajar oleh guru yang berbeda (contoh: <i>Kelas X TSM diajar Bu Eka Setiani, sedangkan Kelas X RPL diajar Bu Reni Ulfasari</i>), pembagian guru dilakukan per rombel pada <b><a href="{{ route('akademik.jadwal.index', ['tab' => 'distribusi']) }}" style="color:#047857; font-weight:800; text-decoration:underline;">Langkah 2: SK Pembagian Tugas (Matriks)</a></b>.</li>
+        <li><b>Beda Jenjang Beda Beban JP:</b> Jika suatu mapel memiliki beban JP yang berbeda antar jenjang (contoh: <i>Bahasa Indonesia Kelas X = 4 JP, Kelas XI = 3 JP, Kelas XII = 2 JP</i>), daftarkan sebagai <b>baris terpisah per tingkat kelas</b> agar alokasi jadwal KBM akurat.</li>
+        <li><b>Beda Guru Tiap Kelas / Rombel:</b> Jika dalam 1 angkatan diajar oleh guru yang berbeda, pembagian guru dilakukan per rombel pada <b><a href="{{ route('akademik.jadwal.index', ['tab' => 'distribusi']) }}" style="color:#047857; font-weight:800; text-decoration:underline;">Langkah 2: SK Pembagian Tugas (Matriks)</a></b>.</li>
+        <li><b>Capaian Pembelajaran (CP) &amp; Modul Ajar:</b> Rumusan CP, TP/ATP, dan Modul Ajar dikelola langsung oleh masing-masing guru pengampu pada menu <b>Perangkat Pembelajaran</b>.</li>
       </ul>
     </div>
   </div>
@@ -106,7 +107,6 @@
               <th>Guru Pengampu</th>
               <th>Beban JP</th>
               <th>Jurusan</th>
-              <th>Capaian Pembelajaran (CP)</th>
               <th style="width:90px; text-align:center;">Aksi</th>
             </tr>
           </thead>
@@ -189,20 +189,6 @@
                 </td>
                 <td style="font-weight:700;">{{ $m->jumlah_jam_per_minggu }} JP</td>
                 <td>{{ $m->jurusan?->nama_jurusan ?? 'Semua Jurusan' }}</td>
-                <td style="max-width:280px; font-size:12px; color:#475569;">
-                  @if($m->deskripsi_cp)
-                    <div style="display:flex; flex-direction:column; gap:4px;">
-                      <span style="font-size:10px; font-weight:800; color:#0369a1; background:#e0f2fe; padding:1px 6px; border-radius:4px; width:fit-content;">
-                        {{ $m->fase_label }}
-                      </span>
-                      <span style="line-height:1.4; color:#334155;" title="{{ $m->deskripsi_cp }}">
-                        {{ Str::limit($m->deskripsi_cp, 90) }}
-                      </span>
-                    </div>
-                  @else
-                    <span style="color:#94a3b8; font-style:italic;">Belum ada ringkasan CP</span>
-                  @endif
-                </td>
                 <td style="text-align:center;">
                   <div style="display:flex; justify-content:center; gap:6px;">
                     <button type="button" class="ak-btn ak-btn-secondary ak-btn-sm" data-bs-toggle="modal" data-bs-target="#modalEditMapel{{ $m->id }}" title="Ubah">
@@ -295,10 +281,6 @@
                           <div style="font-size:11px; color:#64748b; margin-top:4px;">
                             💡 Jika disetel ke salah satu lab/bengkel, sistem otomatis menolak &amp; mencegah bentrok pemakaian di jam yang sama.
                           </div>
-                        </div>
-                        <div style="margin-bottom:12px;">
-                          <label class="ak-form-label">Ringkasan Capaian Pembelajaran (CP)</label>
-                          <textarea name="deskripsi_cp" class="ak-textarea" rows="3">{{ $m->deskripsi_cp }}</textarea>
                         </div>
                       </div>
                       <div class="modal-footer">
@@ -412,10 +394,6 @@
             <div style="font-size:11px; color:#64748b; margin-top:4px;">
               💡 Jika disetel ke salah satu lab/bengkel, sistem otomatis menolak &amp; mencegah bentrok pemakaian di jam yang sama.
             </div>
-          </div>
-          <div style="margin-bottom:12px;">
-            <label class="ak-form-label">Ringkasan Capaian Pembelajaran (CP)</label>
-            <textarea name="deskripsi_cp" class="ak-textarea" rows="3" placeholder="Tuliskan kompetensi akhir / elemen CP dari Kemdikbudristek..."></textarea>
           </div>
         </div>
         <div class="modal-footer">

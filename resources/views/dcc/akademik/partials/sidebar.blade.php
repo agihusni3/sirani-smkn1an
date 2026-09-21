@@ -75,7 +75,7 @@
       <a href="{{ route('akademik.matpel.index') }}" class="akademik-nav-link {{ request()->routeIs('akademik.matpel.*') ? 'active' : '' }}">
         <div class="akademik-nav-link-left">
           <i class="bi bi-1-circle-fill" style="font-size:15px; color:#2563eb;"></i>
-          <span>1. Mata Pelajaran &amp; CP</span>
+          <span>1. Mata Pelajaran</span>
         </div>
       </a>
       @endif

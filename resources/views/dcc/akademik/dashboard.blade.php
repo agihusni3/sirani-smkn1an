@@ -62,7 +62,7 @@
 {{-- ========================================================================== --}}
 <div class="akademik-kpi-grid">
   {{-- 1. Mapel Aktif --}}
-  <a href="{{ route('akademik.matpel.index') }}" class="akademik-kpi-card" title="Kelola Mata Pelajaran & CP">
+  <a href="{{ route('akademik.matpel.index') }}" class="akademik-kpi-card" title="Kelola Mata Pelajaran">
     <div>
       <div class="akademik-kpi-val">{{ $totalMapel }}</div>
       <div class="akademik-kpi-label">Mata Pelajaran Aktif</div>

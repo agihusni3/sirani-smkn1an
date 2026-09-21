@@ -17,8 +17,8 @@
     <a href="{{ route('akademik.matpel.index') }}" class="akademik-step-item {{ $currentStep == 1 ? 'active' : ($currentStep > 1 ? 'completed' : '') }}">
       <div class="step-num">{{ $currentStep > 1 ? '✓' : '1' }}</div>
       <div class="step-text">
-        <div class="step-title">1. Mata Pelajaran &amp; CP</div>
-        <div class="step-sub">Struktur Mapel, Fase, &amp; Lab</div>
+        <div class="step-title">1. Mata Pelajaran</div>
+        <div class="step-sub">Struktur Mapel, Tingkat, &amp; Lab</div>
       </div>
     </a>
 
