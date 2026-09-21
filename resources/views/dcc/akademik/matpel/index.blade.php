@@ -147,7 +147,15 @@
                   </div>
                 </td>
                 <td>
-                  @if($m->distribusiMengajars->isEmpty())
+                  @php
+                    $dists = $m->distribusiMengajars;
+                    if ($selectedTaId = request('tahun_ajaran_id', $ta?->id)) {
+                        $dists = $dists->where('tahun_ajaran_id', $selectedTaId);
+                    }
+                    $groupedGurus = $dists->groupBy('guru_id');
+                  @endphp
+
+                  @if($groupedGurus->isEmpty())
                     <div style="display:flex; flex-direction:column; gap:2px;">
                       <span style="font-size:11px; color:#94a3b8; font-style:italic;">Belum di-plot</span>
                       <a href="{{ route('akademik.jadwal.index', ['tab' => 'distribusi']) }}" style="font-size:10px; color:var(--ak-primary); text-decoration:none; font-weight:700;">
@@ -155,16 +163,25 @@
                       </a>
                     </div>
                   @else
-                    <div style="display:flex; flex-direction:column; gap:4px;">
-                      @foreach($m->distribusiMengajars as $dist)
-                        <div style="font-size:11.5px; line-height:1.2; display:flex; align-items:center; gap:4px; flex-wrap:wrap;">
-                          <span style="font-weight:700; color:var(--ak-dark); white-space:nowrap;">
-                            <i class="bi bi-person-check text-success me-1"></i>{{ $dist->guru?->nama ?? '-' }}
-                          </span>
-                          @if($dist->rombel)
-                            <span class="ak-badge" style="background:#f1f5f9; color:#475569; font-size:9.5px; font-weight:700; padding:1px 5px;">
-                              {{ $dist->rombel->nama_rombel }}
-                            </span>
+                    <div style="display:flex; flex-direction:column; gap:6px;">
+                      @foreach($groupedGurus as $guruId => $distList)
+                        @php
+                          $guru = $distList->first()->guru;
+                          $uniqueRombels = $distList->pluck('rombel.nama_rombel')->filter()->unique()->values();
+                        @endphp
+                        <div style="font-size:11.5px; line-height:1.25;">
+                          <div style="font-weight:700; color:var(--ak-dark); display:flex; align-items:center; gap:4px;">
+                            <i class="bi bi-person-check text-success" style="font-size:12px;"></i>
+                            <span>{{ $guru?->nama ?? '-' }}</span>
+                          </div>
+                          @if($uniqueRombels->isNotEmpty())
+                            <div style="display:flex; flex-wrap:wrap; gap:3px; margin-top:2px; margin-left:16px;">
+                              @foreach($uniqueRombels as $rName)
+                                <span class="ak-badge" style="background:#f1f5f9; color:#475569; font-size:9.5px; font-weight:700; padding:1px 5px; border:1px solid #e2e8f0;">
+                                  {{ $rName }}
+                                </span>
+                              @endforeach
+                            </div>
                           @endif
                         </div>
                       @endforeach
