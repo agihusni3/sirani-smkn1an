@@ -68,7 +68,8 @@ class DeployController extends Controller
 
             if ($composerBin) {
                 $composerCmd = sprintf(
-                    'cd %s && COMPOSER_HOME=/tmp/.composer %s install --no-dev --prefer-dist --optimize-autoloader --no-interaction 2>&1',
+                    'git config --global --add safe.directory %s 2>/dev/null; cd %s && COMPOSER_HOME=/tmp/.composer %s install --no-dev --prefer-dist --optimize-autoloader --no-interaction --ignore-platform-req=ext-gd 2>&1',
+                    escapeshellarg($basePath),
                     escapeshellarg($basePath),
                     escapeshellarg($composerBin)
                 );
