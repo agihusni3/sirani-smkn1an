@@ -47,7 +47,7 @@
   @endphp
 
   {{-- ===== HEADER CARD: Identitas + Tombol Aksi ===== --}}
-  <div class="akademik-card" style="margin-bottom:20px; padding:18px 22px; border-left:4px solid var(--ak-primary);">
+  <div class="akademik-card" style="margin-bottom:20px; padding:18px 22px; border-left:4px solid var(--ak-primary); overflow:visible !important; position:relative; z-index:20;">
     <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:14px;">
       
       {{-- Info Kiri --}}
@@ -79,54 +79,51 @@
 
       {{-- Tombol Aksi --}}
       <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
-        {{-- Dropdown Ekspor A4 (PDF & Word) --}}
-        <div class="dropdown">
+        {{-- Tombol Langsung: Ekspor CP ke PDF A4 --}}
+        <a href="{{ route('akademik.perangkat.cp.export-pdf', $activePerangkat->id) }}"
+           target="_blank"
+           class="ak-btn"
+           style="font-size:12.5px; padding:7px 14px; font-weight:700; background:#fef2f2; color:#b91c1c; border:1px solid #fca5a5; border-radius:8px; display:inline-flex; align-items:center; gap:6px; text-decoration:none; cursor:pointer;"
+           title="Unduh Dokumen CP format PDF A4 Resmi Kop SITUAN">
+          <i class="bi bi-file-earmark-pdf-fill" style="font-size:15px; color:#dc2626;"></i>
+          <span>Ekspor PDF</span>
+        </a>
+
+        {{-- Tombol Langsung: Ekspor CP ke Word A4 --}}
+        <a href="{{ route('akademik.perangkat.cp.export-docx', $activePerangkat->id) }}"
+           class="ak-btn"
+           style="font-size:12.5px; padding:7px 14px; font-weight:700; background:#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe; border-radius:8px; display:inline-flex; align-items:center; gap:6px; text-decoration:none; cursor:pointer;"
+           title="Unduh Dokumen CP format Word (.docx) A4 Resmi Kop SITUAN">
+          <i class="bi bi-file-earmark-word-fill" style="font-size:15px; color:#2563eb;"></i>
+          <span>Ekspor Word</span>
+        </a>
+
+        {{-- Dropdown Pilihan Tambahan: Perangkat Lengkap --}}
+        <div class="dropdown" style="position:relative; z-index:100;">
           <button class="ak-btn ak-btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown"
-                  style="font-size:12.5px; padding:7px 14px; font-weight:700; display:flex; align-items:center; gap:6px;">
-            <i class="bi bi-printer text-primary"></i>
-            <span>Ekspor Dokumen</span>
+                  style="font-size:12.5px; padding:7px 12px; font-weight:700; display:flex; align-items:center; gap:4px;">
+            <i class="bi bi-three-dots-vertical"></i>
+            <span>Lainnya</span>
           </button>
-          <ul class="dropdown-menu dropdown-menu-end shadow" style="font-size:12.5px; min-width:240px; border-radius:10px; padding:6px 0; border:1px solid #e2e8f0;">
+          <ul class="dropdown-menu dropdown-menu-end shadow" style="font-size:12.5px; min-width:240px; border-radius:10px; padding:6px 0; border:1px solid #e2e8f0; z-index:1050;">
             <li class="dropdown-header" style="font-size:10.5px; font-weight:800; text-transform:uppercase; color:#64748b; padding:6px 16px 4px; letter-spacing:0.5px;">
-              Dokumen Capaian Pembelajaran (CP)
+              Dokumen Perangkat Lengkap (5 Bab)
             </li>
             <li>
-              <a class="dropdown-item py-2 d-flex align-items-center gap-2" href="{{ route('akademik.perangkat.cp.export-pdf', $activePerangkat->id) }}">
-                <i class="bi bi-file-earmark-pdf-fill text-danger fs-5"></i>
-                <div>
-                  <div style="font-weight:700; color:#1e293b;">Ekspor CP (PDF A4)</div>
-                  <div style="font-size:11px; color:#64748b;">Kop resmi SITUAN 2-logo + TTD</div>
-                </div>
-              </a>
-            </li>
-            <li>
-              <a class="dropdown-item py-2 d-flex align-items-center gap-2" href="{{ route('akademik.perangkat.cp.export-docx', $activePerangkat->id) }}">
-                <i class="bi bi-file-earmark-word-fill text-primary fs-5"></i>
-                <div>
-                  <div style="font-weight:700; color:#1e293b;">Ekspor CP (Word A4)</div>
-                  <div style="font-size:11px; color:#64748b;">Format Microsoft Word (.docx)</div>
-                </div>
-              </a>
-            </li>
-            <li><hr class="dropdown-divider my-1"></li>
-            <li class="dropdown-header" style="font-size:10.5px; font-weight:800; text-transform:uppercase; color:#64748b; padding:6px 16px 4px; letter-spacing:0.5px;">
-              Seluruh Portofolio Perangkat (5 Bab)
-            </li>
-            <li>
-              <a class="dropdown-item py-2 d-flex align-items-center gap-2" href="{{ route('akademik.perangkat.export-pdf', $activePerangkat->id) }}">
-                <i class="bi bi-folder-symlink-fill text-danger fs-5"></i>
+              <a class="dropdown-item py-2 d-flex align-items-center gap-2" href="{{ route('akademik.perangkat.export-pdf', $activePerangkat->id) }}" target="_blank">
+                <i class="bi bi-file-earmark-pdf text-danger fs-5"></i>
                 <div>
                   <div style="font-weight:700; color:#1e293b;">Perangkat Lengkap (PDF A4)</div>
-                  <div style="font-size:11px; color:#64748b;">Sampul, Pengesahan &amp; 5 Bab Lengkap</div>
+                  <div style="font-size:11px; color:#64748b;">Sampul, Pengesahan &amp; 5 Bab</div>
                 </div>
               </a>
             </li>
             <li>
               <a class="dropdown-item py-2 d-flex align-items-center gap-2" href="{{ route('akademik.perangkat.export-docx', $activePerangkat->id) }}">
-                <i class="bi bi-folder-symlink-fill text-primary fs-5"></i>
+                <i class="bi bi-file-earmark-word text-primary fs-5"></i>
                 <div>
                   <div style="font-weight:700; color:#1e293b;">Perangkat Lengkap (Word A4)</div>
-                  <div style="font-size:11px; color:#64748b;">5 Bab Dokumen Perangkat Ajar (.docx)</div>
+                  <div style="font-size:11px; color:#64748b;">Dokumen Lengkap (.docx)</div>
                 </div>
               </a>
             </li>
