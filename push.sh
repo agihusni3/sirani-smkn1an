@@ -95,7 +95,7 @@ if [ -n "$SERVER_URL" ]; then
     echo -e "Menghubungi endpoint Webhook Server di: ${CYAN}${SERVER_URL}${NC}..."
     WEBHOOK_URL="${SERVER_URL%/}/api/deploy-webhook?token=${DEPLOY_TOKEN}"
     
-    RESPONSE=$(curl -s -m 20 -X POST "$WEBHOOK_URL" 2>/dev/null || curl -s -m 20 "$WEBHOOK_URL" 2>/dev/null || true)
+    RESPONSE=$(curl -s -m 180 -X POST "$WEBHOOK_URL" 2>/dev/null || curl -s -m 180 "$WEBHOOK_URL" 2>/dev/null || true)
     
     if echo "$RESPONSE" | grep -q "success"; then
         echo -e "${GREEN}✔ SERVER BERHASIL DIUPDATE SECARA INSTAN VIA WEBHOOK!${NC}"

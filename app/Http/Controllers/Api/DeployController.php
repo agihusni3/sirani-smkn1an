@@ -34,6 +34,9 @@ class DeployController extends Controller
             ], 403);
         }
 
+        @set_time_limit(300);
+        @ini_set('max_execution_time', '300');
+
         $basePath = base_path();
         $logs = [];
 
@@ -46,7 +49,38 @@ class DeployController extends Controller
         exec($gitCmd, $gitOutput, $gitStatus);
         $logs['git'] = $gitOutput;
 
-        // 2. Jalankan Migrasi Database
+        // 2. Jalankan composer install jika paket penting (DomPDF/PhpWord) belum terpasang di vendor
+        $needsComposer = !class_exists(\Barryvdh\DomPDF\Facade\Pdf::class) || !class_exists(\PhpOffice\PhpWord\PhpWord::class);
+        if ($needsComposer || $request->has('run_composer')) {
+            $composerBin = null;
+            $possiblePaths = ['composer', '/usr/local/bin/composer', '/usr/bin/composer'];
+            foreach ($possiblePaths as $p) {
+                $check = trim((string) @shell_exec("which $p 2>/dev/null"));
+                if ($check) {
+                    $composerBin = $check;
+                    break;
+                }
+                if (file_exists($p)) {
+                    $composerBin = $p;
+                    break;
+                }
+            }
+
+            if ($composerBin) {
+                $composerCmd = sprintf(
+                    'cd %s && COMPOSER_HOME=/tmp/.composer %s install --no-dev --prefer-dist --optimize-autoloader --no-interaction 2>&1',
+                    escapeshellarg($basePath),
+                    escapeshellarg($composerBin)
+                );
+                exec($composerCmd, $composerOutput, $composerStatus);
+                $logs['composer'] = $composerOutput;
+                $logs['composer_status'] = $composerStatus;
+            } else {
+                $logs['composer_error'] = 'Binary composer tidak ditemukan di server Ubuntu';
+            }
+        }
+
+        // 3. Jalankan Migrasi Database
         try {
             Artisan::call('migrate', ['--force' => true]);
             $logs['migrate'] = trim(Artisan::output());
