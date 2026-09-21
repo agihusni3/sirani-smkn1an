@@ -280,6 +280,12 @@ Route::middleware('auth')->group(function () {
         // Sub-Modul 2b: Perangkat Pembelajaran Kurikulum Merdeka (CP, ATP, Prota/Promes, Modul Ajar, KKTP & Supervisi)
         Route::middleware('role:admin,kepala_sekolah,waka_kurikulum,kaprog,guru')->group(function () {
             Route::get('/perangkat', [\App\Http\Controllers\Akademik\AkademikPerangkatController::class, 'index'])->name('akademik.perangkat.index');
+            Route::get('/perangkat/cp', [\App\Http\Controllers\Akademik\AkademikPerangkatController::class, 'cp'])->name('akademik.perangkat.cp');
+            Route::get('/perangkat/atp', [\App\Http\Controllers\Akademik\AkademikPerangkatController::class, 'atp'])->name('akademik.perangkat.atp');
+            Route::get('/perangkat/prota-promes', [\App\Http\Controllers\Akademik\AkademikPerangkatController::class, 'protaPromes'])->name('akademik.perangkat.prota-promes');
+            Route::get('/perangkat/modul-ajar', [\App\Http\Controllers\Akademik\AkademikPerangkatController::class, 'modulAjar'])->name('akademik.perangkat.modul');
+            Route::get('/perangkat/kktp', [\App\Http\Controllers\Akademik\AkademikPerangkatController::class, 'kktp'])->name('akademik.perangkat.kktp');
+            Route::get('/perangkat/supervisi-meja', [\App\Http\Controllers\Akademik\AkademikPerangkatController::class, 'supervisiMeja'])->name('akademik.perangkat.supervisi-meja');
             Route::get('/perangkat/{id}', [\App\Http\Controllers\Akademik\AkademikPerangkatController::class, 'show'])->name('akademik.perangkat.show');
             Route::get('/perangkat/{id}/cetak-pengesahan', [\App\Http\Controllers\Akademik\AkademikPerangkatController::class, 'cetakPengesahan'])->name('akademik.perangkat.cetak-pengesahan');
         });

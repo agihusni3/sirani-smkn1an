@@ -481,4 +481,210 @@ class AkademikPerangkatController extends Controller
         $perangkat->delete();
         return redirect()->route('akademik.perangkat.index')->with('success', 'Folder Perangkat Pembelajaran berhasil dihapus.');
     }
+
+    /**
+     * Helper resolver konteks perangkat pembelajaran per guru / mata pelajaran
+     */
+    private function resolvePerangkatContext(Request $request)
+    {
+        $user = auth()->user();
+        $isGuru = $user->isGuru();
+        $isAdminOrWaka = $user->isAdmin() || $user->isWakaKurikulum() || $user->isKepalaSekolah();
+
+        $tahunAktif = TahunAjaran::where('is_active', true)->first() ?? TahunAjaran::latest('id')->first();
+        $semester = (int) $request->get('semester', 1);
+
+        $guruId = null;
+        if ($user->guru_id) {
+            $guruId = $user->guru_id;
+        } elseif ($request->filled('guru_id') && $isAdminOrWaka) {
+            $guruId = $request->guru_id;
+        }
+
+        // Query Perangkats yang tersedia untuk dropdown switcher
+        $perangkatsQuery = AkademikPerangkatAjar::with(['guru', 'mataPelajaran', 'tahunAjaran'])
+            ->where('semester', $semester);
+
+        if ($guruId && !$isAdminOrWaka) {
+            $perangkatsQuery->where('guru_id', $guruId);
+        } elseif ($request->filled('guru_id')) {
+            $perangkatsQuery->where('guru_id', $request->guru_id);
+        }
+
+        $perangkatsList = $perangkatsQuery->orderBy('tingkat')->orderBy('id', 'desc')->get();
+
+        // Cari active perangkat
+        $activePerangkat = null;
+        if ($request->filled('perangkat_id')) {
+            $activePerangkat = AkademikPerangkatAjar::with(['guru', 'mataPelajaran', 'distribusiMengajar.rombel', 'tahunAjaran', 'atpItems', 'modulAjars', 'kktpItems', 'validator'])
+                ->find($request->perangkat_id);
+        }
+
+        if (!$activePerangkat && $perangkatsList->isNotEmpty()) {
+            $activePerangkat = AkademikPerangkatAjar::with(['guru', 'mataPelajaran', 'distribusiMengajar.rombel', 'tahunAjaran', 'atpItems', 'modulAjars', 'kktpItems', 'validator'])
+                ->find($perangkatsList->first()->id);
+        }
+
+        // Ambil daftar distribusi mengajar aktif milik guru (untuk pembuatan cepat jika belum ada)
+        $myDistribusis = collect([]);
+        if ($user->guru_id) {
+            $myDistribusis = AkademikDistribusiMengajar::with(['mataPelajaran', 'rombel'])
+                ->where('guru_id', $user->guru_id)
+                ->where('semester', $semester)
+                ->get();
+        }
+
+        $gurus = Guru::where('status', 'aktif')->orderBy('nama')->get();
+        $mapels = AkademikMataPelajaran::where('is_active', true)->orderBy('nama_mapel')->get();
+
+        return [
+            'user' => $user,
+            'isGuru' => $isGuru,
+            'isAdminOrWaka' => $isAdminOrWaka,
+            'tahunAktif' => $tahunAktif,
+            'semester' => $semester,
+            'perangkatsList' => $perangkatsList,
+            'activePerangkat' => $activePerangkat,
+            'myDistribusis' => $myDistribusis,
+            'gurus' => $gurus,
+            'mapels' => $mapels,
+        ];
+    }
+
+    /**
+     * Menu 1: Capaian Pembelajaran (CP) Resmi Kurikulum Merdeka
+     */
+    public function cp(Request $request)
+    {
+        $ctx = $this->resolvePerangkatContext($request);
+        
+        $selectedMapelId = $request->get('mapel_id', $ctx['activePerangkat']?->mata_pelajaran_id);
+        $selectedMapel = null;
+        if ($selectedMapelId) {
+            $selectedMapel = AkademikMataPelajaran::find($selectedMapelId);
+        }
+        if (!$selectedMapel && $ctx['mapels']->isNotEmpty()) {
+            $selectedMapel = $ctx['mapels']->first();
+        }
+
+        return view('dcc.akademik.perangkat.cp', array_merge($ctx, [
+            'selectedMapel' => $selectedMapel,
+        ]));
+    }
+
+    /**
+     * Menu 2: Tujuan & Alur Pembelajaran (TP & ATP)
+     */
+    public function atp(Request $request)
+    {
+        $ctx = $this->resolvePerangkatContext($request);
+        $atpItems = $ctx['activePerangkat']?->atpItems()->orderBy('urutan')->get() ?? collect([]);
+        $totalJp = $atpItems->sum('alokasi_jp');
+
+        return view('dcc.akademik.perangkat.atp', array_merge($ctx, [
+            'atpItems' => $atpItems,
+            'totalJp' => $totalJp,
+        ]));
+    }
+
+    /**
+     * Menu 3: Program Tahunan (Prota) & Program Semester (Promes)
+     */
+    public function protaPromes(Request $request)
+    {
+        $ctx = $this->resolvePerangkatContext($request);
+        $atpItems = $ctx['activePerangkat']?->atpItems()->orderBy('urutan')->get() ?? collect([]);
+        
+        $rpePekanEfektif = $ctx['activePerangkat']?->rpe_pekan_efektif ?? 18;
+        $rpeCadangan = $ctx['activePerangkat']?->rpe_pekan_cadangan ?? 2;
+        $totalPekan = $rpePekanEfektif + $rpeCadangan;
+
+        $jamPerMinggu = $ctx['activePerangkat']?->distribusiMengajar?->total_jam_per_minggu ?? 4;
+        $totalJpSemester = $rpePekanEfektif * $jamPerMinggu;
+
+        return view('dcc.akademik.perangkat.prota_promes', array_merge($ctx, [
+            'atpItems' => $atpItems,
+            'rpePekanEfektif' => $rpePekanEfektif,
+            'rpeCadangan' => $rpeCadangan,
+            'totalPekan' => $totalPekan,
+            'jamPerMinggu' => $jamPerMinggu,
+            'totalJpSemester' => $totalJpSemester,
+        ]));
+    }
+
+    /**
+     * Menu 4: Modul Ajar (RPP Merdeka), LKPD & Bahan Ajar Praktik
+     */
+    public function modulAjar(Request $request)
+    {
+        $ctx = $this->resolvePerangkatContext($request);
+        $modulAjars = $ctx['activePerangkat']?->modulAjars()->with('atpItem')->orderBy('pertemuan_ke_mulai')->get() ?? collect([]);
+        $atpItems = $ctx['activePerangkat']?->atpItems()->orderBy('urutan')->get() ?? collect([]);
+
+        return view('dcc.akademik.perangkat.modul_ajar', array_merge($ctx, [
+            'modulAjars' => $modulAjars,
+            'atpItems' => $atpItems,
+        ]));
+    }
+
+    /**
+     * Menu 5: Kriteria Ketuntasan Tujuan Pembelajaran (KKTP)
+     */
+    public function kktp(Request $request)
+    {
+        $ctx = $this->resolvePerangkatContext($request);
+        $kktpItems = $ctx['activePerangkat']?->kktpItems()->with('atpItem')->get() ?? collect([]);
+        $atpItems = $ctx['activePerangkat']?->atpItems()->orderBy('urutan')->get() ?? collect([]);
+
+        return view('dcc.akademik.perangkat.kktp', array_merge($ctx, [
+            'kktpItems' => $kktpItems,
+            'atpItems' => $atpItems,
+        ]));
+    }
+
+    /**
+     * Menu 6: Meja Supervisi, Telaah & Validasi Pengesahan Resmi
+     */
+    public function supervisiMeja(Request $request)
+    {
+        $user = auth()->user();
+        $isGuru = $user->isGuru();
+        $isAdminOrWaka = $user->isAdmin() || $user->isWakaKurikulum() || $user->isKepalaSekolah();
+
+        $tahunAktif = TahunAjaran::where('is_active', true)->first() ?? TahunAjaran::latest('id')->first();
+        $semester = (int) $request->get('semester', 1);
+
+        $query = AkademikPerangkatAjar::with(['guru', 'mataPelajaran', 'distribusiMengajar.rombel', 'tahunAjaran', 'atpItems', 'modulAjars', 'kktpItems', 'validator'])
+            ->where('semester', $semester);
+
+        if ($user->guru_id && !$isAdminOrWaka) {
+            $query->where('guru_id', $user->guru_id);
+        } elseif ($request->filled('guru_id')) {
+            $query->where('guru_id', $request->guru_id);
+        }
+
+        if ($request->filled('tingkat')) {
+            $query->where('tingkat', $request->tingkat);
+        }
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        $perangkats = $query->orderBy('status', 'asc')->orderBy('tingkat')->paginate(20)->withQueryString();
+
+        $stats = [
+            'total' => AkademikPerangkatAjar::where('semester', $semester)->count(),
+            'disahkan' => AkademikPerangkatAjar::where('semester', $semester)->where('status', 'disahkan')->count(),
+            'diajukan' => AkademikPerangkatAjar::where('semester', $semester)->where('status', 'diajukan')->count(),
+            'revisi' => AkademikPerangkatAjar::where('semester', $semester)->where('status', 'perlu_revisi')->count(),
+            'draft' => AkademikPerangkatAjar::where('semester', $semester)->where('status', 'draft')->count(),
+        ];
+
+        $gurus = Guru::where('status', 'aktif')->orderBy('nama')->get();
+
+        return view('dcc.akademik.perangkat.supervisi', compact(
+            'perangkats', 'stats', 'semester', 'tahunAktif', 'gurus', 'isAdminOrWaka', 'isGuru'
+        ));
+    }
 }

@@ -106,29 +106,66 @@
       @endif
     </div>
 
+    {{-- Grup Perangkat Pembelajaran Kurikulum Merdeka --}}
+    @if($canManagePerangkat)
+    <div class="akademik-nav-group">
+      <div class="akademik-nav-group-title">Perangkat Pembelajaran</div>
+
+      <a href="{{ route('akademik.perangkat.cp') }}" class="akademik-nav-link {{ request()->routeIs('akademik.perangkat.cp') ? 'active' : '' }}">
+        <div class="akademik-nav-link-left">
+          <i class="bi bi-bookmark-star" style="font-size:15px; color:#0284c7;"></i>
+          <span>1. Capaian Pembelajaran (CP)</span>
+        </div>
+      </a>
+
+      <a href="{{ route('akademik.perangkat.atp') }}" class="akademik-nav-link {{ request()->routeIs('akademik.perangkat.atp') ? 'active' : '' }}">
+        <div class="akademik-nav-link-left">
+          <i class="bi bi-list-ol" style="font-size:15px; color:#2563eb;"></i>
+          <span>2. Tujuan &amp; Alur (TP / ATP)</span>
+        </div>
+      </a>
+
+      <a href="{{ route('akademik.perangkat.prota-promes') }}" class="akademik-nav-link {{ request()->routeIs('akademik.perangkat.prota-promes') ? 'active' : '' }}">
+        <div class="akademik-nav-link-left">
+          <i class="bi bi-calendar3" style="font-size:15px; color:#059669;"></i>
+          <span>3. Prota &amp; Promes</span>
+        </div>
+      </a>
+
+      <a href="{{ route('akademik.perangkat.modul') }}" class="akademik-nav-link {{ request()->routeIs('akademik.perangkat.modul') ? 'active' : '' }}">
+        <div class="akademik-nav-link-left">
+          <i class="bi bi-journal-richtext" style="font-size:15px; color:#7c3aed;"></i>
+          <span>4. Modul Ajar &amp; LKPD</span>
+        </div>
+      </a>
+
+      <a href="{{ route('akademik.perangkat.kktp') }}" class="akademik-nav-link {{ request()->routeIs('akademik.perangkat.kktp') ? 'active' : '' }}">
+        <div class="akademik-nav-link-left">
+          <i class="bi bi-speedometer2" style="font-size:15px; color:#ea580c;"></i>
+          <span>5. Kriteria Ketuntasan (KKTP)</span>
+        </div>
+      </a>
+
+      <a href="{{ route('akademik.perangkat.supervisi-meja') }}" class="akademik-nav-link {{ request()->routeIs('akademik.perangkat.supervisi-meja') ? 'active' : '' }}">
+        <div class="akademik-nav-link-left">
+          <i class="bi bi-shield-check" style="font-size:15px; color:#dc2626;"></i>
+          <span>6. Supervisi &amp; Pengesahan</span>
+        </div>
+      </a>
+    </div>
+    @endif
+
     {{-- Pembelajaran Harian --}}
-    @if($canManagePerangkat || $canManageJurnal)
+    @if($canManageJurnal)
     <div class="akademik-nav-group">
       <div class="akademik-nav-group-title">Pembelajaran &amp; KBM</div>
 
-      @if($canManagePerangkat)
-      <a href="{{ route('akademik.perangkat.index') }}" class="akademik-nav-link {{ request()->routeIs('akademik.perangkat.*') ? 'active' : '' }}">
-        <div class="akademik-nav-link-left">
-          <i class="bi bi-folder-check" style="font-size:16px; color:#0284c7;"></i>
-          <span>Perangkat Pembelajaran</span>
-        </div>
-        <span class="akademik-nav-badge" style="background:#e0f2fe; color:#0369a1; font-weight:700;">Kurmer</span>
-      </a>
-      @endif
-
-      @if($canManageJurnal)
       <a href="{{ route('akademik.jurnal.index') }}" class="akademik-nav-link {{ request()->routeIs('akademik.jurnal.*') ? 'active' : '' }}">
         <div class="akademik-nav-link-left">
           <i class="bi bi-pencil-square"></i>
           <span>Jurnal KBM Harian</span>
         </div>
       </a>
-      @endif
     </div>
     @endif
 
