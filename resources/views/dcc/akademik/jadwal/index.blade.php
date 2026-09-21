@@ -43,17 +43,17 @@
         </div>
 
         {{-- Cetak SK Resmi --}}
-        <a href="{{ route('akademik.jadwal.cetak-sk', ['semester' => $semester]) }}" target="_blank" class="ak-btn ak-btn-secondary" style="font-size:12.5px; font-weight:700;">
+        <a href="{{ route('akademik.jadwal.cetak-sk', ['semester' => $semester]) }}" target="_blank" class="ak-btn ak-btn-secondary" style="font-size:12.5px; font-weight:700; white-space:nowrap;">
           <i class="bi bi-file-earmark-text-fill text-primary me-1"></i> Cetak Dokumen SK (PDF)
         </a>
 
         {{-- Tambah Alokasi Baru --}}
-        <button type="button" class="ak-btn ak-btn-primary" data-bs-toggle="modal" data-bs-target="#modalTambahDistribusi" style="font-size:12.5px; font-weight:700;">
+        <button type="button" class="ak-btn ak-btn-primary" data-bs-toggle="modal" data-bs-target="#modalTambahDistribusi" style="font-size:12.5px; font-weight:700; white-space:nowrap;">
           <i class="bi bi-plus-circle me-1"></i> + Tambah Alokasi Baru
         </button>
 
         {{-- Lanjut ke Langkah 3 --}}
-        <a href="{{ route('akademik.jadwal.index', ['tab' => 'roster', 'semester' => $semester]) }}" class="ak-btn" style="font-size:12.5px; background:linear-gradient(135deg, #1e40af, #3b82f6); color:#ffffff; font-weight:700; border:none; box-shadow:0 4px 12px rgba(59,130,246,0.3);">
+        <a href="{{ route('akademik.jadwal.index', ['tab' => 'roster', 'semester' => $semester]) }}" class="ak-btn" style="font-size:12.5px; background:linear-gradient(135deg, #1e40af, #3b82f6); color:#ffffff; font-weight:700; border:none; box-shadow:0 4px 12px rgba(59,130,246,0.3); white-space:nowrap;">
           Lanjut ke Langkah 3: Roster <i class="bi bi-arrow-right ms-1"></i>
         </a>
       </div>
@@ -1025,9 +1025,58 @@ function tambahIstirahat(hari) {
 
 {{-- SUBTAB 1: MATRIKS MAPEL X ROMBEL --}}
 @if($subtab === 'matriks')
+<style>
+  .matrix-table-wrap {
+    overflow-x: auto;
+    max-height: calc(100vh - 270px);
+    position: relative;
+    border-radius: 0 0 14px 14px;
+  }
+  .matrix-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: 12px;
+  }
+  .matrix-table th, .matrix-table td {
+    border-bottom: 1px solid #e2e8f0;
+    border-right: 1px solid #f1f5f9;
+  }
+  .matrix-table tbody tr:hover td {
+    background-color: #f8fafc !important;
+  }
+  .matrix-table tbody tr:hover td.matrix-sticky-col {
+    background-color: #f1f5f9 !important;
+  }
+  .matrix-btn-assign {
+    background: #fef2f2;
+    color: #dc2626;
+    border: 1px dashed #fca5a5;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 5px 8px;
+    width: 100%;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    transition: all 0.15s ease;
+  }
+  .matrix-btn-assign:hover {
+    background: #fee2e2;
+    border-color: #ef4444;
+    border-style: solid;
+    color: #991b1b;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(220, 38, 38, 0.15);
+  }
+</style>
+
 <div class="akademik-card" style="margin-bottom:24px;">
-  <div class="akademik-card-header" style="background:linear-gradient(135deg, #f0fdf4, #dcfce7); border-bottom:1px solid #bbf7d0;">
-    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+  <div class="akademik-card-header" style="background:linear-gradient(135deg, #f0fdf4, #dcfce7); border-bottom:1px solid #bbf7d0; padding:14px 20px;">
+    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
       <div>
         <h3 style="font-weight:900; font-size:16px; margin:0; color:#166534; display:flex; align-items:center; gap:8px;">
           <i class="bi bi-grid-3x3 text-success"></i> Matriks Pemetaan Pembagian Tugas Mengajar
@@ -1036,26 +1085,50 @@ function tambahIstirahat(hari) {
           Peta alokasi guru untuk setiap mata pelajaran dan rombel. Setiap kotak menunjukkan guru yang bertugas beserta status jam terjadwal.
         </div>
       </div>
-      <div style="display:flex; gap:6px; align-items:center; font-size:11.5px;">
-        <span style="background:#dcfce7; color:#15803d; padding:3px 8px; border-radius:6px; font-weight:700; border:1px solid #86efac;">🟢 Terpenuhi</span>
-        <span style="background:#fef3c7; color:#b45309; padding:3px 8px; border-radius:6px; font-weight:700; border:1px solid #fde68a;">🟡 Sisa Belum Terjadwal</span>
-        <span style="background:#fee2e2; color:#b91c1c; padding:3px 8px; border-radius:6px; font-weight:700; border:1px solid #fca5a5;">🔴 Belum Ada Guru</span>
+      <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+        <div style="position:relative;">
+          <input type="text" id="filterMatrixMapel" onkeyup="filterMatrixRows()" placeholder="🔍 Cari mapel / kode..."
+                 style="padding:5px 12px 5px 28px; font-size:12px; border-radius:8px; border:1px solid #86efac; background:#fff; width:180px; outline:none; transition:width 0.2s;"
+                 onfocus="this.style.width='220px'" onblur="this.style.width='180px'">
+          <i class="bi bi-search" style="position:absolute; left:9px; top:8px; font-size:11px; color:#16a34a;"></i>
+        </div>
+        <span class="ak-badge" style="background:#dcfce7; color:#15803d; border:1px solid #86efac; font-size:11px; padding:4px 8px; font-weight:800;">
+          <i class="bi bi-check-circle-fill text-success me-1"></i> Terpenuhi
+        </span>
+        <span class="ak-badge" style="background:#fef3c7; color:#b45309; border:1px solid #fde68a; font-size:11px; padding:4px 8px; font-weight:800;">
+          <i class="bi bi-clock-history text-warning me-1"></i> Sisa Belum Terjadwal
+        </span>
+        <span class="ak-badge" style="background:#fee2e2; color:#b91c1c; border:1px solid #fca5a5; font-size:11px; padding:4px 8px; font-weight:800;">
+          <i class="bi bi-person-x-fill text-danger me-1"></i> Belum Ada Guru
+        </span>
       </div>
     </div>
   </div>
 
-  <div class="akademik-card-body" style="padding:0; overflow-x:auto;">
-    <table class="akademik-table" style="font-size:12px;">
+  <div class="akademik-card-body matrix-table-wrap" style="padding:0;">
+    <table id="matrixTable" class="matrix-table">
       <thead>
-        <tr>
-          <th style="width:35px; text-align:center;">No</th>
-          <th style="min-width:180px;">Mata Pelajaran</th>
-          <th style="width:70px; text-align:center;">Beban JP</th>
-          <th style="width:90px; text-align:center;">Ruang/Lab</th>
+        <tr style="position:sticky; top:0; z-index:20; background:#f8fafc; border-bottom:2px solid #cbd5e1;">
+          <th style="width:40px; text-align:center; position:sticky; left:0; z-index:30; background:#f8fafc; padding:10px 6px;">No</th>
+          <th style="min-width:230px; position:sticky; left:40px; z-index:30; background:#f8fafc; box-shadow:3px 0 6px -2px rgba(0,0,0,0.06); padding:10px 14px;">
+            Mata Pelajaran &amp; Jenjang
+          </th>
+          <th style="width:75px; text-align:center; background:#f8fafc; padding:10px 6px;">Beban JP</th>
+          <th style="width:110px; text-align:center; background:#f8fafc; padding:10px 6px;">Ruang/Lab</th>
           @foreach($rombels as $rb)
-            <th style="min-width:140px; text-align:center; background:#f8fafc;">
-              <div style="font-weight:800; color:var(--ak-dark);">{{ $rb->nama_rombel }}</div>
-              <div style="font-size:10px; font-weight:600; color:#64748b;">Tingkat {{ $rb->tingkat }}</div>
+            @php
+              $t = strtoupper(trim($rb->tingkat));
+              $isX = $t == 'X' || $t == '10';
+              $isXI = $t == 'XI' || $t == '11';
+              $borderCol = $isX ? '#3b82f6' : ($isXI ? '#10b981' : '#8b5cf6');
+              $bgBadge = $isX ? '#eff6ff' : ($isXI ? '#ecfdf5' : '#f5f3ff');
+              $textBadge = $isX ? '#1d4ed8' : ($isXI ? '#047857' : '#6d28d9');
+            @endphp
+            <th style="min-width:145px; text-align:center; background:#f8fafc; border-top:3.5px solid {{ $borderCol }}; padding:10px 6px;">
+              <div style="font-weight:900; font-size:12.5px; color:var(--ak-dark);">{{ $rb->nama_rombel }}</div>
+              <span class="ak-badge" style="background:{{ $bgBadge }}; color:{{ $textBadge }}; font-size:9.5px; font-weight:800; padding:1px 6px; margin-top:2px;">
+                Tingkat {{ $rb->tingkat }}
+              </span>
             </th>
           @endforeach
         </tr>
@@ -1068,21 +1141,54 @@ function tambahIstirahat(hari) {
         @endphp
         @foreach($mapels as $m)
           <tr>
-            <td style="text-align:center; font-weight:700;">{{ $no++ }}</td>
-            <td>
-              <div style="font-weight:800; color:var(--ak-dark);">{{ $m->nama_mapel }}</div>
-              <div style="font-size:10.5px; color:#64748b;">
-                <code>{{ $m->kode_mapel }}</code> · <span class="text-capitalize">{{ $m->jenis }}</span>
+            <td class="matrix-sticky-col" style="text-align:center; font-weight:800; color:#64748b; position:sticky; left:0; z-index:10; background:#fff; width:40px; padding:8px 4px;">
+              {{ $no++ }}
+            </td>
+            <td class="mapel-name-cell matrix-sticky-col" style="position:sticky; left:40px; z-index:10; background:#fff; box-shadow:3px 0 6px -2px rgba(0,0,0,0.06); padding:8px 14px;">
+              <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+                <span style="font-weight:800; color:var(--ak-dark); font-size:13px; line-height:1.2;">{{ $m->nama_mapel }}</span>
+                @foreach($m->tingkat_array as $t)
+                  <span class="ak-badge" style="background:#e0f2fe; color:#0369a1; border:1px solid #bae6fd; font-size:10px; font-weight:800; padding:1px 5px;">
+                    Kelas {{ $t }}
+                  </span>
+                @endforeach
+              </div>
+              <div style="display:flex; align-items:center; gap:6px; margin-top:3px; font-size:11px; color:#64748b;">
+                <code style="font-weight:700; color:var(--ak-primary);">{{ $m->kode_mapel }}</code>
+                <span>·</span>
+                <span class="text-capitalize">{{ $m->jenis }}</span>
+                @if($m->jurusan)
+                  <span>·</span>
+                  <span class="ak-badge" style="background:#f1f5f9; color:#475569; font-size:9.5px; font-weight:700; padding:1px 5px;">
+                    {{ $m->jurusan->nama_jurusan }}
+                  </span>
+                @endif
               </div>
             </td>
-            <td style="text-align:center; font-weight:800; color:var(--ak-primary);">
-              {{ $m->jumlah_jam_per_minggu }} JP
+            <td style="text-align:center; padding:8px 6px; background:#fff;">
+              <span class="ak-badge" style="background:#f3e8ff; color:#7e22ce; border:1px solid #e9d5ff; font-weight:800; font-size:11px;">
+                {{ $m->jumlah_jam_per_minggu }} JP
+              </span>
             </td>
-            <td style="text-align:center;">
-              @if($m->resource_key)
-                <span class="ak-badge" style="background:#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe; font-size:10px; font-weight:800;">{{ $m->resource_label }}</span>
+            <td style="text-align:center; padding:8px 6px; background:#fff;">
+              @if($m->resource_key === 'LAB_KOMPUTER')
+                <span class="ak-badge" style="background:#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe; font-size:10px; font-weight:800; white-space:nowrap;">
+                  <i class="bi bi-display me-1"></i>Lab Komputer
+                </span>
+              @elseif($m->resource_key === 'LAB_APHP')
+                <span class="ak-badge" style="background:#fdf4ff; color:#86198f; border:1px solid #f5d0fe; font-size:10px; font-weight:800; white-space:nowrap;">
+                  <i class="bi bi-cup-straw me-1"></i>Lab APHP
+                </span>
+              @elseif($m->resource_key === 'BENGKEL_TSM')
+                <span class="ak-badge" style="background:#fff7ed; color:#c2410c; border:1px solid #ffedd5; font-size:10px; font-weight:800; white-space:nowrap;">
+                  <i class="bi bi-tools me-1"></i>Bengkel TSM
+                </span>
+              @elseif($m->resource_key)
+                <span class="ak-badge" style="background:#f1f5f9; color:#334155; border:1px solid #cbd5e1; font-size:10px; font-weight:800; white-space:nowrap;">
+                  {{ $m->resource_label }}
+                </span>
               @else
-                <span style="font-size:11px; color:#94a3b8;">Kelas</span>
+                <span style="font-size:11px; color:#94a3b8; font-weight:600;">Kelas</span>
               @endif
             </td>
 
@@ -1104,46 +1210,45 @@ function tambahIstirahat(hari) {
                 }
               @endphp
 
-              <td style="vertical-align:middle; padding:6px; {{ $dist ? 'background:#f0fdf4;' : ($isApplicable ? 'background:#fff;' : 'background:#f8fafc;') }}">
+              <td style="vertical-align:middle; padding:6px; {{ $dist ? ($dist->sisa_jam == 0 ? 'background:#f0fdf4;' : 'background:#fefce8;') : ($isApplicable ? 'background:#fff;' : 'background:#f8fafc;') }}">
                 @if($dist)
-                  <div style="background:#fff; border:1.5px solid #86efac; border-radius:8px; padding:6px 8px; box-shadow:0 1px 3px rgba(0,0,0,0.04);">
+                  <div style="background:{{ $dist->sisa_jam == 0 ? '#fff' : '#fffdf5' }}; border:1.5px solid {{ $dist->sisa_jam == 0 ? '#86efac' : '#fde047' }}; border-radius:8px; padding:6px 8px; box-shadow:0 1px 3px rgba(0,0,0,0.04); transition:all 0.15s ease;">
                     <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:4px;">
-                      <div style="font-weight:800; font-size:11.5px; color:#0f172a; line-height:1.2;">
+                      <div style="font-weight:800; font-size:11.5px; color:#0f172a; line-height:1.25;">
                         {{ $dist->guru?->nama ?? '-' }}
                       </div>
-                      <span class="ak-badge ak-badge-primary" style="font-size:10px; font-weight:800; padding:1px 5px;">
+                      <span class="ak-badge" style="background:{{ $dist->sisa_jam == 0 ? '#dcfce7' : '#fef3c7' }}; color:{{ $dist->sisa_jam == 0 ? '#15803d' : '#b45309' }}; border:1px solid {{ $dist->sisa_jam == 0 ? '#86efac' : '#fde68a' }}; font-size:10px; font-weight:800; padding:1px 5px; white-space:nowrap;">
                         {{ $dist->total_jam_per_minggu }} JP
                       </span>
                     </div>
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-top:4px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-top:5px;">
                       @if($dist->sisa_jam == 0)
-                        <span style="font-size:10px; color:#16a34a; font-weight:800;">
-                          <i class="bi bi-check2-circle"></i> Terjadwal Penuh
+                        <span style="font-size:10px; color:#16a34a; font-weight:800; display:inline-flex; align-items:center; gap:3px;">
+                          <i class="bi bi-check-circle-fill"></i> Terpenuhi
                         </span>
                       @else
-                        <span style="font-size:10px; color:#d97706; font-weight:800;">
-                          <i class="bi bi-clock"></i> Sisa {{ $dist->sisa_jam }} JP
+                        <span style="font-size:10px; color:#d97706; font-weight:800; display:inline-flex; align-items:center; gap:3px;">
+                          <i class="bi bi-clock-history"></i> Sisa {{ $dist->sisa_jam }} JP
                         </span>
                       @endif
                       <form action="{{ route('akademik.jadwal.destroy', $dist->id) }}" method="POST" onsubmit="return confirm('Hapus alokasi {{ $m->nama_mapel }} untuk {{ $rb->nama_rombel }}?')" style="margin:0;">
                         @csrf
                         @method('DELETE')
-                        <button type="submit" class="btn btn-link p-0 text-danger" style="font-size:11px;" title="Hapus Alokasi">
-                          <i class="bi bi-x-circle"></i>
+                        <button type="submit" class="btn btn-link p-0 text-danger" style="font-size:12px; opacity:0.65; transition:opacity 0.2s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.65'" title="Hapus Alokasi">
+                          <i class="bi bi-trash3-fill"></i>
                         </button>
                       </form>
                     </div>
                   </div>
                 @elseif($isApplicable)
                   <div style="text-align:center;">
-                    <button type="button" class="btn btn-sm btn-outline-danger"
-                            onclick="openQuickAssign({{ $m->id }}, '{{ addslashes($m->nama_mapel) }}', {{ $rb->id }}, '{{ addslashes($rb->nama_rombel) }}', {{ $m->jumlah_jam_per_minggu }})"
-                            style="font-size:10.5px; padding:3px 8px; border-radius:6px; font-weight:700;">
-                      <i class="bi bi-plus-lg"></i> Tugaskan Guru
+                    <button type="button" class="matrix-btn-assign"
+                            onclick="openQuickAssign({{ $m->id }}, '{{ addslashes($m->nama_mapel) }}', {{ $rb->id }}, '{{ addslashes($rb->nama_rombel) }}', {{ $m->jumlah_jam_per_minggu }})">
+                      <i class="bi bi-person-plus-fill"></i> + Tugaskan Guru
                     </button>
                   </div>
                 @else
-                  <div style="text-align:center; color:#cbd5e1; font-size:11px;">-</div>
+                  <div style="text-align:center; color:#cbd5e1; font-size:13px; font-weight:300;">—</div>
                 @endif
               </td>
             @endforeach
@@ -1151,16 +1256,26 @@ function tambahIstirahat(hari) {
         @endforeach
       </tbody>
       <tfoot>
-        <tr style="background:#f8fafc; font-weight:900; border-top:2px solid var(--ak-slate-300);">
-          <td colspan="4" style="text-align:right; padding:10px; font-size:12.5px;">
-            TOTAL JAM KBM TERPETAKAN :
+        <tr style="background:#f8fafc; font-weight:900; border-top:2px solid #cbd5e1;">
+          <td colspan="4" style="text-align:right; padding:12px 16px; font-size:12.5px; position:sticky; left:0; background:#f8fafc; z-index:15; box-shadow:3px 0 6px -2px rgba(0,0,0,0.06);">
+            <span style="color:#1e293b; font-weight:900;">TOTAL BEBAN KBM TERPETAKAN :</span>
           </td>
           @foreach($rombels as $rb)
             @php $totalJam = $totalJpPerRombel[$rb->id] ?? 0; @endphp
-            <td style="text-align:center; padding:10px;">
-              <span class="ak-badge {{ $totalJam >= 44 ? 'ak-badge-success' : ($totalJam > 0 ? 'ak-badge-warning' : 'ak-badge-secondary') }}" style="font-size:12px; font-weight:900;">
-                {{ $totalJam }} JP / Mgg
-              </span>
+            <td style="text-align:center; padding:10px 6px; background:#f8fafc;">
+              @if($totalJam >= 44)
+                <span class="ak-badge" style="background:#dcfce7; color:#15803d; border:1px solid #86efac; font-size:11.5px; font-weight:900; padding:4px 8px; white-space:nowrap;">
+                  <i class="bi bi-check-circle-fill me-1"></i>{{ $totalJam }} JP / Mgg
+                </span>
+              @elseif($totalJam > 0)
+                <span class="ak-badge" style="background:#fef3c7; color:#b45309; border:1px solid #fde68a; font-size:11.5px; font-weight:900; padding:4px 8px; white-space:nowrap;">
+                  <i class="bi bi-clock-history me-1"></i>{{ $totalJam }} JP / Mgg
+                </span>
+              @else
+                <span class="ak-badge" style="background:#f1f5f9; color:#94a3b8; border:1px solid #e2e8f0; font-size:11px; font-weight:700; padding:3px 6px; white-space:nowrap;">
+                  0 JP / Mgg
+                </span>
+              @endif
             </td>
           @endforeach
         </tr>
@@ -2319,6 +2434,16 @@ function openQuickAssign(mapelId, mapelName, rombelId, rombelName, defaultJp) {
   const modalEl = document.getElementById('modalQuickAssignDistribusi');
   const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
   modal.show();
+}
+
+// Live Search Filter untuk Matriks Mapel x Rombel
+function filterMatrixRows() {
+  const q = (document.getElementById('filterMatrixMapel')?.value || '').toLowerCase().trim();
+  const rows = document.querySelectorAll('#matrixTable tbody tr');
+  rows.forEach(tr => {
+    const text = tr.querySelector('.mapel-name-cell')?.innerText?.toLowerCase() || '';
+    tr.style.display = text.includes(q) ? '' : 'none';
+  });
 }
 
 // Dynamic Auto-fill Rombel & SK Mapel Handler (Form Blok Cepat)
