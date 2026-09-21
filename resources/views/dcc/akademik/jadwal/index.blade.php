@@ -1028,12 +1028,17 @@ function tambahIstirahat(hari) {
 <style>
   .matrix-table-wrap {
     overflow-x: auto;
+    max-width: 100%;
+    width: 100%;
+    box-sizing: border-box;
     max-height: calc(100vh - 270px);
     position: relative;
     border-radius: 0 0 14px 14px;
+    -webkit-overflow-scrolling: touch;
   }
   .matrix-table {
-    width: 100%;
+    width: max-content;
+    min-width: 100%;
     border-collapse: separate;
     border-spacing: 0;
     font-size: 12px;
