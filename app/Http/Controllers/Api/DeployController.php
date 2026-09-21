@@ -78,6 +78,18 @@ class DeployController extends Controller
 
         Log::info('Deploy webhook sukses dieksekusi: ' . $latestCommit);
 
+        // Cek ekstensi jika diminta
+        $logs['php_zip'] = class_exists(\ZipArchive::class);
+        $logs['php_xml'] = class_exists(\DOMDocument::class);
+        $logs['php_gd']  = extension_loaded('gd');
+
+        // Ambil 30 baris terakhir log laravel jika ada
+        $logPath = storage_path('logs/laravel.log');
+        if (file_exists($logPath)) {
+            exec('tail -n 35 ' . escapeshellarg($logPath), $recentLogLines);
+            $logs['recent_log'] = $recentLogLines;
+        }
+
         return response()->json([
             'status'        => 'success',
             'message'       => 'Server SIRANI berhasil diperbarui ke commit terbaru!',

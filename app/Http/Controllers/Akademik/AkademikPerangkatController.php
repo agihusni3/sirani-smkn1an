@@ -14,6 +14,7 @@ use App\Models\PengaturanSekolah;
 use App\Models\TahunAjaran;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -889,11 +890,15 @@ class AkademikPerangkatController extends Controller
         // Logo Kiri: Provinsi
         $cell1 = $table->addCell(1300, ['valign' => 'center']);
         if ($provPath && file_exists($provPath)) {
-            $cell1->addImage($provPath, [
-                'width' => $compact ? 44 : 50,
-                'height' => $compact ? 55 : 62,
-                'alignment' => \PhpOffice\PhpWord\SimpleType\Jc::CENTER,
-            ]);
+            try {
+                $cell1->addImage($provPath, [
+                    'width' => $compact ? 44 : 50,
+                    'height' => $compact ? 55 : 62,
+                    'alignment' => \PhpOffice\PhpWord\SimpleType\Jc::CENTER,
+                ]);
+            } catch (\Throwable $e) {
+                // Abaikan jika library gambar atau GD bermasalah pada server
+            }
         }
 
         // Teks Tengah: Kop Instansi
@@ -929,11 +934,15 @@ class AkademikPerangkatController extends Controller
         // Logo Kanan: Sekolah
         $cell3 = $table->addCell(1300, ['valign' => 'center']);
         if ($sekolahPath && file_exists($sekolahPath)) {
-            $cell3->addImage($sekolahPath, [
-                'width' => $compact ? 44 : 50,
-                'height' => $compact ? 50 : 56,
-                'alignment' => \PhpOffice\PhpWord\SimpleType\Jc::CENTER,
-            ]);
+            try {
+                $cell3->addImage($sekolahPath, [
+                    'width' => $compact ? 44 : 50,
+                    'height' => $compact ? 50 : 56,
+                    'alignment' => \PhpOffice\PhpWord\SimpleType\Jc::CENTER,
+                ]);
+            } catch (\Throwable $e) {
+                // Abaikan jika library gambar atau GD bermasalah pada server
+            }
         }
 
         // Garis Ganda Pembatas Kop Surat
@@ -985,122 +994,127 @@ class AkademikPerangkatController extends Controller
      */
     public function exportCpDocx($id)
     {
-        $perangkat = AkademikPerangkatAjar::with([
-            'guru', 'mataPelajaran', 'distribusiMengajar.rombel',
-            'tahunAjaran', 'validator'
-        ])->findOrFail($id);
+        try {
+            $perangkat = AkademikPerangkatAjar::with([
+                'guru', 'mataPelajaran', 'distribusiMengajar.rombel',
+                'tahunAjaran', 'validator'
+            ])->findOrFail($id);
 
-        $sekolah = PengaturanSekolah::getAktif();
-        $logos = $this->resolveKopLogos($sekolah);
+            $sekolah = PengaturanSekolah::getAktif();
+            $logos = $this->resolveKopLogos($sekolah);
 
-        $phpWord = new PhpWord();
-        $phpWord->getSettings()->setUpdateFields(true);
-        $phpWord->setDefaultFontName('Times New Roman');
-        $phpWord->setDefaultFontSize(11);
+            $phpWord = new PhpWord();
+            $phpWord->getSettings()->setUpdateFields(true);
+            $phpWord->setDefaultFontName('Times New Roman');
+            $phpWord->setDefaultFontSize(11);
 
-        $sectionStyle = [
-            'paperSize'    => 'A4',
-            'marginTop'    => 1134, // 2 cm
-            'marginBottom' => 1134, // 2 cm
-            'marginLeft'   => 1418, // 2.5 cm
-            'marginRight'  => 1134, // 2 cm
-        ];
-        $section = $phpWord->addSection($sectionStyle);
+            $sectionStyle = [
+                'paperSize'    => 'A4',
+                'marginTop'    => 1134, // 2 cm
+                'marginBottom' => 1134, // 2 cm
+                'marginLeft'   => 1418, // 2.5 cm
+                'marginRight'  => 1134, // 2 cm
+            ];
+            $section = $phpWord->addSection($sectionStyle);
 
-        // 1. KOP SURAT SITUAN
-        $this->addWordKopSurat($section, $sekolah, $logos['provPath'], $logos['sekolahPath'], false);
+            // 1. KOP SURAT SITUAN
+            $this->addWordKopSurat($section, $sekolah, $logos['provPath'], $logos['sekolahPath'], false);
 
-        // 2. JUDUL DOKUMEN
-        $section->addText('CAPAIAN PEMBELAJARAN (CP)', ['bold' => true, 'size' => 13, 'underline' => 'single'], ['alignment' => Jc::CENTER, 'spaceAfter' => 30]);
-        $section->addText('KURIKULUM MERDEKA TAHUN AJARAN ' . ($perangkat->tahunAjaran?->nama ?? '2026/2027'), ['bold' => true, 'size' => 11], ['alignment' => Jc::CENTER, 'spaceAfter' => 100]);
+            // 2. JUDUL DOKUMEN
+            $section->addText('CAPAIAN PEMBELAJARAN (CP)', ['bold' => true, 'size' => 13, 'underline' => 'single'], ['alignment' => Jc::CENTER, 'spaceAfter' => 30]);
+            $section->addText('KURIKULUM MERDEKA TAHUN AJARAN ' . ($perangkat->tahunAjaran?->nama ?? '2026/2027'), ['bold' => true, 'size' => 11], ['alignment' => Jc::CENTER, 'spaceAfter' => 100]);
 
-        // 3. TABEL IDENTITAS
-        $tblIdentitas = $section->addTable(['borderSize' => 6, 'borderColor' => 'CCCCCC', 'cellMargin' => 60, 'width' => 100 * 50, 'unit' => \PhpOffice\PhpWord\SimpleType\TblWidth::PERCENT]);
-        $tblIdentitas->addRow();
-        $tblIdentitas->addCell(2200, ['bgColor' => 'F1F5F9'])->addText('Mata Pelajaran', ['bold' => true, 'size' => 10]);
-        $tblIdentitas->addCell(4000)->addText($perangkat->mataPelajaran?->nama_mapel . ' (' . $perangkat->mataPelajaran?->kode_mapel . ')', ['size' => 10]);
-        $tblIdentitas->addCell(1600, ['bgColor' => 'F1F5F9'])->addText('Fase / Kelas', ['bold' => true, 'size' => 10]);
-        $tblIdentitas->addCell(1800)->addText('Fase ' . $perangkat->fase . ' / Kls ' . $perangkat->tingkat, ['size' => 10]);
+            // 3. TABEL IDENTITAS
+            $tblIdentitas = $section->addTable(['borderSize' => 6, 'borderColor' => 'CCCCCC', 'cellMargin' => 60, 'width' => 100 * 50, 'unit' => \PhpOffice\PhpWord\SimpleType\TblWidth::PERCENT]);
+            $tblIdentitas->addRow();
+            $tblIdentitas->addCell(2200, ['bgColor' => 'F1F5F9'])->addText('Mata Pelajaran', ['bold' => true, 'size' => 10]);
+            $tblIdentitas->addCell(4000)->addText($perangkat->mataPelajaran?->nama_mapel . ' (' . $perangkat->mataPelajaran?->kode_mapel . ')', ['size' => 10]);
+            $tblIdentitas->addCell(1600, ['bgColor' => 'F1F5F9'])->addText('Fase / Kelas', ['bold' => true, 'size' => 10]);
+            $tblIdentitas->addCell(1800)->addText('Fase ' . $perangkat->fase . ' / Kls ' . $perangkat->tingkat, ['size' => 10]);
 
-        $tblIdentitas->addRow();
-        $tblIdentitas->addCell(2200, ['bgColor' => 'F1F5F9'])->addText('Guru Pengampu', ['bold' => true, 'size' => 10]);
-        $tblIdentitas->addCell(4000)->addText($perangkat->guru?->nama ?? '-', ['bold' => true, 'size' => 10]);
-        $tblIdentitas->addCell(1600, ['bgColor' => 'F1F5F9'])->addText('Semester', ['bold' => true, 'size' => 10]);
-        $tblIdentitas->addCell(1800)->addText($perangkat->semester == 1 ? '1 (Ganjil)' : '2 (Genap)', ['size' => 10]);
+            $tblIdentitas->addRow();
+            $tblIdentitas->addCell(2200, ['bgColor' => 'F1F5F9'])->addText('Guru Pengampu', ['bold' => true, 'size' => 10]);
+            $tblIdentitas->addCell(4000)->addText($perangkat->guru?->nama ?? '-', ['bold' => true, 'size' => 10]);
+            $tblIdentitas->addCell(1600, ['bgColor' => 'F1F5F9'])->addText('Semester', ['bold' => true, 'size' => 10]);
+            $tblIdentitas->addCell(1800)->addText($perangkat->semester == 1 ? '1 (Ganjil)' : '2 (Genap)', ['size' => 10]);
 
-        $tblIdentitas->addRow();
-        $tblIdentitas->addCell(2200, ['bgColor' => 'F1F5F9'])->addText('NIP / NUPTK', ['bold' => true, 'size' => 10]);
-        $tblIdentitas->addCell(4000)->addText($perangkat->guru?->nip ?? '-', ['size' => 10]);
-        $tblIdentitas->addCell(1600, ['bgColor' => 'F1F5F9'])->addText('Status', ['bold' => true, 'size' => 10]);
-        $tblIdentitas->addCell(1800)->addText(ucfirst($perangkat->status ?? 'Draft'), ['bold' => true, 'size' => 10]);
+            $tblIdentitas->addRow();
+            $tblIdentitas->addCell(2200, ['bgColor' => 'F1F5F9'])->addText('NIP / NUPTK', ['bold' => true, 'size' => 10]);
+            $tblIdentitas->addCell(4000)->addText($perangkat->guru?->nip ?? '-', ['size' => 10]);
+            $tblIdentitas->addCell(1600, ['bgColor' => 'F1F5F9'])->addText('Status', ['bold' => true, 'size' => 10]);
+            $tblIdentitas->addCell(1800)->addText(ucfirst($perangkat->status ?? 'Draft'), ['bold' => true, 'size' => 10]);
 
-        $section->addTextBreak(1);
+            $section->addTextBreak(1);
 
-        // 4. CAPAIAN PEMBELAJARAN
-        $section->addText('A. Capaian Pembelajaran Fase ' . $perangkat->fase, ['bold' => true, 'size' => 11], ['spaceBefore' => 60, 'spaceAfter' => 40]);
-        $cpParagraph = preg_replace('/\s*\n\s*/', ' ', $perangkat->resolved_cp);
-        $section->addText($cpParagraph ?: '—', ['size' => 10.5], ['alignment' => Jc::BOTH, 'spaceAfter' => 60]);
+            // 4. CAPAIAN PEMBELAJARAN
+            $section->addText('A. Capaian Pembelajaran Fase ' . $perangkat->fase, ['bold' => true, 'size' => 11], ['spaceBefore' => 60, 'spaceAfter' => 40]);
+            $cpParagraph = preg_replace('/\s*\n\s*/', ' ', $perangkat->resolved_cp);
+            $section->addText($cpParagraph ?: '—', ['size' => 10.5], ['alignment' => Jc::BOTH, 'spaceAfter' => 60]);
 
-        // 5. RASIONAL (jika ada)
-        if (!empty($perangkat->rasional_tujuan)) {
-            $section->addText('B. Rasional & Tujuan Mata Pelajaran', ['bold' => true, 'size' => 11], ['spaceBefore' => 60, 'spaceAfter' => 40]);
-            $rasionalParagraph = preg_replace('/\s*\n\s*/', ' ', $perangkat->rasional_tujuan);
-            $section->addText($rasionalParagraph, ['size' => 10.5], ['alignment' => Jc::BOTH, 'spaceAfter' => 60]);
-        }
-
-        // 6. ELEMEN KOMPETENSI CP
-        $sectionLabel = !empty($perangkat->rasional_tujuan) ? 'C.' : 'B.';
-        $section->addText($sectionLabel . ' Elemen Kompetensi Capaian Pembelajaran', ['bold' => true, 'size' => 11], ['spaceBefore' => 60, 'spaceAfter' => 40]);
-
-        $elemenList = !empty($perangkat->elemen_cp) && is_array($perangkat->elemen_cp) && count($perangkat->elemen_cp) > 0
-            ? $perangkat->elemen_cp
-            : $perangkat->resolved_elemen_cp;
-
-        if (!empty($elemenList) && count($elemenList) > 0) {
-            $tblElem = $section->addTable(['borderSize' => 6, 'borderColor' => '000000', 'cellMargin' => 50, 'width' => 100 * 50, 'unit' => \PhpOffice\PhpWord\SimpleType\TblWidth::PERCENT]);
-            $tblElem->addRow();
-            $tblElem->addCell(500, ['bgColor' => 'DCE8F5'])->addText('No', ['bold' => true, 'size' => 9.5], ['alignment' => Jc::CENTER]);
-            $tblElem->addCell(2500, ['bgColor' => 'DCE8F5'])->addText('Nama Elemen CP', ['bold' => true, 'size' => 9.5], ['alignment' => Jc::CENTER]);
-            $tblElem->addCell(6600, ['bgColor' => 'DCE8F5'])->addText('Deskripsi Capaian Pembelajaran Elemen', ['bold' => true, 'size' => 9.5], ['alignment' => Jc::CENTER]);
-
-            foreach ($elemenList as $idx => $elem) {
-                $tblElem->addRow();
-                $namaEl = is_array($elem) ? ($elem['nama'] ?? $elem['elemen'] ?? '-') : $elem;
-                $deskEl = is_array($elem) ? ($elem['deskripsi'] ?? $elem['capaian'] ?? '-') : '-';
-                $tblElem->addCell(500)->addText((string)($idx + 1), ['size' => 9.5], ['alignment' => Jc::CENTER]);
-                $tblElem->addCell(2500)->addText($namaEl, ['bold' => true, 'size' => 9.5]);
-                $tblElem->addCell(6600)->addText($deskEl, ['size' => 9.5], ['alignment' => Jc::BOTH]);
+            // 5. RASIONAL (jika ada)
+            if (!empty($perangkat->rasional_tujuan)) {
+                $section->addText('B. Rasional & Tujuan Mata Pelajaran', ['bold' => true, 'size' => 11], ['spaceBefore' => 60, 'spaceAfter' => 40]);
+                $rasionalParagraph = preg_replace('/\s*\n\s*/', ' ', $perangkat->rasional_tujuan);
+                $section->addText($rasionalParagraph, ['size' => 10.5], ['alignment' => Jc::BOTH, 'spaceAfter' => 60]);
             }
+
+            // 6. ELEMEN KOMPETENSI CP
+            $sectionLabel = !empty($perangkat->rasional_tujuan) ? 'C.' : 'B.';
+            $section->addText($sectionLabel . ' Elemen Kompetensi Capaian Pembelajaran', ['bold' => true, 'size' => 11], ['spaceBefore' => 60, 'spaceAfter' => 40]);
+
+            $elemenList = !empty($perangkat->elemen_cp) && is_array($perangkat->elemen_cp) && count($perangkat->elemen_cp) > 0
+                ? $perangkat->elemen_cp
+                : $perangkat->resolved_elemen_cp;
+
+            if (!empty($elemenList) && count($elemenList) > 0) {
+                $tblElem = $section->addTable(['borderSize' => 6, 'borderColor' => '000000', 'cellMargin' => 50, 'width' => 100 * 50, 'unit' => \PhpOffice\PhpWord\SimpleType\TblWidth::PERCENT]);
+                $tblElem->addRow();
+                $tblElem->addCell(500, ['bgColor' => 'DCE8F5'])->addText('No', ['bold' => true, 'size' => 9.5], ['alignment' => Jc::CENTER]);
+                $tblElem->addCell(2500, ['bgColor' => 'DCE8F5'])->addText('Nama Elemen CP', ['bold' => true, 'size' => 9.5], ['alignment' => Jc::CENTER]);
+                $tblElem->addCell(6600, ['bgColor' => 'DCE8F5'])->addText('Deskripsi Capaian Pembelajaran Elemen', ['bold' => true, 'size' => 9.5], ['alignment' => Jc::CENTER]);
+
+                foreach ($elemenList as $idx => $elem) {
+                    $tblElem->addRow();
+                    $namaEl = is_array($elem) ? ($elem['nama'] ?? $elem['elemen'] ?? '-') : $elem;
+                    $deskEl = is_array($elem) ? ($elem['deskripsi'] ?? $elem['capaian'] ?? '-') : '-';
+                    $tblElem->addCell(500)->addText((string)($idx + 1), ['size' => 9.5], ['alignment' => Jc::CENTER]);
+                    $tblElem->addCell(2500)->addText($namaEl, ['bold' => true, 'size' => 9.5]);
+                    $tblElem->addCell(6600)->addText($deskEl, ['size' => 9.5], ['alignment' => Jc::BOTH]);
+                }
+            }
+
+            $section->addTextBreak(2);
+
+            // 7. LEMBAR PENGESAHAN & TTD
+            $tblTtd = $section->addTable(['borderSize' => 0, 'cellMargin' => 0, 'width' => 100 * 50, 'unit' => \PhpOffice\PhpWord\SimpleType\TblWidth::PERCENT]);
+            $tblTtd->addRow();
+            $cellKepsek = $tblTtd->addCell(5000);
+            $cellKepsek->addText('Mengetahui,', ['size' => 10]);
+            $cellKepsek->addText('Kepala SMK Negeri 1 Air Naningan', ['size' => 10]);
+            $cellKepsek->addTextBreak(3);
+            $cellKepsek->addText($sekolah->nama_kepala_sekolah ?? 'Aprida, S.Si.', ['bold' => true, 'underline' => 'single', 'size' => 10]);
+            $cellKepsek->addText('NIP. ' . ($sekolah->nip_kepala_sekolah ?? '197904172008012019'), ['size' => 10]);
+
+            $cellGuru = $tblTtd->addCell(5000);
+            $cellGuru->addText('Air Naningan, ' . \Carbon\Carbon::parse($perangkat->tanggal_pengesahan ?? now())->translatedFormat('d F Y'), ['size' => 10]);
+            $cellGuru->addText('Guru Pengampu Mata Pelajaran,', ['size' => 10]);
+            $cellGuru->addTextBreak(3);
+            $cellGuru->addText($perangkat->guru?->nama ?? '-', ['bold' => true, 'underline' => 'single', 'size' => 10]);
+            $cellGuru->addText('NIP. ' . ($perangkat->guru?->nip ?? '-'), ['size' => 10]);
+
+            $filename = 'CP-' . Str::slug($perangkat->mataPelajaran?->nama_mapel ?? 'mapel') . '-Kelas' . $perangkat->tingkat . '-Fase' . $perangkat->fase . '-Smt' . $perangkat->semester . '.docx';
+
+            $tmpPath = sys_get_temp_dir() . DIRECTORY_SEPARATOR . $filename;
+            $writer = IOFactory::createWriter($phpWord, 'Word2007');
+            $writer->save($tmpPath);
+
+            return response()->download($tmpPath, $filename, [
+                'Content-Type' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            ])->deleteFileAfterSend(true);
+        } catch (\Throwable $e) {
+            Log::error('Gagal membuat dokumen Word CP: ' . $e->getMessage() . ' at ' . $e->getFile() . ':' . $e->getLine());
+            return back()->with('error', 'Gagal mengekspor dokumen Word CP: ' . $e->getMessage());
         }
-
-        $section->addTextBreak(2);
-
-        // 7. LEMBAR PENGESAHAN & TTD
-        $tblTtd = $section->addTable(['borderSize' => 0, 'cellMargin' => 0, 'width' => 100 * 50, 'unit' => \PhpOffice\PhpWord\SimpleType\TblWidth::PERCENT]);
-        $tblTtd->addRow();
-        $cellKepsek = $tblTtd->addCell(5000);
-        $cellKepsek->addText('Mengetahui,', ['size' => 10]);
-        $cellKepsek->addText('Kepala SMK Negeri 1 Air Naningan', ['size' => 10]);
-        $cellKepsek->addTextBreak(3);
-        $cellKepsek->addText($sekolah->nama_kepala_sekolah ?? 'Aprida, S.Si.', ['bold' => true, 'underline' => 'single', 'size' => 10]);
-        $cellKepsek->addText('NIP. ' . ($sekolah->nip_kepala_sekolah ?? '197904172008012019'), ['size' => 10]);
-
-        $cellGuru = $tblTtd->addCell(5000);
-        $cellGuru->addText('Air Naningan, ' . \Carbon\Carbon::parse($perangkat->tanggal_pengesahan ?? now())->translatedFormat('d F Y'), ['size' => 10]);
-        $cellGuru->addText('Guru Pengampu Mata Pelajaran,', ['size' => 10]);
-        $cellGuru->addTextBreak(3);
-        $cellGuru->addText($perangkat->guru?->nama ?? '-', ['bold' => true, 'underline' => 'single', 'size' => 10]);
-        $cellGuru->addText('NIP. ' . ($perangkat->guru?->nip ?? '-'), ['size' => 10]);
-
-        $filename = 'CP-' . Str::slug($perangkat->mataPelajaran?->nama_mapel ?? 'mapel') . '-Kelas' . $perangkat->tingkat . '-Fase' . $perangkat->fase . '-Smt' . $perangkat->semester . '.docx';
-
-        $tmpPath = sys_get_temp_dir() . DIRECTORY_SEPARATOR . $filename;
-        $writer = IOFactory::createWriter($phpWord, 'Word2007');
-        $writer->save($tmpPath);
-
-        return Response::download($tmpPath, $filename, [
-            'Content-Type' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-        ])->deleteFileAfterSend(true);
     }
 
     /**
@@ -1343,14 +1357,19 @@ class AkademikPerangkatController extends Controller
         }
 
         // ---- GENERATE & DOWNLOAD ----
-        $filename = 'Perangkat-' . Str::slug($perangkat->mataPelajaran?->nama_mapel ?? 'mapel') . '-Kelas' . $perangkat->tingkat . '-Smt' . $perangkat->semester . '.docx';
-        $tmpPath  = sys_get_temp_dir() . DIRECTORY_SEPARATOR . $filename;
+        try {
+            $filename = 'Perangkat-' . Str::slug($perangkat->mataPelajaran?->nama_mapel ?? 'mapel') . '-Kelas' . $perangkat->tingkat . '-Smt' . $perangkat->semester . '.docx';
+            $tmpPath  = sys_get_temp_dir() . DIRECTORY_SEPARATOR . $filename;
 
-        $writer = IOFactory::createWriter($phpWord, 'Word2007');
-        $writer->save($tmpPath);
+            $writer = IOFactory::createWriter($phpWord, 'Word2007');
+            $writer->save($tmpPath);
 
-        return Response::download($tmpPath, $filename, [
-            'Content-Type' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-        ])->deleteFileAfterSend(true);
+            return response()->download($tmpPath, $filename, [
+                'Content-Type' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            ])->deleteFileAfterSend(true);
+        } catch (\Throwable $e) {
+            Log::error('Gagal membuat dokumen Word Perangkat: ' . $e->getMessage() . ' at ' . $e->getFile() . ':' . $e->getLine());
+            return back()->with('error', 'Gagal mengekspor dokumen Word: ' . $e->getMessage());
+        }
     }
 }
