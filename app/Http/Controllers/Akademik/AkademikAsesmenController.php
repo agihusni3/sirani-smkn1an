@@ -81,6 +81,10 @@ class AkademikAsesmenController extends Controller
         ]);
 
         $distribusi = AkademikDistribusiMengajar::findOrFail($request->distribusi_id);
+        $user = auth()->user();
+        if ($user->isGuru() && !$user->isAdmin() && !$user->isWakaKurikulum() && !$user->isKaprog() && $distribusi->guru_id !== $user->guru_id) {
+            abort(403, 'Akses Ditolak: Anda hanya dapat membuat asesmen untuk rombel/mapel yang Anda ampu.');
+        }
 
         $asesmen = AkademikAsesmenOnline::create([
             'distribusi_id' => $request->distribusi_id,
@@ -101,9 +105,24 @@ class AkademikAsesmenController extends Controller
             ->with('success', 'Asesmen online berhasil dibuat. Silakan tambahkan butir soal.');
     }
 
+    protected function authorizeAsesmen(AkademikAsesmenOnline $asesmen): void
+    {
+        $user = auth()->user();
+        if ($user->isAdmin() || $user->isWakaKurikulum() || $user->isKaprog()) {
+            return;
+        }
+
+        if ($user->guru_id && $asesmen->distribusi?->guru_id === $user->guru_id) {
+            return;
+        }
+
+        abort(403, 'Akses Ditolak: Anda hanya memiliki hak akses untuk mengelola asesmen pada mata pelajaran yang Anda ampu.');
+    }
+
     public function soal($id)
     {
         $asesmen = AkademikAsesmenOnline::with(['distribusi.mataPelajaran', 'distribusi.rombel', 'soals'])->findOrFail($id);
+        $this->authorizeAsesmen($asesmen);
         $totalBobot = $asesmen->soals->sum('bobot');
         $nomorBerikutnya = ($asesmen->soals->max('nomor') ?? 0) + 1;
 
@@ -113,6 +132,7 @@ class AkademikAsesmenController extends Controller
     public function storeSoal(Request $request, $id)
     {
         $asesmen = AkademikAsesmenOnline::findOrFail($id);
+        $this->authorizeAsesmen($asesmen);
 
         $request->validate([
             'pertanyaan' => 'required|string',
@@ -149,6 +169,8 @@ class AkademikAsesmenController extends Controller
 
     public function destroySoal($id, $soalId)
     {
+        $asesmen = AkademikAsesmenOnline::findOrFail($id);
+        $this->authorizeAsesmen($asesmen);
         $soal = AkademikAsesmenSoal::where('asesmen_id', $id)->findOrFail($soalId);
         $soal->delete();
 
@@ -158,6 +180,7 @@ class AkademikAsesmenController extends Controller
     public function toggleStatus($id)
     {
         $asesmen = AkademikAsesmenOnline::findOrFail($id);
+        $this->authorizeAsesmen($asesmen);
         $asesmen->update(['is_active' => !$asesmen->is_active]);
 
         $statusStr = $asesmen->is_active ? 'diaktifkan' : 'dinonaktifkan';
@@ -191,6 +214,7 @@ class AkademikAsesmenController extends Controller
     public function pushToNilai(Request $request, $id)
     {
         $asesmen = AkademikAsesmenOnline::with('distribusi')->findOrFail($id);
+        $this->authorizeAsesmen($asesmen);
         $hasils = AkademikAsesmenHasil::where('asesmen_id', $asesmen->id)->where('is_selesai', true)->get();
 
         if ($hasils->isEmpty()) {

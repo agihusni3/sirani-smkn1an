@@ -32,10 +32,25 @@ class AkademikNilaiController extends Controller
         return view('dcc.akademik.nilai.index', compact('distribusis', 'ta'));
     }
 
+    protected function authorizeDistribusi(AkademikDistribusiMengajar $distribusi): void
+    {
+        $user = auth()->user();
+        if ($user->isAdmin() || $user->isWakaKurikulum()) {
+            return;
+        }
+
+        if ($user->guru_id && $distribusi->guru_id === $user->guru_id) {
+            return;
+        }
+
+        abort(403, 'Akses Ditolak: Anda hanya memiliki hak akses untuk menginput nilai pada mata pelajaran dan rombel yang Anda ampu.');
+    }
+
     public function inputNilai(Request $request, $distribusiId)
     {
         $distribusi = AkademikDistribusiMengajar::with(['mataPelajaran', 'rombel', 'guru', 'tahunAjaran'])
             ->findOrFail($distribusiId);
+        $this->authorizeDistribusi($distribusi);
 
         $siswas = Siswa::whereHas('rombels', fn($q) => $q->where('rombels.id', $distribusi->rombel_id))
             ->whereIn('status', ['aktif', 'pkl'])
@@ -62,6 +77,7 @@ class AkademikNilaiController extends Controller
     public function storeNilai(Request $request, $distribusiId)
     {
         $distribusi = AkademikDistribusiMengajar::findOrFail($distribusiId);
+        $this->authorizeDistribusi($distribusi);
         $nilaiData = $request->input('nilai', []); // [siswa_id => [penilaian_key => score]]
         $deskripsiData = $request->input('deskripsi', []);
 

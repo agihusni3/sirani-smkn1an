@@ -3,7 +3,24 @@
   $isAdmin = $user ? $user->isAdmin() : false;
   $isWakaKurikulum = $user ? $user->isWakaKurikulum() : false;
   $isKepsek = $user ? $user->isKepalaSekolah() : false;
+  $isWakaKesiswaan = $user ? $user->isWakaKesiswaan() : false;
+  $isWakaHubin = $user ? $user->isWakaHubin() : false;
+  $isKaprog = $user ? $user->isKaprog() : false;
+  $isWaliKelas = $user ? $user->isWaliKelas() : false;
   $isGuru = $user ? $user->isGuru() : false;
+  $isGuruPiket = $user ? $user->isGuruPiket() : false;
+
+  // Pemetaan Hak Akses Menu Akademik & KBM
+  $canManageMatpel = $isAdmin || $isWakaKurikulum || $isKepsek || $isKaprog;
+  $canManageSk = $isAdmin || $isWakaKurikulum || $isKepsek;
+  $canViewPiket = $isAdmin || $isWakaKurikulum || $isWakaKesiswaan || $isGuruPiket || $isKepsek;
+  $canManagePerangkat = $isAdmin || $isWakaKurikulum || $isKepsek || $isKaprog || $isGuru;
+  $canManageJurnal = $isAdmin || $isWakaKurikulum || $isKepsek || $isGuru;
+  $canManageNilai = $isAdmin || $isWakaKurikulum || $isGuru;
+  $canViewLeger = $isAdmin || $isWakaKurikulum || $isKepsek || $isKaprog || $isWaliKelas || $isGuru;
+  $canManageAsesmen = $isAdmin || $isWakaKurikulum || $isKaprog || $isGuru;
+  $canManagePkl = $isAdmin || $isWakaHubin || $isKaprog || $isKepsek || $isGuru;
+  $canManageP5bk = $isAdmin || $isWakaKurikulum || $isKepsek || $isKaprog || $isWaliKelas || $isGuru;
 @endphp
 
 {{-- Backdrop Overlay for Mobile Drawer --}}
@@ -54,19 +71,23 @@
     <div class="akademik-nav-group">
       <div class="akademik-nav-group-title">Alur Kerja Kurikulum (Wakakur)</div>
       
+      @if($canManageMatpel)
       <a href="{{ route('akademik.matpel.index') }}" class="akademik-nav-link {{ request()->routeIs('akademik.matpel.*') ? 'active' : '' }}">
         <div class="akademik-nav-link-left">
           <i class="bi bi-1-circle-fill" style="font-size:15px; color:#2563eb;"></i>
           <span>1. Mata Pelajaran &amp; CP</span>
         </div>
       </a>
+      @endif
 
+      @if($canManageSk)
       <a href="{{ route('akademik.jadwal.index', ['tab' => 'distribusi']) }}" class="akademik-nav-link {{ (request()->routeIs('akademik.jadwal.*') && request('tab') === 'distribusi') ? 'active' : '' }}">
         <div class="akademik-nav-link-left">
           <i class="bi bi-2-circle-fill" style="font-size:15px; color:#4f46e5;"></i>
           <span>2. SK Pembagian Tugas</span>
         </div>
       </a>
+      @endif
 
       <a href="{{ route('akademik.jadwal.index', ['tab' => 'jadwal']) }}" class="akademik-nav-link {{ (request()->routeIs('akademik.jadwal.*') && (in_array(request('tab', 'jadwal'), ['jadwal', 'roster', 'formulasi', 'pukul']))) ? 'active' : '' }}">
         <div class="akademik-nav-link-left">
@@ -75,18 +96,22 @@
         </div>
       </a>
 
+      @if($canViewPiket)
       <a href="{{ route('akademik.jadwal.index', ['tab' => 'piket']) }}" class="akademik-nav-link {{ (request()->routeIs('akademik.jadwal.*') && request('tab') === 'piket') ? 'active' : '' }}">
         <div class="akademik-nav-link-left">
           <i class="bi bi-4-circle-fill" style="font-size:15px; color:#d97706;"></i>
           <span>4. Jadwal Guru Piket</span>
         </div>
       </a>
+      @endif
     </div>
 
     {{-- Pembelajaran Harian --}}
+    @if($canManagePerangkat || $canManageJurnal)
     <div class="akademik-nav-group">
       <div class="akademik-nav-group-title">Pembelajaran &amp; KBM</div>
 
+      @if($canManagePerangkat)
       <a href="{{ route('akademik.perangkat.index') }}" class="akademik-nav-link {{ request()->routeIs('akademik.perangkat.*') ? 'active' : '' }}">
         <div class="akademik-nav-link-left">
           <i class="bi bi-folder-check" style="font-size:16px; color:#0284c7;"></i>
@@ -94,34 +119,44 @@
         </div>
         <span class="akademik-nav-badge" style="background:#e0f2fe; color:#0369a1; font-weight:700;">Kurmer</span>
       </a>
+      @endif
 
+      @if($canManageJurnal)
       <a href="{{ route('akademik.jurnal.index') }}" class="akademik-nav-link {{ request()->routeIs('akademik.jurnal.*') ? 'active' : '' }}">
         <div class="akademik-nav-link-left">
           <i class="bi bi-pencil-square"></i>
           <span>Jurnal KBM Harian</span>
         </div>
       </a>
+      @endif
     </div>
+    @endif
 
     {{-- Evaluasi & Penilaian --}}
+    @if($canManageNilai || $canViewLeger || $canManageAsesmen)
     <div class="akademik-nav-group">
       <div class="akademik-nav-group-title">Evaluasi &amp; Asesmen</div>
 
+      @if($canManageNilai)
       <a href="{{ route('akademik.nilai.index') }}" class="akademik-nav-link {{ request()->routeIs('akademik.nilai.index') || request()->routeIs('akademik.nilai.input') ? 'active' : '' }}">
         <div class="akademik-nav-link-left">
           <i class="bi bi-clipboard2-data"></i>
           <span>Input Nilai Formatif &amp; Sumatif</span>
         </div>
       </a>
+      @endif
 
+      @if($canViewLeger)
       <a href="{{ route('akademik.nilai.leger') }}" class="akademik-nav-link {{ request()->routeIs('akademik.nilai.leger') ? 'active' : '' }}">
         <div class="akademik-nav-link-left">
           <i class="bi bi-table"></i>
           <span>Leger Nilai Kelas</span>
         </div>
       </a>
+      @endif
 
       {{-- Asesmen Penilaian Berbasis Online --}}
+      @if($canManageAsesmen)
       <a href="{{ route('akademik.asesmen.index') }}" class="akademik-nav-link {{ request()->routeIs('akademik.asesmen.*') ? 'active' : '' }}">
         <div class="akademik-nav-link-left">
           <i class="bi bi-laptop"></i>
@@ -129,26 +164,34 @@
         </div>
         <span class="akademik-nav-badge">CBT</span>
       </a>
+      @endif
     </div>
+    @endif
 
     {{-- Vokasi SMK --}}
+    @if($canManagePkl || $canManageP5bk)
     <div class="akademik-nav-group">
       <div class="akademik-nav-group-title">Khas Vokasi SMK</div>
 
+      @if($canManagePkl)
       <a href="{{ route('akademik.pkl.index') }}" class="akademik-nav-link {{ request()->routeIs('akademik.pkl.*') ? 'active' : '' }}">
         <div class="akademik-nav-link-left">
           <i class="bi bi-briefcase"></i>
           <span>Praktik Kerja Lapangan (PKL)</span>
         </div>
       </a>
+      @endif
 
+      @if($canManageP5bk)
       <a href="{{ route('akademik.p5bk.index') }}" class="akademik-nav-link {{ request()->routeIs('akademik.p5bk.*') ? 'active' : '' }}">
         <div class="akademik-nav-link-left">
           <i class="bi bi-award"></i>
           <span>Projek Penguatan P5BK</span>
         </div>
       </a>
+      @endif
     </div>
+    @endif
 
   </div>
 
