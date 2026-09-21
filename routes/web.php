@@ -290,6 +290,8 @@ Route::middleware('auth')->group(function () {
             Route::get('/perangkat/{id}/cetak-pengesahan', [\App\Http\Controllers\Akademik\AkademikPerangkatController::class, 'cetakPengesahan'])->name('akademik.perangkat.cetak-pengesahan');
             Route::get('/perangkat/{id}/export-pdf', [\App\Http\Controllers\Akademik\AkademikPerangkatController::class, 'exportPdf'])->name('akademik.perangkat.export-pdf');
             Route::get('/perangkat/{id}/export-docx', [\App\Http\Controllers\Akademik\AkademikPerangkatController::class, 'exportDocx'])->name('akademik.perangkat.export-docx');
+            Route::get('/perangkat/{id}/cp/export-pdf', [\App\Http\Controllers\Akademik\AkademikPerangkatController::class, 'exportCpPdf'])->name('akademik.perangkat.cp.export-pdf');
+            Route::get('/perangkat/{id}/cp/export-docx', [\App\Http\Controllers\Akademik\AkademikPerangkatController::class, 'exportCpDocx'])->name('akademik.perangkat.cp.export-docx');
         });
 
         // Penyusunan Dokumen Perangkat Ajar (Guru & Wakakur)

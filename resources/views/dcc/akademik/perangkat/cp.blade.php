@@ -78,42 +78,106 @@
       </div>
 
       {{-- Tombol Aksi --}}
-      @if($canEdit)
-      <div style="display:flex; gap:8px; flex-wrap:wrap;">
-        <form action="{{ route('akademik.perangkat.cp.salin-template', $activePerangkat->id) }}" method="POST" style="display:inline;"
-              onsubmit="return confirm('Salin rumusan standar resmi BSKAP 032/2024 ke dokumen ini?')">
-          @csrf
-          <button type="submit" class="ak-btn ak-btn-secondary" style="font-size:12.5px; padding:7px 14px;">
-            <i class="bi bi-lightning-charge me-1"></i> Salin Template BSKAP
+      <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+        {{-- Dropdown Ekspor A4 (PDF & Word) --}}
+        <div class="dropdown">
+          <button class="ak-btn ak-btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown"
+                  style="font-size:12.5px; padding:7px 14px; font-weight:700; display:flex; align-items:center; gap:6px;">
+            <i class="bi bi-printer text-primary"></i>
+            <span>Ekspor Dokumen</span>
           </button>
-        </form>
-        <button type="button" id="btnOpenEdit" onclick="togglePanel(true)"
-                class="ak-btn ak-btn-primary" style="font-size:12.5px; padding:7px 16px; font-weight:700;">
-          <i class="bi bi-pencil-square me-1"></i>
-          {{ $hasCustomCp ? 'Edit Capaian Pembelajaran' : 'Input Capaian Pembelajaran' }}
-        </button>
+          <ul class="dropdown-menu dropdown-menu-end shadow" style="font-size:12.5px; min-width:240px; border-radius:10px; padding:6px 0; border:1px solid #e2e8f0;">
+            <li class="dropdown-header" style="font-size:10.5px; font-weight:800; text-transform:uppercase; color:#64748b; padding:6px 16px 4px; letter-spacing:0.5px;">
+              Dokumen Capaian Pembelajaran (CP)
+            </li>
+            <li>
+              <a class="dropdown-item py-2 d-flex align-items-center gap-2" href="{{ route('akademik.perangkat.cp.export-pdf', $activePerangkat->id) }}">
+                <i class="bi bi-file-earmark-pdf-fill text-danger fs-5"></i>
+                <div>
+                  <div style="font-weight:700; color:#1e293b;">Ekspor CP (PDF A4)</div>
+                  <div style="font-size:11px; color:#64748b;">Kop resmi SITUAN 2-logo + TTD</div>
+                </div>
+              </a>
+            </li>
+            <li>
+              <a class="dropdown-item py-2 d-flex align-items-center gap-2" href="{{ route('akademik.perangkat.cp.export-docx', $activePerangkat->id) }}">
+                <i class="bi bi-file-earmark-word-fill text-primary fs-5"></i>
+                <div>
+                  <div style="font-weight:700; color:#1e293b;">Ekspor CP (Word A4)</div>
+                  <div style="font-size:11px; color:#64748b;">Format Microsoft Word (.docx)</div>
+                </div>
+              </a>
+            </li>
+            <li><hr class="dropdown-divider my-1"></li>
+            <li class="dropdown-header" style="font-size:10.5px; font-weight:800; text-transform:uppercase; color:#64748b; padding:6px 16px 4px; letter-spacing:0.5px;">
+              Seluruh Portofolio Perangkat (5 Bab)
+            </li>
+            <li>
+              <a class="dropdown-item py-2 d-flex align-items-center gap-2" href="{{ route('akademik.perangkat.export-pdf', $activePerangkat->id) }}">
+                <i class="bi bi-folder-symlink-fill text-danger fs-5"></i>
+                <div>
+                  <div style="font-weight:700; color:#1e293b;">Perangkat Lengkap (PDF A4)</div>
+                  <div style="font-size:11px; color:#64748b;">Sampul, Pengesahan &amp; 5 Bab Lengkap</div>
+                </div>
+              </a>
+            </li>
+            <li>
+              <a class="dropdown-item py-2 d-flex align-items-center gap-2" href="{{ route('akademik.perangkat.export-docx', $activePerangkat->id) }}">
+                <i class="bi bi-folder-symlink-fill text-primary fs-5"></i>
+                <div>
+                  <div style="font-weight:700; color:#1e293b;">Perangkat Lengkap (Word A4)</div>
+                  <div style="font-size:11px; color:#64748b;">5 Bab Dokumen Perangkat Ajar (.docx)</div>
+                </div>
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        @if($canEdit)
+          <form action="{{ route('akademik.perangkat.cp.salin-template', $activePerangkat->id) }}" method="POST" style="display:inline;"
+                onsubmit="return confirm('Salin rumusan standar resmi BSKAP 032/2024 ke dokumen ini?')">
+            @csrf
+            <button type="submit" class="ak-btn ak-btn-secondary" style="font-size:12.5px; padding:7px 14px;">
+              <i class="bi bi-lightning-charge me-1"></i> Salin Template BSKAP
+            </button>
+          </form>
+          <button type="button" id="btnOpenEdit" onclick="togglePanel(true)"
+                  class="ak-btn ak-btn-primary" style="font-size:12.5px; padding:7px 16px; font-weight:700;">
+            <i class="bi bi-pencil-square me-1"></i>
+            {{ $hasCustomCp ? 'Edit Capaian Pembelajaran' : 'Input Capaian Pembelajaran' }}
+          </button>
+        @endif
       </div>
-      @endif
     </div>
   </div>
 
   {{-- ===== SECTION 1: TEKS CP ===== --}}
   <div class="akademik-card" style="margin-bottom:20px; border-top:4px solid #0284c7;">
-    <div class="akademik-card-header" style="background:#f0f9ff; display:flex; justify-content:space-between; align-items:center;">
+    <div class="akademik-card-header" style="background:#f0f9ff; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
       <h3 class="akademik-card-title" style="font-size:14.5px; display:flex; align-items:center; gap:8px; margin:0;">
         <i class="bi bi-file-text text-primary"></i>
         Teks Capaian Pembelajaran
         <span class="badge bg-primary" style="font-size:11px; font-weight:600;">Fase {{ $activePerangkat->fase }}</span>
       </h3>
-      @if($hasCustomCp)
-        <span style="font-size:11.5px; color:#059669; font-weight:700; display:flex; align-items:center; gap:4px;">
-          <i class="bi bi-person-check-fill"></i> Rumusan Guru
-        </span>
-      @else
-        <span style="font-size:11.5px; color:#92400e; font-weight:600; display:flex; align-items:center; gap:4px;">
-          <i class="bi bi-info-circle"></i> Acuan Standar Nasional
-        </span>
-      @endif
+      <div style="display:flex; align-items:center; gap:10px;">
+        <div class="btn-group btn-group-sm" role="group">
+          <a href="{{ route('akademik.perangkat.cp.export-pdf', $activePerangkat->id) }}" class="btn btn-outline-danger" title="Ekspor Dokumen CP ke PDF A4" style="font-size:11.5px; font-weight:700; padding:3px 9px;">
+            <i class="bi bi-file-earmark-pdf me-1"></i> PDF
+          </a>
+          <a href="{{ route('akademik.perangkat.cp.export-docx', $activePerangkat->id) }}" class="btn btn-outline-primary" title="Ekspor Dokumen CP ke Word A4" style="font-size:11.5px; font-weight:700; padding:3px 9px;">
+            <i class="bi bi-file-earmark-word me-1"></i> Word
+          </a>
+        </div>
+        @if($hasCustomCp)
+          <span style="font-size:11.5px; color:#059669; font-weight:700; display:flex; align-items:center; gap:4px;">
+            <i class="bi bi-person-check-fill"></i> Rumusan Guru
+          </span>
+        @else
+          <span style="font-size:11.5px; color:#92400e; font-weight:600; display:flex; align-items:center; gap:4px;">
+            <i class="bi bi-info-circle"></i> Acuan Standar Nasional
+          </span>
+        @endif
+      </div>
     </div>
     <div class="akademik-card-body" style="padding:0;">
       @if(!empty($activeCpText))

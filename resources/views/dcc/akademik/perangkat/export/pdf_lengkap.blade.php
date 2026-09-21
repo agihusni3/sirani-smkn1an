@@ -28,17 +28,8 @@
 <body>
 
 {{-- SAMPUL --}}
-<div style="text-align:center; padding: 30px 20px;">
-  <table class="tabel-info" style="border:none !important;">
-    <tr>
-      <td style="text-align:center; padding:0 !important; border:none !important;">
-        <div style="font-size:11pt; font-weight:bold; text-transform:uppercase;">PEMERINTAH PROVINSI LAMPUNG — DINAS PENDIDIKAN DAN KEBUDAYAAN</div>
-        <div style="font-size:16pt; font-weight:900; text-transform:uppercase; margin:6px 0;">{{ $sekolah->nama_sekolah ?? 'SMK NEGERI 1 AIR NANINGAN' }}</div>
-        <div style="font-size:9pt; font-style:italic;">{{ $sekolah->alamat ?? 'Jl. Raya Air Naningan, Kec. Air Naningan, Kab. Tanggamus, Lampung' }}</div>
-        <div style="border-bottom: 3px double #000; margin: 10px 0;"></div>
-      </td>
-    </tr>
-  </table>
+<div style="text-align:center; padding: 10px 10px 30px 10px;">
+  @include('dcc.akademik.perangkat.export.partials.kop_surat_a4')
 
   <div style="margin: 50px 0 30px 0;">
     <div style="font-size:15pt; font-weight:bold; text-transform:uppercase; margin-bottom:6px;">PERANGKAT PEMBELAJARAN</div>
@@ -60,13 +51,7 @@
 <div class="page-break"></div>
 
 {{-- LEMBAR PENGESAHAN --}}
-<div class="kop-surat">
-  <div class="kop-text">
-    <div class="kop-instansi">PEMERINTAH PROVINSI LAMPUNG — DINAS PENDIDIKAN DAN KEBUDAYAAN</div>
-    <div class="kop-sekolah">{{ $sekolah->nama_sekolah ?? 'SMK NEGERI 1 AIR NANINGAN' }}</div>
-    <div class="kop-alamat">{{ $sekolah->alamat ?? 'Jl. Raya Air Naningan, Kec. Air Naningan, Kab. Tanggamus, Lampung' }}</div>
-  </div>
-</div>
+@include('dcc.akademik.perangkat.export.partials.kop_surat_a4')
 
 <div class="section-title">LEMBAR PENGESAHAN PERANGKAT PEMBELAJARAN<br>
   <span style="font-size:11pt;">TAHUN AJARAN {{ $perangkat->tahunAjaran?->nama ?? '2026/2027' }}</span>
@@ -109,7 +94,7 @@
 <div class="page-break"></div>
 
 {{-- BAB I: CP --}}
-<div class="kop-surat"><div class="kop-text"><div class="kop-instansi">PEMERINTAH PROVINSI LAMPUNG — DINAS PENDIDIKAN DAN KEBUDAYAAN</div><div class="kop-sekolah">{{ $sekolah->nama_sekolah ?? 'SMK NEGERI 1 AIR NANINGAN' }}</div></div></div>
+@include('dcc.akademik.perangkat.export.partials.kop_surat_a4', ['compact' => true])
 <div class="section-title">BAB I — CAPAIAN PEMBELAJARAN (CP)</div>
 
 <div class="sub-title">A. Identitas Mata Pelajaran</div>
@@ -142,7 +127,7 @@
 <div class="page-break"></div>
 
 {{-- BAB II: ATP --}}
-<div class="kop-surat"><div class="kop-text"><div class="kop-instansi">PEMERINTAH PROVINSI LAMPUNG — DINAS PENDIDIKAN DAN KEBUDAYAAN</div><div class="kop-sekolah">{{ $sekolah->nama_sekolah ?? 'SMK NEGERI 1 AIR NANINGAN' }}</div></div></div>
+@include('dcc.akademik.perangkat.export.partials.kop_surat_a4', ['compact' => true])
 <div class="section-title">BAB II — ALUR TUJUAN PEMBELAJARAN (ATP)</div>
 <div class="sub-title">{{ $perangkat->mataPelajaran?->nama_mapel }} | Kelas {{ $perangkat->tingkat }} Semester {{ $perangkat->semester == 1 ? 'Ganjil' : 'Genap' }}</div>
 
@@ -168,7 +153,7 @@
 <div class="page-break"></div>
 
 {{-- BAB III: PROTA/PROMES --}}
-<div class="kop-surat"><div class="kop-text"><div class="kop-instansi">PEMERINTAH PROVINSI LAMPUNG — DINAS PENDIDIKAN DAN KEBUDAYAAN</div><div class="kop-sekolah">{{ $sekolah->nama_sekolah ?? 'SMK NEGERI 1 AIR NANINGAN' }}</div></div></div>
+@include('dcc.akademik.perangkat.export.partials.kop_surat_a4', ['compact' => true])
 <div class="section-title">BAB III — PROGRAM TAHUNAN &amp; PROGRAM SEMESTER</div>
 
 @php
@@ -207,7 +192,7 @@
 <div class="page-break"></div>
 
 {{-- BAB IV: MODUL AJAR --}}
-<div class="kop-surat"><div class="kop-text"><div class="kop-instansi">PEMERINTAH PROVINSI LAMPUNG — DINAS PENDIDIKAN DAN KEBUDAYAAN</div><div class="kop-sekolah">{{ $sekolah->nama_sekolah ?? 'SMK NEGERI 1 AIR NANINGAN' }}</div></div></div>
+@include('dcc.akademik.perangkat.export.partials.kop_surat_a4', ['compact' => true])
 <div class="section-title">BAB IV — MODUL AJAR / RPP MERDEKA</div>
 
 @if($modulAjars->count() > 0)
@@ -232,7 +217,7 @@
 <div class="page-break"></div>
 
 {{-- BAB V: KKTP --}}
-<div class="kop-surat"><div class="kop-text"><div class="kop-instansi">PEMERINTAH PROVINSI LAMPUNG — DINAS PENDIDIKAN DAN KEBUDAYAAN</div><div class="kop-sekolah">{{ $sekolah->nama_sekolah ?? 'SMK NEGERI 1 AIR NANINGAN' }}</div></div></div>
+@include('dcc.akademik.perangkat.export.partials.kop_surat_a4', ['compact' => true])
 <div class="section-title">BAB V — KRITERIA KETERCAPAIAN TUJUAN PEMBELAJARAN (KKTP)</div>
 
 @if($kktpItems->count() > 0)

@@ -842,6 +842,272 @@ class AkademikPerangkatController extends Controller
      * EXPORT PDF — Seluruh Dokumen Perangkat Pembelajaran (5 Bab)
      * ============================================================
      */
+    /**
+     * Dapatkan path dan base64 logo untuk ekspor PDF & Word berstandar SITUAN
+     */
+    private function resolveKopLogos($sekolah): array
+    {
+        $storageProv = $sekolah->logo_provinsi ? storage_path('app/public/' . $sekolah->logo_provinsi) : null;
+        $provPath = ($storageProv && file_exists($storageProv)) ? $storageProv : (
+            file_exists(public_path('img/logo_prov_lampung.png')) ? public_path('img/logo_prov_lampung.png') : (
+                file_exists(public_path('lampung.png')) ? public_path('lampung.png') : null
+            )
+        );
+
+        $storageSekolah = $sekolah->logo_sekolah ? storage_path('app/public/' . $sekolah->logo_sekolah) : null;
+        $sekolahPath = ($storageSekolah && file_exists($storageSekolah)) ? $storageSekolah : (
+            file_exists(public_path('img/logo.png')) ? public_path('img/logo.png') : (
+                file_exists(public_path('logo.png')) ? public_path('logo.png') : null
+            )
+        );
+
+        $logoProvBase64 = ($provPath && file_exists($provPath)) ? 'data:image/png;base64,' . base64_encode(file_get_contents($provPath)) : null;
+        $logoSekolahBase64 = ($sekolahPath && file_exists($sekolahPath)) ? 'data:image/png;base64,' . base64_encode(file_get_contents($sekolahPath)) : null;
+
+        return [
+            'provPath'          => $provPath,
+            'sekolahPath'       => $sekolahPath,
+            'logoProvBase64'    => $logoProvBase64,
+            'logoSekolahBase64' => $logoSekolahBase64,
+        ];
+    }
+
+    /**
+     * Helper: Tambahkan Kop Surat resmi dinas SITUAN pada dokumen Word (PhpWord)
+     */
+    private function addWordKopSurat($section, $sekolah, $provPath, $sekolahPath, $compact = false)
+    {
+        $table = $section->addTable([
+            'borderSize' => 0,
+            'cellMargin' => 0,
+            'alignment' => \PhpOffice\PhpWord\SimpleType\JcTable::CENTER,
+            'width' => 100 * 50,
+            'unit' => \PhpOffice\PhpWord\SimpleType\TblWidth::PERCENT,
+        ]);
+        $table->addRow();
+
+        // Logo Kiri: Provinsi
+        $cell1 = $table->addCell(1300, ['valign' => 'center']);
+        if ($provPath && file_exists($provPath)) {
+            $cell1->addImage($provPath, [
+                'width' => $compact ? 44 : 50,
+                'height' => $compact ? 55 : 62,
+                'alignment' => \PhpOffice\PhpWord\SimpleType\Jc::CENTER,
+            ]);
+        }
+
+        // Teks Tengah: Kop Instansi
+        $cell2 = $table->addCell(7000, ['valign' => 'center']);
+        $cell2->addText(
+            strtoupper($sekolah->nama_instansi_atas ?: 'PEMERINTAH PROVINSI LAMPUNG'),
+            ['bold' => true, 'size' => $compact ? 9.5 : 10.5, 'name' => 'Times New Roman'],
+            ['alignment' => \PhpOffice\PhpWord\SimpleType\Jc::CENTER, 'spaceAfter' => 10]
+        );
+        $cell2->addText(
+            strtoupper($sekolah->nama_dinas ?: 'DINAS PENDIDIKAN DAN KEBUDAYAAN'),
+            ['bold' => true, 'size' => $compact ? 10.5 : 11.5, 'name' => 'Times New Roman'],
+            ['alignment' => \PhpOffice\PhpWord\SimpleType\Jc::CENTER, 'spaceAfter' => 10]
+        );
+        $cell2->addText(
+            strtoupper($sekolah->nama_sekolah ?: 'SMK NEGERI 1 AIR NANINGAN'),
+            ['bold' => true, 'size' => $compact ? 12.5 : 14.5, 'name' => 'Times New Roman'],
+            ['alignment' => \PhpOffice\PhpWord\SimpleType\Jc::CENTER, 'spaceAfter' => 20]
+        );
+        $alamat = ($sekolah->alamat ?: 'Jl. Makam Baturuguk, Pekon Karang Sari') . ', Kec. ' . ($sekolah->kecamatan ?: 'Air Naningan') . ', Kab. ' . ($sekolah->kabupaten ?: 'Tanggamus') . ', ' . ($sekolah->provinsi ?: 'Lampung') . ' ' . ($sekolah->kode_pos ?: '35379');
+        $cell2->addText(
+            $alamat,
+            ['italic' => true, 'size' => $compact ? 7 : 7.5, 'name' => 'Times New Roman'],
+            ['alignment' => \PhpOffice\PhpWord\SimpleType\Jc::CENTER, 'spaceAfter' => 10]
+        );
+        $kontak = 'NPSN: ' . ($sekolah->npsn ?: '70011825') . ' | Website: ' . ($sekolah->website ?: 'smkn1airnaningan.sch.id') . ' | Email: ' . ($sekolah->email ?: 'smkn1airnaningan@gmail.com');
+        $cell2->addText(
+            $kontak,
+            ['size' => $compact ? 6.5 : 7, 'name' => 'Times New Roman'],
+            ['alignment' => \PhpOffice\PhpWord\SimpleType\Jc::CENTER, 'spaceAfter' => 0]
+        );
+
+        // Logo Kanan: Sekolah
+        $cell3 = $table->addCell(1300, ['valign' => 'center']);
+        if ($sekolahPath && file_exists($sekolahPath)) {
+            $cell3->addImage($sekolahPath, [
+                'width' => $compact ? 44 : 50,
+                'height' => $compact ? 50 : 56,
+                'alignment' => \PhpOffice\PhpWord\SimpleType\Jc::CENTER,
+            ]);
+        }
+
+        // Garis Ganda Pembatas Kop Surat
+        $lineTable = $section->addTable(['borderSize' => 0, 'cellMargin' => 0, 'width' => 100 * 50, 'unit' => \PhpOffice\PhpWord\SimpleType\TblWidth::PERCENT]);
+        $lineTable->addRow(20);
+        $lineTable->addCell(9600, [
+            'borderTopSize' => 18,
+            'borderTopColor' => '000000',
+            'borderBottomSize' => 6,
+            'borderBottomColor' => '000000',
+        ]);
+        $section->addTextBreak(1);
+    }
+
+    /**
+     * ================================================================
+     * EXPORT PDF — Dokumen Capaian Pembelajaran (CP) A4 (Format SITUAN)
+     * ================================================================
+     */
+    public function exportCpPdf($id)
+    {
+        $perangkat = AkademikPerangkatAjar::with([
+            'guru', 'mataPelajaran', 'distribusiMengajar.rombel',
+            'tahunAjaran', 'validator'
+        ])->findOrFail($id);
+
+        $sekolah = PengaturanSekolah::getAktif();
+        $logos = $this->resolveKopLogos($sekolah);
+        $logoProvBase64 = $logos['logoProvBase64'];
+        $logoSekolahBase64 = $logos['logoSekolahBase64'];
+
+        $activeCpText = $perangkat->resolved_cp;
+        $activeElemen = $perangkat->resolved_elemen_cp;
+
+        $pdf = Pdf::loadView('dcc.akademik.perangkat.export.pdf_cp', compact(
+            'perangkat', 'sekolah', 'logoProvBase64', 'logoSekolahBase64',
+            'activeCpText', 'activeElemen'
+        ))->setPaper('a4', 'portrait');
+
+        $filename = 'CP-' . Str::slug($perangkat->mataPelajaran?->nama_mapel ?? 'mapel') . '-Kelas' . $perangkat->tingkat . '-Fase' . $perangkat->fase . '-Smt' . $perangkat->semester . '.pdf';
+
+        return $pdf->download($filename);
+    }
+
+    /**
+     * ================================================================
+     * EXPORT DOCX — Dokumen Capaian Pembelajaran (CP) A4 (Format SITUAN)
+     * ================================================================
+     */
+    public function exportCpDocx($id)
+    {
+        $perangkat = AkademikPerangkatAjar::with([
+            'guru', 'mataPelajaran', 'distribusiMengajar.rombel',
+            'tahunAjaran', 'validator'
+        ])->findOrFail($id);
+
+        $sekolah = PengaturanSekolah::getAktif();
+        $logos = $this->resolveKopLogos($sekolah);
+
+        $phpWord = new PhpWord();
+        $phpWord->getSettings()->setUpdateFields(true);
+        $phpWord->setDefaultFontName('Times New Roman');
+        $phpWord->setDefaultFontSize(11);
+
+        $sectionStyle = [
+            'paperSize'    => 'A4',
+            'marginTop'    => 1134, // 2 cm
+            'marginBottom' => 1134, // 2 cm
+            'marginLeft'   => 1418, // 2.5 cm
+            'marginRight'  => 1134, // 2 cm
+        ];
+        $section = $phpWord->addSection($sectionStyle);
+
+        // 1. KOP SURAT SITUAN
+        $this->addWordKopSurat($section, $sekolah, $logos['provPath'], $logos['sekolahPath'], false);
+
+        // 2. JUDUL DOKUMEN
+        $section->addText('CAPAIAN PEMBELAJARAN (CP)', ['bold' => true, 'size' => 13, 'underline' => 'single'], ['alignment' => Jc::CENTER, 'spaceAfter' => 30]);
+        $section->addText('KURIKULUM MERDEKA TAHUN AJARAN ' . ($perangkat->tahunAjaran?->nama ?? '2026/2027'), ['bold' => true, 'size' => 11], ['alignment' => Jc::CENTER, 'spaceAfter' => 100]);
+
+        // 3. TABEL IDENTITAS
+        $tblIdentitas = $section->addTable(['borderSize' => 6, 'borderColor' => 'CCCCCC', 'cellMargin' => 60, 'width' => 100 * 50, 'unit' => \PhpOffice\PhpWord\SimpleType\TblWidth::PERCENT]);
+        $tblIdentitas->addRow();
+        $tblIdentitas->addCell(2200, ['bgColor' => 'F1F5F9'])->addText('Mata Pelajaran', ['bold' => true, 'size' => 10]);
+        $tblIdentitas->addCell(4000)->addText($perangkat->mataPelajaran?->nama_mapel . ' (' . $perangkat->mataPelajaran?->kode_mapel . ')', ['size' => 10]);
+        $tblIdentitas->addCell(1600, ['bgColor' => 'F1F5F9'])->addText('Fase / Kelas', ['bold' => true, 'size' => 10]);
+        $tblIdentitas->addCell(1800)->addText('Fase ' . $perangkat->fase . ' / Kls ' . $perangkat->tingkat, ['size' => 10]);
+
+        $tblIdentitas->addRow();
+        $tblIdentitas->addCell(2200, ['bgColor' => 'F1F5F9'])->addText('Guru Pengampu', ['bold' => true, 'size' => 10]);
+        $tblIdentitas->addCell(4000)->addText($perangkat->guru?->nama ?? '-', ['bold' => true, 'size' => 10]);
+        $tblIdentitas->addCell(1600, ['bgColor' => 'F1F5F9'])->addText('Semester', ['bold' => true, 'size' => 10]);
+        $tblIdentitas->addCell(1800)->addText($perangkat->semester == 1 ? '1 (Ganjil)' : '2 (Genap)', ['size' => 10]);
+
+        $tblIdentitas->addRow();
+        $tblIdentitas->addCell(2200, ['bgColor' => 'F1F5F9'])->addText('NIP / NUPTK', ['bold' => true, 'size' => 10]);
+        $tblIdentitas->addCell(4000)->addText($perangkat->guru?->nip ?? '-', ['size' => 10]);
+        $tblIdentitas->addCell(1600, ['bgColor' => 'F1F5F9'])->addText('Status', ['bold' => true, 'size' => 10]);
+        $tblIdentitas->addCell(1800)->addText(ucfirst($perangkat->status ?? 'Draft'), ['bold' => true, 'size' => 10]);
+
+        $section->addTextBreak(1);
+
+        // 4. CAPAIAN PEMBELAJARAN
+        $section->addText('A. Capaian Pembelajaran Fase ' . $perangkat->fase, ['bold' => true, 'size' => 11], ['spaceBefore' => 60, 'spaceAfter' => 40]);
+        $cpParagraph = preg_replace('/\s*\n\s*/', ' ', $perangkat->resolved_cp);
+        $section->addText($cpParagraph ?: '—', ['size' => 10.5], ['alignment' => Jc::BOTH, 'spaceAfter' => 60]);
+
+        // 5. RASIONAL (jika ada)
+        if (!empty($perangkat->rasional_tujuan)) {
+            $section->addText('B. Rasional & Tujuan Mata Pelajaran', ['bold' => true, 'size' => 11], ['spaceBefore' => 60, 'spaceAfter' => 40]);
+            $rasionalParagraph = preg_replace('/\s*\n\s*/', ' ', $perangkat->rasional_tujuan);
+            $section->addText($rasionalParagraph, ['size' => 10.5], ['alignment' => Jc::BOTH, 'spaceAfter' => 60]);
+        }
+
+        // 6. ELEMEN KOMPETENSI CP
+        $sectionLabel = !empty($perangkat->rasional_tujuan) ? 'C.' : 'B.';
+        $section->addText($sectionLabel . ' Elemen Kompetensi Capaian Pembelajaran', ['bold' => true, 'size' => 11], ['spaceBefore' => 60, 'spaceAfter' => 40]);
+
+        $elemenList = !empty($perangkat->elemen_cp) && is_array($perangkat->elemen_cp) && count($perangkat->elemen_cp) > 0
+            ? $perangkat->elemen_cp
+            : $perangkat->resolved_elemen_cp;
+
+        if (!empty($elemenList) && count($elemenList) > 0) {
+            $tblElem = $section->addTable(['borderSize' => 6, 'borderColor' => '000000', 'cellMargin' => 50, 'width' => 100 * 50, 'unit' => \PhpOffice\PhpWord\SimpleType\TblWidth::PERCENT]);
+            $tblElem->addRow();
+            $tblElem->addCell(500, ['bgColor' => 'DCE8F5'])->addText('No', ['bold' => true, 'size' => 9.5], ['alignment' => Jc::CENTER]);
+            $tblElem->addCell(2500, ['bgColor' => 'DCE8F5'])->addText('Nama Elemen CP', ['bold' => true, 'size' => 9.5], ['alignment' => Jc::CENTER]);
+            $tblElem->addCell(6600, ['bgColor' => 'DCE8F5'])->addText('Deskripsi Capaian Pembelajaran Elemen', ['bold' => true, 'size' => 9.5], ['alignment' => Jc::CENTER]);
+
+            foreach ($elemenList as $idx => $elem) {
+                $tblElem->addRow();
+                $namaEl = is_array($elem) ? ($elem['nama'] ?? $elem['elemen'] ?? '-') : $elem;
+                $deskEl = is_array($elem) ? ($elem['deskripsi'] ?? $elem['capaian'] ?? '-') : '-';
+                $tblElem->addCell(500)->addText((string)($idx + 1), ['size' => 9.5], ['alignment' => Jc::CENTER]);
+                $tblElem->addCell(2500)->addText($namaEl, ['bold' => true, 'size' => 9.5]);
+                $tblElem->addCell(6600)->addText($deskEl, ['size' => 9.5], ['alignment' => Jc::BOTH]);
+            }
+        }
+
+        $section->addTextBreak(2);
+
+        // 7. LEMBAR PENGESAHAN & TTD
+        $tblTtd = $section->addTable(['borderSize' => 0, 'cellMargin' => 0, 'width' => 100 * 50, 'unit' => \PhpOffice\PhpWord\SimpleType\TblWidth::PERCENT]);
+        $tblTtd->addRow();
+        $cellKepsek = $tblTtd->addCell(5000);
+        $cellKepsek->addText('Mengetahui,', ['size' => 10]);
+        $cellKepsek->addText('Kepala SMK Negeri 1 Air Naningan', ['size' => 10]);
+        $cellKepsek->addTextBreak(3);
+        $cellKepsek->addText($sekolah->nama_kepala_sekolah ?? 'Aprida, S.Si.', ['bold' => true, 'underline' => 'single', 'size' => 10]);
+        $cellKepsek->addText('NIP. ' . ($sekolah->nip_kepala_sekolah ?? '197904172008012019'), ['size' => 10]);
+
+        $cellGuru = $tblTtd->addCell(5000);
+        $cellGuru->addText('Air Naningan, ' . \Carbon\Carbon::parse($perangkat->tanggal_pengesahan ?? now())->translatedFormat('d F Y'), ['size' => 10]);
+        $cellGuru->addText('Guru Pengampu Mata Pelajaran,', ['size' => 10]);
+        $cellGuru->addTextBreak(3);
+        $cellGuru->addText($perangkat->guru?->nama ?? '-', ['bold' => true, 'underline' => 'single', 'size' => 10]);
+        $cellGuru->addText('NIP. ' . ($perangkat->guru?->nip ?? '-'), ['size' => 10]);
+
+        $filename = 'CP-' . Str::slug($perangkat->mataPelajaran?->nama_mapel ?? 'mapel') . '-Kelas' . $perangkat->tingkat . '-Fase' . $perangkat->fase . '-Smt' . $perangkat->semester . '.docx';
+
+        $tmpPath = sys_get_temp_dir() . DIRECTORY_SEPARATOR . $filename;
+        $writer = IOFactory::createWriter($phpWord, 'Word2007');
+        $writer->save($tmpPath);
+
+        return Response::download($tmpPath, $filename, [
+            'Content-Type' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        ])->deleteFileAfterSend(true);
+    }
+
+    /**
+     * ================================================================
+     * EXPORT PDF — Seluruh Dokumen Perangkat Pembelajaran A4
+     * ================================================================
+     */
     public function exportPdf($id)
     {
         $perangkat = AkademikPerangkatAjar::with([
@@ -849,13 +1115,10 @@ class AkademikPerangkatController extends Controller
             'tahunAjaran', 'atpItems', 'modulAjars', 'kktpItems.atpItem', 'validator'
         ])->findOrFail($id);
 
-        $sekolah = PengaturanSekolah::first() ?? new PengaturanSekolah([
-            'nama_sekolah'       => 'SMK NEGERI 1 AIR NANINGAN',
-            'npsn'               => '69896425',
-            'alamat'             => 'Jl. Raya Air Naningan, Kec. Air Naningan, Kab. Tanggamus, Lampung',
-            'nama_kepala_sekolah'=> 'Aprida, S.Pd., M.M.',
-            'nip_kepala_sekolah' => '19750412 200501 2 007',
-        ]);
+        $sekolah = PengaturanSekolah::getAktif();
+        $logos   = $this->resolveKopLogos($sekolah);
+        $logoProvBase64    = $logos['logoProvBase64'];
+        $logoSekolahBase64 = $logos['logoSekolahBase64'];
 
         $qrToken    = $perangkat->generateQrToken();
         $atpItems   = $perangkat->atpItems()->orderBy('urutan')->get();
@@ -863,7 +1126,8 @@ class AkademikPerangkatController extends Controller
         $kktpItems  = $perangkat->kktpItems()->with('atpItem')->get();
 
         $pdf = Pdf::loadView('dcc.akademik.perangkat.export.pdf_lengkap', compact(
-            'perangkat', 'sekolah', 'qrToken', 'atpItems', 'modulAjars', 'kktpItems'
+            'perangkat', 'sekolah', 'qrToken', 'atpItems', 'modulAjars', 'kktpItems',
+            'logoProvBase64', 'logoSekolahBase64'
         ))->setPaper('a4', 'portrait');
 
         $filename = 'Perangkat-' . Str::slug($perangkat->mataPelajaran?->nama_mapel ?? 'mapel') . '-Kelas' . $perangkat->tingkat . '-Smt' . $perangkat->semester . '.pdf';
@@ -873,7 +1137,7 @@ class AkademikPerangkatController extends Controller
 
     /**
      * ================================================================
-     * EXPORT DOCX — Seluruh Dokumen Perangkat Pembelajaran (PhpWord)
+     * EXPORT DOCX — Seluruh Dokumen Perangkat Pembelajaran A4 (PhpWord)
      * ================================================================
      */
     public function exportDocx($id)
@@ -883,8 +1147,9 @@ class AkademikPerangkatController extends Controller
             'tahunAjaran', 'atpItems', 'modulAjars', 'kktpItems.atpItem', 'validator'
         ])->findOrFail($id);
 
-        $sekolah    = PengaturanSekolah::first();
-        $namaSekolah= $sekolah?->nama_sekolah ?? 'SMK NEGERI 1 AIR NANINGAN';
+        $sekolah    = PengaturanSekolah::getAktif();
+        $logos      = $this->resolveKopLogos($sekolah);
+        $namaSekolah= $sekolah->nama_sekolah ?: 'SMK NEGERI 1 AIR NANINGAN';
         $atpItems   = $perangkat->atpItems()->orderBy('urutan')->get();
         $modulAjars = $perangkat->modulAjars()->with('atpItem')->orderBy('pertemuan_ke_mulai')->get();
         $kktpItems  = $perangkat->kktpItems()->with('atpItem')->get();
@@ -897,49 +1162,49 @@ class AkademikPerangkatController extends Controller
 
         // Page layout A4
         $sectionStyle = [
-            'marginTop'    => 850,
-            'marginBottom' => 850,
-            'marginLeft'   => 1134,
-            'marginRight'  => 1020,
+            'marginTop'    => 1134,
+            'marginBottom' => 1134,
+            'marginLeft'   => 1418,
+            'marginRight'  => 1134,
             'paperSize'    => 'A4',
         ];
 
         // Helper: Judul Section
         $addJudul = function ($section, $text) {
-            $h = $section->addText($text, ['bold' => true, 'size' => 14, 'underline' => 'single'], ['alignment' => Jc::CENTER]);
+            $section->addText($text, ['bold' => true, 'size' => 13, 'underline' => 'single'], ['alignment' => Jc::CENTER]);
             $section->addTextBreak(1);
         };
 
         // Helper: Sub-judul
         $addSub = function ($section, $text) {
-            $section->addText($text, ['bold' => true, 'size' => 12], ['spaceBefore' => 120, 'spaceAfter' => 60]);
+            $section->addText($text, ['bold' => true, 'size' => 11.5], ['spaceBefore' => 100, 'spaceAfter' => 50]);
         };
 
         // Helper: Paragraf teks biasa
         $addPara = function ($section, $text) {
-            $section->addText($text ?? '—', ['size' => 11], ['alignment' => Jc::BOTH, 'spaceBefore' => 40, 'spaceAfter' => 40]);
+            $cleanText = preg_replace('/\s*\n\s*/', ' ', $text);
+            $section->addText($cleanText ?: '—', ['size' => 11], ['alignment' => Jc::BOTH, 'spaceBefore' => 30, 'spaceAfter' => 30]);
         };
 
         // ---- HALAMAN SAMPUL ----
         $section = $phpWord->addSection($sectionStyle);
-        $section->addText('PEMERINTAH PROVINSI LAMPUNG', ['bold' => true, 'size' => 12], ['alignment' => Jc::CENTER]);
-        $section->addText('DINAS PENDIDIKAN DAN KEBUDAYAAN', ['bold' => true, 'size' => 12], ['alignment' => Jc::CENTER]);
-        $section->addText(strtoupper($namaSekolah), ['bold' => true, 'size' => 16], ['alignment' => Jc::CENTER]);
-        $section->addText($sekolah?->alamat ?? 'Jl. Raya Air Naningan, Tanggamus, Lampung', ['italic' => true, 'size' => 10], ['alignment' => Jc::CENTER]);
-        $section->addTextBreak(3);
+        $this->addWordKopSurat($section, $sekolah, $logos['provPath'], $logos['sekolahPath'], false);
+
+        $section->addTextBreak(2);
         $section->addText('PERANGKAT PEMBELAJARAN', ['bold' => true, 'size' => 18], ['alignment' => Jc::CENTER]);
-        $section->addText('Kurikulum Merdeka', ['size' => 13], ['alignment' => Jc::CENTER]);
+        $section->addText('Kurikulum Merdeka (Kepmendikbudristek No. 12/2024)', ['size' => 12], ['alignment' => Jc::CENTER]);
         $section->addTextBreak(1);
         $section->addText($perangkat->mataPelajaran?->nama_mapel ?? 'Mata Pelajaran', ['bold' => true, 'size' => 16], ['alignment' => Jc::CENTER]);
         $section->addText('Kelas ' . $perangkat->tingkat . ' / Fase ' . $perangkat->fase, ['size' => 13], ['alignment' => Jc::CENTER]);
         $section->addText('Semester ' . ($perangkat->semester == 1 ? 'Ganjil' : 'Genap'), ['size' => 12], ['alignment' => Jc::CENTER]);
         $section->addText('Tahun Ajaran ' . ($perangkat->tahunAjaran?->nama ?? date('Y') . '/' . (date('Y') + 1)), ['size' => 12], ['alignment' => Jc::CENTER]);
         $section->addTextBreak(3);
-        $section->addText('Guru Pengampu : ' . ($perangkat->guru?->nama ?? '-'), ['size' => 12], ['alignment' => Jc::CENTER]);
+        $section->addText('Guru Pengampu : ' . ($perangkat->guru?->nama ?? '-'), ['bold' => true, 'size' => 12], ['alignment' => Jc::CENTER]);
         $section->addText('NIP : ' . ($perangkat->guru?->nip ?? '-'), ['size' => 12], ['alignment' => Jc::CENTER]);
 
         // ---- BAB I: CP ----
         $section = $phpWord->addSection($sectionStyle);
+        $this->addWordKopSurat($section, $sekolah, $logos['provPath'], $logos['sekolahPath'], true);
         $addJudul($section, 'BAB I — CAPAIAN PEMBELAJARAN (CP)');
 
         $addSub($section, 'A. Identitas Mata Pelajaran');
@@ -970,6 +1235,7 @@ class AkademikPerangkatController extends Controller
 
         // ---- BAB II: ATP ----
         $section = $phpWord->addSection($sectionStyle);
+        $this->addWordKopSurat($section, $sekolah, $logos['provPath'], $logos['sekolahPath'], true);
         $addJudul($section, 'BAB II — ALUR TUJUAN PEMBELAJARAN (ATP)');
         $addSub($section, $perangkat->mataPelajaran?->nama_mapel . ' | Kelas ' . $perangkat->tingkat . ' Semester ' . ($perangkat->semester == 1 ? 'Ganjil' : 'Genap'));
 
@@ -998,6 +1264,7 @@ class AkademikPerangkatController extends Controller
 
         // ---- BAB III: PROTA/PROMES ----
         $section = $phpWord->addSection($sectionStyle);
+        $this->addWordKopSurat($section, $sekolah, $logos['provPath'], $logos['sekolahPath'], true);
         $addJudul($section, 'BAB III — PROGRAM TAHUNAN & PROGRAM SEMESTER');
 
         $rpeEfektif  = $perangkat->rpe_pekan_efektif ?? 18;
@@ -1030,6 +1297,7 @@ class AkademikPerangkatController extends Controller
 
         // ---- BAB IV: MODUL AJAR ----
         $section = $phpWord->addSection($sectionStyle);
+        $this->addWordKopSurat($section, $sekolah, $logos['provPath'], $logos['sekolahPath'], true);
         $addJudul($section, 'BAB IV — MODUL AJAR / RPP MERDEKA');
 
         if ($modulAjars->count() > 0) {
@@ -1052,6 +1320,7 @@ class AkademikPerangkatController extends Controller
 
         // ---- BAB V: KKTP ----
         $section = $phpWord->addSection($sectionStyle);
+        $this->addWordKopSurat($section, $sekolah, $logos['provPath'], $logos['sekolahPath'], true);
         $addJudul($section, 'BAB V — KRITERIA KETERCAPAIAN TUJUAN PEMBELAJARAN (KKTP)');
 
         if ($kktpItems->count() > 0) {
