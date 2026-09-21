@@ -117,7 +117,7 @@
     </div>
     <div class="akademik-card-body" style="padding:0;">
       @if(!empty($activeCpText))
-        <div style="padding:22px 26px; font-size:13.5px; line-height:1.85; color:#1e293b; text-align:justify; white-space:pre-line; background:#fff;">{{ $activeCpText }}</div>
+        <div style="padding:22px 26px; font-size:13.5px; line-height:1.85; color:#1e293b; text-align:justify; background:#fff;">{!! nl2br(e($activeCpText)) !!}</div>
       @else
         <div style="padding:40px; text-align:center; color:#94a3b8;">
           <i class="bi bi-journal-x" style="font-size:36px; display:block; margin-bottom:12px; opacity:0.5;"></i>
@@ -141,7 +141,7 @@
         <i class="bi bi-bullseye text-primary"></i> Rasional &amp; Tujuan Mata Pelajaran
       </h3>
     </div>
-    <div class="akademik-card-body" style="padding:22px 26px; font-size:13.5px; line-height:1.85; color:#334155; text-align:justify; white-space:pre-line;">{{ $activePerangkat->rasional_tujuan }}</div>
+    <div class="akademik-card-body" style="padding:22px 26px; font-size:13.5px; line-height:1.85; color:#334155; text-align:justify;">{!! nl2br(e($activePerangkat->rasional_tujuan)) !!}</div>
   </div>
   @endif
 
@@ -387,13 +387,13 @@
         @if($selectedMapel->capaian_pembelajaran_fase_e)
           <div style="margin-bottom:16px;">
             <div class="badge bg-primary mb-2">Fase E (Kelas X)</div>
-            <div style="font-size:13.5px; line-height:1.8; color:#334155; text-align:justify; white-space:pre-line;">{{ $selectedMapel->capaian_pembelajaran_fase_e }}</div>
+            <div style="font-size:13.5px; line-height:1.8; color:#334155; text-align:justify;">{!! nl2br(e($selectedMapel->capaian_pembelajaran_fase_e)) !!}</div>
           </div>
         @endif
         @if($selectedMapel->capaian_pembelajaran_fase_f)
           <div style="border-top:1px dashed #e2e8f0; padding-top:16px;">
             <div class="badge mb-2" style="background:#7c3aed; color:#fff;">Fase F (Kelas XI–XII)</div>
-            <div style="font-size:13.5px; line-height:1.8; color:#334155; text-align:justify; white-space:pre-line;">{{ $selectedMapel->capaian_pembelajaran_fase_f }}</div>
+            <div style="font-size:13.5px; line-height:1.8; color:#334155; text-align:justify;">{!! nl2br(e($selectedMapel->capaian_pembelajaran_fase_f)) !!}</div>
           </div>
         @endif
       </div>
