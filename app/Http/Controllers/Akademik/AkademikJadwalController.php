@@ -850,7 +850,7 @@ class AkademikJadwalController extends Controller
             'catatan' => 'nullable|string',
         ]);
 
-        AkademikGuruPiket::updateOrCreate(
+        $piket = AkademikGuruPiket::updateOrCreate(
             [
                 'tahun_ajaran_id' => $request->tahun_ajaran_id,
                 'semester' => $request->semester,
@@ -863,7 +863,22 @@ class AkademikJadwalController extends Controller
             ]
         );
 
-        return redirect()->back()->with('success', "Petugas piket untuk hari {$request->hari} berhasil disimpan.");
+        $piket->syncDayToSirani();
+
+        return redirect()->back()->with('success', "Petugas piket untuk hari {$request->hari} berhasil disimpan dan otomatis disinkronkan ke Meja Piket SIRANI.");
+    }
+
+    /**
+     * Sinkronkan Seluruh Jadwal Piket ke SIRANI secara manual
+     */
+    public function syncPiketToSirani(Request $request)
+    {
+        $taId = $request->input('tahun_ajaran_id');
+        $semester = $request->input('semester');
+
+        $count = AkademikGuruPiket::syncAllToSirani($taId, $semester);
+
+        return redirect()->back()->with('success', "Berhasil menyinkronkan seluruh jadwal piket ({$count} hari) ke Meja Piket SIRANI & Smart Gate.");
     }
 
     /**

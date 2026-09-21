@@ -97,37 +97,22 @@ class JadwalPiketController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
-            'hari' => 'required|in:Senin,Selasa,Rabu,Kamis,Jumat',
-            'guru_id' => 'required|exists:gurus,id',
-            'keterangan' => 'nullable|string|max:100',
-        ]);
-
-        $exists = JadwalPiket::where('hari', $request->input('hari'))
-            ->where('guru_id', $request->input('guru_id'))
-            ->exists();
-
-        if ($exists) {
-            return back()->with('error', 'Guru tersebut sudah terdaftar dalam jadwal piket hari ' . $request->input('hari') . '.');
-        }
-
-        JadwalPiket::create([
-            'hari' => $request->input('hari'),
-            'guru_id' => $request->input('guru_id'),
-            'keterangan' => $request->input('keterangan'),
-        ]);
-
-        $guru = Guru::find($request->input('guru_id'));
-        return back()->with('success', "Berhasil menambahkan {$guru->nama} ke jadwal piket hari {$request->input('hari')}.");
+        return back()->with('error', 'Penambahan jadwal piket dikelola terpusat oleh Waka Kurikulum melalui modul Akademik & KBM (Langkah 4: Jadwal Guru Piket).');
     }
 
     public function destroy($id)
     {
-        $jadwal = JadwalPiket::with('guru')->findOrFail($id);
-        $namaGuru = $jadwal->guru->nama ?? 'Guru';
-        $hari = $jadwal->hari;
-        $jadwal->delete();
+        return back()->with('error', 'Penghapusan jadwal piket dikelola terpusat oleh Waka Kurikulum melalui modul Akademik & KBM (Langkah 4: Jadwal Guru Piket).');
+    }
 
-        return back()->with('success', "Penugasan piket {$namaGuru} pada hari {$hari} berhasil dihapus.");
+    /**
+     * Sinkronkan penugasan piket dari modul Waka Kurikulum (DCC Akademik)
+     */
+    public function syncFromAkademik(Request $request)
+    {
+        $ta = \App\Models\TahunAjaran::where('is_active', true)->first();
+        $count = \App\Models\AkademikGuruPiket::syncAllToSirani($ta?->id);
+
+        return back()->with('success', "Berhasil menyinkronkan {$count} hari penugasan guru piket dari Waka Kurikulum (DCC Akademik).");
     }
 }

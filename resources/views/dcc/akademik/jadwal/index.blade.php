@@ -103,6 +103,17 @@
             Sem 2 (Genap)
           </a>
         </div>
+        <form action="{{ route('akademik.jadwal.piket.sync') }}" method="POST" style="margin:0;">
+          @csrf
+          <input type="hidden" name="tahun_ajaran_id" value="{{ $ta?->id ?? 1 }}">
+          <input type="hidden" name="semester" value="{{ $semester }}">
+          <button type="submit" class="ak-btn" style="font-size:12px; font-weight:700; background:#f0fdf4; color:#15803d; border:1px solid #bbf7d0;" title="Sinkronkan ulang seluruh penugasan piket ke Meja Piket SIRANI">
+            <i class="bi bi-arrow-repeat me-1"></i> Sinkronkan ke SIRANI
+          </button>
+        </form>
+        <a href="{{ route('piket.index') }}" target="_blank" class="ak-btn ak-btn-secondary" style="font-size:12.5px; font-weight:700;" title="Buka layar operasional Meja Piket">
+          <i class="bi bi-box-arrow-up-right me-1"></i> Buka Meja Piket SIRANI
+        </a>
         <a href="{{ route('akademik.jadwal.index', ['tab' => 'roster', 'semester' => $semester]) }}" class="ak-btn ak-btn-secondary" style="font-size:12.5px; font-weight:700;">
           <i class="bi bi-arrow-left me-1"></i> Kembali ke Roster Jadwal
         </a>
@@ -876,12 +887,19 @@ function tambahIstirahat(hari) {
 {{-- ========================================================================= --}}
 @if($tab === 'piket')
 <div class="akademik-card" style="margin-bottom:24px;">
-  <div class="akademik-card-header">
-    <h3 style="font-weight:800; font-size:16px; margin:0; color:var(--ak-dark);">
-      <i class="bi bi-person-badge-fill text-success me-1"></i> Penugasan Waka &amp; Guru Piket Mingguan
-    </h3>
-    <div style="font-size:12px; color:#64748b;">
-      Atur jadwal petugas piket harian untuk menjaga kedisiplinan dan kelancaran KBM di SMKN 1 Air Naningan.
+  <div class="akademik-card-header" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+    <div>
+      <h3 style="font-weight:800; font-size:16px; margin:0; color:var(--ak-dark); display:flex; align-items:center; gap:8px;">
+        <i class="bi bi-person-badge-fill text-success"></i> Penugasan Waka &amp; Guru Piket Mingguan
+      </h3>
+      <div style="font-size:12px; color:#64748b; margin-top:2px;">
+        Atur jadwal petugas piket harian untuk menjaga kedisiplinan dan kelancaran KBM di SMKN 1 Air Naningan.
+      </div>
+    </div>
+    <div style="display:flex; align-items:center; gap:8px;">
+      <span class="badge" style="background:#dcfce7; color:#15803d; border:1px solid #86efac; font-size:11.5px; font-weight:700; padding:6px 12px; border-radius:8px; display:inline-flex; align-items:center; gap:6px;">
+        <i class="bi bi-patch-check-fill text-success"></i> Terhubung &amp; Sinkron Otomatis ke Meja Piket SIRANI
+      </span>
     </div>
   </div>
   <div class="akademik-card-body" style="padding:0;">

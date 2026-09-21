@@ -249,6 +249,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/jadwal/slot', [\App\Http\Controllers\Akademik\AkademikJadwalController::class, 'storeSlot'])->name('akademik.jadwal.slot.store');
         Route::post('/jadwal/blok', [\App\Http\Controllers\Akademik\AkademikJadwalController::class, 'storeBlok'])->name('akademik.jadwal.blok.store');
         Route::post('/jadwal/piket', [\App\Http\Controllers\Akademik\AkademikJadwalController::class, 'storePiket'])->name('akademik.jadwal.piket.store');
+        Route::post('/jadwal/piket/sync-sirani', [\App\Http\Controllers\Akademik\AkademikJadwalController::class, 'syncPiketToSirani'])->name('akademik.jadwal.piket.sync');
         Route::post('/jadwal/check-conflict', [\App\Http\Controllers\Akademik\AkademikJadwalController::class, 'checkConflict'])->name('akademik.jadwal.check-conflict');
         Route::post('/jadwal/auto-generate', [\App\Http\Controllers\Akademik\AkademikJadwalController::class, 'autoGenerate'])->name('akademik.jadwal.auto-generate');
         Route::post('/jadwal/clear', [\App\Http\Controllers\Akademik\AkademikJadwalController::class, 'clearJadwal'])->name('akademik.jadwal.clear');
@@ -344,6 +345,7 @@ Route::middleware('auth')->group(function () {
     // 3. Jadwal Piket Harian & Mode Ujian (STS / SAS)
     Route::get('/jadwal-piket', [JadwalPiketController::class, 'index'])->name('jadwal-piket.index')->middleware('role:admin,kepala_sekolah,waka_kesiswaan,waka_kurikulum,staf_tu');
     Route::post('/jadwal-piket', [JadwalPiketController::class, 'store'])->name('jadwal-piket.store')->middleware('role:admin,waka_kesiswaan,waka_kurikulum');
+    Route::post('/jadwal-piket/sync-akademik', [JadwalPiketController::class, 'syncFromAkademik'])->name('jadwal-piket.sync-akademik')->middleware('role:admin,waka_kesiswaan,waka_kurikulum');
     Route::delete('/jadwal-piket/{id}', [JadwalPiketController::class, 'destroy'])->name('jadwal-piket.destroy')->middleware('role:admin,waka_kesiswaan,waka_kurikulum');
     Route::post('/mode-ujian/simpan', [JadwalPiketController::class, 'simpanModeUjian'])->name('mode-ujian.simpan')->middleware('role:admin,waka_kesiswaan,waka_kurikulum');
     Route::delete('/mode-ujian/{id}', [JadwalPiketController::class, 'hapusModeUjian'])->name('mode-ujian.destroy')->middleware('role:admin,waka_kesiswaan,waka_kurikulum');

@@ -33,12 +33,21 @@
 
         <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
           @if($canManagePiket)
+            <form action="{{ route('jadwal-piket.sync-akademik') }}" method="POST" style="margin:0;">
+              @csrf
+              <button type="submit" class="btn btn-sm btn-outline" style="height:32px; padding:0 12px; font-size:11.5px; font-weight:800; display:inline-flex; align-items:center; gap:5px; border-radius:6px; cursor:pointer;" title="Tarik pembaruan penugasan piket dari Waka Kurikulum (DCC Akademik)">
+                <i class="bi bi-arrow-repeat text-success"></i>
+                <span>Sinkron dari Akademik</span>
+              </button>
+            </form>
+            @if($currentUser && ($currentUser->isAdmin() || $currentUser->isWakaKurikulum()))
+              <a href="{{ route('akademik.jadwal.index', ['tab' => 'piket']) }}" class="btn btn-sm" style="height:32px; padding:0 12px; font-size:11.5px; font-weight:800; display:inline-flex; align-items:center; gap:5px; border-radius:6px; background:#16a34a; color:#fff; text-decoration:none;" title="Kelola penugasan piket di DCC Akademik (Waka Kurikulum)">
+                <i class="bi bi-pencil-square"></i>
+                <span>Kelola di Akademik &rarr;</span>
+              </a>
+            @endif
             <button type="button" onclick="toggleModalModeUjian(true)" class="btn btn-sm" style="height:32px; padding:0 14px; font-size:11.5px; font-weight:800; display:inline-flex; align-items:center; border-radius:6px; cursor:pointer; background:linear-gradient(135deg, #4f46e5, #7c3aed); color:#fff; border:none; box-shadow:0 2px 6px rgba(79, 70, 229, 0.25);">
               <span>Mode Sumatif</span>
-            </button>
-            <button type="button" id="btnToggleFormPiket" onclick="toggleFormPiket()" class="btn btn-sm btn-gold" style="height:32px; padding:0 12px; font-size:11.5px; font-weight:800; display:inline-flex; align-items:center; gap:5px; border-radius:6px; cursor:pointer;">
-              <i class="bi bi-person-plus-fill" id="iconTogglePiket"></i>
-              <span id="textTogglePiket">Tambah Penugasan</span>
             </button>
           @endif
           @include('partials.header_actions')
@@ -92,53 +101,36 @@
       </div>
     @endif
 
-    <!-- Form Tambah Penugasan Piket (Collapsible / Toggle) -->
-    @if($canManagePiket)
-    <div class="panel" id="panelFormPiket" style="display:none; margin-bottom:24px; animation:fadeIn 0.25s ease;">
-      <div class="panel-title" style="display:flex; justify-content:space-between; align-items:center;">
-        <span><i class="bi bi-person-plus-fill" style="color:#000000; margin-right:6px;"></i>Tambah Guru ke Jadwal Piket</span>
-        <button type="button" onclick="toggleFormPiket(false)" class="btn btn-outline" style="height:30px; width:30px; padding:0; display:inline-flex; align-items:center; justify-content:center; border-radius:6px; color:var(--text-3);" title="Tutup Form">
-          <i class="bi bi-x-lg"></i>
-        </button>
-      </div>
-      <form action="/jadwal-piket" method="POST">
-        @csrf
-        <div class="form-row" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px 20px;">
-          <div class="form-group">
-            <label>Hari Bertugas <span style="color:var(--red);">*</span></label>
-            <select name="hari" required style="width:100%; height:42px;">
-              @foreach($hariList as $h)
-                <option value="{{ $h }}" {{ $h === $hariHariIni ? 'selected' : '' }}>
-                  Hari {{ $h }} {{ $h === $hariHariIni ? '(Hari Ini)' : '' }}
-                </option>
-              @endforeach
-            </select>
+    {{-- Banner Mode Read-Only: Dikelola oleh Waka Kurikulum --}}
+    <div class="panel no-print" style="margin-bottom:20px; background:linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border:1.5px solid #86efac; border-radius:var(--r-md); padding:14px 18px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+      <div style="display:flex; align-items:center; gap:12px;">
+        <div style="width:38px; height:38px; border-radius:10px; background:#16a34a; display:flex; align-items:center; justify-content:center; font-size:18px; color:#fff; flex-shrink:0;">
+          <i class="bi bi-shield-lock-fill"></i>
+        </div>
+        <div>
+          <div style="font-size:13.5px; font-weight:800; color:#14532d; display:flex; align-items:center; gap:6px;">
+            <span>Jadwal Piket Terpusat (Mode Baca / Read-Only)</span>
+            <span style="font-size:10.5px; padding:2px 7px; border-radius:6px; background:#16a34a; color:#fff; font-weight:800;">WAKAKUR ONLY</span>
           </div>
-          <div class="form-group">
-            <label>Pilih Guru / Pegawai <span style="color:var(--red);">*</span></label>
-            <select name="guru_id" required style="width:100%; height:42px;">
-              <option value="">-- Pilih Guru --</option>
-              @foreach($gurus as $g)
-                <option value="{{ $g->id }}">{{ $g->nama }} ({{ $g->jabatan }})</option>
-              @endforeach
-            </select>
-          </div>
-          <div class="form-group">
-            <label>Keterangan / Peran</label>
-            <input type="text" name="keterangan" placeholder="Opsional (Koordinator / Anggota)" style="width:100%; height:42px;" />
-          </div>
-          <div style="align-self: flex-end; display:flex; gap:8px;">
-            <button type="button" onclick="toggleFormPiket(false)" class="btn btn-outline" style="height:42px; padding:0 14px; font-weight:700;">
-              Batal
-            </button>
-            <button type="submit" class="btn" style="background:#000000; color:#FFFFFF; border:1.5px solid #000000; flex:1; height:42px; display:inline-flex; align-items:center; justify-content:center; gap:8px; font-weight:800; border-radius:6px; cursor:pointer;">
-              <i class="bi bi-save-fill" style="color:#FFFFFF;"></i>Tugaskan Piket
-            </button>
+          <div style="font-size:12px; color:#166534; margin-top:2px;">
+            Penetapan, perubahan, dan plotting guru piket dikelola penuh oleh <b>Waka Kurikulum</b> melalui modul <b>Akademik &amp; KBM (Langkah 4)</b>.
           </div>
         </div>
-      </form>
+      </div>
+      <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+        <form action="{{ route('jadwal-piket.sync-akademik') }}" method="POST" style="margin:0;">
+          @csrf
+          <button type="submit" class="btn btn-sm" style="height:34px; padding:0 12px; font-size:11.5px; font-weight:800; display:inline-flex; align-items:center; gap:5px; border-radius:6px; background:#fff; border:1px solid #86efac; color:#15803d; cursor:pointer;" title="Tarik pembaruan penugasan piket dari DCC Akademik">
+            <i class="bi bi-arrow-repeat"></i> Sinkronkan Ulang
+          </button>
+        </form>
+        @if($currentUser && ($currentUser->isAdmin() || $currentUser->isWakaKurikulum()))
+          <a href="{{ route('akademik.jadwal.index', ['tab' => 'piket']) }}" class="btn btn-sm" style="height:34px; padding:0 14px; font-size:11.5px; font-weight:800; display:inline-flex; align-items:center; gap:6px; border-radius:6px; background:#16a34a; color:#fff; text-decoration:none; box-shadow:0 2px 8px rgba(22,163,74,0.3);">
+            <i class="bi bi-pencil-square"></i> Kelola di DCC Akademik &rarr;
+          </a>
+        @endif
+      </div>
     </div>
-    @endif
 
     <!-- Board Penugasan 5 Hari (Senin s/d Jumat) -->
     <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap:16px; margin-bottom:32px;">
@@ -177,15 +169,17 @@
                   </div>
                 </div>
 
-                @if($canManagePiket)
-                <form action="/jadwal-piket/{{ $jp->id }}" method="POST" onsubmit="return confirm('Hapus penugasan piket {{ $jp->guru->nama ?? '' }} hari {{ $hari }}?')" style="margin:0;">
-                  @csrf
-                  @method('DELETE')
-                  <button type="submit" class="btn-icon btn-icon-danger" style="width:28px; height:28px; font-size:12px;" data-tooltip="Hapus Penugasan">
-                    <i class="bi bi-trash3"></i>
-                  </button>
-                </form>
-                @endif
+                <div style="flex-shrink:0;">
+                  @if(stripos($jp->keterangan ?? '', 'koordinator') !== false || stripos($jp->keterangan ?? '', 'waka') !== false)
+                    <span class="badge" style="background:#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe; font-size:10px; font-weight:800; padding:3px 8px; border-radius:6px; white-space:nowrap;">
+                      <i class="bi bi-shield-check"></i> Waka
+                    </span>
+                  @else
+                    <span class="badge" style="background:var(--bg-3); color:var(--text-3); font-size:10px; font-weight:700; padding:3px 7px; border-radius:6px; white-space:nowrap;">
+                      Petugas
+                    </span>
+                  @endif
+                </div>
               </div>
             @empty
               <div style="text-align:center; padding:20px 10px; color:var(--text-3); font-size:12px; border:1px dashed var(--border-2); border-radius:var(--r-sm);">
@@ -335,28 +329,6 @@
     });
   }
 
-  function toggleFormPiket(forceState) {
-    const panel = document.getElementById('panelFormPiket');
-    const text = document.getElementById('textTogglePiket');
-    const icon = document.getElementById('iconTogglePiket');
-    const btn = document.getElementById('btnToggleFormPiket');
-    if (!panel) return;
-
-    const isVisible = (panel.style.display !== 'none' && panel.style.display !== '');
-    const targetState = (forceState !== undefined) ? forceState : !isVisible;
-
-    if (targetState) {
-      panel.style.display = 'block';
-      if (text) text.innerText = 'Tutup Form';
-      if (icon) icon.className = 'bi bi-x-lg';
-      if (btn) btn.classList.add('active');
-      panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    } else {
-      panel.style.display = 'none';
-      if (text) text.innerText = 'Tambah Penugasan Guru Piket';
-      if (icon) icon.className = 'bi bi-person-plus-fill';
-      if (btn) btn.classList.remove('active');
-    }
   }
 </script>
 
