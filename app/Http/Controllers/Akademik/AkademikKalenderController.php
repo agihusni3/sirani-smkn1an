@@ -29,6 +29,7 @@ class AkademikKalenderController extends Controller
         $kalender = null;
         $itemsByMonth = collect([]);
 
+        $calendarMonths = [];
         if ($selectedTa) {
             $kalender = AkademikKalender::with('items')
                 ->where('tahun_ajaran_id', $selectedTa->id)
@@ -38,6 +39,89 @@ class AkademikKalenderController extends Controller
             if ($kalender) {
                 $itemsByMonth = $kalender->items->groupBy('bulan');
             }
+
+            $tahunAwal = $selectedTa->tahun_awal;
+            $monthsConfig = $semester == 1 ? [
+                ['name' => 'Juli', 'm' => 7, 'year' => $tahunAwal],
+                ['name' => 'Agustus', 'm' => 8, 'year' => $tahunAwal],
+                ['name' => 'September', 'm' => 9, 'year' => $tahunAwal],
+                ['name' => 'Oktober', 'm' => 10, 'year' => $tahunAwal],
+                ['name' => 'November', 'm' => 11, 'year' => $tahunAwal],
+                ['name' => 'Desember', 'm' => 12, 'year' => $tahunAwal],
+            ] : [
+                ['name' => 'Januari', 'm' => 1, 'year' => $tahunAwal + 1],
+                ['name' => 'Februari', 'm' => 2, 'year' => $tahunAwal + 1],
+                ['name' => 'Maret', 'm' => 3, 'year' => $tahunAwal + 1],
+                ['name' => 'April', 'm' => 4, 'year' => $tahunAwal + 1],
+                ['name' => 'Mei', 'm' => 5, 'year' => $tahunAwal + 1],
+                ['name' => 'Juni', 'm' => 6, 'year' => $tahunAwal + 1],
+            ];
+
+            foreach ($monthsConfig as $mc) {
+                $firstDay = \Carbon\Carbon::createFromDate($mc['year'], $mc['m'], 1);
+                $daysInMonth = $firstDay->daysInMonth;
+                $startDayOfWeek = $firstDay->dayOfWeekIso; // 1 (Senin) - 7 (Minggu)
+
+                $monthKaldikItems = $kalender ? $kalender->items->where('bulan', $mc['name'])->values() : collect([]);
+                $totalPekanBulan = $monthKaldikItems->count() ?: 4;
+
+                $weeksGrid = [];
+                $currentDay = 1;
+
+                // Baris pertama (minggu ke-1)
+                $firstWeekDays = [];
+                for ($pad = 1; $pad < $startDayOfWeek; $pad++) {
+                    $firstWeekDays[] = null;
+                }
+                while (count($firstWeekDays) < 7 && $currentDay <= $daysInMonth) {
+                    $firstWeekDays[] = $currentDay++;
+                }
+                $weeksGrid[] = $firstWeekDays;
+
+                // Baris-baris berikutnya
+                while ($currentDay <= $daysInMonth) {
+                    $weekDays = [];
+                    while (count($weekDays) < 7 && $currentDay <= $daysInMonth) {
+                        $weekDays[] = $currentDay++;
+                    }
+                    while (count($weekDays) < 7) {
+                        $weekDays[] = null;
+                    }
+                    $weeksGrid[] = $weekDays;
+                }
+
+                $weeksData = [];
+                foreach ($weeksGrid as $wIdx => $days) {
+                    $kaldikIndex = min($wIdx, $totalPekanBulan - 1);
+                    $kItem = $monthKaldikItems->get($kaldikIndex);
+
+                    $validDays = array_filter($days);
+                    $dateRange = '';
+                    if (!empty($validDays)) {
+                        $minD = min($validDays);
+                        $maxD = max($validDays);
+                        $dateRange = ($minD == $maxD) ? "{$minD} {$mc['name']}" : "{$minD} - {$maxD} {$mc['name']}";
+                    }
+
+                    $weeksData[] = [
+                        'week_number' => $wIdx + 1,
+                        'kaldik_item' => $kItem,
+                        'days' => $days,
+                        'date_range' => $dateRange,
+                    ];
+                }
+
+                $calendarMonths[] = [
+                    'name' => $mc['name'],
+                    'year' => $mc['year'],
+                    'month_num' => $mc['m'],
+                    'days_in_month' => $daysInMonth,
+                    'kaldik_items' => $monthKaldikItems,
+                    'weeks' => $weeksData,
+                    'efektif_count' => $monthKaldikItems->where('jenis', 'efektif')->count(),
+                    'non_efektif_count' => $monthKaldikItems->where('jenis', 'non_efektif')->count(),
+                ];
+            }
         }
 
         return view('dcc.akademik.kalender.index', [
@@ -46,6 +130,7 @@ class AkademikKalenderController extends Controller
             'semester' => $semester,
             'kalender' => $kalender,
             'itemsByMonth' => $itemsByMonth,
+            'calendarMonths' => $calendarMonths,
             'canManage' => $canManage,
         ]);
     }
