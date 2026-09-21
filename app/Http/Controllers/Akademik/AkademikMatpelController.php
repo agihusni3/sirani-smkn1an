@@ -15,7 +15,7 @@ class AkademikMatpelController extends Controller
         $ta = TahunAjaran::where('is_active', true)->first();
         $jurusans = Jurusan::all();
 
-        $query = AkademikMataPelajaran::with(['tahunAjaran', 'jurusan', 'gurus']);
+        $query = AkademikMataPelajaran::with(['tahunAjaran', 'jurusan', 'gurus', 'distribusiMengajars.guru', 'distribusiMengajars.rombel']);
 
         if ($request->filled('tahun_ajaran_id')) {
             $query->where('tahun_ajaran_id', $request->tahun_ajaran_id);

@@ -14,12 +14,9 @@ class AkademikMataPelajaran extends Model {
      * Tambahkan resource baru di sini jika ada lab/ruangan baru.
      */
     const RESOURCES = [
-        'LAB_KOMPUTER' => '🖥️ Lab Komputer',
-        'LAB_IPA'      => '🔬 Lab IPA',
-        'LAB_BAHASA'   => '🎧 Lab Bahasa',
-        'AULA'         => '🏛️ Aula / Gedung Serbaguna',
-        'BENGKEL_TKR'  => '🔧 Bengkel TKR',
-        'DAPUR_TPHP'   => '🍳 Dapur Praktik TPHP',
+        'LAB_KOMPUTER' => 'Lab Komputer',
+        'LAB_APHP'     => 'Lab APHP',
+        'BENGKEL_TSM'  => 'Bengkel TSM',
     ];
 
     public function tahunAjaran(): BelongsTo { return $this->belongsTo(TahunAjaran::class, 'tahun_ajaran_id'); }

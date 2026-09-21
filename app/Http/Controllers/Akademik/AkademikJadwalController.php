@@ -1116,8 +1116,7 @@ class AkademikJadwalController extends Controller
             $ta = TahunAjaran::find($request->tahun_ajaran_id) ?? $ta;
         }
         $semester = (int) $request->get('semester', 1);
-        $resourceKey = $request->get('resource_key', 'LAB_KOMPUTER');
-        $resourceLabel = \App\Models\AkademikMataPelajaran::RESOURCES[$resourceKey] ?? '🖥️ Lab Komputer';
+        $resourceLabel = \App\Models\AkademikMataPelajaran::RESOURCES[$resourceKey] ?? 'Lab Komputer';
 
         $sekolah = \App\Models\PengaturanSekolah::first();
         $allSlots = AkademikJadwalPelajaran::with(['guru', 'mataPelajaran', 'rombel'])

@@ -20,6 +20,22 @@
   </button>
 </div>
 
+{{-- Panduan Kurikulum Merdeka --}}
+<div class="akademik-card" style="margin-bottom:16px; background:linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%); border:1px solid #a7f3d0; border-radius:12px; padding:14px 18px;">
+  <div style="display:flex; align-items:flex-start; gap:12px;">
+    <div style="width:32px; height:32px; border-radius:8px; background:#10b981; color:#fff; display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0;">
+      <i class="bi bi-lightbulb-fill"></i>
+    </div>
+    <div style="font-size:12px; color:#065f46; line-height:1.5;">
+      <b>Panduan Struktur Kurikulum &amp; Penugasan Guru:</b>
+      <ul style="margin:4px 0 0 0; padding-left:18px;">
+        <li><b>Beda Jenjang Beda Beban JP/CP:</b> Jika suatu mapel memiliki beban JP atau Fase CP yang berbeda antar jenjang (contoh: <i>Bahasa Indonesia Kelas X = 4 JP, Kelas XI = 3 JP, Kelas XII = 2 JP</i>), daftarkan sebagai <b>baris terpisah per tingkat kelas</b> agar alokasi jam dan capaian rapor Fase E/F akurat.</li>
+        <li><b>Beda Guru Tiap Kelas / Rombel:</b> Jika dalam 1 angkatan diajar oleh guru yang berbeda (contoh: <i>Kelas X TSM diajar Bu Eka Setiani, sedangkan Kelas X RPL diajar Bu Reni Ulfasari</i>), pembagian guru dilakukan per rombel pada <b><a href="{{ route('akademik.jadwal.index', ['tab' => 'distribusi']) }}" style="color:#047857; font-weight:800; text-decoration:underline;">Langkah 2: SK Pembagian Tugas (Matriks)</a></b>.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
 {{-- Filter Toolbar --}}
 <div class="akademik-card" style="margin-bottom:16px;">
   <div class="akademik-card-body" style="padding:14px 20px;">
@@ -131,14 +147,26 @@
                   </div>
                 </td>
                 <td>
-                  @if($m->gurus->isEmpty())
-                    <span style="font-size:11.5px; color:#94a3b8; font-style:italic;">Belum ada pengampu</span>
-                  @else
+                  @if($m->distribusiMengajars->isEmpty())
                     <div style="display:flex; flex-direction:column; gap:2px;">
-                      @foreach($m->gurus as $guru)
-                        <span style="font-size:11.5px; font-weight:600; color:var(--ak-dark); white-space:nowrap;">
-                          <i class="bi bi-person-check text-success me-1"></i>{{ $guru->nama }}
-                        </span>
+                      <span style="font-size:11px; color:#94a3b8; font-style:italic;">Belum di-plot</span>
+                      <a href="{{ route('akademik.jadwal.index', ['tab' => 'distribusi']) }}" style="font-size:10px; color:var(--ak-primary); text-decoration:none; font-weight:700;">
+                        + Plot Guru di Langkah 2 &rarr;
+                      </a>
+                    </div>
+                  @else
+                    <div style="display:flex; flex-direction:column; gap:4px;">
+                      @foreach($m->distribusiMengajars as $dist)
+                        <div style="font-size:11.5px; line-height:1.2; display:flex; align-items:center; gap:4px; flex-wrap:wrap;">
+                          <span style="font-weight:700; color:var(--ak-dark); white-space:nowrap;">
+                            <i class="bi bi-person-check text-success me-1"></i>{{ $dist->guru?->nama ?? '-' }}
+                          </span>
+                          @if($dist->rombel)
+                            <span class="ak-badge" style="background:#f1f5f9; color:#475569; font-size:9.5px; font-weight:700; padding:1px 5px;">
+                              {{ $dist->rombel->nama_rombel }}
+                            </span>
+                          @endif
+                        </div>
                       @endforeach
                     </div>
                   @endif
@@ -248,7 +276,7 @@
                             @endforeach
                           </select>
                           <div style="font-size:11px; color:#64748b; margin-top:4px;">
-                            💡 Jika disetel ke <b>Lab Komputer</b>, sistem otomatis menolak &amp; mencegah jadwal kelas lain memakai lab di jam yang sama.
+                            💡 Jika disetel ke salah satu lab/bengkel, sistem otomatis menolak &amp; mencegah bentrok pemakaian di jam yang sama.
                           </div>
                         </div>
                         <div style="margin-bottom:12px;">
@@ -365,7 +393,7 @@
               @endforeach
             </select>
             <div style="font-size:11px; color:#64748b; margin-top:4px;">
-              💡 Jika disetel ke <b>Lab Komputer</b>, sistem otomatis menolak &amp; mencegah jadwal kelas lain memakai lab di jam yang sama.
+              💡 Jika disetel ke salah satu lab/bengkel, sistem otomatis menolak &amp; mencegah bentrok pemakaian di jam yang sama.
             </div>
           </div>
           <div style="margin-bottom:12px;">

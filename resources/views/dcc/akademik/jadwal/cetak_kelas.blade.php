@@ -222,10 +222,8 @@
                   @if($slot->guru)
                     <div class="slot-guru">{{ $slot->guru->nama }}</div>
                   @endif
-                  @if($slot->resource_key === 'LAB_KOMPUTER')
-                    <span class="slot-lab">🖥️ Lab Komputer</span>
-                  @elseif($slot->resource_key)
-                    <span class="slot-lab" style="background:#4f46e5;">{{ $slot->resource_key }}</span>
+                  @if($slot->resource_key)
+                    <span class="slot-lab">{{ \App\Models\AkademikMataPelajaran::RESOURCES[$slot->resource_key] ?? $slot->resource_key }}</span>
                   @endif
                 </td>
               @else

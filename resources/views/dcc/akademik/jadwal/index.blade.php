@@ -616,13 +616,13 @@ function tambahIstirahat(hari) {
                         {{ $slot->singkatan_mapel ?? $slot->kegiatan_khusus }}
                       </span>
                       @if($slot->resource_key === 'LAB_KOMPUTER')
-                        <span style="font-size:9px; background:#0284c7; color:#fff; padding:1px 4px; border-radius:3px; font-weight:800; white-space:nowrap;" title="Praktik di Lab Komputer">🖥️ LAB</span>
-                      @elseif($slot->resource_key === 'BENGKEL_TKR')
-                        <span style="font-size:9px; background:#d97706; color:#fff; padding:1px 4px; border-radius:3px; font-weight:800; white-space:nowrap;" title="Bengkel Otomotif">🔧 TKR</span>
-                      @elseif($slot->resource_key === 'DAPUR_TPHP')
-                        <span style="font-size:9px; background:#059669; color:#fff; padding:1px 4px; border-radius:3px; font-weight:800; white-space:nowrap;" title="Dapur Praktik">🍳 TPHP</span>
+                        <span style="font-size:9px; background:#0284c7; color:#fff; padding:1px 4px; border-radius:3px; font-weight:800; white-space:nowrap;" title="Praktik di Lab Komputer">LAB KOMP</span>
+                      @elseif($slot->resource_key === 'LAB_APHP')
+                        <span style="font-size:9px; background:#059669; color:#fff; padding:1px 4px; border-radius:3px; font-weight:800; white-space:nowrap;" title="Praktik di Lab APHP">LAB APHP</span>
+                      @elseif($slot->resource_key === 'BENGKEL_TSM')
+                        <span style="font-size:9px; background:#d97706; color:#fff; padding:1px 4px; border-radius:3px; font-weight:800; white-space:nowrap;" title="Praktik di Bengkel TSM">BENGKEL TSM</span>
                       @elseif($slot->resource_key)
-                        <span style="font-size:9px; background:#6366f1; color:#fff; padding:1px 4px; border-radius:3px; font-weight:800; white-space:nowrap;" title="{{ $slot->resource_key }}">🏛️ RUANG</span>
+                        <span style="font-size:9px; background:#6366f1; color:#fff; padding:1px 4px; border-radius:3px; font-weight:800; white-space:nowrap;" title="{{ $slot->resource_key }}">{{ $slot->resource_key }}</span>
                       @endif
                       @if($isLocked)
                         <span class="roster-lock-badge" title="Slot ini dikunci (KEEP)">🔒</span>
@@ -1079,10 +1079,8 @@ function tambahIstirahat(hari) {
               {{ $m->jumlah_jam_per_minggu }} JP
             </td>
             <td style="text-align:center;">
-              @if($m->resource_key === 'LAB_KOMPUTER')
-                <span class="ak-badge" style="background:#e0f2fe; color:#0369a1; border:1px solid #bae6fd; font-size:10px; font-weight:800;">🖥️ LAB</span>
-              @elseif($m->resource_key)
-                <span class="ak-badge" style="background:#fef3c7; color:#92400e; border:1px solid #fde68a; font-size:10px; font-weight:800;">{{ $m->resource_label }}</span>
+              @if($m->resource_key)
+                <span class="ak-badge" style="background:#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe; font-size:10px; font-weight:800;">{{ $m->resource_label }}</span>
               @else
                 <span style="font-size:11px; color:#94a3b8;">Kelas</span>
               @endif
