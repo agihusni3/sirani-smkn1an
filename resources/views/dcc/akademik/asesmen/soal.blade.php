@@ -46,46 +46,7 @@
     font-size: 12px;
   }
 
-  /* Sleek Status KPI Bar */
-  .kpi-status-bar {
-    background: #ffffff;
-    border: 1px solid #e2e8f0;
-    border-radius: 12px;
-    padding: 12px 18px;
-    margin-bottom: 20px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 14px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.02);
-  }
-  .kpi-item {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-  .kpi-icon {
-    width: 36px;
-    height: 36px;
-    border-radius: 9px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 17px;
-  }
-  .kpi-data-label {
-    font-size: 11px;
-    font-weight: 700;
-    color: #64748b;
-    text-transform: uppercase;
-    letter-spacing: 0.3px;
-  }
-  .kpi-data-val {
-    font-size: 15px;
-    font-weight: 800;
-    color: #0f172a;
-  }
+
 
   /* Main 2-Column Grid Layout */
   .soal-layout-grid {
@@ -351,6 +312,9 @@
       <span class="soal-meta-chip"><i class="bi bi-book me-1"></i> {{ $asesmen->distribusi?->mataPelajaran?->nama_mapel ?? 'Mata Pelajaran' }}</span>
       <span class="soal-meta-chip"><i class="bi bi-clock me-1"></i> {{ $asesmen->durasi_menit }} Menit</span>
       <span class="soal-meta-chip"><i class="bi bi-bullseye me-1"></i> KKM: {{ $asesmen->passing_grade ?? 75 }}</span>
+      <span class="soal-meta-chip" style="color:#2563eb; background:#eff6ff;">
+        <i class="bi bi-card-checklist me-1"></i> Soal: {{ $auditKelayakan['total_soal'] }}@if($asesmen->target_jumlah_soal)/{{ $asesmen->target_jumlah_soal }} Target@endif
+      </span>
       @if($asesmen->rombel_names)
         <span class="soal-meta-chip"><i class="bi bi-people me-1"></i> {{ $asesmen->rombel_names }}</span>
       @endif
@@ -383,68 +347,6 @@
 {{-- Step Indicator --}}
 @include('dcc.akademik.asesmen.partials.wizard_steps', ['step' => 2])
 
-{{-- Sleek Status KPI Bar (Minimalist & Clean) --}}
-<div class="kpi-status-bar">
-  <div style="display:flex; align-items:center; gap:20px; flex-wrap:wrap;">
-    {{-- KPI 1: Progress Soal --}}
-    <div class="kpi-item">
-      <div class="kpi-icon" style="background:#eff6ff; color:#2563eb;">
-        <i class="bi bi-card-checklist"></i>
-      </div>
-      <div>
-        <div class="kpi-data-label">Progress Soal</div>
-        <div class="kpi-data-val">
-          {{ $auditKelayakan['total_soal'] }}
-          @if($asesmen->target_jumlah_soal)
-            <span style="font-size:12px; color:#64748b; font-weight:600;">/ {{ $asesmen->target_jumlah_soal }} Target</span>
-          @else
-            <span style="font-size:12px; color:#64748b; font-weight:600;">Butir</span>
-          @endif
-        </div>
-      </div>
-    </div>
-
-    <div style="height:28px; width:1px; background:#e2e8f0;"></div>
-
-    {{-- KPI 2: KKM --}}
-    <div class="kpi-item">
-      <div class="kpi-icon" style="background:#ecfdf5; color:#059669;">
-        <i class="bi bi-award"></i>
-      </div>
-      <div>
-        <div class="kpi-data-label">Standar KKM</div>
-        <div class="kpi-data-val" style="color:#059669;">{{ $asesmen->passing_grade ?? 75 }}</div>
-      </div>
-    </div>
-
-    <div style="height:28px; width:1px; background:#e2e8f0;"></div>
-
-    {{-- KPI 3: Total Bobot --}}
-    <div class="kpi-item">
-      <div class="kpi-icon" style="background:#f5f3ff; color:#7c3aed;">
-        <i class="bi bi-pie-chart"></i>
-      </div>
-      <div>
-        <div class="kpi-data-label">Total Bobot Nilai</div>
-        <div class="kpi-data-val" style="color:#7c3aed;">{{ $auditKelayakan['total_bobot'] }} Poin</div>
-      </div>
-    </div>
-  </div>
-
-  {{-- Status Chip Kanan --}}
-  <div>
-    @if($auditKelayakan['is_valid'])
-      <span class="ak-badge ak-badge-success" style="padding:6px 12px; font-size:12px;">
-        <i class="bi bi-check-circle-fill me-1"></i> Soal Siap Diujikan
-      </span>
-    @else
-      <span class="ak-badge ak-badge-warning" style="padding:6px 12px; font-size:12px;">
-        <i class="bi bi-pencil-square me-1"></i> Tahap Penyusunan Soal
-      </span>
-    @endif
-  </div>
-</div>
-
 {{-- Main Grid --}}
 <div class="soal-layout-grid">
 
@@ -455,7 +357,6 @@
         <i class="bi bi-plus-circle text-primary"></i>
         <span>Tambah Butir Pertanyaan No. {{ $nomorBerikutnya }}</span>
       </h3>
-      <span class="ak-badge ak-badge-primary" style="font-size:11px;">Pilihan Ganda</span>
     </div>
 
     <div class="panel-card-body">
@@ -474,7 +375,7 @@
           <div class="editor-shell">
             {{-- 1. Area Textarea Penulisan Soal di Atas --}}
             <textarea name="pertanyaan" id="inputPertanyaan" class="editor-textarea" rows="4" 
-                      placeholder="Tuliskan butir soal di sini... (Dukungan penuh untuk rumus KaTeX $\frac{1}{2}$ dan teks Arab)" 
+                      placeholder="Tuliskan butir soal di sini..." 
                       required oninput="updateLivePreview()">{{ old('pertanyaan') }}</textarea>
 
             {{-- 2. Box Preview Gambar Terpilih --}}
@@ -577,15 +478,13 @@
               <button type="button" class="drawer-chip-btn" onclick="insertChar('$\\int$')">∫</button>
             </div>
 
-            {{-- 6. Live Render Preview (Pratinjau Halus) --}}
-            <div class="live-preview-box">
+            {{-- 6. Live Render Preview (Pratinjau hanya tampil jika ada teks) --}}
+            <div class="live-preview-box" id="livePreviewBox" style="display:none;">
               <div class="live-preview-head">
                 <span><i class="bi bi-eye me-1"></i> Pratinjau Tampilan Siswa</span>
                 <span id="previewTagArab" style="display:none; color:#059669; background:#ecfdf5; padding:1px 6px; border-radius:4px;">Mode Arab</span>
               </div>
-              <div id="livePreviewContainer" style="color:#0f172a; line-height:1.6; min-height:22px;">
-                <span style="color:#94a3b8; font-style:italic;">Ketik soal di atas untuk melihat pratinjau rendering otomatis...</span>
-              </div>
+              <div id="livePreviewContainer" style="color:#0f172a; line-height:1.6; min-height:22px;"></div>
             </div>
           </div>
         </div>
@@ -597,7 +496,7 @@
               Pilihan Jawaban &amp; Kunci Benar <span class="text-danger">*</span>
             </label>
             <div style="font-size:11.5px; color:#059669; font-weight:700;">
-              <i class="bi bi-check-circle-fill me-1"></i> Klik opsi untuk menandai Kunci Jawaban
+              <i class="bi bi-check-circle-fill me-1"></i> Klik opsi untuk menandai kunci
             </div>
           </div>
 
@@ -605,7 +504,7 @@
             {{-- OPSI A --}}
             <div class="option-row" id="card_opsi_A" onclick="setKunciJawaban('A')">
               <button type="button" class="option-badge-btn" id="badge_abjad_A" onclick="setKunciJawaban('A'); event.stopPropagation();">A</button>
-              <input type="text" name="opsi_a" id="opsi_A" class="option-input" placeholder="Tuliskan pilihan jawaban A (Wajib)..." value="{{ old('opsi_a') }}" required oninput="cekKesesuaianKunci()" onclick="event.stopPropagation()">
+              <input type="text" name="opsi_a" id="opsi_A" class="option-input" placeholder="Pilihan A (Wajib)" value="{{ old('opsi_a') }}" required oninput="cekKesesuaianKunci()" onclick="event.stopPropagation()">
               <button type="button" class="option-key-btn" id="btn_kunci_A" onclick="setKunciJawaban('A'); event.stopPropagation();">
                 <i class="bi bi-circle"></i> <span>Kunci</span>
               </button>
@@ -614,7 +513,7 @@
             {{-- OPSI B --}}
             <div class="option-row" id="card_opsi_B" onclick="setKunciJawaban('B')">
               <button type="button" class="option-badge-btn" id="badge_abjad_B" onclick="setKunciJawaban('B'); event.stopPropagation();">B</button>
-              <input type="text" name="opsi_b" id="opsi_B" class="option-input" placeholder="Tuliskan pilihan jawaban B (Wajib)..." value="{{ old('opsi_b') }}" required oninput="cekKesesuaianKunci()" onclick="event.stopPropagation()">
+              <input type="text" name="opsi_b" id="opsi_B" class="option-input" placeholder="Pilihan B (Wajib)" value="{{ old('opsi_b') }}" required oninput="cekKesesuaianKunci()" onclick="event.stopPropagation()">
               <button type="button" class="option-key-btn" id="btn_kunci_B" onclick="setKunciJawaban('B'); event.stopPropagation();">
                 <i class="bi bi-circle"></i> <span>Kunci</span>
               </button>
@@ -623,7 +522,7 @@
             {{-- OPSI C --}}
             <div class="option-row" id="card_opsi_C" onclick="setKunciJawaban('C')">
               <button type="button" class="option-badge-btn" id="badge_abjad_C" onclick="setKunciJawaban('C'); event.stopPropagation();">C</button>
-              <input type="text" name="opsi_c" id="opsi_C" class="option-input" placeholder="Pilihan jawaban C (Opsional)..." value="{{ old('opsi_c') }}" oninput="cekKesesuaianKunci()" onclick="event.stopPropagation()">
+              <input type="text" name="opsi_c" id="opsi_C" class="option-input" placeholder="Pilihan C (Opsional)" value="{{ old('opsi_c') }}" oninput="cekKesesuaianKunci()" onclick="event.stopPropagation()">
               <button type="button" class="option-key-btn" id="btn_kunci_C" onclick="setKunciJawaban('C'); event.stopPropagation();">
                 <i class="bi bi-circle"></i> <span>Kunci</span>
               </button>
@@ -632,7 +531,7 @@
             {{-- OPSI D --}}
             <div class="option-row" id="card_opsi_D" onclick="setKunciJawaban('D')">
               <button type="button" class="option-badge-btn" id="badge_abjad_D" onclick="setKunciJawaban('D'); event.stopPropagation();">D</button>
-              <input type="text" name="opsi_d" id="opsi_D" class="option-input" placeholder="Pilihan jawaban D (Opsional)..." value="{{ old('opsi_d') }}" oninput="cekKesesuaianKunci()" onclick="event.stopPropagation()">
+              <input type="text" name="opsi_d" id="opsi_D" class="option-input" placeholder="Pilihan D (Opsional)" value="{{ old('opsi_d') }}" oninput="cekKesesuaianKunci()" onclick="event.stopPropagation()">
               <button type="button" class="option-key-btn" id="btn_kunci_D" onclick="setKunciJawaban('D'); event.stopPropagation();">
                 <i class="bi bi-circle"></i> <span>Kunci</span>
               </button>
@@ -641,7 +540,7 @@
             {{-- OPSI E --}}
             <div class="option-row" id="card_opsi_E" onclick="setKunciJawaban('E')">
               <button type="button" class="option-badge-btn" id="badge_abjad_E" onclick="setKunciJawaban('E'); event.stopPropagation();">E</button>
-              <input type="text" name="opsi_e" id="opsi_E" class="option-input" placeholder="Pilihan jawaban E (Opsional)..." value="{{ old('opsi_e') }}" oninput="cekKesesuaianKunci()" onclick="event.stopPropagation()">
+              <input type="text" name="opsi_e" id="opsi_E" class="option-input" placeholder="Pilihan E (Opsional)" value="{{ old('opsi_e') }}" oninput="cekKesesuaianKunci()" onclick="event.stopPropagation()">
               <button type="button" class="option-key-btn" id="btn_kunci_E" onclick="setKunciJawaban('E'); event.stopPropagation();">
                 <i class="bi bi-circle"></i> <span>Kunci</span>
               </button>
@@ -897,12 +796,15 @@
   // 5. LIVE KATEX & FORMATTING PREVIEW
   function updateLivePreview() {
     const text = document.getElementById('inputPertanyaan').value;
+    const box = document.getElementById('livePreviewBox');
     const container = document.getElementById('livePreviewContainer');
     if (!text.trim()) {
-      container.innerHTML = '<span style="color:#94a3b8; font-style:italic;">Ketik soal di atas untuk melihat pratinjau rendering otomatis...</span>';
+      if (box) box.style.display = 'none';
+      if (container) container.innerHTML = '';
       return;
     }
 
+    if (box) box.style.display = 'block';
     let formatted = text.replace(/\n/g, '<br>');
     container.innerHTML = formatted;
 
