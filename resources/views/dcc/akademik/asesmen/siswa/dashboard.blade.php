@@ -304,17 +304,12 @@
     /* Empty state */
     .empty-card {
       background: #ffffff;
-      border: 1.5px dashed #cbd5e1;
-      border-radius: 14px;
+      border: 1px solid #e2e8f0;
+      border-radius: 16px;
       padding: 40px 20px;
       text-align: center;
       color: #64748b;
-    }
-    .empty-card i {
-      font-size: 42px;
-      color: #94a3b8;
-      margin-bottom: 12px;
-      display: inline-block;
+      box-shadow: 0 4px 12px -2px rgba(0,0,0,0.03);
     }
 
     /* Modal Token */
@@ -345,6 +340,155 @@
       color: #94a3b8;
       border-top: 1px solid #e2e8f0;
       background: #ffffff;
+    }
+
+    /* Responsive Styles & Mobile Optimization */
+    @media (max-width: 640px) {
+      .cbt-topbar {
+        padding: 10px 14px;
+      }
+      .cbt-brand {
+        gap: 8px;
+      }
+      .cbt-brand img {
+        width: 32px;
+        height: 32px;
+      }
+      .cbt-brand-title {
+        font-size: 13px;
+        line-height: 1.15;
+      }
+      .cbt-brand-sub {
+        font-size: 10px;
+      }
+      .btn-logout {
+        padding: 5px 10px;
+        font-size: 11px;
+        border-radius: 7px;
+      }
+      .main-container {
+        margin: 12px auto 20px;
+        padding: 0 12px;
+      }
+      .student-id-card {
+        padding: 16px;
+        border-radius: 14px;
+        margin-bottom: 16px;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+      }
+      .student-info-left {
+        gap: 12px;
+      }
+      .student-avatar {
+        width: 46px;
+        height: 46px;
+        font-size: 22px;
+        border-radius: 12px;
+        flex-shrink: 0;
+      }
+      .student-name {
+        font-size: 16.5px;
+        margin-bottom: 4px;
+      }
+      .student-meta-pills {
+        gap: 5px;
+      }
+      .meta-pill {
+        font-size: 11px;
+        padding: 2.5px 7px;
+        border-radius: 5px;
+      }
+      .student-card-footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding-top: 10px;
+        border-top: 1px solid rgba(255,255,255,0.15);
+        margin-top: 2px;
+        width: 100%;
+      }
+      .student-card-footer .time-text {
+        font-size: 11.5px !important;
+        text-align: left !important;
+      }
+      .student-card-footer .status-pill {
+        display: inline-flex !important;
+      }
+      .section-head {
+        margin-bottom: 12px;
+        gap: 8px;
+      }
+      .section-title {
+        font-size: 14px;
+      }
+      .badge-count {
+        font-size: 10.5px;
+        padding: 2px 7px;
+      }
+      .empty-card {
+        padding: 28px 14px;
+        border-radius: 14px;
+      }
+      .empty-icon-wrap {
+        width: 52px !important;
+        height: 52px !important;
+        font-size: 22px !important;
+        margin-bottom: 10px !important;
+      }
+      .empty-title {
+        font-size: 14.5px !important;
+      }
+      .empty-desc {
+        font-size: 12px !important;
+        margin-bottom: 14px !important;
+      }
+      .exam-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+        margin-bottom: 24px;
+      }
+      .exam-card {
+        padding: 14px;
+        border-radius: 12px;
+      }
+      .exam-title {
+        font-size: 14.5px;
+      }
+      .exam-mapel {
+        font-size: 12px;
+        margin-bottom: 10px;
+      }
+      .exam-meta-specs {
+        gap: 6px;
+        padding: 8px 10px;
+        font-size: 11.5px;
+        margin-bottom: 12px;
+      }
+      .btn-exam-start, .btn-exam-done {
+        padding: 9px 12px;
+        font-size: 12.5px;
+      }
+      .footer-bar {
+        padding: 14px 10px;
+        font-size: 11px;
+      }
+    }
+
+    @keyframes pulse-dot {
+      0% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(1.2); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+    .pulse-dot {
+      display: inline-block;
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #4ade80;
+      animation: pulse-dot 2s infinite;
+      vertical-align: middle;
     }
   </style>
 </head>
@@ -401,13 +545,17 @@
           <div class="student-meta-pills">
             <span class="meta-pill"><i class="bi bi-mortarboard-fill me-1"></i> {{ $siswa->rombels->first()?->nama_rombel ?? 'Umum' }}</span>
             <span class="meta-pill"><i class="bi bi-person-vcard me-1"></i> NISN: {{ $siswa->nisn ?: $siswa->nis }}</span>
-            <span class="meta-pill"><i class="bi bi-check-circle-fill text-success me-1"></i> Siswa Aktif</span>
+            <span class="meta-pill"><span class="pulse-dot me-1"></span> Siswa Aktif</span>
           </div>
         </div>
       </div>
-      <div>
-        <div style="font-size:12px; color:rgba(255,255,255,0.8); text-align:right;">Waktu Server:</div>
-        <div style="font-size:15px; font-weight:800; text-align:right;">{{ now()->translatedFormat('d M Y, H:i') }} WIB</div>
+      <div class="student-card-footer">
+        <div class="time-text" style="font-size:12.5px; color:rgba(255,255,255,0.85); text-align:right;">
+          <i class="bi bi-clock-history me-1"></i> Waktu Server: <strong style="color:#ffffff;">{{ now()->translatedFormat('d M Y, H:i') }} WIB</strong>
+        </div>
+        <div class="status-pill" style="display:none; align-items:center; gap:5px; font-size:11px; font-weight:700; background:rgba(255,255,255,0.18); padding:3px 9px; border-radius:20px; color:#ffffff;">
+          <span class="pulse-dot" style="width:6px; height:6px;"></span> Ruang CBT
+        </div>
       </div>
     </div>
 
@@ -422,11 +570,19 @@
 
     @if($asesmens->isEmpty())
       <div class="empty-card">
-        <i class="bi bi-journal-x"></i>
-        <h4 style="font-size:16px; font-weight:800; color:#1e293b; margin-bottom:6px;">Tidak Ada Ujian yang Sedang Dibuka</h4>
-        <p style="font-size:13px; max-width:480px; margin:0 auto;">
+        <div class="empty-icon-wrap" style="width:60px; height:60px; background:#eff6ff; color:#2563eb; border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 12px; font-size:26px;">
+          <i class="bi bi-journal-check" style="color:#2563eb;"></i>
+        </div>
+        <h4 class="empty-title" style="font-size:16px; font-weight:800; color:#1e293b; margin-bottom:6px;">Tidak Ada Ujian yang Sedang Dibuka</h4>
+        <p class="empty-desc" style="font-size:13px; color:#64748b; max-width:440px; margin:0 auto 16px; line-height:1.5;">
           Saat ini belum ada paket asesmen atau ujian CBT yang dijadwalkan aktif untuk rombel kelas Anda. Silakan tunggu instruksi dari Bapak/Ibu Guru pengajar.
         </p>
+        <div>
+          <button type="button" onclick="location.reload()" style="display:inline-flex; align-items:center; gap:6px; padding:7px 16px; background:#f8fafc; border:1px solid #cbd5e1; border-radius:8px; font-size:12px; font-weight:700; color:#334155; cursor:pointer;">
+            <i class="bi bi-arrow-clockwise"></i>
+            <span>Segarkan Halaman</span>
+          </button>
+        </div>
       </div>
     @else
       <div class="exam-grid">
