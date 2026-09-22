@@ -41,12 +41,21 @@ class PortalAsesmenSiswaController extends Controller
         ]);
 
         $nisnClean = trim($request->nisn);
+        $nisnWithoutZeros = ltrim($nisnClean, '0');
+        $nisnWith10Digits = str_pad($nisnClean, 10, '0', STR_PAD_LEFT);
         
-        // Cari siswa berdasarkan NISN atau NIS
+        // Cari siswa berdasarkan NISN (dengan/tanpa leading zero) atau NIS
         $siswa = Siswa::with('rombels')
-            ->where(function ($q) use ($nisnClean) {
+            ->where(function ($q) use ($nisnClean, $nisnWithoutZeros, $nisnWith10Digits) {
                 $q->where('nisn', $nisnClean)
                   ->orWhere('nis', $nisnClean);
+                if (!empty($nisnWithoutZeros)) {
+                    $q->orWhere('nisn', $nisnWithoutZeros)
+                      ->orWhere('nis', $nisnWithoutZeros);
+                }
+                if (strlen($nisnClean) <= 10) {
+                    $q->orWhere('nisn', $nisnWith10Digits);
+                }
             })
             ->first();
 
@@ -77,13 +86,19 @@ class PortalAsesmenSiswaController extends Controller
             }
         }
 
-        if ($siswa->tanggal_lahir) {
+        // Cek apakah tanggal lahir di DB sudah terisi valid
+        $rawDbDate = (string) ($siswa->getRawOriginal('tanggal_lahir') ?? '');
+        $isDbDateEmpty = empty($rawDbDate)
+            || in_array(substr($rawDbDate, 0, 10), ['0000-00-00', '0001-01-01', '1970-01-01'])
+            || (int) substr($rawDbDate, 0, 4) < 1980;
+
+        if (!$isDbDateEmpty && $siswa->tanggal_lahir) {
             $dbDate = Carbon::parse($siswa->tanggal_lahir)->format('Y-m-d');
             if ($dbDate !== $inputDate) {
                 return back()->withInput()->with('error', 'Kombinasi NISN dan Tanggal Lahir tidak cocok. Pastikan tanggal lahir yang Anda masukkan sesuai format ddmmyyyy (Contoh: 22101991).');
             }
         } else {
-            // Jika tanggal lahir di DB masih kosong, perbarui otomatis dengan tanggal yang dimasukkan siswa pertama kali
+            // Jika tanggal lahir di DB masih kosong/belum valid, perbarui otomatis dengan tanggal yang dimasukkan siswa
             $siswa->update(['tanggal_lahir' => $inputDate]);
         }
 
