@@ -120,20 +120,21 @@ class DeployController extends Controller
 
         // Cek data siswa jika diminta untuk diagnostik
         if ($request->has('check_nisn')) {
-            $s = \App\Models\Siswa::where('nisn', $request->check_nisn)
-                ->orWhere('nis', $request->check_nisn)
-                ->first();
-            $logs['student_detail'] = $s ? [
-                'id' => $s->id,
-                'nama' => $s->nama,
-                'nisn' => $s->nisn,
-                'tempat_lahir' => $s->tempat_lahir,
-                'tanggal_lahir_raw' => $s->getRawOriginal('tanggal_lahir'),
-                'tanggal_lahir_formatted' => $s->tanggal_lahir ? (\Carbon\Carbon::parse($s->tanggal_lahir)->format('d-m-Y')) : null,
-                'status' => $s->status,
-                'rombels' => $s->rombels->pluck('nama_rombel')->all(),
-                'audit_logs' => \App\Models\AuditLog::where('model_id', $s->id)->where('model_type', 'siswa')->orderBy('id', 'desc')->take(5)->get(['id', 'aksi', 'deskripsi', 'payload_sebelum', 'payload_sesudah', 'created_at'])->all(),
-            ] : 'not found';
+            $all = \App\Models\Siswa::where('nisn', 'like', '%' . $request->check_nisn . '%')
+                ->orWhere('nama', 'like', '%Adist%')
+                ->get();
+            $logs['students_found'] = $all->map(function($s) {
+                return [
+                    'id' => $s->id,
+                    'nama' => $s->nama,
+                    'nisn' => $s->nisn,
+                    'tempat_lahir' => $s->tempat_lahir,
+                    'tanggal_lahir_raw' => $s->getRawOriginal('tanggal_lahir'),
+                    'tanggal_lahir_formatted' => $s->tanggal_lahir ? (\Carbon\Carbon::parse($s->tanggal_lahir)->format('d-m-Y')) : null,
+                    'status' => $s->status,
+                    'rombels' => $s->rombels->pluck('nama_rombel')->all(),
+                ];
+            })->all();
         }
 
         // Ambil baris error terakhir jika ada
