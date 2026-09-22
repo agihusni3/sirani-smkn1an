@@ -132,6 +132,7 @@ class DeployController extends Controller
                 'tanggal_lahir_formatted' => $s->tanggal_lahir ? (\Carbon\Carbon::parse($s->tanggal_lahir)->format('d-m-Y')) : null,
                 'status' => $s->status,
                 'rombels' => $s->rombels->pluck('nama_rombel')->all(),
+                'audit_logs' => \App\Models\AuditLog::where('model_id', $s->id)->where('model_type', 'siswa')->orderBy('id', 'desc')->take(5)->get(['id', 'aksi', 'deskripsi', 'payload_sebelum', 'payload_sesudah', 'created_at'])->all(),
             ] : 'not found';
         }
 
