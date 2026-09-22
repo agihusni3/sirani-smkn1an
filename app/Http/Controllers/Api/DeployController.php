@@ -132,6 +132,8 @@ class DeployController extends Controller
                     'tanggal_lahir_raw' => $s->getRawOriginal('tanggal_lahir'),
                     'tanggal_lahir_formatted' => $s->tanggal_lahir ? (\Carbon\Carbon::parse($s->tanggal_lahir)->format('d-m-Y')) : null,
                     'status' => $s->status,
+                    'created_at' => (string) $s->created_at,
+                    'updated_at' => (string) $s->updated_at,
                     'rombels' => $s->rombels->pluck('nama_rombel')->all(),
                 ];
             })->all();
