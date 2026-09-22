@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="@yield('meta_description', 'Official Portal SMKN 1 Air Naningan - Pusat Pendidikan Vokasi Unggulan berbasis Rekayasa Teknologi, Agro-Industri, dan Otomotif di Kabupaten Tanggamus.')">
-    <title>@yield('title', 'SMKN 1 Air Naningan — Precision Vocational Academy')</title>
+    <title>@yield('title', 'SMKN 1 Air Naningan')</title>
     
     <link rel="icon" type="image/png" href="{{ asset('favicon.png') }}">
     
@@ -120,7 +120,7 @@
                                     <div class="dropdown-item-sub">Standar kompetensi uji kompetensi kejuruan</div>
                                 </div>
                             </a>
-                            <a href="{{ route('web.ekosistem.show', 'teaching-factory') }}" class="dropdown-item-card">
+                            <a href="{{ route('web.jurusan.index') }}#tefa" class="dropdown-item-card">
                                 <div class="dropdown-item-icon" style="background: #fff7ed; color: #ea580c;">
                                     <i class="fa-solid fa-boxes-stacked"></i>
                                 </div>
@@ -132,19 +132,46 @@
                         </div>
                     </li>
 
-                    <!-- Ekosistem Digital (Master Plan) Mega Dropdown -->
-                    <li class="nav-dropdown {{ request()->routeIs('web.ekosistem*') || request()->routeIs('ppdb*') ? 'active' : '' }}">
-                        <a href="{{ route('web.ekosistem.index') }}" class="nav-dropdown-toggle">
-                            <span>Ekosistem Digital</span>
-                            <span class="badge-subtle-status live" style="font-size: 0.58rem; padding: 1px 5px;">Plan</span>
+                    <!-- Layanan Terpadu DCC Dropdown -->
+                    <li class="nav-dropdown {{ request()->routeIs('web.ekosistem*') || request()->routeIs('ppdb*') || request()->routeIs('situan*') ? 'active' : '' }}">
+                        <a href="{{ route('admin.portal') }}" class="nav-dropdown-toggle">
+                            <span>Layanan DCC</span>
                             <i class="fa-solid fa-chevron-down" style="font-size: 0.62rem; opacity: 0.7;"></i>
                         </a>
                         <div class="nav-dropdown-menu wide">
-                            <div class="dropdown-header-label">Modul Sistem Informasi Terpadu</div>
+                            <div class="dropdown-header-label">Sistem &amp; Layanan Data Control Center (DCC)</div>
 
-                            <!-- Modul Aktif: PPDB -->
+                            <!-- 1. SIRANI Presensi -->
+                            <a href="{{ route('portal.ortu.index') }}" class="dropdown-item-card">
+                                <div class="dropdown-item-icon" style="background: #eff6ff; color: #2563eb;">
+                                    <i class="fa-solid fa-fingerprint"></i>
+                                </div>
+                                <div class="dropdown-item-info">
+                                    <div class="dropdown-item-title">
+                                        <span>SIRANI — Monitoring Presensi</span>
+                                        <span class="badge-subtle-status aktif">Aktif</span>
+                                    </div>
+                                    <div class="dropdown-item-sub">Pantauan kehadiran mandiri siswa &amp; gerbang RFID</div>
+                                </div>
+                            </a>
+
+                            <!-- 2. AKADEMIK Asesmen CBT -->
+                            <a href="{{ route('portal.asesmen.index') }}" class="dropdown-item-card">
+                                <div class="dropdown-item-icon" style="background: #f0fdf4; color: #059669;">
+                                    <i class="fa-solid fa-laptop-code"></i>
+                                </div>
+                                <div class="dropdown-item-info">
+                                    <div class="dropdown-item-title">
+                                        <span>AKADEMIK — Asesmen &amp; CBT</span>
+                                        <span class="badge-subtle-status live" style="background: #ecfdf5; color: #059669;">Aktif</span>
+                                    </div>
+                                    <div class="dropdown-item-sub">Ruang ujian online siswa via NISN &amp; Tanggal Lahir</div>
+                                </div>
+                            </a>
+
+                            <!-- 3. PPDB Online Pendaftaran -->
                             <a href="{{ route('ppdb.index') }}" class="dropdown-item-card">
-                                <div class="dropdown-item-icon" style="background: #fee2e2; color: #dc2626;">
+                                <div class="dropdown-item-icon" style="background: #fef2f2; color: #dc2626;">
                                     <i class="fa-solid fa-file-signature"></i>
                                 </div>
                                 <div class="dropdown-item-info">
@@ -152,112 +179,42 @@
                                         <span>PPDB Online 2026/2027</span>
                                         <span class="badge-subtle-status live">Buka</span>
                                     </div>
-                                    <div class="dropdown-item-sub">Pendaftaran mandiri siswa baru online</div>
+                                    <div class="dropdown-item-sub">Pendaftaran mandiri online calon peserta didik baru</div>
                                 </div>
                             </a>
 
-                            <!-- Modul Aktif: Ruang Ujian CBT PPDB -->
+                            <!-- 4. PPDB Ruang Ujian CBT -->
                             <a href="{{ route('ppdb.ujian.portal') }}" class="dropdown-item-card">
                                 <div class="dropdown-item-icon" style="background: #e0f2fe; color: #0284c7;">
-                                    <i class="fa-solid fa-laptop-code"></i>
+                                    <i class="fa-solid fa-clipboard-check"></i>
                                 </div>
                                 <div class="dropdown-item-info">
                                     <div class="dropdown-item-title">
-                                        <span>Ruang Ujian CBT PPDB</span>
+                                        <span>PPDB — Ujian Seleksi CBT</span>
                                         <span class="badge-subtle-status live" style="background: #e0f2fe; color: #0284c7;">CBT</span>
                                     </div>
-                                    <div class="dropdown-item-sub">Login tes seleksi dengan No. Pendaftaran</div>
+                                    <div class="dropdown-item-sub">Tes minat kejuruan online dengan No. Pendaftaran</div>
                                 </div>
                             </a>
 
-                            <!-- Modul Aktif: Portal Asesmen & CBT Siswa -->
-                            <a href="{{ route('portal.asesmen.index') }}" class="dropdown-item-card">
-                                <div class="dropdown-item-icon" style="background: #eff6ff; color: #2563eb;">
-                                    <i class="fa-solid fa-laptop-code"></i>
+                            <!-- 5. SITUAN Pelayanan Surat -->
+                            <a href="{{ route('situan.pelayanan.index') }}" class="dropdown-item-card">
+                                <div class="dropdown-item-icon" style="background: #fef3c7; color: #d97706;">
+                                    <i class="fa-solid fa-envelope-open-text"></i>
                                 </div>
                                 <div class="dropdown-item-info">
                                     <div class="dropdown-item-title">
-                                        <span>Portal Asesmen &amp; CBT</span>
-                                        <span class="badge-subtle-status live" style="background: #eff6ff; color: #2563eb;">Aktif</span>
-                                    </div>
-                                    <div class="dropdown-item-sub">Login ujian dengan NISN &amp; Tanggal Lahir</div>
-                                </div>
-                            </a>
-
-                            <!-- Modul Aktif: Monitoring Absen Mandiri SIRANI -->
-                            <a href="{{ route('portal.ortu.index') }}" class="dropdown-item-card">
-                                <div class="dropdown-item-icon" style="background: var(--brand-blue-subtle); color: var(--brand-blue);">
-                                    <i class="fa-solid fa-id-card-clip"></i>
-                                </div>
-                                <div class="dropdown-item-info">
-                                    <div class="dropdown-item-title">
-                                        <span>Monitoring Absen Mandiri</span>
+                                        <span>SITUAN — Pelayanan Surat Mandiri</span>
                                         <span class="badge-subtle-status aktif">Aktif</span>
                                     </div>
-                                    <div class="dropdown-item-sub">Pantauan kehadiran mandiri siswa &amp; orang tua</div>
+                                    <div class="dropdown-item-sub">Pengajuan surat keterangan aktif &amp; perizinan siswa</div>
                                 </div>
                             </a>
 
-                            <!-- Modul Roadmap: SIM-PKL -->
-                            <a href="{{ route('web.ekosistem.show', 'sim-pkl') }}" class="dropdown-item-card">
-                                <div class="dropdown-item-icon" style="background: #e0f2fe; color: #0284c7;">
-                                    <i class="fa-solid fa-business-time"></i>
-                                </div>
-                                <div class="dropdown-item-info">
-                                    <div class="dropdown-item-title">
-                                        <span>SIM-PKL &amp; Magang Industri</span>
-                                        <span class="badge-subtle-status segera">Segera</span>
-                                    </div>
-                                    <div class="dropdown-item-sub">GPS geotagging &amp; jurnal kegiatan siswa</div>
-                                </div>
-                            </a>
-
-                            <!-- Modul Roadmap: Smart Toolman -->
-                            <a href="{{ route('web.ekosistem.show', 'smart-toolman') }}" class="dropdown-item-card">
-                                <div class="dropdown-item-icon" style="background: #fef3c7; color: #b45309;">
-                                    <i class="fa-solid fa-wrench"></i>
-                                </div>
-                                <div class="dropdown-item-info">
-                                    <div class="dropdown-item-title">
-                                        <span>Smart Toolman RFID Bengkel</span>
-                                        <span class="badge-subtle-status segera">Segera</span>
-                                    </div>
-                                    <div class="dropdown-item-sub">Peminjaman alat bengkel APHP, TSM, RPL</div>
-                                </div>
-                            </a>
-
-                            <!-- Modul Roadmap: BKK Tracer -->
-                            <a href="{{ route('web.ekosistem.show', 'bkk-tracer') }}" class="dropdown-item-card">
-                                <div class="dropdown-item-icon" style="background: #ecfdf5; color: #059669;">
-                                    <i class="fa-solid fa-user-tie"></i>
-                                </div>
-                                <div class="dropdown-item-info">
-                                    <div class="dropdown-item-title">
-                                        <span>BKK &amp; Tracer Study Alumni</span>
-                                        <span class="badge-subtle-status segera">Segera</span>
-                                    </div>
-                                    <div class="dropdown-item-sub">Bursa kerja vokasi &amp; pelacakan karir BMW</div>
-                                </div>
-                            </a>
-
-                            <!-- Modul Roadmap: E-Library -->
-                            <a href="{{ route('web.ekosistem.show', 'e-library') }}" class="dropdown-item-card">
-                                <div class="dropdown-item-icon" style="background: #f5f3ff; color: #7c3aed;">
-                                    <i class="fa-solid fa-book-bookmark"></i>
-                                </div>
-                                <div class="dropdown-item-info">
-                                    <div class="dropdown-item-title">
-                                        <span>Perpustakaan Digital &amp; Modul</span>
-                                        <span class="badge-subtle-status segera">Segera</span>
-                                    </div>
-                                    <div class="dropdown-item-sub">E-book kejuruan &amp; jobsheet instruksi bengkel</div>
-                                </div>
-                            </a>
-
-                            <!-- Peta Arsitektur Link -->
-                            <a href="{{ route('web.ekosistem.index') }}" class="dropdown-item-card" style="border-top: 1px solid var(--border-main); justify-content: center; background: var(--bg-surface-alt) !important; padding: 8px !important;">
-                                <span style="font-family: var(--font-tech); font-size: 0.72rem; font-weight: 700; color: var(--brand-blue);">
-                                    <i class="fa-solid fa-diagram-project" style="margin-right: 4px;"></i> Lihat Seluruh Peta Arsitektur Ekosistem &rarr;
+                            <!-- 6. DCC Portal Masuk -->
+                            <a href="{{ route('admin.portal') }}" class="dropdown-item-card" style="border-top: 1px solid var(--border-main); justify-content: center; background: var(--bg-surface-alt) !important; padding: 10px !important;">
+                                <span style="font-family: var(--font-tech); font-size: 0.76rem; font-weight: 700; color: var(--brand-blue);">
+                                    <i class="fa-solid fa-shield-halved" style="margin-right: 5px;"></i> Buka Pusat Kendali DCC Portal (GTK &amp; Admin) &rarr;
                                 </span>
                             </a>
                         </div>
@@ -327,13 +284,13 @@
             </div>
         </div>
 
-        <!-- 3. Modern Responsive Mobile Drawer (Master Plan Structured) -->
+        <!-- 3. Modern Responsive Mobile Drawer (DCC Integrated Systems) -->
         <div id="navMobileDrawer" class="mobile-drawer">
             <div class="mobile-drawer-inner">
                 <!-- Status Badge -->
                 <div class="drawer-announcement">
                     <span class="live-status-dot"></span>
-                    <span>Master Plan Ekosistem Digital SMKN 1 Air Naningan</span>
+                    <span>Layanan Terpadu DCC SMKN 1 Air Naningan</span>
                 </div>
 
                 <!-- Group 0: Akses Gerbang Mandiri & Dasbor (ditampilkan paling atas di mobile) -->
@@ -435,74 +392,63 @@
                     </div>
                 </div>
 
-                <!-- Group 2: Modul Ekosistem Digital Master Plan -->
+                <!-- Group 2: Modul Operasional DCC SMKN 1 Air Naningan -->
                 <div class="drawer-gateways">
                     <div class="drawer-section-label" style="display: flex; align-items: center; justify-content: space-between;">
-                        <span>Ekosistem Layanan (Master Plan)</span>
-                        <a href="{{ route('web.ekosistem.index') }}" style="color: var(--brand-blue); text-transform: none; font-size: 0.68rem; font-weight: 700;">Lihat Peta Blueprint &rarr;</a>
+                        <span>Layanan Terpadu DCC</span>
+                        <a href="{{ route('admin.portal') }}" style="color: var(--brand-blue); text-transform: none; font-size: 0.68rem; font-weight: 700;">Masuk Portal DCC &rarr;</a>
                     </div>
                     <div class="drawer-menu-grid">
-                        <a href="{{ route('ppdb.index') }}" class="drawer-nav-item {{ request()->routeIs('ppdb*') ? 'active' : '' }}">
-                            <div class="drawer-nav-icon ppdb-icon"><i class="fa-solid fa-file-signature"></i></div>
+                        <a href="{{ route('portal.ortu.index') }}" class="drawer-nav-item {{ request()->routeIs('portal.ortu*') ? 'active' : '' }}">
+                            <div class="drawer-nav-icon" style="background: #eff6ff; color: #2563eb;"><i class="fa-solid fa-fingerprint"></i></div>
                             <div class="drawer-nav-text">
-                                <span class="drawer-nav-title">PPDB Online 2026/2027</span>
-                                <span class="drawer-nav-desc">Pendaftaran Online Bebas Biaya</span>
-                            </div>
-                            <span class="badge-subtle-status live">Buka</span>
-                        </a>
-
-                        <a href="{{ route('portal.ortu.index') }}" class="drawer-nav-item">
-                            <div class="drawer-nav-icon" style="background: var(--brand-blue-subtle); color: var(--brand-blue);"><i class="fa-solid fa-id-card-clip"></i></div>
-                            <div class="drawer-nav-text">
-                                <span class="drawer-nav-title">Monitoring Absen Mandiri</span>
-                                <span class="drawer-nav-desc">Kartu RFID &amp; pantau presensi siswa</span>
+                                <span class="drawer-nav-title">SIRANI — Presensi Siswa</span>
+                                <span class="drawer-nav-desc">Smart gate RFID &amp; pantau kehadiran mandiri</span>
                             </div>
                             <span class="badge-subtle-status aktif">Aktif</span>
                         </a>
 
-                        <a href="{{ route('web.ekosistem.show', 'sim-pkl') }}" class="drawer-nav-item">
-                            <div class="drawer-nav-icon" style="background: #e0f2fe; color: #0284c7;"><i class="fa-solid fa-business-time"></i></div>
+                        <a href="{{ route('portal.asesmen.index') }}" class="drawer-nav-item {{ request()->routeIs('portal.asesmen*') ? 'active' : '' }}">
+                            <div class="drawer-nav-icon" style="background: #f0fdf4; color: #059669;"><i class="fa-solid fa-laptop-code"></i></div>
                             <div class="drawer-nav-text">
-                                <span class="drawer-nav-title">SIM-PKL Magang Industri</span>
-                                <span class="drawer-nav-desc">Presensi GPS &amp; logbook praktik</span>
+                                <span class="drawer-nav-title">AKADEMIK — Asesmen CBT</span>
+                                <span class="drawer-nav-desc">Ruang ujian online siswa via NISN</span>
                             </div>
-                            <span class="badge-subtle-status segera">Segera</span>
+                            <span class="badge-subtle-status live" style="background: #ecfdf5; color: #059669;">Aktif</span>
                         </a>
 
-                        <a href="{{ route('web.ekosistem.show', 'smart-toolman') }}" class="drawer-nav-item">
-                            <div class="drawer-nav-icon" style="background: #fef3c7; color: #b45309;"><i class="fa-solid fa-wrench"></i></div>
+                        <a href="{{ route('ppdb.index') }}" class="drawer-nav-item {{ request()->routeIs('ppdb*') ? 'active' : '' }}">
+                            <div class="drawer-nav-icon ppdb-icon"><i class="fa-solid fa-file-signature"></i></div>
                             <div class="drawer-nav-text">
-                                <span class="drawer-nav-title">Smart Toolman RFID Bengkel</span>
-                                <span class="drawer-nav-desc">Peminjaman alat lab &amp; bengkel</span>
+                                <span class="drawer-nav-title">PPDB Online 2026/2027</span>
+                                <span class="drawer-nav-desc">Pendaftaran mandiri calon murid baru</span>
                             </div>
-                            <span class="badge-subtle-status segera">Segera</span>
+                            <span class="badge-subtle-status live">Buka</span>
                         </a>
 
-                        <a href="{{ route('web.ekosistem.show', 'bkk-tracer') }}" class="drawer-nav-item">
-                            <div class="drawer-nav-icon" style="background: #ecfdf5; color: #059669;"><i class="fa-solid fa-user-tie"></i></div>
+                        <a href="{{ route('ppdb.ujian.portal') }}" class="drawer-nav-item {{ request()->routeIs('ppdb.ujian*') ? 'active' : '' }}">
+                            <div class="drawer-nav-icon" style="background: #e0f2fe; color: #0284c7;"><i class="fa-solid fa-clipboard-check"></i></div>
                             <div class="drawer-nav-text">
-                                <span class="drawer-nav-title">BKK &amp; Tracer Study Alumni</span>
-                                <span class="drawer-nav-desc">Bursa kerja &amp; survei lulusan BMW</span>
+                                <span class="drawer-nav-title">PPDB — Ujian Seleksi CBT</span>
+                                <span class="drawer-nav-desc">Tes minat &amp; bakat calon siswa baru</span>
                             </div>
-                            <span class="badge-subtle-status segera">Segera</span>
+                            <span class="badge-subtle-status live" style="background: #e0f2fe; color: #0284c7;">CBT</span>
                         </a>
 
-                        <a href="{{ route('web.ekosistem.show', 'e-library') }}" class="drawer-nav-item">
-                            <div class="drawer-nav-icon" style="background: #f5f3ff; color: #7c3aed;"><i class="fa-solid fa-book-bookmark"></i></div>
+                        <a href="{{ route('situan.pelayanan.index') }}" class="drawer-nav-item {{ request()->routeIs('situan*') ? 'active' : '' }}">
+                            <div class="drawer-nav-icon" style="background: #fef3c7; color: #d97706;"><i class="fa-solid fa-envelope-open-text"></i></div>
                             <div class="drawer-nav-text">
-                                <span class="drawer-nav-title">E-Perpustakaan &amp; Modul</span>
-                                <span class="drawer-nav-desc">E-book &amp; jobsheet bengkel</span>
+                                <span class="drawer-nav-title">SITUAN — Pelayanan Surat</span>
+                                <span class="drawer-nav-desc">Pengajuan surat keterangan aktif mandiri</span>
                             </div>
-                            <span class="badge-subtle-status segera">Segera</span>
+                            <span class="badge-subtle-status aktif">Aktif</span>
                         </a>
                     </div>
                 </div>
 
-                {{-- Group 3 sudah dipindah ke atas (setelah drawer-announcement) --}}
-
                 <!-- Group 4: WhatsApp Helpdesk -->
                 <div class="drawer-helpdesk">
-                    <a href="https://wa.me/6281234567890?text=Halo%20Admin%20SMKN%201%20Air%20Naningan,%20saya%20ingin%20bertanya%20seputar%20sekolah" target="_blank" class="btn-drawer-whatsapp">
+                    <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $sekolah->telepon ?? '6281234567890') }}?text=Halo%20Admin%20SMKN%201%20Air%20Naningan,%20saya%20ingin%20bertanya%20seputar%20sekolah" target="_blank" class="btn-drawer-whatsapp">
                         <i class="fa-brands fa-whatsapp" style="font-size: 1.1rem;"></i> Chat Helpdesk WhatsApp Kampus
                     </a>
                 </div>
@@ -539,8 +485,10 @@
                     <a href="{{ route('web.beranda') }}">Beranda</a>
                     <a href="{{ route('web.jurusan.index') }}">Kejuruan</a>
                     <a href="{{ route('ppdb.index') }}">PPDB Online</a>
+                    <a href="{{ route('portal.asesmen.index') }}">Asesmen CBT</a>
+                    <a href="{{ route('portal.ortu.index') }}">Presensi RFID</a>
+                    <a href="{{ route('situan.pelayanan.index') }}">Layanan Surat</a>
                     <a href="{{ route('web.berita.index') }}">Warta</a>
-                    <a href="{{ route('portal.ortu.index') }}">Presensi</a>
                     <a href="{{ route('web.kontak') }}">Kontak</a>
                 </nav>
 
@@ -562,7 +510,7 @@
             <!-- Bottom Copyright -->
             <div class="footer-bottom-bar">
                 <div>&copy; {{ date('Y') }} <strong>SMKN 1 Air Naningan</strong>. Hak Cipta Dilindungi.</div>
-                <div class="footer-badge-sys">SIRANI Integrated System</div>
+                <div class="footer-badge-sys">DCC Integrated System · SMKN 1 Air Naningan</div>
             </div>
         </div>
     </footer>
