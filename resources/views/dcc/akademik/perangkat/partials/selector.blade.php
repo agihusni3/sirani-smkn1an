@@ -51,24 +51,22 @@
       @endif
     </form>
 
-    {{-- Info Status & Aksi Cepat --}}
+    {{-- Status Validasi (Hanya jika perlu perhatian khusus) --}}
     <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-      @if($activePerangkat)
+      @if($activePerangkat && in_array($activePerangkat->status, ['disahkan', 'diajukan', 'perlu_revisi']))
         @php
           $st = match($activePerangkat->status) {
-            'disahkan' => ['label' => 'Disahkan Kepala Sekolah', 'color' => '#059669', 'bg' => '#ecfdf5', 'icon' => 'bi-patch-check-fill'],
+            'disahkan' => ['label' => 'Disahkan', 'color' => '#059669', 'bg' => '#ecfdf5', 'icon' => 'bi-patch-check-fill'],
             'diajukan' => ['label' => 'Menunggu Supervisi', 'color' => '#d97706', 'bg' => '#fef3c7', 'icon' => 'bi-hourglass-split'],
             'perlu_revisi' => ['label' => 'Perlu Revisi', 'color' => '#dc2626', 'bg' => '#fee2e2', 'icon' => 'bi-exclamation-octagon-fill'],
-            default => ['label' => 'Draft Guru', 'color' => '#475569', 'bg' => '#f1f5f9', 'icon' => 'bi-file-earmark-text'],
+            default => null,
           };
         @endphp
-        <span class="badge" style="background:{{ $st['bg'] }}; color:{{ $st['color'] }}; font-weight:700; font-size:11.5px; padding:6px 12px; border-radius:8px;">
-          <i class="bi {{ $st['icon'] }} me-1"></i> {{ $st['label'] }}
-        </span>
-
-        <a href="{{ route('akademik.perangkat.show', $activePerangkat->id) }}" class="ak-btn ak-btn-secondary" style="font-size:11.5px; padding:5px 10px;" title="Lihat Portofolio Lengkap">
-          <i class="bi bi-box-arrow-up-right me-1"></i> Detail Portofolio
-        </a>
+        @if($st)
+          <span class="badge" style="background:{{ $st['bg'] }}; color:{{ $st['color'] }}; font-weight:700; font-size:11.5px; padding:6px 12px; border-radius:8px;">
+            <i class="bi {{ $st['icon'] }} me-1"></i> {{ $st['label'] }}
+          </span>
+        @endif
       @endif
 
       @if(!empty($isGuru) && isset($myDistribusis) && $myDistribusis->isNotEmpty())

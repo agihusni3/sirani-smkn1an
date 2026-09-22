@@ -120,8 +120,8 @@
         <div class="akademik-card-body">
           <div style="background:#fff1f2; border:1px solid #fecdd3; border-radius:10px; padding:12px 16px; margin-bottom:18px; display:flex; gap:12px; align-items:center;">
             <i class="bi bi-info-circle-fill" style="color:#e11d48; font-size:20px;"></i>
-            <div style="font-size:12.5px; color:#9f1239; line-height:1.4;">
-              Fitur anti-kecurangan secara aktif memonitor status layar, fokus jendela browser, melacak perpindahan tab, mengunci shortcut inspeksi (DevTools/F12), dan mengacak urutan butir soal serta pilihan opsi per siswa.
+            <div style="font-size:12.5px; color:#9f1239; line-height:1.5;">
+              <strong>Dioptimalkan untuk Ujian Berbasis HP (Smartphone) & Komputer:</strong> Secara aktif melacak perpindahan aplikasi di HP (seperti membuka WhatsApp, Google Chrome, floating calculator, atau split-screen), memblokir seleksi tekan-lama untuk salin soal/Google Lens, serta mengacak butir soal & opsi per siswa.
             </div>
           </div>
 
@@ -130,10 +130,10 @@
             <div style="background:#f8fafc; padding:14px; border-radius:10px; border:1px solid #e2e8f0;">
               <div style="font-weight:700; font-size:13px; color:#1e293b; margin-bottom:6px; display:flex; align-items:center; gap:8px;">
                 <input type="checkbox" name="anti_cheat_mode" id="anti_cheat_mode" value="1" checked style="width:16px; height:16px; accent-color:#dc2626;">
-                <label for="anti_cheat_mode" style="cursor:pointer; margin:0;">Aktifkan Mode Keamanan Ketat (Strict Anti-Cheat)</label>
+                <label for="anti_cheat_mode" style="cursor:pointer; margin:0;">Aktifkan Mode Pengawasan Ketat (Anti-Cheat)</label>
               </div>
               <div style="font-size:11.5px; color:#64748b; margin-left:24px;">
-                Mengaktifkan pendeteksi pelanggaran realtime dan pencatatan audit log integritas siswa.
+                Mencatat log pelanggaran secara otomatis saat siswa beralih aplikasi atau keluar dari layar ujian.
               </div>
             </div>
 
@@ -145,7 +145,7 @@
                   <i class="bi bi-arrow-repeat"></i>
                 </button>
               </div>
-              <div style="font-size:11px; color:#64748b; margin-top:4px;">Kosongkan jika siswa dapat langsung masuk tanpa input token.</div>
+              <div style="font-size:11px; color:#64748b; margin-top:4px;">Kosongkan jika siswa dapat langsung masuk tanpa input token pengawas.</div>
             </div>
           </div>
 
@@ -154,16 +154,16 @@
             <label style="display:flex; align-items:flex-start; gap:10px; padding:12px; border:1px solid #e2e8f0; border-radius:8px; cursor:pointer; background:#ffffff;">
               <input type="checkbox" name="wajib_fullscreen" id="wajib_fullscreen" value="1" checked style="accent-color:#2563eb; margin-top:3px;">
               <div>
-                <div style="font-size:13px; font-weight:700; color:#1e293b;">Wajib Layar Penuh (Fullscreen Lock)</div>
-                <div style="font-size:11.5px; color:#64748b;">Siswa wajib masuk mode fullscreen. Peringatan keras muncul jika keluar.</div>
+                <div style="font-size:13px; font-weight:700; color:#1e293b;">Kunci Layar Penuh & Fokus (Fullscreen Lock)</div>
+                <div style="font-size:11.5px; color:#64748b;">Siswa wajib dalam mode layar penuh. Alarm peringatan berbunyi jika keluar atau menekan recent apps.</div>
               </div>
             </label>
 
             <label style="display:flex; align-items:flex-start; gap:10px; padding:12px; border:1px solid #e2e8f0; border-radius:8px; cursor:pointer; background:#ffffff;">
               <input type="checkbox" name="blokir_copy_paste" id="blokir_copy_paste" value="1" checked style="accent-color:#2563eb; margin-top:3px;">
               <div>
-                <div style="font-size:13px; font-weight:700; color:#1e293b;">Blokir Copy-Paste &amp; Shortcut DevTools</div>
-                <div style="font-size:11.5px; color:#64748b;">Menonaktifkan klik kanan, Ctrl+C, Ctrl+V, F12, dan pintasan inspeksi.</div>
+                <div style="font-size:13px; font-weight:700; color:#1e293b;">Blokir Salin Teks & Tekan-Lama (Anti Copy-Paste)</div>
+                <div style="font-size:11.5px; color:#64748b;">Menonaktifkan seleksi teks tekan-lama di HP (cegah kirim ke WA/Google Lens) serta klik kanan.</div>
               </div>
             </label>
 
@@ -171,7 +171,7 @@
               <input type="checkbox" name="acak_soal" id="acak_soal" value="1" checked style="accent-color:#2563eb; margin-top:3px;">
               <div>
                 <div style="font-size:13px; font-weight:700; color:#1e293b;">Acak Urutan Butir Soal</div>
-                <div style="font-size:11.5px; color:#64748b;">Setiap peserta menerima nomor butir soal dengan susunan berbeda.</div>
+                <div style="font-size:11.5px; color:#64748b;">Setiap peserta menerima nomor soal dengan susunan berbeda (cegah lirik HP teman di sebelah).</div>
               </div>
             </label>
 
@@ -179,7 +179,7 @@
               <input type="checkbox" name="acak_opsi" id="acak_opsi" value="1" checked style="accent-color:#2563eb; margin-top:3px;">
               <div>
                 <div style="font-size:13px; font-weight:700; color:#1e293b;">Acak Pilihan Opsi Ganda (A, B, C, D, E)</div>
-                <div style="font-size:11.5px; color:#64748b;">Letak opsi jawaban diacak acak unik per siswa mencegah saling mencontek.</div>
+                <div style="font-size:11.5px; color:#64748b;">Letak opsi diacak unik per siswa sehingga contekan kunci huruf A/B/C/D tidak berlaku.</div>
               </div>
             </label>
           </div>
@@ -187,8 +187,8 @@
           {{-- Batas Toleransi Keluar Layar --}}
           <div style="margin-top:16px; padding:12px 16px; background:#f8fafc; border-radius:8px; border:1px solid #e2e8f0; display:flex; justify-content:space-between; align-items:center;">
             <div>
-              <div style="font-size:13px; font-weight:700; color:#1e293b;">Batas Maksimal Toleransi Keluar Layar / Pindah Tab</div>
-              <div style="font-size:11.5px; color:#64748b;">Jika pelanggaran mencapai batas ini, lembar jawaban otomatis dikunci / disubmit paksa.</div>
+              <div style="font-size:13px; font-weight:700; color:#1e293b;">Batas Maksimal Toleransi Beralih Aplikasi / Keluar Layar</div>
+              <div style="font-size:11.5px; color:#64748b;">Jika siswa membuka WA, split-screen, atau beralih aplikasi melebihi batas ini, ujian otomatis dikunci.</div>
             </div>
             <div style="display:flex; align-items:center; gap:8px;">
               <select name="max_toleransi_keluar" id="max_toleransi_keluar" class="ak-select" style="width:110px; font-weight:700;">

@@ -20,9 +20,9 @@
   </div>
 
   @if($activePerangkat && ($activePerangkat->guru_id == auth()->user()->guru_id || $isAdminOrWaka))
-    <button type="button" class="ak-btn ak-btn-primary" data-bs-toggle="modal" data-bs-target="#modalTambahAtp">
-      <i class="bi bi-plus-lg me-1"></i>
-      <span>Tambah Butir TP</span>
+    <button type="button" class="ak-btn ak-btn-primary" onclick="toggleFormAtp()">
+      <i class="bi bi-pencil-square me-1"></i>
+      <span id="btnTeksTambahTp">{{ $atpItems->isEmpty() ? 'Tutup Formulir TP' : 'Tambah Butir TP' }}</span>
     </button>
   @endif
 </div>
@@ -30,6 +30,81 @@
 @include('dcc.akademik.perangkat.partials.selector')
 
 @if($activePerangkat)
+
+  {{-- FORM INLINE TAMBAH BUTIR ATP (NON-POPUP) --}}
+  @if($activePerangkat->guru_id == auth()->user()->guru_id || $isAdminOrWaka)
+    <div class="akademik-card" id="formCardTambahAtp" style="border: 2px solid #3b82f6; border-radius: 14px; margin-bottom: 22px; box-shadow: 0 4px 14px rgba(37, 99, 235, 0.08); {{ $atpItems->isEmpty() ? '' : 'display: none;' }}">
+      <div class="akademik-card-header" style="background: linear-gradient(135deg, #eff6ff 0%, #ffffff 100%); border-bottom: 1px solid #dbeafe; display: flex; justify-content: space-between; align-items: center; padding: 14px 20px;">
+        <h3 class="akademik-card-title" style="font-weight: 800; font-size: 15px; color: #1e3a8a; margin: 0;">
+          <i class="bi bi-plus-circle-fill text-primary me-2"></i>
+          <span>Formulir Tambah Butir Alur Tujuan Pembelajaran (ATP)</span>
+        </h3>
+        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="toggleFormAtp(false)" title="Tutup Formulir" style="border-radius: 8px; padding: 4px 12px; font-size: 12px; font-weight: 700;">
+          <i class="bi bi-x-lg me-1"></i> Tutup
+        </button>
+      </div>
+
+      <div class="akademik-card-body" style="padding: 20px;">
+        <form action="{{ route('akademik.perangkat.atp.store', $activePerangkat->id) }}" method="POST">
+          @csrf
+
+          <div style="display: grid; grid-template-columns: 140px 180px 140px 1fr; gap: 14px; margin-bottom: 16px;">
+            <div>
+              <label class="ak-form-label">Urutan Alur <span class="text-danger">*</span></label>
+              <input type="number" name="urutan" id="inputUrutan" class="ak-input" value="{{ $atpItems->count() + 1 }}" min="1" required>
+            </div>
+            <div>
+              <label class="ak-form-label">Kode TP <span class="text-danger">*</span></label>
+              <input type="text" name="kode_tp" id="inputKodeTp" class="ak-input" value="TP 1.{{ $atpItems->count() + 1 }}" placeholder="Misal: TP 1.1" required>
+            </div>
+            <div>
+              <label class="ak-form-label">Alokasi JP <span class="text-danger">*</span></label>
+              <div style="position: relative;">
+                <input type="number" name="alokasi_jp" class="ak-input" value="4" min="1" max="40" required>
+                <span style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); font-size: 11px; color: #94a3b8; font-weight: 700;">JP</span>
+              </div>
+            </div>
+            <div>
+              <label class="ak-form-label">Elemen Capaian Pembelajaran (CP)</label>
+              <input type="text" name="elemen_cp" class="ak-input" placeholder="Misal: Proses Bisnis, Pemrograman Dasar, dll">
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+            <div>
+              <label class="ak-form-label">Rumusan Tujuan Pembelajaran (TP) <span class="text-danger">*</span></label>
+              <textarea name="tujuan_pembelajaran" rows="3" class="ak-textarea" placeholder="Peserta didik mampu memahami dan mendemonstrasikan..." required></textarea>
+            </div>
+            <div>
+              <label class="ak-form-label">Materi Pokok / Lingkup Pembelajaran <span class="text-danger">*</span></label>
+              <textarea name="materi_pokok" rows="3" class="ak-textarea" placeholder="Topik dan materi inti yang dipelajari..." required></textarea>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px;">
+            <div>
+              <label class="ak-form-label">Dimensi Profil Pelajar Pancasila</label>
+              <input type="text" name="profil_pancasila" class="ak-input" value="Mandiri, Bernalar Kritis, Gotong Royong" placeholder="Pilih dimensi profil">
+            </div>
+            <div>
+              <label class="ak-form-label">Rencana Asesmen Awal / Formatif</label>
+              <input type="text" name="asesmen_rencana" class="ak-input" placeholder="Misal: Tes Lisan, Lembar Observasi Praktik">
+            </div>
+          </div>
+
+          <div style="display: flex; justify-content: flex-end; gap: 10px; border-top: 1px solid #f1f5f9; padding-top: 16px;">
+            <button type="button" class="ak-btn ak-btn-secondary" onclick="toggleFormAtp(false)">
+              <i class="bi bi-x"></i> Batal / Sembunyikan
+            </button>
+            <button type="submit" class="ak-btn ak-btn-primary" style="padding: 9px 22px;">
+              <i class="bi bi-check2-circle me-1"></i> Simpan Butir TP
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  @endif
+
   {{-- Tabel Alur Tujuan Pembelajaran (ATP) --}}
   <div class="akademik-card" style="border-top:4px solid var(--ak-primary);">
     <div class="akademik-card-header" style="background:#f8fafc; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; padding:12px 20px;">
@@ -53,12 +128,6 @@
             Jumlah: <strong style="color:#059669; font-size:14px; font-weight:800;">{{ $atpItems->count() }} Tujuan</strong>
           </span>
         </div>
-
-        @if($atpItems->isNotEmpty() && ($activePerangkat->guru_id == auth()->user()->guru_id || $isAdminOrWaka))
-          <button type="button" class="ak-btn ak-btn-primary ak-btn-sm" data-bs-toggle="modal" data-bs-target="#modalTambahAtp" style="font-size:12px; padding:5px 12px; font-weight:700;">
-            <i class="bi bi-plus-lg me-1"></i> Tambah TP
-          </button>
-        @endif
       </div>
     </div>
 
@@ -135,7 +204,7 @@
                   Belum ada butir Tujuan Pembelajaran (TP) yang dimasukkan untuk mata pelajaran ini.
                   @if($activePerangkat->guru_id == auth()->user()->guru_id || $isAdminOrWaka)
                     <div style="margin-top:10px;">
-                      <button type="button" class="ak-btn ak-btn-primary ak-btn-sm" data-bs-toggle="modal" data-bs-target="#modalTambahAtp">
+                      <button type="button" class="ak-btn ak-btn-primary ak-btn-sm" onclick="toggleFormAtp(true)">
                         <i class="bi bi-plus-lg me-1"></i> Mulai Rumuskan TP Pertama
                       </button>
                     </div>
@@ -149,71 +218,6 @@
     </div>
   </div>
 
-  {{-- Modal Tambah Butir ATP --}}
-  @if($activePerangkat && ($activePerangkat->guru_id == auth()->user()->guru_id || $isAdminOrWaka))
-  <div class="modal fade" id="modalTambahAtp" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-      <div class="modal-content" style="border-radius:14px;">
-        <form action="{{ route('akademik.perangkat.atp.store', $activePerangkat->id) }}" method="POST">
-          @csrf
-          <div class="modal-header">
-            <h5 class="modal-title" style="font-weight:800; font-size:16px;">
-              <i class="bi bi-plus-circle text-primary me-1"></i> Tambah Butir Alur Tujuan Pembelajaran (ATP)
-            </h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-          </div>
-          <div class="modal-body" style="padding:20px;">
-            <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:12px; margin-bottom:14px;">
-              <div>
-                <label class="ak-form-label">Urutan Alur <span class="text-danger">*</span></label>
-                <input type="number" name="urutan" class="ak-input" value="{{ $atpItems->count() + 1 }}" min="1" required>
-              </div>
-              <div>
-                <label class="ak-form-label">Kode TP <span class="text-danger">*</span></label>
-                <input type="text" name="kode_tp" class="ak-input" value="TP 1.{{ $atpItems->count() + 1 }}" placeholder="Misal: TP 1.1" required>
-              </div>
-              <div>
-                <label class="ak-form-label">Alokasi JP <span class="text-danger">*</span></label>
-                <input type="number" name="alokasi_jp" class="ak-input" value="4" min="1" max="40" required>
-              </div>
-            </div>
-
-            <div style="margin-bottom:14px;">
-              <label class="ak-form-label">Elemen Capaian Pembelajaran (CP)</label>
-              <input type="text" name="elemen_cp" class="ak-input" placeholder="Misal: Proses Bisnis, Pemrograman Dasar, dll">
-            </div>
-
-            <div style="margin-bottom:14px;">
-              <label class="ak-form-label">Rumusan Tujuan Pembelajaran (TP) <span class="text-danger">*</span></label>
-              <textarea name="tujuan_pembelajaran" rows="3" class="ak-textarea" placeholder="Peserta didik mampu memahami dan mendemonstrasikan..." required></textarea>
-            </div>
-
-            <div style="margin-bottom:14px;">
-              <label class="ak-form-label">Materi Pokok / Lingkup Pembelajaran <span class="text-danger">*</span></label>
-              <textarea name="materi_pokok" rows="2" class="ak-textarea" placeholder="Topik dan materi inti yang dipelajari..." required></textarea>
-            </div>
-
-            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
-              <div>
-                <label class="ak-form-label">Dimensi Profil Pelajar Pancasila</label>
-                <input type="text" name="profil_pancasila" class="ak-input" value="Mandiri, Bernalar Kritis, Gotong Royong" placeholder="Pilih dimensi profil">
-              </div>
-              <div>
-                <label class="ak-form-label">Rencana Asesmen Awal / Formatif</label>
-                <input type="text" name="asesmen_rencana" class="ak-input" placeholder="Misal: Tes Lisan, Lembar Observasi Praktik">
-              </div>
-            </div>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="ak-btn ak-btn-secondary" data-bs-dismiss="modal">Batal</button>
-            <button type="submit" class="ak-btn ak-btn-primary">Simpan Butir TP</button>
-          </div>
-        </form>
-      </div>
-    </div>
-  </div>
-  @endif
-
 @else
   <div class="akademik-card" style="padding:40px 20px; text-align:center; color:#64748b;">
     <i class="bi bi-folder-x" style="font-size:36px; color:#cbd5e1; display:block; margin-bottom:12px;"></i>
@@ -222,4 +226,25 @@
   </div>
 @endif
 
+<script>
+  function toggleFormAtp(show) {
+    const formEl = document.getElementById('formCardTambahAtp');
+    if (!formEl) return;
+    if (show === undefined) {
+      show = (formEl.style.display === 'none' || formEl.style.display === '');
+    }
+    formEl.style.display = show ? 'block' : 'none';
+
+    const btnTeks = document.getElementById('btnTeksTambahTp');
+    if (btnTeks) {
+      btnTeks.innerText = show ? 'Tutup Formulir TP' : 'Tambah Butir TP';
+    }
+
+    if (show) {
+      formEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      const targetInput = document.getElementById('inputKodeTp');
+      if (targetInput) setTimeout(() => targetInput.focus(), 300);
+    }
+  }
+</script>
 @endsection

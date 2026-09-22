@@ -273,6 +273,89 @@
       0% { transform: scale(0.92); opacity: 0; }
       100% { transform: scale(1); opacity: 1; }
     }
+
+    /* Mobile Bottom Navigation Bar */
+    .cbt-mobile-bottom-bar {
+      display: none;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(255, 255, 255, 0.96);
+      backdrop-filter: blur(10px);
+      border-top: 1.5px solid #e2e8f0;
+      padding: 10px 14px;
+      z-index: 90;
+      box-shadow: 0 -4px 14px rgba(0, 0, 0, 0.08);
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    /* Responsive Mobile Screen Tuning */
+    @media (max-width: 900px) {
+      .cbt-topbar {
+        padding: 10px 12px;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+      }
+      .cbt-app-brand {
+        justify-content: space-between;
+      }
+      .cbt-status-group {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 6px;
+      }
+      .cbt-pill {
+        padding: 5px 8px;
+        font-size: 11px;
+      }
+      .cbt-pill-timer {
+        font-size: 14.5px;
+      }
+      .cbt-body-layout {
+        margin: 10px auto 85px;
+        padding: 0 10px;
+        grid-template-columns: 1fr;
+        gap: 14px;
+      }
+      .cbt-question-card {
+        padding: 16px 14px;
+        border-radius: 12px;
+        margin-bottom: 14px;
+      }
+      .cbt-q-text {
+        font-size: 14.5px;
+        line-height: 1.55;
+        margin-bottom: 14px;
+        -webkit-touch-callout: {{ $asesmen->blokir_copy_paste ? 'none' : 'default' }};
+      }
+      .cbt-opt-label {
+        padding: 12px 14px;
+        min-height: 48px;
+        touch-action: manipulation;
+        -webkit-touch-callout: none;
+      }
+      .cbt-opt-label input[type="radio"] {
+        width: 20px;
+        height: 20px;
+        flex-shrink: 0;
+      }
+      .cbt-opt-txt {
+        font-size: 13.5px;
+        line-height: 1.4;
+      }
+      .cbt-nav-box {
+        position: static;
+        margin-top: 10px;
+      }
+      .cbt-mobile-bottom-bar {
+        display: flex;
+      }
+    }
   </style>
 </head>
 <body>
@@ -556,7 +639,7 @@
 
     {{-- Right Sidebar: Palette Navigasi Soal --}}
     <aside>
-      <div class="cbt-nav-box">
+      <div class="cbt-nav-box" id="cbtNavBoxWrapper">
         <div style="font-weight:800; font-size:13.5px; color:#0f172a; display:flex; justify-content:space-between; align-items:center;">
           <span>Navigasi Soal</span>
           <span style="font-size:12px; color:#64748b;">
@@ -600,6 +683,17 @@
 
   </div>
 
+  {{-- Mobile Floating Action Bar (HP Mode) --}}
+  <div class="cbt-mobile-bottom-bar">
+    <button type="button" class="ak-btn ak-btn-secondary" style="font-size:12px; padding:8px 12px; font-weight:700;" onclick="smoothScrollTo('cbtNavBoxWrapper', event)">
+      <i class="bi bi-grid-3x3-gap-fill me-1"></i>
+      <span>Daftar Soal (<span id="mobCountAnswered">0</span>/{{ $soals->count() }})</span>
+    </button>
+    <button type="button" class="ak-btn ak-btn-primary" style="font-size:12.5px; padding:8px 14px; font-weight:800;" onclick="konfirmasiSelesai()">
+      <i class="bi bi-send-check me-1"></i> Kirim Jawaban
+    </button>
+  </div>
+
 </div>
 
 <script>
@@ -632,20 +726,31 @@
     } catch(e) {}
   }
 
-  // Smooth scroll
+  // Smooth scroll accounting for sticky header
   function smoothScrollTo(id, e) {
     if (e) e.preventDefault();
     const el = document.getElementById(id);
     if (el) {
-      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      const offset = 70;
+      const bodyRect = document.body.getBoundingClientRect().top;
+      const elementRect = el.getBoundingClientRect().top;
+      const elementPosition = elementRect - bodyRect;
+      const offsetPosition = elementPosition - offset;
+
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: 'smooth'
+      });
     }
   }
 
-  // Count answered
+  // Count answered (desktop & mobile synced)
   function refreshAnsweredCount() {
     const answered = document.querySelectorAll('.cbt-nav-btn.answered').length;
     const countEl = document.getElementById('countAnswered');
+    const mobCountEl = document.getElementById('mobCountAnswered');
     if (countEl) countEl.innerText = answered;
+    if (mobCountEl) mobCountEl.innerText = answered;
   }
   refreshAnsweredCount();
 
@@ -693,7 +798,7 @@
     });
   }
 
-  // Exam Start Handler
+  // Exam Start Handler (Safe for Mobile & Desktop)
   function mulaiUjianSekarang() {
     if (TOKEN_RESMI) {
       const inputVal = document.getElementById('tokenInput').value.trim().toUpperCase();
@@ -703,14 +808,16 @@
       }
     }
 
-    // Enter Fullscreen if required
+    // Enter Fullscreen if required (Safe on Android & iOS Safari)
     if (WAJIB_FULLSCREEN) {
       const root = document.documentElement;
-      if (root.requestFullscreen) {
-        root.requestFullscreen().catch(() => {});
-      } else if (root.webkitRequestFullscreen) {
-        root.webkitRequestFullscreen();
-      }
+      try {
+        if (root.requestFullscreen) {
+          root.requestFullscreen().catch(() => {});
+        } else if (root.webkitRequestFullscreen) {
+          root.webkitRequestFullscreen();
+        }
+      } catch(e) {}
     }
 
     document.getElementById('overlayTokenGate').style.display = 'none';
@@ -719,9 +826,13 @@
 
   function kembalikanFullscreen() {
     const root = document.documentElement;
-    if (root.requestFullscreen) {
-      root.requestFullscreen().catch(() => {});
-    }
+    try {
+      if (root.requestFullscreen) {
+        root.requestFullscreen().catch(() => {});
+      } else if (root.webkitRequestFullscreen) {
+        root.webkitRequestFullscreen();
+      }
+    } catch(e) {}
     document.getElementById('overlayFullscreenWarning').style.display = 'none';
   }
 
@@ -761,7 +872,7 @@
     .then(r => r.json())
     .then(data => {
       if (data.is_locked) {
-        alert("Batas pelanggaran toleransi integritas telah habis. Ujian Anda otomatis dikunci.");
+        alert("Batas toleransi pelanggaran integritas telah habis. Ujian Anda otomatis dikunci.");
         document.getElementById('formExam').submit();
       }
     });
@@ -782,17 +893,20 @@
     }
   });
 
-  // 2. Visibility / Tab Switching Listener
+  // 2. Visibility / Tab & App Switching Listener (Paling Efektif di HP)
   document.addEventListener('visibilitychange', () => {
     if (document.hidden && isExamActive && ANTI_CHEAT) {
-      catatPelanggaran('pindah_tab', 'Membuka tab browser lain atau meminimalkan browser');
+      catatPelanggaran('pindah_tab', 'Membuka aplikasi lain, WhatsApp, atau meminimalkan browser di HP');
     }
   });
 
-  // 3. Window Blur Listener
+  // 3. Window Blur Listener (Dengan filter virtual keyboard HP)
   window.addEventListener('blur', () => {
+    if (document.activeElement && (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA' || document.activeElement.tagName === 'SELECT')) {
+      return; // Abaikan interaksi keyboard virtual HP
+    }
     if (isExamActive && ANTI_CHEAT) {
-      catatPelanggaran('window_blur', 'Fokus layar berpindah ke aplikasi lain');
+      catatPelanggaran('window_blur', 'Beralih ke aplikasi lain atau split-screen di HP');
     }
   });
 
