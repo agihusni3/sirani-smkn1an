@@ -230,11 +230,15 @@
           <label class="form-label" for="inputTanggalLahir">Tanggal Lahir Siswa</label>
           <div class="form-input-wrap">
             <i class="bi bi-calendar-event"></i>
-            <input type="date" name="tanggal_lahir" id="inputTanggalLahir" class="form-input" 
-                   value="{{ old('tanggal_lahir') }}" required>
+            <input type="text" name="tanggal_lahir" id="inputTanggalLahir" class="form-input" 
+                   placeholder="Contoh: 22101991" 
+                   value="{{ old('tanggal_lahir') }}" 
+                   inputmode="numeric" 
+                   maxlength="10" 
+                   required autocomplete="off">
           </div>
           <div class="form-hint">
-            <i class="bi bi-lock-fill text-warning"></i> Digunakan sebagai kunci verifikasi keamanan identitas peserta ujian.
+            <i class="bi bi-info-circle-fill text-primary"></i> Ketik 8 digit format <strong>ddmmyyyy</strong> (Contoh: <strong>22101991</strong> untuk 22 Oktober 1991).
           </div>
         </div>
 

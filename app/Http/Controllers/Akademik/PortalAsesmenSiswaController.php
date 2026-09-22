@@ -54,17 +54,33 @@ class PortalAsesmenSiswaController extends Controller
             return back()->withInput()->with('error', 'NISN / NIS tidak ditemukan dalam data siswa aktif SMKN 1 Air Naningan.');
         }
 
-        // Parse dan validasi tanggal lahir
-        try {
-            $inputDate = Carbon::parse($request->tanggal_lahir)->format('Y-m-d');
-        } catch (\Throwable $e) {
-            return back()->withInput()->with('error', 'Format tanggal lahir tidak valid.');
+        // Parse dan validasi tanggal lahir format ddmmyyyy (misal: 22101991)
+        $rawDob = trim($request->tanggal_lahir);
+        $cleanDob = preg_replace('/[^0-9]/', '', $rawDob);
+
+        $inputDate = null;
+        if (strlen($cleanDob) === 8) {
+            $day = (int) substr($cleanDob, 0, 2);
+            $month = (int) substr($cleanDob, 2, 2);
+            $year = (int) substr($cleanDob, 4, 4);
+
+            if (checkdate($month, $day, $year)) {
+                $inputDate = sprintf('%04d-%02d-%02d', $year, $month, $day);
+            }
+        }
+
+        if (!$inputDate) {
+            try {
+                $inputDate = Carbon::parse($rawDob)->format('Y-m-d');
+            } catch (\Throwable $e) {
+                return back()->withInput()->with('error', 'Format tanggal lahir tidak valid. Masukkan 8 digit angka ddmmyyyy (Contoh: 22101991).');
+            }
         }
 
         if ($siswa->tanggal_lahir) {
             $dbDate = Carbon::parse($siswa->tanggal_lahir)->format('Y-m-d');
             if ($dbDate !== $inputDate) {
-                return back()->withInput()->with('error', 'Kombinasi NISN dan Tanggal Lahir tidak cocok. Pastikan tanggal lahir yang Anda masukkan sesuai.');
+                return back()->withInput()->with('error', 'Kombinasi NISN dan Tanggal Lahir tidak cocok. Pastikan tanggal lahir yang Anda masukkan sesuai format ddmmyyyy (Contoh: 22101991).');
             }
         } else {
             // Jika tanggal lahir di DB masih kosong, perbarui otomatis dengan tanggal yang dimasukkan siswa pertama kali
