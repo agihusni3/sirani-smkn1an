@@ -95,6 +95,24 @@ Route::middleware('throttle:300,1')->group(function () {
     Route::get('/kartu-digital-guru/{id}', [\App\Http\Controllers\RfidController::class, 'kartuDigitalGuru'])->name('kartu.digital.guru');
 });
 
+// Portal Masuk Asesmen & CBT Siswa (Akses Siswa via NISN & Tanggal Lahir)
+Route::prefix('asesmen')->group(function () {
+    Route::get('/', [\App\Http\Controllers\Akademik\PortalAsesmenSiswaController::class, 'login'])->name('portal.asesmen.index');
+    Route::get('/masuk', [\App\Http\Controllers\Akademik\PortalAsesmenSiswaController::class, 'login'])->name('portal.asesmen.login');
+    Route::post('/masuk', [\App\Http\Controllers\Akademik\PortalAsesmenSiswaController::class, 'masuk'])->name('portal.asesmen.masuk');
+    Route::get('/ruang', [\App\Http\Controllers\Akademik\PortalAsesmenSiswaController::class, 'dashboard'])->name('portal.asesmen.dashboard');
+    Route::post('/{id}/buka', [\App\Http\Controllers\Akademik\PortalAsesmenSiswaController::class, 'konfirmasiToken'])->name('portal.asesmen.buka');
+    Route::get('/{id}/ujian', [\App\Http\Controllers\Akademik\PortalAsesmenSiswaController::class, 'ujian'])->name('portal.asesmen.ujian');
+    Route::post('/{id}/submit', [\App\Http\Controllers\Akademik\PortalAsesmenSiswaController::class, 'submitJawaban'])->name('portal.asesmen.submit');
+    Route::post('/{id}/autosave', [\App\Http\Controllers\Akademik\AkademikAsesmenController::class, 'autosaveJawaban'])->name('portal.asesmen.autosave');
+    Route::post('/{id}/log-pelanggaran', [\App\Http\Controllers\Akademik\AkademikAsesmenController::class, 'logPelanggaran'])->name('portal.asesmen.log_pelanggaran');
+    Route::post('/keluar', [\App\Http\Controllers\Akademik\PortalAsesmenSiswaController::class, 'keluar'])->name('portal.asesmen.keluar');
+});
+
+// Shortcut Alias CBT & Ujian
+Route::get('/cbt', fn() => redirect()->route('portal.asesmen.index'));
+Route::get('/ujian-cbt', fn() => redirect()->route('portal.asesmen.index'));
+
 // Kirim WA Gateway dari Halaman Kartu Digital Publik (Akses Siswa/Ortu/Guru via HP tanpa login)
 Route::post('/kartu-digital/kirim-wa', [\App\Http\Controllers\RfidController::class, 'kirimWaPersonal'])
     ->middleware('throttle:20,1')

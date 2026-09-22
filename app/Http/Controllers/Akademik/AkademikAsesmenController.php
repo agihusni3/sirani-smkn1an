@@ -697,7 +697,7 @@ class AkademikAsesmenController extends Controller
     public function logPelanggaran(Request $request, $id)
     {
         $asesmen = AkademikAsesmenOnline::findOrFail($id);
-        $siswaId = $request->input('siswa_id');
+        $siswaId = $request->input('siswa_id') ?: session('cbt_siswa_id');
         $tipe = $request->input('tipe', 'pindah_tab');
         $keterangan = $request->input('keterangan', 'Terdeteksi keluar dari layar CBT');
 
@@ -740,7 +740,7 @@ class AkademikAsesmenController extends Controller
     public function autosaveJawaban(Request $request, $id)
     {
         $asesmen = AkademikAsesmenOnline::findOrFail($id);
-        $siswaId = $request->input('siswa_id');
+        $siswaId = $request->input('siswa_id') ?: session('cbt_siswa_id');
         $jawabanInput = $request->input('jawaban', []);
 
         $hasil = AkademikAsesmenHasil::firstOrCreate(

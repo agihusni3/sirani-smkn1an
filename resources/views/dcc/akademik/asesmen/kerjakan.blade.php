@@ -416,8 +416,8 @@
       </div>
 
       <div style="display:flex; gap:10px; justify-content:center;">
-        <a href="{{ route('akademik.asesmen.index') }}" class="ak-btn ak-btn-primary" style="padding:10px 24px;">
-          <i class="bi bi-house-door"></i> Kembali ke Modul Asesmen
+        <a href="{{ ($isSiswaPortal ?? false) ? route('portal.asesmen.dashboard') : route('akademik.asesmen.index') }}" class="ak-btn ak-btn-primary" style="padding:10px 24px;">
+          <i class="bi bi-house-door"></i> Kembali ke {{ ($isSiswaPortal ?? false) ? 'Ruang Ujian Siswa' : 'Modul Asesmen' }}
         </a>
       </div>
     </div>
@@ -442,8 +442,8 @@
         <i class="bi bi-info-circle-fill me-1"></i> Silakan lapor ke <strong>Pengawas Ruang atau Guru Pengampu</strong> untuk meminta reset izin sesi ujian Anda.
       </div>
 
-      <a href="{{ route('akademik.asesmen.index') }}" class="ak-btn ak-btn-secondary" style="width:100%; justify-content:center;">
-        Kembali ke Halaman Utama
+      <a href="{{ ($isSiswaPortal ?? false) ? route('portal.asesmen.dashboard') : route('akademik.asesmen.index') }}" class="ak-btn ak-btn-secondary" style="width:100%; justify-content:center;">
+        Kembali ke {{ ($isSiswaPortal ?? false) ? 'Ruang Ujian Siswa' : 'Halaman Utama' }}
       </a>
     </div>
   </div>
@@ -565,7 +565,7 @@
           <a href="{{ route('akademik.asesmen.index') }}" class="ak-btn ak-btn-secondary">Kembali</a>
         </div>
       @else
-        <form action="{{ route('akademik.asesmen.submit', $asesmen->id) }}" method="POST" id="formExam">
+        <form action="{{ ($isSiswaPortal ?? false) ? route('portal.asesmen.submit', $asesmen->id) : route('akademik.asesmen.submit', $asesmen->id) }}" method="POST" id="formExam">
           @csrf
           <input type="hidden" name="siswa_id" value="{{ $siswa?->id }}">
 
@@ -782,7 +782,7 @@
       jawaban: { [soalId]: opsiKey }
     };
 
-    fetch('{{ route("akademik.asesmen.autosave", $asesmen->id) }}', {
+    fetch('{{ ($isSiswaPortal ?? false) ? route("portal.asesmen.autosave", $asesmen->id) : route("akademik.asesmen.autosave", $asesmen->id) }}', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -859,7 +859,7 @@
     }
 
     // Call server to log infraction
-    fetch('{{ route("akademik.asesmen.log_pelanggaran", $asesmen->id) }}', {
+    fetch('{{ ($isSiswaPortal ?? false) ? route("portal.asesmen.log_pelanggaran", $asesmen->id) : route("akademik.asesmen.log_pelanggaran", $asesmen->id) }}', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

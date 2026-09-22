@@ -170,6 +170,20 @@
                                 </div>
                             </a>
 
+                            <!-- Modul Aktif: Portal Asesmen & CBT Siswa -->
+                            <a href="{{ route('portal.asesmen.index') }}" class="dropdown-item-card">
+                                <div class="dropdown-item-icon" style="background: #eff6ff; color: #2563eb;">
+                                    <i class="fa-solid fa-laptop-code"></i>
+                                </div>
+                                <div class="dropdown-item-info">
+                                    <div class="dropdown-item-title">
+                                        <span>Portal Asesmen &amp; CBT</span>
+                                        <span class="badge-subtle-status live" style="background: #eff6ff; color: #2563eb;">Aktif</span>
+                                    </div>
+                                    <div class="dropdown-item-sub">Login ujian dengan NISN &amp; Tanggal Lahir</div>
+                                </div>
+                            </a>
+
                             <!-- Modul Aktif: Monitoring Absen Mandiri SIRANI -->
                             <a href="{{ route('portal.ortu.index') }}" class="dropdown-item-card">
                                 <div class="dropdown-item-icon" style="background: var(--brand-blue-subtle); color: var(--brand-blue);">
@@ -285,6 +299,10 @@
                 <!-- Desktop Action Gateways & Mobile Hamburger -->
                 <div class="nav-right-actions">
                     <div class="desktop-nav-actions">
+                        <a href="{{ route('portal.asesmen.index') }}" class="btn-nav-presensi" style="background:#eff6ff; color:#2563eb; border-color:#bfdbfe;" title="Portal Masuk Ujian Asesmen Siswa">
+                            <i class="fa-solid fa-laptop-code" style="color: #2563eb;"></i>
+                            <span>Asesmen</span>
+                        </a>
                         <a href="{{ route('portal.ortu.index') }}" class="btn-nav-presensi" title="Monitoring Absen Mandiri Siswa &amp; Orang Tua">
                             <i class="fa-solid fa-id-card-clip" style="color: var(--brand-blue);"></i>
                             <span>Monitoring Absen</span>
@@ -322,6 +340,16 @@
                 <div class="drawer-gateways" style="padding-top: 0; border-top: none;">
                     <div class="drawer-section-label">Akses Gerbang Mandiri &amp; Dasbor</div>
                     <div class="drawer-gateway-grid">
+                        <a href="{{ route('portal.asesmen.index') }}" class="drawer-gateway-card" style="border-color:#bfdbfe; background:#eff6ff;">
+                            <div class="gateway-icon-box blue" style="background:#2563eb; color:#ffffff;">
+                                <i class="fa-solid fa-laptop-code"></i>
+                            </div>
+                            <div>
+                                <div class="gateway-card-title" style="color:#1e3a8a;">Asesmen CBT Siswa</div>
+                                <div class="gateway-card-sub">Login NISN &amp; Tanggal Lahir</div>
+                            </div>
+                        </a>
+
                         <a href="{{ route('portal.ortu.index') }}" class="drawer-gateway-card">
                             <div class="gateway-icon-box blue">
                                 <i class="fa-solid fa-fingerprint"></i>
