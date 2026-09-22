@@ -393,66 +393,59 @@
         {{-- RIWAYAT KEHADIRAN TERPADU --}}
         <div id="riwayat-kehadiran" style="scroll-margin-top: 70px;">
         
-        {{-- KARTU SKOR DISIPLIN & 4 METRIK KEHADIRAN (KPI) --}}
-        <div class="stats-overview-grid">
-          {{-- Skor Disiplin Utama --}}
-          <div class="discipline-score-card">
-            <div class="discipline-val">{{ $stats['persen'] }}%</div>
-            <div class="discipline-lbl">Tingkat Kedisiplinan</div>
-            <div style="font-size:11.5px; font-weight:800; color:var(--text); margin-top:4px;">{{ $stats['predikat'] }} ({{ $stats['total'] }} Hari Aktif)</div>
-          </div>
-
-          {{-- 1. Hadir Tepat --}}
-          <div class="stat-metric-card">
-            <div class="stat-metric-title">
-              <span style="font-weight:800; color:var(--text);">Hadir Tepat</span>
+        {{-- RINGKASAN METRIK KEHADIRAN (RINGKAS & PROPORSIONAL) --}}
+        <div class="attendance-summary-card">
+          <div class="summary-top-row">
+            <div class="summary-main-score">
+              <span class="summary-score-val">{{ $stats['persen'] }}%</span>
+              <div class="summary-score-meta">
+                <strong>Tingkat Kehadiran Siswa</strong>
+                <span>{{ $stats['predikat'] }} &middot; Total {{ $stats['total'] }} Hari Efektif</span>
+              </div>
             </div>
-            <div class="stat-metric-num" style="color:var(--text);">{{ $stats['hadir'] }}</div>
           </div>
-
-          {{-- 2. Terlambat --}}
-          <div class="stat-metric-card">
-            <div class="stat-metric-title">
-              <span style="font-weight:800; color:var(--text);">Terlambat</span>
+          <div class="summary-pills-row">
+            <div class="summary-stat-pill pill-hadir">
+              <span class="pill-dot"></span>
+              <span class="pill-num">{{ $stats['hadir'] }}</span>
+              <span class="pill-lbl">Hadir Tepat</span>
             </div>
-            <div class="stat-metric-num" style="color:var(--text);">{{ $stats['terlambat'] }}</div>
-          </div>
-
-          {{-- 3. Izin / Sakit --}}
-          <div class="stat-metric-card">
-            <div class="stat-metric-title">
-              <span style="font-weight:800; color:var(--text);">Izin / Sakit</span>
+            <div class="summary-stat-pill pill-telat">
+              <span class="pill-dot"></span>
+              <span class="pill-num">{{ $stats['terlambat'] }}</span>
+              <span class="pill-lbl">Terlambat</span>
             </div>
-            <div class="stat-metric-num" style="color:var(--text);">{{ $stats['izin'] + $stats['sakit'] }}</div>
-          </div>
-
-          {{-- 4. Alpha / Bolos --}}
-          <div class="stat-metric-card">
-            <div class="stat-metric-title">
-              <span style="font-weight:800; color:var(--text);">Alpha / Bolos</span>
+            <div class="summary-stat-pill pill-izin">
+              <span class="pill-dot"></span>
+              <span class="pill-num">{{ $stats['izin'] + $stats['sakit'] }}</span>
+              <span class="pill-lbl">Izin/Sakit</span>
             </div>
-            <div class="stat-metric-num" style="color:var(--text);">{{ $stats['alpha'] + $stats['bolos'] }}</div>
+            <div class="summary-stat-pill pill-alpha">
+              <span class="pill-dot"></span>
+              <span class="pill-num">{{ $stats['alpha'] + $stats['bolos'] }}</span>
+              <span class="pill-lbl">Alpha/Bolos</span>
+            </div>
           </div>
         </div>
 
         {{-- KONTROL PILIHAN PERIODE (RINGKAS & RAMPING) --}}
         <div class="period-control-card">
           <div class="period-tabs">
-            <a href="/cek-presensi?keyword={{ $siswa->nisn ?: $siswa->nis }}&periode=harian#riwayat-kehadiran" class="period-btn {{ $periode === 'harian' ? 'active' : '' }}">
+            <a href="/cek-presensi?keyword={{ $siswa->nisn ?: $siswa->nis }}&periode=harian" class="period-btn {{ $periode === 'harian' ? 'active' : '' }}">
               <i class="bi bi-calendar-day"></i> Harian
             </a>
-            <a href="/cek-presensi?keyword={{ $siswa->nisn ?: $siswa->nis }}&periode=mingguan#riwayat-kehadiran" class="period-btn {{ $periode === 'mingguan' ? 'active' : '' }}">
+            <a href="/cek-presensi?keyword={{ $siswa->nisn ?: $siswa->nis }}&periode=mingguan" class="period-btn {{ $periode === 'mingguan' ? 'active' : '' }}">
               <i class="bi bi-calendar-week"></i> Mingguan
             </a>
-            <a href="/cek-presensi?keyword={{ $siswa->nisn ?: $siswa->nis }}&periode=bulanan#riwayat-kehadiran" class="period-btn {{ $periode === 'bulanan' ? 'active' : '' }}">
+            <a href="/cek-presensi?keyword={{ $siswa->nisn ?: $siswa->nis }}&periode=bulanan" class="period-btn {{ $periode === 'bulanan' ? 'active' : '' }}">
               <i class="bi bi-calendar-month"></i> Bulanan
             </a>
-            <a href="/cek-presensi?keyword={{ $siswa->nisn ?: $siswa->nis }}&periode=tahunan#riwayat-kehadiran" class="period-btn {{ $periode === 'tahunan' ? 'active' : '' }}">
+            <a href="/cek-presensi?keyword={{ $siswa->nisn ?: $siswa->nis }}&periode=tahunan" class="period-btn {{ $periode === 'tahunan' ? 'active' : '' }}">
               <i class="bi bi-calendar3"></i> Tahunan
             </a>
           </div>
 
-          <form method="GET" action="{{ route('portal.ortu.index') }}#riwayat-kehadiran" class="period-input-wrap">
+          <form method="GET" action="{{ route('portal.ortu.index') }}" class="period-input-wrap">
             <input type="hidden" name="keyword" value="{{ $siswa->nisn ?: $siswa->nis }}" />
             <input type="hidden" name="periode" value="{{ $periode }}" />
 
@@ -486,23 +479,16 @@
           </form>
         </div>
 
-        {{-- TABEL RINCIAN LOG / REKAPITULASI JUMLAH KEHADIRAN --}}
+        {{-- TABEL RINCIAN LOG / REKAPITULASI KEHADIRAN --}}
         <div class="panel">
           <div class="panel-title">
             @if($periode === 'tahunan')
-              <span><i class="bi bi-calendar3" style="color:var(--gold); margin-right:6px;"></i>Rekapitulasi Kehadiran per Bulan (Tahun {{ $tahunSelected }})</span>
+              <span><i class="bi bi-calendar3" style="color:var(--gold); margin-right:6px;"></i>Rekap Bulanan (Tahun {{ $tahunSelected }})</span>
               <span style="font-size:11.5px; font-weight:700; color:var(--text-3); font-family:var(--font-mono);">12 Bulan Terdata</span>
-            @elseif($periode === 'bulanan')
-              <span><i class="bi bi-pie-chart-fill" style="color:var(--gold); margin-right:6px;"></i>Ringkasan Jumlah Kehadiran ({{ $periodeText }})</span>
-              <span style="font-size:11.5px; font-weight:700; color:var(--text-3); font-family:var(--font-mono);">Total {{ $stats['total'] }} Hari Efektif</span>
             @else
-              <span><i class="bi bi-journal-check" style="color:var(--gold); margin-right:6px;"></i>Rincian Riwayat Kehadiran ({{ $periodeText }})</span>
+              <span><i class="bi bi-journal-check" style="color:var(--gold); margin-right:6px;"></i>Riwayat Kehadiran ({{ $periodeText }})</span>
               <span style="font-size:11.5px; font-weight:700; color:var(--text-3); font-family:var(--font-mono);">{{ $absensis->count() }} Hari Tercatat</span>
             @endif
-          </div>
-
-          <div class="mobile-scroll-hint">
-            <i class="bi bi-arrows-expand"></i> Geser tabel ke samping untuk melihat data lengkap
           </div>
 
           <div class="table-wrap">
@@ -576,201 +562,80 @@
                 </tbody>
               </table>
 
-            @elseif($periode === 'bulanan')
-              {{-- 2. REKAP BULANAN (RINGKASAN JUMLAH KATEGORI) --}}
-              <table>
-                <thead>
-                  <tr>
-                    <th style="width:220px; white-space:nowrap;">Kategori Kehadiran</th>
-                    <th style="width:130px; text-align:center; white-space:nowrap;">Jumlah (Hari/Kali)</th>
-                    <th style="width:120px; text-align:center; white-space:nowrap;">Proporsi (%)</th>
-                    <th style="min-width:180px;">Keterangan &amp; Penjelasan</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td style="white-space:nowrap;">
-                      <span style="font-weight:800; font-size:13px; color:var(--text);">
-                        Hadir Tepat Waktu
-                      </span>
-                    </td>
-                    <td style="text-align:center; font-family:var(--font-mono); font-weight:900; font-size:14px; color:var(--text);">
-                      {{ $stats['hadir'] }} Hari
-                    </td>
-                    <td style="text-align:center; font-family:var(--font-mono); font-weight:800; font-size:13px; color:var(--text-2);">
-                      {{ $stats['total'] > 0 ? round(($stats['hadir'] / $stats['total']) * 100, 1) : 0 }}%
-                    </td>
-                    <td style="font-size:12px; color:var(--text-2);">
-                      Tercatat hadir tepat waktu mengikuti pembelajaran di sekolah
-                    </td>
-                  </tr>
-                  <tr>
-                    <td style="white-space:nowrap;">
-                      <span style="font-weight:800; font-size:13px; color:var(--text);">
-                        Terlambat Hadir
-                      </span>
-                    </td>
-                    <td style="text-align:center; font-family:var(--font-mono); font-weight:900; font-size:14px; color:var(--text);">
-                      {{ $stats['terlambat'] }} Kali
-                    </td>
-                    <td style="text-align:center; font-family:var(--font-mono); font-weight:800; font-size:13px; color:var(--text-2);">
-                      {{ $stats['total'] > 0 ? round(($stats['terlambat'] / $stats['total']) * 100, 1) : 0 }}%
-                    </td>
-                    <td style="font-size:12px; color:var(--text-2);">
-                      Tap masuk melewati batas jam toleransi gerbang
-                    </td>
-                  </tr>
-                  <tr>
-                    <td style="white-space:nowrap;">
-                      <span style="font-weight:800; font-size:13px; color:var(--text);">
-                        Izin (Disetujui)
-                      </span>
-                    </td>
-                    <td style="text-align:center; font-family:var(--font-mono); font-weight:900; font-size:14px; color:var(--text);">
-                      {{ $stats['izin'] }} Hari
-                    </td>
-                    <td style="text-align:center; font-family:var(--font-mono); font-weight:800; font-size:13px; color:var(--text-2);">
-                      {{ $stats['total'] > 0 ? round(($stats['izin'] / $stats['total']) * 100, 1) : 0 }}%
-                    </td>
-                    <td style="font-size:12px; color:var(--text-2);">
-                      Disertai surat permohonan izin resmi dari orang tua/wali
-                    </td>
-                  </tr>
-                  <tr>
-                    <td style="white-space:nowrap;">
-                      <span style="font-weight:800; font-size:13px; color:var(--text);">
-                        Sakit
-                      </span>
-                    </td>
-                    <td style="text-align:center; font-family:var(--font-mono); font-weight:900; font-size:14px; color:var(--text);">
-                      {{ $stats['sakit'] }} Hari
-                    </td>
-                    <td style="text-align:center; font-family:var(--font-mono); font-weight:800; font-size:13px; color:var(--text-2);">
-                      {{ $stats['total'] > 0 ? round(($stats['sakit'] / $stats['total']) * 100, 1) : 0 }}%
-                    </td>
-                    <td style="font-size:12px; color:var(--text-2);">
-                      Disertai surat keterangan dokter atau konfirmasi wali murid
-                    </td>
-                  </tr>
-                  <tr>
-                    <td style="white-space:nowrap;">
-                      <span style="font-weight:800; font-size:13px; color:var(--text);">
-                        Alpha (Tanpa Keterangan)
-                      </span>
-                    </td>
-                    <td style="text-align:center; font-family:var(--font-mono); font-weight:900; font-size:14px; color:var(--text);">
-                      {{ $stats['alpha'] }} Hari
-                    </td>
-                    <td style="text-align:center; font-family:var(--font-mono); font-weight:800; font-size:13px; color:var(--text-2);">
-                      {{ $stats['total'] > 0 ? round(($stats['alpha'] / $stats['total']) * 100, 1) : 0 }}%
-                    </td>
-                    <td style="font-size:12px; color:var(--text);">
-                      {{ $stats['alpha'] > 0 ? 'Perlu perhatian wali murid & konfirmasi ke wali kelas' : 'Tidak ada catatan alpha (Tertib)' }}
-                    </td>
-                  </tr>
-                  <tr>
-                    <td style="white-space:nowrap;">
-                      <span style="font-weight:800; font-size:13px; color:var(--text);">
-                        Bolos
-                      </span>
-                    </td>
-                    <td style="text-align:center; font-family:var(--font-mono); font-weight:900; font-size:14px; color:var(--text);">
-                      {{ $stats['bolos'] }} Kali
-                    </td>
-                    <td style="text-align:center; font-family:var(--font-mono); font-weight:800; font-size:13px; color:var(--text-2);">
-                      {{ $stats['total'] > 0 ? round(($stats['bolos'] / $stats['total']) * 100, 1) : 0 }}%
-                    </td>
-                    <td style="font-size:12px; color:var(--text);">
-                      {{ $stats['bolos'] > 0 ? 'Meninggalkan KBM tanpa izin piket' : 'Tidak ada catatan bolos' }}
-                    </td>
-                  </tr>
-                  <tr style="background:var(--bg-subtle); font-weight:800; border-top:2px solid var(--border);">
-                    <td style="white-space:nowrap; font-weight:900; color:var(--text);">
-                      TOTAL HARI EFEKTIF
-                    </td>
-                    <td style="text-align:center; font-family:var(--font-mono); font-weight:900; font-size:14.5px; color:var(--text);">
-                      {{ $stats['total'] }} Hari
-                    </td>
-                    <td style="text-align:center; font-family:var(--font-mono); font-weight:900; color:var(--text-2);">
-                      100%
-                    </td>
-                    <td style="font-size:12px; color:var(--text);">
-                      Skor Kedisiplinan: <strong style="color:var(--text); font-family:var(--font-mono);">{{ $stats['persen'] }}%</strong> ({{ $stats['predikat'] }})
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-
             @else
-              {{-- 3. REKAP HARIAN & MINGGUAN (TABEL RINCIAN LOG TANGGAL) --}}
-              <table>
-                <thead>
-                  <tr>
-                    <th style="width:170px; white-space:nowrap;">Hari &amp; Tanggal</th>
-                    <th style="width:110px; text-align:center; white-space:nowrap;">Jam Masuk</th>
-                    <th style="width:110px; text-align:center; white-space:nowrap;">Jam Pulang</th>
-                    <th style="width:170px; text-align:center; white-space:nowrap;">Status Kehadiran</th>
-                    <th style="min-width:180px;">Keterangan / Alasan</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  @forelse($absensis as $abs)
+              {{-- 2. REKAP HARIAN, MINGGUAN & BULANAN (TABEL RINCIAN LOG TANGGAL) --}}
+              @if($absensis->count() > 0)
+                <div class="mobile-scroll-hint">
+                  <i class="bi bi-arrows-expand"></i> Geser tabel ke samping untuk melihat data lengkap
+                </div>
+                <table>
+                  <thead>
                     <tr>
-                      <td style="white-space:nowrap;">
-                        <strong style="color:var(--text); font-size:13px;">{{ \Carbon\Carbon::parse($abs->tanggal)->translatedFormat('l') }}</strong>
-                        <div style="font-size:11.5px; color:var(--text-3); font-family:var(--font-mono); margin-top:2px;">{{ \Carbon\Carbon::parse($abs->tanggal)->translatedFormat('d M Y') }}</div>
-                      </td>
-                      <td style="text-align:center; white-space:nowrap;">
-                        <span style="font-family:var(--font-mono); font-weight:800; font-size:13px; color:var(--text); white-space:nowrap;">
-                          {{ $abs->jam_masuk ? substr($abs->jam_masuk, 0, 5).' WIB' : '—' }}
-                        </span>
-                      </td>
-                      <td style="text-align:center; white-space:nowrap;">
-                        <span style="font-family:var(--font-mono); font-weight:800; font-size:13px; color:var(--text); white-space:nowrap;">
-                          {{ $abs->jam_pulang ? substr($abs->jam_pulang, 0, 5).' WIB' : '—' }}
-                        </span>
-                      </td>
-                      <td style="text-align:center; white-space:nowrap;">
-                        @if($abs->status === 'hadir')
-                          <span style="font-weight:800; font-size:12.5px; color:var(--text);">Hadir Tepat Waktu</span>
-                        @elseif($abs->status === 'terlambat')
-                          <span style="font-weight:800; font-size:12.5px; color:var(--text);">Terlambat</span>
-                        @elseif($abs->status === 'izin')
-                          <span style="font-weight:800; font-size:12.5px; color:var(--text);">Izin</span>
-                        @elseif($abs->status === 'sakit')
-                          <span style="font-weight:800; font-size:12.5px; color:var(--text);">Sakit</span>
-                        @elseif($abs->status === 'bolos')
-                          <span style="font-weight:800; font-size:12.5px; color:var(--text);">Bolos</span>
-                        @elseif($abs->status === 'alpha')
-                          <span style="font-weight:800; font-size:12.5px; color:var(--text);">Alpha</span>
-                        @endif
-                      </td>
-                      <td style="font-size:12.5px; color:var(--text-2); min-width:180px;">
-                        @if($abs->keterangan)
-                          <span style="font-weight:600; color:var(--text);"><i class="bi bi-chat-left-text-fill" style="color:var(--gold); font-size:11px; margin-right:4px;"></i>{{ $abs->keterangan }}</span>
-                        @elseif($abs->status === 'bolos')
-                          <span style="color:#991B1B; font-weight:600;"><i class="bi bi-exclamation-triangle-fill"></i> Tidak tap pulang (tanpa izin piket)</span>
-                        @elseif($abs->status === 'alpha')
-                          <span style="color:#DC2626; font-weight:600;"><i class="bi bi-x-circle-fill"></i> Tidak hadir tanpa keterangan</span>
-                        @elseif($abs->status === 'terlambat')
-                          <span style="color:var(--amber); font-weight:600;"><i class="bi bi-clock-history"></i> Terlambat masuk gerbang</span>
-                        @elseif($abs->status === 'hadir')
-                          <span style="color:var(--text-3);"><i class="bi bi-check2"></i> Hadir pembelajaran reguler</span>
-                        @else
-                          -
-                        @endif
-                      </td>
+                      <th style="width:170px; white-space:nowrap;">Hari &amp; Tanggal</th>
+                      <th style="width:110px; text-align:center; white-space:nowrap;">Jam Masuk</th>
+                      <th style="width:110px; text-align:center; white-space:nowrap;">Jam Pulang</th>
+                      <th style="width:170px; text-align:center; white-space:nowrap;">Status Kehadiran</th>
+                      <th style="min-width:180px;">Keterangan / Alasan</th>
                     </tr>
-                  @empty
-                    <tr>
-                      <td colspan="5" style="text-align:center; padding:32px 16px; color:var(--text-3);">
-                        <i class="bi bi-calendar-x" style="font-size:28px; color:var(--text-3); margin-bottom:8px; display:inline-block;"></i>
-                        <div style="font-weight:700;">Tidak ada catatan kehadiran pada periode {{ $periodeText }}.</div>
-                      </td>
-                    </tr>
-                  @endforelse
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    @foreach($absensis as $abs)
+                      <tr>
+                        <td style="white-space:nowrap;">
+                          <strong style="color:var(--text); font-size:13px;">{{ \Carbon\Carbon::parse($abs->tanggal)->translatedFormat('l') }}</strong>
+                          <div style="font-size:11.5px; color:var(--text-3); font-family:var(--font-mono); margin-top:2px;">{{ \Carbon\Carbon::parse($abs->tanggal)->translatedFormat('d M Y') }}</div>
+                        </td>
+                        <td style="text-align:center; white-space:nowrap;">
+                          <span style="font-family:var(--font-mono); font-weight:800; font-size:13px; color:var(--text); white-space:nowrap;">
+                            {{ $abs->jam_masuk ? substr($abs->jam_masuk, 0, 5).' WIB' : '—' }}
+                          </span>
+                        </td>
+                        <td style="text-align:center; white-space:nowrap;">
+                          <span style="font-family:var(--font-mono); font-weight:800; font-size:13px; color:var(--text); white-space:nowrap;">
+                            {{ $abs->jam_pulang ? substr($abs->jam_pulang, 0, 5).' WIB' : '—' }}
+                          </span>
+                        </td>
+                        <td style="text-align:center; white-space:nowrap;">
+                          @if($abs->status === 'hadir')
+                            <span style="font-weight:800; font-size:12.5px; color:#16a34a;"><i class="bi bi-check-circle-fill"></i> Hadir Tepat Waktu</span>
+                          @elseif($abs->status === 'terlambat')
+                            <span style="font-weight:800; font-size:12.5px; color:#d97706;"><i class="bi bi-clock-history"></i> Terlambat</span>
+                          @elseif($abs->status === 'izin')
+                            <span style="font-weight:800; font-size:12.5px; color:#0284c7;"><i class="bi bi-info-circle-fill"></i> Izin</span>
+                          @elseif($abs->status === 'sakit')
+                            <span style="font-weight:800; font-size:12.5px; color:#8b5cf6;"><i class="bi bi-heart-pulse-fill"></i> Sakit</span>
+                          @elseif($abs->status === 'bolos')
+                            <span style="font-weight:800; font-size:12.5px; color:#dc2626;"><i class="bi bi-exclamation-triangle-fill"></i> Bolos</span>
+                          @elseif($abs->status === 'alpha')
+                            <span style="font-weight:800; font-size:12.5px; color:#ef4444;"><i class="bi bi-x-circle-fill"></i> Alpha</span>
+                          @endif
+                        </td>
+                        <td style="font-size:12.5px; color:var(--text-2); min-width:180px;">
+                          @if($abs->keterangan)
+                            <span style="font-weight:600; color:var(--text);"><i class="bi bi-chat-left-text-fill" style="color:var(--gold); font-size:11px; margin-right:4px;"></i>{{ $abs->keterangan }}</span>
+                          @elseif($abs->status === 'bolos')
+                            <span style="color:#991B1B; font-weight:600;"><i class="bi bi-exclamation-triangle-fill"></i> Tidak tap pulang (tanpa izin piket)</span>
+                          @elseif($abs->status === 'alpha')
+                            <span style="color:#DC2626; font-weight:600;"><i class="bi bi-x-circle-fill"></i> Tidak hadir tanpa keterangan</span>
+                          @elseif($abs->status === 'terlambat')
+                            <span style="color:var(--amber); font-weight:600;"><i class="bi bi-clock-history"></i> Terlambat masuk gerbang</span>
+                          @elseif($abs->status === 'hadir')
+                            <span style="color:var(--text-3);"><i class="bi bi-check2"></i> Hadir pembelajaran reguler</span>
+                          @else
+                            -
+                          @endif
+                        </td>
+                      </tr>
+                    @endforeach
+                  </tbody>
+                </table>
+              @else
+                <div style="text-align:center; padding:32px 16px; color:var(--text-3);">
+                  <i class="bi bi-calendar2-check" style="font-size:32px; color:var(--border-2); margin-bottom:8px; display:inline-block;"></i>
+                  <div style="font-weight:800; font-size:13.5px; color:var(--text-2); margin-bottom:4px;">Belum Ada Catatan Kehadiran</div>
+                  <div style="font-size:12px; color:var(--text-3);">Tidak ada rekaman presensi pada periode {{ $periodeText }}.</div>
+                </div>
+              @endif
             @endif
           </div>
         </div>

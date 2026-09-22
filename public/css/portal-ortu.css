@@ -1022,105 +1022,105 @@
     .status-pkl { background: var(--teal-subtle); color: var(--teal); border: 1px solid rgba(13,148,136,0.25); }
     .status-none { background: var(--bg-card); color: var(--text-3); border: 1px solid var(--border); }
 
-    /* ─── Discipline Score & 4 KPI Cards ─── */
-    .stats-overview-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 10px;
-      margin-bottom: 20px;
-    }
-    .discipline-score-card {
-      grid-column: 1 / -1;
-    }
-    @media (min-width: 768px) {
-      .stats-overview-grid {
-        grid-template-columns: 1.35fr repeat(4, 1fr);
-        gap: 12px;
-      }
-      .discipline-score-card {
-        grid-column: auto;
-      }
+    /* ─── Compact Attendance Summary Card ─── */
+    .attendance-summary-card {
+      background: var(--bg-card, #ffffff);
+      border: 1.5px solid var(--border, #e2e8f0);
+      border-radius: 14px;
+      padding: 12px 16px;
+      margin-bottom: 14px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
     }
 
-    .discipline-score-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: var(--r-lg);
-      padding: 16px 18px;
-      color: var(--text);
+    .summary-top-row {
       display: flex;
-      flex-direction: column;
-      justify-content: center;
-      box-shadow: var(--shadow-sm);
+      align-items: center;
+      justify-content: space-between;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border, #e2e8f0);
+      margin-bottom: 10px;
     }
-    .discipline-val {
-      font-size: 30px;
+
+    .summary-main-score {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .summary-score-val {
+      font-size: 26px;
       font-weight: 900;
+      font-family: var(--font-mono);
+      color: var(--text, #0f172a);
       line-height: 1;
-      font-family: var(--font-mono);
-      color: var(--text);
-    }
-    .discipline-lbl {
-      font-size: 11px;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      margin-top: 4px;
-      color: var(--text-3);
-    }
-    .discipline-badge {
-      display: inline-block;
-      background: var(--gold-subtle);
-      border: 1px solid var(--gold-border);
-      color: var(--gold);
-      padding: 2px 8px;
-      border-radius: 12px;
-      font-size: 11px;
-      font-weight: 800;
-      margin-top: 6px;
-      width: fit-content;
     }
 
-    .stat-metric-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: var(--r-lg);
-      padding: 14px 16px;
+    .summary-score-meta strong {
+      font-size: 12.5px;
+      font-weight: 800;
+      color: var(--text, #0f172a);
+      display: block;
+    }
+
+    .summary-score-meta span {
+      font-size: 11px;
+      color: var(--text-3, #64748b);
+      font-weight: 600;
+    }
+
+    .summary-pills-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+    }
+
+    .summary-stat-pill {
       display: flex;
-      flex-direction: column;
-      justify-content: center;
-      box-shadow: var(--shadow-sm);
-      transition: transform .15s ease;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 10px;
+      border-radius: 8px;
+      background: var(--bg-subtle, #f8fafc);
+      border: 1px solid var(--border, #e2e8f0);
+      min-width: 0;
     }
-    .stat-metric-card:hover {
-      border-color: var(--border-2);
-      transform: translateY(-2px);
+
+    .summary-stat-pill .pill-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
     }
-    .stat-metric-num {
-      font-size: 24px;
+    .pill-hadir .pill-dot { background: #16a34a; }
+    .pill-telat .pill-dot { background: #d97706; }
+    .pill-izin .pill-dot { background: #0284c7; }
+    .pill-alpha .pill-dot { background: #ef4444; }
+
+    .summary-stat-pill .pill-num {
+      font-size: 13.5px;
       font-weight: 900;
-      line-height: 1.1;
       font-family: var(--font-mono);
-      color: var(--text);
-      margin-top: 4px;
+      color: var(--text, #0f172a);
+      line-height: 1;
     }
-    .stat-metric-title {
+
+    .summary-stat-pill .pill-lbl {
       font-size: 11px;
       font-weight: 700;
-      color: var(--text-2);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+      color: var(--text-2, #475569);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     /* ─── Period Control ─── */
     .period-control-card {
       background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: var(--r-md);
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
       padding: 8px 12px;
       margin-bottom: 16px;
-      box-shadow: var(--shadow-sm);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.03);
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -1128,13 +1128,82 @@
       flex-wrap: wrap;
     }
     .period-tabs {
-      display: inline-flex;
-      background: var(--bg-subtle);
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      background: var(--bg-subtle, #f1f5f9);
       padding: 3px;
       border-radius: 10px;
       gap: 3px;
-      border: 1px solid var(--border);
-      flex-wrap: wrap;
+      border: 1px solid var(--border, #e2e8f0);
+    }
+    .period-btn {
+      padding: 6px 12px;
+      border-radius: 7px;
+      font-size: 11.5px;
+      font-weight: 700;
+      border: none;
+      background: transparent;
+      color: var(--text-2, #475569);
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      transition: all .15s ease;
+      white-space: nowrap;
+    }
+    .period-btn:hover {
+      background: rgba(0,0,0,0.06);
+      color: var(--text);
+    }
+    .period-btn.active {
+      background: #0f172a !important;
+      color: #FFFFFF !important;
+      font-weight: 800;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    }
+    .period-btn.active i,
+    .period-btn.active span {
+      color: #FFFFFF !important;
+    }
+
+    @media (max-width: 600px) {
+      .summary-pills-row {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 6px;
+      }
+      .summary-stat-pill {
+        padding: 6px 8px;
+      }
+      .summary-stat-pill .pill-lbl {
+        font-size: 10px;
+      }
+      .period-control-card {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+        padding: 10px;
+      }
+      .period-tabs {
+        width: 100%;
+      }
+      .period-btn {
+        padding: 6px 2px;
+        font-size: 10.5px;
+      }
+      .period-btn i {
+        display: none;
+      }
+      .period-input-wrap {
+        width: 100%;
+        justify-content: center;
+      }
+      .period-input-wrap .form-control-pt {
+        flex: 1;
+        width: 100%;
+        text-align: center;
+      }
     }
     .portal-nav-btn-group {
       display: grid;
