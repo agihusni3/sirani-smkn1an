@@ -143,8 +143,8 @@
   }
   .editor-toolbar {
     background: #f8fafc;
-    border-bottom: 1px solid #e2e8f0;
-    padding: 6px 10px;
+    border-top: 1px solid #e2e8f0;
+    padding: 7px 10px;
     display: flex;
     align-items: center;
     flex-wrap: wrap;
@@ -466,23 +466,31 @@
 
         {{-- Section 1: Pertanyaan Editor Shell --}}
         <div style="margin-bottom:18px;">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-            <label class="ak-form-label" style="font-size:13px; font-weight:800; color:#0f172a; margin:0;">
-              Teks Pertanyaan / Soal <span class="text-danger">*</span>
-            </label>
-            <div style="display:flex; gap:6px;">
-              <button type="button" class="tool-btn" id="btnToggleArab" onclick="toggleModeArab()" title="Mode Penulisan Teks Arab">
-                <span style="font-family:'Amiri', serif; font-size:14px;">ع</span> Arab (RTL)
-              </button>
-              <button type="button" class="tool-btn" id="btnToggleMath" onclick="toggleDrawer('mathDrawer')" title="Simbol & Rumus Matematika">
-                <span style="font-weight:900;">∑</span> Rumus (LaTeX)
-              </button>
-            </div>
-          </div>
+          <label class="ak-form-label" style="font-size:13px; font-weight:800; color:#0f172a; margin-bottom:8px; display:block;">
+            Teks Pertanyaan / Soal <span class="text-danger">*</span>
+          </label>
 
           {{-- Editor Container Shell --}}
           <div class="editor-shell">
-            {{-- Toolbar Bar --}}
+            {{-- 1. Area Textarea Penulisan Soal di Atas --}}
+            <textarea name="pertanyaan" id="inputPertanyaan" class="editor-textarea" rows="4" 
+                      placeholder="Tuliskan butir soal di sini... (Dukungan penuh untuk rumus KaTeX $\frac{1}{2}$ dan teks Arab)" 
+                      required oninput="updateLivePreview()">{{ old('pertanyaan') }}</textarea>
+
+            {{-- 2. Box Preview Gambar Terpilih --}}
+            <div id="boxPreviewGambar" style="display:none; padding:10px 14px; background:#f8fafc; border-top:1px solid #e2e8f0;">
+              <div style="display:flex; align-items:center; justify-content:space-between; max-width:320px; background:#ffffff; border:1px solid #cbd5e1; border-radius:8px; padding:6px 10px;">
+                <div style="display:flex; align-items:center; gap:8px; overflow:hidden;">
+                  <img id="imgPreviewTarget" src="" style="width:40px; height:40px; border-radius:6px; object-fit:cover; border:1px solid #e2e8f0;">
+                  <div style="font-size:12px; font-weight:700; color:#334155; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:180px;" id="infoNamaGambar"></div>
+                </div>
+                <button type="button" onclick="hapusUploadGambar()" style="background:#fee2e2; color:#dc2626; border:1px solid #fca5a5; border-radius:6px; padding:4px 8px; font-size:11px; font-weight:700; cursor:pointer;">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </div>
+            </div>
+
+            {{-- 3. Toolbar Pengaturan Huruf, Format, Gambar & Mode di Bawah Textarea --}}
             <div class="editor-toolbar">
               {{-- Text Format --}}
               <button type="button" class="tool-btn" onclick="wrapText('<b>', '</b>')" title="Tebal (Bold)"><b>B</b></button>
@@ -521,12 +529,22 @@
                 <span>َ ِ ُ Harakat</span>
               </button>
 
+              <span class="tool-sep"></span>
+
+              {{-- Arab & Rumus Buttons --}}
+              <button type="button" class="tool-btn" id="btnToggleArab" onclick="toggleModeArab()" title="Mode Penulisan Teks Arab">
+                <span style="font-family:'Amiri', serif; font-size:13.5px;">ع</span> Arab (RTL)
+              </button>
+              <button type="button" class="tool-btn" id="btnToggleMath" onclick="toggleDrawer('mathDrawer')" title="Simbol & Rumus Matematika">
+                <span style="font-weight:900;">∑</span> Rumus (LaTeX)
+              </button>
+
               {{-- Native file input hidden strictly without overriding --}}
               <input type="file" name="gambar" id="fileGambarSoal" accept="image/*" onchange="previewUploadGambar(this)" 
                      style="display:none !important; visibility:hidden !important; position:absolute !important; width:0 !important; height:0 !important; opacity:0 !important; pointer-events:none !important;">
             </div>
 
-            {{-- Drawer 1: Harakat Arab --}}
+            {{-- 4. Drawer 1: Harakat Arab --}}
             <div id="harakatDrawer" class="editor-drawer">
               <span style="font-size:11px; font-weight:700; color:#64748b; width:100%; margin-bottom:2px;">Klik untuk menyisipkan harakat:</span>
               <button type="button" class="drawer-chip-btn" onclick="insertChar('َ')">َ Fathah</button>
@@ -540,7 +558,7 @@
               <button type="button" class="drawer-chip-btn" onclick="insertChar('،')">،</button>
             </div>
 
-            {{-- Drawer 2: Rumus KaTeX --}}
+            {{-- 5. Drawer 2: Rumus KaTeX --}}
             <div id="mathDrawer" class="editor-drawer" style="background:#eff6ff; border-color:#bfdbfe;">
               <span style="font-size:11px; font-weight:700; color:#1e40af; width:100%; margin-bottom:2px;">Klik untuk menyisipkan simbol/formula:</span>
               <button type="button" class="drawer-chip-btn" onclick="insertChar('$\\frac{a}{b}$')">a/b (Pecahan)</button>
@@ -559,25 +577,7 @@
               <button type="button" class="drawer-chip-btn" onclick="insertChar('$\\int$')">∫</button>
             </div>
 
-            {{-- Textarea --}}
-            <textarea name="pertanyaan" id="inputPertanyaan" class="editor-textarea" rows="4" 
-                      placeholder="Tuliskan butir soal di sini... (Dukungan penuh untuk rumus KaTeX $\frac{1}{2}$ dan teks Arab)" 
-                      required oninput="updateLivePreview()">{{ old('pertanyaan') }}</textarea>
-
-            {{-- Box Preview Gambar Terpilih --}}
-            <div id="boxPreviewGambar" style="display:none; padding:10px 14px; background:#f8fafc; border-top:1px solid #e2e8f0;">
-              <div style="display:flex; align-items:center; justify-content:space-between; max-width:320px; background:#ffffff; border:1px solid #cbd5e1; border-radius:8px; padding:6px 10px;">
-                <div style="display:flex; align-items:center; gap:8px; overflow:hidden;">
-                  <img id="imgPreviewTarget" src="" style="width:40px; height:40px; border-radius:6px; object-fit:cover; border:1px solid #e2e8f0;">
-                  <div style="font-size:12px; font-weight:700; color:#334155; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:180px;" id="infoNamaGambar"></div>
-                </div>
-                <button type="button" onclick="hapusUploadGambar()" style="background:#fee2e2; color:#dc2626; border:1px solid #fca5a5; border-radius:6px; padding:4px 8px; font-size:11px; font-weight:700; cursor:pointer;">
-                  <i class="bi bi-trash"></i>
-                </button>
-              </div>
-            </div>
-
-            {{-- Live Render Preview (Pratinjau Halus) --}}
+            {{-- 6. Live Render Preview (Pratinjau Halus) --}}
             <div class="live-preview-box">
               <div class="live-preview-head">
                 <span><i class="bi bi-eye me-1"></i> Pratinjau Tampilan Siswa</span>
