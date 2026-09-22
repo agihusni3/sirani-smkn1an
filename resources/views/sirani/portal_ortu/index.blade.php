@@ -145,10 +145,16 @@
     @if($siswa)
       {{-- HASIL DATA SISWA TERPILIH --}}
 
-      {{-- 3 TAB NAVIGASI UTAMA ATAS (Riwayat Absensi Paling Kiri & Default Aktif) --}}
+      {{-- 4 TAB NAVIGASI UTAMA ATAS (Riwayat Absensi Paling Kiri & Default Aktif) --}}
       <div class="portal-main-tabs">
         <button type="button" id="btnTabAbsen" onclick="switchPortalMainTab('absen')" class="portal-main-tab active">
           <i class="bi bi-calendar3"></i> <span>Riwayat Absensi</span>
+        </button>
+        <button type="button" id="btnTabDisiplin" onclick="switchPortalMainTab('disiplin')" class="portal-main-tab">
+          <i class="bi bi-shield-check"></i> <span>Catatan Kedisiplinan Siswa</span>
+          @if(isset($kasusDisiplin) && $kasusDisiplin->total_poin_pelanggaran > 0)
+            <span class="portal-badge-count" style="background:#ef4444;">{{ $kasusDisiplin->total_poin_pelanggaran }} pt</span>
+          @endif
         </button>
         <button type="button" id="btnTabKartuQr" onclick="switchPortalMainTab('kartu-qr')" class="portal-main-tab">
           <i class="bi bi-qr-code"></i> <span>Kartu &amp; QR Code</span>
@@ -739,23 +745,25 @@
           </div>
         </div>
       </div>
+      </div>
 
-      {{-- 3. PORTOFOLIO KARAKTER, KEDISIPLINAN & SELF-REWARD --}}
-      @php
-        $poinBersih = $kasusDisiplin ? $kasusDisiplin->poin_bersih : 0;
-        $totalPelanggaran = $kasusDisiplin ? $kasusDisiplin->total_poin_pelanggaran : 0;
-        $totalPemulihan = $kasusDisiplin ? $kasusDisiplin->total_poin_pemulihan : 0;
-        $a1 = $pengaturanDisiplin->ambang_tahap_1_wali ?? 10;
-        $a2 = $pengaturanDisiplin->ambang_tahap_2_bk ?? 30;
-        $a3 = $pengaturanDisiplin->ambang_tahap_3_wakasis ?? 50;
-        $a4 = $pengaturanDisiplin->ambang_tahap_4_kepsek ?? 75;
-      @endphp
-      <div class="dossier-card" id="portofolio-karakter" style="margin-top: 20px; scroll-margin-top: 70px; display: block;">
-        <div class="dossier-header">
-          <div>
-            <h3 style="font-size:14.5px; font-weight:800; color:var(--text); margin:0;">Riwayat Kasus &amp; Catatan Kedisiplinan Siswa</h3>
-            <p style="font-size:11.5px; color:var(--text-3); margin-top:2px;">Transparansi poin kedisiplinan, catatan ketidakhadiran, serta apresiasi perilaku positif</p>
-          </div>
+      {{-- TAB 2: CATATAN KEDISIPLINAN SISWA --}}
+      <div id="section-disiplin-wrap" style="display: none;">
+        @php
+          $poinBersih = $kasusDisiplin ? $kasusDisiplin->poin_bersih : 0;
+          $totalPelanggaran = $kasusDisiplin ? $kasusDisiplin->total_poin_pelanggaran : 0;
+          $totalPemulihan = $kasusDisiplin ? $kasusDisiplin->total_poin_pemulihan : 0;
+          $a1 = $pengaturanDisiplin->ambang_tahap_1_wali ?? 10;
+          $a2 = $pengaturanDisiplin->ambang_tahap_2_bk ?? 30;
+          $a3 = $pengaturanDisiplin->ambang_tahap_3_wakasis ?? 50;
+          $a4 = $pengaturanDisiplin->ambang_tahap_4_kepsek ?? 75;
+        @endphp
+        <div class="dossier-card" id="portofolio-karakter" style="margin-top: 0px; scroll-margin-top: 70px; display: block;">
+          <div class="dossier-header">
+            <div>
+              <h3 style="font-size:14.5px; font-weight:800; color:var(--text); margin:0;">Catatan Kedisiplinan Siswa</h3>
+              <p style="font-size:11.5px; color:var(--text-3); margin-top:2px;">Transparansi poin kedisiplinan, catatan ketidakhadiran, serta apresiasi perilaku positif</p>
+            </div>
           <div>
             @if($poinBersih == 0)
               <span style="font-weight:800; font-size:12px; color:var(--text);">
@@ -876,8 +884,8 @@
             <strong>Prinsip Pendidikan Positif:</strong> Seluruh catatan ketertiban bersifat edukatif dan dapat dipulihkan melalui perbaikan perilaku, keaktifan ibadah, serta konsistensi hadir tepat waktu di sekolah.
           </span>
         </div>
-      </div>
-      </div>
+      </div> {{-- Penutup #portofolio-karakter --}}
+      </div> {{-- Penutup #section-disiplin-wrap --}}
 
       {{-- 4. PENGUMUMAN RESMI SEKOLAH --}}
       <div class="dossier-card" id="section-pengumuman" style="margin-top: 20px; scroll-margin-top: 70px; display: none;">
@@ -1003,42 +1011,60 @@
       window.location.href = '/cek-presensi';
     }
 
-    // ===== MAIN TABS SWITCHER (KARTU & QR, RIWAYAT ABSENSI, PENGUMUMAN) =====
+    // ===== MAIN TABS SWITCHER (RIWAYAT ABSENSI, CATATAN KEDISIPLINAN, KARTU & QR, PENGUMUMAN) =====
     function switchPortalMainTab(tabName) {
       const secKartuQr = document.getElementById('section-kartu-qr');
       const secAbsenWrap = document.getElementById('section-absen-wrap');
+      const secDisiplinWrap = document.getElementById('section-disiplin-wrap');
       const secPengumuman = document.getElementById('section-pengumuman');
       
       const btnKartuQr = document.getElementById('btnTabKartuQr');
       const btnAbsen = document.getElementById('btnTabAbsen');
+      const btnDisiplin = document.getElementById('btnTabDisiplin');
       const btnPengumuman = document.getElementById('btnTabPengumuman');
 
       if (tabName === 'kartu-qr') {
         if (secKartuQr) secKartuQr.style.display = 'block';
         if (secAbsenWrap) secAbsenWrap.style.display = 'none';
+        if (secDisiplinWrap) secDisiplinWrap.style.display = 'none';
         if (secPengumuman) secPengumuman.style.display = 'none';
 
         if (btnKartuQr) btnKartuQr.classList.add('active');
         if (btnAbsen) btnAbsen.classList.remove('active');
+        if (btnDisiplin) btnDisiplin.classList.remove('active');
         if (btnPengumuman) btnPengumuman.classList.remove('active');
         if (typeof renderPortalQrCode === 'function') {
           setTimeout(renderPortalQrCode, 50);
         }
+      } else if (tabName === 'disiplin') {
+        if (secKartuQr) secKartuQr.style.display = 'none';
+        if (secAbsenWrap) secAbsenWrap.style.display = 'none';
+        if (secDisiplinWrap) secDisiplinWrap.style.display = 'block';
+        if (secPengumuman) secPengumuman.style.display = 'none';
+
+        if (btnKartuQr) btnKartuQr.classList.remove('active');
+        if (btnAbsen) btnAbsen.classList.remove('active');
+        if (btnDisiplin) btnDisiplin.classList.add('active');
+        if (btnPengumuman) btnPengumuman.classList.remove('active');
       } else if (tabName === 'absen') {
         if (secKartuQr) secKartuQr.style.display = 'none';
         if (secAbsenWrap) secAbsenWrap.style.display = 'block';
+        if (secDisiplinWrap) secDisiplinWrap.style.display = 'none';
         if (secPengumuman) secPengumuman.style.display = 'none';
 
         if (btnKartuQr) btnKartuQr.classList.remove('active');
         if (btnAbsen) btnAbsen.classList.add('active');
+        if (btnDisiplin) btnDisiplin.classList.remove('active');
         if (btnPengumuman) btnPengumuman.classList.remove('active');
       } else if (tabName === 'pengumuman') {
         if (secKartuQr) secKartuQr.style.display = 'none';
         if (secAbsenWrap) secAbsenWrap.style.display = 'none';
+        if (secDisiplinWrap) secDisiplinWrap.style.display = 'none';
         if (secPengumuman) secPengumuman.style.display = 'block';
 
         if (btnKartuQr) btnKartuQr.classList.remove('active');
         if (btnAbsen) btnAbsen.classList.remove('active');
+        if (btnDisiplin) btnDisiplin.classList.remove('active');
         if (btnPengumuman) btnPengumuman.classList.add('active');
       }
     }
@@ -1336,10 +1362,14 @@
 
         if (hash === '#riwayat-kehadiran' || hash === '#absen' || urlParams.has('periode') || urlParams.has('tanggal') || urlParams.has('bulan') || urlParams.has('tahun')) {
           switchPortalMainTab('absen');
+        } else if (hash === '#disiplin' || hash === '#catatan-kedisiplinan' || hash === '#portofolio-karakter' || hash === '#section-disiplin-wrap') {
+          switchPortalMainTab('disiplin');
         } else if (hash === '#section-pengumuman' || hash === '#pengumuman') {
           switchPortalMainTab('pengumuman');
-        } else {
+        } else if (hash === '#kartu-qr' || hash === '#kartu') {
           switchPortalMainTab('kartu-qr');
+        } else {
+          switchPortalMainTab('absen');
         }
 
         // Simpan NISN ke localStorage untuk Auto-Login jika tidak dinonaktifkan

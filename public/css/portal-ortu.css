@@ -456,10 +456,10 @@
       font-weight: 800;
     }
 
-    /* ─── Portal Top 3 Tabs Navigation ─── */
+    /* ─── Portal Top Tabs Navigation ─── */
     .portal-main-tabs {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(4, 1fr);
       gap: 6px;
       margin-bottom: 16px;
       width: 100%;
@@ -1052,7 +1052,8 @@
       margin-left: 2px;
       display: inline-block;
     }
-    .btn-portal-tab.active .portal-badge-count {
+    .btn-portal-tab.active .portal-badge-count,
+    .portal-main-tab.active .portal-badge-count {
       background: #FFFFFF !important;
       color: #000000 !important;
     }
