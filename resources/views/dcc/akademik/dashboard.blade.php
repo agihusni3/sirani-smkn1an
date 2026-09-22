@@ -9,59 +9,12 @@
 {{-- 1. HERO WELCOME BANNER (SAMBUTAN WAKA KURIKULUM)                           --}}
 {{-- ========================================================================== --}}
 <div class="akademik-hero">
-  <div class="akademik-hero-top">
-    <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-      <span class="akademik-hero-badge">
-        <i class="bi bi-person-check-fill"></i> Tim Kurikulum &amp; Manajemen KBM
-      </span>
-      <span class="akademik-hero-badge">
-        <i class="bi bi-calendar-event"></i> Tahun Ajaran {{ $ta?->nama ?? $ta?->tahun_ajaran ?? '2026/2027' }} · Ganjil
-      </span>
-      <span class="akademik-hero-badge" style="background:rgba(255,255,255,0.22);">
-        <i class="bi bi-clock-history"></i> {{ \Carbon\Carbon::now()->locale('id')->isoFormat('dddd, D MMMM Y') }}
-      </span>
-    </div>
-
-    <div>
-      @if($kalender)
-        @if($kalender->is_locked)
-          <span class="akademik-hero-badge" style="background:#10b981; color:#fff;">
-            <i class="bi bi-shield-check me-1"></i> Kaldik Resmi Ditetapkan
-          </span>
-        @else
-          <span class="akademik-hero-badge" style="background:#f59e0b; color:#fff;">
-            <i class="bi bi-pencil-square me-1"></i> Draf Kalender Akademik
-          </span>
-        @endif
-      @endif
-    </div>
-  </div>
-
   <h1 class="akademik-hero-title">
     Selamat Datang, {{ auth()->user()?->name ?? 'Waka Kurikulum' }}
   </h1>
-  <p class="akademik-hero-desc">
+  <p class="akademik-hero-desc" style="margin-bottom: 0;">
     Pusat kendali dan monitoring operasional kurikulum SMKN 1 Air Naningan. Pantau penetapan kalender pendidikan, distribusi beban mengajar guru, matriks roster mingguan, dan keterisian jurnal KBM harian secara terpadu.
   </p>
-
-  <div class="akademik-hero-actions">
-    <a href="{{ route('akademik.kalender.index') }}" class="akademik-hero-btn akademik-hero-btn-primary">
-      <i class="bi bi-calendar-range"></i>
-      <span>Kalender Pendidikan (Kaldik)</span>
-    </a>
-    <a href="{{ route('akademik.jadwal.index', ['tab' => 'distribusi']) }}" class="akademik-hero-btn akademik-hero-btn-ghost">
-      <i class="bi bi-file-earmark-person"></i>
-      <span>SK &amp; Beban Mengajar</span>
-    </a>
-    <a href="{{ route('akademik.jadwal.index', ['tab' => 'jadwal']) }}" class="akademik-hero-btn akademik-hero-btn-ghost">
-      <i class="bi bi-clock-history"></i>
-      <span>Roster Jadwal Kelas</span>
-    </a>
-    <a href="{{ route('akademik.perangkat.supervisi-meja') }}" class="akademik-hero-btn akademik-hero-btn-ghost">
-      <i class="bi bi-patch-check"></i>
-      <span>Supervisi Perangkat</span>
-    </a>
-  </div>
 </div>
 
 {{-- ========================================================================== --}}
