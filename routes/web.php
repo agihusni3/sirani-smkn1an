@@ -405,6 +405,7 @@ Route::middleware('auth')->group(function () {
             Route::post('/asesmen', [\App\Http\Controllers\Akademik\AkademikAsesmenController::class, 'store'])->name('akademik.asesmen.store');
             Route::get('/asesmen/{id}/soal', [\App\Http\Controllers\Akademik\AkademikAsesmenController::class, 'soal'])->name('akademik.asesmen.soal');
             Route::post('/asesmen/{id}/soal', [\App\Http\Controllers\Akademik\AkademikAsesmenController::class, 'storeSoal'])->name('akademik.asesmen.soal.store');
+            Route::post('/asesmen/{id}/import-bank-soal', [\App\Http\Controllers\Akademik\AkademikAsesmenController::class, 'importFromBankSoal'])->name('akademik.asesmen.soal.import_bank');
             Route::delete('/asesmen/{id}/soal/{soalId}', [\App\Http\Controllers\Akademik\AkademikAsesmenController::class, 'destroySoal'])->name('akademik.asesmen.soal.destroy');
             Route::post('/asesmen/{id}/toggle', [\App\Http\Controllers\Akademik\AkademikAsesmenController::class, 'toggleStatus'])->name('akademik.asesmen.toggle');
             Route::post('/asesmen/{id}/validasi', [\App\Http\Controllers\Akademik\AkademikAsesmenController::class, 'validasiSoal'])->name('akademik.asesmen.validasi');
@@ -413,6 +414,8 @@ Route::middleware('auth')->group(function () {
             Route::post('/asesmen/{id}/refresh-token', [\App\Http\Controllers\Akademik\AkademikAsesmenController::class, 'refreshToken'])->name('akademik.asesmen.refresh_token');
             Route::post('/asesmen/{id}/reset-siswa/{siswaId}', [\App\Http\Controllers\Akademik\AkademikAsesmenController::class, 'resetSiswa'])->name('akademik.asesmen.reset_siswa');
             Route::post('/asesmen/{id}/push-nilai', [\App\Http\Controllers\Akademik\AkademikAsesmenController::class, 'pushToNilai'])->name('akademik.asesmen.push_nilai');
+            Route::get('/bank-soal', [\App\Http\Controllers\Akademik\AkademikAsesmenController::class, 'bankSoalIndex'])->name('akademik.bank_soal.index');
+            Route::delete('/bank-soal/{id}', [\App\Http\Controllers\Akademik\AkademikAsesmenController::class, 'destroyBankSoal'])->name('akademik.bank_soal.destroy');
         });
 
         // Pengerjaan Ujian Siswa & Anti-Cheat Session

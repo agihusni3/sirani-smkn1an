@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\AkademikAsesmenHasil;
 use App\Models\AkademikAsesmenOnline;
 use App\Models\AkademikAsesmenSoal;
+use App\Models\AkademikBankSoal;
 use App\Models\AkademikDistribusiMengajar;
 use App\Models\AkademikMataPelajaran;
 use App\Models\AkademikNilai;
@@ -156,7 +157,19 @@ class AkademikAsesmenController extends Controller
         $nomorBerikutnya = ($asesmen->soals->max('nomor') ?? 0) + 1;
         $auditKelayakan = $asesmen->cekKelayakanSoal();
 
-        return view('dcc.akademik.asesmen.soal', compact('asesmen', 'totalBobot', 'nomorBerikutnya', 'auditKelayakan'));
+        // Ambil data Bank Soal yang relevan dengan mata pelajaran asesmen ini
+        $mapelId = $asesmen->distribusi?->mata_pelajaran_id;
+        $bankSoals = collect([]);
+        if ($mapelId) {
+            $bankSoals = AkademikBankSoal::where('mata_pelajaran_id', $mapelId)
+                ->orderByDesc('id')
+                ->get();
+        }
+
+        // Teks pertanyaan yang sudah ada di asesmen saat ini (untuk penandaan duplikasi)
+        $existingPertanyaans = $asesmen->soals->pluck('pertanyaan')->map(fn($p) => trim(strip_tags($p)))->toArray();
+
+        return view('dcc.akademik.asesmen.soal', compact('asesmen', 'totalBobot', 'nomorBerikutnya', 'auditKelayakan', 'bankSoals', 'existingPertanyaans'));
     }
 
     public function storeSoal(Request $request, $id)
@@ -217,13 +230,95 @@ class AkademikAsesmenController extends Controller
             'pembahasan' => $request->pembahasan,
         ]);
 
+        // Otomatis simpan / perbarui ke Master Bank Soal untuk mata pelajaran ini
+        $mapelId = $asesmen->distribusi?->mata_pelajaran_id;
+        $guruId = $asesmen->distribusi?->guru_id ?? auth()->user()->guru_id;
+        if ($mapelId) {
+            AkademikBankSoal::updateOrCreate(
+                [
+                    'mata_pelajaran_id' => $mapelId,
+                    'pertanyaan' => $request->pertanyaan,
+                ],
+                [
+                    'guru_id' => $guruId,
+                    'tipe' => $request->tipe,
+                    'gambar_url' => $gambarUrl,
+                    'opsi_a' => $request->opsi_a,
+                    'opsi_b' => $request->opsi_b,
+                    'opsi_c' => $request->opsi_c,
+                    'opsi_d' => $request->opsi_d,
+                    'opsi_e' => $request->opsi_e,
+                    'kunci_jawaban' => strtoupper($request->kunci_jawaban),
+                    'bobot' => $request->bobot,
+                    'pembahasan' => $request->pembahasan,
+                ]
+            );
+        }
+
         // Auto-update status validasi jika paket sudah memenuhi syarat
         $audit = $asesmen->fresh()->cekKelayakanSoal();
         if ($audit['is_valid'] && $asesmen->status_validasi === 'draft') {
             $asesmen->update(['status_validasi' => 'siap_diujikan']);
         }
 
-        return redirect()->back()->with('success', 'Butir soal no. ' . $nomor . ' berhasil divalidasi dan disimpan.');
+        return redirect()->back()->with('success', 'Butir soal no. ' . $nomor . ' berhasil disimpan ke asesmen & tersimpan di Bank Soal.');
+    }
+
+    public function importFromBankSoal(Request $request, $id)
+    {
+        $asesmen = AkademikAsesmenOnline::findOrFail($id);
+        $this->authorizeAsesmen($asesmen);
+
+        $request->validate([
+            'bank_soal_ids' => 'required|array|min:1',
+            'bank_soal_ids.*' => 'integer|exists:akademik_bank_soals,id',
+        ]);
+
+        $bankSoals = AkademikBankSoal::whereIn('id', $request->bank_soal_ids)->get();
+        if ($bankSoals->isEmpty()) {
+            return redirect()->back()->with('error', 'Pilih minimal 1 butir soal dari bank soal.');
+        }
+
+        $lastNomor = $asesmen->soals()->max('nomor') ?? 0;
+        $importedCount = 0;
+
+        foreach ($bankSoals as $bs) {
+            // Cek apakah butir soal ini sudah ada di asesmen
+            $exists = $asesmen->soals()->where('pertanyaan', $bs->pertanyaan)->exists();
+            if ($exists) {
+                continue;
+            }
+
+            $lastNomor++;
+            AkademikAsesmenSoal::create([
+                'asesmen_id' => $asesmen->id,
+                'nomor' => $lastNomor,
+                'pertanyaan' => $bs->pertanyaan,
+                'tipe' => $bs->tipe,
+                'gambar_url' => $bs->gambar_url,
+                'opsi_a' => $bs->opsi_a,
+                'opsi_b' => $bs->opsi_b,
+                'opsi_c' => $bs->opsi_c,
+                'opsi_d' => $bs->opsi_d,
+                'opsi_e' => $bs->opsi_e,
+                'kunci_jawaban' => $bs->kunci_jawaban,
+                'bobot' => $bs->bobot ?? 1,
+                'pembahasan' => $bs->pembahasan,
+            ]);
+            $importedCount++;
+        }
+
+        // Auto-update status validasi jika paket sudah memenuhi syarat
+        $audit = $asesmen->fresh()->cekKelayakanSoal();
+        if ($audit['is_valid'] && $asesmen->status_validasi === 'draft') {
+            $asesmen->update(['status_validasi' => 'siap_diujikan']);
+        }
+
+        if ($importedCount === 0) {
+            return redirect()->back()->with('warning', 'Semua soal yang Anda pilih sudah pernah dimasukkan ke dalam paket asesmen ini.');
+        }
+
+        return redirect()->back()->with('success', "Berhasil memanggil {$importedCount} butir soal dari Bank Soal ke dalam asesmen ini.");
     }
 
     public function destroySoal($id, $soalId)
@@ -756,5 +851,52 @@ class AkademikAsesmenController extends Controller
         ]);
 
         return response()->json(['success' => true, 'saved_at' => now()->format('H:i:s')]);
+    }
+
+    public function bankSoalIndex(Request $request)
+    {
+        $user = auth()->user();
+        $guruId = $user?->guru_id;
+
+        $query = AkademikBankSoal::with(['mataPelajaran', 'guru']);
+
+        if ($guruId && !$user->isAdmin() && !$user->isWakaKurikulum()) {
+            $query->where(function($q) use ($guruId) {
+                $q->where('guru_id', $guruId)->orWhereNull('guru_id');
+            });
+        }
+
+        if ($request->filled('mapel_id')) {
+            $query->where('mata_pelajaran_id', $request->mapel_id);
+        }
+
+        if ($request->filled('q')) {
+            $keyword = '%' . $request->q . '%';
+            $query->where(function($q) use ($keyword) {
+                $q->where('pertanyaan', 'like', $keyword)
+                  ->orWhere('opsi_a', 'like', $keyword)
+                  ->orWhere('opsi_b', 'like', $keyword)
+                  ->orWhere('opsi_c', 'like', $keyword)
+                  ->orWhere('opsi_d', 'like', $keyword)
+                  ->orWhere('opsi_e', 'like', $keyword);
+            });
+        }
+
+        $bankSoals = $query->latest()->paginate(20)->withQueryString();
+        $allMapels = AkademikMataPelajaran::where('is_active', true)->orderBy('nama_mapel')->get();
+
+        return view('dcc.akademik.asesmen.bank_soal', compact('bankSoals', 'allMapels'));
+    }
+
+    public function destroyBankSoal($id)
+    {
+        $bs = AkademikBankSoal::findOrFail($id);
+        $user = auth()->user();
+        if (!$user->isAdmin() && !$user->isWakaKurikulum() && $bs->guru_id && $bs->guru_id !== $user->guru_id) {
+            abort(403, 'Akses Ditolak: Anda tidak memiliki hak untuk menghapus butir soal ini.');
+        }
+
+        $bs->delete();
+        return redirect()->back()->with('success', 'Butir soal berhasil dihapus dari Bank Soal.');
     }
 }

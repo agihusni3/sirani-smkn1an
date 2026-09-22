@@ -12,7 +12,11 @@
     </div>
   </div>
 
-  <div>
+  <div style="display:flex; gap:8px;">
+    <a href="{{ route('akademik.bank_soal.index') }}" class="ak-btn ak-btn-secondary">
+      <i class="bi bi-archive me-1"></i>
+      <span>Bank Soal</span>
+    </a>
     <a href="{{ route('akademik.asesmen.create') }}" class="ak-btn ak-btn-primary">
       <i class="bi bi-plus-circle"></i>
       <span>Buat Paket Asesmen Baru</span>

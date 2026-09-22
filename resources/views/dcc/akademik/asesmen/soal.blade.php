@@ -357,6 +357,10 @@
         <i class="bi bi-plus-circle text-primary"></i>
         <span>Tambah Butir Pertanyaan No. {{ $nomorBerikutnya }}</span>
       </h3>
+      <button type="button" onclick="bukaModalBankSoal()" class="ak-btn ak-btn-secondary" style="padding:5px 12px; font-size:12px; font-weight:700;">
+        <i class="bi bi-box-arrow-in-down-right text-primary me-1"></i>
+        <span>Panggil dari Bank Soal ({{ $bankSoals->count() }})</span>
+      </button>
     </div>
 
     <div class="panel-card-body">
@@ -573,26 +577,31 @@
     </div>
   </div>
 
-  {{-- Right Column: Bank Soal Tersimpan --}}
+  {{-- Right Column: Daftar Butir Soal Asesmen Ini --}}
   <div class="panel-card">
     <div class="panel-card-head">
       <h3 class="panel-card-title">
         <i class="bi bi-collection text-primary"></i>
-        <span>Bank Soal Tersimpan ({{ $asesmen->soals->count() }})</span>
+        <span>Daftar Soal Asesmen Ini ({{ $asesmen->soals->count() }})</span>
       </h3>
       <span class="ak-badge ak-badge-success" style="font-size:11px;">Total: {{ $totalBobot }} Poin</span>
     </div>
 
     <div class="panel-card-body" style="padding:16px; max-height:820px; overflow-y:auto;" id="savedQuestionsContainer">
       @if($asesmen->soals->isEmpty())
-        <div style="padding:48px 20px; text-align:center; color:#64748b;">
+        <div style="padding:44px 20px; text-align:center; color:#64748b;">
           <div style="width:54px; height:54px; border-radius:50%; background:#f1f5f9; color:#94a3b8; display:flex; align-items:center; justify-content:center; margin:0 auto 12px; font-size:24px;">
             <i class="bi bi-file-earmark-plus"></i>
           </div>
           <h5 style="font-size:15px; font-weight:800; color:#1e293b; margin-bottom:4px;">Belum Ada Butir Soal</h5>
-          <p style="font-size:12.5px; color:#64748b; max-width:320px; margin:0 auto; line-height:1.5;">
-            Tulis pertanyaan dan pilihan jawaban di formulir sebelah kiri untuk mulai menambahkan soal.
+          <p style="font-size:12.5px; color:#64748b; max-width:320px; margin:0 auto 14px; line-height:1.5;">
+            Tulis pertanyaan di sebelah kiri atau panggil butir soal yang sudah tersimpan di Bank Soal.
           </p>
+          @if($bankSoals->isNotEmpty())
+            <button type="button" onclick="bukaModalBankSoal()" class="ak-btn ak-btn-secondary ak-btn-sm" style="font-weight:700;">
+              <i class="bi bi-box-arrow-in-down-right text-primary me-1"></i> Panggil dari Bank Soal ({{ $bankSoals->count() }})
+            </button>
+          @endif
         </div>
       @else
         <div style="display:flex; flex-direction:column; gap:12px;">
@@ -861,5 +870,189 @@
       }
     }, 400);
   });
+
+  // 6. MODAL & FITUR PANGGIL DARI BANK SOAL
+  function bukaModalBankSoal() {
+    const modal = document.getElementById('modalBankSoal');
+    if (modal) {
+      modal.style.display = 'flex';
+      hitungTerpilihBankSoal();
+      if (typeof renderMathInElement === 'function') {
+        renderMathInElement(document.getElementById('listBankSoalContainer'), {
+          delimiters: [
+            {left: '$$', right: '$$', display: true},
+            {left: '$', right: '$', display: false},
+            {left: '\\(', right: '\\)', display: false},
+            {left: '\\[', right: '\\]', display: true}
+          ],
+          throwOnError: false
+        });
+      }
+    }
+  }
+
+  function tutupModalBankSoal() {
+    const modal = document.getElementById('modalBankSoal');
+    if (modal) modal.style.display = 'none';
+  }
+
+  function hitungTerpilihBankSoal() {
+    const cbs = document.querySelectorAll('.bank-item-cb:checked');
+    const label = document.getElementById('labelJumlahTerpilih');
+    const btn = document.getElementById('btnSubmitImportBank');
+    if (label) label.innerText = cbs.length;
+    if (btn) btn.disabled = (cbs.length === 0);
+  }
+
+  function pilihSemuaBankSoal(status) {
+    const cbs = document.querySelectorAll('.bank-item-cb:not(:disabled)');
+    cbs.forEach(cb => {
+      const parent = cb.closest('.bank-soal-item');
+      if (!parent || parent.style.display !== 'none') {
+        cb.checked = status;
+      }
+    });
+    hitungTerpilihBankSoal();
+  }
+
+  function filterBankSoal() {
+    const query = (document.getElementById('cariBankSoalInput').value || '').toLowerCase();
+    const items = document.querySelectorAll('.bank-soal-item');
+    items.forEach(item => {
+      const text = item.getAttribute('data-pertanyaan') || '';
+      if (text.includes(query)) {
+        item.style.display = '';
+      } else {
+        item.style.display = 'none';
+      }
+    });
+  }
 </script>
+
+{{-- Modal Panggil dari Bank Soal --}}
+<div id="modalBankSoal" style="display:none; position:fixed; inset:0; background:rgba(15,23,42,0.6); z-index:99999; align-items:center; justify-content:center; padding:16px;">
+  <div style="background:#ffffff; border-radius:14px; max-width:780px; width:100%; max-height:90vh; display:flex; flex-direction:column; box-shadow:0 20px 25px -5px rgba(0,0,0,0.2); overflow:hidden;">
+    
+    {{-- Modal Header --}}
+    <div style="padding:16px 20px; border-bottom:1px solid #e2e8f0; display:flex; justify-content:space-between; align-items:center; background:#f8fafc;">
+      <div>
+        <h4 style="font-size:16px; font-weight:800; color:#0f172a; margin:0; display:flex; align-items:center; gap:8px;">
+          <i class="bi bi-archive-fill text-primary"></i>
+          <span>Bank Soal: {{ $asesmen->distribusi?->mataPelajaran?->nama_mapel ?? 'Mata Pelajaran' }}</span>
+        </h4>
+        <div style="font-size:12px; color:#64748b; margin-top:3px;">
+          Pilih butir soal yang tersimpan untuk digunakan pada paket asesmen ini.
+        </div>
+      </div>
+      <button type="button" onclick="tutupModalBankSoal()" style="background:none; border:none; font-size:20px; color:#64748b; cursor:pointer; padding:4px;">
+        <i class="bi bi-x-lg"></i>
+      </button>
+    </div>
+
+    {{-- Filter & Search Toolbar --}}
+    <div style="padding:12px 20px; border-bottom:1px solid #f1f5f9; background:#ffffff; display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;">
+      <div style="position:relative; flex:1; min-width:240px;">
+        <i class="bi bi-search" style="position:absolute; left:12px; top:50%; transform:translateY(-50%); color:#94a3b8; font-size:13px;"></i>
+        <input type="text" id="cariBankSoalInput" oninput="filterBankSoal()" placeholder="Ketik kata kunci untuk mencari butir soal..." class="ak-input" style="padding-left:34px; font-size:12.5px; height:36px;">
+      </div>
+      <div style="display:flex; align-items:center; gap:8px;">
+        <button type="button" onclick="pilihSemuaBankSoal(true)" class="ak-btn ak-btn-secondary ak-btn-sm" style="font-size:11.5px;">Pilih Semua</button>
+        <button type="button" onclick="pilihSemuaBankSoal(false)" class="ak-btn ak-btn-secondary ak-btn-sm" style="font-size:11.5px;">Batal Pilih</button>
+      </div>
+    </div>
+
+    {{-- Form Import --}}
+    <form action="{{ route('akademik.asesmen.soal.import_bank', $asesmen->id) }}" method="POST" id="formImportBankSoal" style="display:flex; flex-direction:column; flex:1; overflow:hidden; margin:0;">
+      @csrf
+
+      {{-- Question List Container --}}
+      <div style="padding:16px 20px; overflow-y:auto; flex:1; max-height:480px; display:flex; flex-direction:column; gap:12px;" id="listBankSoalContainer">
+        @if($bankSoals->isEmpty())
+          <div style="padding:40px 20px; text-align:center; color:#64748b;">
+            <i class="bi bi-folder-x" style="font-size:36px; color:#cbd5e1; display:block; margin-bottom:10px;"></i>
+            <h5 style="font-size:14.5px; font-weight:700; color:#334155; margin-bottom:4px;">Bank Soal Masih Kosong</h5>
+            <p style="font-size:12px; color:#64748b; margin:0;">
+              Belum ada butir soal tersimpan untuk mata pelajaran ini. Setiap butir soal yang dibuat akan otomatis tersimpan di sini.
+            </p>
+          </div>
+        @else
+          @foreach($bankSoals as $bs)
+            @php
+              $sudahAda = in_array(trim(strip_tags($bs->pertanyaan)), $existingPertanyaans);
+            @endphp
+            <div class="bank-soal-item" data-pertanyaan="{{ strtolower(strip_tags($bs->pertanyaan)) }}" style="background:#ffffff; border:1px solid #e2e8f0; border-radius:10px; padding:12px 14px; transition:all 0.15s ease; {{ $sudahAda ? 'opacity:0.65; background:#f8fafc;' : '' }}">
+              <div style="display:flex; align-items:flex-start; gap:12px;">
+                <div style="margin-top:3px;">
+                  @if($sudahAda)
+                    <input type="checkbox" disabled checked style="width:17px; height:17px; cursor:not-allowed;">
+                  @else
+                    <input type="checkbox" name="bank_soal_ids[]" value="{{ $bs->id }}" class="bank-item-cb" onchange="hitungTerpilihBankSoal()" style="width:17px; height:17px; cursor:pointer;">
+                  @endif
+                </div>
+                <div style="flex:1;">
+                  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                    <div style="display:flex; align-items:center; gap:6px;">
+                      <span class="ak-badge ak-badge-primary" style="font-size:10.5px;">{{ strtoupper(str_replace('_', ' ', $bs->tipe)) }}</span>
+                      <span class="ak-badge ak-badge-secondary" style="font-size:10.5px;">Bobot: {{ $bs->bobot }} Poin</span>
+                      @if($bs->guru)
+                        <span style="font-size:11px; color:#64748b;">· {{ $bs->guru->nama_guru }}</span>
+                      @endif
+                    </div>
+                    @if($sudahAda)
+                      <span class="ak-badge ak-badge-success" style="font-size:10.5px;">
+                        <i class="bi bi-check-circle-fill me-1"></i> Sudah Ada di Asesmen
+                      </span>
+                    @endif
+                  </div>
+
+                  {{-- Teks Pertanyaan --}}
+                  <div class="render-math-target" style="font-size:13px; font-weight:700; color:#0f172a; margin-bottom:8px; line-height:1.5;">
+                    {!! $bs->pertanyaan !!}
+                  </div>
+
+                  @if($bs->gambar_url)
+                    <div style="margin-bottom:8px; max-width:180px;">
+                      <img src="{{ $bs->gambar_url }}" alt="Gambar" style="width:100%; border-radius:6px; border:1px solid #cbd5e1;">
+                    </div>
+                  @endif
+
+                  {{-- Preview Opsi Jawaban --}}
+                  <div style="display:flex; flex-direction:column; gap:3px; font-size:11.5px;">
+                    @foreach(['A' => $bs->opsi_a, 'B' => $bs->opsi_b, 'C' => $bs->opsi_c, 'D' => $bs->opsi_d, 'E' => $bs->opsi_e] as $abjad => $teksOpsi)
+                      @if(!empty($teksOpsi))
+                        @php $isKunci = ($bs->kunci_jawaban == $abjad); @endphp
+                        <div class="render-math-target" style="display:flex; align-items:center; gap:6px; padding:2px 6px; border-radius:4px; {{ $isKunci ? 'font-weight:700; color:#065f46; background:#ecfdf5;' : 'color:#475569;' }}">
+                          <span style="width:14px;">{{ $abjad }}.</span>
+                          <span>{{ $teksOpsi }}</span>
+                          @if($isKunci)
+                            <i class="bi bi-check-circle-fill text-success" title="Kunci Jawaban"></i>
+                          @endif
+                        </div>
+                      @endif
+                    @endforeach
+                  </div>
+                </div>
+              </div>
+            </div>
+          @endforeach
+        @endif
+      </div>
+
+      {{-- Modal Footer --}}
+      <div style="padding:14px 20px; border-top:1px solid #e2e8f0; background:#f8fafc; display:flex; justify-content:space-between; align-items:center;">
+        <div style="font-size:12.5px; font-weight:700; color:#334155;">
+          <span id="labelJumlahTerpilih">0</span> butir soal dipilih
+        </div>
+        <div style="display:flex; gap:8px;">
+          <button type="button" onclick="tutupModalBankSoal()" class="ak-btn ak-btn-secondary" style="font-size:12.5px; padding:7px 14px;">Batal</button>
+          <button type="submit" id="btnSubmitImportBank" class="ak-btn ak-btn-primary" disabled style="font-size:12.5px; padding:7px 16px; font-weight:800;">
+            <i class="bi bi-box-arrow-in-down-right me-1"></i>
+            <span>Panggil &amp; Masukkan ke Asesmen</span>
+          </button>
+        </div>
+      </div>
+    </form>
+
+  </div>
+</div>
 @endsection
