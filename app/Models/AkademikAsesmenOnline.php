@@ -87,8 +87,8 @@ class AkademikAsesmenOnline extends Model {
         return match($this->jenis) {
             'kuis' => 'Kuis Harian',
             'ulangan_harian' => 'Ulangan Harian (UH)',
-            'pts' => 'PTS (Tengah Semester)',
-            'pas' => 'PAS (Akhir Semester)',
+            'pts' => 'STS (Sumatif Tengah Semester)',
+            'pas' => 'SAS (Sumatif Akhir Semester)',
             'tugas' => 'Tugas Daring',
             default => ucwords(str_replace('_', ' ', $this->jenis))
         };

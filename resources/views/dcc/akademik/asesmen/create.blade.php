@@ -80,8 +80,8 @@
             <select name="jenis" id="inputJenis" class="ak-select" required style="font-size:14px; padding:10px 14px;">
               <option value="ulangan_harian" {{ old('jenis') == 'ulangan_harian' ? 'selected' : '' }}>Ulangan Harian (UH)</option>
               <option value="kuis" {{ old('jenis') == 'kuis' ? 'selected' : '' }}>Kuis / Latihan Harian</option>
-              <option value="pts" {{ old('jenis') == 'pts' ? 'selected' : '' }}>PTS (Sumatif Tengah Semester)</option>
-              <option value="pas" {{ old('jenis') == 'pas' ? 'selected' : '' }}>PAS (Sumatif Akhir Semester)</option>
+              <option value="pts" {{ old('jenis') == 'pts' ? 'selected' : '' }}>STS (Sumatif Tengah Semester)</option>
+              <option value="pas" {{ old('jenis') == 'pas' ? 'selected' : '' }}>SAS (Sumatif Akhir Semester)</option>
               <option value="tugas" {{ old('jenis') == 'tugas' ? 'selected' : '' }}>Tugas Daring Mandiri</option>
             </select>
             <div style="font-size:11.5px; color:#64748b; margin-top:4px;">

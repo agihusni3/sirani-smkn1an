@@ -8,21 +8,24 @@
   <div>
     <h1 class="akademik-page-title">Asesmen Penilaian Berbasis Online</h1>
     <div class="akademik-page-desc">
-      Evaluasi pembelajaran berbasis komputer (CBT): Kuis, Ulangan Harian, Penilaian Tengah Semester (PTS), dan Penilaian Akhir Semester (PAS).
+      Evaluasi pembelajaran berbasis komputer (CBT): Kuis, Ulangan Harian, Sumatif Tengah Semester (STS), dan Sumatif Akhir Semester (SAS).
     </div>
   </div>
 
-  <a href="{{ route('akademik.asesmen.create') }}" class="ak-btn ak-btn-primary">
-    <i class="bi bi-plus-circle"></i>
-    <span>Buat Asesmen Online Baru</span>
-  </a>
+  <div>
+    <a href="{{ route('akademik.asesmen.create') }}" class="ak-btn ak-btn-primary">
+      <i class="bi bi-plus-circle"></i>
+      <span>Buat Paket Asesmen Baru</span>
+    </a>
+  </div>
 </div>
 
-{{-- Filter Toolbar --}}
-<div class="akademik-card" style="margin-bottom:16px;">
+{{-- Filter Card --}}
+<div class="akademik-card" style="margin-bottom:20px;">
   <div class="akademik-card-body" style="padding:14px 20px;">
-    <form action="{{ route('akademik.asesmen.index') }}" method="GET" style="display:flex; flex-wrap:wrap; gap:12px; align-items:center;">
-      <div style="flex:1; min-width:180px;">
+    <form action="{{ route('akademik.asesmen.index') }}" method="GET" style="display:flex; gap:12px; align-items:center; flex-wrap:wrap;">
+      
+      <div style="width:200px;">
         <select name="mapel_id" class="ak-select" onchange="this.form.submit()">
           <option value="">Semua Mata Pelajaran</option>
           @foreach($filterMapels as $m)
@@ -33,7 +36,7 @@
         </select>
       </div>
 
-      <div style="width:160px;">
+      <div style="width:180px;">
         <select name="rombel_id" class="ak-select" onchange="this.form.submit()">
           <option value="">Semua Rombel</option>
           @foreach($filterRombels as $r)
@@ -49,8 +52,8 @@
           <option value="">Semua Jenis Asesmen</option>
           <option value="kuis" {{ request('jenis') == 'kuis' ? 'selected' : '' }}>Kuis Harian</option>
           <option value="ulangan_harian" {{ request('jenis') == 'ulangan_harian' ? 'selected' : '' }}>Ulangan Harian (UH)</option>
-          <option value="pts" {{ request('jenis') == 'pts' ? 'selected' : '' }}>PTS (Tengah Semester)</option>
-          <option value="pas" {{ request('jenis') == 'pas' ? 'selected' : '' }}>PAS (Akhir Semester)</option>
+          <option value="pts" {{ request('jenis') == 'pts' ? 'selected' : '' }}>STS (Sumatif Tengah Semester)</option>
+          <option value="pas" {{ request('jenis') == 'pas' ? 'selected' : '' }}>SAS (Sumatif Akhir Semester)</option>
           <option value="tugas" {{ request('jenis') == 'tugas' ? 'selected' : '' }}>Tugas Daring</option>
         </select>
       </div>
