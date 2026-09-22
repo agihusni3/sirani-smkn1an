@@ -12,15 +12,97 @@
     </div>
   </div>
 
-  <div style="display:flex; gap:10px;">
+  <div style="display:flex; gap:10px; align-items:center;">
     <a href="{{ route('akademik.asesmen.index') }}" class="ak-btn ak-btn-secondary">
       <i class="bi bi-arrow-left"></i>
       <span>Kembali</span>
     </a>
+    <form action="{{ route('akademik.asesmen.toggle', $asesmen->id) }}" method="POST" style="margin:0;">
+      @csrf
+      <button type="submit" class="ak-btn {{ $asesmen->is_active ? 'ak-btn-secondary' : 'ak-btn-success' }}" title="Aktivasi atau nonaktifkan ujian untuk siswa">
+        <i class="bi {{ $asesmen->is_active ? 'bi-pause-circle' : 'bi-play-circle-fill' }}"></i>
+        <span>{{ $asesmen->is_active ? 'Nonaktifkan Sesi' : 'Aktifkan Ujian Sekarang' }}</span>
+      </button>
+    </form>
     <a href="{{ route('akademik.asesmen.kerjakan', $asesmen->id) }}" class="ak-btn ak-btn-primary" target="_blank">
-      <i class="bi bi-play-circle"></i>
-      <span>Simulasi Kerjakan (CBT)</span>
+      <i class="bi bi-phone"></i>
+      <span>Simulasi CBT Mobile</span>
     </a>
+  </div>
+</div>
+
+{{-- Panel Audit Kelayakan & Validasi Mutu Soal --}}
+<div class="akademik-card" style="margin-bottom:20px; border-left:4px solid {{ $auditKelayakan['is_valid'] ? '#10b981' : '#f59e0b' }};">
+  <div class="akademik-card-body" style="padding:16px 20px;">
+    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+      <div style="display:flex; align-items:center; gap:12px;">
+        <div style="width:42px; height:42px; border-radius:10px; background:{{ $auditKelayakan['is_valid'] ? '#ecfdf5' : '#fffbeb' }}; color:{{ $auditKelayakan['is_valid'] ? '#059669' : '#d97706' }}; display:flex; align-items:center; justify-content:center; font-size:22px;">
+          <i class="bi {{ $auditKelayakan['is_valid'] ? 'bi-shield-check' : 'bi-shield-exclamation' }}"></i>
+        </div>
+        <div>
+          <div style="display:flex; align-items:center; gap:8px;">
+            <strong style="font-size:14.5px; color:#0f172a;">Audit Kelayakan &amp; Validasi Butir Soal</strong>
+            @if($asesmen->status_validasi === 'siap_diujikan')
+              <span class="ak-badge ak-badge-success"><i class="bi bi-check-circle-fill me-1"></i> Terverifikasi &amp; Siap Diujikan</span>
+            @elseif($asesmen->status_validasi === 'perlu_revisi')
+              <span class="ak-badge ak-badge-danger"><i class="bi bi-exclamation-octagon-fill me-1"></i> Perlu Revisi</span>
+            @else
+              <span class="ak-badge ak-badge-warning"><i class="bi bi-pencil-square me-1"></i> Draft Penyusunan</span>
+            @endif
+          </div>
+          <div style="font-size:12px; color:#64748b; margin-top:2px;">
+            @if($auditKelayakan['is_valid'])
+              Semua <strong>{{ $auditKelayakan['total_soal'] }} butir soal</strong> memenuhi standar teknis integritas CBT (Kunci valid &amp; opsi lengkap).
+            @else
+              Ditemukan <strong>{{ count($auditKelayakan['errors']) }} kendala</strong> yang perlu diselesaikan sebelum ujian dapat diaktifkan.
+            @endif
+          </div>
+        </div>
+      </div>
+
+      {{-- KPI Mini Bar --}}
+      <div style="display:flex; gap:16px; align-items:center;">
+        <div style="text-align:right;">
+          <div style="font-size:11px; color:#64748b; text-transform:uppercase; font-weight:700;">Total Soal</div>
+          <div style="font-size:18px; font-weight:900; color:#0f172a;">{{ $auditKelayakan['total_soal'] }} Butir</div>
+        </div>
+        <div style="height:32px; width:1px; background:#e2e8f0;"></div>
+        <div style="text-align:right;">
+          <div style="font-size:11px; color:#64748b; text-transform:uppercase; font-weight:700;">Total Bobot</div>
+          <div style="font-size:18px; font-weight:900; color:#2563eb;">{{ $auditKelayakan['total_bobot'] }} Poin</div>
+        </div>
+      </div>
+    </div>
+
+    {{-- Error Checklist (Jika ada) --}}
+    @if(!empty($auditKelayakan['errors']))
+      <div style="margin-top:14px; padding:10px 14px; background:#fef2f2; border:1px solid #fecaca; border-radius:8px; font-size:12px; color:#991b1b;">
+        <div style="font-weight:800; margin-bottom:4px;"><i class="bi bi-x-circle me-1"></i> Wajib Diperbaiki Sebelum Sesi Diaktifkan:</div>
+        <ul style="margin:0; padding-left:18px;">
+          @foreach($auditKelayakan['errors'] as $err)
+            <li>{{ $err }}</li>
+          @endforeach
+        </ul>
+      </div>
+    @endif
+
+    {{-- Warning Checklist (Saran Mutu) --}}
+    @if(!empty($auditKelayakan['warnings']))
+      <div style="margin-top:10px; padding:10px 14px; background:#fffbeb; border:1px solid #fde68a; border-radius:8px; font-size:12px; color:#92400e;">
+        <div style="font-weight:800; margin-bottom:4px;"><i class="bi bi-exclamation-triangle me-1"></i> Catatan Mutu Butir Soal:</div>
+        <ul style="margin:0; padding-left:18px;">
+          @foreach($auditKelayakan['warnings'] as $warn)
+            <li>{{ $warn }}</li>
+          @endforeach
+        </ul>
+      </div>
+    @endif
+
+    @if($asesmen->catatan_validasi)
+      <div style="margin-top:10px; padding:8px 12px; background:#f8fafc; border-left:3px solid #64748b; font-size:12px; color:#334155;">
+        <strong>Catatan Telaah Pengawas / Waka Kurikulum:</strong> {{ $asesmen->catatan_validasi }}
+      </div>
+    @endif
   </div>
 </div>
 
@@ -36,63 +118,66 @@
       <span class="ak-badge ak-badge-primary">Pilihan Ganda</span>
     </div>
     <div class="akademik-card-body">
-      <form action="{{ route('akademik.asesmen.soal.store', $asesmen->id) }}" method="POST">
+      <form action="{{ route('akademik.asesmen.soal.store', $asesmen->id) }}" method="POST" id="formTambahSoal" onsubmit="return validasiFormSoal(event)">
         @csrf
         <input type="hidden" name="tipe" value="pilihan_ganda">
 
         <div style="margin-bottom:14px;">
           <label class="ak-form-label">Teks Pertanyaan / Soal <span class="text-danger">*</span></label>
-          <textarea name="pertanyaan" class="ak-textarea" rows="4" placeholder="Tuliskan butir soal di sini..." required></textarea>
+          <textarea name="pertanyaan" id="inputPertanyaan" class="ak-textarea" rows="4" placeholder="Tuliskan butir soal di sini..." required>{{ old('pertanyaan') }}</textarea>
         </div>
 
         <div style="display:flex; flex-direction:column; gap:10px; margin-bottom:14px;">
           <div>
             <label class="ak-form-label">Pilihan Jawaban A <span class="text-danger">*</span></label>
-            <input type="text" name="opsi_a" class="ak-input" placeholder="Opsi A" required>
+            <input type="text" name="opsi_a" id="opsi_A" class="ak-input" placeholder="Opsi A" value="{{ old('opsi_a') }}" required oninput="cekKesesuaianKunci()">
           </div>
           <div>
             <label class="ak-form-label">Pilihan Jawaban B <span class="text-danger">*</span></label>
-            <input type="text" name="opsi_b" class="ak-input" placeholder="Opsi B" required>
+            <input type="text" name="opsi_b" id="opsi_B" class="ak-input" placeholder="Opsi B" value="{{ old('opsi_b') }}" required oninput="cekKesesuaianKunci()">
           </div>
           <div>
             <label class="ak-form-label">Pilihan Jawaban C</label>
-            <input type="text" name="opsi_c" class="ak-input" placeholder="Opsi C">
+            <input type="text" name="opsi_c" id="opsi_C" class="ak-input" placeholder="Opsi C" value="{{ old('opsi_c') }}" oninput="cekKesesuaianKunci()">
           </div>
           <div>
             <label class="ak-form-label">Pilihan Jawaban D</label>
-            <input type="text" name="opsi_d" class="ak-input" placeholder="Opsi D">
+            <input type="text" name="opsi_d" id="opsi_D" class="ak-input" placeholder="Opsi D" value="{{ old('opsi_d') }}" oninput="cekKesesuaianKunci()">
           </div>
           <div>
             <label class="ak-form-label">Pilihan Jawaban E</label>
-            <input type="text" name="opsi_e" class="ak-input" placeholder="Opsi E">
+            <input type="text" name="opsi_e" id="opsi_E" class="ak-input" placeholder="Opsi E" value="{{ old('opsi_e') }}" oninput="cekKesesuaianKunci()">
           </div>
         </div>
 
         <div style="display:grid; grid-template-columns: 1fr 1fr; gap:14px; margin-bottom:14px;">
           <div>
-            <label class="ak-form-label">Kunci Jawaban Benar <span class="text-danger">*</span></label>
-            <select name="kunci_jawaban" class="ak-select" required>
-              <option value="A">A</option>
-              <option value="B">B</option>
-              <option value="C">C</option>
-              <option value="D">D</option>
-              <option value="E">E</option>
+            <label class="ak-form-label">
+              Kunci Jawaban Benar <span class="text-danger">*</span>
+              <span id="kunciWarning" style="color:#dc2626; font-size:11px; font-weight:700; display:none; margin-left:6px;">⚠️ Opsi Kosong!</span>
+            </label>
+            <select name="kunci_jawaban" id="selectKunci" class="ak-select" required onchange="cekKesesuaianKunci()">
+              <option value="A" {{ old('kunci_jawaban') == 'A' ? 'selected' : '' }}>A</option>
+              <option value="B" {{ old('kunci_jawaban') == 'B' ? 'selected' : '' }}>B</option>
+              <option value="C" {{ old('kunci_jawaban') == 'C' ? 'selected' : '' }}>C</option>
+              <option value="D" {{ old('kunci_jawaban') == 'D' ? 'selected' : '' }}>D</option>
+              <option value="E" {{ old('kunci_jawaban') == 'E' ? 'selected' : '' }}>E</option>
             </select>
           </div>
           <div>
             <label class="ak-form-label">Bobot Nilai Soal</label>
-            <input type="number" name="bobot" class="ak-input" value="1" min="1" required>
+            <input type="number" name="bobot" class="ak-input" value="{{ old('bobot', 1) }}" min="1" required>
           </div>
         </div>
 
         <div style="margin-bottom:16px;">
           <label class="ak-form-label">Pembahasan / Penjelasan (Opsional)</label>
-          <textarea name="pembahasan" class="ak-textarea" rows="2" placeholder="Tampilkan sebagai feedback setelah siswa menjawab..."></textarea>
+          <textarea name="pembahasan" class="ak-textarea" rows="2" placeholder="Tampilkan sebagai feedback setelah siswa menjawab...">{{ old('pembahasan') }}</textarea>
         </div>
 
         <button type="submit" class="ak-btn ak-btn-primary" style="width:100%;">
           <i class="bi bi-save"></i>
-          <span>Simpan Butir Soal</span>
+          <span>Validasi &amp; Simpan Butir Soal</span>
         </button>
       </form>
     </div>
@@ -160,7 +245,50 @@
         </div>
       @endif
     </div>
-  </div>
-
 </div>
+
+<script>
+  function cekKesesuaianKunci() {
+    const kunci = document.getElementById('selectKunci').value;
+    const inputOpsi = document.getElementById('opsi_' + kunci);
+    const warningEl = document.getElementById('kunciWarning');
+
+    if (inputOpsi && inputOpsi.value.trim() === '') {
+      if (warningEl) {
+        warningEl.style.display = 'inline';
+        warningEl.innerText = '⚠️ Opsi ' + kunci + ' masih kosong!';
+      }
+      return false;
+    } else {
+      if (warningEl) {
+        warningEl.style.display = 'none';
+      }
+      return true;
+    }
+  }
+
+  function validasiFormSoal(e) {
+    const isKunciValid = cekKesesuaianKunci();
+    if (!isKunciValid) {
+      const kunci = document.getElementById('selectKunci').value;
+      alert("Peringatan Validasi: Anda memilih Kunci Jawaban '" + kunci + "', tetapi teks Pilihan Jawaban " + kunci + " masih kosong. Harap isi teks opsi tersebut sebelum menyimpan.");
+      const inputOpsi = document.getElementById('opsi_' + kunci);
+      if (inputOpsi) inputOpsi.focus();
+      return false;
+    }
+
+    // Cek duplikasi opsi A dan B
+    const opsiA = document.getElementById('opsi_A').value.trim();
+    const opsiB = document.getElementById('opsi_B').value.trim();
+    if (opsiA && opsiB && opsiA.toLowerCase() === opsiB.toLowerCase()) {
+      alert("Peringatan Validasi: Pilihan Jawaban A dan B memiliki teks yang sama persis!");
+      return false;
+    }
+
+    return true;
+  }
+
+  // Initial check
+  document.addEventListener('DOMContentLoaded', cekKesesuaianKunci);
+</script>
 @endsection

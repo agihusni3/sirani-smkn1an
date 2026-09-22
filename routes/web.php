@@ -389,6 +389,7 @@ Route::middleware('auth')->group(function () {
             Route::post('/asesmen/{id}/soal', [\App\Http\Controllers\Akademik\AkademikAsesmenController::class, 'storeSoal'])->name('akademik.asesmen.soal.store');
             Route::delete('/asesmen/{id}/soal/{soalId}', [\App\Http\Controllers\Akademik\AkademikAsesmenController::class, 'destroySoal'])->name('akademik.asesmen.soal.destroy');
             Route::post('/asesmen/{id}/toggle', [\App\Http\Controllers\Akademik\AkademikAsesmenController::class, 'toggleStatus'])->name('akademik.asesmen.toggle');
+            Route::post('/asesmen/{id}/validasi', [\App\Http\Controllers\Akademik\AkademikAsesmenController::class, 'validasiSoal'])->name('akademik.asesmen.validasi');
             Route::post('/asesmen/{id}/refresh-token', [\App\Http\Controllers\Akademik\AkademikAsesmenController::class, 'refreshToken'])->name('akademik.asesmen.refresh_token');
             Route::post('/asesmen/{id}/reset-siswa/{siswaId}', [\App\Http\Controllers\Akademik\AkademikAsesmenController::class, 'resetSiswa'])->name('akademik.asesmen.reset_siswa');
             Route::post('/asesmen/{id}/push-nilai', [\App\Http\Controllers\Akademik\AkademikAsesmenController::class, 'pushToNilai'])->name('akademik.asesmen.push_nilai');

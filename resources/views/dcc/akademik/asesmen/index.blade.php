@@ -88,6 +88,19 @@
                   <div style="font-weight:700; color:var(--ak-dark); font-size:14px;">{{ $a->judul }}</div>
                   <div style="display:flex; align-items:center; gap:6px; margin-top:4px; flex-wrap:wrap;">
                     <span style="font-size:11px; color:#64748b;">KKM: <strong>{{ $a->passing_grade }}</strong></span>
+                    @if($a->status_validasi === 'siap_diujikan')
+                      <span class="ak-badge ak-badge-success" style="font-size:9.5px; padding:2px 6px;" title="Butir soal telah divalidasi dan memenuhi syarat kelayakan ujian">
+                        <i class="bi bi-patch-check-fill me-1"></i>Valid
+                      </span>
+                    @elseif($a->status_validasi === 'perlu_revisi')
+                      <span class="ak-badge ak-badge-danger" style="font-size:9.5px; padding:2px 6px;" title="Butir soal perlu revisi pengawas">
+                        <i class="bi bi-exclamation-triangle-fill me-1"></i>Revisi
+                      </span>
+                    @else
+                      <span class="ak-badge ak-badge-warning" style="font-size:9.5px; padding:2px 6px;" title="Soal masih dalam proses penyusunan draft">
+                        <i class="bi bi-pencil me-1"></i>Draft
+                      </span>
+                    @endif
                     @if($a->anti_cheat_mode)
                       <span class="ak-badge ak-badge-danger" style="font-size:9.5px; padding:2px 6px;">
                         <i class="bi bi-shield-lock-fill me-1"></i>Anti-Curang

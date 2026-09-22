@@ -63,14 +63,53 @@
         <div class="akademik-card-body">
           <div style="margin-bottom:16px;">
             <label class="ak-form-label">Mata Pelajaran &amp; Rombel Sasaran <span class="text-danger">*</span></label>
-            <select name="distribusi_id" class="ak-select" required>
+            <select name="distribusi_id" id="selectDistribusi" class="ak-select" required onchange="handleDistribusiChange()">
               <option value="">-- Pilih Rombel &amp; Mata Pelajaran --</option>
               @foreach($distribusis as $d)
-                <option value="{{ $d->id }}">
+                <option value="{{ $d->id }}" data-rombel-id="{{ $d->rombel_id }}" data-rombel-name="{{ $d->rombel?->nama_rombel }}">
                   {{ $d->rombel?->nama_rombel }} — {{ $d->mataPelajaran?->nama_mapel }} (Pengampu: {{ $d->guru?->nama }})
                 </option>
               @endforeach
             </select>
+          </div>
+
+          {{-- Pilihan Target Peserta: Seluruh Rombel vs Siswa Tertentu --}}
+          <div style="margin-bottom:16px; padding:14px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px;">
+            <label class="ak-form-label" style="font-size:12.5px; font-weight:800; color:#0f172a; margin-bottom:8px;">
+              Sasaran Penugasan Peserta Ujian <span class="text-danger">*</span>
+            </label>
+            <div style="display:flex; gap:20px; margin-bottom:6px; flex-wrap:wrap;">
+              <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-size:13px; font-weight:600; color:#1e293b;">
+                <input type="radio" name="target_tipe" value="rombel" checked onchange="toggleTargetPeserta(this.value)" style="accent-color:#2563eb;">
+                <span>Seluruh Siswa di Rombel Kelas</span>
+              </label>
+              <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-size:13px; font-weight:600; color:#b45309;">
+                <input type="radio" name="target_tipe" value="siswa_terpilih" onchange="toggleTargetPeserta(this.value)" style="accent-color:#2563eb;">
+                <span>Siswa Tertentu Saja (Remedial / Susulan / Pengayaan)</span>
+              </label>
+            </div>
+
+            {{-- Container Siswa Terpilih (Muncul jika opsi siswa_terpilih aktif) --}}
+            <div id="containerSiswaTerpilih" style="display:none; margin-top:12px; border-top:1px dashed #cbd5e1; padding-top:12px;">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; flex-wrap:wrap; gap:8px;">
+                <div style="font-size:12px; color:#64748b;">
+                  Centang nama siswa yang ditugaskan untuk mengikuti sesi ujian ini:
+                </div>
+                <div style="display:flex; gap:6px;">
+                  <button type="button" class="ak-btn ak-btn-secondary ak-btn-sm" style="font-size:11px; padding:3px 8px;" onclick="pilihSemuaSiswa(true)">Pilih Semua</button>
+                  <button type="button" class="ak-btn ak-btn-secondary ak-btn-sm" style="font-size:11px; padding:3px 8px;" onclick="pilihSemuaSiswa(false)">Bersihkan</button>
+                </div>
+              </div>
+
+              <div id="listSiswaCheckbox" style="max-height:200px; overflow-y:auto; border:1px solid #cbd5e1; border-radius:8px; padding:10px; background:#ffffff; display:grid; grid-template-columns: 1fr 1fr; gap:8px;">
+                <div style="color:#94a3b8; font-size:12px; grid-column:span 2; text-align:center; padding:12px;">
+                  Pilih Rombel &amp; Mata Pelajaran terlebih dahulu di atas untuk memuat daftar siswa.
+                </div>
+              </div>
+              <div style="font-size:11px; color:#b45309; margin-top:6px;">
+                <i class="bi bi-info-circle me-1"></i> Hanya siswa yang dicentang yang berhak dan diizinkan mengakses lembar ujian ini.
+              </div>
+            </div>
           </div>
 
           <div style="display:grid; grid-template-columns: 2fr 1fr; gap:14px; margin-bottom:16px;">
@@ -369,6 +408,59 @@
       tampilkanPembahasan.checked = false;
       generateRandomToken();
     }
+  }
+
+  // Data Siswa per Rombel dari Controller
+  const SISWA_DATA = {!! json_encode($siswasPerRombel ?? []) !!};
+
+  function toggleTargetPeserta(tipe) {
+    const container = document.getElementById('containerSiswaTerpilih');
+    if (tipe === 'siswa_terpilih') {
+      container.style.display = 'block';
+      renderSiswaCheckbox();
+    } else {
+      container.style.display = 'none';
+    }
+  }
+
+  function handleDistribusiChange() {
+    const targetTipe = document.querySelector('input[name="target_tipe"]:checked')?.value;
+    if (targetTipe === 'siswa_terpilih') {
+      renderSiswaCheckbox();
+    }
+  }
+
+  function renderSiswaCheckbox() {
+    const select = document.getElementById('selectDistribusi');
+    const selectedOpt = select.options[select.selectedIndex];
+    const rombelId = selectedOpt ? selectedOpt.getAttribute('data-rombel-id') : null;
+    const container = document.getElementById('listSiswaCheckbox');
+
+    if (!rombelId || !SISWA_DATA[rombelId] || SISWA_DATA[rombelId].length === 0) {
+      container.innerHTML = '<div style="color:#94a3b8; font-size:12px; grid-column:span 2; text-align:center; padding:12px;">Pilih Rombel &amp; Mata Pelajaran terlebih dahulu di atas untuk memuat daftar siswa.</div>';
+      return;
+    }
+
+    const siswas = SISWA_DATA[rombelId];
+    let html = '';
+    siswas.forEach(s => {
+      html += `
+        <label style="display:flex; align-items:center; gap:8px; padding:6px 10px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:6px; cursor:pointer; font-size:12.5px;">
+          <input type="checkbox" name="target_siswa_ids[]" value="${s.id}" class="chk-siswa" style="accent-color:#2563eb;">
+          <div style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+            <strong style="color:#0f172a;">${s.nama}</strong>
+            <span style="font-size:11px; color:#64748b; margin-left:4px;">(${s.nisn || 'NISN -'})</span>
+          </div>
+        </label>
+      `;
+    });
+    container.innerHTML = html;
+  }
+
+  function pilihSemuaSiswa(status) {
+    document.querySelectorAll('.chk-siswa').forEach(cb => {
+      cb.checked = status;
+    });
   }
 </script>
 @endsection
