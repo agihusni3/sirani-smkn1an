@@ -118,6 +118,23 @@ class DeployController extends Controller
         $logs['php_xml'] = class_exists(\DOMDocument::class);
         $logs['php_gd']  = extension_loaded('gd');
 
+        // Cek data siswa jika diminta untuk diagnostik
+        if ($request->has('check_nisn')) {
+            $s = \App\Models\Siswa::where('nisn', $request->check_nisn)
+                ->orWhere('nis', $request->check_nisn)
+                ->first();
+            $logs['student_detail'] = $s ? [
+                'id' => $s->id,
+                'nama' => $s->nama,
+                'nisn' => $s->nisn,
+                'tempat_lahir' => $s->tempat_lahir,
+                'tanggal_lahir_raw' => $s->getRawOriginal('tanggal_lahir'),
+                'tanggal_lahir_formatted' => $s->tanggal_lahir ? (\Carbon\Carbon::parse($s->tanggal_lahir)->format('d-m-Y')) : null,
+                'status' => $s->status,
+                'rombels' => $s->rombels->pluck('nama_rombel')->all(),
+            ] : 'not found';
+        }
+
         // Ambil baris error terakhir jika ada
         $logPath = storage_path('logs/laravel.log');
         if (file_exists($logPath)) {
