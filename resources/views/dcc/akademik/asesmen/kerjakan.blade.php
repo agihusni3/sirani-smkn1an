@@ -8,8 +8,11 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Amiri:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
   <link rel="stylesheet" href="{{ asset('css/akademik-app.css') }}?v={{ time() }}">
 
   <style>
@@ -586,7 +589,7 @@
               </div>
 
               <div class="cbt-q-text">
-                {!! nl2br(e($soal->pertanyaan)) !!}
+                {!! $soal->pertanyaan !!}
               </div>
 
               @if($soal->gambar_url)
@@ -611,7 +614,7 @@
                              {{ $isSelected ? 'checked' : '' }} 
                              onchange="pilihJawaban({{ $soal->id }}, '{{ $key }}', {{ $no }})">
                       <div class="cbt-opt-txt">
-                        <strong style="margin-right:6px;">{{ $currentAbjad }}.</strong> {{ $teks }}
+                        <strong style="margin-right:6px;">{{ $currentAbjad }}.</strong> {!! $teks !!}
                       </div>
                     </label>
                   @endif
@@ -980,6 +983,23 @@
       document.getElementById('formExam').submit();
     }
   }
+
+  // Render Rumus Matematika (KaTeX) untuk Siswa di HP & PC
+  document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(function() {
+      if (typeof renderMathInElement === 'function') {
+        renderMathInElement(document.body, {
+          delimiters: [
+            {left: '$$', right: '$$', display: true},
+            {left: '$', right: '$', display: false},
+            {left: '\\(', right: '\\)', display: false},
+            {left: '\\[', right: '\\]', display: true}
+          ],
+          throwOnError: false
+        });
+      }
+    }, 250);
+  });
 </script>
 
 </body>

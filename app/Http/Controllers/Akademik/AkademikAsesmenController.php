@@ -209,7 +209,18 @@ class AkademikAsesmenController extends Controller
             'kunci_jawaban' => 'required|string|max:5',
             'bobot' => 'required|integer|min:1',
             'pembahasan' => 'nullable|string',
+            'gambar' => 'nullable|image|mimes:jpeg,png,jpg,webp,gif|max:3072',
+            'gambar_url' => 'nullable|string',
         ]);
+
+        // Handle unggah file gambar atau URL gambar
+        $gambarUrl = null;
+        if ($request->hasFile('gambar')) {
+            $path = $request->file('gambar')->store('asesmen_soal', 'public');
+            $gambarUrl = '/storage/' . $path;
+        } elseif ($request->filled('gambar_url')) {
+            $gambarUrl = $request->gambar_url;
+        }
 
         // Validasi Kunci Jawaban harus memiliki teks pilihan yang terisi
         if ($request->tipe === 'pilihan_ganda') {
@@ -229,6 +240,7 @@ class AkademikAsesmenController extends Controller
             'nomor' => $nomor,
             'pertanyaan' => $request->pertanyaan,
             'tipe' => $request->tipe,
+            'gambar_url' => $gambarUrl,
             'opsi_a' => $request->opsi_a,
             'opsi_b' => $request->opsi_b,
             'opsi_c' => $request->opsi_c,
