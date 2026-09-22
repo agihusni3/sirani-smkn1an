@@ -156,14 +156,21 @@ class PortalOrtuController extends Controller
                     ->take(10)
                     ->get();
 
-                // Berkas Dossier Karakter & Kedisiplinan Siswa
-                $kasusDisiplin = \App\Models\KasusDisiplin::where('siswa_id', $siswa->id)
-                    ->where('is_active', true)
-                    ->with([
-                        'rewards' => fn($q) => $q->orderBy('tanggal', 'desc')->take(6),
-                        'pelanggarans' => fn($q) => $q->orderBy('tanggal', 'desc')->take(6),
-                    ])
-                    ->first();
+                // Berkas Dossier Karakter & Riwayat Kasus Kedisiplinan Siswa
+                try {
+                    $kasusDisiplin = \App\Models\KasusDisiplin::syncFromPresensi($siswa->id);
+                    $kasusDisiplin->loadMissing([
+                        'rewards' => fn($q) => $q->orderBy('tanggal', 'desc')->take(10),
+                        'pelanggarans' => fn($q) => $q->orderBy('tanggal', 'desc')->take(10),
+                    ]);
+                } catch (\Throwable $e) {
+                    $kasusDisiplin = \App\Models\KasusDisiplin::where('siswa_id', $siswa->id)
+                        ->with([
+                            'rewards' => fn($q) => $q->orderBy('tanggal', 'desc')->take(10),
+                            'pelanggarans' => fn($q) => $q->orderBy('tanggal', 'desc')->take(10),
+                        ])
+                        ->first();
+                }
 
                 // Rekapitulasi Jumlah per Bulan untuk Laporan Tahunan
                 $rekapBulananTahunan = [];

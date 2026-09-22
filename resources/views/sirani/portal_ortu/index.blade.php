@@ -145,13 +145,13 @@
     @if($siswa)
       {{-- HASIL DATA SISWA TERPILIH --}}
 
-      {{-- 3 TAB NAVIGASI UTAMA ATAS SESUAI DESAIN --}}
+      {{-- 3 TAB NAVIGASI UTAMA ATAS (Riwayat Absensi Paling Kiri & Default Aktif) --}}
       <div class="portal-main-tabs">
-        <button type="button" id="btnTabKartuQr" onclick="switchPortalMainTab('kartu-qr')" class="portal-main-tab active">
-          <i class="bi bi-qr-code"></i> <span>Kartu &amp; QR Code</span>
-        </button>
-        <button type="button" id="btnTabAbsen" onclick="switchPortalMainTab('absen')" class="portal-main-tab">
+        <button type="button" id="btnTabAbsen" onclick="switchPortalMainTab('absen')" class="portal-main-tab active">
           <i class="bi bi-calendar3"></i> <span>Riwayat Absensi</span>
+        </button>
+        <button type="button" id="btnTabKartuQr" onclick="switchPortalMainTab('kartu-qr')" class="portal-main-tab">
+          <i class="bi bi-qr-code"></i> <span>Kartu &amp; QR Code</span>
         </button>
         <button type="button" id="btnTabPengumuman" onclick="switchPortalMainTab('pengumuman')" class="portal-main-tab">
           <i class="bi bi-megaphone-fill"></i> <span>Pengumuman</span>
@@ -162,7 +162,7 @@
       </div>
 
       {{-- TAB 1: KARTU & QR CODE SCANNER (EMERALD CARD + SCANNER KIOSK) --}}
-      <div id="section-kartu-qr" style="display: block;">
+      <div id="section-kartu-qr" style="display: none;">
         {{-- AREA KARTU DIGITAL SISWA UTUH (DITAMPILKAN & DIUNDUH SECARA IDENTIK) --}}
         <div id="kartuSiswaDigitalArea" style="padding:12px; border-radius:24px; background:var(--bg-2, #0f172a); margin-bottom:14px; transition:background-color .25s ease;">
           {{-- CARD SISWA HIJAU EMERALD SMKN 1 AIR NANINGAN --}}
@@ -226,8 +226,8 @@
         </div>
       </div>
 
-      {{-- TAB 2: RIWAYAT ABSENSI & DOSSIER SISWA --}}
-      <div id="section-absen-wrap" style="display: none;">
+      {{-- TAB RIWAYAT ABSENSI & DOSSIER SISWA (DEFAULT LANGSUNG TERBUKA) --}}
+      <div id="section-absen-wrap" style="display: block;">
         {{-- DOSSIER DIGITAL DETAIL --}}
         <div class="dossier-card">
           <div class="dossier-header">
@@ -750,11 +750,11 @@
         $a3 = $pengaturanDisiplin->ambang_tahap_3_wakasis ?? 50;
         $a4 = $pengaturanDisiplin->ambang_tahap_4_kepsek ?? 75;
       @endphp
-      <div class="dossier-card" id="portofolio-karakter" style="margin-top: 20px; scroll-margin-top: 70px; display: none;">
+      <div class="dossier-card" id="portofolio-karakter" style="margin-top: 20px; scroll-margin-top: 70px; display: block;">
         <div class="dossier-header">
           <div>
-            <h3 style="font-size:14.5px; font-weight:800; color:var(--text); margin:0;">Portofolio Karakter &amp; Kredit Kedisiplinan</h3>
-            <p style="font-size:11.5px; color:var(--text-3); margin-top:2px;">Pantauan pembinaan karakter &amp; apresiasi tindakan positif siswa</p>
+            <h3 style="font-size:14.5px; font-weight:800; color:var(--text); margin:0;">Riwayat Kasus &amp; Catatan Kedisiplinan Siswa</h3>
+            <p style="font-size:11.5px; color:var(--text-3); margin-top:2px;">Transparansi poin kedisiplinan, catatan ketidakhadiran, serta apresiasi perilaku positif</p>
           </div>
           <div>
             @if($poinBersih == 0)
