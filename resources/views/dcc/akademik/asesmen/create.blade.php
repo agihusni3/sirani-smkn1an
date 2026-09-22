@@ -1,6 +1,6 @@
 @extends('dcc.akademik.layout')
 
-@section('title', 'Langkah 1: Tentukan Nama Paket Soal')
+@section('title', 'Langkah 1: Tentukan Nama Paket Soal & KKM')
 @section('breadcrumb', 'Buat Paket Asesmen')
 
 @section('content')
@@ -8,7 +8,7 @@
   <div>
     <h1 class="akademik-page-title">Buat Paket Asesmen Baru</h1>
     <div class="akademik-page-desc">
-      Langkah 1 dari 3: Tentukan identitas paket soal, mata pelajaran, dan checklist rombel sasaran.
+      Langkah 1 dari 3: Tentukan identitas paket soal, mata pelajaran, target jumlah soal, dan KKM.
     </div>
   </div>
 
@@ -26,24 +26,24 @@
 <form action="{{ route('akademik.asesmen.store') }}" method="POST" id="formBuatPaket">
   @csrf
 
-  <div style="max-width:880px; margin:0 auto;">
+  <div style="max-width:820px; margin:0 auto;">
     <div class="akademik-card">
       <div class="akademik-card-header" style="background:#ffffff; border-bottom:1px solid #f1f5f9;">
         <h3 class="akademik-card-title">
           <i class="bi bi-folder-plus text-primary"></i>
-          <span>Identitas &amp; Capaian Paket Soal</span>
+          <span>Identitas &amp; Ketentuan Paket Soal</span>
         </h3>
         <span class="ak-badge ak-badge-primary">Tahap 1: Definisi Paket</span>
       </div>
 
-      <div class="akademik-card-body" style="padding:24px 28px;">
+      <div class="akademik-card-body" style="padding:26px 30px;">
         
         {{-- Mata Pelajaran --}}
-        <div style="margin-bottom:20px;">
-          <label class="ak-form-label" style="font-size:13px; font-weight:800; color:#0f172a;">
+        <div style="margin-bottom:22px;">
+          <label class="ak-form-label" style="font-size:13.5px; font-weight:800; color:#0f172a;">
             Mata Pelajaran yang Diampu <span class="text-danger">*</span>
           </label>
-          <select name="mata_pelajaran_id" id="selectMapel" class="ak-select" required style="font-size:14px; padding:10px 14px;" onchange="renderRombels(this.value)">
+          <select name="mata_pelajaran_id" id="selectMapel" class="ak-select" required style="font-size:14px; padding:11px 14px;">
             <option value="">-- Pilih Mata Pelajaran --</option>
             @foreach($mapels as $m)
               <option value="{{ $m->id }}" {{ (old('mata_pelajaran_id') == $m->id || $mapels->count() === 1) ? 'selected' : '' }}>
@@ -51,88 +51,94 @@
               </option>
             @endforeach
           </select>
-          <div style="font-size:12px; color:#64748b; margin-top:4px;">
+          <div style="font-size:12px; color:#64748b; margin-top:5px;">
             Pilih mata pelajaran yang Anda ampu untuk paket asesmen ini.
           </div>
         </div>
 
-        {{-- Checklist Rombel Sasaran (Bisa memilih lebih dari 1 rombel) --}}
-        <div style="margin-bottom:24px;">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; flex-wrap:wrap; gap:8px;">
-            <label class="ak-form-label" style="font-size:13px; font-weight:800; color:#0f172a; margin-bottom:0;">
-              Rombel / Kelas Sasaran (Opsi Checklist: Bisa Memilih Lebih dari 1 Rombel) <span class="text-danger">*</span>
-            </label>
-            <div style="display:flex; gap:6px;">
-              <button type="button" class="ak-btn ak-btn-secondary ak-btn-sm" style="font-size:11px; padding:4px 10px;" onclick="pilihSemuaRombel(true)">
-                <i class="bi bi-check-all me-1"></i>Pilih Semua
-              </button>
-              <button type="button" class="ak-btn ak-btn-secondary ak-btn-sm" style="font-size:11px; padding:4px 10px;" onclick="pilihSemuaRombel(false)">
-                <i class="bi bi-x me-1"></i>Bersihkan
-              </button>
-            </div>
-          </div>
-
-          <div id="rombelChecklistContainer" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap:10px; border:1.5px solid #e2e8f0; border-radius:10px; padding:16px; background:#f8fafc; min-height:80px;">
-            {{-- Dimuat secara otomatis lewat JS berdasarkan mapel yang dipilih --}}
-            <div style="color:#94a3b8; font-size:13px; grid-column:1/-1; text-align:center; padding:16px;">
-              <i class="bi bi-arrow-up-circle me-1"></i> Silakan pilih Mata Pelajaran di atas untuk menampilkan daftar rombel.
-            </div>
-          </div>
-          <div style="font-size:12px; color:#64748b; margin-top:6px;">
-            <i class="bi bi-info-circle me-1"></i> Anda dapat mencentang beberapa kelas sekaligus jika ujian ini digunakan bersama untuk satu mata pelajaran.
+        {{-- Nama / Judul Paket Soal --}}
+        <div style="margin-bottom:22px;">
+          <label class="ak-form-label" style="font-size:13.5px; font-weight:800; color:#0f172a;">
+            Nama / Judul Paket Soal <span class="text-danger">*</span>
+          </label>
+          <input type="text" name="judul" id="inputJudul" class="ak-input" 
+                 placeholder="Contoh: Ulangan Harian 1 - Pemrograman Web Dasar" 
+                 value="{{ old('judul') }}" required style="font-size:14px; padding:11px 14px;">
+          <div style="font-size:12px; color:#64748b; margin-top:5px;">
+            Gunakan judul yang spesifik dan mudah dikenali oleh guru maupun siswa.
           </div>
         </div>
 
-        {{-- Judul & Jenis --}}
-        <div style="display:grid; grid-template-columns: 2fr 1fr; gap:16px; margin-bottom:20px;">
-          <div>
-            <label class="ak-form-label" style="font-size:13px; font-weight:800; color:#0f172a;">
-              Nama / Judul Paket Soal <span class="text-danger">*</span>
-            </label>
-            <input type="text" name="judul" id="inputJudul" class="ak-input" 
-                   placeholder="Contoh: Ulangan Harian 1 - Pemrograman Web Dasar" 
-                   value="{{ old('judul') }}" required style="font-size:14px; padding:10px 14px;">
-          </div>
+        {{-- Grid: Jenis Evaluasi, Rencana Jumlah Soal, dan KKM --}}
+        <div style="display:grid; grid-template-columns: 1.4fr 1fr 1fr; gap:16px; margin-bottom:26px;">
+          
+          {{-- Jenis Evaluasi --}}
           <div>
             <label class="ak-form-label" style="font-size:13px; font-weight:800; color:#0f172a;">
               Jenis Evaluasi <span class="text-danger">*</span>
             </label>
             <select name="jenis" id="inputJenis" class="ak-select" required style="font-size:14px; padding:10px 14px;">
-              <option value="ulangan_harian" selected>Ulangan Harian (UH)</option>
-              <option value="kuis">Kuis / Latihan Harian</option>
-              <option value="pts">PTS (Sumatif Tengah Semester)</option>
-              <option value="pas">PAS (Sumatif Akhir Semester)</option>
-              <option value="tugas">Tugas Daring Mandiri</option>
+              <option value="ulangan_harian" {{ old('jenis') == 'ulangan_harian' ? 'selected' : '' }}>Ulangan Harian (UH)</option>
+              <option value="kuis" {{ old('jenis') == 'kuis' ? 'selected' : '' }}>Kuis / Latihan Harian</option>
+              <option value="pts" {{ old('jenis') == 'pts' ? 'selected' : '' }}>PTS (Sumatif Tengah Semester)</option>
+              <option value="pas" {{ old('jenis') == 'pas' ? 'selected' : '' }}>PAS (Sumatif Akhir Semester)</option>
+              <option value="tugas" {{ old('jenis') == 'tugas' ? 'selected' : '' }}>Tugas Daring Mandiri</option>
             </select>
+            <div style="font-size:11.5px; color:#64748b; margin-top:4px;">
+              Kategori penilaian akademik.
+            </div>
           </div>
+
+          {{-- Target / Rencana Jumlah Soal --}}
+          <div>
+            <label class="ak-form-label" style="font-size:13px; font-weight:800; color:#0f172a;">
+              Target Jumlah Soal <span class="text-danger">*</span>
+            </label>
+            <div style="position:relative;">
+              <input type="number" name="target_jumlah_soal" id="inputJumlahSoal" class="ak-input" 
+                     min="1" max="200" value="{{ old('target_jumlah_soal', 10) }}" required 
+                     style="font-size:14px; padding:10px 48px 10px 14px; font-weight:700;">
+              <span style="position:absolute; right:12px; top:50%; transform:translateY(-50%); font-size:12px; color:#64748b; font-weight:600; pointer-events:none;">
+                Butir
+              </span>
+            </div>
+            <div style="font-size:11.5px; color:#64748b; margin-top:4px;">
+              Rencana butir soal disusun.
+            </div>
+          </div>
+
+          {{-- Standar Nilai Minimal / KKM --}}
+          <div>
+            <label class="ak-form-label" style="font-size:13px; font-weight:800; color:#0f172a;">
+              KKM / Standar Minimal <span class="text-danger">*</span>
+            </label>
+            <div style="position:relative;">
+              <input type="number" name="passing_grade" id="inputPassingGrade" class="ak-input" 
+                     min="0" max="100" value="{{ old('passing_grade', 75) }}" required 
+                     style="font-size:14px; padding:10px 44px 10px 14px; font-weight:700; color:#2563eb;">
+              <span style="position:absolute; right:12px; top:50%; transform:translateY(-50%); font-size:12px; color:#64748b; font-weight:600; pointer-events:none;">
+                / 100
+              </span>
+            </div>
+            <div style="font-size:11.5px; color:#64748b; margin-top:4px;">
+              Batas nilai ketuntasan (KKTP).
+            </div>
+          </div>
+
         </div>
 
-        {{-- TP Rujukan Kurikulum Merdeka --}}
-        <div style="margin-bottom:20px;">
-          <label class="ak-form-label" style="font-size:13px; font-weight:800; color:#0f172a;">
-            <span>Tujuan Pembelajaran (TP) / Capaian Rujukan</span>
-            <span class="ak-badge ak-badge-primary" style="font-size:10px; margin-left:6px;">Kurikulum Merdeka</span>
-          </label>
-          <textarea name="tujuan_pembelajaran" class="ak-textarea" rows="2" 
-                    placeholder="Contoh: 10.1 Memahami sintaks dasar PHP dan kontrol percabangan logika dalam pemecahan algoritma.">{{ old('tujuan_pembelajaran') }}</textarea>
-          <div style="font-size:11.5px; color:#64748b; margin-top:4px;">
-            Menghubungkan paket butir soal dengan capaian kompetensi siswa pada Buku Nilai &amp; Leger KBM.
+        {{-- Notice Banner Penugasan Dipisah --}}
+        <div style="padding:14px 18px; background:#f8fafc; border:1px dashed #cbd5e1; border-radius:10px; margin-bottom:24px; display:flex; align-items:flex-start; gap:12px;">
+          <i class="bi bi-info-circle-fill text-primary" style="font-size:18px; margin-top:2px;"></i>
+          <div style="font-size:12.5px; color:#475569; line-height:1.5;">
+            <strong>Catatan Alur:</strong> Pemilihan kelas/rombel sasaran peserta ujian, pembagian token, jadwal buka-tutup, dan proteksi anti-curang dilakukan secara terpusat pada <strong>Langkah 3 (Sesi Penugasan)</strong> setelah Anda selesai menyusun butir-butir soal.
           </div>
-        </div>
-
-        {{-- Petunjuk & Tata Tertib --}}
-        <div style="margin-bottom:24px;">
-          <label class="ak-form-label" style="font-size:13px; font-weight:800; color:#0f172a;">
-            Petunjuk Umum Pengerjaan (Opsional)
-          </label>
-          <textarea name="deskripsi" id="inputDeskripsi" class="ak-textarea" rows="3" 
-                    placeholder="Pilihlah salah satu opsi jawaban yang paling tepat. Dilarang membuka buku atau berpindah jendela aplikasi selama tes berlangsung...">{{ old('deskripsi') }}</textarea>
         </div>
 
         {{-- Tombol Lanjut ke Tahap 2 --}}
         <div style="border-top:1px solid #e2e8f0; padding-top:20px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
           <div style="font-size:12.5px; color:#64748b;">
-            <i class="bi bi-info-circle me-1"></i> Setelah menyimpan paket, Anda akan langsung diarahkan untuk <strong>membuat butir soal &amp; validasi mutu (Langkah 2)</strong>.
+            <i class="bi bi-check2-circle text-success me-1"></i> Data paket akan disimpan dan dilanjutkan ke <strong>Penyusunan Butir Soal (Langkah 2)</strong>.
           </div>
           <button type="submit" class="ak-btn ak-btn-primary" style="padding:12px 24px; font-size:14px; font-weight:800;">
             <span>Lanjut: Buat Butir Soal &amp; Validasi</span>
@@ -145,75 +151,4 @@
   </div>
 
 </form>
-
-<script>
-  const mapelRombelsData = @json($mapelRombels);
-  const oldTargetRombelIds = @json(old('target_rombel_ids', []));
-
-  function renderRombels(mapelId) {
-    const container = document.getElementById('rombelChecklistContainer');
-    if (!mapelId || !mapelRombelsData[mapelId] || mapelRombelsData[mapelId].length === 0) {
-      container.innerHTML = `
-        <div style="color:#94a3b8; font-size:13px; grid-column:1/-1; text-align:center; padding:16px;">
-          <i class="bi bi-exclamation-circle me-1"></i> Belum ada data rombel yang Anda ampu untuk mata pelajaran ini.
-        </div>
-      `;
-      return;
-    }
-
-    const rombels = mapelRombelsData[mapelId];
-    let html = '';
-
-    rombels.forEach((r) => {
-      const isChecked = oldTargetRombelIds.length > 0 
-        ? oldTargetRombelIds.includes(r.id.toString()) || oldTargetRombelIds.includes(r.id)
-        : true;
-
-      html += `
-        <label style="display:flex; align-items:center; gap:10px; padding:10px 14px; background:${isChecked ? '#f0f7ff' : '#ffffff'}; border:1.5px solid ${isChecked ? '#2563eb' : '#cbd5e1'}; border-radius:8px; cursor:pointer; transition:all 0.15s ease;" class="rombel-item-card">
-          <input type="checkbox" name="target_rombel_ids[]" value="${r.id}" class="chk-rombel" ${isChecked ? 'checked' : ''} 
-                 style="width:18px; height:18px; accent-color:#2563eb;" onchange="updateCardStyle(this)">
-          <div style="flex:1; overflow:hidden;">
-            <div style="font-weight:800; font-size:13.5px; color:#0f172a;">${r.nama}</div>
-            <div style="font-size:11px; color:#64748b;">${r.siswa_count} Siswa Terdaftar</div>
-          </div>
-        </label>
-      `;
-    });
-
-    container.innerHTML = html;
-  }
-
-  function updateCardStyle(chk) {
-    const card = chk.closest('.rombel-item-card');
-    if (card) {
-      card.style.borderColor = chk.checked ? '#2563eb' : '#cbd5e1';
-      card.style.background = chk.checked ? '#f0f7ff' : '#ffffff';
-    }
-  }
-
-  function pilihSemuaRombel(status) {
-    const checkboxes = document.querySelectorAll('.chk-rombel');
-    checkboxes.forEach(chk => {
-      chk.checked = status;
-      updateCardStyle(chk);
-    });
-  }
-
-  document.addEventListener('DOMContentLoaded', function() {
-    const selectMapel = document.getElementById('selectMapel');
-    if (selectMapel && selectMapel.value) {
-      renderRombels(selectMapel.value);
-    }
-  });
-
-  // Validasi sebelum submit: minimal 1 rombel dicentang
-  document.getElementById('formBuatPaket').addEventListener('submit', function(e) {
-    const checkedRombels = document.querySelectorAll('.chk-rombel:checked');
-    if (checkedRombels.length === 0) {
-      e.preventDefault();
-      alert('Mohon centang minimal 1 Rombel / Kelas sasaran untuk paket soal ini.');
-    }
-  });
-</script>
 @endsection

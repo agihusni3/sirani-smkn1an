@@ -70,7 +70,7 @@ class AkademikAsesmenController extends Controller
         $user = auth()->user();
         $guruId = $user?->guru_id;
 
-        $distribusiQuery = AkademikDistribusiMengajar::with(['mataPelajaran', 'rombel', 'guru'])
+        $distribusiQuery = AkademikDistribusiMengajar::with(['mataPelajaran'])
             ->when($ta, fn($q) => $q->where('tahun_ajaran_id', $ta->id));
 
         if ($guruId && !$user->isAdmin() && !$user->isWakaKurikulum()) {
@@ -81,58 +81,25 @@ class AkademikAsesmenController extends Controller
         // Mapel unik yang diampu guru
         $mapels = $distribusis->pluck('mataPelajaran')->filter()->unique('id')->sortBy('nama_mapel')->values();
 
-        // Hitung jumlah siswa per rombel
-        $rombelIds = $distribusis->pluck('rombel_id')->unique()->filter()->values();
-        $studentCounts = Siswa::whereHas('rombels', fn($q) => $q->whereIn('rombels.id', $rombelIds))
-            ->whereIn('status', ['aktif', 'pkl'])
-            ->join('siswa_rombels', 'siswas.id', '=', 'siswa_rombels.siswa_id')
-            ->whereIn('siswa_rombels.rombel_id', $rombelIds)
-            ->select('siswa_rombels.rombel_id', DB::raw('count(*) as total'))
-            ->groupBy('siswa_rombels.rombel_id')
-            ->pluck('total', 'rombel_id');
-
-        // Buat mapping Mapel -> Rombels unik (menghapus duplikasi semester)
-        $mapelRombels = [];
-        foreach ($mapels as $m) {
-            $related = $distribusis->where('mata_pelajaran_id', $m->id)->unique('rombel_id');
-            $list = [];
-            foreach ($related as $d) {
-                if ($d->rombel) {
-                    $list[] = [
-                        'id' => $d->rombel->id,
-                        'nama' => $d->rombel->nama_rombel,
-                        'siswa_count' => $studentCounts[$d->rombel->id] ?? 0,
-                    ];
-                }
-            }
-            $mapelRombels[$m->id] = $list;
-        }
-
-        return view('dcc.akademik.asesmen.create', compact('mapels', 'mapelRombels', 'ta'));
+        return view('dcc.akademik.asesmen.create', compact('mapels', 'ta'));
     }
 
     public function store(Request $request)
     {
         $request->validate([
             'mata_pelajaran_id' => 'required|exists:akademik_mata_pelajarans,id',
-            'target_rombel_ids' => 'required|array|min:1',
-            'target_rombel_ids.*' => 'required|exists:rombels,id',
             'judul' => 'required|string|max:255',
             'jenis' => 'required|in:kuis,ulangan_harian,pts,pas,tugas',
-            'tujuan_pembelajaran' => 'nullable|string',
-            'deskripsi' => 'nullable|string',
+            'target_jumlah_soal' => 'required|integer|min:1|max:200',
+            'passing_grade' => 'required|integer|min:0|max:100',
         ]);
 
         $user = auth()->user();
         $guruId = $user?->guru_id;
         $ta = TahunAjaran::where('is_active', true)->first();
 
-        $targetRombelIds = array_map('intval', (array) $request->target_rombel_ids);
-        $primaryRombelId = $targetRombelIds[0];
-
-        // Cari record distribusi yang valid untuk guru, mapel, dan rombel pertama
+        // Cari record distribusi yang valid untuk guru dan mapel ini
         $distribusi = AkademikDistribusiMengajar::where('mata_pelajaran_id', $request->mata_pelajaran_id)
-            ->where('rombel_id', $primaryRombelId)
             ->when($ta, fn($q) => $q->where('tahun_ajaran_id', $ta->id))
             ->when($guruId && !$user->isAdmin() && !$user->isWakaKurikulum(), fn($q) => $q->where('guru_id', $guruId))
             ->first();
@@ -145,14 +112,13 @@ class AkademikAsesmenController extends Controller
 
         $asesmen = AkademikAsesmenOnline::create([
             'distribusi_id' => $distribusi->id,
-            'target_rombel_ids' => $targetRombelIds,
+            'target_rombel_ids' => null,
             'judul' => $request->judul,
             'jenis' => $request->jenis,
-            'deskripsi' => $request->deskripsi,
-            'tujuan_pembelajaran' => $request->tujuan_pembelajaran,
+            'target_jumlah_soal' => (int) $request->target_jumlah_soal,
+            'passing_grade' => (int) $request->passing_grade,
             'semester' => $distribusi->semester ?? 1,
             'durasi_menit' => 60,
-            'passing_grade' => 75,
             'target_tipe' => 'rombel',
             'status_validasi' => 'draft',
             'is_active' => false,
@@ -356,8 +322,9 @@ class AkademikAsesmenController extends Controller
             ->sortBy('nama_rombel')
             ->values();
 
-        $currentTargetRombelIds = $asesmen->target_rombel_ids ?? [$asesmen->distribusi?->rombel_id];
-        $currentTargetRombelIds = array_map('intval', (array) $currentTargetRombelIds);
+        $currentTargetRombelIds = !empty($asesmen->target_rombel_ids)
+            ? array_map('intval', (array) $asesmen->target_rombel_ids)
+            : $availableRombels->pluck('id')->all();
 
         // Siswa dari semua rombel sasaran, dikelompokkan per rombel
         $allRombelIds = $availableRombels->pluck('id')->values();

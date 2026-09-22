@@ -12,7 +12,8 @@ class AkademikAsesmenOnline extends Model {
         'tampilkan_nilai', 'tampilkan_pembahasan', 'is_active', 'passing_grade',
         'token_ujian', 'anti_cheat_mode', 'wajib_fullscreen', 'blokir_copy_paste',
         'max_toleransi_keluar', 'status_validasi', 'catatan_validasi', 'divalidasi_oleh',
-        'divalidasi_pada', 'target_tipe', 'target_rombel_ids', 'target_siswa_ids'
+        'divalidasi_pada', 'target_tipe', 'target_rombel_ids', 'target_siswa_ids',
+        'target_jumlah_soal'
     ];
 
     protected $casts = [
@@ -29,6 +30,7 @@ class AkademikAsesmenOnline extends Model {
         'blokir_copy_paste' => 'boolean',
         'max_toleransi_keluar' => 'integer',
         'passing_grade' => 'integer',
+        'target_jumlah_soal' => 'integer',
         'target_rombel_ids' => 'array',
         'target_siswa_ids' => 'array',
     ];
@@ -47,7 +49,7 @@ class AkademikAsesmenOnline extends Model {
         if (!empty($ids) && is_array($ids)) {
             return Rombel::whereIn('id', $ids)->orderBy('nama_rombel')->get();
         }
-        if ($this->distribusi?->rombel) {
+        if ($this->target_rombel_ids === null && $this->distribusi?->rombel && $this->is_active) {
             return collect([$this->distribusi->rombel]);
         }
         return collect([]);
@@ -60,7 +62,7 @@ class AkademikAsesmenOnline extends Model {
     {
         $rombels = $this->getTargetRombels();
         if ($rombels->isEmpty()) {
-            return '-';
+            return 'Belum Ditugaskan';
         }
         return $rombels->pluck('nama_rombel')->implode(', ');
     }
@@ -155,6 +157,10 @@ class AkademikAsesmenOnline extends Model {
                     $warnings[] = "Soal no. {$no}: Pilihan jawaban hanya sampai " . array_key_last($opsiNonEmpty) . " (Standar SMK biasanya A sampai D/E).";
                 }
             }
+        }
+
+        if ($this->target_jumlah_soal && $soals->count() < $this->target_jumlah_soal) {
+            $warnings[] = "Jumlah butir soal saat ini ({$soals->count()} butir) belum mencapai target yang ditentukan ({$this->target_jumlah_soal} butir).";
         }
 
         return [

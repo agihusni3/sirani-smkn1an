@@ -76,8 +76,19 @@
       {{-- KPI Mini Bar --}}
       <div style="display:flex; gap:16px; align-items:center;">
         <div style="text-align:right;">
-          <div style="font-size:11px; color:#64748b; text-transform:uppercase; font-weight:700;">Total Soal</div>
-          <div style="font-size:18px; font-weight:900; color:#0f172a;">{{ $auditKelayakan['total_soal'] }} Butir</div>
+          <div style="font-size:11px; color:#64748b; text-transform:uppercase; font-weight:700;">Progress Soal</div>
+          <div style="font-size:18px; font-weight:900; color:#0f172a;">
+            {{ $auditKelayakan['total_soal'] }}
+            @if($asesmen->target_jumlah_soal)
+              <span style="font-size:13px; color:#64748b; font-weight:700;">/ {{ $asesmen->target_jumlah_soal }}</span>
+            @endif
+            <span style="font-size:12px; font-weight:600; color:#64748b;">Butir</span>
+          </div>
+        </div>
+        <div style="height:32px; width:1px; background:#e2e8f0;"></div>
+        <div style="text-align:right;">
+          <div style="font-size:11px; color:#64748b; text-transform:uppercase; font-weight:700;">KKM</div>
+          <div style="font-size:18px; font-weight:900; color:#059669;">{{ $asesmen->passing_grade ?? 75 }}</div>
         </div>
         <div style="height:32px; width:1px; background:#e2e8f0;"></div>
         <div style="text-align:right;">

@@ -18,7 +18,7 @@
         <div style="font-size:13px; font-weight:{{ $currentStep == 1 ? '800' : '700' }}; color:{{ $currentStep == 1 ? '#1e293b' : '#64748b' }};">
           1. Nama Paket Soal
         </div>
-        <div style="font-size:11px; color:#94a3b8;">Identitas, Mapel &amp; TP</div>
+        <div style="font-size:11px; color:#94a3b8;">Identitas, Target Soal &amp; KKM</div>
       </div>
     </div>
 
