@@ -39,22 +39,25 @@
           <i class="bi bi-mortarboard-fill"></i>
         </div>
         <div class="brand-text">
-          <h1>SIRANI · Monitoring Absen Mandiri</h1>
-          <p>Layanan Pantau Kehadiran Siswa &amp; Orang Tua · SMKN 1 Air Naningan</p>
+          <h1>SIRANI</h1>
+          <p>Presensi SMKN 1 Air Naningan</p>
         </div>
       </a>
 
-      <div class="nav-actions" style="display:flex; align-items:center; gap:8px;">
+      <div class="nav-actions">
         @if($siswa)
-          <button type="button" onclick="logoutSavedStudent()" style="background:var(--bg-subtle); color:#ef4444; border:1px solid #fecaca; padding:6px 12px; border-radius:var(--r-sm); font-size:11.5px; font-weight:800; cursor:pointer; display:inline-flex; align-items:center; gap:5px; font-family:var(--font-main);" title="Ganti Siswa / Keluar dari Akun">
-            <i class="bi bi-box-arrow-right"></i> Ganti NISN
+          <button type="button" onclick="logoutSavedStudent()" class="nav-action-btn btn-ganti-nisn" title="Ganti Siswa / Keluar dari Akun">
+            <i class="bi bi-arrow-left-right"></i>
+            <span>Ganti NISN</span>
           </button>
         @endif
-        <a href="/" style="text-decoration:none; color:var(--text-2); font-size:12px; font-weight:700; padding:6px 14px; border-radius:var(--r-sm); background:var(--bg-subtle); border:1px solid var(--border-2); display:inline-flex; align-items:center; gap:5px;">
-          Portal Sekolah
+        <a href="/" class="nav-action-btn btn-portal-sekolah" title="Website Resmi SMKN 1 Air Naningan">
+          <i class="bi bi-globe2"></i>
+          <span>Web SMK</span>
         </a>
-        <button type="button" id="btnPwaInstall" onclick="triggerPwaInstall()" style="background:#0f172a; color:#ffffff; border:none; padding:6px 14px; border-radius:var(--r-sm); font-size:12px; font-weight:800; cursor:pointer; display:inline-flex; align-items:center; gap:5px; font-family:var(--font-main);">
-          Instal Aplikasi
+        <button type="button" id="btnPwaInstall" onclick="triggerPwaInstall()" class="nav-action-btn btn-pwa-install" title="Instal Aplikasi ke HP">
+          <i class="bi bi-download"></i>
+          <span>Instal</span>
         </button>
       </div>
     </div>
@@ -145,25 +148,52 @@
     @if($siswa)
       {{-- HASIL DATA SISWA TERPILIH --}}
 
-      {{-- 4 TAB NAVIGASI UTAMA ATAS (Riwayat Absensi Paling Kiri & Default Aktif) --}}
+      {{-- 4 TAB NAVIGASI UTAMA ATAS (Dashboard Menu 2x2 di Mobile, 4 Kolom di Desktop) --}}
       <div class="portal-main-tabs">
         <button type="button" id="btnTabAbsen" onclick="switchPortalMainTab('absen')" class="portal-main-tab active">
-          <i class="bi bi-calendar3"></i> <span>Riwayat Absensi</span>
+          <div class="portal-tab-icon">
+            <i class="bi bi-calendar3"></i>
+          </div>
+          <div class="portal-tab-content">
+            <div class="portal-tab-title">Riwayat Absensi</div>
+            <div class="portal-tab-sub">Kehadiran Harian</div>
+          </div>
         </button>
+
         <button type="button" id="btnTabDisiplin" onclick="switchPortalMainTab('disiplin')" class="portal-main-tab">
-          <i class="bi bi-shield-check"></i> <span>Catatan Kedisiplinan Siswa</span>
-          @if(isset($kasusDisiplin) && $kasusDisiplin->total_poin_pelanggaran > 0)
-            <span class="portal-badge-count" style="background:#ef4444;">{{ $kasusDisiplin->total_poin_pelanggaran }} pt</span>
-          @endif
+          <div class="portal-tab-icon">
+            <i class="bi bi-shield-check"></i>
+            @if(isset($kasusDisiplin) && $kasusDisiplin->total_poin_pelanggaran > 0)
+              <span class="portal-tab-badge danger">{{ $kasusDisiplin->total_poin_pelanggaran }} pt</span>
+            @endif
+          </div>
+          <div class="portal-tab-content">
+            <div class="portal-tab-title">Catatan Disiplin</div>
+            <div class="portal-tab-sub">Poin &amp; Pelanggaran</div>
+          </div>
         </button>
+
         <button type="button" id="btnTabKartuQr" onclick="switchPortalMainTab('kartu-qr')" class="portal-main-tab">
-          <i class="bi bi-qr-code"></i> <span>Kartu &amp; QR Code</span>
+          <div class="portal-tab-icon">
+            <i class="bi bi-qr-code"></i>
+          </div>
+          <div class="portal-tab-content">
+            <div class="portal-tab-title">Kartu &amp; QR Code</div>
+            <div class="portal-tab-sub">Kartu Pelajar Digital</div>
+          </div>
         </button>
+
         <button type="button" id="btnTabPengumuman" onclick="switchPortalMainTab('pengumuman')" class="portal-main-tab">
-          <i class="bi bi-megaphone-fill"></i> <span>Pengumuman</span>
-          @if(isset($pengumumans) && $pengumumans->count() > 0)
-            <span class="portal-badge-count">{{ $pengumumans->count() }}</span>
-          @endif
+          <div class="portal-tab-icon">
+            <i class="bi bi-megaphone-fill"></i>
+            @if(isset($pengumumans) && $pengumumans->count() > 0)
+              <span class="portal-tab-badge info">{{ $pengumumans->count() }}</span>
+            @endif
+          </div>
+          <div class="portal-tab-content">
+            <div class="portal-tab-title">Pengumuman</div>
+            <div class="portal-tab-sub">Informasi Sekolah</div>
+          </div>
         </button>
       </div>
 
