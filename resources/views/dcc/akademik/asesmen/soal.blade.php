@@ -17,19 +17,26 @@
       <i class="bi bi-arrow-left"></i>
       <span>Kembali</span>
     </a>
-    <form action="{{ route('akademik.asesmen.toggle', $asesmen->id) }}" method="POST" style="margin:0;">
-      @csrf
-      <button type="submit" class="ak-btn {{ $asesmen->is_active ? 'ak-btn-secondary' : 'ak-btn-success' }}" title="Aktivasi atau nonaktifkan ujian untuk siswa">
-        <i class="bi {{ $asesmen->is_active ? 'bi-pause-circle' : 'bi-play-circle-fill' }}"></i>
-        <span>{{ $asesmen->is_active ? 'Nonaktifkan Sesi' : 'Aktifkan Ujian Sekarang' }}</span>
-      </button>
-    </form>
-    <a href="{{ route('akademik.asesmen.kerjakan', $asesmen->id) }}" class="ak-btn ak-btn-primary" target="_blank">
+    <a href="{{ route('akademik.asesmen.kerjakan', $asesmen->id) }}" class="ak-btn ak-btn-secondary" target="_blank" title="Simulasi Ujian CBT">
       <i class="bi bi-phone"></i>
-      <span>Simulasi CBT Mobile</span>
+      <span>Simulasi CBT</span>
     </a>
+    @if($auditKelayakan['is_valid'])
+      <a href="{{ route('akademik.asesmen.penugasan', $asesmen->id) }}" class="ak-btn ak-btn-primary" style="font-weight:800;">
+        <span>Lanjut ke Sesi Penugasan</span>
+        <i class="bi bi-arrow-right ms-1"></i>
+      </a>
+    @else
+      <span class="ak-btn ak-btn-secondary" style="opacity:0.6; cursor:not-allowed;" title="Selesaikan minimal 1 butir soal yang valid untuk membuka sesi penugasan">
+        <span>Lanjut ke Sesi Penugasan</span>
+        <i class="bi bi-lock-fill ms-1"></i>
+      </span>
+    @endif
   </div>
 </div>
+
+{{-- Step Indicator: Step 2 Aktif --}}
+@include('dcc.akademik.asesmen.partials.wizard_steps', ['step' => 2])
 
 {{-- Panel Audit Kelayakan & Validasi Mutu Soal --}}
 <div class="akademik-card" style="margin-bottom:20px; border-left:4px solid {{ $auditKelayakan['is_valid'] ? '#10b981' : '#f59e0b' }};">

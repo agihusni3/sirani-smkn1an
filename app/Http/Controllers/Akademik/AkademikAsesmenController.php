@@ -290,6 +290,96 @@ class AkademikAsesmenController extends Controller
         return redirect()->back()->with('success', 'Status validasi & telaah soal berhasil diperbarui.');
     }
 
+    /**
+     * Langkah 3: Sesi Penugasan Rombel / Select Siswa Remedial & Pengaturan Ujian
+     */
+    public function penugasan($id)
+    {
+        $asesmen = AkademikAsesmenOnline::with(['distribusi.mataPelajaran', 'distribusi.rombel', 'soals'])->findOrFail($id);
+        $this->authorizeAsesmen($asesmen);
+
+        $audit = $asesmen->cekKelayakanSoal();
+        if (!$audit['is_valid']) {
+            $firstError = $audit['errors'][0] ?? 'Lengkapi butir soal terlebih dahulu.';
+            return redirect()->route('akademik.asesmen.soal', $asesmen->id)
+                ->with('error', "Belum Dapat Masuk Penugasan: {$firstError}");
+        }
+
+        $rombelId = $asesmen->distribusi?->rombel_id;
+        $siswas = collect();
+        if ($rombelId) {
+            $siswas = Siswa::whereHas('rombels', fn($q) => $q->where('rombels.id', $rombelId))
+                ->whereIn('status', ['aktif', 'pkl'])
+                ->orderBy('nama')
+                ->get(['id', 'nama', 'nisn']);
+        }
+
+        return view('dcc.akademik.asesmen.penugasan', compact('asesmen', 'siswas'));
+    }
+
+    public function storePenugasan(Request $request, $id)
+    {
+        $asesmen = AkademikAsesmenOnline::findOrFail($id);
+        $this->authorizeAsesmen($asesmen);
+
+        $request->validate([
+            'durasi_menit' => 'required|integer|min:5|max:300',
+            'passing_grade' => 'required|integer|min:0|max:100',
+            'max_toleransi_keluar' => 'nullable|integer|min:1|max:10',
+            'dibuka_pada' => 'nullable|date',
+            'ditutup_pada' => 'nullable|date|after_or_equal:dibuka_pada',
+            'token_ujian' => 'nullable|string|max:10',
+            'target_tipe' => 'required|in:rombel,siswa_terpilih',
+            'target_siswa_ids' => 'nullable|array',
+            'aksi' => 'required|in:publish,draft',
+        ]);
+
+        $audit = $asesmen->cekKelayakanSoal();
+        if (!$audit['is_valid']) {
+            $firstError = $audit['errors'][0] ?? 'Butir soal belum lengkap.';
+            return redirect()->route('akademik.asesmen.soal', $asesmen->id)
+                ->with('error', "Gagal Menyimpan Penugasan: {$firstError}");
+        }
+
+        $targetTipe = $request->input('target_tipe', 'rombel');
+        $targetSiswaIds = null;
+        if ($targetTipe === 'siswa_terpilih') {
+            $rawIds = $request->input('target_siswa_ids', []);
+            if (empty($rawIds)) {
+                return redirect()->back()->withInput()->with('error', 'Anda memilih mode penugasan "Siswa Tertentu", tetapi belum mencentang satu siswa pun!');
+            }
+            $targetSiswaIds = array_map('intval', (array) $rawIds);
+        }
+
+        $isActive = ($request->aksi === 'publish');
+
+        $asesmen->update([
+            'target_tipe' => $targetTipe,
+            'target_siswa_ids' => $targetSiswaIds,
+            'durasi_menit' => $request->durasi_menit,
+            'dibuka_pada' => $request->dibuka_pada,
+            'ditutup_pada' => $request->ditutup_pada,
+            'token_ujian' => $request->filled('token_ujian') ? strtoupper(trim($request->token_ujian)) : null,
+            'passing_grade' => $request->passing_grade,
+            'anti_cheat_mode' => $request->boolean('anti_cheat_mode'),
+            'wajib_fullscreen' => $request->boolean('wajib_fullscreen'),
+            'blokir_copy_paste' => $request->boolean('blokir_copy_paste'),
+            'acak_soal' => $request->boolean('acak_soal'),
+            'acak_opsi' => $request->boolean('acak_opsi'),
+            'tampilkan_nilai' => $request->boolean('tampilkan_nilai'),
+            'tampilkan_pembahasan' => $request->boolean('tampilkan_pembahasan'),
+            'max_toleransi_keluar' => $request->input('max_toleransi_keluar', 3),
+            'status_validasi' => 'siap_diujikan',
+            'is_active' => $isActive,
+        ]);
+
+        $msg = $isActive 
+            ? 'Selamat! Asesmen berhasil diterbitkan dan sesi ujian telah AKTIF untuk siswa.' 
+            : 'Sesi penugasan asesmen berhasil disimpan sebagai Draft Terjadwal.';
+
+        return redirect()->route('akademik.asesmen.index')->with('success', $msg);
+    }
+
     public function hasil($id)
     {
         $asesmen = AkademikAsesmenOnline::with(['distribusi.mataPelajaran', 'distribusi.rombel', 'soals'])->findOrFail($id);

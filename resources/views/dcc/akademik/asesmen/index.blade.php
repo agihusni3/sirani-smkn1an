@@ -115,7 +115,14 @@
                 </td>
                 <td>
                   <div style="font-weight:700; color:var(--ak-primary);">{{ $a->distribusi?->mataPelajaran?->nama_mapel ?? '-' }}</div>
-                  <span class="ak-badge ak-badge-secondary">{{ $a->distribusi?->rombel?->nama_rombel ?? '-' }}</span>
+                  <div style="display:flex; align-items:center; gap:4px; margin-top:3px; flex-wrap:wrap;">
+                    <span class="ak-badge ak-badge-secondary">{{ $a->distribusi?->rombel?->nama_rombel ?? '-' }}</span>
+                    @if($a->target_tipe === 'siswa_terpilih')
+                      <span class="ak-badge ak-badge-warning" style="font-size:9.5px; padding:2px 6px;" title="Hanya siswa tertentu yang ditugaskan (Remedial/Susulan)">
+                        <i class="bi bi-person-check-fill me-1"></i>{{ count($a->target_siswa_ids ?? []) }} Siswa
+                      </span>
+                    @endif
+                  </div>
                 </td>
                 <td>
                   <span class="ak-badge ak-badge-primary" style="text-transform:uppercase;">
@@ -126,7 +133,7 @@
                   </div>
                 </td>
                 <td>
-                  <a href="{{ route('akademik.asesmen.soal', $a->id) }}" class="ak-badge {{ $a->soals_count > 0 ? 'ak-badge-success' : 'ak-badge-warning' }}" style="text-decoration:none;" title="Kelola Soal">
+                  <a href="{{ route('akademik.asesmen.soal', $a->id) }}" class="ak-badge {{ $a->soals_count > 0 ? 'ak-badge-success' : 'ak-badge-warning' }}" style="text-decoration:none;" title="Kelola Butir Soal">
                     <i class="bi bi-question-circle me-1"></i>{{ $a->soals_count }} Soal
                   </a>
                 </td>
@@ -146,13 +153,16 @@
                 </td>
                 <td style="text-align:center;">
                   <div style="display:flex; justify-content:center; gap:6px;">
-                    <a href="{{ route('akademik.asesmen.soal', $a->id) }}" class="ak-btn ak-btn-secondary ak-btn-sm" title="Kelola Butir Soal">
+                    <a href="{{ route('akademik.asesmen.soal', $a->id) }}" class="ak-btn ak-btn-secondary ak-btn-sm" title="Tahap 2: Kelola &amp; Validasi Butir Soal">
                       <i class="bi bi-card-checklist"></i>
+                    </a>
+                    <a href="{{ route('akademik.asesmen.penugasan', $a->id) }}" class="ak-btn ak-btn-secondary ak-btn-sm" title="Tahap 3: Atur Sesi Penugasan &amp; Jadwal">
+                      <i class="bi bi-send-check"></i>
                     </a>
                     <a href="{{ route('akademik.asesmen.hasil', $a->id) }}" class="ak-btn ak-btn-secondary ak-btn-sm" title="Pantau Hasil Siswa">
                       <i class="bi bi-bar-chart"></i>
                     </a>
-                    <a href="{{ route('akademik.asesmen.kerjakan', $a->id) }}" class="ak-btn ak-btn-primary ak-btn-sm" title="Simulasi Ujian">
+                    <a href="{{ route('akademik.asesmen.kerjakan', $a->id) }}" class="ak-btn ak-btn-primary ak-btn-sm" title="Simulasi Ujian CBT">
                       <i class="bi bi-play-circle"></i>
                     </a>
                   </div>
