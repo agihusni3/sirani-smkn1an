@@ -313,7 +313,7 @@
       <span class="soal-meta-chip"><i class="bi bi-clock me-1"></i> {{ $asesmen->durasi_menit }} Menit</span>
       <span class="soal-meta-chip"><i class="bi bi-bullseye me-1"></i> KKM: {{ $asesmen->passing_grade ?? 75 }}</span>
       <span class="soal-meta-chip" style="color:#2563eb; background:#eff6ff;">
-        <i class="bi bi-card-checklist me-1"></i> Soal: {{ $auditKelayakan['total_soal'] }}@if($asesmen->target_jumlah_soal)/{{ $asesmen->target_jumlah_soal }} Target@endif
+        <i class="bi bi-card-checklist me-1"></i> Soal: {{ $auditKelayakan['total_soal'] }}@if($asesmen->target_jumlah_soal)/{{ $asesmen->target_jumlah_soal }} Target @endif
       </span>
       @if($asesmen->rombel_names)
         <span class="soal-meta-chip"><i class="bi bi-people me-1"></i> {{ $asesmen->rombel_names }}</span>
