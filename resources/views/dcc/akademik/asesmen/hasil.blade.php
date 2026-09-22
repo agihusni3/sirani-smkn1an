@@ -8,7 +8,7 @@
   <div>
     <h1 class="akademik-page-title">Rekapitulasi Hasil &amp; Integritas Asesmen</h1>
     <div class="akademik-page-desc">
-      {{ $asesmen->judul }} · {{ $asesmen->distribusi?->rombel?->nama_rombel }} · {{ $asesmen->distribusi?->mataPelajaran?->nama_mapel }} · KKM: <strong>{{ $asesmen->passing_grade }}</strong>
+      {{ $asesmen->judul }} · {{ $asesmen->rombel_names }} · {{ $asesmen->distribusi?->mataPelajaran?->nama_mapel }} · KKM: <strong>{{ $asesmen->passing_grade }}</strong>
     </div>
   </div>
 
@@ -132,6 +132,21 @@
   </div>
 </div>
 
+{{-- Filter Rombel Tabs jika asesmen memiliki lebih dari 1 rombel --}}
+@if($targetRombels->count() > 1)
+  <div style="display:flex; gap:8px; margin-bottom:16px; flex-wrap:wrap; align-items:center;">
+    <span style="font-size:12px; font-weight:800; color:#475569; margin-right:4px;">Filter Kelas:</span>
+    <a href="{{ route('akademik.asesmen.hasil', $asesmen->id) }}" class="ak-btn {{ empty($selectedRombelId) ? 'ak-btn-primary' : 'ak-btn-secondary' }}" style="font-size:12px; padding:5px 14px;">
+      Semua Kelas ({{ $targetRombels->count() }} Rombel)
+    </a>
+    @foreach($targetRombels as $tr)
+      <a href="{{ route('akademik.asesmen.hasil', [$asesmen->id, 'rombel_id' => $tr->id]) }}" class="ak-btn {{ (string)$selectedRombelId === (string)$tr->id ? 'ak-btn-primary' : 'ak-btn-secondary' }}" style="font-size:12px; padding:5px 14px;">
+        Kelas {{ $tr->nama_rombel }}
+      </a>
+    @endforeach
+  </div>
+@endif
+
 {{-- Table Hasil Siswa --}}
 <div class="akademik-card">
   <div class="akademik-card-header" style="display:flex; justify-content:space-between; align-items:center;">
@@ -148,6 +163,9 @@
             <th style="width:40px;">No</th>
             <th>NISN</th>
             <th>Nama Lengkap Siswa</th>
+            @if($targetRombels->count() > 1)
+              <th>Kelas</th>
+            @endif
             <th>Waktu &amp; Durasi</th>
             <th style="text-align:center;">Integritas &amp; Pelanggaran</th>
             <th style="text-align:center;">Skor Nilai</th>
@@ -166,13 +184,18 @@
               <td>{{ $idx + 1 }}</td>
               <td><code>{{ $s->nisn ?? '-' }}</code></td>
               <td>
-                <div style="font-weight:700; color:var(--ak-dark);">{{ $s->nama_lengkap }}</div>
+                <div style="font-weight:700; color:var(--ak-dark);">{{ $s->nama }}</div>
                 @if($h && $h->catatan_pengawas)
                   <div style="font-size:10.5px; color:#7c3aed; margin-top:2px;">
                     <i class="bi bi-info-circle me-1"></i>{{ $h->catatan_pengawas }}
                   </div>
                 @endif
               </td>
+              @if($targetRombels->count() > 1)
+                <td>
+                  <span class="ak-badge ak-badge-secondary">{{ $s->rombels->first()?->nama_rombel ?? '-' }}</span>
+                </td>
+              @endif
               <td style="font-size:12px; color:#64748b;">
                 @if($h && $h->mulai_pada)
                   <div>{{ \Carbon\Carbon::parse($h->mulai_pada)->isoFormat('D MMM, HH:mm') }}</div>

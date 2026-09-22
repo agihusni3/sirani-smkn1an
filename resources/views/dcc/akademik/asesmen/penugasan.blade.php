@@ -35,7 +35,7 @@
         <span class="ak-badge ak-badge-primary" style="text-transform:uppercase; margin-bottom:6px;">{{ $asesmen->jenis_label }}</span>
         <h2 style="font-size:18px; font-weight:900; color:#0f172a; margin:4px 0;">{{ $asesmen->judul }}</h2>
         <div style="font-size:13px; color:#475569;">
-          {{ $asesmen->distribusi?->mataPelajaran?->nama_mapel }} · Rombel Dasar: <strong>{{ $asesmen->distribusi?->rombel?->nama_rombel }}</strong>
+          {{ $asesmen->distribusi?->mataPelajaran?->nama_mapel }} · Rombel Sasaran: <strong>{{ $asesmen->rombel_names }}</strong>
         </div>
       </div>
       <div style="display:flex; gap:12px; align-items:center;">
@@ -47,7 +47,7 @@
   </div>
 </div>
 
-<form action="{{ route('akademik.asesmen.penugasan.store', $asesmen->id) }}" method="POST">
+<form action="{{ route('akademik.asesmen.penugasan.store', $asesmen->id) }}" method="POST" id="formPenugasan">
   @csrf
 
   <div style="display:grid; grid-template-columns: 2fr 1fr; gap:20px; align-items:start;">
@@ -64,12 +64,43 @@
           </h3>
         </div>
         <div class="akademik-card-body">
+          
+          {{-- Checklist Rombel Sasaran (Bisa memilih lebih dari 1 rombel) --}}
+          <div style="margin-bottom:20px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; flex-wrap:wrap; gap:8px;">
+              <label class="ak-form-label" style="font-weight:800; font-size:13px; margin-bottom:0;">
+                Rombel / Kelas Sasaran Ujian (Checklist) <span class="text-danger">*</span>
+              </label>
+              <div style="display:flex; gap:6px;">
+                <button type="button" class="ak-btn ak-btn-secondary ak-btn-sm" style="font-size:11px; padding:3px 8px;" onclick="pilihSemuaRombelPenugasan(true)">Pilih Semua</button>
+                <button type="button" class="ak-btn ak-btn-secondary ak-btn-sm" style="font-size:11px;" onclick="pilihSemuaRombelPenugasan(false)">Bersihkan</button>
+              </div>
+            </div>
+
+            <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap:10px; padding:12px; background:#f8fafc; border:1.5px solid #e2e8f0; border-radius:8px;">
+              @foreach($availableRombels as $r)
+                @php
+                  $isRombelChecked = in_array((int)$r->id, $currentTargetRombelIds);
+                @endphp
+                <label style="display:flex; align-items:center; gap:8px; padding:8px 12px; background:{{ $isRombelChecked ? '#eff6ff' : '#ffffff' }}; border:1.5px solid {{ $isRombelChecked ? '#2563eb' : '#cbd5e1' }}; border-radius:6px; cursor:pointer; font-size:13px;" class="rombel-penugasan-card">
+                  <input type="checkbox" name="target_rombel_ids[]" value="{{ $r->id }}" class="chk-penugasan-rombel" {{ $isRombelChecked ? 'checked' : '' }} 
+                         style="accent-color:#2563eb; width:16px; height:16px;" onchange="onRombelPenugasanChange(this)">
+                  <span style="font-weight:800; color:#0f172a;">{{ $r->nama_rombel }}</span>
+                </label>
+              @endforeach
+            </div>
+            <div style="font-size:11.5px; color:#64748b; margin-top:5px;">
+              <i class="bi bi-info-circle me-1"></i> Asesmen ini akan aktif dan dapat diakses oleh seluruh rombel yang dicentang di atas.
+            </div>
+          </div>
+
+          {{-- Mode Peserta --}}
           <div style="margin-bottom:16px;">
-            <label class="ak-form-label" style="font-weight:800;">Mode Penugasan <span class="text-danger">*</span></label>
+            <label class="ak-form-label" style="font-weight:800;">Target Peserta Ujian <span class="text-danger">*</span></label>
             <div style="display:flex; gap:20px; margin-top:8px; flex-wrap:wrap;">
               <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-size:13.5px; font-weight:700; color:#1e293b;">
                 <input type="radio" name="target_tipe" value="rombel" {{ ($asesmen->target_tipe ?? 'rombel') === 'rombel' ? 'checked' : '' }} onchange="toggleTargetPeserta(this.value)" style="accent-color:#2563eb; width:17px; height:17px;">
-                <span>Seluruh Siswa di Rombel Kelas ({{ $asesmen->distribusi?->rombel?->nama_rombel }})</span>
+                <span>Seluruh Siswa di Rombel Kelas Terpilih</span>
               </label>
               <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-size:13.5px; font-weight:700; color:#b45309;">
                 <input type="radio" name="target_tipe" value="siswa_terpilih" {{ ($asesmen->target_tipe ?? '') === 'siswa_terpilih' ? 'checked' : '' }} onchange="toggleTargetPeserta(this.value)" style="accent-color:#2563eb; width:17px; height:17px;">
@@ -78,37 +109,52 @@
             </div>
           </div>
 
-          {{-- Container Checklist Siswa Terpilih --}}
+          {{-- Container Checklist Siswa Terpilih (Dikelompokkan per Rombel) --}}
           <div id="containerSiswaTerpilih" style="display:{{ ($asesmen->target_tipe ?? '') === 'siswa_terpilih' ? 'block' : 'none' }}; margin-top:16px; border-top:1.5px dashed #cbd5e1; padding-top:16px;">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; flex-wrap:wrap; gap:8px;">
-              <div style="font-size:12.5px; color:#475569; font-weight:700;">
-                Centang siswa yang wajib mengikuti sesi ujian/remedial ini:
-              </div>
-              <div style="display:flex; gap:6px;">
-                <button type="button" class="ak-btn ak-btn-secondary ak-btn-sm" style="font-size:11px;" onclick="pilihSemuaSiswa(true)">Pilih Semua</button>
-                <button type="button" class="ak-btn ak-btn-secondary ak-btn-sm" style="font-size:11px;" onclick="pilihSemuaSiswa(false)">Bersihkan</button>
-              </div>
+            <div style="font-size:12.5px; color:#475569; font-weight:700; margin-bottom:10px;">
+              Centang siswa yang wajib mengikuti sesi ujian / remedial ini:
             </div>
 
             @php
               $selectedIds = $asesmen->target_siswa_ids ?? [];
             @endphp
 
-            <div style="max-height:240px; overflow-y:auto; border:1px solid #cbd5e1; border-radius:8px; padding:10px; background:#ffffff; display:grid; grid-template-columns: 1fr 1fr; gap:8px;">
-              @forelse($siswas as $s)
-                <label style="display:flex; align-items:center; gap:8px; padding:8px 10px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:6px; cursor:pointer; font-size:12.5px;">
-                  <input type="checkbox" name="target_siswa_ids[]" value="{{ $s->id }}" class="chk-siswa" {{ in_array($s->id, $selectedIds) ? 'checked' : '' }} style="accent-color:#2563eb;">
-                  <div style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
-                    <strong style="color:#0f172a;">{{ $s->nama }}</strong>
-                    <span style="font-size:11px; color:#64748b; margin-left:4px;">({{ $s->nisn ?: 'NISN -' }})</span>
+            <div style="display:flex; flex-direction:column; gap:12px;">
+              @foreach($availableRombels as $r)
+                @php
+                  $rombelSiswas = $siswasPerRombel[$r->id] ?? collect();
+                  $isRombelActive = in_array((int)$r->id, $currentTargetRombelIds);
+                @endphp
+                <div class="rombel-siswa-box" id="siswaBoxRombel{{ $r->id }}" style="display:{{ $isRombelActive ? 'block' : 'none' }}; border:1px solid #cbd5e1; border-radius:8px; padding:12px; background:#ffffff;">
+                  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; flex-wrap:wrap; gap:8px;">
+                    <div style="font-size:13px; font-weight:800; color:#1e3a8a;">
+                      <i class="bi bi-people-fill me-1"></i> Kelas {{ $r->nama_rombel }} ({{ $rombelSiswas->count() }} Siswa)
+                    </div>
+                    <div style="display:flex; gap:6px;">
+                      <button type="button" class="ak-btn ak-btn-secondary ak-btn-sm" style="font-size:11px; padding:2px 8px;" onclick="pilihSiswaByRombel({{ $r->id }}, true)">Pilih Semua</button>
+                      <button type="button" class="ak-btn ak-btn-secondary ak-btn-sm" style="font-size:11px; padding:2px 8px;" onclick="pilihSiswaByRombel({{ $r->id }}, false)">Bersihkan</button>
+                    </div>
                   </div>
-                </label>
-              @empty
-                <div style="color:#94a3b8; font-size:12px; grid-column:span 2; text-align:center; padding:12px;">
-                  Belum ada data siswa pada rombel ini.
+
+                  <div style="max-height:180px; overflow-y:auto; display:grid; grid-template-columns: 1fr 1fr; gap:6px; padding-right:4px;">
+                    @forelse($rombelSiswas as $s)
+                      <label style="display:flex; align-items:center; gap:8px; padding:6px 10px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:6px; cursor:pointer; font-size:12px;">
+                        <input type="checkbox" name="target_siswa_ids[]" value="{{ $s->id }}" class="chk-siswa chk-siswa-rombel-{{ $r->id }}" {{ in_array($s->id, $selectedIds) ? 'checked' : '' }} style="accent-color:#2563eb;">
+                        <div style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+                          <strong style="color:#0f172a;">{{ $s->nama }}</strong>
+                          <span style="font-size:10.5px; color:#64748b; margin-left:4px;">({{ $s->nisn ?: '-' }})</span>
+                        </div>
+                      </label>
+                    @empty
+                      <div style="color:#94a3b8; font-size:12px; grid-column:span 2; text-align:center; padding:8px;">
+                        Tidak ada data siswa aktif pada kelas ini.
+                      </div>
+                    @endforelse
+                  </div>
                 </div>
-              @endforelse
+              @endforeach
             </div>
+
             <div style="font-size:11.5px; color:#b45309; margin-top:8px;">
               <i class="bi bi-info-circle me-1"></i> Hanya siswa yang dicentang yang akan terdaftar dan diizinkan masuk ke lembar ujian di HP.
             </div>
@@ -318,6 +364,35 @@
     }
   }
 
+  function onRombelPenugasanChange(chk) {
+    const card = chk.closest('.rombel-penugasan-card');
+    if (card) {
+      card.style.borderColor = chk.checked ? '#2563eb' : '#cbd5e1';
+      card.style.background = chk.checked ? '#eff6ff' : '#ffffff';
+    }
+    const box = document.getElementById('siswaBoxRombel' + chk.value);
+    if (box) {
+      box.style.display = chk.checked ? 'block' : 'none';
+      if (!chk.checked) {
+        // Uncheck siswa jika rombel dinonaktifkan
+        box.querySelectorAll('.chk-siswa').forEach(cb => cb.checked = false);
+      }
+    }
+  }
+
+  function pilihSemuaRombelPenugasan(status) {
+    document.querySelectorAll('.chk-penugasan-rombel').forEach(chk => {
+      chk.checked = status;
+      onRombelPenugasanChange(chk);
+    });
+  }
+
+  function pilihSiswaByRombel(rombelId, status) {
+    document.querySelectorAll('.chk-siswa-rombel-' + rombelId).forEach(cb => {
+      cb.checked = status;
+    });
+  }
+
   function pilihSemuaSiswa(status) {
     document.querySelectorAll('.chk-siswa').forEach(cb => {
       cb.checked = status;
@@ -332,5 +407,24 @@
     }
     document.getElementById('inputToken').value = token;
   }
+
+  document.getElementById('formPenugasan').addEventListener('submit', function(e) {
+    const checkedRombels = document.querySelectorAll('.chk-penugasan-rombel:checked');
+    if (checkedRombels.length === 0) {
+      e.preventDefault();
+      alert('Mohon centang minimal 1 Rombel / Kelas sasaran ujian!');
+      return;
+    }
+
+    const modeSiswa = document.querySelector('input[name="target_tipe"]:checked');
+    if (modeSiswa && modeSiswa.value === 'siswa_terpilih') {
+      const checkedSiswa = document.querySelectorAll('.chk-siswa:checked');
+      if (checkedSiswa.length === 0) {
+        e.preventDefault();
+        alert('Anda memilih mode "Siswa Tertentu", mohon centang minimal 1 siswa!');
+        return;
+      }
+    }
+  });
 </script>
 @endsection

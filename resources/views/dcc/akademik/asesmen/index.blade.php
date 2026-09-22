@@ -22,12 +22,23 @@
 <div class="akademik-card" style="margin-bottom:16px;">
   <div class="akademik-card-body" style="padding:14px 20px;">
     <form action="{{ route('akademik.asesmen.index') }}" method="GET" style="display:flex; flex-wrap:wrap; gap:12px; align-items:center;">
-      <div style="flex:1; min-width:200px;">
-        <select name="distribusi_id" class="ak-select" onchange="this.form.submit()">
-          <option value="">Semua Mata Pelajaran &amp; Rombel</option>
-          @foreach($distribusis as $d)
-            <option value="{{ $d->id }}" {{ request('distribusi_id') == $d->id ? 'selected' : '' }}>
-              {{ $d->rombel?->nama_rombel }} — {{ $d->mataPelajaran?->nama_mapel }}
+      <div style="flex:1; min-width:180px;">
+        <select name="mapel_id" class="ak-select" onchange="this.form.submit()">
+          <option value="">Semua Mata Pelajaran</option>
+          @foreach($filterMapels as $m)
+            <option value="{{ $m->id }}" {{ request('mapel_id') == $m->id ? 'selected' : '' }}>
+              {{ $m->nama_mapel }}
+            </option>
+          @endforeach
+        </select>
+      </div>
+
+      <div style="width:160px;">
+        <select name="rombel_id" class="ak-select" onchange="this.form.submit()">
+          <option value="">Semua Rombel</option>
+          @foreach($filterRombels as $r)
+            <option value="{{ $r->id }}" {{ request('rombel_id') == $r->id ? 'selected' : '' }}>
+              {{ $r->nama_rombel }}
             </option>
           @endforeach
         </select>
@@ -44,12 +55,12 @@
         </select>
       </div>
 
-      <button type="submit" class="ak-btn ak-btn-secondary">
+      <button type="submit" class="ak-btn ak-btn-secondary" title="Terapkan Filter">
         <i class="bi bi-filter"></i>
       </button>
 
-      @if(request()->anyFilled(['distribusi_id', 'jenis']))
-        <a href="{{ route('akademik.asesmen.index') }}" class="ak-btn ak-btn-secondary" title="Reset">
+      @if(request()->anyFilled(['mapel_id', 'rombel_id', 'jenis']))
+        <a href="{{ route('akademik.asesmen.index') }}" class="ak-btn ak-btn-secondary" title="Reset Filter">
           <i class="bi bi-x-circle"></i>
         </a>
       @endif
@@ -116,7 +127,19 @@
                 <td>
                   <div style="font-weight:700; color:var(--ak-primary);">{{ $a->distribusi?->mataPelajaran?->nama_mapel ?? '-' }}</div>
                   <div style="display:flex; align-items:center; gap:4px; margin-top:3px; flex-wrap:wrap;">
-                    <span class="ak-badge ak-badge-secondary">{{ $a->distribusi?->rombel?->nama_rombel ?? '-' }}</span>
+                    @php
+                      $targetRombels = $a->getTargetRombels();
+                    @endphp
+                    @if($targetRombels->count() > 1)
+                      <span class="ak-badge ak-badge-info" style="font-size:11px;" title="{{ $a->rombel_names }}">
+                        <i class="bi bi-people-fill me-1"></i>{{ $targetRombels->count() }} Rombel: {{ $a->rombel_names }}
+                      </span>
+                    @else
+                      <span class="ak-badge ak-badge-secondary">
+                        {{ $targetRombels->first()?->nama_rombel ?? ($a->distribusi?->rombel?->nama_rombel ?? '-') }}
+                      </span>
+                    @endif
+
                     @if($a->target_tipe === 'siswa_terpilih')
                       <span class="ak-badge ak-badge-warning" style="font-size:9.5px; padding:2px 6px;" title="Hanya siswa tertentu yang ditugaskan (Remedial/Susulan)">
                         <i class="bi bi-person-check-fill me-1"></i>{{ count($a->target_siswa_ids ?? []) }} Siswa

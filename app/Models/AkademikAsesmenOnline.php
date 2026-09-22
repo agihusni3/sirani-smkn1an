@@ -12,7 +12,7 @@ class AkademikAsesmenOnline extends Model {
         'tampilkan_nilai', 'tampilkan_pembahasan', 'is_active', 'passing_grade',
         'token_ujian', 'anti_cheat_mode', 'wajib_fullscreen', 'blokir_copy_paste',
         'max_toleransi_keluar', 'status_validasi', 'catatan_validasi', 'divalidasi_oleh',
-        'divalidasi_pada', 'target_tipe', 'target_siswa_ids'
+        'divalidasi_pada', 'target_tipe', 'target_rombel_ids', 'target_siswa_ids'
     ];
 
     protected $casts = [
@@ -29,6 +29,7 @@ class AkademikAsesmenOnline extends Model {
         'blokir_copy_paste' => 'boolean',
         'max_toleransi_keluar' => 'integer',
         'passing_grade' => 'integer',
+        'target_rombel_ids' => 'array',
         'target_siswa_ids' => 'array',
     ];
 
@@ -36,6 +37,46 @@ class AkademikAsesmenOnline extends Model {
     public function soals(): HasMany { return $this->hasMany(AkademikAsesmenSoal::class, 'asesmen_id')->orderBy('nomor'); }
     public function hasils(): HasMany { return $this->hasMany(AkademikAsesmenHasil::class, 'asesmen_id'); }
     public function validator(): BelongsTo { return $this->belongsTo(User::class, 'divalidasi_oleh'); }
+
+    /**
+     * Dapatkan daftar rombel sasaran asesmen ini
+     */
+    public function getTargetRombels()
+    {
+        $ids = $this->target_rombel_ids;
+        if (!empty($ids) && is_array($ids)) {
+            return Rombel::whereIn('id', $ids)->orderBy('nama_rombel')->get();
+        }
+        if ($this->distribusi?->rombel) {
+            return collect([$this->distribusi->rombel]);
+        }
+        return collect([]);
+    }
+
+    /**
+     * Nama rombel dalam bentuk string gabungan
+     */
+    public function getRombelNamesAttribute(): string
+    {
+        $rombels = $this->getTargetRombels();
+        if ($rombels->isEmpty()) {
+            return '-';
+        }
+        return $rombels->pluck('nama_rombel')->implode(', ');
+    }
+
+    /**
+     * Cek apakah suatu rombel berhak mengakses ujian ini
+     */
+    public function isRombelEligible($rombelId): bool
+    {
+        if (empty($rombelId)) return false;
+        $targetIds = $this->target_rombel_ids;
+        if (!empty($targetIds) && is_array($targetIds)) {
+            return in_array((int)$rombelId, array_map('intval', $targetIds));
+        }
+        return (int)$this->distribusi?->rombel_id === (int)$rombelId;
+    }
 
     public function getTotalSoalAttribute(): int { return $this->soals()->count(); }
     public function getTotalPesertaAttribute(): int { return $this->hasils()->where('is_selesai', true)->count(); }
