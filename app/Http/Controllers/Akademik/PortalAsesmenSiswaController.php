@@ -41,20 +41,29 @@ class PortalAsesmenSiswaController extends Controller
         ]);
 
         $nisnClean = trim($request->nisn);
+        $nisnDigitsOnly = preg_replace('/[^0-9A-Za-z]/', '', $nisnClean);
         $nisnWithoutZeros = ltrim($nisnClean, '0');
-        $nisnWith10Digits = str_pad($nisnClean, 10, '0', STR_PAD_LEFT);
+        $nisnWith10Digits = (strlen($nisnClean) <= 10 && ctype_digit($nisnClean)) ? str_pad($nisnClean, 10, '0', STR_PAD_LEFT) : null;
         
-        // Cari siswa berdasarkan NISN (dengan/tanpa leading zero) atau NIS
+        // Cari siswa berdasarkan NISN atau NIS secara fleksibel (bebas jumlah digit)
         $siswa = Siswa::with('rombels')
-            ->where(function ($q) use ($nisnClean, $nisnWithoutZeros, $nisnWith10Digits) {
+            ->where(function ($q) use ($nisnClean, $nisnDigitsOnly, $nisnWithoutZeros, $nisnWith10Digits) {
                 $q->where('nisn', $nisnClean)
                   ->orWhere('nis', $nisnClean);
-                if (!empty($nisnWithoutZeros)) {
+
+                if (!empty($nisnDigitsOnly) && $nisnDigitsOnly !== $nisnClean) {
+                    $q->orWhere('nisn', $nisnDigitsOnly)
+                      ->orWhere('nis', $nisnDigitsOnly);
+                }
+
+                if (!empty($nisnWithoutZeros) && $nisnWithoutZeros !== $nisnClean) {
                     $q->orWhere('nisn', $nisnWithoutZeros)
                       ->orWhere('nis', $nisnWithoutZeros);
                 }
-                if (strlen($nisnClean) <= 10) {
-                    $q->orWhere('nisn', $nisnWith10Digits);
+
+                if (!empty($nisnWith10Digits) && $nisnWith10Digits !== $nisnClean) {
+                    $q->orWhere('nisn', $nisnWith10Digits)
+                      ->orWhere('nis', $nisnWith10Digits);
                 }
             })
             ->first();

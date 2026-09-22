@@ -211,17 +211,17 @@
       <form action="{{ route('portal.asesmen.masuk') }}" method="POST">
         @csrf
 
-        {{-- NISN --}}
+        {{-- NISN / NIS --}}
         <div class="form-group">
-          <label class="form-label" for="inputNisn">Nomor Induk Siswa Nasional (NISN)</label>
+          <label class="form-label" for="inputNisn">Nomor Induk Siswa Nasional (NISN) / NIS</label>
           <div class="form-input-wrap">
             <i class="bi bi-person-vcard"></i>
             <input type="text" name="nisn" id="inputNisn" class="form-input" 
-                   placeholder="Contoh: 20261001 atau 0081234567" 
+                   placeholder="Masukkan NISN atau NIS terdaftar Anda" 
                    value="{{ old('nisn') }}" required autofocus autocomplete="off">
           </div>
           <div class="form-hint">
-            <i class="bi bi-shield-check text-primary"></i> Masukkan 10 digit NISN atau NIS terdaftar Anda.
+            <i class="bi bi-shield-check text-primary"></i> Masukkan nomor NISN atau NIS terdaftar Anda (bebas jumlah digit).
           </div>
         </div>
 
