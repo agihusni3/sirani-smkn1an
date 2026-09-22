@@ -46,7 +46,7 @@
     <div style="display:flex; align-items:center; gap:12px; flex:1; min-width:200px;">
       <div style="width:36px; height:36px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:14px; 
                   background:{{ $currentStep == 3 ? '#eff6ff' : '#f1f5f9' }}; 
-                  color:{{ $currentStep == 3 ? '#2563eb' : '#94a3b8') }};
+                  color:{{ $currentStep == 3 ? '#2563eb' : '#94a3b8' }};
                   border:2px solid {{ $currentStep == 3 ? '#2563eb' : '#cbd5e1' }};">
         3
       </div>
