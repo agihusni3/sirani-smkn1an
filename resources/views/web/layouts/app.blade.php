@@ -175,97 +175,40 @@
 
                 <!-- Desktop Action Gateways & Mobile Hamburger -->
                 <div class="nav-right-actions">
-                    <!-- Unified DCC Gateway Launcher (No Duplicate Buttons) -->
+                    <!-- Unified DCC Gateway Launcher (Clean & Harmonized) -->
                     <div class="dcc-launcher nav-dropdown">
                         <button type="button" class="btn-dcc-launcher" aria-label="Buka Layanan Data Control Center">
-                            <i class="fa-solid fa-shapes launcher-icon"></i>
                             <span>Layanan DCC</span>
                             <i class="fa-solid fa-chevron-down launcher-chevron"></i>
                         </button>
                         <div class="nav-dropdown-menu align-right wide">
-                            <div class="dropdown-header-label">Akses Mandiri Siswa &amp; Wali</div>
+                            <div class="dropdown-header-label">Layanan Siswa &amp; Guru</div>
 
-                            <a href="{{ route('portal.asesmen.index') }}" class="dropdown-item-card">
-                                <div class="dropdown-item-icon" style="background: #eff6ff; color: #2563eb;">
-                                    <i class="fa-solid fa-laptop-code"></i>
-                                </div>
-                                <div class="dropdown-item-info">
-                                    <div class="dropdown-item-title">
-                                        <span>Asesmen CBT Siswa</span>
-                                        <span class="badge-subtle-status live" style="background:#eff6ff; color:#2563eb; border-color:#bfdbfe;">Ujian</span>
-                                    </div>
-                                    <div class="dropdown-item-sub">Ruang asesmen online via NISN &amp; Tgl Lahir</div>
-                                </div>
+                            <a href="{{ route('portal.asesmen.index') }}" class="dcc-menu-item">
+                                <div class="dcc-menu-title">Asesmen CBT Siswa</div>
+                                <div class="dcc-menu-desc">Ruang ujian online berbasis NISN dan Tanggal Lahir</div>
                             </a>
 
-                            <a href="{{ route('portal.ortu.index') }}" class="dropdown-item-card">
-                                <div class="dropdown-item-icon" style="background: #f0fdf4; color: #059669;">
-                                    <i class="fa-solid fa-fingerprint"></i>
-                                </div>
-                                <div class="dropdown-item-info">
-                                    <div class="dropdown-item-title">
-                                        <span>Monitoring Presensi</span>
-                                        <span class="badge-subtle-status aktif">Aktif</span>
-                                    </div>
-                                    <div class="dropdown-item-sub">Pantauan kehadiran siswa mandiri &amp; kartu RFID</div>
-                                </div>
+                            <a href="{{ route('portal.ortu.index') }}" class="dcc-menu-item">
+                                <div class="dcc-menu-title">Monitoring Presensi</div>
+                                <div class="dcc-menu-desc">Pantauan absensi mandiri kartu RFID siswa &amp; wali</div>
                             </a>
 
-                            <a href="{{ route('situan.pelayanan.index') }}" class="dropdown-item-card">
-                                <div class="dropdown-item-icon" style="background: #fef3c7; color: #d97706;">
-                                    <i class="fa-solid fa-envelope-open-text"></i>
-                                </div>
-                                <div class="dropdown-item-info">
-                                    <div class="dropdown-item-title">
-                                        <span>Pelayanan Surat (SITUAN)</span>
-                                        <span class="badge-subtle-status aktif">Aktif</span>
-                                    </div>
-                                    <div class="dropdown-item-sub">Permohonan surat keterangan aktif mandiri</div>
-                                </div>
-                            </a>
-
-                            <div class="dropdown-header-label" style="margin-top: 4px; border-top: 1px solid rgba(226, 232, 240, 0.8); padding-top: 8px;">
-                                Penerimaan Murid Baru
-                            </div>
-
-                            <a href="{{ route('ppdb.index') }}" class="dropdown-item-card">
-                                <div class="dropdown-item-icon" style="background: #fef2f2; color: #dc2626;">
-                                    <i class="fa-solid fa-file-signature"></i>
-                                </div>
-                                <div class="dropdown-item-info">
-                                    <div class="dropdown-item-title">
-                                        <span>Pendaftaran PPDB 2026/2027</span>
-                                        <span class="badge-subtle-status live">Buka</span>
-                                    </div>
-                                    <div class="dropdown-item-sub">Formulir pendaftaran daring calon siswa</div>
-                                </div>
-                            </a>
-
-                            <a href="{{ route('ppdb.ujian.portal') }}" class="dropdown-item-card">
-                                <div class="dropdown-item-icon" style="background: #e0f2fe; color: #0284c7;">
-                                    <i class="fa-solid fa-clipboard-check"></i>
-                                </div>
-                                <div class="dropdown-item-info">
-                                    <div class="dropdown-item-title">
-                                        <span>Ujian Seleksi CBT PPDB</span>
-                                        <span class="badge-subtle-status live" style="background:#e0f2fe; color:#0284c7;">CBT</span>
-                                    </div>
-                                    <div class="dropdown-item-sub">Tes minat jurusan calon siswa baru</div>
-                                </div>
+                            <a href="{{ route('situan.pelayanan.index') }}" class="dcc-menu-item">
+                                <div class="dcc-menu-title">Pelayanan Surat (SITUAN)</div>
+                                <div class="dcc-menu-desc">Permohonan surat keterangan aktif siswa mandiri</div>
                             </a>
 
                             <!-- Bottom Bar: DCC Portal Gateway -->
                             @auth
-                                <a href="{{ route('admin.portal') }}" class="dropdown-item-card" style="margin-top: 4px; border-top: 1px solid rgba(226, 232, 240, 0.8); background: #f8fafc !important; justify-content: center; text-align: center; padding: 10px !important;">
-                                    <span style="font-family: var(--font-tech); font-size: 0.76rem; font-weight: 700; color: var(--brand-blue);">
-                                        <i class="fa-solid fa-gauge-high" style="margin-right: 6px;"></i> Masuk Dashboard DCC ({{ auth()->user()->name }}) &rarr;
-                                    </span>
+                                <a href="{{ route('admin.portal') }}" class="dcc-menu-footer-link">
+                                    <span>Masuk Dashboard DCC ({{ auth()->user()->name }})</span>
+                                    <i class="fa-solid fa-arrow-right" style="font-size: 0.72rem;"></i>
                                 </a>
                             @else
-                                <a href="{{ route('login') }}" class="dropdown-item-card" style="margin-top: 4px; border-top: 1px solid rgba(226, 232, 240, 0.8); background: #f8fafc !important; justify-content: center; text-align: center; padding: 10px !important;">
-                                    <span style="font-family: var(--font-tech); font-size: 0.76rem; font-weight: 700; color: var(--brand-blue);">
-                                        <i class="fa-solid fa-right-to-bracket" style="margin-right: 6px;"></i> Login Petugas &amp; Guru (DCC Portal) &rarr;
-                                    </span>
+                                <a href="{{ route('login') }}" class="dcc-menu-footer-link">
+                                    <span>Login Petugas &amp; Guru (DCC Portal)</span>
+                                    <i class="fa-solid fa-arrow-right" style="font-size: 0.72rem;"></i>
                                 </a>
                             @endauth
                         </div>
