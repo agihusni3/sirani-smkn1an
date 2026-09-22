@@ -45,7 +45,7 @@
     {{-- Step 3: Sesi Penugasan --}}
     <div style="display:flex; align-items:center; gap:10px; flex:1; min-width:180px;">
       <div style="width:32px; height:32px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:13px; flex-shrink:0;
-                  background:{{ $currentStep == 3 ? '#eff6ff' : '#f8fafc') }}; 
+                  background:{{ $currentStep == 3 ? '#eff6ff' : '#f8fafc' }}; 
                   color:{{ $currentStep == 3 ? '#2563eb' : '#94a3b8' }};
                   border:2px solid {{ $currentStep == 3 ? '#2563eb' : '#e2e8f0' }};">
         3
