@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\RfidController;
+use App\Http\Controllers\Sirani\RfidController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function () {

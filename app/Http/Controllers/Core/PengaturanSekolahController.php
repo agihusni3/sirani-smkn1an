@@ -1,6 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Core;
+
+use App\Http\Controllers\Controller;
 
 use App\Models\PengaturanSekolah;
 use Illuminate\Http\Request;

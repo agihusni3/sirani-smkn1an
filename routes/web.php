@@ -2,26 +2,26 @@
 
 use App\Http\Controllers\AuditController;
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\BackupDatabaseController;
-use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\GuruController;
-use App\Http\Controllers\GuruPiketController;
-use App\Http\Controllers\HariLiburController;
-use App\Http\Controllers\IzinSiswaController;
-use App\Http\Controllers\JadwalPiketController;
-use App\Http\Controllers\KasusDisiplinController;
-use App\Http\Controllers\LaporanController;
+use App\Http\Controllers\Core\BackupDatabaseController;
+use App\Http\Controllers\Sirani\DashboardController;
+use App\Http\Controllers\Sirani\GuruController;
+use App\Http\Controllers\Sirani\GuruPiketController;
+use App\Http\Controllers\Sirani\HariLiburController;
+use App\Http\Controllers\Sirani\IzinSiswaController;
+use App\Http\Controllers\Sirani\JadwalPiketController;
+use App\Http\Controllers\Sirani\KasusDisiplinController;
+use App\Http\Controllers\Sirani\LaporanController;
 use App\Http\Controllers\NotifikasiController;
-use App\Http\Controllers\PengaturanSekolahController;
+use App\Http\Controllers\Core\PengaturanSekolahController;
 use App\Http\Controllers\PengumumanController;
-use App\Http\Controllers\PeringkatController;
-use App\Http\Controllers\PortalOrtuController;
-use App\Http\Controllers\PresensiManualController;
-use App\Http\Controllers\RombelController;
-use App\Http\Controllers\SiklusSiswaController;
-use App\Http\Controllers\SiswaController;
-use App\Http\Controllers\SuratKesiswaanController;
-use App\Http\Controllers\PengawasanGuruController;
+use App\Http\Controllers\Sirani\PeringkatController;
+use App\Http\Controllers\Core\PortalOrtuController;
+use App\Http\Controllers\Sirani\PresensiManualController;
+use App\Http\Controllers\Sirani\RombelController;
+use App\Http\Controllers\Sirani\SiklusSiswaController;
+use App\Http\Controllers\Sirani\SiswaController;
+use App\Http\Controllers\Sirani\SuratKesiswaanController;
+use App\Http\Controllers\Sirani\PengawasanGuruController;
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\Web\BerandaController;
@@ -38,11 +38,11 @@ use App\Http\Controllers\Ppdb\PpdbPresensiUjianController;
 use App\Http\Controllers\Admin\BeritaAdminController;
 use App\Http\Controllers\Admin\WebsiteBannerController;
 use App\Http\Controllers\Admin\WebsiteStatistikController;
-use App\Http\Controllers\SituanPersuratanController;
-use App\Http\Controllers\SituanPelayananSuratController;
-use App\Http\Controllers\SituanKepegawaianController;
-use App\Http\Controllers\SituanEKabinetController;
-use App\Http\Controllers\SituanSuratTugasController;
+use App\Http\Controllers\Situan\SituanPersuratanController;
+use App\Http\Controllers\Situan\SituanPelayananSuratController;
+use App\Http\Controllers\Situan\SituanKepegawaianController;
+use App\Http\Controllers\Situan\SituanEKabinetController;
+use App\Http\Controllers\Situan\SituanSuratTugasController;
 
 
 // ══ 1. Website Resmi Publik SMKN 1 Air Naningan (Dilindungi Pelacak Kunjungan Otomatis) ══
@@ -90,9 +90,9 @@ Route::middleware('throttle:300,1')->group(function () {
     Route::get('/presensi-siswa/{nisn}', [PortalOrtuController::class, 'detail'])->name('portal.ortu.direct');
     
     // Redirect Alias dari rute lama ke monitoring absen mandiri
-    Route::get('/portal-siswa/{nisn?}', [\App\Http\Controllers\RfidController::class, 'portalSiswa'])->name('portal.siswa');
-    Route::get('/kartu-digital/{nisn}', [\App\Http\Controllers\RfidController::class, 'kartuDigital'])->name('kartu.digital');
-    Route::get('/kartu-digital-guru/{id}', [\App\Http\Controllers\RfidController::class, 'kartuDigitalGuru'])->name('kartu.digital.guru');
+    Route::get('/portal-siswa/{nisn?}', [\App\Http\Controllers\Sirani\RfidController::class, 'portalSiswa'])->name('portal.siswa');
+    Route::get('/kartu-digital/{nisn}', [\App\Http\Controllers\Sirani\RfidController::class, 'kartuDigital'])->name('kartu.digital');
+    Route::get('/kartu-digital-guru/{id}', [\App\Http\Controllers\Sirani\RfidController::class, 'kartuDigitalGuru'])->name('kartu.digital.guru');
 });
 
 // Portal Masuk Asesmen & CBT Siswa (Akses Siswa via NISN & Tanggal Lahir)
@@ -114,12 +114,12 @@ Route::get('/cbt', fn() => redirect()->route('portal.asesmen.index'));
 Route::get('/ujian-cbt', fn() => redirect()->route('portal.asesmen.index'));
 
 // Kirim WA Gateway dari Halaman Kartu Digital Publik (Akses Siswa/Ortu/Guru via HP tanpa login)
-Route::post('/kartu-digital/kirim-wa', [\App\Http\Controllers\RfidController::class, 'kirimWaPersonal'])
+Route::post('/kartu-digital/kirim-wa', [\App\Http\Controllers\Sirani\RfidController::class, 'kirimWaPersonal'])
     ->middleware('throttle:20,1')
     ->name('kartu.digital.kirim.wa');
 
 // Download QR Code PNG Server-Side (konsisten dengan tampilan kartu digital)
-Route::get('/qr/{type}/{id}', [\App\Http\Controllers\RfidController::class, 'generateQrImage'])
+Route::get('/qr/{type}/{id}', [\App\Http\Controllers\Sirani\RfidController::class, 'generateQrImage'])
     ->middleware('throttle:60,1')
     ->where('type', 'guru|siswa')
     ->name('qr.download');
@@ -130,7 +130,7 @@ Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:60
 
 Route::match(['get', 'post'], '/logout', [AuthController::class, 'logout'])->name('logout');
 
-use App\Http\Controllers\AdminPortalController;
+use App\Http\Controllers\Core\AdminPortalController;
 
 // Rute Internal Terproteksi Dasbor Utama & Master Data (Hanya Staf/Admin Terautentikasi)
 Route::middleware('auth')->group(function () {
@@ -149,28 +149,28 @@ Route::middleware('auth')->group(function () {
 
     // 0a. Smart Gate Kiosk RFID & Barcode (Hanya Admin & Guru Piket)
     Route::middleware('role:admin,guru_piket')->group(function () {
-        Route::get('/smart-gate', [\App\Http\Controllers\RfidController::class, 'kiosk'])->name('rfid.kiosk');
-        Route::get('/kios-rfid', [\App\Http\Controllers\RfidController::class, 'kiosk']);
-        Route::get('/rfid', [\App\Http\Controllers\RfidController::class, 'kiosk']);
-        Route::get('/kiosk/monitor-feed', [\App\Http\Controllers\RfidController::class, 'monitorFeed'])->name('kiosk.monitor.feed');
+        Route::get('/smart-gate', [\App\Http\Controllers\Sirani\RfidController::class, 'kiosk'])->name('rfid.kiosk');
+        Route::get('/kios-rfid', [\App\Http\Controllers\Sirani\RfidController::class, 'kiosk']);
+        Route::get('/rfid', [\App\Http\Controllers\Sirani\RfidController::class, 'kiosk']);
+        Route::get('/kiosk/monitor-feed', [\App\Http\Controllers\Sirani\RfidController::class, 'monitorFeed'])->name('kiosk.monitor.feed');
     });
 
 
     // 0b. Pairing Kartu RFID (Khusus Admin & Staf TU)
     Route::middleware('role:admin,staf_tu')->group(function () {
-        Route::post('/api/v1/rfid-pair', [\App\Http\Controllers\RfidController::class, 'pair'])->middleware('throttle:60,1')->name('api.rfid.pair');
-        Route::post('/api/v1/rfid-unpair', [\App\Http\Controllers\RfidController::class, 'unpair'])->middleware('throttle:60,1')->name('api.rfid.unpair');
+        Route::post('/api/v1/rfid-pair', [\App\Http\Controllers\Sirani\RfidController::class, 'pair'])->middleware('throttle:60,1')->name('api.rfid.pair');
+        Route::post('/api/v1/rfid-unpair', [\App\Http\Controllers\Sirani\RfidController::class, 'unpair'])->middleware('throttle:60,1')->name('api.rfid.unpair');
     });
 
     // 0c. Pengaturan Profil & Ganti Password Mandiri (Semua Pengguna Terautentikasi)
     Route::post('/profil/update', [AuthController::class, 'updateProfil'])->name('profil.update');
 
     // 0c-2. Portal Mandiri PTK (Biodata & Lemari Berkas Digital Pribadi)
-    Route::get('/ptk/profil-saya', [\App\Http\Controllers\PtkProfilMandiriController::class, 'index'])->name('ptk.profil-saya');
-    Route::post('/ptk/profil-saya/unggah-berkas', [\App\Http\Controllers\PtkProfilMandiriController::class, 'unggahBerkasMandiri'])->name('ptk.unggah-berkas');
-    Route::post('/ptk/profil-saya/update-foto', [\App\Http\Controllers\PtkProfilMandiriController::class, 'updateFoto'])->name('ptk.update-foto');
-    Route::post('/ptk/profil-saya/update-biodata', [\App\Http\Controllers\PtkProfilMandiriController::class, 'updateBiodata'])->name('ptk.update-biodata');
-    Route::delete('/ptk/profil-saya/berkas/{id}', [\App\Http\Controllers\PtkProfilMandiriController::class, 'hapusBerkasMandiri'])->name('ptk.hapus-berkas');
+    Route::get('/ptk/profil-saya', [\App\Http\Controllers\Core\PtkProfilMandiriController::class, 'index'])->name('ptk.profil-saya');
+    Route::post('/ptk/profil-saya/unggah-berkas', [\App\Http\Controllers\Core\PtkProfilMandiriController::class, 'unggahBerkasMandiri'])->name('ptk.unggah-berkas');
+    Route::post('/ptk/profil-saya/update-foto', [\App\Http\Controllers\Core\PtkProfilMandiriController::class, 'updateFoto'])->name('ptk.update-foto');
+    Route::post('/ptk/profil-saya/update-biodata', [\App\Http\Controllers\Core\PtkProfilMandiriController::class, 'updateBiodata'])->name('ptk.update-biodata');
+    Route::delete('/ptk/profil-saya/berkas/{id}', [\App\Http\Controllers\Core\PtkProfilMandiriController::class, 'hapusBerkasMandiri'])->name('ptk.hapus-berkas');
 
     // 0c-3. Pintasan ke Modul PPDB — Meja Wawancara 2026
     Route::get('/guru/ppdb/wawancara', function () {
@@ -187,10 +187,10 @@ Route::middleware('auth')->group(function () {
 
     // 0e. SITUAN — SMKN 1 AN (Sistem Informasi Tata Usaha & Data Pokok Sekolah)
     Route::middleware('role:admin,kepala_sekolah,staf_tu,waka_kurikulum,waka_kesiswaan,waka_sarpras,waka_hubin,wali_kelas')->group(function () {
-        Route::get('/situan', [\App\Http\Controllers\SituanDashboardController::class, 'index'])->name('situan.index');
-        Route::get('/situan/dashboard', [\App\Http\Controllers\SituanDashboardController::class, 'index'])->name('situan.dashboard');
-        Route::get('/situan/log', [\App\Http\Controllers\SituanDashboardController::class, 'log'])->name('situan.log');
-        Route::get('/admin/situan', [\App\Http\Controllers\SituanDashboardController::class, 'index']);
+        Route::get('/situan', [\App\Http\Controllers\Situan\SituanDashboardController::class, 'index'])->name('situan.index');
+        Route::get('/situan/dashboard', [\App\Http\Controllers\Situan\SituanDashboardController::class, 'index'])->name('situan.dashboard');
+        Route::get('/situan/log', [\App\Http\Controllers\Situan\SituanDashboardController::class, 'log'])->name('situan.log');
+        Route::get('/admin/situan', [\App\Http\Controllers\Situan\SituanDashboardController::class, 'index']);
 
         // Persuratan Kedinasan & E-Disposisi
         Route::get('/situan/surat-masuk', [SituanPersuratanController::class, 'suratMasukIndex'])->name('situan.surat-masuk.index');
@@ -554,18 +554,18 @@ Route::middleware('auth')->group(function () {
 
     // 8. Kios Presensi Mandiri (Hanya Admin & Guru Piket)
     Route::middleware('role:admin,guru_piket')->group(function () {
-        Route::get('/kiosk', [\App\Http\Controllers\RfidController::class, 'kiosk'])->name('kiosk.index');
-        Route::post('/kiosk/tap', [\App\Http\Controllers\RfidController::class, 'scan'])->name('kiosk.tap');
+        Route::get('/kiosk', [\App\Http\Controllers\Sirani\RfidController::class, 'kiosk'])->name('kiosk.index');
+        Route::post('/kiosk/tap', [\App\Http\Controllers\Sirani\RfidController::class, 'scan'])->name('kiosk.tap');
     });
 
     // 9. Surat Izin Siswa Terpadu (Admin, Wakasis & Guru Piket)
     Route::middleware('role:admin,waka_kesiswaan,guru_piket')->group(function () {
-        Route::get('/izin-siswa', [\App\Http\Controllers\IzinSiswaController::class, 'index'])->name('izin.index');
-        Route::get('/izin-siswa/cetak-pdf', [\App\Http\Controllers\IzinSiswaController::class, 'cetakPdf'])->name('izin.cetak-pdf');
-        Route::post('/izin-siswa', [\App\Http\Controllers\IzinSiswaController::class, 'store'])->name('izin.store');
-        Route::post('/izin-siswa/store', [\App\Http\Controllers\IzinSiswaController::class, 'store'])->name('izin-siswa.store');
-        Route::delete('/izin-siswa/{id}', [\App\Http\Controllers\IzinSiswaController::class, 'destroy'])->name('izin-siswa.destroy');
-        Route::delete('/izin-guru/{id}', [\App\Http\Controllers\IzinSiswaController::class, 'destroyGuru'])->name('izin-guru.destroy');
+        Route::get('/izin-siswa', [\App\Http\Controllers\Sirani\IzinSiswaController::class, 'index'])->name('izin.index');
+        Route::get('/izin-siswa/cetak-pdf', [\App\Http\Controllers\Sirani\IzinSiswaController::class, 'cetakPdf'])->name('izin.cetak-pdf');
+        Route::post('/izin-siswa', [\App\Http\Controllers\Sirani\IzinSiswaController::class, 'store'])->name('izin.store');
+        Route::post('/izin-siswa/store', [\App\Http\Controllers\Sirani\IzinSiswaController::class, 'store'])->name('izin-siswa.store');
+        Route::delete('/izin-siswa/{id}', [\App\Http\Controllers\Sirani\IzinSiswaController::class, 'destroy'])->name('izin-siswa.destroy');
+        Route::delete('/izin-guru/{id}', [\App\Http\Controllers\Sirani\IzinSiswaController::class, 'destroyGuru'])->name('izin-guru.destroy');
     });
 
     // 10. Guru Piket Operasional Meja Piket (Admin, Wakasis & Guru Piket)
@@ -609,16 +609,16 @@ Route::middleware('auth')->group(function () {
 
     // 13b. Pusat Manajemen Kartu RFID & Cetak Barcode Kartu (Admin & Staf TU)
     Route::middleware('role:admin,staf_tu')->group(function () {
-        Route::get('/kartu-rfid', [\App\Http\Controllers\RfidController::class, 'index'])->name('rfid.index');
-        Route::get('/kartu-rfid/cetak', [\App\Http\Controllers\RfidController::class, 'cetak'])->name('rfid.cetak');
-        Route::get('/kartu-rfid/broadcast-recipients', [\App\Http\Controllers\RfidController::class, 'getBroadcastRecipients'])->name('rfid.broadcast.recipients');
-        Route::post('/kartu-rfid/broadcast-wa', [\App\Http\Controllers\RfidController::class, 'broadcastWa'])->name('rfid.broadcast.wa');
-        Route::get('/manajemen-rfid', [\App\Http\Controllers\RfidController::class, 'index']);
+        Route::get('/kartu-rfid', [\App\Http\Controllers\Sirani\RfidController::class, 'index'])->name('rfid.index');
+        Route::get('/kartu-rfid/cetak', [\App\Http\Controllers\Sirani\RfidController::class, 'cetak'])->name('rfid.cetak');
+        Route::get('/kartu-rfid/broadcast-recipients', [\App\Http\Controllers\Sirani\RfidController::class, 'getBroadcastRecipients'])->name('rfid.broadcast.recipients');
+        Route::post('/kartu-rfid/broadcast-wa', [\App\Http\Controllers\Sirani\RfidController::class, 'broadcastWa'])->name('rfid.broadcast.wa');
+        Route::get('/manajemen-rfid', [\App\Http\Controllers\Sirani\RfidController::class, 'index']);
     });
 
     // Kirim WA Personal (Bisa diakses Admin, Staf TU, Guru, dan Pegawai)
-    Route::post('/kartu-rfid/kirim-wa-personal', [\App\Http\Controllers\RfidController::class, 'kirimWaPersonal'])->name('rfid.kirim.wa.personal');
-    Route::post('/kartu-rfid/kirim-wa-personal-alias', [\App\Http\Controllers\RfidController::class, 'kirimWaPersonal'])->name('rfid.kirimWaPersonal');
+    Route::post('/kartu-rfid/kirim-wa-personal', [\App\Http\Controllers\Sirani\RfidController::class, 'kirimWaPersonal'])->name('rfid.kirim.wa.personal');
+    Route::post('/kartu-rfid/kirim-wa-personal-alias', [\App\Http\Controllers\Sirani\RfidController::class, 'kirimWaPersonal'])->name('rfid.kirimWaPersonal');
 
     // 14. Jam Operasional & Jadwal Sekolah (Admin, Kepsek, Wakasis, Waka Kurikulum, Guru Piket, Staf TU, Guru)
     Route::middleware('role:admin,kepala_sekolah,waka_kesiswaan,waka_kurikulum,waka_sarpras,waka_hubin,guru_piket,staf_tu,guru')->group(function () {

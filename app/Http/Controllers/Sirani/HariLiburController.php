@@ -1,6 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Sirani;
+
+use App\Http\Controllers\Controller;
 
 use App\Models\HariLibur;
 use App\Models\TahunAjaran;
