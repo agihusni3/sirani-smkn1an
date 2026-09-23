@@ -1092,6 +1092,21 @@ class KasusDisiplinController extends Controller
         // 3. Sinkronkan dan Recalculate Kasus
         KasusDisiplin::syncFromPresensi($kasus->siswa_id);
 
+        // 4. Kirim Push Notification ke HP Orang Tua Siswa
+        $siswa = $kasus->siswa;
+        if ($siswa && !empty($siswa->nisn)) {
+            try {
+                \App\Services\PushNotificationService::sendToSiswa(
+                    $siswa->nisn,
+                    "⚠️ Catatan Kedisiplinan: " . $siswa->nama,
+                    "Ananda tercatat melakukan pelanggaran: {$namaPelanggaran} (+{$poinPlus} Poin). Ketuk untuk melihat riwayat.",
+                    "/presensi-siswa/" . $siswa->nisn
+                );
+            } catch (\Throwable $e) {
+                \Illuminate\Support\Facades\Log::warning("Gagal kirim push notif pelanggaran: " . $e->getMessage());
+            }
+        }
+
         return redirect()->back()->with('success', "Pelanggaran berhasil dicatat! Poin pelanggaran bertambah +{$poinPlus} poin.");
     }
 

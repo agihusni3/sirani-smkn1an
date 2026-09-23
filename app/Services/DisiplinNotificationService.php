@@ -88,6 +88,20 @@ class DisiplinNotificationService
 
             $waService->kirim($notifOrtu);
         }
+
+        // 3. Kirim Push Notification ke Aplikasi HP Orang Tua (jika terpasang)
+        if (!empty($siswa->nisn)) {
+            try {
+                \App\Services\PushNotificationService::sendToSiswa(
+                    $siswa->nisn,
+                    "📋 Pembinaan Disiplin: " . $siswa->nama,
+                    "Perkembangan kasus kedisiplinan ananda telah mencapai tahap {$tahapBaru}. Mohon cek informasi pembinaan.",
+                    "/presensi-siswa/" . $siswa->nisn
+                );
+            } catch (\Throwable $e) {
+                Log::warning("Gagal kirim push notif eskalasi disiplin: " . $e->getMessage());
+            }
+        }
     }
 
     /**
