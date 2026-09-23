@@ -395,47 +395,6 @@
     <!-- 3. Clean Streamlined Minimalist Footer -->
     <footer class="site-footer">
         <div class="container">
-            <!-- Footer Content Row -->
-            <div class="footer-main-row">
-                <!-- Brand Identity -->
-                <div class="footer-brand-box">
-                    <img src="{{ asset('logo.png') }}" alt="Logo SMK" class="footer-logo" onerror="this.src='{{ asset('img/logo.png') }}'">
-                    <div class="footer-brand-info">
-                        <div class="footer-brand-title">SMK NEGERI 1 AIR NANINGAN</div>
-                        <div class="footer-brand-sub">
-                            <span>NPSN: {{ $sekolah->npsn ?? '69888999' }}</span>
-                            <span class="sep">&bull;</span>
-                            <span><i class="fa-solid fa-location-dot"></i> Air Naningan, Tanggamus, Lampung</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Quick Inline Links (Clean, No Duplicate SITUAN) -->
-                <nav class="footer-nav-inline" aria-label="Navigasi Footer">
-                    <a href="{{ route('web.beranda') }}">Beranda</a>
-                    <a href="{{ route('web.jurusan.index') }}">Kejuruan</a>
-                    <a href="{{ route('ppdb.index') }}">PPDB</a>
-                    <a href="{{ route('portal.ortu.index') }}">Presensi Siswa</a>
-                    <a href="{{ route('portal.asesmen.index') }}">Asesmen CBT</a>
-                    <a href="{{ route('web.berita.index') }}">Warta</a>
-                    <a href="{{ route('web.kontak') }}">Kontak</a>
-                </nav>
-
-                <!-- Action & Socials -->
-                <div class="footer-actions-cluster">
-                    <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $sekolah->telepon ?? '6281234567890') }}?text=Halo%20Admin%20SMKN%201%20Air%20Naningan"
-                       target="_blank" rel="noopener" class="footer-wa-pill" title="Konsultasi WhatsApp">
-                        <i class="fa-brands fa-whatsapp"></i>
-                        <span>Helpdesk</span>
-                    </a>
-                    <div class="footer-social-icons">
-                        <a href="https://facebook.com" target="_blank" rel="noopener" class="footer-social-circle fb" title="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
-                        <a href="https://instagram.com" target="_blank" rel="noopener" class="footer-social-circle ig" title="Instagram"><i class="fa-brands fa-instagram"></i></a>
-                        <a href="https://youtube.com" target="_blank" rel="noopener" class="footer-social-circle yt" title="YouTube"><i class="fa-brands fa-youtube"></i></a>
-                    </div>
-                </div>
-            </div>
-
             <!-- Bottom Copyright (Minimalist & Clean) -->
             <div class="footer-bottom-bar">
                 <div>&copy; {{ date('Y') }} SMKN 1 Air Naningan. Seluruh hak cipta dilindungi.</div>
