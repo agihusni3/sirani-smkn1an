@@ -423,5 +423,44 @@ class NotifikasiController extends Controller
         );
     }
 
+    /**
+     * Dapatkan jumlah subscriber HP wali murid aktif
+     */
+    public function getSubscribersCount()
+    {
+        $activeCount = \App\Models\PushSubscription::where('is_active', true)->count();
+        $totalCount  = \App\Models\PushSubscription::count();
+
+        return response()->json([
+            'status'       => 'success',
+            'active_count' => $activeCount,
+            'total_count'  => $totalCount,
+        ]);
+    }
+
+    /**
+     * Broadcast uji coba / demo ke SELURUH wali murid
+     */
+    public function demoPushWaliMurid(Request $request)
+    {
+        $title = trim($request->input('title') ?: '🔔 [DEMO SIRANI] Uji Coba Notifikasi Wali Murid');
+        $body  = trim($request->input('body') ?: 'Halo Bapak/Ibu Wali Murid! Notifikasi kehadiran & kedisiplinan siswa SMKN 1 Air Naningan berhasil aktif di HP Anda. Terima kasih.');
+        $url   = trim($request->input('url') ?: '/cek-presensi');
+
+        $result = \App\Services\PushNotificationService::broadcastDemoWaliMurid($title, $body, $url);
+
+        if ($request->expectsJson() || $request->ajax()) {
+            return response()->json([
+                'status'  => $result['success'] ? 'success' : ($result['total'] === 0 ? 'warning' : 'error'),
+                'message' => $result['message'],
+                'data'    => $result,
+            ]);
+        }
+
+        return back()->with(
+            $result['success'] ? 'success' : 'error',
+            $result['message']
+        );
+    }
 }
 

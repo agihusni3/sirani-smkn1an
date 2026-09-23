@@ -17,4 +17,5 @@ Route::get('/push-vapid-key', [\App\Http\Controllers\Api\PushSubscriptionControl
 Route::post('/push-subscribe', [\App\Http\Controllers\Api\PushSubscriptionController::class, 'subscribe']);
 Route::post('/push-unsubscribe', [\App\Http\Controllers\Api\PushSubscriptionController::class, 'unsubscribe']);
 Route::post('/push-test-background', [\App\Http\Controllers\Api\PushSubscriptionController::class, 'testBackground']);
-
+Route::get('/push-subscribers-count', [\App\Http\Controllers\Api\PushSubscriptionController::class, 'getSubscribersCount']);
+Route::post('/push-broadcast-demo', [\App\Http\Controllers\Api\PushSubscriptionController::class, 'broadcastDemo']);

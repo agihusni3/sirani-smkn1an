@@ -87,6 +87,55 @@ class PushNotificationService
     }
 
     /**
+     * Broadcast notifikasi uji coba / demo langsung ke SEMUA perangkat wali murid yang aktif
+     */
+    public static function broadcastDemoWaliMurid(string $title, string $body, ?string $url = null): array
+    {
+        $subscriptions = PushSubscription::where('is_active', true)->get();
+        $totalDevices = $subscriptions->count();
+
+        if ($totalDevices === 0) {
+            return [
+                'success' => false,
+                'total'   => 0,
+                'sent'    => 0,
+                'failed'  => 0,
+                'message' => 'Saat ini belum ada perangkat HP wali murid yang terdaftar di portal. Minta wali murid membuka portal di HP dan mengizinkan notifikasi.',
+            ];
+        }
+
+        $payload = [
+            'title'     => $title,
+            'body'      => $body,
+            'url'       => $url ?: '/cek-presensi',
+            'icon'      => '/icons/icon-192.png',
+            'badge'     => '/icons/icon-192.png',
+            'vibrate'   => [300, 100, 300, 100, 400],
+            'sound'     => 'chime',
+            'tag'       => 'sirani-demo-' . time(),
+            'timestamp' => now()->timestamp,
+        ];
+
+        $sentCount = 0;
+        $failCount = 0;
+
+        foreach ($subscriptions as $sub) {
+            if (self::dispatchPush($sub, $payload)) {
+                $sentCount++;
+            } else {
+                $failCount++;
+            }
+        }
+
+        return [
+            'success' => $sentCount > 0,
+            'total'   => $totalDevices,
+            'sent'    => $sentCount,
+            'failed'  => $failCount,
+            'message' => "Notifikasi demo berhasil terkirim ke {$sentCount} dari {$totalDevices} perangkat HP wali murid!",
+        ];
+    }
+
     /**
      * Kirim siaran pengumuman sekolah ke seluruh atau target perangkat orang tua
      */

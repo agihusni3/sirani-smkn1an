@@ -534,6 +534,8 @@ Route::middleware('auth')->group(function () {
         Route::post('/notifikasi/sinkronkan-presensi', [NotifikasiController::class, 'sinkronkanPresensi'])->name('notifikasi.sinkronkan-presensi');
         Route::post('/notifikasi/pengaturan', [NotifikasiController::class, 'updatePengaturan'])->name('notifikasi.pengaturan.update')->middleware('role:admin,guru_piket');
         Route::post('/notifikasi/test-kirim', [NotifikasiController::class, 'testKirim'])->name('notifikasi.test-kirim')->middleware('role:admin,guru_piket');
+        Route::post('/notifikasi/demo-push-walimurid', [NotifikasiController::class, 'demoPushWaliMurid'])->name('notifikasi.demo-push-walimurid');
+        Route::get('/notifikasi/subscribers-count', [NotifikasiController::class, 'getSubscribersCount'])->name('notifikasi.subscribers-count');
     });
 
     // 5b. Pusat Pengumuman & Broadcast Sekolah (Admin, Kepsek, Wakasis, Waka Kurikulum, BK, Wali Kelas, Guru Piket, Guru)

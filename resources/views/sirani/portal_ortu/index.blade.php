@@ -3007,14 +3007,70 @@
       }
     }
 
-    // Listener suara saat Service Worker menerima Push Notification
+    // Listener suara & floating toast saat Service Worker menerima Push Notification
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.addEventListener('message', function(event) {
         if (event.data && event.data.type === 'SIRANI_PUSH_RECEIVED') {
           const soundChoice = localStorage.getItem('sirani_sound_choice') || 'chime';
           sirani_playPreviewSound(soundChoice);
+          sirani_showInAppToast(event.data.title, event.data.body);
         }
       });
+    }
+
+    function sirani_showInAppToast(title, body) {
+      let toast = document.getElementById('siraniInAppToast');
+      if (!toast) {
+        toast = document.createElement('div');
+        toast.id = 'siraniInAppToast';
+        toast.style.cssText = 'position:fixed; top:16px; left:50%; transform:translateX(-50%) translateY(-120%); z-index:999999; width:calc(100% - 32px); max-width:440px; background:rgba(15, 23, 42, 0.96); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px); color:#ffffff; border-radius:14px; padding:12px 16px; box-shadow:0 12px 30px rgba(0,0,0,0.4); border:1px solid rgba(255,255,255,0.18); transition:transform .35s cubic-bezier(0.16, 1, 0.3, 1), opacity .35s ease; opacity:0; pointer-events:auto; cursor:pointer;';
+        document.body.appendChild(toast);
+        toast.addEventListener('click', function() {
+          toast.style.transform = 'translateX(-50%) translateY(-120%)';
+          toast.style.opacity = '0';
+        });
+      }
+
+      function esc(str) {
+        const d = document.createElement('div');
+        d.innerText = str || '';
+        return d.innerHTML;
+      }
+
+      toast.innerHTML = `
+        <div style="display:flex; align-items:flex-start; gap:10px;">
+          <div style="width:34px; height:34px; border-radius:8px; background:linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0;">
+            🔔
+          </div>
+          <div style="flex:1; min-width:0;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:2px;">
+              <span style="font-size:11px; font-weight:800; color:#93c5fd; letter-spacing:0.5px; text-transform:uppercase;">SIRANI NOTIFIKASI</span>
+              <span style="font-size:10px; color:#94a3b8;">Baru Saja</span>
+            </div>
+            <div style="font-size:12.5px; font-weight:800; color:#ffffff; line-height:1.3; margin-bottom:2px;">
+              ${esc(title || 'SIRANI — Presensi Siswa')}
+            </div>
+            <div style="font-size:11.5px; color:#cbd5e1; line-height:1.4;">
+              ${esc(body || '')}
+            </div>
+          </div>
+        </div>
+      `;
+
+      requestAnimationFrame(() => {
+        toast.style.transform = 'translateX(-50%) translateY(0)';
+        toast.style.opacity = '1';
+      });
+
+      if (navigator.vibrate) {
+        try { navigator.vibrate([200, 100, 200]); } catch(e){}
+      }
+
+      clearTimeout(toast._dismissTimer);
+      toast._dismissTimer = setTimeout(() => {
+        toast.style.transform = 'translateX(-50%) translateY(-120%)';
+        toast.style.opacity = '0';
+      }, 7000);
     }
 
     // Unlock Web Audio & HTML5 Audio pada interaksi pengguna pertama di mobile browser

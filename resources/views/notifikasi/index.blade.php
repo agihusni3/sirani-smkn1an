@@ -57,6 +57,10 @@
             <button type="button" class="btn btn-sm btn-outline" onclick="openModal('modalPengaturan')" style="height:32px; padding:0 12px; font-size:11.5px; font-weight:800; color:#000000; border:1px solid var(--border-2); background:var(--bg-2); display:inline-flex; align-items:center; gap:4px; border-radius:6px; cursor:pointer;">
               <i class="bi bi-gear-fill"></i> Pengaturan Gateway
             </button>
+
+            <button type="button" class="btn btn-sm" onclick="openModalDemoPush()" style="height:32px; padding:0 12px; font-size:11.5px; font-weight:800; color:#ffffff; background:linear-gradient(135deg, #7c3aed 0%, #4f46e5 100%); border:none; display:inline-flex; align-items:center; gap:5px; border-radius:6px; cursor:pointer; box-shadow:0 2px 6px rgba(124,58,237,0.25);" title="Demo Push Notifikasi ke Seluruh HP Wali Murid">
+              <i class="bi bi-broadcast"></i> Demo Push Wali Murid (<span class="global-subscriber-count">0</span>)
+            </button>
           @endif
 
           @include('partials.header_actions')
@@ -884,6 +888,8 @@
   function openModal(id) { document.getElementById(id).classList.add('active'); }
   function closeModal(id) { document.getElementById(id).classList.remove('active'); }
 </script>
+
+@include('partials.modal_demo_push')
 
 </body>
 </html>

@@ -131,6 +131,32 @@
     @if(session('success'))<div class="alert-success"><i class="bi bi-check-circle-fill" style="margin-right:6px;"></i>{{ session('success') }}</div>@endif
     @if(session('error'))<div class="alert-error"><i class="bi bi-exclamation-triangle-fill" style="margin-right:6px;"></i>{{ session('error') }}</div>@endif
 
+    {{-- BANNER DEMO BROADCAST NOTIFIKASI WALI MURID (SEMENTARA UNTUK DEMO & PENGUJIAN) --}}
+    @if(auth()->check() && (auth()->user()->isAdmin() || auth()->user()->isKepalaSekolah() || auth()->user()->isWakasis() || auth()->user()->isGuruPiket() || auth()->user()->isWakaKurikulum()))
+      <div class="panel no-print" style="background:linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); color:#ffffff; padding:14px 18px; border-radius:var(--r-md); margin-bottom:18px; box-shadow:0 6px 18px rgba(124,58,237,0.25); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+        <div style="display:flex; align-items:center; gap:12px;">
+          <div style="width:42px; height:42px; border-radius:10px; background:rgba(255,255,255,0.18); display:flex; align-items:center; justify-content:center; font-size:20px; flex-shrink:0;">
+            <i class="bi bi-broadcast"></i>
+          </div>
+          <div>
+            <div style="font-weight:900; font-size:14px; letter-spacing:-0.2px; display:flex; align-items:center; gap:6px;">
+              <span>Demo Notifikasi Portal Wali Murid</span>
+              <span style="display:inline-flex; align-items:center; gap:4px; background:rgba(0,0,0,0.25); padding:2px 8px; border-radius:10px; font-weight:800; font-size:11px;">
+                <span style="width:6px; height:6px; border-radius:50%; background:#4ade80;"></span>
+                <span class="global-subscriber-count">0</span> HP Terhubung
+              </span>
+            </div>
+            <div style="font-size:11.5px; opacity:0.92; margin-top:2px;">
+              Uji coba tembak notifikasi instan langsung ke seluruh HP wali murid yang membuka portal saat sesi sosialisasi.
+            </div>
+          </div>
+        </div>
+        <button type="button" onclick="openModalDemoPush()" style="border:none; background:#ffffff; color:#4338ca; font-weight:800; font-size:12px; padding:8px 16px; border-radius:8px; cursor:pointer; display:inline-flex; align-items:center; gap:6px; box-shadow:0 2px 6px rgba(0,0,0,0.12); transition:all .15s ease;">
+          <i class="bi bi-broadcast"></i> Buka Panel Demo Push 🚀
+        </button>
+      </div>
+    @endif
+
     <!-- ═══════════════════════════════════════════════════════════════════ -->
     <!-- OPERASIONAL KURIKULUM & KALENDER AKADEMIK (KHUSUS WAKA KURIKULUM) -->
     <!-- ═══════════════════════════════════════════════════════════════════ -->
@@ -944,6 +970,8 @@
     themeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
   });
 </script>
+
+@include('partials.modal_demo_push')
 
 </body>
 </html>

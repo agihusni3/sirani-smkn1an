@@ -121,4 +121,37 @@ class PushSubscriptionController extends Controller
             'message' => $success ? 'Push notifikasi latar belakang berhasil dikirim ke HP Anda!' : 'Gagal mengirim push ke browser/FCM.',
         ]);
     }
+
+    /**
+     * Dapatkan jumlah perangkat HP wali murid yang aktif terhubung
+     */
+    public function getSubscribersCount()
+    {
+        $activeCount = PushSubscription::where('is_active', true)->count();
+        $totalCount  = PushSubscription::count();
+
+        return response()->json([
+            'status'       => 'success',
+            'active_count' => $activeCount,
+            'total_count'  => $totalCount,
+        ]);
+    }
+
+    /**
+     * Broadcast uji coba / demo ke SELURUH wali murid
+     */
+    public function broadcastDemo(Request $request)
+    {
+        $title = trim($request->input('title') ?: '🔔 [DEMO SIRANI] Uji Coba Notifikasi Wali Murid');
+        $body  = trim($request->input('body') ?: 'Halo Bapak/Ibu Wali Murid! Notifikasi kehadiran & kedisiplinan siswa SMKN 1 Air Naningan berhasil aktif di HP Anda. Terima kasih.');
+        $url   = trim($request->input('url') ?: '/cek-presensi');
+
+        $result = PushNotificationService::broadcastDemoWaliMurid($title, $body, $url);
+
+        return response()->json([
+            'status'  => $result['success'] ? 'success' : ($result['total'] === 0 ? 'warning' : 'error'),
+            'message' => $result['message'],
+            'data'    => $result,
+        ]);
+    }
 }
