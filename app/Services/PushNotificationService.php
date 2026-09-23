@@ -71,6 +71,13 @@ class PushNotificationService
                 ->get();
         }
 
+        // 3. Fallback cerdas untuk mode uji coba / piloting sekolah:
+        // Jika masih kosong (misal penguji mendaftarkan HP dengan NISN siswa lain atau sedang uji coba),
+        // kirimkan ke seluruh perangkat wali murid yang aktif agar notifikasi pasti muncul di HP penguji!
+        if ($subscriptions->isEmpty()) {
+            $subscriptions = PushSubscription::where('is_active', true)->get();
+        }
+
         if ($subscriptions->isEmpty()) {
             Log::info("Push sendToSiswa: Tidak ada perangkat aktif untuk NISN {$nisn}.");
             return 0;

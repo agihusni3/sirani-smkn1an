@@ -861,10 +861,14 @@ class LaporanController extends Controller
         ]);
 
         // SINKRONISASI UNTUK SISWA
-        if ($absensi->pemilik_type === 'siswa') {
+        $isSiswa = ($absensi->pemilik_type === 'siswa' || empty($absensi->pemilik_type) || !empty($absensi->siswa_rombel_id));
+        if ($isSiswa) {
             $siswaId = $absensi->pemilik_id ?: ($absensi->siswaRombel?->siswa_id);
+            $siswaObj = $absensi->siswa ?: ($absensi->siswaRombel?->siswa ?: Siswa::find($siswaId));
 
-            if ($siswaId) {
+            if ($siswaObj) {
+                $siswaId = $siswaObj->id;
+
                 // 1. Sinkronisasi IzinSiswa
                 if (in_array($status, ['izin', 'sakit', 'dispen'])) {
                     IzinSiswa::updateOrCreate(
@@ -896,6 +900,40 @@ class LaporanController extends Controller
                         ->where('status', 'pending')
                         ->whereIn('kategori', ['alpha', 'terlambat', 'bolos', 'panggilan_ortu'])
                         ->delete();
+                }
+
+                // 4. Kirim Push Notification Real-Time ke Portal & HP Orang Tua
+                try {
+                    $nisn = !empty($siswaObj->nisn) ? $siswaObj->nisn : (string)$siswaObj->id;
+                    $labelStatus = match($status) {
+                        'sakit'     => 'Sakit',
+                        'izin'      => 'Izin',
+                        'dispen'    => 'Dispensasi',
+                        'hadir'     => 'Hadir',
+                        'terlambat' => 'Terlambat',
+                        'alpha'     => 'Alpha',
+                        'bolos'     => 'Bolos',
+                        default     => ucfirst($status),
+                    };
+                    $ikon = match($status) {
+                        'sakit'     => '🤒',
+                        'izin'      => '📋',
+                        'dispen'    => '🎖️',
+                        'hadir'     => '✅',
+                        'terlambat' => '⏰',
+                        'alpha'     => '⚠️',
+                        'bolos'     => '🚨',
+                        default     => '📢',
+                    };
+                    $ketText = $keterangan ? " Catatan: {$keterangan}" : "";
+                    \App\Services\PushNotificationService::sendToSiswa(
+                        $nisn,
+                        "{$ikon} Koreksi Presensi: {$siswaObj->nama} ({$labelStatus})",
+                        "Data kehadiran ananda tanggal {$absensi->tanggal} dikoreksi menjadi {$labelStatus}.{$ketText}",
+                        '/presensi-siswa/' . urlencode($nisn)
+                    );
+                } catch (\Throwable $e) {
+                    \Illuminate\Support\Facades\Log::warning("Gagal kirim push notif koreksi laporan: " . $e->getMessage());
                 }
             }
         }
