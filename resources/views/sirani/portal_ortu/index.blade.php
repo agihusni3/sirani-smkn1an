@@ -183,8 +183,11 @@
           <span>HP ini akan menerima pemberitahuan otomatis untuk presensi ananda.</span>
         </div>
       </div>
-      <div class="sirani-notif-banner-right">
-        <button type="button" onclick="sirani_unsubscribePush()" class="btn-notif-tutup" style="font-size:11px;padding:6px 12px;border-radius:8px;background:rgba(220,38,38,0.08);color:#dc2626;font-weight:700;">
+      <div class="sirani-notif-banner-right" style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
+        <button type="button" onclick="sirani_testPushNotification()" class="btn-notif-aktifkan" style="font-size:11px;padding:6px 12px;background:linear-gradient(135deg,#059669,#10b981);" title="Kirim notifikasi tes langsung ke HP ini">
+          <i class="bi bi-send-fill"></i> Uji Notif
+        </button>
+        <button type="button" onclick="sirani_unsubscribePush()" class="btn-notif-tutup" style="font-size:11px;padding:6px 10px;border-radius:8px;background:rgba(220,38,38,0.08);color:#dc2626;font-weight:700;">
           <i class="bi bi-bell-slash"></i> Matikan
         </button>
       </div>
@@ -1608,6 +1611,39 @@
         console.error('Gagal unsubscribe push:', err);
       }
     }
+
+    /**
+     * Uji kirim push notification langsung ke HP pengguna
+     */
+    window.sirani_testPushNotification = function() {
+      const nisn = sirani_getNisnAktif() || '0106605523';
+      const btn = event ? event.target.closest('button') : null;
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Mengirim...';
+      }
+
+      fetch('/api/push-test?nisn=' + encodeURIComponent(nisn), { method: 'POST' })
+        .then(function(res) { return res.json(); })
+        .then(function(data) {
+          if (btn) {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="bi bi-send-fill"></i> Uji Notif';
+          }
+          if (data.status === 'success') {
+            alert('✓ Sukses! Push Notification telah dikirim. Silakan periksa status bar / layar HP Anda sekarang.');
+          } else {
+            alert(data.message || 'Pemberitahuan: Belum terhubung.');
+          }
+        })
+        .catch(function(err) {
+          if (btn) {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="bi bi-send-fill"></i> Uji Notif';
+          }
+          alert('Gagal menghubungi server: ' + err.message);
+        });
+    };
 
     /**
      * Helper: Decode base64url ke Uint8Array untuk VAPID
