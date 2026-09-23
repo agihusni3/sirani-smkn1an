@@ -136,6 +136,23 @@ class PresensiManualController extends Controller
                     ->where('status', 'pending')
                     ->whereIn('kategori', ['alpha', 'terlambat', 'bolos', 'panggilan_ortu'])
                     ->delete();
+
+                // Push Notifikasi Real-Time ke HP Orang Tua
+                try {
+                    $siswaObj = Siswa::find($pemilikId);
+                    if ($siswaObj && !empty($siswaObj->nisn)) {
+                        $labelStatus = $status === 'terlambat' ? 'Terlambat' : 'Hadir Tepat Waktu';
+                        $ikon = $status === 'terlambat' ? '⏰' : '✅';
+                        \App\Services\PushNotificationService::sendToSiswa(
+                            $siswaObj->nisn,
+                            "{$ikon} Presensi Masuk: {$siswaObj->nama} ({$labelStatus})",
+                            "Ananda hadir di sekolah pukul {$now->format('H:i')} WIB ({$labelStatus} - Verifikasi Manual). Ketuk untuk cek riwayat.",
+                            '/presensi-siswa/' . urlencode($siswaObj->nisn)
+                        );
+                    }
+                } catch (\Throwable $e) {
+                    \Illuminate\Support\Facades\Log::warning("Gagal push presensi manual masuk: " . $e->getMessage());
+                }
             }
 
             return [
@@ -167,6 +184,23 @@ class PresensiManualController extends Controller
         $nama = $kategori === 'siswa'
             ? (Siswa::find($pemilikId)?->nama ?? '-')
             : (Guru::find($pemilikId)?->nama ?? '-');
+
+        // Push Notifikasi Pulang Manual
+        if ($kategori === 'siswa') {
+            try {
+                $siswaObj = Siswa::find($pemilikId);
+                if ($siswaObj && !empty($siswaObj->nisn)) {
+                    \App\Services\PushNotificationService::sendToSiswa(
+                        $siswaObj->nisn,
+                        "🏠 Pulang: {$siswaObj->nama}",
+                        "Ananda telah tercatat pulang pada pukul {$now->format('H:i')} WIB (Verifikasi Manual). Ketuk untuk cek riwayat.",
+                        '/presensi-siswa/' . urlencode($siswaObj->nisn)
+                    );
+                }
+            } catch (\Throwable $e) {
+                \Illuminate\Support\Facades\Log::warning("Gagal push presensi manual pulang: " . $e->getMessage());
+            }
+        }
 
         return [
             'success' => true,
