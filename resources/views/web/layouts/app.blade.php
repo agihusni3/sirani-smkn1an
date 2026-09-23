@@ -184,19 +184,14 @@
                         <div class="nav-dropdown-menu align-right wide">
                             <div class="dropdown-header-label">Layanan Siswa &amp; Guru</div>
 
-                            <a href="{{ route('portal.asesmen.index') }}" class="dcc-menu-item">
-                                <div class="dcc-menu-title">Asesmen CBT Siswa</div>
-                                <div class="dcc-menu-desc">Ruang ujian online berbasis NISN dan Tanggal Lahir</div>
-                            </a>
-
                             <a href="{{ route('portal.ortu.index') }}" class="dcc-menu-item">
                                 <div class="dcc-menu-title">Monitoring Presensi</div>
                                 <div class="dcc-menu-desc">Pantauan absensi mandiri kartu RFID siswa &amp; wali</div>
                             </a>
 
-                            <a href="{{ route('situan.pelayanan.index') }}" class="dcc-menu-item">
-                                <div class="dcc-menu-title">Pelayanan Surat (SITUAN)</div>
-                                <div class="dcc-menu-desc">Permohonan surat keterangan aktif siswa mandiri</div>
+                            <a href="{{ route('portal.asesmen.index') }}" class="dcc-menu-item">
+                                <div class="dcc-menu-title">Asesmen CBT Siswa</div>
+                                <div class="dcc-menu-desc">Ruang ujian online berbasis NISN dan Tanggal Lahir</div>
                             </a>
 
                             <!-- Bottom Bar: DCC Portal Gateway -->
@@ -234,16 +229,6 @@
                 <div class="drawer-gateways" style="padding-top: 0; border-top: none;">
                     <div class="drawer-section-label">Akses Gerbang Mandiri &amp; Dasbor</div>
                     <div class="drawer-gateway-grid">
-                        <a href="{{ route('portal.asesmen.index') }}" class="drawer-gateway-card" style="border-color:#bfdbfe; background:#eff6ff;">
-                            <div class="gateway-icon-box blue" style="background:#2563eb; color:#ffffff;">
-                                <i class="fa-solid fa-laptop-code"></i>
-                            </div>
-                            <div>
-                                <div class="gateway-card-title" style="color:#1e3a8a;">Asesmen CBT Siswa</div>
-                                <div class="gateway-card-sub">Login NISN &amp; Tanggal Lahir</div>
-                            </div>
-                        </a>
-
                         <a href="{{ route('portal.ortu.index') }}" class="drawer-gateway-card">
                             <div class="gateway-icon-box blue">
                                 <i class="fa-solid fa-fingerprint"></i>
@@ -251,6 +236,16 @@
                             <div>
                                 <div class="gateway-card-title">Monitoring Absen Mandiri</div>
                                 <div class="gateway-card-sub">Khusus Siswa &amp; Orang Tua</div>
+                            </div>
+                        </a>
+
+                        <a href="{{ route('portal.asesmen.index') }}" class="drawer-gateway-card" style="border-color:#bfdbfe; background:#eff6ff;">
+                            <div class="gateway-icon-box blue" style="background:#2563eb; color:#ffffff;">
+                                <i class="fa-solid fa-laptop-code"></i>
+                            </div>
+                            <div>
+                                <div class="gateway-card-title" style="color:#1e3a8a;">Asesmen CBT Siswa</div>
+                                <div class="gateway-card-sub">Login NISN &amp; Tanggal Lahir</div>
                             </div>
                         </a>
 
@@ -400,31 +395,28 @@
     <!-- 3. Clean Streamlined Minimalist Footer -->
     <footer class="site-footer">
         <div class="container">
+            <!-- Footer Content Row -->
             <div class="footer-main-row">
-                <!-- Brand & Akreditasi -->
+                <!-- Brand Identity -->
                 <div class="footer-brand-box">
                     <img src="{{ asset('logo.png') }}" alt="Logo SMK" class="footer-logo" onerror="this.src='{{ asset('img/logo.png') }}'">
-                    <div>
+                    <div class="footer-brand-info">
                         <div class="footer-brand-title">SMK NEGERI 1 AIR NANINGAN</div>
-                        <div class="footer-meta-line">
-                            <span class="footer-badge">
-                                <span class="status-dot"></span> Akreditasi B • NPSN: {{ $sekolah->npsn ?? '70011825' }}
-                            </span>
-                            <span class="footer-loc-text">
-                                <i class="fa-solid fa-location-dot"></i> Air Naningan, Tanggamus, Lampung
-                            </span>
+                        <div class="footer-brand-sub">
+                            <span>NPSN: {{ $sekolah->npsn ?? '69888999' }}</span>
+                            <span class="sep">&bull;</span>
+                            <span><i class="fa-solid fa-location-dot"></i> Air Naningan, Tanggamus, Lampung</span>
                         </div>
                     </div>
                 </div>
 
-                <!-- Quick Inline Links -->
+                <!-- Quick Inline Links (Clean, No Duplicate SITUAN) -->
                 <nav class="footer-nav-inline" aria-label="Navigasi Footer">
                     <a href="{{ route('web.beranda') }}">Beranda</a>
                     <a href="{{ route('web.jurusan.index') }}">Kejuruan</a>
-                    <a href="{{ route('ppdb.index') }}">PPDB Online</a>
+                    <a href="{{ route('ppdb.index') }}">PPDB</a>
+                    <a href="{{ route('portal.ortu.index') }}">Presensi Siswa</a>
                     <a href="{{ route('portal.asesmen.index') }}">Asesmen CBT</a>
-                    <a href="{{ route('portal.ortu.index') }}">Presensi RFID</a>
-                    <a href="{{ route('situan.pelayanan.index') }}">Layanan Surat</a>
                     <a href="{{ route('web.berita.index') }}">Warta</a>
                     <a href="{{ route('web.kontak') }}">Kontak</a>
                 </nav>
@@ -444,10 +436,9 @@
                 </div>
             </div>
 
-            <!-- Bottom Copyright -->
+            <!-- Bottom Copyright (Minimalist & Clean) -->
             <div class="footer-bottom-bar">
-                <div>&copy; {{ date('Y') }} <strong>SMKN 1 Air Naningan</strong>. Hak Cipta Dilindungi.</div>
-                <div class="footer-badge-sys">DCC Integrated System · SMKN 1 Air Naningan</div>
+                <div>&copy; {{ date('Y') }} SMKN 1 Air Naningan. Seluruh hak cipta dilindungi.</div>
             </div>
         </div>
     </footer>
