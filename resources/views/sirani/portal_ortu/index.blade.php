@@ -2782,11 +2782,61 @@
     }
 
     const SiraniNotifManager = {
+      getDeletedIds() {
+        try {
+          return JSON.parse(localStorage.getItem('sirani_deleted_notif_ids') || '[]');
+        } catch(e) {
+          return [];
+        }
+      },
+
+      addDeletedId(id) {
+        if (!id) return;
+        try {
+          const list = this.getDeletedIds();
+          if (!list.includes(id)) {
+            list.push(id);
+            if (list.length > 200) list.shift();
+            localStorage.setItem('sirani_deleted_notif_ids', JSON.stringify(list));
+          }
+        } catch(e) {}
+      },
+
+      getAlertedIds() {
+        try {
+          return JSON.parse(localStorage.getItem('sirani_alerted_notif_ids') || '[]');
+        } catch(e) {
+          return [];
+        }
+      },
+
+      addAlertedId(id) {
+        if (!id) return;
+        try {
+          const list = this.getAlertedIds();
+          if (!list.includes(id)) {
+            list.push(id);
+            if (list.length > 200) list.shift();
+            localStorage.setItem('sirani_alerted_notif_ids', JSON.stringify(list));
+          }
+        } catch(e) {}
+      },
+
       async init() {
-        // 1. Simpan dan sinkronkan notifikasi dari database server ke IndexedDB lokal browser
+        // 1. Bersihkan pesan yang sudah dibuka lebih dari 1 menit
+        await this.purgeExpiredReadMessages();
+
+        // 2. Tandai pesan server yang sudah ada sebagai "alerted" agar tidak spam suara/toast saat polling
         const serverItems = @json($serverNotifs ?? []);
-        if (Array.isArray(serverItems) && serverItems.length > 0) {
-          await this.syncServerNotifsToIndexedDB(serverItems);
+        const deletedIds = this.getDeletedIds();
+        const activeServerItems = (serverItems || []).filter(i => !deletedIds.includes(i.id));
+
+        activeServerItems.forEach(item => {
+          this.addAlertedId(item.id);
+        });
+
+        if (activeServerItems.length > 0) {
+          await this.syncServerNotifsToIndexedDB(activeServerItems);
         }
 
         if ('serviceWorker' in navigator) {
@@ -2813,13 +2863,60 @@
         }
         await this.loadAndRender();
 
-        // 2. Mulai real-time live polling jika portal sedang membuka data siswa
+        // 3. Mulai real-time live polling jika portal sedang membuka data siswa
         @if(isset($siswa) && $siswa)
           this.startPolling("{{ $siswa->nisn ?: $siswa->nis ?: $siswa->id }}");
         @endif
+
+        // 4. Interval pembersih otomatis pesan yang sudah dibuka >= 1 menit (60 detik)
+        setInterval(() => {
+          this.purgeExpiredReadMessages().then(purged => {
+            if (purged) {
+              this.loadAndRender();
+            } else {
+              // Re-render live countdown detik pada pesan yang sudah dibuka
+              const container = document.getElementById('notifMessagesList');
+              if (container && container.querySelector('.read-auto-delete-countdown')) {
+                this.loadAndRender();
+              }
+            }
+          });
+        }, 2000);
+      },
+
+      purgeExpiredReadMessages() {
+        return new Promise((resolve) => {
+          if (!('indexedDB' in window)) return resolve(false);
+          const request = indexedDB.open('sirani_pwa_notifs_v1', 1);
+          request.onsuccess = (e) => {
+            const db = e.target.result;
+            if (!db.objectStoreNames.contains('messages')) return resolve(false);
+            const tx = db.transaction('messages', 'readwrite');
+            const store = tx.objectStore('messages');
+            const req = store.getAll();
+            let hasDeleted = false;
+
+            req.onsuccess = () => {
+              const now = Date.now();
+              (req.result || []).forEach(item => {
+                // Hapus jika sudah dibuka (is_read) dan sudah lewat 60.000 ms (1 menit)
+                if (item.is_read && item.opened_at && (now - item.opened_at >= 60000)) {
+                  store.delete(item.id);
+                  this.addDeletedId(item.id);
+                  hasDeleted = true;
+                }
+              });
+            };
+
+            tx.oncomplete = () => resolve(hasDeleted);
+            tx.onerror = () => resolve(false);
+          };
+          request.onerror = () => resolve(false);
+        });
       },
 
       syncServerNotifsToIndexedDB(serverItems) {
+        const deletedIds = this.getDeletedIds();
         return new Promise((resolve) => {
           if (!('indexedDB' in window)) return resolve();
           const request = indexedDB.open('sirani_pwa_notifs_v1', 1);
@@ -2837,6 +2934,7 @@
             const lastReadTime = parseInt(localStorage.getItem('sirani_last_read_notif_time') || '0', 10);
 
             serverItems.forEach(item => {
+              if (deletedIds.includes(item.id)) return;
               const getReq = store.get(item.id);
               getReq.onsuccess = () => {
                 if (!getReq.result) {
@@ -2844,6 +2942,7 @@
                   store.put({
                     ...item,
                     is_read: !isUnread,
+                    opened_at: !isUnread ? Date.now() : null,
                   });
                 }
               };
@@ -2877,32 +2976,45 @@
 
       readFromIndexedDB() {
         const serverItems = @json($serverNotifs ?? []);
+        const deletedIds = this.getDeletedIds();
         return new Promise((resolve) => {
           const lastReadTime = parseInt(localStorage.getItem('sirani_last_read_notif_time') || '0', 10);
           if (!('indexedDB' in window)) {
-            const fallback = (serverItems || []).map(i => ({ ...i, is_read: (i.time || 0) <= lastReadTime }));
+            const fallback = (serverItems || [])
+              .filter(i => !deletedIds.includes(i.id))
+              .map(i => ({ ...i, is_read: (i.time || 0) <= lastReadTime }));
             return resolve(fallback);
           }
           const request = indexedDB.open('sirani_pwa_notifs_v1', 1);
           request.onsuccess = (e) => {
             const db = e.target.result;
             if (!db.objectStoreNames.contains('messages')) {
-              const fallback = (serverItems || []).map(i => ({ ...i, is_read: (i.time || 0) <= lastReadTime }));
+              const fallback = (serverItems || [])
+                .filter(i => !deletedIds.includes(i.id))
+                .map(i => ({ ...i, is_read: (i.time || 0) <= lastReadTime }));
               return resolve(fallback);
             }
             const tx = db.transaction('messages', 'readonly');
             const req = tx.objectStore('messages').getAll();
             req.onsuccess = () => {
-              let res = req.result || [];
+              const now = Date.now();
+              let res = (req.result || []).filter(i => {
+                if (deletedIds.includes(i.id)) return false;
+                if (i.is_read && i.opened_at && (now - i.opened_at >= 60000)) return false;
+                return true;
+              });
+
               if (res.length === 0 && serverItems && serverItems.length > 0) {
-                res = serverItems.map(i => ({ ...i, is_read: (i.time || 0) <= lastReadTime }));
+                res = serverItems
+                  .filter(i => !deletedIds.includes(i.id))
+                  .map(i => ({ ...i, is_read: (i.time || 0) <= lastReadTime }));
               }
               res.sort((a,b) => (b.time || 0) - (a.time || 0));
               resolve(res);
             };
-            req.onerror = () => resolve(serverItems || []);
+            req.onerror = () => resolve([]);
           };
-          request.onerror = () => resolve(serverItems || []);
+          request.onerror = () => resolve([]);
         });
       },
 
@@ -2946,7 +3058,15 @@
         const container = document.getElementById('notifMessagesList');
         if (!container) return;
 
-        if (!items || items.length === 0) {
+        const deletedIds = this.getDeletedIds();
+        const now = Date.now();
+        const validItems = (items || []).filter(i => {
+          if (deletedIds.includes(i.id)) return false;
+          if (i.is_read && i.opened_at && (now - i.opened_at >= 60000)) return false;
+          return true;
+        });
+
+        if (validItems.length === 0) {
           container.innerHTML = `
             <div style="text-align:center; padding:35px 20px; color:#64748b;">
               <div style="width:48px; height:48px; border-radius:50%; background:#f1f5f9; display:inline-flex; align-items:center; justify-content:center; font-size:22px; margin-bottom:10px; color:#94a3b8;">
@@ -2954,7 +3074,7 @@
               </div>
               <div style="font-size:13.5px; font-weight:700; color:#334155; margin-bottom:4px;">Belum Ada Riwayat Pesan</div>
               <div style="font-size:11.5px; line-height:1.5; max-width:280px; margin:0 auto;">
-                Setiap kali ananda melakukan scan presensi atau data kehadiran dikoreksi guru piket, pemberitahuan akan tercatat di sini dan membunyikan HP Anda.
+                Setiap kali ananda melakukan scan presensi atau data kehadiran dikoreksi guru piket, pemberitahuan akan tercatat di sini. Pesan yang telah dibuka akan otomatis terhapus dalam 1 menit.
               </div>
             </div>
           `;
@@ -2963,7 +3083,7 @@
 
         const lastReadTime = parseInt(localStorage.getItem('sirani_last_read_notif_time') || '0', 10);
         let html = '';
-        items.forEach(item => {
+        validItems.forEach(item => {
           const isUnread = !item.is_read && (item.time || 0) > lastReadTime;
           const dateObj = new Date(item.time || Date.now());
           const timeStr = dateObj.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) + ' WIB';
@@ -2992,6 +3112,13 @@
             iconBg = '#f3e8ff';
           }
 
+          // Indikator auto-delete 1 menit untuk pesan yang sudah dibuka
+          let autoDeleteBadge = '';
+          if (item.is_read && item.opened_at) {
+            const sisaDetik = Math.max(0, Math.ceil((60000 - (now - item.opened_at)) / 1000));
+            autoDeleteBadge = `<span class="read-auto-delete-countdown" style="font-size:9.5px; font-weight:800; color:#ef4444; background:#fee2e2; border:1px solid #fecaca; padding:1px 6px; border-radius:4px; display:inline-flex; align-items:center; gap:3px;" title="Pesan yang sudah dibuka akan terhapus otomatis dalam 1 menit"><i class="bi bi-clock-history"></i> Terhapus dlm ${sisaDetik}s</span>`;
+          }
+
           html += `
             <div class="notif-message-card ${isUnread ? 'unread' : ''}" onclick="SiraniNotifManager.clickItem('${item.id}', '${item.url || '/cek-presensi'}')" style="cursor:pointer;">
               ${isUnread ? '<div class="notif-unread-dot" title="Belum Dibaca"></div>' : ''}
@@ -3003,6 +3130,7 @@
                   <span style="font-size:10.5px; font-weight:700; color:#64748b;">${dateStr} · ${timeStr}</span>
                   <div style="display:flex; align-items:center; gap:4px;">
                     ${tagBadge}
+                    ${autoDeleteBadge}
                     ${isUnread ? '<span style="font-size:9.5px; font-weight:800; color:#2563eb; background:#dbeafe; padding:1px 5px; border-radius:4px;">BARU</span>' : ''}
                   </div>
                 </div>
@@ -3021,7 +3149,8 @@
       },
 
       async markAllRead() {
-        localStorage.setItem('sirani_last_read_notif_time', String(Date.now()));
+        const now = Date.now();
+        localStorage.setItem('sirani_last_read_notif_time', String(now));
 
         try {
           if ('serviceWorker' in navigator) {
@@ -3043,6 +3172,7 @@
             req.onsuccess = () => {
               (req.result || []).forEach(item => {
                 item.is_read = true;
+                item.opened_at = item.opened_at || now;
                 store.put(item);
               });
             };
@@ -3059,7 +3189,8 @@
       },
 
       async clickItem(id, url) {
-        localStorage.setItem('sirani_last_read_notif_time', String(Date.now()));
+        const now = Date.now();
+        localStorage.setItem('sirani_last_read_notif_time', String(now));
         try {
           if ('serviceWorker' in navigator) {
             const reg = await navigator.serviceWorker.ready;
@@ -3080,6 +3211,7 @@
             req.onsuccess = () => {
               if (req.result) {
                 req.result.is_read = true;
+                req.result.opened_at = req.result.opened_at || now;
                 store.put(req.result);
               }
             };
@@ -3100,20 +3232,33 @@
         setInterval(async () => {
           try {
             if (document.hidden) return; // hemat bandwidth jika tab tidak aktif
-            const res = await fetch('/api/portal-notifikasi-terbaru?nisn=' + encodeURIComponent(nisn) + '&since=' + lastPollingTime);
+            const queryTime = lastPollingTime;
+            lastPollingTime = Date.now(); // update waktu polling seketika agar tidak mengambil data berulang
+
+            const res = await fetch('/api/portal-notifikasi-terbaru?nisn=' + encodeURIComponent(nisn) + '&since=' + queryTime);
             if (!res.ok) return;
             const data = await res.json();
             if (data.status === 'success' && data.notifs && data.notifs.length > 0) {
-              lastPollingTime = Date.now();
-              await this.syncServerNotifsToIndexedDB(data.notifs);
-              const soundChoice = localStorage.getItem('sirani_sound_choice') || 'chime';
-              sirani_playPreviewSound(soundChoice);
-              const latest = data.notifs[0];
-              sirani_showInAppToast(latest.title, latest.body);
-              await this.loadAndRender();
+              const alertedIds = this.getAlertedIds();
+              const deletedIds = this.getDeletedIds();
+
+              // Filter hanya pesan yang benar-benar baru (belum pernah dibunyikan dan belum dihapus)
+              const freshNotifs = data.notifs.filter(n => !alertedIds.includes(n.id) && !deletedIds.includes(n.id));
+
+              if (freshNotifs.length > 0) {
+                // Tandai ID notifikasi ini sudah di-alert agar tidak bunyi berulang di interval berikutnya
+                freshNotifs.forEach(n => this.addAlertedId(n.id));
+
+                await this.syncServerNotifsToIndexedDB(freshNotifs);
+                const soundChoice = localStorage.getItem('sirani_sound_choice') || 'chime';
+                sirani_playPreviewSound(soundChoice);
+                const latest = freshNotifs[0];
+                sirani_showInAppToast(latest.title, latest.body);
+                await this.loadAndRender();
+              }
             }
           } catch(e) {}
-        }, 20000);
+        }, 25000);
       }
     };
 

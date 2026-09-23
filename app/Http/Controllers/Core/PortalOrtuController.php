@@ -348,17 +348,21 @@ class PortalOrtuController extends Controller
         }
 
         $since = $request->input('since');
-        $sinceCarbon = $since ? Carbon::createFromTimestampMs((int)$since) : Carbon::today()->subDays(3);
+        if ($since && is_numeric($since)) {
+            $sinceCarbon = Carbon::createFromTimestampMs((int)$since)->addSecond();
+        } else {
+            $sinceCarbon = Carbon::now()->subMinutes(5);
+        }
 
         $dbNotifs = \App\Models\NotifikasiOrtu::where('siswa_id', $siswa->id)
-            ->where('created_at', '>=', $sinceCarbon)
+            ->where('created_at', '>', $sinceCarbon)
             ->orderBy('created_at', 'desc')
             ->take(10)
             ->get();
 
         $koreksiAbsensis = Absensi::where('pemilik_type', 'siswa')
             ->where('pemilik_id', $siswa->id)
-            ->where('updated_at', '>=', $sinceCarbon)
+            ->where('updated_at', '>', $sinceCarbon)
             ->where(function($q) {
                 $q->whereIn('sumber_absen', ['koreksi_piket_manual', 'interfensi_titip_kartu', 'manual_izin_piket'])
                   ->orWhere('keterangan', 'LIKE', '%koreksi%')
