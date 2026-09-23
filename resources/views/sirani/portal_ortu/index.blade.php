@@ -1056,10 +1056,75 @@
           const latestId = '{{ $pengumumans->first()->id ?? 0 }}';
           localStorage.setItem('sirani_last_read_pengumuman_id', latestId);
           localStorage.setItem('sirani_last_read_pengumuman_count', '{{ $pengumumans->count() }}');
+          localStorage.setItem('sirani_last_seen_popup_pengumuman_id', latestId);
         } catch(e) {}
       @endif
     }
     window.markPengumumanAsRead = markPengumumanAsRead;
+
+    // Kontroler Pop-up Pengumuman Otomatis
+    function openPengumumanPopup() {
+      const modal = document.getElementById('modalPengumumanPopup');
+      if (!modal) return;
+      modal.style.display = 'flex';
+      try {
+        if (typeof sirani_playPreviewSound === 'function') {
+          sirani_playPreviewSound('chime');
+        }
+      } catch(e) {}
+    }
+
+    function closePengumumanPopup(markAsRead = true) {
+      const modal = document.getElementById('modalPengumumanPopup');
+      if (modal) modal.style.display = 'none';
+      if (markAsRead) {
+        markPengumumanAsRead();
+      }
+    }
+
+    function handlePengumumanPopupOverlayClick(event) {
+      if (event.target && event.target.id === 'modalPengumumanPopup') {
+        closePengumumanPopup(true);
+      }
+    }
+
+    function goToAllPengumumanFromPopup() {
+      closePengumumanPopup(true);
+      if (typeof switchPortalMainTab === 'function') {
+        switchPortalMainTab('pengumuman');
+      }
+      setTimeout(function() {
+        const sec = document.getElementById('section-pengumuman');
+        if (sec) sec.scrollIntoView({ behavior: 'smooth' });
+      }, 150);
+    }
+
+    function checkAutoPopupPengumuman() {
+      @if(isset($pengumumans) && $pengumumans->count() > 0)
+        try {
+          const latestId = '{{ $pengumumans->first()->id ?? 0 }}';
+          const lastSeenId = localStorage.getItem('sirani_last_seen_popup_pengumuman_id');
+          const lastReadId = localStorage.getItem('sirani_last_read_pengumuman_id');
+
+          if (latestId && latestId !== '0' && lastSeenId !== latestId && lastReadId !== latestId) {
+            setTimeout(function() {
+              openPengumumanPopup();
+            }, 800);
+          }
+        } catch(e) {}
+      @endif
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', checkAutoPopupPengumuman);
+    } else {
+      checkAutoPopupPengumuman();
+    }
+
+    window.openPengumumanPopup = openPengumumanPopup;
+    window.closePengumumanPopup = closePengumumanPopup;
+    window.handlePengumumanPopupOverlayClick = handlePengumumanPopupOverlayClick;
+    window.goToAllPengumumanFromPopup = goToAllPengumumanFromPopup;
 
     @if($siswa)
     // ===== QR CODE & BARCODE SCANNER KIOSK & AUTO-ZOOM MAX BRIGHTNESS =====
@@ -2052,6 +2117,85 @@
     </div>
   </div>
 
+  @endif
+
+  @if(isset($pengumumans) && $pengumumans->count() > 0)
+    @php
+      $latestPengumuman = $pengumumans->first();
+      $badgeKategori = $latestPengumuman->kategori_badge ?? ['label' => 'Pengumuman Resmi', 'color' => '#2563eb'];
+    @endphp
+    {{-- MODAL POPUP PENGUMUMAN OTOMATIS SAAT BUKA APLIKASI --}}
+    <div id="modalPengumumanPopup" class="sirani-modal-overlay" style="display:none; z-index: 1050;" onclick="handlePengumumanPopupOverlayClick(event)">
+      <div class="sirani-modal-container" onclick="event.stopPropagation()" style="max-width: 490px; max-height: 88vh; display: flex; flex-direction: column; border-radius: 22px; overflow: hidden; box-shadow: 0 25px 60px rgba(0, 0, 0, 0.35);">
+        
+        {{-- Modal Header --}}
+        <div class="sirani-modal-header" style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); color: #ffffff; padding: 16px 20px; border-bottom: 1px solid rgba(255,255,255,0.08); display: flex; align-items: center; justify-content: space-between;">
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <div style="width: 42px; height: 42px; border-radius: 12px; background: rgba(59, 130, 246, 0.2); border: 1.5px solid rgba(59, 130, 246, 0.4); display: flex; align-items: center; justify-content: center; font-size: 20px; color: #60a5fa; flex-shrink: 0; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);">
+              <i class="bi bi-megaphone-fill"></i>
+            </div>
+            <div>
+              <div style="font-size: 15px; font-weight: 800; color: #ffffff; line-height: 1.2;">Pengumuman Baru Sekolah</div>
+              <div style="font-size: 11.5px; color: #94a3b8; margin-top: 2px;">SMK Negeri 1 Air Naningan</div>
+            </div>
+          </div>
+          <button type="button" onclick="closePengumumanPopup(true)" style="background: rgba(255,255,255,0.12); border: none; width: 34px; height: 34px; border-radius: 50%; color: #ffffff; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: background 0.15s;" title="Tutup">
+            <i class="bi bi-x-lg" style="font-size: 13px;"></i>
+          </button>
+        </div>
+
+        {{-- Modal Body (Scrollable) --}}
+        <div class="sirani-modal-body" style="padding: 20px; overflow-y: auto; -webkit-overflow-scrolling: touch; max-height: calc(88vh - 150px);">
+          {{-- Kategori & Tanggal Badge --}}
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 12px; flex-wrap: wrap;">
+            <span style="display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 800; padding: 4px 10px; border-radius: 100px; background: #dbeafe; color: #1e40af; text-transform: uppercase; letter-spacing: 0.5px;">
+              <i class="bi bi-info-circle-fill"></i> {{ $badgeKategori['label'] ?? 'PENGUMUMAN RESMI' }}
+            </span>
+            <span style="font-size: 11.5px; color: var(--text-3, #64748b); font-weight: 600;">
+              <i class="bi bi-clock"></i> {{ $latestPengumuman->created_at->translatedFormat('d M Y') }}
+            </span>
+          </div>
+
+          {{-- Judul Pengumuman --}}
+          <h3 style="font-size: 17px; font-weight: 800; color: var(--text, #0f172a); margin: 0 0 12px; line-height: 1.35;">
+            {{ $latestPengumuman->judul }}
+          </h3>
+
+          {{-- Banner Gambar jika ada --}}
+          @if($latestPengumuman->banner_url)
+            <div style="margin-bottom: 14px; border-radius: 12px; overflow: hidden; border: 1px solid var(--border, #e2e8f0); cursor: zoom-in;" onclick="openImageZoom('{{ $latestPengumuman->banner_url }}', '{{ addslashes($latestPengumuman->judul) }}')">
+              <img src="{{ $latestPengumuman->banner_url }}" alt="{{ $latestPengumuman->judul }}" style="width: 100%; max-height: 240px; object-fit: contain; background: rgba(0,0,0,0.03); display: block;" />
+              <div style="background: rgba(15,23,42,0.85); color: #fff; font-size: 10.5px; font-weight: 700; padding: 4px 8px; text-align: center;">
+                <i class="bi bi-arrows-fullscreen"></i> Ketuk gambar untuk memperbesar (Zoom)
+              </div>
+            </div>
+          @endif
+
+          {{-- Isi Pesan Pengumuman --}}
+          <div style="font-size: 13.5px; color: var(--text-2, #334155); line-height: 1.6; white-space: pre-line; background: var(--bg-subtle, #f8fafc); padding: 14px 16px; border-radius: 14px; border: 1px solid var(--border, #e2e8f0);">
+            {{ $latestPengumuman->isi_pesan }}
+          </div>
+
+          @if($pengumumans->count() > 1)
+            <div style="margin-top: 12px; font-size: 11.5px; color: var(--text-3, #64748b); text-align: center;">
+              <i class="bi bi-layers-fill" style="color: #2563eb;"></i> Terdapat total <strong>{{ $pengumumans->count() }} pengumuman aktif</strong> di portal saat ini.
+            </div>
+          @endif
+        </div>
+
+        {{-- Modal Footer Actions --}}
+        <div style="padding: 14px 20px; background: var(--bg-subtle, #f8fafc); border-top: 1px solid var(--border, #e2e8f0); display: flex; flex-direction: column; gap: 8px;">
+          <button type="button" onclick="closePengumumanPopup(true)" style="width: 100%; padding: 12px 18px; background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); color: #ffffff; border: none; border-radius: 12px; font-size: 13.5px; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 4px 14px rgba(37,99,235,0.3);">
+            <i class="bi bi-check-circle-fill"></i> Sudah Dibaca &amp; Paham
+          </button>
+          @if($pengumumans->count() > 1)
+            <button type="button" onclick="goToAllPengumumanFromPopup()" style="width: 100%; padding: 9px 16px; background: #ffffff; border: 1.5px solid var(--border, #cbd5e1); color: var(--text, #334155); border-radius: 10px; font-size: 12px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;">
+              <i class="bi bi-megaphone"></i> Buka Daftar Semua Pengumuman ({{ $pengumumans->count() }})
+            </button>
+          @endif
+        </div>
+      </div>
+    </div>
   @endif
 
   {{-- MODAL INSTAL APLIKASI & DOWNLOAD APK SIRANI --}}
