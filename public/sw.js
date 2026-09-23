@@ -1,7 +1,7 @@
 // ══════════════════════════════════════════════════════════════
 // SIRANI Portal Wali Murid — Service Worker (PWA Offline Ready)
 // ══════════════════════════════════════════════════════════════
-const CACHE_NAME = 'sirani-ortu-v5';
+const CACHE_NAME = 'sirani-ortu-v6';
 const OFFLINE_URL = '/cek-presensi';
 
 // Aset statis yang di-cache saat install (shell app)
@@ -288,14 +288,25 @@ self.addEventListener('push', (event) => {
 self.addEventListener('message', async (event) => {
   if (!event.data) return;
 
-  // Permintaan daftar riwayat notifikasi & jumlah belum dibaca
+  // Permintaan daftar riwayat notifikasi & jumlah belum dibaca (Hanya Hari Ini)
   if (event.data.type === 'SIRANI_GET_NOTIFS') {
     try {
       const db = await openNotifDB();
-      const tx = db.transaction(NOTIF_DB_STORE, 'readonly');
-      const req = tx.objectStore(NOTIF_DB_STORE).getAll();
+      const tx = db.transaction(NOTIF_DB_STORE, 'readwrite');
+      const store = tx.objectStore(NOTIF_DB_STORE);
+      const req = store.getAll();
       req.onsuccess = () => {
-        const items = req.result || [];
+        const now = new Date();
+        const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+        const rawItems = req.result || [];
+        const items = [];
+        for (const item of rawItems) {
+          if ((item.time || 0) < startOfToday) {
+            store.delete(item.id); // Bersihkan pesan hari kemarin
+          } else {
+            items.push(item);
+          }
+        }
         items.sort((a, b) => (b.time || 0) - (a.time || 0));
         const unread = items.filter((i) => !i.is_read).length;
         if (event.source && event.source.postMessage) {
@@ -307,6 +318,18 @@ self.addEventListener('message', async (event) => {
         }
       };
     } catch (e) {}
+  }
+
+  // Reset total pesan jika pergantian hari
+  if (event.data.type === 'SIRANI_CLEAR_ALL_NOTIFS') {
+    try {
+      const db = await openNotifDB();
+      const tx = db.transaction(NOTIF_DB_STORE, 'readwrite');
+      tx.objectStore(NOTIF_DB_STORE).clear();
+      if ('clearAppBadge' in self.navigator) {
+        try { await self.navigator.clearAppBadge(); } catch(e) {}
+      }
+    } catch(e) {}
   }
 
   // Permintaan menandai semua atau salah satu pesan telah dibaca

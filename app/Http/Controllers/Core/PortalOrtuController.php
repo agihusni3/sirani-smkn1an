@@ -213,8 +213,9 @@ class PortalOrtuController extends Controller
                 $serverNotifs = [];
                 $koreksiTerbaru = null;
 
-                // 1. Ambil dari tabel NotifikasiOrtu
+                // 1. Ambil dari tabel NotifikasiOrtu khusus hari ini (reset jika berganti hari)
                 $dbNotifs = \App\Models\NotifikasiOrtu::where('siswa_id', $siswa->id)
+                    ->whereDate('created_at', Carbon::today())
                     ->orderBy('created_at', 'desc')
                     ->take(25)
                     ->get();
@@ -234,16 +235,17 @@ class PortalOrtuController extends Controller
                     ];
                 }
 
-                // 2. Ambil catatan Absensi hasil koreksi guru piket / intervensi
+                // 2. Ambil catatan Absensi hasil koreksi guru piket / intervensi khusus hari ini
                 $koreksiAbsensis = Absensi::where('pemilik_type', 'siswa')
                     ->where('pemilik_id', $siswa->id)
+                    ->whereDate('updated_at', Carbon::today())
                     ->where(function($q) {
                         $q->whereIn('sumber_absen', ['koreksi_piket_manual', 'interfensi_titip_kartu', 'manual_izin_piket'])
                           ->orWhere('keterangan', 'LIKE', '%koreksi%')
                           ->orWhere('keterangan', 'LIKE', '%dikoreksi%')
                           ->orWhere('keterangan', 'LIKE', '%intervensi%');
                     })
-                    ->orderBy('tanggal', 'desc')
+                    ->orderBy('updated_at', 'desc')
                     ->take(15)
                     ->get();
 
@@ -279,7 +281,7 @@ class PortalOrtuController extends Controller
                         ];
                     }
 
-                    if (!$koreksiTerbaru && Carbon::parse($ka->updated_at ?: $ka->tanggal)->gte(Carbon::today()->subDays(7))) {
+                    if (!$koreksiTerbaru && Carbon::parse($ka->updated_at ?: $ka->tanggal)->isToday()) {
                         $koreksiTerbaru = $ka;
                     }
                 }
@@ -357,6 +359,7 @@ class PortalOrtuController extends Controller
         }
 
         $dbNotifs = \App\Models\NotifikasiOrtu::where('siswa_id', $siswa->id)
+            ->whereDate('created_at', Carbon::today())
             ->where('created_at', '>', $sinceCarbon)
             ->orderBy('created_at', 'desc')
             ->take(10)
@@ -364,6 +367,7 @@ class PortalOrtuController extends Controller
 
         $koreksiAbsensis = Absensi::where('pemilik_type', 'siswa')
             ->where('pemilik_id', $siswa->id)
+            ->whereDate('updated_at', Carbon::today())
             ->where('updated_at', '>', $sinceCarbon)
             ->where(function($q) {
                 $q->whereIn('sumber_absen', ['koreksi_piket_manual', 'interfensi_titip_kartu', 'manual_izin_piket'])

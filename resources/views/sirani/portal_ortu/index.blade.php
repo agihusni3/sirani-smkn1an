@@ -2840,8 +2840,64 @@
         } catch(e) {}
       },
 
+      getTodayDateString() {
+        const d = new Date();
+        const y = d.getFullYear();
+        const m = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        return `${y}-${m}-${day}`;
+      },
+
+      async checkAndResetIfNewDay() {
+        const todayStr = this.getTodayDateString();
+        const lastDate = localStorage.getItem('sirani_notif_date');
+        if (lastDate && lastDate !== todayStr) {
+          // Hari telah berganti: reset seluruh riwayat pesan & state notifikasi lokal
+          await this.clearAllMessagesForNewDay();
+        }
+        localStorage.setItem('sirani_notif_date', todayStr);
+      },
+
+      clearAllMessagesForNewDay() {
+        return new Promise((resolve) => {
+          try {
+            localStorage.removeItem('sirani_alerted_notif_ids');
+            localStorage.removeItem('sirani_deleted_notif_ids');
+            localStorage.removeItem('sirani_last_read_notif_time');
+
+            if ('serviceWorker' in navigator) {
+              navigator.serviceWorker.ready.then(reg => {
+                if (reg && reg.active) {
+                  reg.active.postMessage({ type: 'SIRANI_CLEAR_ALL_NOTIFS' });
+                }
+              }).catch(() => {});
+            }
+
+            if (!('indexedDB' in window)) return resolve();
+            const request = indexedDB.open('sirani_pwa_notifs_v1', 1);
+            request.onsuccess = (e) => {
+              const db = e.target.result;
+              if (!db.objectStoreNames.contains('messages')) return resolve();
+              const tx = db.transaction('messages', 'readwrite');
+              tx.objectStore('messages').clear();
+              tx.oncomplete = () => {
+                this.updateBadges(0);
+                resolve();
+              };
+              tx.onerror = () => resolve();
+            };
+            request.onerror = () => resolve();
+          } catch(e) {
+            resolve();
+          }
+        });
+      },
+
       async init() {
-        // 1. Bersihkan pesan yang sudah dibuka lebih dari 1 menit
+        // 0. Cek dan reset seluruh pesan jika hari telah berganti
+        await this.checkAndResetIfNewDay();
+
+        // 1. Bersihkan pesan yang sudah dibuka lebih dari 1 menit atau pesan hari kemarin
         await this.purgeExpiredReadMessages();
 
         // 2. Tandai pesan server yang sudah ada sebagai "alerted" agar tidak spam suara/toast saat polling
@@ -2916,7 +2972,14 @@
 
             req.onsuccess = () => {
               const now = Date.now();
+              const startOfToday = new Date().setHours(0, 0, 0, 0);
               (req.result || []).forEach(item => {
+                // Hapus jika pesan dari hari kemarin (reset pergantian hari)
+                if ((item.time || 0) < startOfToday) {
+                  store.delete(item.id);
+                  hasDeleted = true;
+                  return;
+                }
                 // Hapus jika sudah dibuka (is_read) dan sudah lewat 60.000 ms (1 menit)
                 if (item.is_read && item.opened_at && (now - item.opened_at >= 60000)) {
                   store.delete(item.id);
@@ -3016,15 +3079,17 @@
             const req = tx.objectStore('messages').getAll();
             req.onsuccess = () => {
               const now = Date.now();
+              const startOfToday = new Date().setHours(0, 0, 0, 0);
               let res = (req.result || []).filter(i => {
                 if (deletedIds.includes(i.id)) return false;
+                if ((i.time || 0) < startOfToday) return false;
                 if (i.is_read && i.opened_at && (now - i.opened_at >= 60000)) return false;
                 return true;
               });
 
               if (res.length === 0 && serverItems && serverItems.length > 0) {
                 res = serverItems
-                  .filter(i => !deletedIds.includes(i.id))
+                  .filter(i => !deletedIds.includes(i.id) && (i.time || 0) >= startOfToday)
                   .map(i => ({ ...i, is_read: (i.time || 0) <= lastReadTime }));
               }
               res.sort((a,b) => (b.time || 0) - (a.time || 0));
@@ -3078,8 +3143,10 @@
 
         const deletedIds = this.getDeletedIds();
         const now = Date.now();
+        const startOfToday = new Date().setHours(0, 0, 0, 0);
         const validItems = (items || []).filter(i => {
           if (deletedIds.includes(i.id)) return false;
+          if ((i.time || 0) < startOfToday) return false;
           if (i.is_read && i.opened_at && (now - i.opened_at >= 60000)) return false;
           return true;
         });
@@ -3090,9 +3157,9 @@
               <div style="width:48px; height:48px; border-radius:50%; background:#f1f5f9; display:inline-flex; align-items:center; justify-content:center; font-size:22px; margin-bottom:10px; color:#94a3b8;">
                 <i class="bi bi-bell-slash"></i>
               </div>
-              <div style="font-size:13.5px; font-weight:700; color:#334155; margin-bottom:4px;">Belum Ada Riwayat Pesan</div>
+              <div style="font-size:13.5px; font-weight:700; color:#334155; margin-bottom:4px;">Belum Ada Riwayat Pesan Hari Ini</div>
               <div style="font-size:11.5px; line-height:1.5; max-width:280px; margin:0 auto;">
-                Setiap kali ananda melakukan scan presensi atau data kehadiran dikoreksi guru piket, pemberitahuan akan tercatat di sini. Pesan yang telah dibuka akan otomatis terhapus dalam 1 menit.
+                Setiap kali ananda melakukan scan presensi atau data kehadiran dikoreksi guru piket hari ini, pemberitahuan akan tercatat di sini. Riwayat pesan diperbarui dan di-reset setiap pergantian hari.
               </div>
             </div>
           `;
