@@ -236,6 +236,7 @@ class PushNotificationService
             $report = $webPush->sendOneNotification($subscription, $jsonPayload, [
                 'TTL'     => 86400,
                 'urgency' => 'high',
+                'topic'   => 'presensi',
             ]);
 
             if ($report->isSuccess()) {

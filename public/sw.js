@@ -1,7 +1,7 @@
 // ══════════════════════════════════════════════════════════════
 // SIRANI Portal Wali Murid — Service Worker (PWA Offline Ready)
 // ══════════════════════════════════════════════════════════════
-const CACHE_NAME = 'sirani-ortu-v4';
+const CACHE_NAME = 'sirani-ortu-v5';
 const OFFLINE_URL = '/cek-presensi';
 
 // Aset statis yang di-cache saat install (shell app)
@@ -17,6 +17,83 @@ const STATIC_ASSETS = [
   '/sounds/notif-soft.wav',
   '/sounds/notif-alert.wav',
 ];
+
+// ── INDEXEDDB HELPER UNTUK PESAN & BADGE NOTIFIKASI ───────────
+const NOTIF_DB_NAME = 'sirani_pwa_notifs_v1';
+const NOTIF_DB_STORE = 'messages';
+
+function openNotifDB() {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open(NOTIF_DB_NAME, 1);
+    request.onupgradeneeded = (event) => {
+      const db = event.target.result;
+      if (!db.objectStoreNames.contains(NOTIF_DB_STORE)) {
+        const store = db.createObjectStore(NOTIF_DB_STORE, { keyPath: 'id' });
+        store.createIndex('time', 'time', { unique: false });
+        store.createIndex('is_read', 'is_read', { unique: false });
+      }
+    };
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error);
+  });
+}
+
+async function saveNotificationToDB(notifItem) {
+  try {
+    const db = await openNotifDB();
+    return new Promise((resolve) => {
+      const tx = db.transaction(NOTIF_DB_STORE, 'readwrite');
+      tx.objectStore(NOTIF_DB_STORE).put(notifItem);
+      tx.oncomplete = () => resolve(true);
+      tx.onerror = () => resolve(false);
+    });
+  } catch (e) {
+    return false;
+  }
+}
+
+async function getUnreadCountFromDB() {
+  try {
+    const db = await openNotifDB();
+    return new Promise((resolve) => {
+      const tx = db.transaction(NOTIF_DB_STORE, 'readonly');
+      const store = tx.objectStore(NOTIF_DB_STORE);
+      const req = store.getAll();
+      req.onsuccess = () => {
+        const items = req.result || [];
+        const unread = items.filter((i) => !i.is_read).length;
+        resolve(unread);
+      };
+      req.onerror = () => resolve(0);
+    });
+  } catch (e) {
+    return 0;
+  }
+}
+
+async function markNotifReadInDB(id = null) {
+  try {
+    const db = await openNotifDB();
+    return new Promise((resolve) => {
+      const tx = db.transaction(NOTIF_DB_STORE, 'readwrite');
+      const store = tx.objectStore(NOTIF_DB_STORE);
+      const req = store.getAll();
+      req.onsuccess = () => {
+        const items = req.result || [];
+        for (const item of items) {
+          if (!id || item.id === id) {
+            item.is_read = true;
+            store.put(item);
+          }
+        }
+      };
+      tx.oncomplete = () => resolve(true);
+      tx.onerror = () => resolve(false);
+    });
+  } catch (e) {
+    return false;
+  }
+}
 
 // ── INSTALL: Cache shell statis ──────────────────────────────
 self.addEventListener('install', (event) => {
@@ -86,7 +163,6 @@ self.addEventListener('fetch', (event) => {
         .catch(async () => {
           const cached = await caches.match(event.request);
           if (cached) return cached;
-          // Fallback ke halaman utama portal
           return caches.match(OFFLINE_URL);
         })
     );
@@ -132,49 +208,146 @@ self.addEventListener('push', (event) => {
     data = { title: 'SIRANI', body: event.data.text() };
   }
 
-  const options = {
+  const notifId = data.tag || ('sirani-notif-' + Date.now());
+  const notifItem = {
+    id: notifId,
+    title: data.title || 'SIRANI — Presensi Siswa',
     body: data.body || 'Ada pembaruan data presensi ananda.',
-    icon: '/icons/icon-192.png',
-    badge: '/icons/icon-192.png',
-    image: data.image || null,
-    vibrate: [500, 200, 500, 200, 500],
-    sound: '/sounds/notif-chime.wav',
-    tag: data.tag || ('sirani-notif-' + Date.now()),
-    renotify: true,
-    requireInteraction: true,
-    silent: false,
-    timestamp: data.timestamp || Date.now(),
-    data: {
-      url: data.url || '/cek-presensi',
-      sound: data.sound || 'default',
-    },
-    actions: [
-      { action: 'view', title: '📋 Buka Presensi' },
-      { action: 'close', title: 'Tutup' },
-    ],
+    url: data.url || '/cek-presensi',
+    time: data.timestamp ? (data.timestamp * 1000) : Date.now(),
+    is_read: false,
+    tag: notifId,
   };
 
-  const notifyClients = clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
+  const handlePushEvent = async () => {
+    // 1. Simpan pesan ke IndexedDB lokal agar riwayat tidak hilang
+    await saveNotificationToDB(notifItem);
+
+    // 2. Hitung jumlah total pesan yang belum dibaca
+    const unreadCount = await getUnreadCountFromDB();
+
+    // 3. SET TANDA ANGKA (BADGE) PADA IKON APLIKASI DI HP (App Badging API)
+    if ('setAppBadge' in self.navigator) {
+      try {
+        await self.navigator.setAppBadge(unreadCount);
+      } catch (e) {
+        console.warn('Set badge error in SW:', e);
+      }
+    }
+
+    // 4. Siapkan opsi notifikasi standar W3C
+    const options = {
+      body: notifItem.body,
+      icon: '/icons/icon-192.png',
+      badge: '/icons/icon-192.png',
+      vibrate: [400, 200, 400, 200, 400],
+      tag: notifId,
+      renotify: true,
+      timestamp: notifItem.time,
+      data: {
+        url: notifItem.url,
+        id: notifId,
+      },
+    };
+
+    if (data.image && typeof data.image === 'string' && data.image.startsWith('http')) {
+      options.image = data.image;
+    }
+
+    // 5. Tampilkan Notifikasi Sistem di Layar Kunci / Notification Bar (Bulletproof fallback)
+    try {
+      await self.registration.showNotification(notifItem.title, options);
+    } catch (err) {
+      console.warn('Full options showNotification failed, trying basic notification:', err);
+      try {
+        await self.registration.showNotification(notifItem.title, {
+          body: notifItem.body,
+          icon: '/icons/icon-192.png',
+          tag: notifId,
+        });
+      } catch (e) {}
+    }
+
+    // 6. Teruskan pesan ke halaman portal yang sedang terbuka (jika ada)
+    const clientList = await clients.matchAll({ type: 'window', includeUncontrolled: true });
     for (const client of clientList) {
       client.postMessage({
         type: 'SIRANI_PUSH_RECEIVED',
-        title: data.title || 'SIRANI — Presensi Siswa',
-        body: data.body || '',
+        title: notifItem.title,
+        body: notifItem.body,
+        unreadCount: unreadCount,
+        notif: notifItem,
       });
     }
-  });
+  };
 
-  event.waitUntil(
-    Promise.all([
-      self.registration.showNotification(data.title || 'SIRANI — Presensi Siswa', options),
-      notifyClients
-    ])
-  );
+  event.waitUntil(handlePushEvent());
 });
 
-// ── MESSAGE LISTENER: Sinkronisasi pengaturan suara dari client ─
-self.addEventListener('message', (event) => {
-  if (event.data && event.data.type === 'SIRANI_SET_SOUND_PREFERENCE') {
+// ── MESSAGE LISTENER: Komunikasi antara Frontend Portal & SW ─
+self.addEventListener('message', async (event) => {
+  if (!event.data) return;
+
+  // Permintaan daftar riwayat notifikasi & jumlah belum dibaca
+  if (event.data.type === 'SIRANI_GET_NOTIFS') {
+    try {
+      const db = await openNotifDB();
+      const tx = db.transaction(NOTIF_DB_STORE, 'readonly');
+      const req = tx.objectStore(NOTIF_DB_STORE).getAll();
+      req.onsuccess = () => {
+        const items = req.result || [];
+        items.sort((a, b) => (b.time || 0) - (a.time || 0));
+        const unread = items.filter((i) => !i.is_read).length;
+        if (event.source && event.source.postMessage) {
+          event.source.postMessage({
+            type: 'SIRANI_NOTIFS_LIST',
+            items: items,
+            unreadCount: unread,
+          });
+        }
+      };
+    } catch (e) {}
+  }
+
+  // Permintaan menandai semua atau salah satu pesan telah dibaca
+  if (event.data.type === 'SIRANI_MARK_ALL_READ') {
+    await markNotifReadInDB(null);
+    if ('clearAppBadge' in self.navigator) {
+      try {
+        await self.navigator.clearAppBadge();
+      } catch (e) {}
+    }
+    if (event.source && event.source.postMessage) {
+      event.source.postMessage({
+        type: 'SIRANI_ALL_READ_ACK',
+        unreadCount: 0,
+      });
+    }
+  }
+
+  if (event.data.type === 'SIRANI_MARK_SINGLE_READ' && event.data.id) {
+    await markNotifReadInDB(event.data.id);
+    const unread = await getUnreadCountFromDB();
+    if ('setAppBadge' in self.navigator) {
+      try {
+        if (unread <= 0 && 'clearAppBadge' in self.navigator) {
+          await self.navigator.clearAppBadge();
+        } else {
+          await self.navigator.setAppBadge(unread);
+        }
+      } catch (e) {}
+    }
+    if (event.source && event.source.postMessage) {
+      event.source.postMessage({
+        type: 'SIRANI_SINGLE_READ_ACK',
+        id: event.data.id,
+        unreadCount: unread,
+      });
+    }
+  }
+
+  // Sinkronisasi preferensi suara dari client
+  if (event.data.type === 'SIRANI_SET_SOUND_PREFERENCE') {
     if (event.source && event.source.postMessage) {
       event.source.postMessage({
         type: 'SIRANI_SOUND_PREFERENCE_ACK',
@@ -185,25 +358,45 @@ self.addEventListener('message', (event) => {
   }
 });
 
-// ── NOTIFICATION CLICK: Buka halaman portal ─────────────────
+// ── NOTIFICATION CLICK: Buka halaman portal & bersihkan badge ─
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
 
   if (event.action === 'close') return;
 
   const targetUrl = event.notification.data?.url || '/cek-presensi';
+  const notifId   = event.notification.data?.id;
 
-  event.waitUntil(
-    clients
-      .matchAll({ type: 'window', includeUncontrolled: true })
-      .then((clientList) => {
-        for (const client of clientList) {
-          if (client.url.includes(self.location.origin) && 'focus' in client) {
-            client.navigate(targetUrl);
-            return client.focus();
-          }
+  const handleClickEvent = async () => {
+    // 1. Tandai pesan ini telah dibaca di database lokal
+    if (notifId) {
+      await markNotifReadInDB(notifId);
+    }
+    const unreadCount = await getUnreadCountFromDB();
+
+    // 2. Perbarui badge angka pada aplikasi
+    if ('setAppBadge' in self.navigator) {
+      try {
+        if (unreadCount <= 0 && 'clearAppBadge' in self.navigator) {
+          await self.navigator.clearAppBadge();
+        } else {
+          await self.navigator.setAppBadge(unreadCount);
         }
-        if (clients.openWindow) return clients.openWindow(targetUrl);
-      })
-  );
+      } catch (e) {}
+    }
+
+    // 3. Arahkan atau buka halaman target
+    const clientList = await clients.matchAll({ type: 'window', includeUncontrolled: true });
+    for (const client of clientList) {
+      if (client.url.includes(self.location.origin) && 'focus' in client) {
+        client.navigate(targetUrl);
+        return client.focus();
+      }
+    }
+    if (clients.openWindow) {
+      return clients.openWindow(targetUrl);
+    }
+  };
+
+  event.waitUntil(handleClickEvent());
 });

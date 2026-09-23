@@ -45,13 +45,13 @@
       </a>
 
       <div class="nav-actions">
-        {{-- Tombol Pengaturan Notifikasi & Suara (Selalu Aktif) --}}
-        <button type="button" id="btnNavNotifSettings" onclick="openNotifSettingsModal()" class="nav-action-btn btn-nav-notif" title="Pengaturan Notifikasi & Suara (Selalu Aktif)">
+        {{-- Tombol Pusat Notifikasi & Suara (Dengan Badge Angka Belum Dibuka) --}}
+        <button type="button" id="btnNavNotifSettings" onclick="openNotifSettingsModal('pesan')" class="nav-action-btn btn-nav-notif" title="Pusat Notifikasi &amp; Pesan">
           <span class="nav-icon-wrap">
             <i class="bi bi-bell-fill"></i>
-            <span class="notif-active-dot" title="Notifikasi Selalu Aktif"></span>
+            <span id="navNotifBadgeCount" class="nav-badge-count" style="display:none;">0</span>
           </span>
-          <span class="nav-btn-text">Suara</span>
+          <span class="nav-btn-text" id="navNotifBtnLabel">Pesan</span>
         </button>
 
         {{-- Tombol Pasang Aplikasi / APK --}}
@@ -1530,7 +1530,7 @@
     // ════════════════════════════════════════════════════════════
     // PUSH NOTIFICATION & SERVICE WORKER — SIRANI PORTAL ORANG TUA
     // ════════════════════════════════════════════════════════════
-    const SIRANI_SW_URL       = '/sw.js?v=20260923_v4';
+    const SIRANI_SW_URL       = '/sw.js?v=20260924_v5';
     const SIRANI_PUSH_KEY_URL  = '/api/push-vapid-key';
     const SIRANI_SUB_URL       = '/api/push-subscribe';
     const SIRANI_UNSUB_URL     = '/api/push-unsubscribe';
@@ -2367,7 +2367,7 @@
             <i class="bi bi-bell-fill"></i>
           </div>
           <div>
-            <div class="sirani-modal-title">Suara &amp; Notifikasi</div>
+            <div class="sirani-modal-title">Pusat Notifikasi &amp; Suara</div>
             <div class="sirani-modal-sub">SIRANI Mobile · SMKN 1 Air Naningan</div>
           </div>
         </div>
@@ -2376,10 +2376,54 @@
         </button>
       </div>
 
+      {{-- Tab Navigasi Modal --}}
+      <div class="notif-modal-tabs">
+        <button type="button" class="notif-tab-btn active" id="tabBtnPesan" onclick="sirani_switchNotifTab('pesan')">
+          <i class="bi bi-inbox-fill"></i>
+          <span>Pesan Masuk</span>
+          <span id="modalNotifTabCount" class="notif-tab-badge" style="display:none;">0</span>
+        </button>
+        <button type="button" class="notif-tab-btn" id="tabBtnSuara" onclick="sirani_switchNotifTab('suara')">
+          <i class="bi bi-music-note-beamed"></i>
+          <span>Nada Suara</span>
+        </button>
+        <button type="button" class="notif-tab-btn" id="tabBtnTips" onclick="sirani_switchNotifTab('tips')">
+          <i class="bi bi-phone"></i>
+          <span>Tips HP Terkunci</span>
+        </button>
+      </div>
+
       {{-- Modal Body (Scrollable) --}}
-      <div class="sirani-modal-body" style="overflow-y: auto; padding: 20px;">
+      <div class="sirani-modal-body" style="overflow-y: auto; padding: 18px;">
         
-        {{-- Status Box: Selalu Aktif & Wajib Sekolah --}}
+        {{-- ── TAB 1: DAFTAR PESAN MASUK & RIWAYAT NOTIFIKASI PRESENSI ── --}}
+        <div id="tabContentPesan" style="display:block;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; padding-bottom:8px; border-bottom:1px solid #f1f5f9;">
+            <div style="font-size:12px; font-weight:700; color:#334155;">
+              <i class="bi bi-clock-history" style="color:#2563eb;"></i> Riwayat Pemberitahuan Kehadiran
+            </div>
+            <button type="button" onclick="SiraniNotifManager.markAllRead()" style="background:none; border:none; color:#2563eb; font-size:11.5px; font-weight:800; cursor:pointer; display:inline-flex; align-items:center; gap:4px; padding:4px 8px; border-radius:6px;" onmouseover="this.style.background='#eff6ff'" onmouseout="this.style.background='none'">
+              <i class="bi bi-check2-all"></i> Tandai Semua Dibaca
+            </button>
+          </div>
+
+          {{-- Container List Pesan Masuk --}}
+          <div id="notifMessagesList">
+            <div style="text-align:center; padding:35px 20px; color:#64748b;">
+              <div style="width:48px; height:48px; border-radius:50%; background:#f1f5f9; display:inline-flex; align-items:center; justify-content:center; font-size:22px; margin-bottom:10px; color:#94a3b8;">
+                <i class="bi bi-bell-slash"></i>
+              </div>
+              <div style="font-size:13.5px; font-weight:700; color:#334155; margin-bottom:4px;">Belum Ada Riwayat Pesan</div>
+              <div style="font-size:11.5px; line-height:1.5; max-width:280px; margin:0 auto;">
+                Setiap ananda melakukan scan presensi atau izin disetujui, pemberitahuan akan otomatis tercatat di sini dan membunyikan HP Anda.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {{-- ── TAB 2: PENGATURAN NADA & SUARA ── --}}
+        <div id="tabContentSuara" style="display:none;">
+          {{-- Status Box: Selalu Aktif & Wajib Sekolah --}}
         <div class="sirani-notif-status-box">
           <div class="notif-status-left">
             <div class="notif-status-pulse-icon">
@@ -2517,44 +2561,68 @@
           <input type="range" min="10" max="100" value="85" class="volume-slider" id="notifVolumeSlider" oninput="sirani_updateVolume(this.value)">
         </div>
 
-        {{-- Action Buttons --}}
-        <div class="sirani-notif-modal-actions">
-          <button type="button" id="btnTestBackgroundPush" onclick="sirani_testBackgroundPush()" class="btn-test-notif-full" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
-            <i class="bi bi-broadcast"></i> Tes Notifikasi Latar Belakang (Tutup HP 5 Detik)
-          </button>
-          <button type="button" onclick="sirani_testNotification()" class="btn-test-notif-full" style="background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);">
-            <i class="bi bi-bell-fill"></i> Tes Suara &amp; Notifikasi Layar Sekarang
-          </button>
-          <button type="button" onclick="sirani_saveSoundSettings()" class="btn-save-sound-setting">
-            <i class="bi bi-check-lg"></i> Simpan Pilihan Suara
-          </button>
-          <button type="button" onclick="sirani_forceResetPushRegistration()" class="btn-test-notif-full" style="background: #f8fafc; color: #475569; border: 1px solid #cbd5e1; font-size: 0.8rem; padding: 8px 12px; margin-top: 2px;">
-            <i class="bi bi-arrow-repeat"></i> Daftarkan Ulang / Perbaiki Notifikasi HP
-          </button>
+          {{-- Simpan Suara --}}
+          <div style="margin-top: 18px;">
+            <button type="button" onclick="sirani_saveSoundSettings()" class="btn-save-sound-setting" style="width:100%;">
+              <i class="bi bi-check-lg"></i> Simpan Pilihan Suara
+            </button>
+          </div>
         </div>
 
-        {{-- Panduan Nada Dering Android OS --}}
-        <div class="android-sound-guide-box">
-          <button type="button" class="android-guide-toggle" onclick="toggleAndroidSoundGuide()">
-            <span><i class="bi bi-phone"></i> Cara Mengubah Suara di Pengaturan HP Android</span>
-            <i class="bi bi-chevron-down" id="guideChevron"></i>
-          </button>
-          <div id="androidGuideBody" class="android-guide-content" style="display:none;">
-            <strong>1. Mengubah Suara &amp; Nada Dering Notifikasi:</strong>
-            <ol class="android-guide-steps-list">
-              <li>Buka <strong>Pengaturan (Settings) HP</strong> &gt; <strong>Aplikasi</strong>.</li>
-              <li>Pilih aplikasi <strong>SIRANI</strong> (atau browser Chrome).</li>
-              <li>Ketuk <strong>Pemberitahuan / Notifikasi</strong> &gt; <strong>Kategori Notifikasi</strong>.</li>
-              <li>Pilih <strong>Suara / Nada Dering</strong> lalu pilih nada dering HP yang Anda sukai.</li>
-            </ol>
-            <div style="margin-top:10px; padding-top:10px; border-top:1px dashed #cbd5e1;">
-              <strong style="color:#0f172a;"><i class="bi bi-shield-check" style="color:#22c55e;"></i> 2. Agar Selalu Masuk Real-Time Seperti WhatsApp (Aplikasi Ditutup / Layar Mati):</strong>
-              <ol class="android-guide-steps-list" style="margin-top:4px;">
-                <li>Di <strong>Pengaturan HP &gt; Aplikasi &gt; SIRANI</strong> (atau Chrome).</li>
-                <li>Pilih <strong>Penghemat Baterai (Battery Saver)</strong> &gt; Ubah menjadi <strong>"Tidak Ada Pembatasan" (No Restrictions / Unrestricted)</strong>.</li>
-                <li>Aktifkan <strong>Mulai Otomatis (Autostart)</strong> jika HP Anda bermerek Xiaomi, Oppo, atau Vivo.</li>
-              </ol>
+        {{-- ── TAB 3: TIPS HP TERKUNCI & UJI COBA REAL-TIME ── --}}
+        <div id="tabContentTips" style="display:none;">
+          <div style="background:#eff6ff; border:1px solid #bfdbfe; border-radius:12px; padding:14px; margin-bottom:14px;">
+            <div style="font-size:12.5px; font-weight:800; color:#1e40af; margin-bottom:4px; display:flex; align-items:center; gap:6px;">
+              <i class="bi bi-info-circle-fill"></i> Kenapa Notifikasi Perlu Buka Aplikasi Baru Muncul?
             </div>
+            <div style="font-size:11.5px; color:#1e3a8a; line-height:1.5;">
+              Sistem operasi HP Android (seperti <strong>Xiaomi, Oppo, Vivo, Samsung, Realme</strong>) memiliki fitur <em>"Penghemat Baterai Ketat"</em> yang otomatis menidurkan koneksi browser saat layar HP mati. Lakukan 3 langkah mudah berikut agar HP berdering seketika seperti WhatsApp:
+            </div>
+          </div>
+
+          <div style="display:flex; flex-direction:column; gap:10px; margin-bottom:16px;">
+            {{-- Langkah 1 --}}
+            <div style="background:#ffffff; border:1px solid #e2e8f0; border-radius:10px; padding:12px 14px;">
+              <div style="font-size:12px; font-weight:800; color:#0f172a; margin-bottom:3px;">
+                1. Penghemat Baterai (Paling Penting!)
+              </div>
+              <div style="font-size:11.5px; color:#475569; line-height:1.45;">
+                Buka <strong>Pengaturan HP &gt; Aplikasi &gt; SIRANI</strong> (atau Chrome) &gt; pilih <strong>Penghemat Baterai</strong> &gt; ubah ke <strong>"Tidak Ada Pembatasan / No Restrictions"</strong>.
+              </div>
+            </div>
+
+            {{-- Langkah 2 --}}
+            <div style="background:#ffffff; border:1px solid #e2e8f0; border-radius:10px; padding:12px 14px;">
+              <div style="font-size:12px; font-weight:800; color:#0f172a; margin-bottom:3px;">
+                2. Izinkan Notifikasi di Layar Kunci &amp; Pop-up
+              </div>
+              <div style="font-size:11.5px; color:#475569; line-height:1.45;">
+                Buka <strong>Pengaturan HP &gt; Aplikasi &gt; SIRANI &gt; Notifikasi</strong> &gt; pastikan opsi <strong>"Tampilkan di Layar Kunci"</strong> dan <strong>"Notifikasi Melayang / Banner"</strong> dalam posisi <strong>AKTIF</strong>.
+              </div>
+            </div>
+
+            {{-- Langkah 3 --}}
+            <div style="background:#ffffff; border:1px solid #e2e8f0; border-radius:10px; padding:12px 14px;">
+              <div style="font-size:12px; font-weight:800; color:#0f172a; margin-bottom:3px;">
+                3. Autostart / Mulai Otomatis (Xiaomi &amp; Oppo)
+              </div>
+              <div style="font-size:11.5px; color:#475569; line-height:1.45;">
+                Di menu Info Aplikasi, aktifkan tombol <strong>"Mulai Otomatis (Autostart)"</strong> agar sistem Android tidak menidurkan koneksi aplikasi.
+              </div>
+            </div>
+          </div>
+
+          {{-- Action Buttons untuk Uji Coba --}}
+          <div class="sirani-notif-modal-actions">
+            <button type="button" id="btnTestBackgroundPush" onclick="sirani_testBackgroundPush()" class="btn-test-notif-full" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
+              <i class="bi bi-broadcast"></i> Tes Notifikasi Latar Belakang (Tutup HP 5 Detik)
+            </button>
+            <button type="button" onclick="sirani_testNotification()" class="btn-test-notif-full" style="background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);">
+              <i class="bi bi-bell-fill"></i> Tes Suara &amp; Pop-up Layar Sekarang
+            </button>
+            <button type="button" onclick="sirani_forceResetPushRegistration()" class="btn-test-notif-full" style="background: #f8fafc; color: #475569; border: 1px solid #cbd5e1; font-size: 0.8rem; padding: 8px 12px; margin-top: 2px;">
+              <i class="bi bi-arrow-repeat"></i> Daftarkan Ulang / Perbaiki Notifikasi HP
+            </button>
           </div>
         </div>
 
@@ -2626,10 +2694,268 @@
       }
     }
 
-    function openNotifSettingsModal() {
+    function sirani_switchNotifTab(tabName) {
+      const tabs = ['pesan', 'suara', 'tips'];
+      tabs.forEach(t => {
+        const btn = document.getElementById('tabBtn' + t.charAt(0).toUpperCase() + t.slice(1));
+        const content = document.getElementById('tabContent' + t.charAt(0).toUpperCase() + t.slice(1));
+        if (btn) btn.classList.toggle('active', t === tabName);
+        if (content) content.style.display = (t === tabName) ? 'block' : 'none';
+      });
+      if (tabName === 'pesan' && window.SiraniNotifManager) {
+        SiraniNotifManager.loadAndRender();
+      }
+    }
+
+    const SiraniNotifManager = {
+      async init() {
+        if ('serviceWorker' in navigator) {
+          navigator.serviceWorker.addEventListener('message', (event) => {
+            if (!event.data) return;
+            if (event.data.type === 'SIRANI_PUSH_RECEIVED') {
+              const soundChoice = localStorage.getItem('sirani_sound_choice') || 'chime';
+              sirani_playPreviewSound(soundChoice);
+              sirani_showInAppToast(event.data.title, event.data.body);
+              SiraniNotifManager.loadAndRender();
+            }
+            if (event.data.type === 'SIRANI_NOTIFS_LIST') {
+              SiraniNotifManager.renderList(event.data.items || [], event.data.unreadCount || 0);
+            }
+            if (event.data.type === 'SIRANI_ALL_READ_ACK') {
+              SiraniNotifManager.updateBadges(0);
+              SiraniNotifManager.loadAndRender();
+            }
+            if (event.data.type === 'SIRANI_SINGLE_READ_ACK') {
+              SiraniNotifManager.updateBadges(event.data.unreadCount || 0);
+              SiraniNotifManager.loadAndRender();
+            }
+          });
+        }
+        this.loadAndRender();
+      },
+
+      async loadAndRender() {
+        // Minta data notifikasi ke Service Worker
+        try {
+          if ('serviceWorker' in navigator) {
+            const reg = await navigator.serviceWorker.ready;
+            if (reg && reg.active) {
+              reg.active.postMessage({ type: 'SIRANI_GET_NOTIFS' });
+            }
+          }
+        } catch(e) {}
+
+        // Fallback langsung baca IndexedDB
+        try {
+          const items = await this.readFromIndexedDB();
+          const unread = items.filter(i => !i.is_read).length;
+          this.renderList(items, unread);
+        } catch(e) {}
+      },
+
+      readFromIndexedDB() {
+        return new Promise((resolve) => {
+          if (!('indexedDB' in window)) return resolve([]);
+          const request = indexedDB.open('sirani_pwa_notifs_v1', 1);
+          request.onsuccess = (e) => {
+            const db = e.target.result;
+            if (!db.objectStoreNames.contains('messages')) return resolve([]);
+            const tx = db.transaction('messages', 'readonly');
+            const req = tx.objectStore('messages').getAll();
+            req.onsuccess = () => {
+              const res = req.result || [];
+              res.sort((a,b) => (b.time || 0) - (a.time || 0));
+              resolve(res);
+            };
+            req.onerror = () => resolve([]);
+          };
+          request.onerror = () => resolve([]);
+        });
+      },
+
+      updateBadges(unreadCount) {
+        const badgeEl = document.getElementById('navNotifBadgeCount');
+        const tabBadgeEl = document.getElementById('modalNotifTabCount');
+        const labelEl = document.getElementById('navNotifBtnLabel');
+
+        if (badgeEl) {
+          if (unreadCount > 0) {
+            badgeEl.textContent = unreadCount > 99 ? '99+' : unreadCount;
+            badgeEl.style.display = 'inline-flex';
+          } else {
+            badgeEl.style.display = 'none';
+          }
+        }
+
+        if (tabBadgeEl) {
+          tabBadgeEl.textContent = unreadCount;
+          tabBadgeEl.style.display = unreadCount > 0 ? 'inline-block' : 'none';
+        }
+
+        if (labelEl) {
+          labelEl.textContent = unreadCount > 0 ? `Pesan (${unreadCount})` : 'Pesan';
+        }
+
+        // Tanda angka pada Ikon Aplikasi di Layar HP (App Badging API)
+        if ('setAppBadge' in navigator) {
+          try {
+            if (unreadCount > 0) {
+              navigator.setAppBadge(unreadCount);
+            } else if ('clearAppBadge' in navigator) {
+              navigator.clearAppBadge();
+            }
+          } catch(e) {}
+        }
+      },
+
+      renderList(items, unreadCount) {
+        this.updateBadges(unreadCount);
+        const container = document.getElementById('notifMessagesList');
+        if (!container) return;
+
+        if (!items || items.length === 0) {
+          container.innerHTML = `
+            <div style="text-align:center; padding:35px 20px; color:#64748b;">
+              <div style="width:48px; height:48px; border-radius:50%; background:#f1f5f9; display:inline-flex; align-items:center; justify-content:center; font-size:22px; margin-bottom:10px; color:#94a3b8;">
+                <i class="bi bi-bell-slash"></i>
+              </div>
+              <div style="font-size:13.5px; font-weight:700; color:#334155; margin-bottom:4px;">Belum Ada Riwayat Pesan</div>
+              <div style="font-size:11.5px; line-height:1.5; max-width:280px; margin:0 auto;">
+                Setiap ananda melakukan scan presensi atau izin disetujui, pemberitahuan akan otomatis tercatat di sini dan membunyikan HP Anda.
+              </div>
+            </div>
+          `;
+          return;
+        }
+
+        let html = '';
+        items.forEach(item => {
+          const isUnread = !item.is_read;
+          const dateObj = new Date(item.time || Date.now());
+          const timeStr = dateObj.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) + ' WIB';
+          const dateStr = dateObj.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' });
+
+          let icon = '<i class="bi bi-bell-fill" style="color:#2563eb;"></i>';
+          let iconBg = '#eff6ff';
+          const titleLower = (item.title || '').toLowerCase();
+          if (titleLower.includes('tepat waktu') || titleLower.includes('hadir')) {
+            icon = '<i class="bi bi-check-circle-fill" style="color:#16a34a;"></i>';
+            iconBg = '#dcfce7';
+          } else if (titleLower.includes('terlambat')) {
+            icon = '<i class="bi bi-exclamation-triangle-fill" style="color:#d97706;"></i>';
+            iconBg = '#fef3c7';
+          } else if (titleLower.includes('pulang')) {
+            icon = '<i class="bi bi-house-door-fill" style="color:#0284c7;"></i>';
+            iconBg = '#e0f2fe';
+          } else if (titleLower.includes('izin') || titleLower.includes('sakit')) {
+            icon = '<i class="bi bi-file-earmark-medical-fill" style="color:#8b5cf6;"></i>';
+            iconBg = '#f3e8ff';
+          }
+
+          html += `
+            <div class="notif-message-card ${isUnread ? 'unread' : ''}" onclick="SiraniNotifManager.clickItem('${item.id}', '${item.url || '/cek-presensi'}')">
+              ${isUnread ? '<div class="notif-unread-dot" title="Belum Dibaca"></div>' : ''}
+              <div style="width:36px; height:36px; border-radius:10px; background:${iconBg}; display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0;">
+                ${icon}
+              </div>
+              <div style="flex:1; min-width:0; padding-right:12px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:2px;">
+                  <span style="font-size:10px; font-weight:700; color:#64748b;">${dateStr} · ${timeStr}</span>
+                  ${isUnread ? '<span style="font-size:9.5px; font-weight:800; color:#2563eb; background:#dbeafe; padding:1px 5px; border-radius:4px;">BARU</span>' : ''}
+                </div>
+                <div style="font-size:12.5px; font-weight:700; color:#0f172a; line-height:1.35; margin-bottom:2px;">
+                  ${item.title}
+                </div>
+                <div style="font-size:11.5px; color:#475569; line-height:1.4;">
+                  ${item.body}
+                </div>
+              </div>
+            </div>
+          `;
+        });
+
+        container.innerHTML = html;
+      },
+
+      async markAllRead() {
+        try {
+          if ('serviceWorker' in navigator) {
+            const reg = await navigator.serviceWorker.ready;
+            if (reg && reg.active) {
+              reg.active.postMessage({ type: 'SIRANI_MARK_ALL_READ' });
+            }
+          }
+        } catch(e) {}
+
+        try {
+          const request = indexedDB.open('sirani_pwa_notifs_v1', 1);
+          request.onsuccess = (e) => {
+            const db = e.target.result;
+            if (!db.objectStoreNames.contains('messages')) return;
+            const tx = db.transaction('messages', 'readwrite');
+            const store = tx.objectStore('messages');
+            const req = store.getAll();
+            req.onsuccess = () => {
+              (req.result || []).forEach(item => {
+                item.is_read = true;
+                store.put(item);
+              });
+            };
+            tx.oncomplete = () => {
+              this.loadAndRender();
+            };
+          };
+        } catch(e) {}
+
+        this.updateBadges(0);
+        if ('clearAppBadge' in navigator) {
+          try { navigator.clearAppBadge(); } catch(e){}
+        }
+      },
+
+      async clickItem(id, url) {
+        try {
+          if ('serviceWorker' in navigator) {
+            const reg = await navigator.serviceWorker.ready;
+            if (reg && reg.active) {
+              reg.active.postMessage({ type: 'SIRANI_MARK_SINGLE_READ', id: id });
+            }
+          }
+        } catch(e) {}
+
+        try {
+          const request = indexedDB.open('sirani_pwa_notifs_v1', 1);
+          request.onsuccess = (e) => {
+            const db = e.target.result;
+            if (!db.objectStoreNames.contains('messages')) return;
+            const tx = db.transaction('messages', 'readwrite');
+            const store = tx.objectStore('messages');
+            const req = store.get(id);
+            req.onsuccess = () => {
+              if (req.result) {
+                req.result.is_read = true;
+                store.put(req.result);
+              }
+            };
+            tx.oncomplete = () => {
+              this.loadAndRender();
+            };
+          };
+        } catch(e) {}
+
+        if (url && url !== '#' && url !== window.location.pathname) {
+          window.location.href = url;
+        }
+      }
+    };
+
+    function openNotifSettingsModal(defaultTab = 'pesan') {
       const modal = document.getElementById('modalNotifSettings');
       if (!modal) return;
       modal.style.display = 'flex';
+
+      sirani_switchNotifTab(defaultTab);
+      SiraniNotifManager.loadAndRender();
 
       // Load saved preferences
       const savedSound = localStorage.getItem('sirani_sound_choice') || 'chime';
@@ -3118,7 +3444,17 @@
     document.addEventListener('click', siraniUnlockAudioContext, { once: true });
     document.addEventListener('touchstart', siraniUnlockAudioContext, { once: true, passive: true });
 
+    // Inisialisasi pengelola pesan masuk & badging tanda angka
+    document.addEventListener('DOMContentLoaded', function() {
+      SiraniNotifManager.init();
+    });
+    window.addEventListener('load', function() {
+      SiraniNotifManager.loadAndRender();
+    });
+
     // Expose ke global window
+    window.SiraniNotifManager = SiraniNotifManager;
+    window.sirani_switchNotifTab = sirani_switchNotifTab;
     window.openNotifSettingsModal = openNotifSettingsModal;
     window.closeNotifSettingsModal = closeNotifSettingsModal;
     window.handleNotifSettingsOverlayClick = handleNotifSettingsOverlayClick;
