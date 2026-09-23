@@ -1369,15 +1369,16 @@
         // Cek URL params / hash untuk navigasi tab
         const urlParams = new URLSearchParams(window.location.search);
         const hash = window.location.hash;
+        const requestedTab = urlParams.get('tab');
 
-        if (hash === '#riwayat-kehadiran' || hash === '#absen' || urlParams.has('periode') || urlParams.has('tanggal') || urlParams.has('bulan') || urlParams.has('tahun')) {
-          switchPortalMainTab('absen');
-        } else if (hash === '#disiplin' || hash === '#catatan-kedisiplinan' || hash === '#portofolio-karakter' || hash === '#section-disiplin-wrap') {
+        if (requestedTab === 'disiplin' || hash === '#disiplin' || hash === '#catatan-kedisiplinan' || hash === '#portofolio-karakter' || hash === '#section-disiplin-wrap') {
           switchPortalMainTab('disiplin');
-        } else if (hash === '#section-pengumuman' || hash === '#pengumuman') {
+        } else if (requestedTab === 'pengumuman' || hash === '#section-pengumuman' || hash === '#pengumuman') {
           switchPortalMainTab('pengumuman');
-        } else if (hash === '#kartu-qr' || hash === '#kartu') {
+        } else if (requestedTab === 'kartu-qr' || hash === '#kartu-qr' || hash === '#kartu') {
           switchPortalMainTab('kartu-qr');
+        } else if (requestedTab === 'absen' || hash === '#riwayat-kehadiran' || hash === '#absen' || urlParams.has('periode') || urlParams.has('tanggal') || urlParams.has('bulan') || urlParams.has('tahun')) {
+          switchPortalMainTab('absen');
         } else {
           switchPortalMainTab('absen');
         }

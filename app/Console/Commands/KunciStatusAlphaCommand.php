@@ -84,6 +84,17 @@ class KunciStatusAlphaCommand extends Command
 
                         \App\Services\NotifikasiDraftService::cekAkumulasiAlphaDanBuatPanggilan($membership->siswa, 'sistem_cron');
                         \App\Models\KasusDisiplin::syncFromPresensi($membership->siswa_id);
+
+                        // Push Notifikasi Real-Time ke HP Orang Tua → Alpha (Pukul 09:00)
+                        if (!empty($membership->siswa->nisn)) {
+                            $kelas = $membership->rombel->nama_rombel ?? 'Siswa';
+                            \App\Services\PushNotificationService::sendToSiswa(
+                                $membership->siswa->nisn,
+                                '🚨 Tidak Hadir (Alpha): ' . $membership->siswa->nama,
+                                "Hingga pukul 09:00 WIB, ananda ({$kelas}) belum hadir di sekolah tanpa keterangan (Alpha). Ketuk untuk cek riwayat absensi.",
+                                '/presensi-siswa/' . urlencode($membership->siswa->nisn)
+                            );
+                        }
                     }
                 } catch (\Throwable $e) {
                     // ignore

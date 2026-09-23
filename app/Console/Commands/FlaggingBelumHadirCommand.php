@@ -51,6 +51,20 @@ class FlaggingBelumHadirCommand extends Command
             $res = $waService->kirimDirect($noHp, $pesan, 'PENGINGAT KEHADIRAN SISWA');
             if (!empty($res['success'])) $countSiswaSent++;
 
+            // Push Notification Real-Time ke HP Orang Tua → Pengingat Belum Hadir (07:30)
+            if (!empty($siswa->nisn)) {
+                try {
+                    \App\Services\PushNotificationService::sendToSiswa(
+                        $siswa->nisn,
+                        '⏰ Pengingat Presensi: ' . $siswa->nama,
+                        "Hingga pukul 07:30 WIB ananda belum tercatat hadir di sekolah. Mohon pastikan keberangkatan ananda atau konfirmasi ke piket jika berhalangan.",
+                        '/presensi-siswa/' . urlencode($siswa->nisn)
+                    );
+                } catch (\Throwable $e) {
+                    // silently catch
+                }
+            }
+
             // Delay antar pesan agar tidak diblokir gateway
             if ($countSiswaSent > 0) sleep(rand(3, 5));
         }

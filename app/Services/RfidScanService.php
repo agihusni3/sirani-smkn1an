@@ -461,14 +461,18 @@ class RfidScanService
                         \Illuminate\Support\Facades\Log::warning("Gagal memproses draf notifikasi ortu masuk RFID: " . $e->getMessage());
                     }
 
-                    // Push Notification Real-Time ke Aplikasi HP Orang Tua (HANYA JIKA TERLAMBAT)
-                    // Catatan: Siswa yang datang tepat waktu tidak dikirim notifikasi push ke aplikasi sesuai kebijakan sekolah
+                    // Push Notification Real-Time ke Aplikasi HP Orang Tua (Hadir Tepat Waktu & Terlambat)
                     try {
-                        if (!empty($person->nisn) && $isTerlambat) {
+                        if (!empty($person->nisn)) {
                             $kelasLabel = $rombelOrJabatan;
                             $nisnEncoded = urlencode($person->nisn);
-                            $pushTitle = "⚠️ Terlambat: {$person->nama}";
-                            $pushBody  = "Ananda ({$kelasLabel}) hadir pukul {$timeNow} WIB, melewati batas toleransi {$jamMasukMaks} WIB. Ketuk untuk cek riwayat absensi.";
+                            if ($isTerlambat) {
+                                $pushTitle = "⚠️ Terlambat: {$person->nama}";
+                                $pushBody  = "Ananda ({$kelasLabel}) hadir pukul {$timeNow} WIB, melewati batas toleransi {$jamMasukMaks} WIB. Ketuk untuk cek riwayat absensi.";
+                            } else {
+                                $pushTitle = "✅ Hadir Tepat Waktu: {$person->nama}";
+                                $pushBody  = "Ananda ({$kelasLabel}) telah tiba di sekolah tepat waktu pada pukul {$timeNow} WIB. Ketuk untuk cek riwayat absensi.";
+                            }
                             \App\Services\PushNotificationService::sendToSiswa(
                                 $person->nisn,
                                 $pushTitle,
@@ -477,7 +481,7 @@ class RfidScanService
                             );
                         }
                     } catch (\Throwable $e) {
-                        \Illuminate\Support\Facades\Log::warning("Gagal kirim push notif terlambat: " . $e->getMessage());
+                        \Illuminate\Support\Facades\Log::warning("Gagal kirim push notif presensi masuk: " . $e->getMessage());
                     }
                 }
 
