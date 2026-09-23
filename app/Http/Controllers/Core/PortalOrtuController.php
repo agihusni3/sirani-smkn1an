@@ -34,6 +34,8 @@ class PortalOrtuController extends Controller
         $izins = collect();
         $rekapBulananTahunan = [];
         $periodeText = '';
+        $serverNotifs = [];
+        $koreksiTerbaru = null;
         $stats = [
             'hadir'     => 0,
             'terlambat' => 0,
