@@ -1,7 +1,7 @@
 // ══════════════════════════════════════════════════════════════
 // SIRANI Portal Wali Murid — Service Worker (PWA Offline Ready)
 // ══════════════════════════════════════════════════════════════
-const CACHE_NAME = 'sirani-ortu-v3';
+const CACHE_NAME = 'sirani-ortu-v4';
 const OFFLINE_URL = '/cek-presensi';
 
 // Aset statis yang di-cache saat install (shell app)
