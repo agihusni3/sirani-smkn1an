@@ -59,6 +59,14 @@
           <i class="bi bi-download"></i>
           <span>Instal</span>
         </button>
+        <a href="{{ route('download.apk') }}" class="nav-action-btn" title="Download APK Android" style="text-decoration:none;">
+          <i class="bi bi-android2"></i>
+          <span>APK</span>
+        </a>
+        <button type="button" id="btnNavNotif" onclick="sirani_requestPushPermission()" class="nav-action-btn" title="Aktifkan Notifikasi Presensi" style="display:none;">
+          <i class="bi bi-bell"></i>
+          <span>Notif</span>
+        </button>
       </div>
     </div>
   </nav>
@@ -145,7 +153,46 @@
       </section>
     @endif
 
+    {{-- ══════════════════════════════════════════════════════════
+         BANNER NOTIFIKASI & DOWNLOAD APK (Selalu Tampil)
+    ══════════════════════════════════════════════════════════ --}}
+    <div id="siraniBannerNotif" class="sirani-notif-banner" style="display:none;">
+      <div class="sirani-notif-banner-left">
+        <div class="sirani-notif-banner-icon"><i class="bi bi-bell-fill"></i></div>
+        <div class="sirani-notif-banner-text">
+          <strong>Aktifkan Notifikasi Presensi</strong>
+          <span>Dapatkan pemberitahuan otomatis ke HP Anda saat anak tap RFID di gerbang sekolah.</span>
+        </div>
+      </div>
+      <div class="sirani-notif-banner-right">
+        <button type="button" id="btnAktifkanNotif" onclick="sirani_requestPushPermission()" class="btn-notif-aktifkan">
+          <i class="bi bi-bell-fill"></i> Aktifkan Notifikasi
+        </button>
+        <button type="button" onclick="document.getElementById('siraniBannerNotif').style.display='none'" class="btn-notif-tutup" title="Tutup">
+          <i class="bi bi-x"></i>
+        </button>
+      </div>
+    </div>
+
+    {{-- Status Notifikasi Aktif --}}
+    <div id="siraniBannerNotifAktif" class="sirani-notif-banner sirani-notif-aktif" style="display:none;">
+      <div class="sirani-notif-banner-left">
+        <div class="sirani-notif-banner-icon" style="background:rgba(34,197,94,0.12);color:#22c55e;"><i class="bi bi-bell-slash"></i></div>
+        <div class="sirani-notif-banner-text">
+          <strong>Notifikasi Presensi Aktif ✓</strong>
+          <span>HP ini akan menerima pemberitahuan otomatis untuk presensi ananda.</span>
+        </div>
+      </div>
+      <div class="sirani-notif-banner-right">
+        <button type="button" onclick="sirani_unsubscribePush()" class="btn-notif-tutup" style="font-size:11px;padding:6px 12px;border-radius:8px;background:rgba(220,38,38,0.08);color:#dc2626;font-weight:700;">
+          <i class="bi bi-bell-slash"></i> Matikan
+        </button>
+      </div>
+    </div>
+
     @if($siswa)
+
+
       {{-- HASIL DATA SISWA TERPILIH --}}
 
       {{-- 4 TAB NAVIGASI UTAMA ATAS (Dashboard Menu 2x2 di Mobile, 4 Kolom di Desktop) --}}
@@ -1416,13 +1463,167 @@
       window.addEventListener('load', function() {
         navigator.serviceWorker.register('/sw.js').then(function(reg) {
           console.log('SIRANI PWA ServiceWorker ready:', reg.scope);
+          // Cek status notifikasi setelah SW ready
+          sirani_checkNotifStatus(reg);
         }).catch(function(err) {
           console.log('SIRANI PWA ServiceWorker error:', err);
         });
       });
     }
 
-    let deferredPrompt = null;
+    // ════════════════════════════════════════════════════════════
+    // PUSH NOTIFICATION — SIRANI PORTAL ORANG TUA
+    // ════════════════════════════════════════════════════════════
+    const SIRANI_PUSH_KEY_URL  = '/api/push-vapid-key';
+    const SIRANI_SUB_URL       = '/api/push-subscribe';
+    const SIRANI_UNSUB_URL     = '/api/push-unsubscribe';
+
+    /**
+     * Ambil NISN dari URL atau localStorage
+     */
+    function sirani_getNisnAktif() {
+      const params = new URLSearchParams(window.location.search);
+      return params.get('keyword') || params.get('nisn') || localStorage.getItem('sirani_last_nisn') || '';
+    }
+
+    /**
+     * Periksa apakah notifikasi sudah aktif di perangkat ini
+     */
+    function sirani_checkNotifStatus(swReg) {
+      const nisn = sirani_getNisnAktif();
+      if (!nisn || !('PushManager' in window) || !('Notification' in window)) return;
+
+      const bannerNotif      = document.getElementById('siraniBannerNotif');
+      const bannerNotifAktif = document.getElementById('siraniBannerNotifAktif');
+
+      if (Notification.permission === 'granted') {
+        // Cek apakah sudah punya subscription
+        navigator.serviceWorker.ready.then(function(reg) {
+          reg.pushManager.getSubscription().then(function(sub) {
+            if (sub) {
+              if (bannerNotifAktif) bannerNotifAktif.style.display = 'flex';
+              if (bannerNotif)      bannerNotif.style.display      = 'none';
+            } else {
+              // Permission granted tapi belum subscribe → tampilkan banner aktifkan
+              if (!localStorage.getItem('sirani_push_dismissed_' + nisn)) {
+                if (bannerNotif) bannerNotif.style.display = 'flex';
+              }
+            }
+          });
+        });
+      } else if (Notification.permission === 'default') {
+        // Belum pernah ditanya — tampilkan banner aktifkan
+        if (nisn && !localStorage.getItem('sirani_push_dismissed_' + nisn)) {
+          setTimeout(function() {
+            if (bannerNotif) bannerNotif.style.display = 'flex';
+          }, 2500);
+        }
+      }
+    }
+
+    /**
+     * Minta izin notifikasi dan daftarkan perangkat
+     */
+    async function sirani_requestPushPermission() {
+      const btn = document.getElementById('btnAktifkanNotif');
+      if (btn) { btn.disabled = true; btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Memproses...'; }
+
+      try {
+        const permission = await Notification.requestPermission();
+        if (permission !== 'granted') {
+          alert('Izin notifikasi ditolak. Silakan aktifkan izin notifikasi di pengaturan browser / HP Anda, lalu coba lagi.');
+          if (btn) { btn.disabled = false; btn.innerHTML = '<i class="bi bi-bell-fill"></i> Aktifkan Notifikasi'; }
+          return;
+        }
+
+        // Ambil VAPID Public Key dari server
+        const keyResp = await fetch(SIRANI_PUSH_KEY_URL);
+        const keyData = await keyResp.json();
+        const vapidPublicKey = keyData.publicKey;
+
+        // Convert base64 URL ke Uint8Array
+        const applicationServerKey = sirani_urlBase64ToUint8Array(vapidPublicKey);
+
+        const swReg = await navigator.serviceWorker.ready;
+        const subscription = await swReg.pushManager.subscribe({
+          userVisibleOnly: true,
+          applicationServerKey: applicationServerKey,
+        });
+
+        const subJson = subscription.toJSON();
+        const nisn = sirani_getNisnAktif();
+
+        // Kirim subscription ke server
+        await fetch(SIRANI_SUB_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+          body: JSON.stringify({
+            endpoint : subJson.endpoint,
+            p256dh   : subJson.keys?.p256dh,
+            auth     : subJson.keys?.auth,
+            nisn     : nisn,
+          }),
+        });
+
+        // Update UI
+        const bannerNotif      = document.getElementById('siraniBannerNotif');
+        const bannerNotifAktif = document.getElementById('siraniBannerNotifAktif');
+        if (bannerNotif)      bannerNotif.style.display      = 'none';
+        if (bannerNotifAktif) bannerNotifAktif.style.display = 'flex';
+
+        // Hapus flag dismiss
+        if (nisn) localStorage.removeItem('sirani_push_dismissed_' + nisn);
+
+      } catch (err) {
+        console.error('Gagal subscribe push:', err);
+        if (btn) { btn.disabled = false; btn.innerHTML = '<i class="bi bi-bell-fill"></i> Aktifkan Notifikasi'; }
+        alert('Gagal mengaktifkan notifikasi. Pastikan browser mendukung Web Push dan coba lagi.\n\nDetail: ' + err.message);
+      }
+    }
+
+    /**
+     * Cabut langganan notifikasi
+     */
+    async function sirani_unsubscribePush() {
+      try {
+        const swReg = await navigator.serviceWorker.ready;
+        const sub   = await swReg.pushManager.getSubscription();
+        if (sub) {
+          const endpoint = sub.endpoint;
+          await sub.unsubscribe();
+          // Beri tahu server
+          await fetch(SIRANI_UNSUB_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+            body: JSON.stringify({ endpoint }),
+          });
+        }
+        const bannerNotif      = document.getElementById('siraniBannerNotif');
+        const bannerNotifAktif = document.getElementById('siraniBannerNotifAktif');
+        if (bannerNotifAktif) bannerNotifAktif.style.display = 'none';
+        if (bannerNotif)      bannerNotif.style.display      = 'flex';
+        const nisn = sirani_getNisnAktif();
+        if (nisn) localStorage.setItem('sirani_push_dismissed_' + nisn, '1');
+      } catch (err) {
+        console.error('Gagal unsubscribe push:', err);
+      }
+    }
+
+    /**
+     * Helper: Decode base64url ke Uint8Array untuk VAPID
+     */
+    function sirani_urlBase64ToUint8Array(base64String) {
+      const padding   = '='.repeat((4 - base64String.length % 4) % 4);
+      const base64    = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+      const rawData   = window.atob(base64);
+      const outputArr = new Uint8Array(rawData.length);
+      for (let i = 0; i < rawData.length; ++i) {
+        outputArr[i] = rawData.charCodeAt(i);
+      }
+      return outputArr;
+    }
+
+
     window.addEventListener('beforeinstallprompt', function(e) {
       e.preventDefault();
       deferredPrompt = e;

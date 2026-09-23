@@ -245,6 +245,19 @@ class PengumumanController extends Controller
             ]);
         }
 
+        // Broadcast Push Notification ke Aplikasi HP Seluruh Orang Tua
+        try {
+            $cleanSnippet = trim(preg_replace('/\s+/', ' ', strip_tags($pengumuman->isi_pesan)));
+            $cleanBody = (mb_strlen($cleanSnippet) > 130) ? mb_substr($cleanSnippet, 0, 127) . '...' : $cleanSnippet;
+            \App\Services\PushNotificationService::broadcastPengumuman(
+                $pengumuman->judul,
+                $cleanBody,
+                '/monitoring-absen'
+            );
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning("Gagal broadcast push pengumuman: " . $e->getMessage());
+        }
+
         $penerimaLabel = match ($targetPenerimaWa) {
             'siswa'    => 'WhatsApp Siswa Pribadi',
             'keduanya' => 'Orang Tua & Siswa',

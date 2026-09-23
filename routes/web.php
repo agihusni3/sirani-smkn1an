@@ -88,12 +88,26 @@ Route::middleware('throttle:300,1')->group(function () {
     Route::post('/cek-presensi', [PortalOrtuController::class, 'index'])->name('portal.ortu.cari');
     Route::get('/cek-presensi/{nisn}', [PortalOrtuController::class, 'detail'])->name('portal.ortu.detail');
     Route::get('/presensi-siswa/{nisn}', [PortalOrtuController::class, 'detail'])->name('portal.ortu.direct');
-    
+
     // Redirect Alias dari rute lama ke monitoring absen mandiri
     Route::get('/portal-siswa/{nisn?}', [\App\Http\Controllers\Sirani\RfidController::class, 'portalSiswa'])->name('portal.siswa');
     Route::get('/kartu-digital/{nisn}', [\App\Http\Controllers\Sirani\RfidController::class, 'kartuDigital'])->name('kartu.digital');
     Route::get('/kartu-digital-guru/{id}', [\App\Http\Controllers\Sirani\RfidController::class, 'kartuDigitalGuru'])->name('kartu.digital.guru');
+
+    // Unduh Aplikasi Android SIRANI (APK Langsung)
+    Route::get('/download-apk', function () {
+        $apkPath = public_path('downloads/SIRANI_SMKN1AN.apk');
+        if (file_exists($apkPath)) {
+            return response()->download($apkPath, 'SIRANI_SMKN1AN.apk', [
+                'Content-Type' => 'application/vnd.android.package-archive',
+            ]);
+        }
+        // APK belum tersedia: redirect ke halaman monitoring dengan pesan
+        return redirect()->route('portal.ortu.index')
+            ->with('info', 'File APK sedang dipersiapkan. Silakan install melalui browser Chrome di HP Android Anda dengan menekan tombol "Instal" di bilah bawah browser.');
+    })->name('download.apk');
 });
+
 
 // Portal Masuk Asesmen & CBT Siswa (Akses Siswa via NISN & Tanggal Lahir)
 Route::prefix('asesmen')->group(function () {

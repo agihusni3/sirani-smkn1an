@@ -12,3 +12,8 @@ Route::prefix('v1')->group(function () {
 // Endpoint Webhook Auto-Deploy Server SIRANI
 Route::match(['get', 'post'], '/deploy-webhook', [\App\Http\Controllers\Api\DeployController::class, 'handle']);
 
+// Endpoint Push Notification Portal Orang Tua & Siswa
+Route::get('/push-vapid-key', [\App\Http\Controllers\Api\PushSubscriptionController::class, 'getPublicKey']);
+Route::post('/push-subscribe', [\App\Http\Controllers\Api\PushSubscriptionController::class, 'subscribe']);
+Route::post('/push-unsubscribe', [\App\Http\Controllers\Api\PushSubscriptionController::class, 'unsubscribe']);
+

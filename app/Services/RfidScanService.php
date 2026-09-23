@@ -460,6 +460,18 @@ class RfidScanService
                     } catch (\Throwable $e) {
                         \Illuminate\Support\Facades\Log::warning("Gagal memproses draf notifikasi ortu masuk RFID: " . $e->getMessage());
                     }
+
+                    // Push Notification Real-Time ke Aplikasi HP Orang Tua
+                    try {
+                        if (!empty($person->nisn)) {
+                            $statusTxt = $isTerlambat ? 'TERLAMBAT' : 'Tepat Waktu';
+                            $pushTitle = "Presensi Masuk: {$person->nama}";
+                            $pushBody = "Ananda telah hadir di sekolah pukul {$timeNow} WIB ({$statusTxt}).";
+                            \App\Services\PushNotificationService::sendToSiswa($person->nisn, $pushTitle, $pushBody);
+                        }
+                    } catch (\Throwable $e) {
+                        \Illuminate\Support\Facades\Log::warning("Gagal kirim push notif masuk: " . $e->getMessage());
+                    }
                 }
 
                 $message = $isTerlambat
@@ -509,6 +521,17 @@ class RfidScanService
                         }
                     } catch (\Throwable $e) {
                         \Illuminate\Support\Facades\Log::warning("Gagal memproses draf notifikasi ortu pulang RFID: " . $e->getMessage());
+                    }
+
+                    // Push Notification Real-Time ke Aplikasi HP Orang Tua
+                    try {
+                        if (!empty($person->nisn)) {
+                            $pushTitle = "Presensi Pulang: {$person->nama}";
+                            $pushBody = "Ananda telah selesai kegiatan belajar dan melakukan presensi kepulangan pada pukul {$timeNow} WIB.";
+                            \App\Services\PushNotificationService::sendToSiswa($person->nisn, $pushTitle, $pushBody);
+                        }
+                    } catch (\Throwable $e) {
+                        \Illuminate\Support\Facades\Log::warning("Gagal kirim push notif pulang: " . $e->getMessage());
                     }
                 }
 

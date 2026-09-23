@@ -1398,3 +1398,110 @@
       100% { background-position: 200% 0%; }
     }
   
+/* ════════════════════════════════════════════════════════
+   SIRANI — BANNER NOTIFIKASI PUSH (Aktifkan / Aktif)
+════════════════════════════════════════════════════════ */
+.sirani-notif-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 16px;
+  background: linear-gradient(135deg, rgba(59,130,246,0.08) 0%, rgba(139,92,246,0.08) 100%);
+  border: 1px solid rgba(59,130,246,0.25);
+  border-radius: 14px;
+  margin: 0 0 14px 0;
+  flex-wrap: wrap;
+  animation: notifSlideIn 0.4s ease;
+}
+@keyframes notifSlideIn {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.sirani-notif-aktif {
+  background: linear-gradient(135deg, rgba(34,197,94,0.07) 0%, rgba(16,185,129,0.07) 100%);
+  border-color: rgba(34,197,94,0.22);
+}
+.sirani-notif-banner-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  min-width: 0;
+}
+.sirani-notif-banner-icon {
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  border-radius: 10px;
+  background: rgba(59,130,246,0.12);
+  color: #3b82f6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+}
+.sirani-notif-banner-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.sirani-notif-banner-text strong {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.sirani-notif-banner-text span {
+  font-size: 11.5px;
+  color: var(--text-2);
+  line-height: 1.4;
+}
+.sirani-notif-banner-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+.btn-notif-aktifkan {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  background: linear-gradient(135deg, #3b82f6, #6366f1);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-size: 12.5px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: opacity 0.2s, transform 0.15s;
+  box-shadow: 0 3px 12px rgba(99,102,241,0.25);
+}
+.btn-notif-aktifkan:hover { opacity: 0.88; transform: translateY(-1px); }
+.btn-notif-aktifkan:disabled { opacity: 0.6; cursor: not-allowed; }
+.btn-notif-tutup {
+  width: 30px;
+  height: 30px;
+  border: none;
+  background: transparent;
+  color: var(--text-3);
+  cursor: pointer;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  transition: background 0.15s, color 0.15s;
+}
+.btn-notif-tutup:hover { background: var(--bg-subtle); color: var(--text); }
+@media (max-width: 500px) {
+  .sirani-notif-banner { gap: 8px; padding: 10px 12px; }
+  .sirani-notif-banner-text strong { font-size: 12px; }
+  .sirani-notif-banner-text span { display: none; }
+  .btn-notif-aktifkan { padding: 7px 12px; font-size: 11.5px; }
+}
