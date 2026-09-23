@@ -34,39 +34,45 @@
   {{-- TOP NAVIGATION --}}
   <nav class="top-nav">
     <div class="top-nav-inner">
-      <a href="/monitoring-absen" class="brand-logo">
+      <a href="/monitoring-absen" class="brand-logo" title="SIRANI - Presensi SMKN 1 Air Naningan">
         <div class="brand-icon">
           <i class="bi bi-mortarboard-fill"></i>
         </div>
         <div class="brand-text">
           <h1>SIRANI</h1>
-          <p>Presensi SMKN 1 Air Naningan</p>
+          <p>Presensi SMKN 1 AN</p>
         </div>
       </a>
 
       <div class="nav-actions">
+        {{-- Tombol Pengaturan Notifikasi & Suara (Selalu Aktif) --}}
+        <button type="button" id="btnNavNotifSettings" onclick="openNotifSettingsModal()" class="nav-action-btn btn-nav-notif" title="Pengaturan Notifikasi & Suara (Selalu Aktif)">
+          <span class="nav-icon-wrap">
+            <i class="bi bi-bell-fill"></i>
+            <span class="notif-active-dot" title="Notifikasi Selalu Aktif"></span>
+          </span>
+          <span class="nav-btn-text">Suara</span>
+        </button>
+
+        {{-- Tombol Pasang Aplikasi / APK --}}
+        <button type="button" id="btnPwaInstall" onclick="openApkInstallModal()" class="nav-action-btn btn-pwa-install" title="Pasang Aplikasi SIRANI / Unduh APK">
+          <i class="bi bi-phone-fill"></i>
+          <span class="nav-btn-text">App</span>
+        </button>
+
+        {{-- Link Web Resmi SMK --}}
+        <a href="/" class="nav-action-btn btn-portal-sekolah" title="Website Resmi SMKN 1 Air Naningan">
+          <i class="bi bi-globe2"></i>
+          <span class="nav-btn-text">Web</span>
+        </a>
+
+        {{-- Tombol Ganti Siswa (Hanya jika siswa sedang dibuka) --}}
         @if($siswa)
           <button type="button" onclick="logoutSavedStudent()" class="nav-action-btn btn-ganti-nisn" title="Ganti Siswa / Keluar dari Akun">
             <i class="bi bi-arrow-left-right"></i>
-            <span>Ganti NISN</span>
+            <span class="nav-btn-text">Ganti</span>
           </button>
         @endif
-        <a href="/" class="nav-action-btn btn-portal-sekolah" title="Website Resmi SMKN 1 Air Naningan">
-          <i class="bi bi-globe2"></i>
-          <span>Web SMK</span>
-        </a>
-        <button type="button" id="btnPwaInstall" onclick="openApkInstallModal()" class="nav-action-btn btn-pwa-install" title="Instal Aplikasi ke HP">
-          <i class="bi bi-download"></i>
-          <span>Instal</span>
-        </button>
-        <button type="button" id="btnNavApk" onclick="openApkInstallModal()" class="nav-action-btn" title="Download APK Android SIRANI" style="cursor:pointer; background:none; border:none; color:inherit;">
-          <i class="bi bi-android2"></i>
-          <span>APK</span>
-        </button>
-        <button type="button" id="btnNavNotif" onclick="sirani_requestPushPermission()" class="nav-action-btn" title="Aktifkan Notifikasi Presensi" style="display:none;">
-          <i class="bi bi-bell"></i>
-          <span>Notif</span>
-        </button>
       </div>
     </div>
   </nav>
@@ -154,38 +160,47 @@
     @endif
 
     {{-- ══════════════════════════════════════════════════════════
-         BANNER NOTIFIKASI & DOWNLOAD APK (Selalu Tampil)
+         BANNER NOTIFIKASI & PENGATURAN SUARA (Selalu Tampil)
     ══════════════════════════════════════════════════════════ --}}
+    {{-- Banner jika izin browser di HP belum diberikan --}}
     <div id="siraniBannerNotif" class="sirani-notif-banner" style="display:none;">
       <div class="sirani-notif-banner-left">
         <div class="sirani-notif-banner-icon"><i class="bi bi-bell-fill"></i></div>
         <div class="sirani-notif-banner-text">
-          <strong>Aktifkan Notifikasi Presensi</strong>
-          <span>Dapatkan pemberitahuan otomatis ke HP Anda saat anak tap RFID di gerbang sekolah.</span>
+          <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+            <strong>Notifikasi Presensi Sekolah</strong>
+            <span class="badge-notif-wajib"><i class="bi bi-shield-lock-fill"></i> Wajib Aktif</span>
+          </div>
+          <span>Pemberitahuan tap gerbang otomatis langsung terkirim ke HP saat anak hadir atau pulang.</span>
         </div>
       </div>
       <div class="sirani-notif-banner-right">
         <button type="button" id="btnAktifkanNotif" onclick="sirani_requestPushPermission()" class="btn-notif-aktifkan">
-          <i class="bi bi-bell-fill"></i> Aktifkan Notifikasi
+          <i class="bi bi-bell-fill"></i> Izinkan di HP Ini
         </button>
-        <button type="button" onclick="document.getElementById('siraniBannerNotif').style.display='none'" class="btn-notif-tutup" title="Tutup">
-          <i class="bi bi-x"></i>
+        <button type="button" onclick="openNotifSettingsModal()" class="btn-notif-settings-icon" title="Atur Suara & Nada Dering">
+          <i class="bi bi-sliders"></i>
         </button>
       </div>
     </div>
 
-    {{-- Status Notifikasi Aktif --}}
+    {{-- Banner Status Notifikasi HP Aktif & Terhubung --}}
     <div id="siraniBannerNotifAktif" class="sirani-notif-banner sirani-notif-aktif" style="display:none;">
       <div class="sirani-notif-banner-left">
-        <div class="sirani-notif-banner-icon" style="background:rgba(34,197,94,0.12);color:#22c55e;"><i class="bi bi-bell-slash"></i></div>
+        <div class="sirani-notif-banner-icon sirani-notif-icon-green">
+          <i class="bi bi-bell-fill"></i>
+        </div>
         <div class="sirani-notif-banner-text">
-          <strong>Notifikasi Presensi Aktif ✓</strong>
-          <span>HP ini akan menerima pemberitahuan otomatis untuk presensi ananda.</span>
+          <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+            <strong>Notifikasi Selalu Aktif ✓</strong>
+            <span class="badge-notif-wajib"><i class="bi bi-shield-lock-fill"></i> Wajib Sekolah</span>
+          </div>
+          <span>HP ini terhubung & otomatis menerima bunyi pemberitahuan kehadiran siswa.</span>
         </div>
       </div>
       <div class="sirani-notif-banner-right">
-        <button type="button" onclick="sirani_unsubscribePush()" class="btn-notif-tutup" style="font-size:11px;padding:6px 10px;border-radius:8px;background:rgba(220,38,38,0.08);color:#dc2626;font-weight:700;">
-          <i class="bi bi-bell-slash"></i> Matikan
+        <button type="button" onclick="openNotifSettingsModal()" class="btn-notif-atur-suara">
+          <i class="bi bi-music-note-beamed"></i> Atur Suara
         </button>
       </div>
     </div>
@@ -2090,5 +2105,617 @@
     </div>
   </div>
 
+  {{-- ══════════════════════════════════════════════════════════
+       MODAL PENGATURAN SUARA NOTIFIKASI & WAJIB AKTIF
+  ══════════════════════════════════════════════════════════ --}}
+  <div id="modalNotifSettings" class="sirani-modal-overlay" style="display:none;" onclick="handleNotifSettingsOverlayClick(event)">
+    <div class="sirani-modal-container" onclick="event.stopPropagation()" style="max-width: 480px; max-height: 90vh; display: flex; flex-direction: column;">
+      
+      {{-- Modal Header --}}
+      <div class="sirani-modal-header" style="flex-shrink: 0;">
+        <div class="sirani-modal-app-badge">
+          <div style="width: 42px; height: 42px; border-radius: 12px; background: #eff6ff; color: #2563eb; display: flex; align-items: center; justify-content: center; font-size: 20px; box-shadow: 0 4px 10px rgba(37,99,235,0.15);">
+            <i class="bi bi-bell-fill"></i>
+          </div>
+          <div>
+            <div class="sirani-modal-title">Suara &amp; Notifikasi</div>
+            <div class="sirani-modal-sub">SIRANI Mobile · SMKN 1 Air Naningan</div>
+          </div>
+        </div>
+        <button type="button" onclick="closeNotifSettingsModal()" class="sirani-modal-close" title="Tutup">
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>
+
+      {{-- Modal Body (Scrollable) --}}
+      <div class="sirani-modal-body" style="overflow-y: auto; padding: 20px;">
+        
+        {{-- Status Box: Selalu Aktif & Wajib Sekolah --}}
+        <div class="sirani-notif-status-box">
+          <div class="notif-status-left">
+            <div class="notif-status-pulse-icon">
+              <i class="bi bi-bell-fill"></i>
+            </div>
+            <div>
+              <div class="notif-status-title-row">
+                <span class="notif-status-title">Status: Selalu Aktif</span>
+                <span class="notif-lock-badge"><i class="bi bi-shield-lock-fill"></i> Wajib Sekolah</span>
+              </div>
+              <div class="notif-status-desc">
+                Notifikasi presensi disetel menyala secara permanen agar Anda menerima info kehadiran ananda tepat waktu.
+              </div>
+            </div>
+          </div>
+          <div class="notif-locked-toggle" title="Notifikasi wajib aktif dan tidak dapat dimatikan">
+            <div class="toggle-switch-locked"></div>
+            <span class="toggle-locked-label"><i class="bi bi-lock-fill"></i> Selalu ON</span>
+          </div>
+        </div>
+
+        {{-- Section: Pilihan Nada Notifikasi --}}
+        <div class="sirani-sound-section-title">
+          <i class="bi bi-music-note-beamed" style="color: #2563eb;"></i>
+          <span>Pilih Nada Notifikasi Suara</span>
+        </div>
+        <div class="sirani-sound-section-desc">
+          Pilih nada dering yang ingin Anda dengar setiap kali ananda hadir atau pulang sekolah:
+        </div>
+
+        <div class="sirani-sound-list" id="soundChoicesList">
+          {{-- Sound 1: Chime Klasik --}}
+          <div class="sirani-sound-item selected" id="soundCard_chime" onclick="sirani_selectSound('chime')">
+            <div class="sound-item-left">
+              <div class="sound-radio-circle"></div>
+              <i class="bi bi-bell sound-item-icon"></i>
+              <div>
+                <div class="sound-item-name">Chime Klasik (Ting Tung)</div>
+                <div class="sound-item-desc">Dua nada cerah &amp; elegan (Bawaan)</div>
+              </div>
+            </div>
+            <button type="button" class="btn-sound-preview" id="btnPlay_chime" onclick="event.stopPropagation(); sirani_playPreviewSound('chime')">
+              <i class="bi bi-play-fill"></i> Tes
+            </button>
+          </div>
+
+          {{-- Sound 2: Bel Sekolah --}}
+          <div class="sirani-sound-item" id="soundCard_bell" onclick="sirani_selectSound('bell')">
+            <div class="sound-item-left">
+              <div class="sound-radio-circle"></div>
+              <i class="bi bi-building sound-item-icon"></i>
+              <div>
+                <div class="sound-item-name">Bel Sekolah (School Bell)</div>
+                <div class="sound-item-desc">Tiga nada khas lonceng sekolah</div>
+              </div>
+            </div>
+            <button type="button" class="btn-sound-preview" id="btnPlay_bell" onclick="event.stopPropagation(); sirani_playPreviewSound('bell')">
+              <i class="bi bi-play-fill"></i> Tes
+            </button>
+          </div>
+
+          {{-- Sound 3: Melodi Lembut --}}
+          <div class="sirani-sound-item" id="soundCard_soft" onclick="sirani_selectSound('soft')">
+            <div class="sound-item-left">
+              <div class="sound-radio-circle"></div>
+              <i class="bi bi-soundwave sound-item-icon"></i>
+              <div>
+                <div class="sound-item-name">Melodi Lembut (Gentle Harp)</div>
+                <div class="sound-item-desc">Nada lembut &amp; ramah telinga</div>
+              </div>
+            </div>
+            <button type="button" class="btn-sound-preview" id="btnPlay_soft" onclick="event.stopPropagation(); sirani_playPreviewSound('soft')">
+              <i class="bi bi-play-fill"></i> Tes
+            </button>
+          </div>
+
+          {{-- Sound 4: Alert Modern --}}
+          <div class="sirani-sound-item" id="soundCard_alert" onclick="sirani_selectSound('alert')">
+            <div class="sound-item-left">
+              <div class="sound-radio-circle"></div>
+              <i class="bi bi-lightning-charge sound-item-icon"></i>
+              <div>
+                <div class="sound-item-name">Alert Modern (Double Beep)</div>
+                <div class="sound-item-desc">Nada digital singkat, tegas &amp; jelas</div>
+              </div>
+            </div>
+            <button type="button" class="btn-sound-preview" id="btnPlay_alert" onclick="event.stopPropagation(); sirani_playPreviewSound('alert')">
+              <i class="bi bi-play-fill"></i> Tes
+            </button>
+          </div>
+
+          {{-- Sound 5: Custom Sound File --}}
+          <div class="sirani-sound-item" id="soundCard_custom" onclick="sirani_selectSound('custom')">
+            <div class="sound-item-left">
+              <div class="sound-radio-circle"></div>
+              <i class="bi bi-folder2-open sound-item-icon" style="color: #9333ea;"></i>
+              <div>
+                <div class="sound-item-name">Pilih File Suara Sendiri (MP3 / Audio)</div>
+                <div class="sound-item-desc" id="customSoundDesc">Pilih file audio apapun dari memori HP Anda</div>
+              </div>
+            </div>
+            <button type="button" class="btn-sound-preview" id="btnPlay_custom" style="display:none;" onclick="event.stopPropagation(); sirani_playPreviewSound('custom')">
+              <i class="bi bi-play-fill"></i> Tes
+            </button>
+          </div>
+        </div>
+
+        {{-- Uploader Box for Custom Sound --}}
+        <div id="customSoundUploaderBox" class="sirani-custom-sound-box" style="display:none;">
+          <div class="custom-sound-header">
+            <span class="custom-sound-title"><i class="bi bi-upload"></i> Unggah Audio dari HP</span>
+            <span id="customSoundSize" style="font-size: 11px; color:#9333ea;">Maks 5 MB</span>
+          </div>
+          <div class="custom-sound-info">
+            Pilih file audio (MP3, WAV, M4A, OGG) dari penyimpanan HP Anda untuk dijadikan nada notifikasi SIRANI.
+          </div>
+          <div class="custom-sound-actions">
+            <input type="file" id="inputCustomAudioFile" accept="audio/*,.mp3,.wav,.ogg,.m4a,.aac" style="display:none;" onchange="sirani_handleCustomSoundUpload(event)">
+            <button type="button" class="btn-upload-sound" onclick="document.getElementById('inputCustomAudioFile').click()">
+              <i class="bi bi-folder-symlink-fill"></i> Cari File di HP
+            </button>
+            <div id="customSoundFileBadge" style="display:none;" class="custom-sound-filename"></div>
+            <button type="button" id="btnResetCustomSound" style="display:none; background:none; border:none; color:#ef4444; font-size:11px; font-weight:700; cursor:pointer;" onclick="sirani_removeCustomSound()">
+              <i class="bi bi-trash"></i> Hapus
+            </button>
+          </div>
+        </div>
+
+        {{-- Volume Slider --}}
+        <div class="sirani-volume-box" style="margin-top: 14px;">
+          <div class="volume-header">
+            <span class="volume-label"><i class="bi bi-volume-up-fill" style="color: #2563eb;"></i> Volume Notifikasi:</span>
+            <span class="volume-val-badge" id="volumeValBadge">85%</span>
+          </div>
+          <input type="range" min="10" max="100" value="85" class="volume-slider" id="notifVolumeSlider" oninput="sirani_updateVolume(this.value)">
+        </div>
+
+        {{-- Action Buttons --}}
+        <div class="sirani-notif-modal-actions">
+          <button type="button" onclick="sirani_testNotification()" class="btn-test-notif-full">
+            <i class="bi bi-bell-fill"></i> Tes Kirim Notifikasi &amp; Suara ke HP
+          </button>
+          <button type="button" onclick="sirani_saveSoundSettings()" class="btn-save-sound-setting">
+            <i class="bi bi-check-lg"></i> Simpan Pilihan Suara
+          </button>
+        </div>
+
+        {{-- Panduan Nada Dering Android OS --}}
+        <div class="android-sound-guide-box">
+          <button type="button" class="android-guide-toggle" onclick="toggleAndroidSoundGuide()">
+            <span><i class="bi bi-phone"></i> Cara Mengubah Suara di Pengaturan HP Android</span>
+            <i class="bi bi-chevron-down" id="guideChevron"></i>
+          </button>
+          <div id="androidGuideBody" class="android-guide-content" style="display:none;">
+            Jika Anda ingin menggunakan nada dering bawaan sistem HP (Samsung, Xiaomi, Oppo, Vivo, dsb.):
+            <ol class="android-guide-steps-list">
+              <li>Buka <strong>Pengaturan (Settings) HP</strong> &gt; <strong>Aplikasi</strong>.</li>
+              <li>Pilih aplikasi <strong>SIRANI</strong> (atau browser Chrome).</li>
+              <li>Ketuk <strong>Pemberitahuan / Notifikasi</strong> &gt; <strong>Kategori Notifikasi</strong>.</li>
+              <li>Pilih <strong>Suara / Nada Dering</strong> lalu pilih nada dering HP yang Anda sukai.</li>
+            </ol>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- JAVASCRIPT KONTROLER SUARA & NOTIFIKASI SIRANI -->
+  <script>
+    let currentPreviewAudio = null;
+
+    const SIRANI_SOUND_MAP = {
+      chime: '/sounds/notif-chime.wav',
+      bell:  '/sounds/notif-bell.wav',
+      soft:  '/sounds/notif-soft.wav',
+      alert: '/sounds/notif-alert.wav'
+    };
+
+    function sirani_playToneFallback(type, volume) {
+      try {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (!AudioCtx) return;
+        const ctx = new AudioCtx();
+        const gainNode = ctx.createGain();
+        gainNode.gain.setValueAtTime(volume * 0.4, ctx.currentTime);
+        gainNode.connect(ctx.destination);
+
+        const now = ctx.currentTime;
+        if (type === 'bell') {
+          [523.25, 659.25, 783.99].forEach((freq, i) => {
+            const osc = ctx.createOscillator();
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(freq, now + i * 0.18);
+            osc.connect(gainNode);
+            osc.start(now + i * 0.18);
+            osc.stop(now + i * 0.18 + 0.35);
+          });
+        } else if (type === 'soft') {
+          [440, 554.37, 659.25].forEach((freq, i) => {
+            const osc = ctx.createOscillator();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(freq, now + i * 0.14);
+            osc.connect(gainNode);
+            osc.start(now + i * 0.14);
+            osc.stop(now + i * 0.14 + 0.4);
+          });
+        } else if (type === 'alert') {
+          [880, 880].forEach((freq, i) => {
+            const osc = ctx.createOscillator();
+            osc.type = 'square';
+            osc.frequency.setValueAtTime(freq, now + i * 0.12);
+            osc.connect(gainNode);
+            osc.start(now + i * 0.12);
+            osc.stop(now + i * 0.12 + 0.08);
+          });
+        } else {
+          // chime (default)
+          [659.25, 880].forEach((freq, i) => {
+            const osc = ctx.createOscillator();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(freq, now + i * 0.15);
+            osc.connect(gainNode);
+            osc.start(now + i * 0.15);
+            osc.stop(now + i * 0.15 + 0.35);
+          });
+        }
+      } catch (err) {
+        console.warn('Audio tone fallback error:', err);
+      }
+    }
+
+    function openNotifSettingsModal() {
+      const modal = document.getElementById('modalNotifSettings');
+      if (!modal) return;
+      modal.style.display = 'flex';
+
+      // Load saved preferences
+      const savedSound = localStorage.getItem('sirani_sound_choice') || 'chime';
+      const savedVol = localStorage.getItem('sirani_sound_volume') || '85';
+
+      sirani_selectSound(savedSound, false);
+
+      const slider = document.getElementById('notifVolumeSlider');
+      if (slider) slider.value = savedVol;
+      const volBadge = document.getElementById('volumeValBadge');
+      if (volBadge) volBadge.textContent = savedVol + '%';
+
+      // Check custom sound
+      const customName = localStorage.getItem('sirani_custom_sound_name');
+      const customData = localStorage.getItem('sirani_custom_sound_data');
+      if (customName && customData) {
+        const badge = document.getElementById('customSoundFileBadge');
+        if (badge) {
+          badge.textContent = '🎵 ' + customName;
+          badge.style.display = 'inline-block';
+        }
+        const desc = document.getElementById('customSoundDesc');
+        if (desc) desc.textContent = 'Audio kustom: ' + customName;
+        const btnPlay = document.getElementById('btnPlay_custom');
+        if (btnPlay) btnPlay.style.display = 'inline-flex';
+        const btnReset = document.getElementById('btnResetCustomSound');
+        if (btnReset) btnReset.style.display = 'inline-block';
+      }
+    }
+
+    let currentPreviewSoundKey = null;
+    let fallbackTimeout = null;
+
+    function resetAllPreviewButtons() {
+      if (fallbackTimeout) {
+        clearTimeout(fallbackTimeout);
+        fallbackTimeout = null;
+      }
+      document.querySelectorAll('.btn-sound-preview').forEach(function(btn) {
+        btn.classList.remove('playing');
+        btn.innerHTML = '<i class="bi bi-play-fill"></i> Tes';
+      });
+    }
+
+    function closeNotifSettingsModal() {
+      const modal = document.getElementById('modalNotifSettings');
+      if (modal) modal.style.display = 'none';
+      if (currentPreviewAudio) {
+        try { currentPreviewAudio.pause(); currentPreviewAudio.currentTime = 0; } catch(e){}
+        currentPreviewAudio = null;
+      }
+      resetAllPreviewButtons();
+      currentPreviewSoundKey = null;
+    }
+
+    function handleNotifSettingsOverlayClick(event) {
+      if (event.target && event.target.id === 'modalNotifSettings') {
+        closeNotifSettingsModal();
+      }
+    }
+
+    let activeSelectedSound = 'chime';
+
+    function sirani_selectSound(soundKey, triggerPreview = false) {
+      activeSelectedSound = soundKey;
+      document.querySelectorAll('.sirani-sound-item').forEach(el => el.classList.remove('selected'));
+      const activeCard = document.getElementById('soundCard_' + soundKey);
+      if (activeCard) activeCard.classList.add('selected');
+
+      const uploaderBox = document.getElementById('customSoundUploaderBox');
+      if (uploaderBox) {
+        uploaderBox.style.display = (soundKey === 'custom') ? 'block' : 'none';
+      }
+
+      if (triggerPreview) {
+        sirani_playPreviewSound(soundKey);
+      }
+    }
+
+    function sirani_updateVolume(val) {
+      const badge = document.getElementById('volumeValBadge');
+      if (badge) badge.textContent = val + '%';
+      localStorage.setItem('sirani_sound_volume', val);
+    }
+
+    function sirani_playPreviewSound(soundKey) {
+      // Jika suara yang sama sedang diputar, tombol berfungsi sebagai STOP
+      if (currentPreviewSoundKey === soundKey) {
+        if (currentPreviewAudio) {
+          try { currentPreviewAudio.pause(); currentPreviewAudio.currentTime = 0; } catch(e){}
+          currentPreviewAudio = null;
+        }
+        resetAllPreviewButtons();
+        currentPreviewSoundKey = null;
+        return;
+      }
+
+      // Hentikan suara sebelumnya bila ada
+      if (currentPreviewAudio) {
+        try { currentPreviewAudio.pause(); currentPreviewAudio.currentTime = 0; } catch(e){}
+        currentPreviewAudio = null;
+      }
+      resetAllPreviewButtons();
+
+      const activeBtn = document.getElementById('btnPlay_' + soundKey);
+      if (activeBtn) {
+        activeBtn.classList.add('playing');
+        activeBtn.innerHTML = '<i class="bi bi-stop-fill"></i> Stop';
+      }
+      currentPreviewSoundKey = soundKey;
+
+      const volVal = parseInt(document.getElementById('notifVolumeSlider')?.value || localStorage.getItem('sirani_sound_volume') || 85, 10) / 100;
+
+      function onSoundFinish() {
+        resetAllPreviewButtons();
+        currentPreviewSoundKey = null;
+        currentPreviewAudio = null;
+      }
+
+      if (soundKey === 'custom') {
+        const customData = localStorage.getItem('sirani_custom_sound_data');
+        if (!customData) {
+          resetAllPreviewButtons();
+          currentPreviewSoundKey = null;
+          alert('Silakan pilih file audio dari HP terlebih dahulu melalui tombol "Cari File di HP".');
+          document.getElementById('inputCustomAudioFile')?.click();
+          return;
+        }
+        try {
+          currentPreviewAudio = new Audio(customData);
+          currentPreviewAudio.volume = volVal;
+          currentPreviewAudio.onended = onSoundFinish;
+          currentPreviewAudio.onerror = function() {
+            sirani_playToneFallback('chime', volVal);
+            fallbackTimeout = setTimeout(onSoundFinish, 800);
+          };
+          currentPreviewAudio.play().catch(function() {
+            sirani_playToneFallback('chime', volVal);
+            fallbackTimeout = setTimeout(onSoundFinish, 800);
+          });
+        } catch(e) {
+          sirani_playToneFallback('chime', volVal);
+          fallbackTimeout = setTimeout(onSoundFinish, 800);
+        }
+        return;
+      }
+
+      const soundUrl = SIRANI_SOUND_MAP[soundKey] || SIRANI_SOUND_MAP.chime;
+      try {
+        currentPreviewAudio = new Audio(soundUrl);
+        currentPreviewAudio.volume = volVal;
+        currentPreviewAudio.onended = onSoundFinish;
+        currentPreviewAudio.onerror = function() {
+          sirani_playToneFallback(soundKey, volVal);
+          fallbackTimeout = setTimeout(onSoundFinish, 800);
+        };
+        const playPromise = currentPreviewAudio.play();
+        if (playPromise !== undefined) {
+          playPromise.catch(function() {
+            // Audio file blocked or not found, fallback to Web Audio tone
+            sirani_playToneFallback(soundKey, volVal);
+            fallbackTimeout = setTimeout(onSoundFinish, 800);
+          });
+        }
+      } catch(e) {
+        sirani_playToneFallback(soundKey, volVal);
+        fallbackTimeout = setTimeout(onSoundFinish, 800);
+      }
+    }
+
+    function sirani_handleCustomSoundUpload(event) {
+      const file = event.target.files && event.target.files[0];
+      if (!file) return;
+
+      // Maksimal 5 MB
+      if (file.size > 5 * 1024 * 1024) {
+        alert('Ukuran file terlalu besar! Silakan pilih file audio di bawah 5 MB.');
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const base64Data = e.target.result;
+        try {
+          localStorage.setItem('sirani_custom_sound_data', base64Data);
+          localStorage.setItem('sirani_custom_sound_name', file.name);
+          localStorage.setItem('sirani_sound_choice', 'custom');
+
+          const badge = document.getElementById('customSoundFileBadge');
+          if (badge) {
+            badge.textContent = '🎵 ' + file.name;
+            badge.style.display = 'inline-block';
+          }
+          const desc = document.getElementById('customSoundDesc');
+          if (desc) desc.textContent = 'Audio kustom: ' + file.name;
+          const btnPlay = document.getElementById('btnPlay_custom');
+          if (btnPlay) btnPlay.style.display = 'inline-flex';
+          const btnReset = document.getElementById('btnResetCustomSound');
+          if (btnReset) btnReset.style.display = 'inline-block';
+
+          sirani_selectSound('custom');
+          sirani_playPreviewSound('custom');
+        } catch(quotaErr) {
+          alert('Penyimpanan browser penuh untuk file ini. Coba pilih file audio dengan ukuran lebih kecil (di bawah 1 MB).');
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function sirani_removeCustomSound() {
+      localStorage.removeItem('sirani_custom_sound_data');
+      localStorage.removeItem('sirani_custom_sound_name');
+      const badge = document.getElementById('customSoundFileBadge');
+      if (badge) badge.style.display = 'none';
+      const desc = document.getElementById('customSoundDesc');
+      if (desc) desc.textContent = 'Pilih file audio apapun dari memori HP Anda';
+      const btnPlay = document.getElementById('btnPlay_custom');
+      if (btnPlay) btnPlay.style.display = 'none';
+      const btnReset = document.getElementById('btnResetCustomSound');
+      if (btnReset) btnReset.style.display = 'none';
+      sirani_selectSound('chime');
+    }
+
+    function sirani_saveSoundSettings() {
+      localStorage.setItem('sirani_sound_choice', activeSelectedSound);
+      const vol = document.getElementById('notifVolumeSlider')?.value || '85';
+      localStorage.setItem('sirani_sound_volume', vol);
+
+      // Sinkronkan ke service worker bila aktif
+      if (navigator.serviceWorker && navigator.serviceWorker.controller) {
+        navigator.serviceWorker.controller.postMessage({
+          type: 'SIRANI_SET_SOUND_PREFERENCE',
+          sound: activeSelectedSound,
+          volume: vol
+        });
+      }
+
+      // Beri feedback notifikasi singkat
+      const soundNames = {
+        chime: 'Chime Klasik (Ting Tung)',
+        bell: 'Bel Sekolah (School Bell)',
+        soft: 'Melodi Lembut (Gentle Harp)',
+        alert: 'Alert Modern (Double Beep)',
+        custom: 'File Audio Pilihan Sendiri'
+      };
+      const soundTitle = soundNames[activeSelectedSound] || activeSelectedSound;
+
+      alert('Pengaturan Tersimpan!\n\n• Nada: ' + soundTitle + '\n• Volume: ' + vol + '%\n• Status: Selalu Aktif');
+      closeNotifSettingsModal();
+    }
+
+    function sirani_testNotification() {
+      const volVal = parseInt(document.getElementById('notifVolumeSlider')?.value || 85, 10) / 100;
+      sirani_playPreviewSound(activeSelectedSound);
+
+      if ('Notification' in window) {
+        if (Notification.permission === 'granted') {
+          showActualTestNotification();
+        } else if (Notification.permission !== 'denied') {
+          Notification.requestPermission().then(function(perm) {
+            if (perm === 'granted') {
+              showActualTestNotification();
+            } else {
+              alert('Izin notifikasi tidak diizinkan di browser Anda. Silakan izinkan notifikasi pada ikon gembok di bilah alamat browser.');
+            }
+          });
+        } else {
+          alert('Notifikasi saat ini diblokir di browser HP Anda. Buka Pengaturan Situs / Ikon Gembok di bilah alamat browser, lalu aktifkan Notifikasi.');
+        }
+      } else {
+        alert('Browser ini tidak mendukung Web Notifications API.');
+      }
+    }
+
+    function showActualTestNotification() {
+      const testTitle = 'SIRANI — Tes Notifikasi & Suara';
+      const testOptions = {
+        body: 'Tes berhasil! Suara nada dering dan notifikasi presensi siap diterima.',
+        icon: '/icons/icon-192.png',
+        badge: '/icons/icon-192.png',
+        vibrate: [250, 100, 250, 100, 350],
+        tag: 'sirani-test-' + Date.now()
+      };
+
+      if ('serviceWorker' in navigator && navigator.serviceWorker.ready) {
+        navigator.serviceWorker.ready.then(function(reg) {
+          reg.showNotification(testTitle, testOptions);
+        }).catch(function() {
+          try { new Notification(testTitle, testOptions); } catch(e){}
+        });
+      } else {
+        try { new Notification(testTitle, testOptions); } catch(e){}
+      }
+    }
+
+    function toggleAndroidSoundGuide() {
+      const body = document.getElementById('androidGuideBody');
+      const chev = document.getElementById('guideChevron');
+      if (!body) return;
+      if (body.style.display === 'none' || body.style.display === '') {
+        body.style.display = 'block';
+        if (chev) chev.className = 'bi bi-chevron-up';
+      } else {
+        body.style.display = 'none';
+        if (chev) chev.className = 'bi bi-chevron-down';
+      }
+    }
+
+    // Listener suara saat Service Worker menerima Push Notification
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.addEventListener('message', function(event) {
+        if (event.data && event.data.type === 'SIRANI_PUSH_RECEIVED') {
+          const soundChoice = localStorage.getItem('sirani_sound_choice') || 'chime';
+          sirani_playPreviewSound(soundChoice);
+        }
+      });
+    }
+
+    // Unlock Web Audio & HTML5 Audio pada interaksi pengguna pertama di mobile browser
+    let siraniAudioUnlocked = false;
+    function siraniUnlockAudioContext() {
+      if (siraniAudioUnlocked) return;
+      try {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (AudioCtx) {
+          const ctx = new AudioCtx();
+          if (ctx.state === 'suspended') {
+            ctx.resume();
+          }
+        }
+        siraniAudioUnlocked = true;
+      } catch (e) {}
+    }
+    document.addEventListener('click', siraniUnlockAudioContext, { once: true });
+    document.addEventListener('touchstart', siraniUnlockAudioContext, { once: true, passive: true });
+
+    // Expose ke global window
+    window.openNotifSettingsModal = openNotifSettingsModal;
+    window.closeNotifSettingsModal = closeNotifSettingsModal;
+    window.handleNotifSettingsOverlayClick = handleNotifSettingsOverlayClick;
+    window.handleNotifModalOverlayClick = handleNotifSettingsOverlayClick;
+    window.sirani_selectSound = sirani_selectSound;
+    window.sirani_playPreviewSound = sirani_playPreviewSound;
+    window.sirani_updateVolume = sirani_updateVolume;
+    window.sirani_saveSoundSettings = sirani_saveSoundSettings;
+    window.sirani_testNotification = sirani_testNotification;
+    window.sirani_handleCustomSoundUpload = sirani_handleCustomSoundUpload;
+    window.sirani_removeCustomSound = sirani_removeCustomSound;
+    window.toggleAndroidSoundGuide = toggleAndroidSoundGuide;
+  </script>
 </body>
 </html>

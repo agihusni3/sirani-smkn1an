@@ -1751,3 +1751,409 @@
   flex-shrink: 0;
   margin-top: 2px;
 }
+
+/* ════════════════════════════════════════════════════════
+   SIRANI — PENGATURAN SUARA NOTIFIKASI & STATUS WAJIB AKTIF
+════════════════════════════════════════════════════════ */
+.sirani-notif-status-box {
+  background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
+  border: 1.5px solid #86efac;
+  border-radius: 16px;
+  padding: 16px;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+.notif-status-left {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+.notif-status-pulse-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: #22c55e;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+  box-shadow: 0 4px 14px rgba(34, 197, 94, 0.35);
+  position: relative;
+}
+.notif-status-pulse-icon::after {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border-radius: 16px;
+  border: 2px solid rgba(34, 197, 94, 0.4);
+  animation: pulseStatusRing 2s infinite;
+}
+@keyframes pulseStatusRing {
+  0% { transform: scale(0.95); opacity: 0.8; }
+  50% { transform: scale(1.15); opacity: 0; }
+  100% { transform: scale(0.95); opacity: 0; }
+}
+.notif-status-title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 4px;
+}
+.notif-status-title {
+  font-size: 14px;
+  font-weight: 800;
+  color: #14532d;
+}
+.notif-lock-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: #dcfce7;
+  color: #15803d;
+  font-size: 11px;
+  font-weight: 800;
+  padding: 2px 8px;
+  border-radius: 100px;
+  border: 1px solid #86efac;
+}
+.notif-status-desc {
+  font-size: 12px;
+  color: #166534;
+  line-height: 1.45;
+}
+.notif-locked-toggle {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+.toggle-switch-locked {
+  width: 48px;
+  height: 26px;
+  background: #22c55e;
+  border-radius: 100px;
+  position: relative;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.15);
+  cursor: not-allowed;
+}
+.toggle-switch-locked::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  width: 20px;
+  height: 20px;
+  background: #ffffff;
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+.toggle-locked-label {
+  font-size: 10px;
+  font-weight: 800;
+  color: #15803d;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Sound Options */
+.sirani-sound-section-title {
+  font-size: 13px;
+  font-weight: 800;
+  color: #0f172a;
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.sirani-sound-section-desc {
+  font-size: 12px;
+  color: #64748b;
+  margin-bottom: 12px;
+}
+.sirani-sound-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.sirani-sound-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  background: #f8fafc;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 14px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.sirani-sound-item:hover {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+}
+.sirani-sound-item.selected {
+  background: #eff6ff;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 1px #3b82f6;
+}
+.sound-item-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.sound-radio-circle {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid #cbd5e1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+}
+.sirani-sound-item.selected .sound-radio-circle {
+  border-color: #3b82f6;
+  background: #3b82f6;
+}
+.sound-radio-circle::after {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #ffffff;
+  display: none;
+}
+.sirani-sound-item.selected .sound-radio-circle::after {
+  display: block;
+}
+.sound-item-icon {
+  font-size: 16px;
+  color: #3b82f6;
+}
+.sound-item-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: #1e293b;
+}
+.sound-item-desc {
+  font-size: 11px;
+  color: #64748b;
+}
+.btn-sound-preview {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  background: #ffffff;
+  border: 1.5px solid #cbd5e1;
+  color: #3b82f6;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s;
+  flex-shrink: 0;
+}
+.btn-sound-preview:hover {
+  background: #3b82f6;
+  color: #ffffff;
+  border-color: #3b82f6;
+}
+.btn-sound-preview.playing {
+  background: #ef4444;
+  color: #ffffff;
+  border-color: #ef4444;
+}
+
+/* Custom Sound Upload Box */
+.sirani-custom-sound-box {
+  background: #faf5ff;
+  border: 1.5px dashed #c084fc;
+  border-radius: 14px;
+  padding: 12px 14px;
+  margin-top: 6px;
+}
+.custom-sound-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+.custom-sound-title {
+  font-size: 12px;
+  font-weight: 800;
+  color: #6b21a8;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.custom-sound-info {
+  font-size: 11px;
+  color: #7e22ce;
+  line-height: 1.4;
+  margin-bottom: 8px;
+}
+.custom-sound-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.btn-upload-sound {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  background: #9333ea;
+  color: #ffffff;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.btn-upload-sound:hover {
+  background: #7e22ce;
+}
+.custom-sound-filename {
+  font-size: 11px;
+  font-weight: 600;
+  color: #4c1d95;
+  background: #ede9fe;
+  padding: 4px 8px;
+  border-radius: 6px;
+  max-width: 180px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Volume Slider */
+.sirani-volume-box {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 12px 16px;
+  margin-bottom: 16px;
+}
+.volume-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+.volume-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: #334155;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.volume-val-badge {
+  font-size: 11px;
+  font-weight: 800;
+  color: #2563eb;
+  background: #dbeafe;
+  padding: 2px 8px;
+  border-radius: 100px;
+}
+.volume-slider {
+  width: 100%;
+  accent-color: #3b82f6;
+  cursor: pointer;
+}
+
+/* Action Buttons */
+.sirani-notif-modal-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 16px;
+}
+.btn-test-notif-full {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 12px 20px;
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+  color: #ffffff;
+  border: none;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);
+  transition: all 0.15s ease;
+}
+.btn-test-notif-full:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(37, 99, 235, 0.45);
+}
+.btn-save-sound-setting {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 11px 20px;
+  background: #22c55e;
+  color: #ffffff;
+  border: none;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.btn-save-sound-setting:hover {
+  background: #16a34a;
+}
+
+/* Android System Guide Accordion */
+.android-sound-guide-box {
+  margin-top: 14px;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #ffffff;
+}
+.android-guide-toggle {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  background: #f8fafc;
+  border: none;
+  font-size: 11px;
+  font-weight: 700;
+  color: #475569;
+  cursor: pointer;
+}
+.android-guide-content {
+  padding: 12px 14px;
+  font-size: 11px;
+  color: #64748b;
+  line-height: 1.5;
+  background: #ffffff;
+  border-top: 1px solid #f1f5f9;
+}
+.android-guide-steps-list {
+  margin: 6px 0 0 16px;
+  padding: 0;
+}
+.android-guide-steps-list li {
+  margin-bottom: 4px;
+}

@@ -1,7 +1,7 @@
 // ══════════════════════════════════════════════════════════════
 // SIRANI Portal Wali Murid — Service Worker (PWA Offline Ready)
 // ══════════════════════════════════════════════════════════════
-const CACHE_NAME = 'sirani-ortu-v2';
+const CACHE_NAME = 'sirani-ortu-v3';
 const OFFLINE_URL = '/cek-presensi';
 
 // Aset statis yang di-cache saat install (shell app)
@@ -12,6 +12,10 @@ const STATIC_ASSETS = [
   '/icons/icon-512.png',
   '/icons/maskable-icon-512.png',
   '/logo.png',
+  '/sounds/notif-chime.wav',
+  '/sounds/notif-bell.wav',
+  '/sounds/notif-soft.wav',
+  '/sounds/notif-alert.wav',
 ];
 
 // ── INSTALL: Cache shell statis ──────────────────────────────
@@ -133,9 +137,12 @@ self.addEventListener('push', (event) => {
     icon: '/icons/icon-192.png',
     badge: '/icons/icon-192.png',
     image: data.image || null,
-    vibrate: [200, 100, 200],
+    vibrate: [300, 100, 300, 100, 400],
+    tag: data.tag || ('sirani-notif-' + Date.now()),
+    renotify: true,
     data: {
       url: data.url || '/cek-presensi',
+      sound: data.sound || 'default',
     },
     actions: [
       { action: 'view', title: '📋 Lihat Presensi' },
@@ -143,9 +150,35 @@ self.addEventListener('push', (event) => {
     ],
   };
 
+  const notifyClients = clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
+    for (const client of clientList) {
+      client.postMessage({
+        type: 'SIRANI_PUSH_RECEIVED',
+        title: data.title || 'SIRANI — Presensi Siswa',
+        body: data.body || '',
+      });
+    }
+  });
+
   event.waitUntil(
-    self.registration.showNotification(data.title || 'SIRANI — Presensi Siswa', options)
+    Promise.all([
+      self.registration.showNotification(data.title || 'SIRANI — Presensi Siswa', options),
+      notifyClients
+    ])
   );
+});
+
+// ── MESSAGE LISTENER: Sinkronisasi pengaturan suara dari client ─
+self.addEventListener('message', (event) => {
+  if (event.data && event.data.type === 'SIRANI_SET_SOUND_PREFERENCE') {
+    if (event.source && event.source.postMessage) {
+      event.source.postMessage({
+        type: 'SIRANI_SOUND_PREFERENCE_ACK',
+        sound: event.data.sound,
+        volume: event.data.volume,
+      });
+    }
+  }
 });
 
 // ── NOTIFICATION CLICK: Buka halaman portal ─────────────────
