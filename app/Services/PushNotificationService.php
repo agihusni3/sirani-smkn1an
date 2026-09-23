@@ -137,7 +137,7 @@ class PushNotificationService
     /**
      * Kirim payload terenkripsi ke browser/Android menggunakan WebPush library
      */
-    protected static function dispatchPush(PushSubscription $sub, array $payload): bool
+    public static function dispatchPush(PushSubscription $sub, array $payload): bool
     {
         try {
             $vapidKeys = self::getVapidKeys();

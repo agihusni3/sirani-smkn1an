@@ -75,4 +75,50 @@ class PushSubscriptionController extends Controller
             'message' => 'Langganan notifikasi dinonaktifkan.',
         ]);
     }
+
+    /**
+     * Uji coba pengiriman push nyata dari server ke perangkat (dengan delay agar bisa dites saat HP dikunci)
+     */
+    public function testBackground(Request $request)
+    {
+        $endpoint = trim($request->input('endpoint') ?: '');
+        $nisn = trim($request->input('nisn') ?: '');
+        $delay = min(15, max(0, (int) $request->input('delay', 5)));
+
+        $sub = null;
+        if ($endpoint) {
+            $sub = PushSubscription::where('endpoint', $endpoint)->where('is_active', true)->first();
+        }
+        if (!$sub && $nisn) {
+            $sub = PushSubscription::where('nisn', $nisn)->where('is_active', true)->latest()->first();
+        }
+
+        if (!$sub) {
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'Perangkat ini belum terdaftar di database server. Pastikan Anda menekan tombol "Izinkan di HP Ini" atau muat ulang portal saat izin aktif.',
+            ], 404);
+        }
+
+        if ($delay > 0) {
+            sleep($delay);
+        }
+
+        $payload = [
+            'title'     => '🔔 SIRANI — Tes Notifikasi Background',
+            'body'      => 'Hebat! Notifikasi latar belakang berhasil diterima di HP Anda saat aplikasi tertutup (seperti WhatsApp).',
+            'url'       => '/cek-presensi',
+            'icon'      => '/icons/icon-192.png',
+            'badge'     => '/icons/icon-192.png',
+            'vibrate'   => [300, 100, 300, 100, 400],
+            'timestamp' => now()->timestamp,
+        ];
+
+        $success = PushNotificationService::dispatchPush($sub, $payload);
+
+        return response()->json([
+            'status'  => $success ? 'success' : 'error',
+            'message' => $success ? 'Push notifikasi latar belakang berhasil dikirim ke HP Anda!' : 'Gagal mengirim push ke browser/FCM.',
+        ]);
+    }
 }

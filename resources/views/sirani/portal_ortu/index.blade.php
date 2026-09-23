@@ -1666,11 +1666,16 @@
           }
         });
       } else if (Notification.permission === 'default') {
-        // Belum pernah ditanya — tampilkan banner ajakan aktifkan
-        if (nisn && !localStorage.getItem('sirani_push_dismissed_' + nisn)) {
-          setTimeout(function() {
-            if (bannerNotif) bannerNotif.style.display = 'flex';
-          }, 1500);
+        // Belum pernah ditanya — langsung tampilkan banner ajakan aktifkan
+        if (bannerNotif) bannerNotif.style.display = 'flex';
+      } else if (Notification.permission === 'denied') {
+        // Izin diblokir di browser HP
+        if (bannerNotif) {
+          bannerNotif.style.display = 'flex';
+          const txt = bannerNotif.querySelector('.sirani-notif-banner-text span');
+          if (txt) txt.innerHTML = '<span style="color:#ef4444;font-weight:700;">Notifikasi diblokir di browser HP Anda.</span> Ketuk ikon gembok pada bilah alamat browser &gt; Izin &gt; Ubah Notifikasi menjadi Izinkan.';
+          const btn = document.getElementById('btnAktifkanNotif');
+          if (btn) btn.innerHTML = '<i class="bi bi-info-circle-fill"></i> Diblokir di Browser';
         }
       }
     }
@@ -2478,8 +2483,11 @@
 
         {{-- Action Buttons --}}
         <div class="sirani-notif-modal-actions">
-          <button type="button" onclick="sirani_testNotification()" class="btn-test-notif-full">
-            <i class="bi bi-bell-fill"></i> Tes Kirim Notifikasi &amp; Suara ke HP
+          <button type="button" id="btnTestBackgroundPush" onclick="sirani_testBackgroundPush()" class="btn-test-notif-full" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
+            <i class="bi bi-broadcast"></i> Tes Notifikasi Latar Belakang (Tutup HP 5 Detik)
+          </button>
+          <button type="button" onclick="sirani_testNotification()" class="btn-test-notif-full" style="background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);">
+            <i class="bi bi-bell-fill"></i> Tes Suara &amp; Notifikasi Layar Sekarang
           </button>
           <button type="button" onclick="sirani_saveSoundSettings()" class="btn-save-sound-setting">
             <i class="bi bi-check-lg"></i> Simpan Pilihan Suara
@@ -2878,6 +2886,73 @@
       }
     }
 
+    async function sirani_testBackgroundPush() {
+      const btn = document.getElementById('btnTestBackgroundPush');
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Memeriksa Pendaftaran...';
+      }
+
+      if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
+        alert('Browser HP ini tidak mendukung Web Push Notification.');
+        if (btn) { btn.disabled = false; btn.innerHTML = '<i class="bi bi-broadcast"></i> Tes Notifikasi Latar Belakang (Tutup HP 5 Detik)'; }
+        return;
+      }
+
+      try {
+        const swReg = await navigator.serviceWorker.ready;
+        let sub = await swReg.pushManager.getSubscription();
+
+        if (!sub) {
+          if (btn) btn.innerHTML = '<i class="bi bi-bell"></i> Mendaftarkan Perangkat...';
+          await sirani_requestPushPermission();
+          sub = await swReg.pushManager.getSubscription();
+        }
+
+        if (!sub) {
+          alert('Perangkat belum memiliki izin notifikasi. Silakan izinkan notifikasi pada banner di atas terlebih dahulu.');
+          if (btn) { btn.disabled = false; btn.innerHTML = '<i class="bi bi-broadcast"></i> Tes Notifikasi Latar Belakang (Tutup HP 5 Detik)'; }
+          return;
+        }
+
+        const subJson = sub.toJSON();
+        const nisn = sirani_getNisnAktif();
+
+        // Pastikan token tersimpan di server
+        await sirani_syncSubscriptionToServer(sub, nisn);
+
+        alert('🔔 UJI COBA NOTIFIKASI LATAR BELAKANG\n\nSetelah menekan tombol OK:\n1. SEGERA KUNCI LAYAR HP Anda atau KELUARKAN APLIKASI ini sekarang.\n2. Server akan menembakkan notifikasi nyata dalam waktu 5 detik (seperti WhatsApp).\n3. Tunggu hingga HP bergetar / berdering di layar kunci!');
+
+        if (btn) {
+          btn.innerHTML = '<i class="bi bi-stopwatch"></i> Mengirim dalam 5 detik... Kunci HP Sekarang!';
+        }
+
+        const resp = await fetch('/api/push-test-background', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+          body: JSON.stringify({
+            endpoint: subJson.endpoint,
+            nisn: nisn,
+            delay: 5
+          })
+        });
+
+        const resData = await resp.json();
+        console.log('Hasil tes background push:', resData);
+
+      } catch (err) {
+        console.error('Error test background push:', err);
+        alert('Gagal uji coba: ' + err.message);
+      } finally {
+        setTimeout(function() {
+          if (btn) {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="bi bi-broadcast"></i> Tes Notifikasi Latar Belakang (Tutup HP 5 Detik)';
+          }
+        }, 6000);
+      }
+    }
+
     function toggleAndroidSoundGuide() {
       const body = document.getElementById('androidGuideBody');
       const chev = document.getElementById('guideChevron');
@@ -2929,6 +3004,7 @@
     window.sirani_updateVolume = sirani_updateVolume;
     window.sirani_saveSoundSettings = sirani_saveSoundSettings;
     window.sirani_testNotification = sirani_testNotification;
+    window.sirani_testBackgroundPush = sirani_testBackgroundPush;
     window.sirani_handleCustomSoundUpload = sirani_handleCustomSoundUpload;
     window.sirani_removeCustomSound = sirani_removeCustomSound;
     window.toggleAndroidSoundGuide = toggleAndroidSoundGuide;
