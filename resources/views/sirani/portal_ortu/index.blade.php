@@ -1547,12 +1547,39 @@
       });
     }
 
+    const BLADE_ACTIVE_NISN = "{{ !empty($siswa?->nisn) ? $siswa->nisn : ($keyword ?: '') }}";
+
     /**
-     * Ambil NISN dari URL atau localStorage
+     * Ambil NISN dari Blade, URL path, query params, atau localStorage
      */
     function sirani_getNisnAktif() {
+      if (BLADE_ACTIVE_NISN && BLADE_ACTIVE_NISN.trim() !== '') {
+        const cleanBlade = BLADE_ACTIVE_NISN.trim();
+        try { localStorage.setItem('sirani_last_nisn', cleanBlade); } catch(e){}
+        return cleanBlade;
+      }
+
       const params = new URLSearchParams(window.location.search);
-      return params.get('keyword') || params.get('nisn') || localStorage.getItem('sirani_last_nisn') || '';
+      const qNisn = params.get('keyword') || params.get('nisn') || '';
+      if (qNisn && qNisn.trim() !== '') {
+        const cleanQ = qNisn.trim();
+        try { localStorage.setItem('sirani_last_nisn', cleanQ); } catch(e){}
+        return cleanQ;
+      }
+
+      // Deteksi URL path /presensi-siswa/{nisn} atau /cek-presensi/{nisn}
+      const pathParts = window.location.pathname.split('/');
+      const lastPart = pathParts[pathParts.length - 1];
+      if (/^\d{8,15}$/.test(lastPart)) {
+        try { localStorage.setItem('sirani_last_nisn', lastPart); } catch(e){}
+        return lastPart;
+      }
+
+      try {
+        return localStorage.getItem('sirani_last_nisn') || '';
+      } catch (e) {
+        return '';
+      }
     }
 
     /**

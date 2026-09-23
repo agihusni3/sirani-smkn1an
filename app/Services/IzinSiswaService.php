@@ -73,27 +73,39 @@ class IzinSiswaService
                 );
             }
 
-            // 4. Buat draf notifikasi orang tua (Izin / Sakit)
+            // 4. Buat draf notifikasi orang tua & Kirim Push Notifikasi
             try {
                 $siswa = \App\Models\Siswa::find($siswaId);
-                if ($siswa && in_array($jenis, ['sakit', 'izin'])) {
+                if ($siswa) {
                     \App\Services\NotifikasiDraftService::buatDraft($siswa, $jenis, [
                         'tanggal'    => $tanggal,
                         'keterangan' => $keterangan ?: 'Izin tercatat oleh ' . $disetujuiOleh,
                     ], $disetujuiOleh);
 
-                    // Push Notifikasi Real-Time ke HP Orang Tua → Izin / Sakit
+                    // Push Notifikasi Real-Time ke HP Orang Tua
                     try {
                         if (!empty($siswa->nisn)) {
-                            $labelJenis  = $jenis === 'sakit' ? 'Sakit' : 'Izin';
-                            $ikon        = $jenis === 'sakit' ? '🤒' : '📋';
+                            $labelJenis = match($jenis) {
+                                'sakit'                      => 'Sakit',
+                                'izin'                       => 'Izin',
+                                'dispensasi'                 => 'Dispensasi',
+                                'pulang_cepat', 'pulang_awal' => 'Pulang Awal',
+                                default                      => ucfirst(str_replace('_', ' ', $jenis)),
+                            };
+                            $ikon = match($jenis) {
+                                'sakit'                      => '🤒',
+                                'izin'                       => '📋',
+                                'dispensasi'                 => '🎖️',
+                                'pulang_cepat', 'pulang_awal' => '🏃',
+                                default                      => '📢',
+                            };
                             $keteranganPesan = $keterangan
                                 ? ": {$keterangan}"
                                 : " — tercatat oleh {$disetujuiOleh}.";
                             PushNotificationService::sendToSiswa(
                                 $siswa->nisn,
-                                "{$ikon} {$labelJenis}: {$siswa->nama}",
-                                "Ananda tercatat {$labelJenis} pada {$tanggal}{$keteranganPesan} Ketuk untuk lihat riwayat absensi.",
+                                "{$ikon} Perizinan: {$siswa->nama} ({$labelJenis})",
+                                "Ananda tercatat {$labelJenis} pada {$tanggal}{$keteranganPesan} Ketuk untuk buka portal.",
                                 '/presensi-siswa/' . urlencode($siswa->nisn)
                             );
                         }

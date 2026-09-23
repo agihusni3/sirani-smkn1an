@@ -58,11 +58,21 @@ class PushNotificationService
     {
         if (empty($nisn)) return 0;
 
+        // 1. Ambil langganan perangkat aktif yang terikat dengan NISN ini
         $subscriptions = PushSubscription::where('nisn', $nisn)
             ->where('is_active', true)
             ->get();
 
+        // 2. Fallback untuk pengujian/demo: jika belum ada perangkat terdaftar dengan NISN ini,
+        // cari perangkat aktif yang belum terikat NISN tertentu (nisn is null)
         if ($subscriptions->isEmpty()) {
+            $subscriptions = PushSubscription::whereNull('nisn')
+                ->where('is_active', true)
+                ->get();
+        }
+
+        if ($subscriptions->isEmpty()) {
+            Log::info("Push sendToSiswa: Tidak ada perangkat aktif untuk NISN {$nisn}.");
             return 0;
         }
 
@@ -72,6 +82,9 @@ class PushNotificationService
             'url'       => $url ?: '/presensi-siswa/' . urlencode($nisn),
             'icon'      => $icon ?: '/icons/icon-192.png',
             'badge'     => '/icons/icon-192.png',
+            'vibrate'   => [500, 200, 500, 200, 500],
+            'sound'     => 'chime',
+            'tag'       => 'sirani-siswa-' . $nisn . '-' . time(),
             'nisn'      => $nisn,
             'timestamp' => now()->timestamp,
         ];
@@ -83,6 +96,7 @@ class PushNotificationService
             }
         }
 
+        Log::info("Push sendToSiswa berhasil dikirim ke {$sentCount} perangkat untuk NISN: {$nisn}");
         return $sentCount;
     }
 

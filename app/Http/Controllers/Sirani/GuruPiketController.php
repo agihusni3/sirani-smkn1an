@@ -357,6 +357,40 @@ class GuruPiketController extends Controller
                 $siswaObj = Siswa::find($siswaId);
                 if ($siswaObj) {
                     \App\Services\NotifikasiDraftService::sinkronkanPresensiSiswa($siswaObj, $absensi->tanggal, $status, $jamMasuk, $ketFinal);
+
+                    // Kirim Notifikasi Push Real-Time ke Portal & HP Orang Tua
+                    try {
+                        if (!empty($siswaObj->nisn)) {
+                            $labelStatus = match($status) {
+                                'sakit'     => 'Sakit',
+                                'izin'      => 'Izin',
+                                'dispen'    => 'Dispensasi',
+                                'hadir'     => 'Hadir',
+                                'terlambat' => 'Terlambat',
+                                'alpha'     => 'Alpha',
+                                'bolos'     => 'Bolos',
+                                default     => ucfirst($status),
+                            };
+                            $ikon = match($status) {
+                                'sakit'     => '🤒',
+                                'izin'      => '📋',
+                                'dispen'    => '🎖️',
+                                'hadir'     => '✅',
+                                'terlambat' => '⏰',
+                                'alpha'     => '⚠️',
+                                'bolos'     => '🚨',
+                                default     => '📢',
+                            };
+                            \App\Services\PushNotificationService::sendToSiswa(
+                                $siswaObj->nisn,
+                                "{$ikon} Presensi Siswa: {$siswaObj->nama} ({$labelStatus})",
+                                "Data kehadiran ananda tanggal {$absensi->tanggal} diperbarui menjadi {$labelStatus}. Catatan: {$ketFinal}",
+                                '/presensi-siswa/' . urlencode($siswaObj->nisn)
+                            );
+                        }
+                    } catch (\Throwable $e) {
+                        \Illuminate\Support\Facades\Log::warning("Gagal kirim push notif koreksi: " . $e->getMessage());
+                    }
                 }
             }
         }
@@ -471,6 +505,40 @@ class GuruPiketController extends Controller
         // Sinkronisasi Buku Kasus Disiplin & Sinkronisasi Notifikasi Presensi WhatsApp
         KasusDisiplin::syncFromPresensi($siswa->id);
         \App\Services\NotifikasiDraftService::sinkronkanPresensiSiswa($siswa, $today, $status, $jamMasuk, $ketFinal);
+
+        // Kirim Notifikasi Push Real-Time ke Portal & HP Orang Tua
+        try {
+            if (!empty($siswa->nisn)) {
+                $labelStatus = match($status) {
+                    'sakit'     => 'Sakit',
+                    'izin'      => 'Izin',
+                    'dispen'    => 'Dispensasi',
+                    'hadir'     => 'Hadir',
+                    'terlambat' => 'Terlambat',
+                    'alpha'     => 'Alpha',
+                    'bolos'     => 'Bolos',
+                    default     => ucfirst($status),
+                };
+                $ikon = match($status) {
+                    'sakit'     => '🤒',
+                    'izin'      => '📋',
+                    'dispen'    => '🎖️',
+                    'hadir'     => '✅',
+                    'terlambat' => '⏰',
+                    'alpha'     => '⚠️',
+                    'bolos'     => '🚨',
+                    default     => '📢',
+                };
+                \App\Services\PushNotificationService::sendToSiswa(
+                    $siswa->nisn,
+                    "{$ikon} Validasi Presensi: {$siswa->nama} ({$labelStatus})",
+                    "Presensi ananda tanggal {$today} tercatat sebagai {$labelStatus}. Catatan: {$ketFinal}",
+                    '/presensi-siswa/' . urlencode($siswa->nisn)
+                );
+            }
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning("Gagal kirim push notif validasi: " . $e->getMessage());
+        }
 
         return redirect()->back()->with('success', "Presensi ananda {$siswa->nama} berhasil divalidasi sebagai: " . strtoupper($status));
     }
