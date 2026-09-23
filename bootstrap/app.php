@@ -30,6 +30,8 @@ return Application::configure(basePath: dirname(__DIR__))
             'login/*',
             '/logout',
             'logout',
+            '/notifikasi/demo-push-walimurid',
+            'notifikasi/demo-push-walimurid',
             '/api/*',
             'api/*',
         ]);

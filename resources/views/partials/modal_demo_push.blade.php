@@ -182,7 +182,7 @@
     }
 
     try {
-      const res = await fetch('/notifikasi/subscribers-count', {
+      const res = await fetch('/api/push-subscribers-count', {
         headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' }
       });
       if (!res.ok) throw new Error('HTTP ' + res.status);
@@ -221,8 +221,8 @@
     if (resBox) resBox.style.display = 'none';
 
     try {
-      const csrf = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
-      const response = await fetch('/notifikasi/demo-push-walimurid', {
+      const csrf = '{{ csrf_token() }}' || document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+      const response = await fetch('/api/push-broadcast-demo', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -233,7 +233,12 @@
         body: JSON.stringify({ title, body, url })
       });
 
-      const res = await response.json();
+      let res;
+      try {
+        res = await response.json();
+      } catch (e) {
+        res = { status: 'error', message: 'Respon server tidak valid (' + response.status + ')' };
+      }
 
       if (resBox) {
         resBox.style.display = 'flex';
