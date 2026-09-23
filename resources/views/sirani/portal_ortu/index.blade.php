@@ -159,52 +159,6 @@
       </section>
     @endif
 
-    {{-- ══════════════════════════════════════════════════════════
-         BANNER NOTIFIKASI & PENGATURAN SUARA (Selalu Tampil)
-    ══════════════════════════════════════════════════════════ --}}
-    {{-- Banner jika izin browser di HP belum diberikan --}}
-    <div id="siraniBannerNotif" class="sirani-notif-banner" style="display:none;">
-      <div class="sirani-notif-banner-left">
-        <div class="sirani-notif-banner-icon"><i class="bi bi-bell-fill"></i></div>
-        <div class="sirani-notif-banner-text">
-          <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
-            <strong>Notifikasi Presensi Sekolah</strong>
-            <span class="badge-notif-wajib"><i class="bi bi-shield-lock-fill"></i> Wajib Aktif</span>
-          </div>
-          <span>Pemberitahuan tap gerbang otomatis langsung terkirim ke HP saat anak hadir atau pulang.</span>
-        </div>
-      </div>
-      <div class="sirani-notif-banner-right">
-        <button type="button" id="btnAktifkanNotif" onclick="sirani_requestPushPermission()" class="btn-notif-aktifkan">
-          <i class="bi bi-bell-fill"></i> Izinkan di HP Ini
-        </button>
-        <button type="button" onclick="openNotifSettingsModal()" class="btn-notif-settings-icon" title="Atur Suara & Nada Dering">
-          <i class="bi bi-sliders"></i>
-        </button>
-      </div>
-    </div>
-
-    {{-- Banner Status Notifikasi HP Aktif & Terhubung --}}
-    <div id="siraniBannerNotifAktif" class="sirani-notif-banner sirani-notif-aktif" style="display:none;">
-      <div class="sirani-notif-banner-left">
-        <div class="sirani-notif-banner-icon sirani-notif-icon-green">
-          <i class="bi bi-bell-fill"></i>
-        </div>
-        <div class="sirani-notif-banner-text">
-          <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
-            <strong>Notifikasi Selalu Aktif ✓</strong>
-            <span class="badge-notif-wajib"><i class="bi bi-shield-lock-fill"></i> Wajib Sekolah</span>
-          </div>
-          <span>HP ini terhubung & otomatis menerima bunyi pemberitahuan kehadiran siswa.</span>
-        </div>
-      </div>
-      <div class="sirani-notif-banner-right">
-        <button type="button" onclick="openNotifSettingsModal()" class="btn-notif-atur-suara">
-          <i class="bi bi-music-note-beamed"></i> Atur Suara
-        </button>
-      </div>
-    </div>
-
     @if($siswa)
 
 
@@ -1756,31 +1710,16 @@
       if (!('PushManager' in window) || !('Notification' in window)) return;
       const nisn = sirani_getNisnAktif();
 
-      const bannerNotif      = document.getElementById('siraniBannerNotif');
-      const bannerNotifAktif = document.getElementById('siraniBannerNotifAktif');
-
       if (Notification.permission === 'granted') {
         sirani_getOrRegisterPushSubscription({ forceRefresh: false })
           .then(async function(sub) {
             if (sub) {
               await sirani_syncSubscriptionToServer(sub, nisn);
-              if (bannerNotifAktif) bannerNotifAktif.style.display = 'flex';
-              if (bannerNotif)      bannerNotif.style.display      = 'none';
             }
           })
           .catch(function(err) {
             console.warn('Auto sync push subscription error:', err);
           });
-      } else if (Notification.permission === 'default') {
-        if (bannerNotif) bannerNotif.style.display = 'flex';
-      } else if (Notification.permission === 'denied') {
-        if (bannerNotif) {
-          bannerNotif.style.display = 'flex';
-          const txt = bannerNotif.querySelector('.sirani-notif-banner-text span');
-          if (txt) txt.innerHTML = '<span style="color:#ef4444;font-weight:700;">Notifikasi diblokir di browser HP Anda.</span> Ketuk ikon gembok pada bilah alamat browser &gt; Izin &gt; Ubah Notifikasi menjadi Izinkan.';
-          const btn = document.getElementById('btnAktifkanNotif');
-          if (btn) btn.innerHTML = '<i class="bi bi-info-circle-fill"></i> Diblokir di Browser';
-        }
       }
     }
 
@@ -1788,16 +1727,12 @@
      * Minta izin notifikasi dan daftarkan perangkat
      */
     async function sirani_requestPushPermission(isUserAction = true) {
-      const btn = document.getElementById('btnAktifkanNotif');
-      if (btn) { btn.disabled = true; btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Memproses...'; }
-
       try {
         const permission = await Notification.requestPermission();
         if (permission !== 'granted') {
           if (isUserAction) {
             alert('Izin notifikasi belum diizinkan. Silakan aktifkan izin notifikasi pada bilah alamat / setelan HP Anda.');
           }
-          if (btn) { btn.disabled = false; btn.innerHTML = '<i class="bi bi-bell-fill"></i> Izinkan di HP Ini'; }
           return null;
         }
 
@@ -1807,15 +1742,6 @@
           await sirani_syncSubscriptionToServer(subscription, nisn);
         }
 
-        // Update UI
-        const bannerNotif      = document.getElementById('siraniBannerNotif');
-        const bannerNotifAktif = document.getElementById('siraniBannerNotifAktif');
-        if (bannerNotif)      bannerNotif.style.display      = 'none';
-        if (bannerNotifAktif) bannerNotifAktif.style.display = 'flex';
-
-        // Hapus flag dismiss
-        if (nisn) localStorage.removeItem('sirani_push_dismissed_' + nisn);
-
         if (isUserAction) {
           alert('Notifikasi Berhasil Diaktifkan!\n\nHP Anda sekarang siap menerima pemberitahuan kehadiran siswa dan pengumuman sekolah langsung di bilah notifikasi.');
         }
@@ -1824,7 +1750,6 @@
 
       } catch (err) {
         console.error('Gagal subscribe push:', err);
-        if (btn) { btn.disabled = false; btn.innerHTML = '<i class="bi bi-bell-fill"></i> Izinkan di HP Ini'; }
         if (isUserAction) {
           alert('Gagal mengaktifkan notifikasi:\n\n' + err.message);
         }
@@ -1848,10 +1773,6 @@
             body: JSON.stringify({ endpoint }),
           });
         }
-        const bannerNotif      = document.getElementById('siraniBannerNotif');
-        const bannerNotifAktif = document.getElementById('siraniBannerNotifAktif');
-        if (bannerNotifAktif) bannerNotifAktif.style.display = 'none';
-        if (bannerNotif)      bannerNotif.style.display      = 'flex';
         const nisn = sirani_getNisnAktif();
         if (nisn) localStorage.setItem('sirani_push_dismissed_' + nisn, '1');
       } catch (err) {
@@ -3064,12 +2985,6 @@
         if (sub) {
           await sirani_syncSubscriptionToServer(sub, nisn);
         }
-
-        // Update UI
-        const bannerNotif      = document.getElementById('siraniBannerNotif');
-        const bannerNotifAktif = document.getElementById('siraniBannerNotifAktif');
-        if (bannerNotif)      bannerNotif.style.display      = 'none';
-        if (bannerNotifAktif) bannerNotifAktif.style.display = 'flex';
 
         alert('✅ Pendaftaran Notifikasi Berhasil Diperbarui!\n\nToken push perangkat Anda telah diperbarui dan siap menerima notifikasi latar belakang.');
       } catch (err) {
