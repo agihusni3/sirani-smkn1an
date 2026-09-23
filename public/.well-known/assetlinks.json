@@ -1,0 +1,8 @@
+[{
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "id.sch.smkn1airnaningan.sirani",
+        "sha256_cert_fingerprints": ["FA:0E:50:6B:FE:50:DC:39:5E:3F:26:75:BE:5F:93:E6:34:96:53:B4:37:4B:BD:DC:36:EE:8A:93:0D:12:C1:52"]
+      }
+    }]
