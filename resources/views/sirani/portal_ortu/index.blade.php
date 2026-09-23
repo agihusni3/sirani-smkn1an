@@ -249,7 +249,18 @@
           <div class="portal-tab-icon">
             <i class="bi bi-megaphone-fill"></i>
             @if(isset($pengumumans) && $pengumumans->count() > 0)
-              <span class="portal-tab-badge info">{{ $pengumumans->count() }}</span>
+              <span id="badgeTabPengumuman" class="portal-tab-badge info">{{ $pengumumans->count() }}</span>
+              <script>
+                (function(){
+                  try {
+                    var lastId = localStorage.getItem('sirani_last_read_pengumuman_id');
+                    if (lastId && lastId === '{{ $pengumumans->first()->id ?? 0 }}') {
+                      var b = document.getElementById('badgeTabPengumuman');
+                      if (b) b.style.display = 'none';
+                    }
+                  } catch(e){}
+                })();
+              </script>
             @endif
           </div>
           <div class="portal-tab-content">
@@ -1023,9 +1034,32 @@
         if (btnAbsen) btnAbsen.classList.remove('active');
         if (btnDisiplin) btnDisiplin.classList.remove('active');
         if (btnPengumuman) btnPengumuman.classList.add('active');
+
+        // Hilangkan angka notifikasi saat tab pengumuman dibuka
+        markPengumumanAsRead();
       }
     }
     window.switchPortalMainTab = switchPortalMainTab;
+
+    function markPengumumanAsRead() {
+      const badge = document.getElementById('badgeTabPengumuman') || document.querySelector('#btnTabPengumuman .portal-tab-badge');
+      if (badge) {
+        badge.style.transition = 'opacity 0.25s ease, transform 0.25s ease';
+        badge.style.opacity = '0';
+        badge.style.transform = 'scale(0.5)';
+        setTimeout(function() {
+          badge.style.display = 'none';
+        }, 250);
+      }
+      @if(isset($pengumumans) && $pengumumans->count() > 0)
+        try {
+          const latestId = '{{ $pengumumans->first()->id ?? 0 }}';
+          localStorage.setItem('sirani_last_read_pengumuman_id', latestId);
+          localStorage.setItem('sirani_last_read_pengumuman_count', '{{ $pengumumans->count() }}');
+        } catch(e) {}
+      @endif
+    }
+    window.markPengumumanAsRead = markPengumumanAsRead;
 
     @if($siswa)
     // ===== QR CODE & BARCODE SCANNER KIOSK & AUTO-ZOOM MAX BRIGHTNESS =====
