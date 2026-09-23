@@ -102,10 +102,19 @@ Route::middleware('throttle:300,1')->group(function () {
                 'Content-Type' => 'application/vnd.android.package-archive',
             ]);
         }
-        // APK belum tersedia: redirect ke halaman monitoring dengan pesan
-        return redirect()->route('portal.ortu.index')
-            ->with('info', 'File APK sedang dipersiapkan. Silakan install melalui browser Chrome di HP Android Anda dengan menekan tombol "Instal" di bilah bawah browser.');
+        // APK belum tersedia: redirect dan otomatis buka modal instalasi
+        return redirect()->route('portal.ortu.index', ['open_install' => 1, 'apk_missing' => 1]);
     })->name('download.apk');
+
+    // Cek Ketersediaan File APK
+    Route::get('/api/check-apk', function () {
+        $apkPath = public_path('downloads/SIRANI_SMKN1AN.apk');
+        $exists = file_exists($apkPath);
+        return response()->json([
+            'exists' => $exists,
+            'size'   => $exists ? filesize($apkPath) : 0,
+        ]);
+    });
 });
 
 

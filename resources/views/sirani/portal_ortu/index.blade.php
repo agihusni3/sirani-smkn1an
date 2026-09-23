@@ -55,14 +55,14 @@
           <i class="bi bi-globe2"></i>
           <span>Web SMK</span>
         </a>
-        <button type="button" id="btnPwaInstall" onclick="triggerPwaInstall()" class="nav-action-btn btn-pwa-install" title="Instal Aplikasi ke HP">
+        <button type="button" id="btnPwaInstall" onclick="openApkInstallModal()" class="nav-action-btn btn-pwa-install" title="Instal Aplikasi ke HP">
           <i class="bi bi-download"></i>
           <span>Instal</span>
         </button>
-        <a href="{{ route('download.apk') }}" class="nav-action-btn" title="Download APK Android" style="text-decoration:none;">
+        <button type="button" id="btnNavApk" onclick="openApkInstallModal()" class="nav-action-btn" title="Download APK Android SIRANI" style="cursor:pointer; background:none; border:none; color:inherit;">
           <i class="bi bi-android2"></i>
           <span>APK</span>
-        </a>
+        </button>
         <button type="button" id="btnNavNotif" onclick="sirani_requestPushPermission()" class="nav-action-btn" title="Aktifkan Notifikasi Presensi" style="display:none;">
           <i class="bi bi-bell"></i>
           <span>Notif</span>
@@ -1631,25 +1631,84 @@
       if (btn) btn.style.display = 'inline-flex';
     });
 
+    function openApkInstallModal() {
+      const modal = document.getElementById('modalApkInstall');
+      if (modal) {
+        modal.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+      }
+    }
+
+    function closeApkInstallModal() {
+      const modal = document.getElementById('modalApkInstall');
+      if (modal) {
+        modal.style.display = 'none';
+        document.body.style.overflow = '';
+      }
+    }
+
+    function handleApkModalOverlayClick(e) {
+      if (e.target && e.target.id === 'modalApkInstall') {
+        closeApkInstallModal();
+      }
+    }
+
     function triggerPwaInstall() {
+      openApkInstallModal();
+    }
+
+    function triggerPwaInstallFromModal() {
       if (deferredPrompt) {
         deferredPrompt.prompt();
         deferredPrompt.userChoice.then(function(choiceResult) {
           if (choiceResult.outcome === 'accepted') {
+            closeApkInstallModal();
             const btn = document.getElementById('btnPwaInstall');
             if (btn) btn.style.display = 'none';
           }
           deferredPrompt = null;
         });
       } else {
-        const isIos = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-        if (isIos) {
-          alert('Panduan Instal di iPhone / iPad:\n\n1. Ketuk ikon "Bagikan / Share" (ikon kotak dengan panah ke atas di bilah bawah browser Safari).\n2. Gulir ke bawah dan pilih "Tambahkan ke Layar Utama" (Add to Home Screen).\n3. Ketuk "Tambah" di pojok kanan atas.');
-        } else {
-          alert('Panduan Instal di Android:\n\n1. Ketuk ikon menu browser (titik 3 di kanan atas).\n2. Pilih "Instal Aplikasi" atau "Tambahkan ke Layar Utama".');
+        const guide = document.getElementById('pwaManualGuide');
+        if (guide) {
+          guide.style.display = 'block';
+          guide.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }
       }
     }
+
+    function handleDownloadApkFile() {
+      fetch('/api/check-apk')
+        .then(function(res) { return res.json(); })
+        .then(function(data) {
+          if (data && data.exists) {
+            window.location.href = '/download-apk';
+          } else {
+            const notice = document.getElementById('apkNoticeBox');
+            if (notice) {
+              notice.style.display = 'block';
+              notice.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+          }
+        })
+        .catch(function() {
+          window.location.href = '/download-apk';
+        });
+    }
+
+    // Auto-open modal jika URL membawa param ?open_install=1
+    document.addEventListener('DOMContentLoaded', function() {
+      try {
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('open_install') === '1') {
+          openApkInstallModal();
+          if (urlParams.get('apk_missing') === '1') {
+            const notice = document.getElementById('apkNoticeBox');
+            if (notice) notice.style.display = 'block';
+          }
+        }
+      } catch(e) {}
+    });
 
     // Image Zoom Lightbox Controller
     let currentZoomScale = 1;
@@ -1944,9 +2003,92 @@
     </div>
   </div>
 
-  {{-- CSS Animasi Holo --}}
-
   @endif
+
+  {{-- MODAL INSTAL APLIKASI & DOWNLOAD APK SIRANI --}}
+  <div id="modalApkInstall" class="sirani-modal-overlay" style="display:none;" onclick="handleApkModalOverlayClick(event)">
+    <div class="sirani-modal-container" onclick="event.stopPropagation()">
+      <div class="sirani-modal-header">
+        <div class="sirani-modal-app-badge">
+          <img src="/icons/icon-192.png" alt="SIRANI Logo" class="sirani-modal-logo">
+          <div>
+            <div class="sirani-modal-title">SIRANI Mobile</div>
+            <div class="sirani-modal-sub">SMK Negeri 1 Air Naningan</div>
+          </div>
+        </div>
+        <button type="button" onclick="closeApkInstallModal()" class="sirani-modal-close" title="Tutup">
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>
+
+      <div class="sirani-modal-body">
+        {{-- Info Card --}}
+        <div class="sirani-app-info-card">
+          <div class="sirani-app-info-row">
+            <span class="info-label"><i class="bi bi-phone"></i> Nama Aplikasi:</span>
+            <span class="info-val">SIRANI</span>
+          </div>
+          <div class="sirani-app-info-row">
+            <span class="info-label"><i class="bi bi-shield-check" style="color:#22c55e;"></i> Ikon di HP:</span>
+            <span class="info-val">Logo SMKN 1 Air Naningan</span>
+          </div>
+          <div class="sirani-app-info-row">
+            <span class="info-label"><i class="bi bi-bell-fill" style="color:#3b82f6;"></i> Notifikasi:</span>
+            <span class="info-val">Otomatis saat Masuk/Pulang</span>
+          </div>
+        </div>
+
+        {{-- Opsi 1: Pasang Langsung ke Layar HP (Utama) --}}
+        <div class="sirani-install-option active-opt">
+          <div class="option-header">
+            <div class="option-tag">Rekomendasi Utama · 1 Klik</div>
+            <h5>Pasang Langsung ke Layar HP</h5>
+            <p>Aplikasi otomatis terpasang ke layar utama HP Android / iPhone Anda tanpa perlu download file besar.</p>
+          </div>
+          <button type="button" id="btnActionPwaInstall" onclick="triggerPwaInstallFromModal()" class="btn-install-primary">
+            <i class="bi bi-download"></i>
+            <span>Pasang Sekarang (Instan)</span>
+          </button>
+        </div>
+
+        {{-- Panduan Manual jika prompt otomatis tidak muncul --}}
+        <div id="pwaManualGuide" class="pwa-manual-guide" style="display:none;">
+          <div class="guide-title"><i class="bi bi-info-circle-fill" style="color:#3b82f6;"></i> Langkah Pasang Manual di Chrome:</div>
+          <div class="guide-steps">
+            <div class="guide-step">
+              <span class="step-num">1</span>
+              <span>Ketuk ikon menu titik tiga (<i class="bi bi-three-dots-vertical"></i>) di pojok kanan atas browser Google Chrome Anda.</span>
+            </div>
+            <div class="guide-step">
+              <span class="step-num">2</span>
+              <span>Pilih menu <strong>"Instal aplikasi"</strong> atau <strong>"Tambahkan ke Layar Utama"</strong>.</span>
+            </div>
+            <div class="guide-step">
+              <span class="step-num">3</span>
+              <span>Selesai! Ikon <strong>SIRANI</strong> akan langsung muncul di layar utama HP Anda dengan logo resmi sekolah.</span>
+            </div>
+          </div>
+        </div>
+
+        {{-- Opsi 2: Download File .APK --}}
+        <div class="sirani-install-option">
+          <div class="option-header">
+            <div class="option-tag secondary">Paket File Offline (.APK)</div>
+            <h5>Download Paket APK Android</h5>
+            <p>Untuk perangkat Android yang membutuhkan file paket installer offline langsung.</p>
+          </div>
+          <button type="button" onclick="handleDownloadApkFile()" class="btn-install-secondary">
+            <i class="bi bi-android2"></i>
+            <span>Unduh File .APK</span>
+          </button>
+          <div id="apkNoticeBox" style="display:none; margin-top:10px; padding:10px 12px; background:rgba(59,130,246,0.08); border:1px solid rgba(59,130,246,0.25); border-radius:10px; font-size:12px; line-height:1.5; color:#1e40af;">
+            <i class="bi bi-info-circle-fill" style="color:#2563eb;"></i>
+            <strong>Info File APK:</strong> File installer offline (.apk) sedang disiapkan oleh tim IT. Untuk saat ini, silakan gunakan tombol <strong>"Pasang Sekarang (Instan)"</strong> di atas — fitur, icon SIRANI, dan performanya persis sama seperti aplikasi yang dipasang dari APK!
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
 </body>
 </html>
