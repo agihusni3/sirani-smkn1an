@@ -303,22 +303,6 @@
   </div>
 </div>
 
-{{-- Panduan Lanjut ke Langkah 2 --}}
-<div style="background:linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); border:1.5px solid #bfdbfe; border-radius:12px; padding:16px 20px; margin-bottom:24px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
-  <div>
-    <div style="font-weight:800; font-size:14px; color:#1e40af; display:flex; align-items:center; gap:6px;">
-      <i class="bi bi-arrow-right-circle-fill"></i> Langkah 1 Selesai: Struktur Mata Pelajaran &amp; CP Telah Siap!
-    </div>
-    <div style="font-size:12px; color:#1d4ed8; margin-top:2px;">
-      Langkah selanjutnya adalah menugaskan guru pengampu per rombel dan memverifikasi pemenuhan beban 24–40 JP di SK Pembagian Tugas.
-    </div>
-  </div>
-  <a href="{{ route('akademik.jadwal.index', ['tab' => 'distribusi']) }}" class="ak-btn ak-btn-primary" style="font-size:12.5px; font-weight:700;">
-    <span>Lanjut ke Langkah 2: SK Pembagian Tugas</span>
-    <i class="bi bi-arrow-right ms-1"></i>
-  </a>
-</div>
-
 {{-- Modal Tambah Mapel --}}
 <div class="modal fade" id="modalTambahMapel" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog">
