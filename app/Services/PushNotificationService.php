@@ -87,11 +87,26 @@ class PushNotificationService
     }
 
     /**
-     * Kirim siaran pengumuman sekolah ke seluruh perangkat orang tua yang terpasang aplikasi
+    /**
+     * Kirim siaran pengumuman sekolah ke seluruh atau target perangkat orang tua
      */
-    public static function broadcastPengumuman(string $title, string $body, ?string $url = null, ?string $icon = null): int
-    {
-        $subscriptions = PushSubscription::where('is_active', true)->get();
+    public static function broadcastPengumuman(
+        string $title,
+        string $body,
+        ?string $url = null,
+        ?string $image = null,
+        ?array $targetNisns = null
+    ): int {
+        $query = PushSubscription::where('is_active', true);
+
+        if (!empty($targetNisns)) {
+            $query->where(function ($q) use ($targetNisns) {
+                $q->whereIn('nisn', $targetNisns)
+                  ->orWhereNull('nisn');
+            });
+        }
+
+        $subscriptions = $query->get();
         if ($subscriptions->isEmpty()) {
             return 0;
         }
@@ -99,11 +114,15 @@ class PushNotificationService
         $payload = [
             'title'     => '📢 ' . $title,
             'body'      => $body,
-            'url'       => $url ?: '/pengumuman',
-            'icon'      => $icon ?: '/icons/icon-192.png',
+            'url'       => $url ?: '/cek-presensi#pengumuman',
+            'icon'      => '/icons/icon-192.png',
             'badge'     => '/icons/icon-192.png',
             'timestamp' => now()->timestamp,
         ];
+
+        if (!empty($image)) {
+            $payload['image'] = $image;
+        }
 
         $sentCount = 0;
         foreach ($subscriptions as $sub) {

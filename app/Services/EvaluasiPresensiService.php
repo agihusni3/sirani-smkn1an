@@ -116,6 +116,21 @@ class EvaluasiPresensiService
                                 } catch (\Throwable $e) {
                                     Log::warning("Gagal buat notif alpha: " . $e->getMessage());
                                 }
+
+                                // Push Notifikasi Real-Time ke HP Orang Tua → Alpha
+                                try {
+                                    if (!empty($membership->siswa->nisn)) {
+                                        $kelas = $membership->rombel->nama_rombel ?? 'Siswa';
+                                        PushNotificationService::sendToSiswa(
+                                            $membership->siswa->nisn,
+                                            '🚨 Tidak Hadir: ' . $membership->siswa->nama,
+                                            "Ananda ({$kelas}) tidak hadir di sekolah tanpa keterangan (Alpha) pada {$tanggal}. Ketuk untuk lihat riwayat absensi.",
+                                            '/presensi-siswa/' . urlencode($membership->siswa->nisn)
+                                        );
+                                    }
+                                } catch (\Throwable $e) {
+                                    Log::warning("Gagal kirim push notif alpha: " . $e->getMessage());
+                                }
                             }
                         }
                     } elseif (in_array($absensi->status, ['hadir', 'terlambat']) && is_null($absensi->jam_pulang)) {
@@ -145,6 +160,21 @@ class EvaluasiPresensiService
                                     KasusDisiplin::syncFromPresensi($membership->siswa_id);
                                 } catch (\Throwable $e) {
                                     Log::warning("Gagal kirim notif bolos: " . $e->getMessage());
+                                }
+
+                                // Push Notifikasi Real-Time ke HP Orang Tua → Bolos
+                                try {
+                                    if (!empty($membership->siswa->nisn)) {
+                                        $kelas = $membership->rombel->nama_rombel ?? 'Siswa';
+                                        PushNotificationService::sendToSiswa(
+                                            $membership->siswa->nisn,
+                                            '⚠️ Bolos Pulang: ' . $membership->siswa->nama,
+                                            "Ananda ({$kelas}) hadir pagi namun pulang tanpa izin (Bolos) pada {$tanggal}. Ketuk untuk lihat riwayat absensi.",
+                                            '/presensi-siswa/' . urlencode($membership->siswa->nisn)
+                                        );
+                                    }
+                                } catch (\Throwable $e) {
+                                    Log::warning("Gagal kirim push notif bolos: " . $e->getMessage());
                                 }
                             }
                         }

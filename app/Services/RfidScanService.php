@@ -461,20 +461,23 @@ class RfidScanService
                         \Illuminate\Support\Facades\Log::warning("Gagal memproses draf notifikasi ortu masuk RFID: " . $e->getMessage());
                     }
 
-                    // Push Notification Real-Time ke Aplikasi HP Orang Tua
+                    // Push Notification Real-Time ke Aplikasi HP Orang Tua (HANYA JIKA TERLAMBAT)
+                    // Catatan: Siswa yang datang tepat waktu tidak dikirim notifikasi push ke aplikasi sesuai kebijakan sekolah
                     try {
-                        if (!empty($person->nisn)) {
-                            if ($isTerlambat) {
-                                $pushTitle = "⚠️ Presensi Masuk (TERLAMBAT): {$person->nama}";
-                                $pushBody  = "Ananda baru hadir di sekolah pukul {$timeNow} WIB (Melewati batas toleransi {$jamMasukMaks} WIB).";
-                            } else {
-                                $pushTitle = "✅ Presensi Masuk: {$person->nama}";
-                                $pushBody  = "Ananda telah hadir di sekolah pukul {$timeNow} WIB (Tepat Waktu).";
-                            }
-                            \App\Services\PushNotificationService::sendToSiswa($person->nisn, $pushTitle, $pushBody);
+                        if (!empty($person->nisn) && $isTerlambat) {
+                            $kelasLabel = $rombelOrJabatan;
+                            $nisnEncoded = urlencode($person->nisn);
+                            $pushTitle = "⚠️ Terlambat: {$person->nama}";
+                            $pushBody  = "Ananda ({$kelasLabel}) hadir pukul {$timeNow} WIB, melewati batas toleransi {$jamMasukMaks} WIB. Ketuk untuk cek riwayat absensi.";
+                            \App\Services\PushNotificationService::sendToSiswa(
+                                $person->nisn,
+                                $pushTitle,
+                                $pushBody,
+                                '/presensi-siswa/' . $nisnEncoded
+                            );
                         }
                     } catch (\Throwable $e) {
-                        \Illuminate\Support\Facades\Log::warning("Gagal kirim push notif masuk: " . $e->getMessage());
+                        \Illuminate\Support\Facades\Log::warning("Gagal kirim push notif terlambat: " . $e->getMessage());
                     }
                 }
 
@@ -530,9 +533,16 @@ class RfidScanService
                     // Push Notification Real-Time ke Aplikasi HP Orang Tua
                     try {
                         if (!empty($person->nisn)) {
-                            $pushTitle = "Presensi Pulang: {$person->nama}";
-                            $pushBody = "Ananda telah selesai kegiatan belajar dan melakukan presensi kepulangan pada pukul {$timeNow} WIB.";
-                            \App\Services\PushNotificationService::sendToSiswa($person->nisn, $pushTitle, $pushBody);
+                            $kelasLabel = $rombelOrJabatan;
+                            $nisnEncoded = urlencode($person->nisn);
+                            $pushTitle = "🏠 Pulang: {$person->nama}";
+                            $pushBody = "Ananda ({$kelasLabel}) telah tap pulang dari sekolah pada pukul {$timeNow} WIB. Ketuk untuk cek riwayat absensi.";
+                            \App\Services\PushNotificationService::sendToSiswa(
+                                $person->nisn,
+                                $pushTitle,
+                                $pushBody,
+                                '/presensi-siswa/' . $nisnEncoded
+                            );
                         }
                     } catch (\Throwable $e) {
                         \Illuminate\Support\Facades\Log::warning("Gagal kirim push notif pulang: " . $e->getMessage());

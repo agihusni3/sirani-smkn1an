@@ -8,6 +8,7 @@ use App\Models\IzinGuru;
 use App\Models\SiswaRombel;
 use App\Models\TahunAjaran;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Exception;
 
 class IzinSiswaService
@@ -80,6 +81,25 @@ class IzinSiswaService
                         'tanggal'    => $tanggal,
                         'keterangan' => $keterangan ?: 'Izin tercatat oleh ' . $disetujuiOleh,
                     ], $disetujuiOleh);
+
+                    // Push Notifikasi Real-Time ke HP Orang Tua → Izin / Sakit
+                    try {
+                        if (!empty($siswa->nisn)) {
+                            $labelJenis  = $jenis === 'sakit' ? 'Sakit' : 'Izin';
+                            $ikon        = $jenis === 'sakit' ? '🤒' : '📋';
+                            $keteranganPesan = $keterangan
+                                ? ": {$keterangan}"
+                                : " — tercatat oleh {$disetujuiOleh}.";
+                            PushNotificationService::sendToSiswa(
+                                $siswa->nisn,
+                                "{$ikon} {$labelJenis}: {$siswa->nama}",
+                                "Ananda tercatat {$labelJenis} pada {$tanggal}{$keteranganPesan} Ketuk untuk lihat riwayat absensi.",
+                                '/presensi-siswa/' . urlencode($siswa->nisn)
+                            );
+                        }
+                    } catch (\Throwable $e) {
+                        Log::warning("Gagal kirim push notif {$jenis}: " . $e->getMessage());
+                    }
                 }
             } catch (\Throwable $e) {
                 \Illuminate\Support\Facades\Log::warning("Gagal membuat draf notifikasi izin: " . $e->getMessage());
