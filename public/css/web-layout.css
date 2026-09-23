@@ -419,6 +419,15 @@
             color: var(--brand-blue);
         }
 
+        .btn-dcc-launcher,
+        .dcc-menu-item,
+        .dcc-menu-footer-link,
+        .drawer-gateway-card {
+            -webkit-user-drag: none;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
         .dcc-menu-item {
             display: flex;
             flex-direction: column;
@@ -460,18 +469,18 @@
             border-radius: 8px;
             text-decoration: none;
             background: #f8fafc;
-            border-top: 1px solid rgba(226, 232, 240, 0.8);
-            margin-top: 4px;
-            font-size: 0.78rem;
+            border: 1px solid #e2e8f0;
+            margin-top: 6px;
+            font-size: 0.8rem;
             font-weight: 700;
-            color: var(--brand-blue);
+            color: #2563eb;
             transition: all 0.15s ease;
         }
 
         .dcc-menu-footer-link:hover {
             background: #eff6ff;
             color: #1d4ed8;
-            padding-left: 16px;
+            border-color: #bfdbfe;
         }
 
         .btn-industrial {

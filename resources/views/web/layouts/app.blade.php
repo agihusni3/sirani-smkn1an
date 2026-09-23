@@ -184,25 +184,25 @@
                         <div class="nav-dropdown-menu align-right wide">
                             <div class="dropdown-header-label">Layanan Siswa &amp; Guru</div>
 
-                            <a href="{{ route('portal.ortu.index') }}" class="dcc-menu-item">
+                            <a href="{{ route('portal.ortu.index') }}" class="dcc-menu-item" draggable="false">
                                 <div class="dcc-menu-title">Monitoring Presensi</div>
                                 <div class="dcc-menu-desc">Pantauan absensi mandiri kartu RFID siswa &amp; wali</div>
                             </a>
 
-                            <a href="{{ route('portal.asesmen.index') }}" class="dcc-menu-item">
+                            <a href="{{ route('portal.asesmen.index') }}" class="dcc-menu-item" draggable="false">
                                 <div class="dcc-menu-title">Asesmen CBT Siswa</div>
                                 <div class="dcc-menu-desc">Ruang ujian online berbasis NISN dan Tanggal Lahir</div>
                             </a>
 
                             <!-- Bottom Bar: DCC Portal Gateway -->
                             @auth
-                                <a href="{{ route('admin.portal') }}" class="dcc-menu-footer-link">
-                                    <span>Masuk Dashboard DCC ({{ auth()->user()->name }})</span>
+                                <a href="{{ route('admin.portal') }}" class="dcc-menu-footer-link" draggable="false">
+                                    <span>Login DCC</span>
                                     <i class="fa-solid fa-arrow-right" style="font-size: 0.72rem;"></i>
                                 </a>
                             @else
-                                <a href="{{ route('login') }}" class="dcc-menu-footer-link">
-                                    <span>Login Petugas &amp; Guru (DCC Portal)</span>
+                                <a href="{{ route('login') }}" class="dcc-menu-footer-link" draggable="false">
+                                    <span>Login DCC</span>
                                     <i class="fa-solid fa-arrow-right" style="font-size: 0.72rem;"></i>
                                 </a>
                             @endauth
@@ -229,7 +229,7 @@
                 <div class="drawer-gateways" style="padding-top: 0; border-top: none;">
                     <div class="drawer-section-label">Akses Gerbang Mandiri &amp; Dasbor</div>
                     <div class="drawer-gateway-grid">
-                        <a href="{{ route('portal.ortu.index') }}" class="drawer-gateway-card">
+                        <a href="{{ route('portal.ortu.index') }}" class="drawer-gateway-card" draggable="false">
                             <div class="gateway-icon-box blue">
                                 <i class="fa-solid fa-fingerprint"></i>
                             </div>
@@ -239,7 +239,7 @@
                             </div>
                         </a>
 
-                        <a href="{{ route('portal.asesmen.index') }}" class="drawer-gateway-card" style="border-color:#bfdbfe; background:#eff6ff;">
+                        <a href="{{ route('portal.asesmen.index') }}" class="drawer-gateway-card" style="border-color:#bfdbfe; background:#eff6ff;" draggable="false">
                             <div class="gateway-icon-box blue" style="background:#2563eb; color:#ffffff;">
                                 <i class="fa-solid fa-laptop-code"></i>
                             </div>
@@ -250,17 +250,17 @@
                         </a>
 
                         @auth
-                            <a href="{{ route('admin.portal') }}" class="drawer-gateway-card">
+                            <a href="{{ route('admin.portal') }}" class="drawer-gateway-card" draggable="false">
                                 <div class="gateway-icon-box slate">
                                     <i class="fa-solid fa-sliders"></i>
                                 </div>
                                 <div>
-                                    <div class="gateway-card-title">DCC Portal</div>
-                                    <div class="gateway-card-sub">Halo, {{ auth()->user()->name }}</div>
+                                    <div class="gateway-card-title">Login DCC</div>
+                                    <div class="gateway-card-sub">Pusat Komando &amp; Portal GTK</div>
                                 </div>
                             </a>
                         @else
-                            <a href="{{ route('login') }}" class="drawer-gateway-card">
+                            <a href="{{ route('login') }}" class="drawer-gateway-card" draggable="false">
                                 <div class="gateway-icon-box slate">
                                     <i class="fa-solid fa-arrow-right-to-bracket"></i>
                                 </div>
