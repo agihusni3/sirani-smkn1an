@@ -206,6 +206,84 @@ class PortalOrtuController extends Controller
                         ];
                     }
                 }
+
+                // Rekapitulasi Riwayat Notifikasi & Koreksi Terpadu untuk Portal Orang Tua
+                $serverNotifs = [];
+                $koreksiTerbaru = null;
+
+                // 1. Ambil dari tabel NotifikasiOrtu
+                $dbNotifs = \App\Models\NotifikasiOrtu::where('siswa_id', $siswa->id)
+                    ->orderBy('created_at', 'desc')
+                    ->take(25)
+                    ->get();
+
+                foreach ($dbNotifs as $dn) {
+                    $isKoreksi = str_contains(strtolower($dn->kategori ?? ''), 'koreksi') || str_contains(strtolower($dn->judul ?? ''), 'koreksi');
+                    $serverNotifs[] = [
+                        'id'       => 'db-notif-' . $dn->id,
+                        'title'    => $dn->judul ?: 'Pemberitahuan Presensi',
+                        'body'     => $dn->pesan ?: '',
+                        'time'     => $dn->created_at ? $dn->created_at->timestamp * 1000 : now()->timestamp * 1000,
+                        'is_read'  => false,
+                        'tipe'     => $isKoreksi ? 'koreksi' : 'notifikasi',
+                        'kategori' => $dn->kategori,
+                        'tanggal'  => $dn->tanggal ? $dn->tanggal->format('Y-m-d') : null,
+                        'url'      => '/presensi-siswa/' . ($siswa->nisn ?: $siswa->id),
+                    ];
+                }
+
+                // 2. Ambil catatan Absensi hasil koreksi guru piket / intervensi
+                $koreksiAbsensis = Absensi::where('pemilik_type', 'siswa')
+                    ->where('pemilik_id', $siswa->id)
+                    ->where(function($q) {
+                        $q->whereIn('sumber_absen', ['koreksi_piket_manual', 'interfensi_titip_kartu', 'manual_izin_piket'])
+                          ->orWhere('keterangan', 'LIKE', '%koreksi%')
+                          ->orWhere('keterangan', 'LIKE', '%dikoreksi%')
+                          ->orWhere('keterangan', 'LIKE', '%intervensi%');
+                    })
+                    ->orderBy('tanggal', 'desc')
+                    ->take(15)
+                    ->get();
+
+                foreach ($koreksiAbsensis as $ka) {
+                    $labelStatus = match($ka->status) {
+                        'hadir'     => 'Hadir',
+                        'terlambat' => 'Terlambat',
+                        'sakit'     => 'Sakit',
+                        'izin'      => 'Izin',
+                        'dispen', 'dispensasi' => 'Dispensasi',
+                        'alpha'     => 'Alpha',
+                        'bolos'     => 'Bolos',
+                        default     => ucfirst($ka->status),
+                    };
+                    $dateId = $ka->tanggal ? Carbon::parse($ka->tanggal)->translatedFormat('d M Y') : '';
+                    $notifId = 'koreksi-abs-' . $ka->id . '-' . strtotime($ka->updated_at ?: $ka->tanggal);
+
+                    $alreadyInDb = collect($serverNotifs)->contains(function($item) use ($ka) {
+                        return ($item['tanggal'] ?? '') === $ka->tanggal && ($item['tipe'] ?? '') === 'koreksi';
+                    });
+
+                    if (!$alreadyInDb) {
+                        $serverNotifs[] = [
+                            'id'       => $notifId,
+                            'title'    => "Koreksi Presensi: {$siswa->nama} ({$labelStatus})",
+                            'body'     => "Data presensi ananda untuk tanggal {$dateId} telah disesuaikan menjadi {$labelStatus}." . ($ka->keterangan ? " Catatan: {$ka->keterangan}" : ""),
+                            'time'     => ($ka->updated_at ? $ka->updated_at->timestamp : strtotime($ka->tanggal . ' 12:00:00')) * 1000,
+                            'is_read'  => false,
+                            'tipe'     => 'koreksi',
+                            'kategori' => 'koreksi_presensi',
+                            'tanggal'  => $ka->tanggal,
+                            'url'      => '/presensi-siswa/' . ($siswa->nisn ?: $siswa->id),
+                        ];
+                    }
+
+                    if (!$koreksiTerbaru && Carbon::parse($ka->updated_at ?: $ka->tanggal)->gte(Carbon::today()->subDays(7))) {
+                        $koreksiTerbaru = $ka;
+                    }
+                }
+
+                // Urutkan notifikasi berdasarkan waktu descending
+                usort($serverNotifs, fn($a, $b) => ($b['time'] <=> $a['time']));
             }
         }
 
@@ -233,7 +311,9 @@ class PortalOrtuController extends Controller
             'pengaturanDisiplin',
             'rekapBulananTahunan',
             'modeAkses',
-            'codeValue'
+            'codeValue',
+            'serverNotifs',
+            'koreksiTerbaru'
         ));
     }
 
@@ -245,6 +325,96 @@ class PortalOrtuController extends Controller
         $req = $request ?: request();
         $req->merge(['keyword' => $nis]);
         return $this->index($req);
+    }
+
+    /**
+     * API Real-Time Polling Notifikasi Terbaru Portal Orang Tua
+     */
+    public function getRecentNotifications(Request $request)
+    {
+        $keyword = trim($request->input('keyword') ?: $request->input('nisn') ?: '');
+        if (!$keyword) {
+            return response()->json(['status' => 'error', 'message' => 'NISN/Keyword tidak disertakan'], 400);
+        }
+
+        $cleanKeyword = preg_replace('/[^a-zA-Z0-9]/', '', $keyword);
+        $siswa = Siswa::where('nisn', $cleanKeyword)
+            ->orWhere('nis', $cleanKeyword)
+            ->orWhere('id', $cleanKeyword)
+            ->first();
+
+        if (!$siswa) {
+            return response()->json(['status' => 'error', 'message' => 'Siswa tidak ditemukan'], 404);
+        }
+
+        $since = $request->input('since');
+        $sinceCarbon = $since ? Carbon::createFromTimestampMs((int)$since) : Carbon::today()->subDays(3);
+
+        $dbNotifs = \App\Models\NotifikasiOrtu::where('siswa_id', $siswa->id)
+            ->where('created_at', '>=', $sinceCarbon)
+            ->orderBy('created_at', 'desc')
+            ->take(10)
+            ->get();
+
+        $koreksiAbsensis = Absensi::where('pemilik_type', 'siswa')
+            ->where('pemilik_id', $siswa->id)
+            ->where('updated_at', '>=', $sinceCarbon)
+            ->where(function($q) {
+                $q->whereIn('sumber_absen', ['koreksi_piket_manual', 'interfensi_titip_kartu', 'manual_izin_piket'])
+                  ->orWhere('keterangan', 'LIKE', '%koreksi%')
+                  ->orWhere('keterangan', 'LIKE', '%dikoreksi%')
+                  ->orWhere('keterangan', 'LIKE', '%intervensi%');
+            })
+            ->orderBy('updated_at', 'desc')
+            ->take(5)
+            ->get();
+
+        $notifs = [];
+        foreach ($dbNotifs as $dn) {
+            $isKoreksi = str_contains(strtolower($dn->kategori ?? ''), 'koreksi') || str_contains(strtolower($dn->judul ?? ''), 'koreksi');
+            $notifs[] = [
+                'id'       => 'db-notif-' . $dn->id,
+                'title'    => $dn->judul ?: 'Pemberitahuan Presensi',
+                'body'     => $dn->pesan ?: '',
+                'time'     => $dn->created_at ? $dn->created_at->timestamp * 1000 : now()->timestamp * 1000,
+                'is_read'  => false,
+                'tipe'     => $isKoreksi ? 'koreksi' : 'notifikasi',
+                'kategori' => $dn->kategori,
+                'tanggal'  => $dn->tanggal ? $dn->tanggal->format('Y-m-d') : null,
+                'url'      => '/presensi-siswa/' . ($siswa->nisn ?: $siswa->id),
+            ];
+        }
+
+        foreach ($koreksiAbsensis as $ka) {
+            $labelStatus = match($ka->status) {
+                'hadir'     => 'Hadir',
+                'terlambat' => 'Terlambat',
+                'sakit'     => 'Sakit',
+                'izin'      => 'Izin',
+                'dispen', 'dispensasi' => 'Dispensasi',
+                'alpha'     => 'Alpha',
+                'bolos'     => 'Bolos',
+                default     => ucfirst($ka->status),
+            };
+            $dateId = $ka->tanggal ? Carbon::parse($ka->tanggal)->translatedFormat('d M Y') : '';
+            $notifs[] = [
+                'id'       => 'koreksi-abs-' . $ka->id . '-' . strtotime($ka->updated_at),
+                'title'    => "Koreksi Presensi: {$siswa->nama} ({$labelStatus})",
+                'body'     => "Data kehadiran ananda tanggal {$dateId} diperbarui menjadi {$labelStatus}." . ($ka->keterangan ? " Catatan: {$ka->keterangan}" : ""),
+                'time'     => ($ka->updated_at ? $ka->updated_at->timestamp : now()->timestamp) * 1000,
+                'is_read'  => false,
+                'tipe'     => 'koreksi',
+                'kategori' => 'koreksi_presensi',
+                'tanggal'  => $ka->tanggal,
+                'url'      => '/presensi-siswa/' . ($siswa->nisn ?: $siswa->id),
+            ];
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'notifs' => $notifs,
+            'count'  => count($notifs),
+        ]);
     }
 }
 

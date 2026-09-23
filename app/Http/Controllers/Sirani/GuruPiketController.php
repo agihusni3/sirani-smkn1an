@@ -254,19 +254,19 @@ class GuruPiketController extends Controller
         $user    = auth()->user();
         $today   = Carbon::today()->toDateString();
 
-        // 1. Batasan Waktu: Hanya data presensi pada hari ini yang dapat dikoreksi
-        if ($absensi->tanggal !== $today) {
-            return redirect()->back()->with('error', 'Koreksi presensi hanya diizinkan untuk data absensi pada hari ini (' . Carbon::today()->translatedFormat('d F Y') . '). Catatan hari sebelumnya tidak dapat diubah.');
-        }
-
-        // 2. Hak Akses: Guru Piket hari ini, Panitia STS, atau Admin
+        // 1. Hak Akses: Guru Piket hari ini, Panitia STS, atau Admin
         $isAuthorized = $user && (
             $user->isAdmin() || 
             $user->isPiketHariIni()
         );
 
         if (!$isAuthorized) {
-            return redirect()->back()->with('error', 'Akses ditolak: Hanya Guru Piket yang terjadwal bertugas pada hari ini yang berwenang melakukan koreksi presensi.');
+            return redirect()->back()->with('error', 'Akses ditolak: Hanya Guru Piket yang terjadwal bertugas pada hari ini atau Administrator yang berwenang melakukan koreksi presensi.');
+        }
+
+        // 2. Batasan Waktu: Guru Piket hanya untuk hari ini (Admin memiliki wewenang penuh atas rekaman lampau)
+        if (!$user->isAdmin() && $absensi->tanggal !== $today) {
+            return redirect()->back()->with('error', 'Koreksi presensi oleh Guru Piket hanya diizinkan untuk data absensi pada hari ini (' . Carbon::today()->translatedFormat('d F Y') . '). Catatan hari sebelumnya hanya dapat diubah oleh Administrator.');
         }
 
         $request->validate([
@@ -383,6 +383,25 @@ class GuruPiketController extends Controller
                         'bolos'     => '🚨',
                         default     => '📢',
                     };
+
+                    // Catat ke riwayat notifikasi database agar selalu tampil di portal orang tua
+                    try {
+                        NotifikasiOrtu::create([
+                            'siswa_id'    => $siswaObj->id,
+                            'kategori'    => 'koreksi_presensi',
+                            'tanggal'     => $absensi->tanggal,
+                            'no_tujuan'   => $siswaObj->no_hp_ortu ?: ($siswaObj->no_hp ?: '-'),
+                            'nama_ortu'   => $siswaObj->nama_ortu ?: 'Orang Tua / Wali Murid',
+                            'judul'       => "Koreksi Presensi: {$siswaObj->nama} ({$labelStatus})",
+                            'pesan'       => "Data kehadiran ananda tanggal " . Carbon::parse($absensi->tanggal)->translatedFormat('d M Y') . " diperbarui menjadi {$labelStatus}. Catatan: {$ketFinal}",
+                            'status'      => 'terkirim',
+                            'dibuat_oleh' => $pencatat,
+                            'waktu_kirim' => now(),
+                        ]);
+                    } catch (\Throwable $eDb) {
+                        \Illuminate\Support\Facades\Log::warning("Gagal simpan NotifikasiOrtu koreksi: " . $eDb->getMessage());
+                    }
+
                     \App\Services\PushNotificationService::sendToSiswa(
                         $nisn,
                         "{$ikon} Koreksi Presensi: {$siswaObj->nama} ({$labelStatus})",
@@ -529,6 +548,25 @@ class GuruPiketController extends Controller
                     'bolos'     => '🚨',
                     default     => '📢',
                 };
+
+                // Catat ke riwayat notifikasi database agar selalu tampil di portal orang tua
+                try {
+                    NotifikasiOrtu::create([
+                        'siswa_id'    => $siswa->id,
+                        'kategori'    => 'koreksi_presensi',
+                        'tanggal'     => $today,
+                        'no_tujuan'   => $siswa->no_hp_ortu ?: ($siswa->no_hp ?: '-'),
+                        'nama_ortu'   => $siswa->nama_ortu ?: 'Orang Tua / Wali Murid',
+                        'judul'       => "Validasi Presensi: {$siswa->nama} ({$labelStatus})",
+                        'pesan'       => "Presensi ananda tanggal " . Carbon::parse($today)->translatedFormat('d M Y') . " tercatat sebagai {$labelStatus}. Catatan: {$ketFinal}",
+                        'status'      => 'terkirim',
+                        'dibuat_oleh' => $pencatat,
+                        'waktu_kirim' => now(),
+                    ]);
+                } catch (\Throwable $eDb) {
+                    \Illuminate\Support\Facades\Log::warning("Gagal simpan NotifikasiOrtu validasi: " . $eDb->getMessage());
+                }
+
                 \App\Services\PushNotificationService::sendToSiswa(
                     $siswa->nisn,
                     "{$ikon} Validasi Presensi: {$siswa->nama} ({$labelStatus})",

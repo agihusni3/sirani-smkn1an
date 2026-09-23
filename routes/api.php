@@ -19,3 +19,4 @@ Route::post('/push-unsubscribe', [\App\Http\Controllers\Api\PushSubscriptionCont
 Route::post('/push-test-background', [\App\Http\Controllers\Api\PushSubscriptionController::class, 'testBackground']);
 Route::get('/push-subscribers-count', [\App\Http\Controllers\Api\PushSubscriptionController::class, 'getSubscribersCount']);
 Route::post('/push-broadcast-demo', [\App\Http\Controllers\Api\PushSubscriptionController::class, 'broadcastDemo']);
+Route::get('/portal-notifikasi-terbaru', [\App\Http\Controllers\Core\PortalOrtuController::class, 'getRecentNotifications']);

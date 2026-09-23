@@ -291,6 +291,57 @@
 
       {{-- TAB RIWAYAT ABSENSI & DOSSIER SISWA (DEFAULT LANGSUNG TERBUKA) --}}
       <div id="section-absen-wrap" style="display: block;">
+        @if(isset($koreksiTerbaru) && $koreksiTerbaru)
+          @php
+            $ktStatus = $koreksiTerbaru->status;
+            $ktLabel = match($ktStatus) {
+              'hadir'     => 'Hadir Tepat Waktu',
+              'terlambat' => 'Terlambat',
+              'izin'      => 'Izin',
+              'sakit'     => 'Sakit',
+              'dispen', 'dispensasi' => 'Dispensasi',
+              'alpha'     => 'Alpha',
+              'bolos'     => 'Bolos',
+              default     => ucfirst($ktStatus),
+            };
+            $ktColor = match($ktStatus) {
+              'hadir'     => '#16a34a',
+              'terlambat' => '#d97706',
+              'izin'      => '#0284c7',
+              'sakit'     => '#8b5cf6',
+              'dispen', 'dispensasi' => '#0d9488',
+              'alpha'     => '#ef4444',
+              'bolos'     => '#dc2626',
+              default     => '#2563eb',
+            };
+          @endphp
+          {{-- KARTU PEMBERITAHUAN KOREKSI PRESENSI TERKINI --}}
+          <div class="koreksi-live-alert-card" style="margin-bottom:16px; background:linear-gradient(135deg, rgba(245, 158, 11, 0.12) 0%, rgba(217, 119, 6, 0.05) 100%); border:1.5px solid rgba(245, 158, 11, 0.45); border-radius:18px; padding:14px 18px; display:flex; gap:14px; align-items:flex-start; box-shadow:0 4px 14px rgba(245, 158, 11, 0.08);">
+            <div style="width:42px; height:42px; border-radius:12px; background:rgba(245, 158, 11, 0.2); border:1px solid rgba(245, 158, 11, 0.4); display:flex; align-items:center; justify-content:center; font-size:20px; color:#d97706; flex-shrink:0;">
+              <i class="bi bi-pencil-square"></i>
+            </div>
+            <div style="flex:1; min-width:0;">
+              <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:6px; margin-bottom:4px;">
+                <div style="display:flex; align-items:center; gap:8px;">
+                  <span style="font-size:13px; font-weight:800; color:var(--text, #0f172a);">Pemberitahuan Koreksi Presensi</span>
+                  <span style="background:#fef3c7; color:#b45309; border:1px solid #fde68a; font-size:10px; font-weight:800; padding:1px 7px; border-radius:4px; text-transform:uppercase;">Terverifikasi Guru Piket</span>
+                </div>
+                <span style="font-size:11.5px; color:var(--text-3, #64748b); font-family:var(--font-mono); font-weight:700;">
+                  {{ \Carbon\Carbon::parse($koreksiTerbaru->tanggal)->translatedFormat('l, d F Y') }}
+                </span>
+              </div>
+              <div style="font-size:12.5px; color:var(--text-2, #334155); line-height:1.5;">
+                Catatan kehadiran ananda telah diperbarui menjadi <strong style="color:{{ $ktColor }}; font-weight:800; text-transform:uppercase;">{{ $ktLabel }}</strong>.
+                @if($koreksiTerbaru->keterangan)
+                  <div style="margin-top:6px; font-size:11.5px; color:var(--text, #1e293b); background:rgba(255,255,255,0.75); padding:6px 10px; border-radius:8px; border-left:3px solid #d97706; font-style:italic;">
+                    "{{ $koreksiTerbaru->keterangan }}"
+                  </div>
+                @endif
+              </div>
+            </div>
+          </div>
+        @endif
+
         {{-- DOSSIER DIGITAL DETAIL --}}
         <div class="dossier-card">
           <div class="dossier-header">
@@ -631,10 +682,22 @@
                             <span style="font-weight:800; font-size:12.5px; color:#0284c7;"><i class="bi bi-info-circle-fill"></i> Izin</span>
                           @elseif($abs->status === 'sakit')
                             <span style="font-weight:800; font-size:12.5px; color:#8b5cf6;"><i class="bi bi-heart-pulse-fill"></i> Sakit</span>
+                          @elseif(in_array($abs->status, ['dispen', 'dispensasi']))
+                            <span style="font-weight:800; font-size:12.5px; color:#0d9488;"><i class="bi bi-award-fill"></i> Dispensasi</span>
                           @elseif($abs->status === 'bolos')
                             <span style="font-weight:800; font-size:12.5px; color:#dc2626;"><i class="bi bi-exclamation-triangle-fill"></i> Bolos</span>
                           @elseif($abs->status === 'alpha')
                             <span style="font-weight:800; font-size:12.5px; color:#ef4444;"><i class="bi bi-x-circle-fill"></i> Alpha</span>
+                          @else
+                            <span style="font-weight:800; font-size:12.5px; color:var(--text-2);">{{ ucfirst($abs->status) }}</span>
+                          @endif
+
+                          @if(in_array($abs->sumber_absen, ['koreksi_piket_manual', 'interfensi_titip_kartu', 'manual_izin_piket']) || str_contains(strtolower($abs->keterangan ?? ''), 'koreksi') || str_contains(strtolower($abs->keterangan ?? ''), 'intervensi') || str_contains(strtolower($abs->keterangan ?? ''), 'validasi'))
+                            <div style="margin-top:4px;">
+                              <span style="background:rgba(217,119,6,0.12); color:#b45309; border:1px solid rgba(217,119,6,0.25); padding:1.5px 7px; border-radius:5px; font-size:10px; font-weight:800; display:inline-flex; align-items:center; gap:3px;">
+                                <i class="bi bi-pencil-square"></i> Koreksi Piket
+                              </span>
+                            </div>
                           @endif
                         </td>
                         <td style="font-size:12.5px; color:var(--text-2); min-width:180px;">
@@ -2709,6 +2772,12 @@
 
     const SiraniNotifManager = {
       async init() {
+        // 1. Simpan dan sinkronkan notifikasi dari database server ke IndexedDB lokal browser
+        const serverItems = @json($serverNotifs ?? []);
+        if (Array.isArray(serverItems) && serverItems.length > 0) {
+          await this.syncServerNotifsToIndexedDB(serverItems);
+        }
+
         if ('serviceWorker' in navigator) {
           navigator.serviceWorker.addEventListener('message', (event) => {
             if (!event.data) return;
@@ -2731,7 +2800,48 @@
             }
           });
         }
-        this.loadAndRender();
+        await this.loadAndRender();
+
+        // 2. Mulai real-time live polling jika portal sedang membuka data siswa
+        @if(isset($siswa) && $siswa)
+          this.startPolling("{{ $siswa->nisn ?: $siswa->nis ?: $siswa->id }}");
+        @endif
+      },
+
+      syncServerNotifsToIndexedDB(serverItems) {
+        return new Promise((resolve) => {
+          if (!('indexedDB' in window)) return resolve();
+          const request = indexedDB.open('sirani_pwa_notifs_v1', 1);
+          request.onupgradeneeded = (e) => {
+            const db = e.target.result;
+            if (!db.objectStoreNames.contains('messages')) {
+              db.createObjectStore('messages', { keyPath: 'id' });
+            }
+          };
+          request.onsuccess = (e) => {
+            const db = e.target.result;
+            if (!db.objectStoreNames.contains('messages')) return resolve();
+            const tx = db.transaction('messages', 'readwrite');
+            const store = tx.objectStore('messages');
+            const lastReadTime = parseInt(localStorage.getItem('sirani_last_read_notif_time') || '0', 10);
+
+            serverItems.forEach(item => {
+              const getReq = store.get(item.id);
+              getReq.onsuccess = () => {
+                if (!getReq.result) {
+                  const isUnread = (item.time || 0) > lastReadTime;
+                  store.put({
+                    ...item,
+                    is_read: !isUnread,
+                  });
+                }
+              };
+            });
+            tx.oncomplete = () => resolve();
+            tx.onerror = () => resolve();
+          };
+          request.onerror = () => resolve();
+        });
       },
 
       async loadAndRender() {
@@ -2745,31 +2855,43 @@
           }
         } catch(e) {}
 
-        // Fallback langsung baca IndexedDB
+        // Fallback langsung baca IndexedDB & Server Feeds
         try {
           const items = await this.readFromIndexedDB();
-          const unread = items.filter(i => !i.is_read).length;
+          const lastReadTime = parseInt(localStorage.getItem('sirani_last_read_notif_time') || '0', 10);
+          const unread = items.filter(i => !i.is_read && (i.time || 0) > lastReadTime).length;
           this.renderList(items, unread);
         } catch(e) {}
       },
 
       readFromIndexedDB() {
+        const serverItems = @json($serverNotifs ?? []);
         return new Promise((resolve) => {
-          if (!('indexedDB' in window)) return resolve([]);
+          const lastReadTime = parseInt(localStorage.getItem('sirani_last_read_notif_time') || '0', 10);
+          if (!('indexedDB' in window)) {
+            const fallback = (serverItems || []).map(i => ({ ...i, is_read: (i.time || 0) <= lastReadTime }));
+            return resolve(fallback);
+          }
           const request = indexedDB.open('sirani_pwa_notifs_v1', 1);
           request.onsuccess = (e) => {
             const db = e.target.result;
-            if (!db.objectStoreNames.contains('messages')) return resolve([]);
+            if (!db.objectStoreNames.contains('messages')) {
+              const fallback = (serverItems || []).map(i => ({ ...i, is_read: (i.time || 0) <= lastReadTime }));
+              return resolve(fallback);
+            }
             const tx = db.transaction('messages', 'readonly');
             const req = tx.objectStore('messages').getAll();
             req.onsuccess = () => {
-              const res = req.result || [];
+              let res = req.result || [];
+              if (res.length === 0 && serverItems && serverItems.length > 0) {
+                res = serverItems.map(i => ({ ...i, is_read: (i.time || 0) <= lastReadTime }));
+              }
               res.sort((a,b) => (b.time || 0) - (a.time || 0));
               resolve(res);
             };
-            req.onerror = () => resolve([]);
+            req.onerror = () => resolve(serverItems || []);
           };
-          request.onerror = () => resolve([]);
+          request.onerror = () => resolve(serverItems || []);
         });
       },
 
@@ -2821,52 +2943,62 @@
               </div>
               <div style="font-size:13.5px; font-weight:700; color:#334155; margin-bottom:4px;">Belum Ada Riwayat Pesan</div>
               <div style="font-size:11.5px; line-height:1.5; max-width:280px; margin:0 auto;">
-                Setiap ananda melakukan scan presensi atau izin disetujui, pemberitahuan akan otomatis tercatat di sini dan membunyikan HP Anda.
+                Setiap kali ananda melakukan scan presensi atau data kehadiran dikoreksi guru piket, pemberitahuan akan tercatat di sini dan membunyikan HP Anda.
               </div>
             </div>
           `;
           return;
         }
 
+        const lastReadTime = parseInt(localStorage.getItem('sirani_last_read_notif_time') || '0', 10);
         let html = '';
         items.forEach(item => {
-          const isUnread = !item.is_read;
+          const isUnread = !item.is_read && (item.time || 0) > lastReadTime;
           const dateObj = new Date(item.time || Date.now());
           const timeStr = dateObj.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) + ' WIB';
-          const dateStr = dateObj.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' });
+          const dateStr = dateObj.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
 
           let icon = '<i class="bi bi-bell-fill" style="color:#2563eb;"></i>';
           let iconBg = '#eff6ff';
+          let tagBadge = '';
           const titleLower = (item.title || '').toLowerCase();
-          if (titleLower.includes('tepat waktu') || titleLower.includes('hadir')) {
+
+          if (titleLower.includes('koreksi') || item.tipe === 'koreksi' || (item.kategori && item.kategori.includes('koreksi'))) {
+            icon = '<i class="bi bi-pencil-square" style="color:#d97706;"></i>';
+            iconBg = '#fef3c7';
+            tagBadge = '<span style="font-size:9.5px; font-weight:800; color:#b45309; background:#fef3c7; border:1px solid #fde68a; padding:1px 5px; border-radius:4px;">KOREKSI PIKET</span>';
+          } else if (titleLower.includes('tepat waktu') || titleLower.includes('hadir')) {
             icon = '<i class="bi bi-check-circle-fill" style="color:#16a34a;"></i>';
             iconBg = '#dcfce7';
           } else if (titleLower.includes('terlambat')) {
-            icon = '<i class="bi bi-exclamation-triangle-fill" style="color:#d97706;"></i>';
+            icon = '<i class="bi bi-clock-history" style="color:#d97706;"></i>';
             iconBg = '#fef3c7';
           } else if (titleLower.includes('pulang')) {
             icon = '<i class="bi bi-house-door-fill" style="color:#0284c7;"></i>';
             iconBg = '#e0f2fe';
-          } else if (titleLower.includes('izin') || titleLower.includes('sakit')) {
+          } else if (titleLower.includes('izin') || titleLower.includes('sakit') || titleLower.includes('dispen')) {
             icon = '<i class="bi bi-file-earmark-medical-fill" style="color:#8b5cf6;"></i>';
             iconBg = '#f3e8ff';
           }
 
           html += `
-            <div class="notif-message-card ${isUnread ? 'unread' : ''}" onclick="SiraniNotifManager.clickItem('${item.id}', '${item.url || '/cek-presensi'}')">
+            <div class="notif-message-card ${isUnread ? 'unread' : ''}" onclick="SiraniNotifManager.clickItem('${item.id}', '${item.url || '/cek-presensi'}')" style="cursor:pointer;">
               ${isUnread ? '<div class="notif-unread-dot" title="Belum Dibaca"></div>' : ''}
-              <div style="width:36px; height:36px; border-radius:10px; background:${iconBg}; display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0;">
+              <div style="width:38px; height:38px; border-radius:10px; background:${iconBg}; display:flex; align-items:center; justify-content:center; font-size:17px; flex-shrink:0;">
                 ${icon}
               </div>
-              <div style="flex:1; min-width:0; padding-right:12px;">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:2px;">
-                  <span style="font-size:10px; font-weight:700; color:#64748b;">${dateStr} · ${timeStr}</span>
-                  ${isUnread ? '<span style="font-size:9.5px; font-weight:800; color:#2563eb; background:#dbeafe; padding:1px 5px; border-radius:4px;">BARU</span>' : ''}
+              <div style="flex:1; min-width:0; padding-right:10px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:2px; flex-wrap:wrap; gap:4px;">
+                  <span style="font-size:10.5px; font-weight:700; color:#64748b;">${dateStr} · ${timeStr}</span>
+                  <div style="display:flex; align-items:center; gap:4px;">
+                    ${tagBadge}
+                    ${isUnread ? '<span style="font-size:9.5px; font-weight:800; color:#2563eb; background:#dbeafe; padding:1px 5px; border-radius:4px;">BARU</span>' : ''}
+                  </div>
                 </div>
                 <div style="font-size:12.5px; font-weight:700; color:#0f172a; line-height:1.35; margin-bottom:2px;">
                   ${item.title}
                 </div>
-                <div style="font-size:11.5px; color:#475569; line-height:1.4;">
+                <div style="font-size:11.5px; color:#475569; line-height:1.45;">
                   ${item.body}
                 </div>
               </div>
@@ -2878,6 +3010,8 @@
       },
 
       async markAllRead() {
+        localStorage.setItem('sirani_last_read_notif_time', String(Date.now()));
+
         try {
           if ('serviceWorker' in navigator) {
             const reg = await navigator.serviceWorker.ready;
@@ -2914,6 +3048,7 @@
       },
 
       async clickItem(id, url) {
+        localStorage.setItem('sirani_last_read_notif_time', String(Date.now()));
         try {
           if ('serviceWorker' in navigator) {
             const reg = await navigator.serviceWorker.ready;
@@ -2946,6 +3081,28 @@
         if (url && url !== '#' && url !== window.location.pathname) {
           window.location.href = url;
         }
+      },
+
+      startPolling(nisn) {
+        if (!nisn) return;
+        let lastPollingTime = Date.now();
+        setInterval(async () => {
+          try {
+            if (document.hidden) return; // hemat bandwidth jika tab tidak aktif
+            const res = await fetch('/api/portal-notifikasi-terbaru?nisn=' + encodeURIComponent(nisn) + '&since=' + lastPollingTime);
+            if (!res.ok) return;
+            const data = await res.json();
+            if (data.status === 'success' && data.notifs && data.notifs.length > 0) {
+              lastPollingTime = Date.now();
+              await this.syncServerNotifsToIndexedDB(data.notifs);
+              const soundChoice = localStorage.getItem('sirani_sound_choice') || 'chime';
+              sirani_playPreviewSound(soundChoice);
+              const latest = data.notifs[0];
+              sirani_showInAppToast(latest.title, latest.body);
+              await this.loadAndRender();
+            }
+          } catch(e) {}
+        }, 20000);
       }
     };
 
