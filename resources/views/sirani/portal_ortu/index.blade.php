@@ -1601,36 +1601,76 @@
     }
 
     /**
-     * Periksa apakah notifikasi sudah aktif di perangkat ini
+     * Kirim atau perbarui langganan perangkat ke server database
+     */
+    async function sirani_syncSubscriptionToServer(sub, nisn) {
+      if (!sub) return false;
+      try {
+        const subJson = sub.toJSON();
+        const activeNisn = nisn || sirani_getNisnAktif() || null;
+        await fetch(SIRANI_SUB_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+          body: JSON.stringify({
+            endpoint : subJson.endpoint,
+            p256dh   : subJson.keys?.p256dh,
+            auth     : subJson.keys?.auth,
+            nisn     : activeNisn,
+          }),
+        });
+        console.log('SIRANI Push Subscription berhasil disinkronkan ke server untuk notifikasi background:', activeNisn);
+        return true;
+      } catch (err) {
+        console.warn('Gagal sinkron push subscription ke server:', err);
+        return false;
+      }
+    }
+
+    /**
+     * Periksa status notifikasi & auto-sinkron ke server agar notifikasi background selalu masuk
      */
     function sirani_checkNotifStatus(swReg) {
+      if (!('PushManager' in window) || !('Notification' in window)) return;
       const nisn = sirani_getNisnAktif();
-      if (!nisn || !('PushManager' in window) || !('Notification' in window)) return;
 
       const bannerNotif      = document.getElementById('siraniBannerNotif');
       const bannerNotifAktif = document.getElementById('siraniBannerNotifAktif');
 
       if (Notification.permission === 'granted') {
-        // Cek apakah sudah punya subscription
-        navigator.serviceWorker.ready.then(function(reg) {
-          reg.pushManager.getSubscription().then(function(sub) {
-            if (sub) {
-              if (bannerNotifAktif) bannerNotifAktif.style.display = 'flex';
-              if (bannerNotif)      bannerNotif.style.display      = 'none';
-            } else {
-              // Permission granted tapi belum subscribe → tampilkan banner aktifkan
-              if (!localStorage.getItem('sirani_push_dismissed_' + nisn)) {
-                if (bannerNotif) bannerNotif.style.display = 'flex';
+        navigator.serviceWorker.ready.then(async function(reg) {
+          try {
+            let sub = await reg.pushManager.getSubscription();
+
+            // Jika permission sudah diizinkan tapi belum ada token, auto-subscribe!
+            if (!sub) {
+              const keyResp = await fetch(SIRANI_PUSH_KEY_URL);
+              const keyData = await keyResp.json();
+              if (keyData.publicKey) {
+                const applicationServerKey = sirani_urlBase64ToUint8Array(keyData.publicKey);
+                sub = await reg.pushManager.subscribe({
+                  userVisibleOnly: true,
+                  applicationServerKey: applicationServerKey,
+                });
               }
             }
-          });
+
+            // Selalu daftarkan/perbarui endpoint ke database server agar notifikasi background masuk
+            if (sub) {
+              await sirani_syncSubscriptionToServer(sub, nisn);
+
+              if (bannerNotifAktif) bannerNotifAktif.style.display = 'flex';
+              if (bannerNotif)      bannerNotif.style.display      = 'none';
+            }
+          } catch(err) {
+            console.warn('Auto sync push subscription error:', err);
+          }
         });
       } else if (Notification.permission === 'default') {
-        // Belum pernah ditanya — tampilkan banner aktifkan
+        // Belum pernah ditanya — tampilkan banner ajakan aktifkan
         if (nisn && !localStorage.getItem('sirani_push_dismissed_' + nisn)) {
           setTimeout(function() {
             if (bannerNotif) bannerNotif.style.display = 'flex';
-          }, 2500);
+          }, 1500);
         }
       }
     }
@@ -1645,8 +1685,8 @@
       try {
         const permission = await Notification.requestPermission();
         if (permission !== 'granted') {
-          alert('Izin notifikasi ditolak. Silakan aktifkan izin notifikasi di pengaturan browser / HP Anda, lalu coba lagi.');
-          if (btn) { btn.disabled = false; btn.innerHTML = '<i class="bi bi-bell-fill"></i> Aktifkan Notifikasi'; }
+          alert('Izin notifikasi belum diizinkan. Silakan aktifkan izin notifikasi pada bilah alamat / setelan HP Anda.');
+          if (btn) { btn.disabled = false; btn.innerHTML = '<i class="bi bi-bell-fill"></i> Izinkan di HP Ini'; }
           return;
         }
 
@@ -1664,20 +1704,8 @@
           applicationServerKey: applicationServerKey,
         });
 
-        const subJson = subscription.toJSON();
         const nisn = sirani_getNisnAktif();
-
-        // Kirim subscription ke server
-        await fetch(SIRANI_SUB_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
-          body: JSON.stringify({
-            endpoint : subJson.endpoint,
-            p256dh   : subJson.keys?.p256dh,
-            auth     : subJson.keys?.auth,
-            nisn     : nisn,
-          }),
-        });
+        await sirani_syncSubscriptionToServer(subscription, nisn);
 
         // Update UI
         const bannerNotif      = document.getElementById('siraniBannerNotif');
@@ -1688,10 +1716,12 @@
         // Hapus flag dismiss
         if (nisn) localStorage.removeItem('sirani_push_dismissed_' + nisn);
 
+        alert('Notifikasi Berhasil Diaktifkan!\n\nHP Anda sekarang siap menerima pemberitahuan kehadiran siswa dan pengumuman sekolah langsung di bilah notifikasi.');
+
       } catch (err) {
         console.error('Gagal subscribe push:', err);
-        if (btn) { btn.disabled = false; btn.innerHTML = '<i class="bi bi-bell-fill"></i> Aktifkan Notifikasi'; }
-        alert('Gagal mengaktifkan notifikasi. Pastikan browser mendukung Web Push dan coba lagi.\n\nDetail: ' + err.message);
+        if (btn) { btn.disabled = false; btn.innerHTML = '<i class="bi bi-bell-fill"></i> Izinkan di HP Ini'; }
+        alert('Gagal mengaktifkan notifikasi: ' + err.message);
       }
     }
 
@@ -2463,13 +2493,21 @@
             <i class="bi bi-chevron-down" id="guideChevron"></i>
           </button>
           <div id="androidGuideBody" class="android-guide-content" style="display:none;">
-            Jika Anda ingin menggunakan nada dering bawaan sistem HP (Samsung, Xiaomi, Oppo, Vivo, dsb.):
+            <strong>1. Mengubah Suara &amp; Nada Dering Notifikasi:</strong>
             <ol class="android-guide-steps-list">
               <li>Buka <strong>Pengaturan (Settings) HP</strong> &gt; <strong>Aplikasi</strong>.</li>
               <li>Pilih aplikasi <strong>SIRANI</strong> (atau browser Chrome).</li>
               <li>Ketuk <strong>Pemberitahuan / Notifikasi</strong> &gt; <strong>Kategori Notifikasi</strong>.</li>
               <li>Pilih <strong>Suara / Nada Dering</strong> lalu pilih nada dering HP yang Anda sukai.</li>
             </ol>
+            <div style="margin-top:10px; padding-top:10px; border-top:1px dashed #cbd5e1;">
+              <strong style="color:#0f172a;"><i class="bi bi-shield-check" style="color:#22c55e;"></i> 2. Agar Selalu Masuk Real-Time Seperti WhatsApp (Aplikasi Ditutup / Layar Mati):</strong>
+              <ol class="android-guide-steps-list" style="margin-top:4px;">
+                <li>Di <strong>Pengaturan HP &gt; Aplikasi &gt; SIRANI</strong> (atau Chrome).</li>
+                <li>Pilih <strong>Penghemat Baterai (Battery Saver)</strong> &gt; Ubah menjadi <strong>"Tidak Ada Pembatasan" (No Restrictions / Unrestricted)</strong>.</li>
+                <li>Aktifkan <strong>Mulai Otomatis (Autostart)</strong> jika HP Anda bermerek Xiaomi, Oppo, atau Vivo.</li>
+              </ol>
+            </div>
           </div>
         </div>
 

@@ -140,12 +140,15 @@ self.addEventListener('push', (event) => {
     vibrate: [300, 100, 300, 100, 400],
     tag: data.tag || ('sirani-notif-' + Date.now()),
     renotify: true,
+    requireInteraction: true,
+    silent: false,
+    timestamp: data.timestamp || Date.now(),
     data: {
       url: data.url || '/cek-presensi',
       sound: data.sound || 'default',
     },
     actions: [
-      { action: 'view', title: '📋 Lihat Presensi' },
+      { action: 'view', title: '📋 Buka Presensi' },
       { action: 'close', title: 'Tutup' },
     ],
   };
