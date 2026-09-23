@@ -5,13 +5,16 @@ namespace App\Services;
 use App\Models\PushSubscription;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
+use Minishlink\WebPush\Subscription;
+use Minishlink\WebPush\VAPID;
+use Minishlink\WebPush\WebPush;
 
 class PushNotificationService
 {
     protected static ?array $vapidKeys = null;
 
     /**
-     * Dapatkan atau hasilkan VAPID Keypair otomatis (P-256)
+     * Dapatkan atau hasilkan VAPID Keypair otomatis (P-256 RFC 8292)
      */
     public static function getVapidKeys(): array
     {
@@ -22,48 +25,30 @@ class PushNotificationService
         $vapidPath = storage_path('app/vapid.json');
         if (File::exists($vapidPath)) {
             $data = json_decode(File::get($vapidPath), true);
-            if (!empty($data['publicKey']) && !empty($data['privateKey'])) {
+            if (!empty($data['publicKey']) && !empty($data['privateKey']) && strlen($data['publicKey']) > 50) {
                 self::$vapidKeys = $data;
                 return self::$vapidKeys;
             }
         }
 
-        // Generate VAPID keypair baru jika belum ada
-        $config = [
-            'curve_name' => 'prime256v1',
-            'private_key_type' => OPENSSL_KEYTYPE_EC,
-        ];
-        $res = openssl_pkey_new($config);
-        if ($res) {
-            openssl_pkey_export($res, $privatePem);
-            $details = openssl_pkey_get_details($res);
-            $ec = $details['ec'];
-            
-            // Format uncompressed public key (0x04 + x + y)
-            $rawPublicKey = "\x04" . $ec['x'] . $ec['y'];
-            $publicKey = self::base64UrlEncode($rawPublicKey);
-            $privateKey = self::base64UrlEncode($ec['d']);
-
+        // Generate VAPID keypair RFC-compliant
+        try {
+            $keys = VAPID::createVapidKeys();
             self::$vapidKeys = [
-                'publicKey'  => $publicKey,
-                'privateKey' => $privateKey,
-                'pem'        => $privatePem,
+                'publicKey'  => $keys['publicKey'],
+                'privateKey' => $keys['privateKey'],
             ];
 
-            // Simpan ke storage/app/vapid.json
             File::ensureDirectoryExists(dirname($vapidPath));
             File::put($vapidPath, json_encode(self::$vapidKeys, JSON_PRETTY_PRINT));
-
             return self::$vapidKeys;
+        } catch (\Throwable $e) {
+            Log::error('Gagal generate VAPID keys: ' . $e->getMessage());
+            return [
+                'publicKey'  => '',
+                'privateKey' => '',
+            ];
         }
-
-        // Fallback default jika openssl CLI berbeda
-        $defaultKeys = [
-            'publicKey'  => 'BCv5qD3_SIRANI_SMKN1AN_PUBLIC_KEY_' . bin2hex(random_bytes(16)),
-            'privateKey' => bin2hex(random_bytes(32)),
-        ];
-        self::$vapidKeys = $defaultKeys;
-        return self::$vapidKeys;
     }
 
     /**
@@ -84,7 +69,7 @@ class PushNotificationService
         $payload = [
             'title'     => $title,
             'body'      => $body,
-            'url'       => $url ?: '/monitoring-absen?keyword=' . urlencode($nisn),
+            'url'       => $url ?: '/presensi-siswa/' . urlencode($nisn),
             'icon'      => $icon ?: '/icons/icon-192.png',
             'badge'     => '/icons/icon-192.png',
             'nisn'      => $nisn,
@@ -131,59 +116,60 @@ class PushNotificationService
     }
 
     /**
-     * Kirim payload ke endpoint push browser/Android via HTTP POST
+     * Kirim payload terenkripsi ke browser/Android menggunakan WebPush library
      */
     protected static function dispatchPush(PushSubscription $sub, array $payload): bool
     {
         try {
-            $endpoint = $sub->endpoint;
-            $jsonPayload = json_encode($payload, JSON_UNESCAPED_UNICODE);
-
-            $ch = curl_init();
-            curl_setopt($ch, CURLOPT_URL, $endpoint);
-            curl_setopt($ch, CURLOPT_POST, true);
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-            curl_setopt($ch, CURLOPT_TIMEOUT, 5);
-            curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 3);
-            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
-
-            $headers = [
-                'TTL: 86400',
-                'Urgency: high',
-                'Content-Type: application/json',
-            ];
-
-            // Jika endpoint FCM Google lama
-            if (str_contains($endpoint, 'fcm.googleapis.com/fcm/send')) {
-                curl_setopt($ch, CURLOPT_POSTFIELDS, $jsonPayload);
-            } else {
-                curl_setopt($ch, CURLOPT_POSTFIELDS, $jsonPayload);
-            }
-
-            curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-
-            $response = curl_exec($ch);
-            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-            curl_close($ch);
-
-            // Jika endpoint sudah tidak valid / aplikasi di-uninstall
-            if ($httpCode === 404 || $httpCode === 410) {
-                $sub->update(['is_active' => false]);
+            $vapidKeys = self::getVapidKeys();
+            if (empty($vapidKeys['publicKey']) || empty($vapidKeys['privateKey'])) {
+                Log::warning('Push notification: VAPID keys belum dikonfigurasi.');
                 return false;
             }
 
-            return ($httpCode >= 200 && $httpCode < 300);
+            $auth = [
+                'VAPID' => [
+                    'subject'    => 'mailto:admin@smkn1airnaningan.sch.id',
+                    'publicKey'  => $vapidKeys['publicKey'],
+                    'privateKey' => $vapidKeys['privateKey'],
+                ],
+            ];
+
+            $webPush = new WebPush($auth);
+            $webPush->setDefaultOptions([
+                'TTL'     => 86400,
+                'urgency' => 'high',
+                'timeout' => 8,
+            ]);
+
+            // Buat objek langganan WebPush
+            $subscription = Subscription::create([
+                'endpoint'        => $sub->endpoint,
+                'publicKey'       => $sub->p256dh_key,
+                'authToken'       => $sub->auth_token,
+                'contentEncoding' => 'aes128gcm',
+            ]);
+
+            $jsonPayload = json_encode($payload, JSON_UNESCAPED_UNICODE);
+            $report = $webPush->sendOneNotification($subscription, $jsonPayload);
+
+            if ($report->isSuccess()) {
+                Log::info("Push berhasil dikirim ke endpoint: " . substr($sub->endpoint, 0, 45) . "...");
+                return true;
+            }
+
+            // Jika endpoint expired / diblokir pengguna
+            if ($report->isSubscriptionExpired()) {
+                Log::info("Endpoint push kedaluwarsa, menonaktifkan langganan ID: {$sub->id}");
+                $sub->update(['is_active' => false]);
+            } else {
+                Log::warning("Gagal kirim push: " . $report->getReason());
+            }
+
+            return false;
         } catch (\Throwable $e) {
-            Log::warning('Gagal kirim push notification: ' . $e->getMessage());
+            Log::warning('Exception dispatchPush: ' . $e->getMessage());
             return false;
         }
-    }
-
-    /**
-     * Helper URL-safe Base64
-     */
-    protected static function base64UrlEncode(string $data): string
-    {
-        return rtrim(strtr(base64_encode($data), '+/', '-_'), '=');
     }
 }

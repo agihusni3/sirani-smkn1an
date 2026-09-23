@@ -49,8 +49,10 @@ class DeployController extends Controller
         exec($gitCmd, $gitOutput, $gitStatus);
         $logs['git'] = $gitOutput;
 
-        // 2. Jalankan composer install jika paket penting (DomPDF/PhpWord) belum terpasang di vendor
-        $needsComposer = !class_exists(\Barryvdh\DomPDF\Facade\Pdf::class) || !class_exists(\PhpOffice\PhpWord\PhpWord::class);
+        // 2. Jalankan composer install jika paket penting (DomPDF/PhpWord/WebPush) belum terpasang di vendor
+        $needsComposer = !class_exists(\Barryvdh\DomPDF\Facade\Pdf::class) 
+            || !class_exists(\PhpOffice\PhpWord\PhpWord::class)
+            || !class_exists(\Minishlink\WebPush\WebPush::class);
         if ($needsComposer || $request->has('run_composer')) {
             $composerBin = null;
             $possiblePaths = ['composer', '/usr/local/bin/composer', '/usr/bin/composer'];
