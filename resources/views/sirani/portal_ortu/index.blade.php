@@ -315,20 +315,23 @@
               default     => '#2563eb',
             };
           @endphp
-          {{-- KARTU PEMBERITAHUAN KOREKSI PRESENSI TERKINI --}}
-          <div class="koreksi-live-alert-card" style="margin-bottom:16px; background:linear-gradient(135deg, rgba(245, 158, 11, 0.12) 0%, rgba(217, 119, 6, 0.05) 100%); border:1.5px solid rgba(245, 158, 11, 0.45); border-radius:18px; padding:14px 18px; display:flex; gap:14px; align-items:flex-start; box-shadow:0 4px 14px rgba(245, 158, 11, 0.08);">
+          {{-- KARTU PEMBERITAHUAN KOREKSI PRESENSI TERKINI (AUTO-DISMISS 10 DETIK) --}}
+          <div id="koreksiLiveAlertCard" class="koreksi-live-alert-card" style="position:relative; overflow:hidden; margin-bottom:16px; background:linear-gradient(135deg, rgba(245, 158, 11, 0.12) 0%, rgba(217, 119, 6, 0.05) 100%); border:1.5px solid rgba(245, 158, 11, 0.45); border-radius:18px; padding:14px 18px 18px 18px; display:flex; gap:14px; align-items:flex-start; box-shadow:0 4px 14px rgba(245, 158, 11, 0.08); transition:all 0.6s cubic-bezier(0.4, 0, 0.2, 1); max-height:300px; opacity:1;">
             <div style="width:42px; height:42px; border-radius:12px; background:rgba(245, 158, 11, 0.2); border:1px solid rgba(245, 158, 11, 0.4); display:flex; align-items:center; justify-content:center; font-size:20px; color:#d97706; flex-shrink:0;">
               <i class="bi bi-pencil-square"></i>
             </div>
-            <div style="flex:1; min-width:0;">
+            <div style="flex:1; min-width:0; padding-right:26px;">
               <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:6px; margin-bottom:4px;">
                 <div style="display:flex; align-items:center; gap:8px;">
                   <span style="font-size:13px; font-weight:800; color:var(--text, #0f172a);">Pemberitahuan Koreksi Presensi</span>
                   <span style="background:#fef3c7; color:#b45309; border:1px solid #fde68a; font-size:10px; font-weight:800; padding:1px 7px; border-radius:4px; text-transform:uppercase;">Terverifikasi Guru Piket</span>
                 </div>
-                <span style="font-size:11.5px; color:var(--text-3, #64748b); font-family:var(--font-mono); font-weight:700;">
-                  {{ \Carbon\Carbon::parse($koreksiTerbaru->tanggal)->translatedFormat('l, d F Y') }}
-                </span>
+                <div style="display:flex; align-items:center; gap:6px;">
+                  <span style="font-size:11.5px; color:var(--text-3, #64748b); font-family:var(--font-mono); font-weight:700;">
+                    {{ \Carbon\Carbon::parse($koreksiTerbaru->tanggal)->translatedFormat('l, d F Y') }}
+                  </span>
+                  <span id="koreksiBannerTimerBadge" style="font-size:10px; color:#b45309; font-weight:800; background:rgba(217,119,6,0.18); padding:1px 6px; border-radius:4px; font-family:var(--font-mono);" title="Banner akan tertutup otomatis">10s</span>
+                </div>
               </div>
               <div style="font-size:12.5px; color:var(--text-2, #334155); line-height:1.5;">
                 Catatan kehadiran ananda telah diperbarui menjadi <strong style="color:{{ $ktColor }}; font-weight:800; text-transform:uppercase;">{{ $ktLabel }}</strong>.
@@ -338,6 +341,14 @@
                   </div>
                 @endif
               </div>
+            </div>
+            {{-- Tombol Tutup Manual --}}
+            <button type="button" onclick="sirani_dismissKoreksiBanner()" style="position:absolute; top:10px; right:12px; background:none; border:none; color:#94a3b8; font-size:16px; cursor:pointer; padding:6px; line-height:1; border-radius:6px; transition:color .2s;" onmouseover="this.style.color='#d97706'" onmouseout="this.style.color='#94a3b8'" title="Tutup pemberitahuan">
+              <i class="bi bi-x-lg"></i>
+            </button>
+            {{-- Indikator Garis Durasi Waktu 10 Detik --}}
+            <div style="position:absolute; bottom:0; left:0; right:0; height:3.5px; background:rgba(217,119,6,0.18); overflow:hidden;">
+              <div id="koreksiBannerProgressBar" style="height:100%; width:100%; background:linear-gradient(90deg, #f59e0b, #d97706); transition:width 10s linear;"></div>
             </div>
           </div>
         @endif
@@ -3580,7 +3591,54 @@
       toast._dismissTimer = setTimeout(() => {
         toast.style.transform = 'translateX(-50%) translateY(-120%)';
         toast.style.opacity = '0';
-      }, 7000);
+      }, 10000);
+    }
+
+    // Fungsi tutup & animasi dismiss banner koreksi presensi
+    function sirani_dismissKoreksiBanner() {
+      const banner = document.getElementById('koreksiLiveAlertCard');
+      if (!banner) return;
+      banner.style.opacity = '0';
+      banner.style.transform = 'translateY(-14px)';
+      banner.style.maxHeight = '0px';
+      banner.style.marginBottom = '0px';
+      banner.style.paddingTop = '0px';
+      banner.style.paddingBottom = '0px';
+      setTimeout(() => {
+        if (banner && banner.parentNode) {
+          banner.parentNode.removeChild(banner);
+        }
+      }, 600);
+    }
+
+    // Inisialisasi hitung mundur 10 detik banner koreksi
+    function sirani_initKoreksiBannerCountdown() {
+      const banner = document.getElementById('koreksiLiveAlertCard');
+      if (!banner) return;
+
+      const progressBar = document.getElementById('koreksiBannerProgressBar');
+      const badge = document.getElementById('koreksiBannerTimerBadge');
+
+      // Animasi garis progress bergerak dari 100% ke 0%
+      setTimeout(() => {
+        if (progressBar) progressBar.style.width = '0%';
+      }, 50);
+
+      // Hitung mundur angka detik setiap 1 detik
+      let sisaDetik = 10;
+      const timerInt = setInterval(() => {
+        sisaDetik--;
+        if (badge) badge.textContent = sisaDetik + 's';
+        if (sisaDetik <= 0) {
+          clearInterval(timerInt);
+        }
+      }, 1000);
+
+      // Hilang otomatis tepat setelah 10 detik
+      setTimeout(() => {
+        clearInterval(timerInt);
+        sirani_dismissKoreksiBanner();
+      }, 10000);
     }
 
     // Unlock Web Audio & HTML5 Audio pada interaksi pengguna pertama di mobile browser
@@ -3604,6 +3662,7 @@
     // Inisialisasi pengelola pesan masuk & badging tanda angka
     document.addEventListener('DOMContentLoaded', function() {
       SiraniNotifManager.init();
+      sirani_initKoreksiBannerCountdown();
     });
     window.addEventListener('load', function() {
       SiraniNotifManager.loadAndRender();
