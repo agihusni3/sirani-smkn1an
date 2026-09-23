@@ -556,9 +556,21 @@ body.situan-body {
 /* ─── Metric Strips ─── */
 .situan-metric-strip {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 14px;
   margin-bottom: 20px;
+}
+
+@media (min-width: 1200px) {
+  .situan-metric-strip {
+    grid-template-columns: repeat(5, 1fr);
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1199px) {
+  .situan-metric-strip {
+    grid-template-columns: repeat(3, 1fr);
+  }
 }
 
 .situan-metric-card {

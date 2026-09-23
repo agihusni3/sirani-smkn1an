@@ -89,13 +89,60 @@
 
       {{-- SITUAN MODERN METRIC STRIP --}}
       <div class="situan-metric-strip no-print">
-        <div class="situan-metric-card">
+        <div class="situan-metric-card" title="{{ !empty($selectedRombel) ? 'Total Siswa di Rombel ' . $selectedRombel->nama_rombel : 'Total Seluruh Siswa Aktif' }}">
           <div class="situan-metric-icon">
             <i class="bi bi-people-fill"></i>
           </div>
-          <div>
+          <div style="min-width:0;">
             <div class="situan-metric-val">{{ number_format($statTotal) }}</div>
-            <div class="situan-metric-lbl">Total Siswa Aktif</div>
+            <div class="situan-metric-lbl">
+              @if(!empty($selectedRombel))
+                Siswa {{ $selectedRombel->nama_rombel }}
+              @else
+                Total Siswa Aktif
+              @endif
+            </div>
+            @if(!empty($selectedRombel))
+              <div style="font-size:10px; color:#0284c7; font-weight:800; margin-top:2px;">Filter Rombel Aktif</div>
+            @endif
+          </div>
+        </div>
+
+        <div class="situan-metric-card" title="{{ !empty($selectedRombel) ? 'Siswa Pria di Rombel ' . $selectedRombel->nama_rombel : 'Total Siswa Pria Aktif' }}">
+          <div class="situan-metric-icon" style="background:rgba(2,132,199,0.1); border-color:rgba(2,132,199,0.25); color:#0284c7;">
+            <i class="bi bi-gender-male"></i>
+          </div>
+          <div style="min-width:0;">
+            <div class="situan-metric-val" style="color:#0284c7;">{{ number_format($statPria ?? 0) }}</div>
+            <div class="situan-metric-lbl">
+              @if(!empty($selectedRombel))
+                Pria ({{ $selectedRombel->nama_rombel }})
+              @else
+                Total Siswa Pria
+              @endif
+            </div>
+            @if(($statTotal ?? 0) > 0)
+              <div style="font-size:10px; color:#64748b; font-weight:700; margin-top:2px;">{{ round((($statPria ?? 0) / $statTotal) * 100) }}% porsi</div>
+            @endif
+          </div>
+        </div>
+
+        <div class="situan-metric-card" title="{{ !empty($selectedRombel) ? 'Siswa Wanita di Rombel ' . $selectedRombel->nama_rombel : 'Total Siswa Wanita Aktif' }}">
+          <div class="situan-metric-icon" style="background:rgba(244,63,94,0.1); border-color:rgba(244,63,94,0.25); color:#e11d48;">
+            <i class="bi bi-gender-female"></i>
+          </div>
+          <div style="min-width:0;">
+            <div class="situan-metric-val" style="color:#e11d48;">{{ number_format($statWanita ?? 0) }}</div>
+            <div class="situan-metric-lbl">
+              @if(!empty($selectedRombel))
+                Wanita ({{ $selectedRombel->nama_rombel }})
+              @else
+                Total Siswa Wanita
+              @endif
+            </div>
+            @if(($statTotal ?? 0) > 0)
+              <div style="font-size:10px; color:#64748b; font-weight:700; margin-top:2px;">{{ round((($statWanita ?? 0) / $statTotal) * 100) }}% porsi</div>
+            @endif
           </div>
         </div>
 
@@ -103,9 +150,15 @@
           <div class="situan-metric-icon" style="background:rgba(15,118,110,0.1); border-color:rgba(15,118,110,0.25); color:#0f766e;">
             <i class="bi bi-mortarboard-fill"></i>
           </div>
-          <div>
+          <div style="min-width:0;">
             <div class="situan-metric-val">{{ number_format($statAlumni) }}</div>
-            <div class="situan-metric-lbl">Direktori Alumni / Lulus</div>
+            <div class="situan-metric-lbl">
+              @if(!empty($selectedRombel))
+                Alumni ({{ $selectedRombel->nama_rombel }})
+              @else
+                Direktori Alumni / Lulus
+              @endif
+            </div>
           </div>
         </div>
 
@@ -113,9 +166,15 @@
           <div class="situan-metric-icon" style="background:rgba(147,51,234,0.1); border-color:rgba(147,51,234,0.25); color:#7e22ce;">
             <i class="bi bi-briefcase-fill"></i>
           </div>
-          <div>
+          <div style="min-width:0;">
             <div class="situan-metric-val">{{ number_format($statPkl) }}</div>
-            <div class="situan-metric-lbl">Sedang Praktik Kerja (PKL)</div>
+            <div class="situan-metric-lbl">
+              @if(!empty($selectedRombel))
+                PKL ({{ $selectedRombel->nama_rombel }})
+              @else
+                Sedang Praktik Kerja (PKL)
+              @endif
+            </div>
           </div>
         </div>
       </div>

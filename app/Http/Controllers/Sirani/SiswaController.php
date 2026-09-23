@@ -105,30 +105,60 @@ class SiswaController extends Controller
         $taAktif = TahunAjaran::where('is_active', true)->first();
 
         // Statistik Cepat & Pilihan Rombel
-        if ($isWaliOnly) {
-            $rombels = Rombel::whereIn('id', $waliRombelIds)->orderBy('nama_rombel')->get();
-            $statTotal = Siswa::whereIn('status', ['aktif', 'pkl'])->whereHas('siswaRombels', function ($q) use ($waliRombelIds) {
+        $selectedRombel = !empty($rombelId) ? Rombel::find($rombelId) : null;
+
+        // Base query untuk menghitung statistik siswa
+        $baseActiveQuery = Siswa::whereIn('status', ['aktif', 'pkl']);
+        $baseAlumniQuery = Siswa::where('status', 'lulus');
+        $basePklQuery    = Siswa::where('status', 'pkl');
+
+        if (!empty($rombelId)) {
+            // Ketika rombel dipilih, statistik mengikuti rombel tersebut
+            $baseActiveQuery->whereHas('siswaRombels', function ($q) use ($rombelId) {
+                $q->where('rombel_id', $rombelId)->where('status_keanggotaan', 'aktif');
+            });
+            $baseAlumniQuery->whereHas('siswaRombels', function ($q) use ($rombelId) {
+                $q->where('rombel_id', $rombelId);
+            });
+            $basePklQuery->whereHas('siswaRombels', function ($q) use ($rombelId) {
+                $q->where('rombel_id', $rombelId)->where('status_keanggotaan', 'aktif');
+            });
+        } elseif ($isWaliOnly) {
+            // Jika wali kelas tanpa filter rombel spesifik
+            $baseActiveQuery->whereHas('siswaRombels', function ($q) use ($waliRombelIds) {
                 $q->whereIn('rombel_id', $waliRombelIds)->where('status_keanggotaan', 'aktif');
-            })->count();
-            $statAlumni = Siswa::where('status', 'lulus')->whereHas('siswaRombels', function ($q) use ($waliRombelIds) {
+            });
+            $baseAlumniQuery->whereHas('siswaRombels', function ($q) use ($waliRombelIds) {
                 $q->whereIn('rombel_id', $waliRombelIds);
-            })->count();
-            $statPkl = Siswa::where('status', 'pkl')->whereHas('siswaRombels', function ($q) use ($waliRombelIds) {
+            });
+            $basePklQuery->whereHas('siswaRombels', function ($q) use ($waliRombelIds) {
                 $q->whereIn('rombel_id', $waliRombelIds)->where('status_keanggotaan', 'aktif');
-            })->count();
-            $statRombel = count($waliRombelIds);
-        } else {
-            $rombels = Rombel::orderBy('nama_rombel')->get();
-            $statTotal = Siswa::whereIn('status', ['aktif', 'pkl'])->count();
-            $statAlumni = Siswa::where('status', 'lulus')->count();
-            $statPkl = Siswa::where('status', 'pkl')->count();
-            $statRombel = Rombel::count();
+            });
         }
+
+        $statTotal = (clone $baseActiveQuery)->count();
+        $statPria = (clone $baseActiveQuery)->where(function ($q) {
+            $q->where('jenis_kelamin', 'L')->orWhere('jenis_kelamin', 'like', 'L%');
+        })->count();
+        $statWanita = (clone $baseActiveQuery)->where(function ($q) {
+            $q->where('jenis_kelamin', 'P')->orWhere('jenis_kelamin', 'like', 'P%');
+        })->count();
+        $statAlumni = $baseAlumniQuery->count();
+        $statPkl    = $basePklQuery->count();
+        $statRombel = $isWaliOnly ? count($waliRombelIds) : Rombel::count();
+
+        $rombels = $isWaliOnly
+            ? Rombel::whereIn('id', $waliRombelIds)->orderBy('nama_rombel')->get()
+            : Rombel::orderBy('nama_rombel')->get();
 
         $waliRombel = $isWaliOnly && !empty($waliRombelIds) ? Rombel::find($waliRombelIds[0]) : null;
         $rfidStatus = $biometrikStatus;
 
-        return view('situan.siswa.index', compact('siswas', 'rombels', 'taAktif', 'search', 'rombelId', 'status', 'rfidStatus', 'statusPkl', 'sort', 'tab', 'statTotal', 'statAlumni', 'statPkl', 'statRombel', 'isWaliOnly', 'waliRombel'));
+        return view('situan.siswa.index', compact(
+            'siswas', 'rombels', 'taAktif', 'search', 'rombelId', 'status',
+            'rfidStatus', 'statusPkl', 'sort', 'tab', 'statTotal', 'statPria', 'statWanita',
+            'statAlumni', 'statPkl', 'statRombel', 'isWaliOnly', 'waliRombel', 'selectedRombel'
+        ));
     }
 
     /**
