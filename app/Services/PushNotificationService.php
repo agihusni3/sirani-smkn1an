@@ -219,7 +219,10 @@ class PushNotificationService
             ]);
 
             $jsonPayload = json_encode($payload, JSON_UNESCAPED_UNICODE);
-            $report = $webPush->sendOneNotification($subscription, $jsonPayload);
+            $report = $webPush->sendOneNotification($subscription, $jsonPayload, [
+                'TTL'     => 86400,
+                'urgency' => 'high',
+            ]);
 
             if ($report->isSuccess()) {
                 Log::info("Push berhasil dikirim ke endpoint: " . substr($sub->endpoint, 0, 45) . "...");
