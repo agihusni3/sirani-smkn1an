@@ -314,9 +314,27 @@
               'bolos'     => '#dc2626',
               default     => '#2563eb',
             };
+            $ktBannerKey = 'koreksi_banner_seen_' . $koreksiTerbaru->id . '_' . strtotime($koreksiTerbaru->updated_at ?: $koreksiTerbaru->tanggal);
+            $ktNotifId = 'koreksi-abs-' . $koreksiTerbaru->id . '-' . strtotime($koreksiTerbaru->updated_at ?: $koreksiTerbaru->tanggal);
           @endphp
-          {{-- KARTU PEMBERITAHUAN KOREKSI PRESENSI TERKINI (AUTO-DISMISS 10 DETIK) --}}
-          <div id="koreksiLiveAlertCard" class="koreksi-live-alert-card" style="position:relative; overflow:hidden; margin-bottom:16px; background:linear-gradient(135deg, rgba(245, 158, 11, 0.12) 0%, rgba(217, 119, 6, 0.05) 100%); border:1.5px solid rgba(245, 158, 11, 0.45); border-radius:18px; padding:14px 18px 18px 18px; display:flex; gap:14px; align-items:flex-start; box-shadow:0 4px 14px rgba(245, 158, 11, 0.08); transition:all 0.6s cubic-bezier(0.4, 0, 0.2, 1); max-height:300px; opacity:1;">
+          {{-- CEK APAKAH BANNER SUDAH PERNAH DITAMPILKAN SEBELUMNYA. JIKA SUDAH, JANGAN TAMPILKAN LAGI SAAT REFRESH --}}
+          <script>
+            (function(){
+              try {
+                if (localStorage.getItem('{{ $ktBannerKey }}') === 'seen') {
+                  document.write('<style>#koreksiLiveAlertCard { display: none !important; }</style>');
+                }
+              } catch(e) {}
+            })();
+          </script>
+          {{-- KARTU PEMBERITAHUAN KOREKSI PRESENSI TERKINI (AUTO-DISMISS 10 DETIK & SEKALI TAMPIL) --}}
+          <div id="koreksiLiveAlertCard" 
+               class="koreksi-live-alert-card" 
+               data-banner-key="{{ $ktBannerKey }}" 
+               data-notif-id="{{ $ktNotifId }}" 
+               data-toast-title="Pemberitahuan Koreksi Presensi" 
+               data-toast-body="Catatan kehadiran ananda telah diperbarui menjadi {{ $ktLabel }}." 
+               style="position:relative; overflow:hidden; margin-bottom:16px; background:linear-gradient(135deg, rgba(245, 158, 11, 0.12) 0%, rgba(217, 119, 6, 0.05) 100%); border:1.5px solid rgba(245, 158, 11, 0.45); border-radius:18px; padding:14px 18px 18px 18px; display:flex; gap:14px; align-items:flex-start; box-shadow:0 4px 14px rgba(245, 158, 11, 0.08); transition:all 0.6s cubic-bezier(0.4, 0, 0.2, 1); max-height:300px; opacity:1;">
             <div style="width:42px; height:42px; border-radius:12px; background:rgba(245, 158, 11, 0.2); border:1px solid rgba(245, 158, 11, 0.4); display:flex; align-items:center; justify-content:center; font-size:20px; color:#d97706; flex-shrink:0;">
               <i class="bi bi-pencil-square"></i>
             </div>
@@ -3258,7 +3276,7 @@
               }
             }
           } catch(e) {}
-        }, 25000);
+        }, 6000);
       }
     };
 
@@ -3743,6 +3761,10 @@
     function sirani_dismissKoreksiBanner() {
       const banner = document.getElementById('koreksiLiveAlertCard');
       if (!banner) return;
+      const bannerKey = banner.getAttribute('data-banner-key');
+      if (bannerKey) {
+        try { localStorage.setItem(bannerKey, 'seen'); } catch(e) {}
+      }
       banner.style.opacity = '0';
       banner.style.transform = 'translateY(-14px)';
       banner.style.maxHeight = '0px';
@@ -3756,10 +3778,40 @@
       }, 600);
     }
 
-    // Inisialisasi hitung mundur 10 detik banner koreksi
+    // Inisialisasi hitung mundur 10 detik banner koreksi (Cukup tampil 1 kali & bunyikan notifikasi serentak)
     function sirani_initKoreksiBannerCountdown() {
       const banner = document.getElementById('koreksiLiveAlertCard');
       if (!banner) return;
+
+      const bannerKey = banner.getAttribute('data-banner-key');
+      if (bannerKey && localStorage.getItem(bannerKey) === 'seen') {
+        if (banner.parentNode) banner.parentNode.removeChild(banner);
+        return;
+      }
+
+      // Tandai SEGERA di localStorage bahwa banner ini sudah pernah tampil (sehingga saat refresh tidak muncul lagi)
+      if (bannerKey) {
+        try { localStorage.setItem(bannerKey, 'seen'); } catch(e) {}
+      }
+
+      const notifId = banner.getAttribute('data-notif-id');
+      const toastTitle = banner.getAttribute('data-toast-title') || 'Pemberitahuan Koreksi Presensi';
+      const toastBody = banner.getAttribute('data-toast-body') || 'Catatan kehadiran ananda telah diperbarui.';
+
+      // Cegah startPolling membunyikan/menampilkan notifikasi dobel di kemudian detik
+      if (notifId && typeof SiraniNotifManager !== 'undefined' && SiraniNotifManager.addAlertedId) {
+        SiraniNotifManager.addAlertedId(notifId);
+      }
+
+      // BUNYIKAN SUARA & MUNCULKAN TOAST SERENTAK (0 DETIK) BERSAMAAN DENGAN MUNCULNYA BANER
+      try {
+        const soundChoice = localStorage.getItem('sirani_sound_choice') || 'chime';
+        sirani_playPreviewSound(soundChoice);
+      } catch(e) {}
+
+      try {
+        sirani_showInAppToast(toastTitle, toastBody);
+      } catch(e) {}
 
       const progressBar = document.getElementById('koreksiBannerProgressBar');
       const badge = document.getElementById('koreksiBannerTimerBadge');

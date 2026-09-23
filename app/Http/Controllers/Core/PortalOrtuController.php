@@ -402,7 +402,7 @@ class PortalOrtuController extends Controller
             };
             $dateId = $ka->tanggal ? Carbon::parse($ka->tanggal)->translatedFormat('d M Y') : '';
             $notifs[] = [
-                'id'       => 'koreksi-abs-' . $ka->id . '-' . strtotime($ka->updated_at),
+                'id'       => 'koreksi-abs-' . $ka->id . '-' . strtotime($ka->updated_at ?: $ka->tanggal),
                 'title'    => "Koreksi Presensi: {$siswa->nama} ({$labelStatus})",
                 'body'     => "Data kehadiran ananda tanggal {$dateId} diperbarui menjadi {$labelStatus}." . ($ka->keterangan ? " Catatan: {$ka->keterangan}" : ""),
                 'time'     => ($ka->updated_at ? $ka->updated_at->timestamp : now()->timestamp) * 1000,
