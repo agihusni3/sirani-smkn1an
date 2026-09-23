@@ -16,5 +16,4 @@ Route::match(['get', 'post'], '/deploy-webhook', [\App\Http\Controllers\Api\Depl
 Route::get('/push-vapid-key', [\App\Http\Controllers\Api\PushSubscriptionController::class, 'getPublicKey']);
 Route::post('/push-subscribe', [\App\Http\Controllers\Api\PushSubscriptionController::class, 'subscribe']);
 Route::post('/push-unsubscribe', [\App\Http\Controllers\Api\PushSubscriptionController::class, 'unsubscribe']);
-Route::match(['get', 'post'], '/push-test', [\App\Http\Controllers\Api\PushSubscriptionController::class, 'sendTest']);
 

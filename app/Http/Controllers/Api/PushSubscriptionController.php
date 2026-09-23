@@ -75,36 +75,4 @@ class PushSubscriptionController extends Controller
             'message' => 'Langganan notifikasi dinonaktifkan.',
         ]);
     }
-
-    /**
-     * Uji kirim push notification ke NISN tertentu (untuk pengujian instan)
-     */
-    public function sendTest(Request $request)
-    {
-        $nisn = trim($request->input('nisn') ?: '0106605523');
-
-        $subs = PushSubscription::where('nisn', $nisn)->where('is_active', true)->get();
-        if ($subs->isEmpty()) {
-            return response()->json([
-                'status'      => 'warning',
-                'message'     => "Belum ada HP/browser yang mengaktifkan notifikasi untuk NISN {$nisn}. Silakan klik 'Aktifkan Notifikasi' di HP/browser terlebih dahulu.",
-                'subscribers' => 0,
-                'sent'        => 0,
-            ]);
-        }
-
-        $sent = PushNotificationService::sendToSiswa(
-            $nisn,
-            "🧪 Uji Notifikasi SIRANI (NISN: {$nisn})",
-            "Halo! Notifikasi presensi & kedisiplinan SIRANI SMKN 1 Air Naningan aktif dan terhubung sempurna di HP Anda.",
-            "/presensi-siswa/{$nisn}"
-        );
-
-        return response()->json([
-            'status'      => 'success',
-            'message'     => "Notifikasi uji coba berhasil dikirim ke {$sent} perangkat aktif!",
-            'subscribers' => $subs->count(),
-            'sent'        => $sent,
-        ]);
-    }
 }
