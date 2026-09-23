@@ -256,37 +256,57 @@
     </div>
 
     {{-- RIWAYAT PERIZINAN MULTI-TAB --}}
-    <div class="panel">
+    <div class="panel" style="padding: 16px 20px;">
       <div class="izin-nav-tabs">
-        <button class="izin-tab-btn {{ !request()->has('page_guru') ? 'active' : '' }}" id="tabBtnSiswa" onclick="switchRiwayatTab('tab-riwayat-siswa', this)">
-          <i class="bi bi-people-fill"></i> Izin Siswa ({{ $izins->total() }})
+        <button type="button" class="izin-tab-btn {{ !request()->has('page_guru') ? 'active' : '' }}" id="tabBtnSiswa" onclick="switchRiwayatTab('tab-riwayat-siswa', this)">
+          <i class="bi bi-people-fill"></i>
+          <span>Izin Siswa</span>
+          <span class="izin-tab-badge">{{ $izins->total() }}</span>
         </button>
-        <button class="izin-tab-btn {{ request()->has('page_guru') ? 'active' : '' }}" id="tabBtnGuru" onclick="switchRiwayatTab('tab-riwayat-guru', this)">
-          <i class="bi bi-person-badge-fill"></i> Izin Guru ({{ $izinGurus->total() }})
+        <button type="button" class="izin-tab-btn {{ request()->has('page_guru') ? 'active' : '' }}" id="tabBtnGuru" onclick="switchRiwayatTab('tab-riwayat-guru', this)">
+          <i class="bi bi-person-badge-fill"></i>
+          <span>Izin Guru &amp; Pegawai</span>
+          <span class="izin-tab-badge">{{ $izinGurus->total() }}</span>
         </button>
       </div>
 
       {{-- TAB 1: RIWAYAT IZIN SISWA --}}
-      <div class="izin-tab-pane {{ !request()->has('page_guru') ? 'active' : '' }}" id="tab-riwayat-siswa" style="border:1px solid var(--border); border-radius:var(--r-md); overflow:hidden; background:var(--bg-2); box-shadow:var(--shadow-sm); margin-top:8px;">
-        <div style="padding:8px 12px; border-bottom:1px solid var(--border); background:var(--surface); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
-          <div style="font-weight:800; font-size:12.5px; color:var(--text); display:flex; align-items:center; gap:6px;">
-            <i class="bi bi-people-fill" style="color:#000000;"></i>
-            <span>Daftar Perizinan Siswa ({{ \Carbon\Carbon::parse($tanggal)->translatedFormat('d M Y') }})</span>
-            <span class="badge" style="background:rgba(2, 132, 199, 0.1); color:#0284c7; font-size:10px; border:1px solid rgba(2, 132, 199, 0.2); font-weight:700;">Harian</span>
-          </div>
-          <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
-            <form method="GET" action="{{ url()->current() }}" style="display:flex; align-items:center; gap:4px;">
-              <input type="date" name="tanggal" value="{{ $tanggal }}" onchange="this.form.submit()" style="height:30px; font-size:11.5px; border-radius:var(--r-sm); background:var(--bg-2); border:1px solid var(--border-2); padding:2px 8px; font-family:var(--font-mono); font-weight:700;" title="Pilih tanggal">
-              @if($tanggal !== now()->toDateString())
-                <a href="{{ url()->current() }}" class="btn btn-sm btn-outline-secondary" style="height:30px; padding:3px 8px; font-size:11px; font-weight:700;" title="Kembali ke Hari Ini">Hari Ini</a>
-              @endif
-            </form>
-            <div style="position:relative; width:100%; max-width:180px;">
-              <i class="bi bi-search" style="position:absolute; left:10px; top:50%; transform:translateY(-50%); color:#000000; font-size:11px;"></i>
-              <input type="text" placeholder="Cari nama, NISN..." oninput="filterTableIzin('tableIzinSiswa', this.value)" style="width:100%; padding-left:28px; height:30px; font-size:11.5px; border-radius:var(--r-sm); background:var(--bg-2); border:1px solid var(--border-2);" />
+      <div class="izin-tab-pane {{ !request()->has('page_guru') ? 'active' : '' }}" id="tab-riwayat-siswa">
+        <div class="izin-card-container">
+          <div class="izin-table-header">
+            <div class="izin-table-title-group">
+              <div class="izin-table-icon-wrap">
+                <i class="bi bi-people-fill"></i>
+              </div>
+              <div>
+                <div class="izin-table-title">
+                  <span>Daftar Perizinan Siswa</span>
+                  <span class="badge-status-harian">Harian</span>
+                </div>
+                <div class="izin-table-subtitle">
+                  <i class="bi bi-calendar3"></i> {{ \Carbon\Carbon::parse($tanggal)->translatedFormat('l, d F Y') }}
+                </div>
+              </div>
+            </div>
+
+            <div class="izin-table-toolbar">
+              <form method="GET" action="{{ url()->current() }}" class="izin-date-form">
+                <div class="date-input-wrap">
+                  <input type="date" name="tanggal" value="{{ $tanggal }}" onchange="this.form.submit()" class="izin-date-input" title="Pilih tanggal">
+                </div>
+                @if($tanggal !== now()->toDateString())
+                  <a href="{{ url()->current() }}" class="btn-today-shortcut" title="Kembali ke Hari Ini">
+                    <i class="bi bi-arrow-counterclockwise"></i> Hari Ini
+                  </a>
+                @endif
+              </form>
+
+              <div class="izin-search-wrap">
+                <i class="bi bi-search"></i>
+                <input type="text" placeholder="Cari nama, NISN..." oninput="filterTableIzin('tableIzinSiswa', this.value)" class="izin-search-input" />
+              </div>
             </div>
           </div>
-        </div>
 
         <div class="table-responsive" style="overflow-x:auto;">
           <table class="data-table" id="tableIzinSiswa">
@@ -381,30 +401,47 @@
             </div>
           </div>
         @endif
+        </div>
       </div>
 
       {{-- TAB 2: RIWAYAT IZIN GURU --}}
-      <div class="izin-tab-pane {{ request()->has('page_guru') ? 'active' : '' }}" id="tab-riwayat-guru" style="border:1px solid var(--border); border-radius:var(--r-md); overflow:hidden; background:var(--bg-2); box-shadow:var(--shadow-sm); margin-top:8px;">
-        <div style="padding:8px 12px; border-bottom:1px solid var(--border); background:var(--surface); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
-          <div style="font-weight:800; font-size:12.5px; color:var(--text); display:flex; align-items:center; gap:6px;">
-            <i class="bi bi-person-badge-fill" style="color:#000000;"></i>
-            <span>Daftar Perizinan Guru &amp; Pegawai ({{ \Carbon\Carbon::parse($tanggal)->translatedFormat('d M Y') }})</span>
-            <span class="badge" style="background:rgba(2, 132, 199, 0.1); color:#0284c7; font-size:10px; border:1px solid rgba(2, 132, 199, 0.2); font-weight:700;">Harian</span>
-          </div>
-          <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
-            <form method="GET" action="{{ url()->current() }}" style="display:flex; align-items:center; gap:4px;">
-              <input type="hidden" name="page_guru" value="1">
-              <input type="date" name="tanggal" value="{{ $tanggal }}" onchange="this.form.submit()" style="height:30px; font-size:11.5px; border-radius:var(--r-sm); background:var(--bg-2); border:1px solid var(--border-2); padding:2px 8px; font-family:var(--font-mono); font-weight:700;" title="Pilih tanggal">
-              @if($tanggal !== now()->toDateString())
-                <a href="{{ url()->current() }}?page_guru=1" class="btn btn-sm btn-outline-secondary" style="height:30px; padding:3px 8px; font-size:11px; font-weight:700;" title="Kembali ke Hari Ini">Hari Ini</a>
-              @endif
-            </form>
-            <div style="position:relative; width:100%; max-width:180px;">
-              <i class="bi bi-search" style="position:absolute; left:10px; top:50%; transform:translateY(-50%); color:#000000; font-size:11px;"></i>
-              <input type="text" placeholder="Cari nama, NIP..." oninput="filterTableIzin('tableIzinGuru', this.value)" style="width:100%; padding-left:28px; height:30px; font-size:11.5px; border-radius:var(--r-sm); background:var(--bg-2); border:1px solid var(--border-2);" />
+      <div class="izin-tab-pane {{ request()->has('page_guru') ? 'active' : '' }}" id="tab-riwayat-guru">
+        <div class="izin-card-container">
+          <div class="izin-table-header">
+            <div class="izin-table-title-group">
+              <div class="izin-table-icon-wrap guru-icon">
+                <i class="bi bi-person-badge-fill"></i>
+              </div>
+              <div>
+                <div class="izin-table-title">
+                  <span>Daftar Perizinan Guru &amp; Pegawai</span>
+                  <span class="badge-status-harian">Harian</span>
+                </div>
+                <div class="izin-table-subtitle">
+                  <i class="bi bi-calendar3"></i> {{ \Carbon\Carbon::parse($tanggal)->translatedFormat('l, d F Y') }}
+                </div>
+              </div>
+            </div>
+
+            <div class="izin-table-toolbar">
+              <form method="GET" action="{{ url()->current() }}" class="izin-date-form">
+                <input type="hidden" name="page_guru" value="1">
+                <div class="date-input-wrap">
+                  <input type="date" name="tanggal" value="{{ $tanggal }}" onchange="this.form.submit()" class="izin-date-input" title="Pilih tanggal">
+                </div>
+                @if($tanggal !== now()->toDateString())
+                  <a href="{{ url()->current() }}?page_guru=1" class="btn-today-shortcut" title="Kembali ke Hari Ini">
+                    <i class="bi bi-arrow-counterclockwise"></i> Hari Ini
+                  </a>
+                @endif
+              </form>
+
+              <div class="izin-search-wrap">
+                <i class="bi bi-search"></i>
+                <input type="text" placeholder="Cari nama, NIP..." oninput="filterTableIzin('tableIzinGuru', this.value)" class="izin-search-input" />
+              </div>
             </div>
           </div>
-        </div>
 
         <div class="table-responsive" style="overflow-x:auto;">
           <table class="data-table" id="tableIzinGuru">
@@ -501,6 +538,7 @@
             </div>
           </div>
         @endif
+        </div>
       </div>
 
     </div>
