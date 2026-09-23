@@ -178,6 +178,21 @@ class NotifikasiController extends Controller
 
         $result = $this->waService->kirim($notifikasi);
 
+        // Push Notification ke Aplikasi HP Orang Tua (jika aktif)
+        $siswa = $notifikasi->siswa;
+        if ($siswa && !empty($siswa->nisn)) {
+            try {
+                \App\Services\PushNotificationService::sendToSiswa(
+                    $siswa->nisn,
+                    $notifikasi->judul,
+                    mb_strimwidth(strip_tags($notifikasi->pesan), 0, 140, '...'),
+                    "/presensi-siswa/" . $siswa->nisn
+                );
+            } catch (\Throwable $e) {
+                \Illuminate\Support\Facades\Log::warning("Gagal push notif saat approve: " . $e->getMessage());
+            }
+        }
+
         return back()->with(
             $result['success'] ? 'success' : 'error',
             $result['message'] . " (Diverifikasi oleh {$petugas})"
@@ -203,7 +218,7 @@ class NotifikasiController extends Controller
         $successCount = 0;
         $failCount = 0;
 
-        $notifikasis = NotifikasiOrtu::whereIn('id', $ids)->where('status', 'pending')->get();
+        $notifikasis = NotifikasiOrtu::whereIn('id', $ids)->where('status', 'pending')->with('siswa')->get();
         foreach ($notifikasis as $notif) {
             $notif->update([
                 'status'            => 'diverifikasi',
@@ -216,6 +231,21 @@ class NotifikasiController extends Controller
                 $successCount++;
             } else {
                 $failCount++;
+            }
+
+            // Push Notification ke HP Orang Tua
+            $siswa = $notif->siswa;
+            if ($siswa && !empty($siswa->nisn)) {
+                try {
+                    \App\Services\PushNotificationService::sendToSiswa(
+                        $siswa->nisn,
+                        $notif->judul,
+                        mb_strimwidth(strip_tags($notif->pesan), 0, 140, '...'),
+                        "/presensi-siswa/" . $siswa->nisn
+                    );
+                } catch (\Throwable $e) {
+                    // silently catch
+                }
             }
         }
 

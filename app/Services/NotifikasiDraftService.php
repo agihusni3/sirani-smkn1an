@@ -276,6 +276,20 @@ class NotifikasiDraftService
             \Illuminate\Support\Facades\Log::warning("[SIRANI BOLOS WA] Gagal kirim WA ke {$noHpOrtu}: " . $e->getMessage());
         }
 
+        // 9. Kirim Push Notification ke Aplikasi HP Orang Tua
+        if (!empty($siswa->nisn)) {
+            try {
+                \App\Services\PushNotificationService::sendToSiswa(
+                    $siswa->nisn,
+                    "🚫 Peringatan Bolos: " . $siswa->nama,
+                    "Ananda terdeteksi meninggalkan sekolah sebelum jam pulang tanpa izin ({$namaRombel}). Mohon periksa portal presensi.",
+                    "/presensi-siswa/" . $siswa->nisn
+                );
+            } catch (\Throwable $e) {
+                \Illuminate\Support\Facades\Log::warning("[SIRANI BOLOS PUSH] Gagal: " . $e->getMessage());
+            }
+        }
+
         return $notif;
     }
 

@@ -464,9 +464,13 @@ class RfidScanService
                     // Push Notification Real-Time ke Aplikasi HP Orang Tua
                     try {
                         if (!empty($person->nisn)) {
-                            $statusTxt = $isTerlambat ? 'TERLAMBAT' : 'Tepat Waktu';
-                            $pushTitle = "Presensi Masuk: {$person->nama}";
-                            $pushBody = "Ananda telah hadir di sekolah pukul {$timeNow} WIB ({$statusTxt}).";
+                            if ($isTerlambat) {
+                                $pushTitle = "⚠️ Presensi Masuk (TERLAMBAT): {$person->nama}";
+                                $pushBody  = "Ananda baru hadir di sekolah pukul {$timeNow} WIB (Melewati batas toleransi {$jamMasukMaks} WIB).";
+                            } else {
+                                $pushTitle = "✅ Presensi Masuk: {$person->nama}";
+                                $pushBody  = "Ananda telah hadir di sekolah pukul {$timeNow} WIB (Tepat Waktu).";
+                            }
                             \App\Services\PushNotificationService::sendToSiswa($person->nisn, $pushTitle, $pushBody);
                         }
                     } catch (\Throwable $e) {
