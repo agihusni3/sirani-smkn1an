@@ -613,7 +613,7 @@
               <input type="date" name="tanggal_mulai" value="{{ $tanggalMulai }}" class="form-control-pt" />
               <span style="font-size:11.5px; color:var(--text-3); font-weight:700;">s/d</span>
               <input type="date" name="tanggal_selesai" value="{{ $tanggalSelesai }}" class="form-control-pt" onchange="preserveScrollAndSubmit(this.form)" />
-              <button type="submit" class="btn-search" style="padding:4px 10px; font-size:11.5px; border-radius:6px;">Pilih</button>
+              <button type="submit" class="btn-search" style="padding:4px 12px; font-size:11.5px; border-radius:6px; width:auto !important; height:34px;">Pilih</button>
             @elseif($periode === 'tahunan')
               <select name="tahun" class="form-control-pt" onchange="preserveScrollAndSubmit(this.form)">
                 @for($y = date('Y') + 1; $y >= 2024; $y--)
@@ -2071,21 +2071,23 @@
       html += '<div style="display:flex; flex-direction:column; gap:6px;">';
       saved.forEach(function(s) {
         const idVal = s.nisn || s.nis;
-        html += '<div style="background:var(--bg-card); border:1px solid var(--border); border-radius:var(--r-sm); padding:8px 12px; display:flex; justify-content:space-between; align-items:center; gap:8px;">';
-        html += '<div style="display:flex; align-items:center; gap:10px; min-width:0;">';
-        html += '<div style="width:30px; height:40px; aspect-ratio:3/4; border-radius:6px; background:var(--bg-subtle); border:1px solid var(--border); display:flex; align-items:center; justify-content:center; font-weight:800; font-size:13px; color:var(--text); flex-shrink:0; overflow:hidden;">';
+        html += '<div style="background:var(--bg-card); border:1px solid var(--border); border-radius:10px; padding:10px 12px; display:flex; justify-content:space-between; align-items:center; gap:10px; box-sizing:border-box;">';
+        html += '<div style="display:flex; align-items:center; gap:10px; min-width:0; flex:1;">';
+        html += '<div style="width:34px; height:44px; border-radius:6px; background:var(--bg-subtle); border:1px solid var(--border); display:flex; align-items:center; justify-content:center; font-weight:800; font-size:13px; color:var(--text); flex-shrink:0; overflow:hidden;">';
         if (s.foto) {
-          html += '<img src="' + s.foto + '" style="width:100%; height:100%; aspect-ratio:3/4; object-fit:cover; object-position:center 20%;">';
+          html += '<img src="' + s.foto + '" style="width:100%; height:100%; object-fit:cover; object-position:center 20%; display:block;">';
         } else {
-          html += s.nama.charAt(0).toUpperCase();
+          html += (s.nama ? s.nama.charAt(0).toUpperCase() : 'S');
         }
         html += '</div>';
-        html += '<div style="min-width:0;">';
-        html += '<strong style="color:var(--text); font-size:12.5px; display:block; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">' + s.nama + '</strong>';
-        html += '<span style="font-size:11px; color:var(--text-3); font-family:var(--font-mono);">NISN: ' + idVal + (s.rombel ? ' · ' + s.rombel : '') + '</span>';
+        html += '<div style="min-width:0; flex:1;">';
+        html += '<strong style="color:var(--text); font-size:13px; font-weight:800; display:block; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; line-height:1.3;">' + (s.nama || 'Siswa') + '</strong>';
+        html += '<div style="font-size:11px; color:var(--text-3); font-family:var(--font-mono); margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">';
+        html += '<span>NISN: ' + idVal + '</span>' + (s.rombel ? ' <span style="color:var(--text-2); font-weight:600;">· ' + s.rombel + '</span>' : '');
         html += '</div>';
         html += '</div>';
-        html += '<a href="/cek-presensi?keyword=' + idVal + '" class="btn-search" style="padding:4px 12px; height:30px; font-size:11.5px; text-decoration:none; flex-shrink:0;">Buka →</a>';
+        html += '</div>';
+        html += '<a href="/cek-presensi?keyword=' + idVal + '" class="btn-saved-open" style="background:#0f172a; color:#ffffff !important; font-size:12px; font-weight:800; padding:0 14px; height:32px; border-radius:8px; text-decoration:none !important; display:inline-flex; align-items:center; justify-content:center; gap:5px; flex-shrink:0; white-space:nowrap; width:auto !important; max-width:max-content; box-sizing:border-box; margin:0;">Buka <i class="bi bi-arrow-right" style="font-size:11px;"></i></a>';
         html += '</div>';
       });
       html += '</div></div>';

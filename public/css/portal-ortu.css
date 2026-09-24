@@ -372,6 +372,34 @@
     .btn-search:hover {
       background: #1e293b;
     }
+    .btn-saved-open {
+      background: #0f172a;
+      color: #ffffff !important;
+      font-weight: 800;
+      font-size: 12px;
+      padding: 0 14px;
+      height: 32px;
+      border-radius: 8px;
+      text-decoration: none !important;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      white-space: nowrap;
+      flex-shrink: 0;
+      width: auto !important;
+      max-width: max-content;
+      box-sizing: border-box;
+      transition: all .15s ease;
+      cursor: pointer;
+    }
+    .btn-saved-open:hover {
+      background: #1e293b;
+      transform: translateY(-1px);
+    }
+    .btn-saved-open:active {
+      transform: translateY(0);
+    }
     .search-hints-row {
       margin-top: 10px;
       display: flex;
@@ -448,7 +476,7 @@
       .search-title { font-size: 20px; }
       .search-console-card { padding: 22px 16px; border-radius: var(--r-lg); }
       .search-input-wrap { flex-direction: column; align-items: stretch; }
-      .btn-search { width: 100%; }
+      .search-input-wrap .btn-search { width: 100%; }
       .portal-features-grid { grid-template-columns: 1fr; }
 
       /* Compact search card — stack jadi 2 baris */
