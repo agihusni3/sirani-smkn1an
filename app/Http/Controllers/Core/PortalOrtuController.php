@@ -33,6 +33,7 @@ class PortalOrtuController extends Controller
         $absensis = collect();
         $izins = collect();
         $rekapBulananTahunan = [];
+        $rekapMingguanBulanan = [];
         $periodeText = '';
         $serverNotifs = [];
         $koreksiTerbaru = null;
@@ -196,7 +197,7 @@ class PortalOrtuController extends Controller
 
                         $rekapBulananTahunan[] = [
                             'bulan_num'  => $m,
-                            'bulan_nama' => $mCarbon->translatedFormat('F'),
+                            'bulan_nama' => $mCarbon->locale('id')->translatedFormat('F'),
                             'hadir'      => $mHadir,
                             'terlambat'  => $mTelat,
                             'izin'       => $mIzin,
@@ -205,6 +206,62 @@ class PortalOrtuController extends Controller
                             'bolos'      => $mBolos,
                             'total'      => $mTotal,
                             'persen'     => $mPersen,
+                        ];
+                    }
+                }
+
+                // Rekapitulasi Jumlah per Minggu untuk Laporan Bulanan
+                $rekapMingguanBulanan = [];
+                if ($periode === 'bulanan') {
+                    try {
+                        $startOfMonth = Carbon::createFromFormat('Y-m', $bulanSelected)->startOfMonth();
+                        $endOfMonth = Carbon::createFromFormat('Y-m', $bulanSelected)->endOfMonth();
+                    } catch (\Exception $e) {
+                        $startOfMonth = Carbon::today()->startOfMonth();
+                        $endOfMonth = Carbon::today()->endOfMonth();
+                    }
+
+                    $daysInMonth = $startOfMonth->daysInMonth;
+                    $monthShort = $startOfMonth->locale('id')->translatedFormat('M');
+                    $weekRanges = [
+                        ['num' => 1, 'start' => 1,  'end' => min(7, $daysInMonth)],
+                        ['num' => 2, 'start' => 8,  'end' => min(14, $daysInMonth)],
+                        ['num' => 3, 'start' => 15, 'end' => min(21, $daysInMonth)],
+                        ['num' => 4, 'start' => 22, 'end' => min(28, $daysInMonth)],
+                    ];
+                    if ($daysInMonth > 28) {
+                        $weekRanges[] = ['num' => 5, 'start' => 29, 'end' => $daysInMonth];
+                    }
+
+                    foreach ($weekRanges as $wr) {
+                        $wStart = $startOfMonth->copy()->day($wr['start'])->toDateString();
+                        $wEnd   = $startOfMonth->copy()->day($wr['end'])->toDateString();
+
+                        $wAbs = $absensis->whereBetween('tanggal', [$wStart, $wEnd]);
+                        $wHadir = $wAbs->where('status', 'hadir')->count();
+                        $wTelat = $wAbs->where('status', 'terlambat')->count();
+                        $wIzin = $wAbs->whereIn('status', ['izin', 'dispen', 'dispensasi'])->count();
+                        $wSakit = $wAbs->where('status', 'sakit')->count();
+                        $wAlpha = $wAbs->whereIn('status', ['alpha', 'alfa'])->count();
+                        $wBolos = $wAbs->where('status', 'bolos')->count();
+                        $wTotal = $wHadir + $wTelat + $wIzin + $wSakit + $wAlpha + $wBolos;
+                        $wPersen = $wTotal > 0 ? round((($wHadir + $wTelat) / $wTotal) * 100, 1) : null;
+
+                        $startStr = str_pad($wr['start'], 2, '0', STR_PAD_LEFT);
+                        $endStr   = str_pad($wr['end'], 2, '0', STR_PAD_LEFT);
+
+                        $rekapMingguanBulanan[] = [
+                            'minggu_num'  => $wr['num'],
+                            'minggu_nama' => "Minggu Ke-{$wr['num']}",
+                            'rentang'     => "{$startStr} - {$endStr} {$monthShort}",
+                            'hadir'       => $wHadir,
+                            'terlambat'   => $wTelat,
+                            'izin'        => $wIzin,
+                            'sakit'       => $wSakit,
+                            'alpha'       => $wAlpha,
+                            'bolos'       => $wBolos,
+                            'total'       => $wTotal,
+                            'persen'      => $wPersen,
                         ];
                     }
                 }
@@ -314,6 +371,7 @@ class PortalOrtuController extends Controller
             'kasusDisiplin',
             'pengaturanDisiplin',
             'rekapBulananTahunan',
+            'rekapMingguanBulanan',
             'modeAkses',
             'codeValue',
             'serverNotifs',
