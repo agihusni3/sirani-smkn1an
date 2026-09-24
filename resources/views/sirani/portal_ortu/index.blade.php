@@ -161,6 +161,57 @@
 
     @if($siswa)
 
+      {{-- ══ BANNER NOTIFIKASI PUSH REALTIME (MINIMALIS & SELARAS PORTAL WALI MURID) ══ --}}
+      {{-- 1. Ajakan Izin Notifikasi (Tampil jika belum diizinkan & belum di-dismiss) --}}
+      <div id="siraniBannerNotif" class="sirani-notif-banner" style="display:none;">
+        <div class="sirani-notif-banner-left">
+          <div class="sirani-notif-banner-icon">
+            <i class="bi bi-bell-fill"></i>
+            <span class="sirani-notif-pulse"></span>
+          </div>
+          <div class="sirani-notif-banner-text">
+            <div class="sirani-notif-banner-head">
+              <strong>Notifikasi Presensi HP</strong>
+              <span class="sirani-notif-badge">Realtime</span>
+            </div>
+            <p class="sirani-notif-desc">Dapatkan notifikasi otomatis saat ananda tap kartu hadir &amp; pulang di gerbang sekolah.</p>
+          </div>
+        </div>
+        <div class="sirani-notif-banner-right">
+          <button type="button" id="btnAktifkanNotif" onclick="sirani_requestPushPermission()" class="btn-notif-aktifkan">
+            <i class="bi bi-bell-fill"></i>
+            <span>Aktifkan</span>
+          </button>
+          <button type="button" onclick="sirani_dismissNotifBanner()" class="btn-notif-tutup" title="Tutup pemberitahuan">
+            <i class="bi bi-x-lg"></i>
+          </button>
+        </div>
+      </div>
+
+      {{-- 2. Status Notifikasi Aktif & Terhubung (Minimalist Clean Ribbon) --}}
+      <div id="siraniBannerNotifAktif" class="sirani-notif-banner sirani-notif-aktif" style="display:none;">
+        <div class="sirani-notif-banner-left">
+          <div class="sirani-notif-banner-icon icon-success">
+            <i class="bi bi-bell-fill"></i>
+            <span class="sirani-notif-online-dot"></span>
+          </div>
+          <div class="sirani-notif-banner-text">
+            <div class="sirani-notif-banner-head">
+              <strong>Notifikasi HP Terhubung</strong>
+              <span class="sirani-notif-badge badge-success">Aktif</span>
+            </div>
+            <p class="sirani-notif-desc">Perangkat ini otomatis menerima pemberitahuan tap gerbang ananda.</p>
+          </div>
+        </div>
+        <div class="sirani-notif-banner-right">
+          <button type="button" onclick="openNotifSettingsModal('suara')" class="btn-notif-subtle" title="Atur nada dering &amp; suara">
+            <i class="bi bi-volume-up-fill"></i> <span>Atur Suara</span>
+          </button>
+          <button type="button" onclick="sirani_dismissNotifBannerAktif()" class="btn-notif-tutup" title="Sembunyikan">
+            <i class="bi bi-x-lg"></i>
+          </button>
+        </div>
+      </div>
 
       {{-- HASIL DATA SISWA TERPILIH --}}
 
@@ -327,46 +378,46 @@
               } catch(e) {}
             })();
           </script>
-          {{-- KARTU PEMBERITAHUAN KOREKSI PRESENSI TERKINI (AUTO-DISMISS 10 DETIK & SEKALI TAMPIL) --}}
+          {{-- KARTU PEMBERITAHUAN KOREKSI PRESENSI TERKINI (MINIMALIS & SELARAS PORTAL) --}}
           <div id="koreksiLiveAlertCard" 
                class="koreksi-live-alert-card" 
                data-banner-key="{{ $ktBannerKey }}" 
                data-notif-id="{{ $ktNotifId }}" 
                data-toast-title="Pemberitahuan Koreksi Presensi" 
                data-toast-body="Catatan kehadiran ananda telah diperbarui menjadi {{ $ktLabel }}." 
-               style="position:relative; overflow:hidden; margin-bottom:16px; background:linear-gradient(135deg, rgba(245, 158, 11, 0.12) 0%, rgba(217, 119, 6, 0.05) 100%); border:1.5px solid rgba(245, 158, 11, 0.45); border-radius:18px; padding:14px 18px 18px 18px; display:flex; gap:14px; align-items:flex-start; box-shadow:0 4px 14px rgba(245, 158, 11, 0.08); transition:all 0.6s cubic-bezier(0.4, 0, 0.2, 1); max-height:300px; opacity:1;">
-            <div style="width:42px; height:42px; border-radius:12px; background:rgba(245, 158, 11, 0.2); border:1px solid rgba(245, 158, 11, 0.4); display:flex; align-items:center; justify-content:center; font-size:20px; color:#d97706; flex-shrink:0;">
+               style="position:relative; overflow:hidden; margin-bottom:14px; background:var(--bg-card, #ffffff); border:1px solid rgba(245, 158, 11, 0.35); border-left:4px solid #f59e0b; border-radius:12px; padding:12px 14px; display:flex; gap:12px; align-items:flex-start; box-shadow:0 2px 8px -2px rgba(245, 158, 11, 0.08); transition:all 0.5s cubic-bezier(0.4, 0, 0.2, 1); max-height:300px; opacity:1;">
+            <div style="width:34px; height:34px; border-radius:8px; background:rgba(245, 158, 11, 0.12); display:flex; align-items:center; justify-content:center; font-size:16px; color:#d97706; flex-shrink:0;">
               <i class="bi bi-pencil-square"></i>
             </div>
-            <div style="flex:1; min-width:0; padding-right:26px;">
-              <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:6px; margin-bottom:4px;">
-                <div style="display:flex; align-items:center; gap:8px;">
-                  <span style="font-size:13px; font-weight:800; color:var(--text, #0f172a);">Pemberitahuan Koreksi Presensi</span>
-                  <span style="background:#fef3c7; color:#b45309; border:1px solid #fde68a; font-size:10px; font-weight:800; padding:1px 7px; border-radius:4px; text-transform:uppercase;">Terverifikasi Guru Piket</span>
+            <div style="flex:1; min-width:0; padding-right:24px;">
+              <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:4px; margin-bottom:2px;">
+                <div style="display:flex; align-items:center; gap:6px;">
+                  <span style="font-size:12.5px; font-weight:800; color:var(--text, #0f172a);">Koreksi Presensi</span>
+                  <span style="background:rgba(245, 158, 11, 0.12); color:#b45309; font-size:9.5px; font-weight:800; padding:1px 6px; border-radius:4px; text-transform:uppercase;">Guru Piket</span>
                 </div>
                 <div style="display:flex; align-items:center; gap:6px;">
-                  <span style="font-size:11.5px; color:var(--text-3, #64748b); font-family:var(--font-mono); font-weight:700;">
+                  <span style="font-size:11px; color:var(--text-3, #64748b); font-family:var(--font-mono); font-weight:600;">
                     {{ format_tanggal_indo($koreksiTerbaru->tanggal) }}
                   </span>
-                  <span id="koreksiBannerTimerBadge" style="font-size:10px; color:#b45309; font-weight:800; background:rgba(217,119,6,0.18); padding:1px 6px; border-radius:4px; font-family:var(--font-mono);" title="Banner akan tertutup otomatis">10s</span>
+                  <span id="koreksiBannerTimerBadge" style="font-size:9.5px; color:#b45309; font-weight:800; background:rgba(217,119,6,0.15); padding:1px 5px; border-radius:3px; font-family:var(--font-mono);" title="Banner akan tertutup otomatis">10s</span>
                 </div>
               </div>
-              <div style="font-size:12.5px; color:var(--text-2, #334155); line-height:1.5;">
-                Catatan kehadiran ananda telah diperbarui menjadi <strong style="color:{{ $ktColor }}; font-weight:800; text-transform:uppercase;">{{ $ktLabel }}</strong>.
+              <div style="font-size:12px; color:var(--text-2, #334155); line-height:1.45;">
+                Kehadiran ananda diperbarui menjadi <strong style="color:{{ $ktColor }}; font-weight:800; text-transform:uppercase;">{{ $ktLabel }}</strong>.
                 @if($koreksiTerbaru->keterangan)
-                  <div style="margin-top:6px; font-size:11.5px; color:var(--text, #1e293b); background:rgba(255,255,255,0.75); padding:6px 10px; border-radius:8px; border-left:3px solid #d97706; font-style:italic;">
+                  <div style="margin-top:4px; font-size:11px; color:var(--text, #1e293b); background:var(--bg-subtle, #f8fafc); padding:4px 8px; border-radius:6px; font-style:italic;">
                     "{{ $koreksiTerbaru->keterangan }}"
                   </div>
                 @endif
               </div>
             </div>
             {{-- Tombol Tutup Manual --}}
-            <button type="button" onclick="sirani_dismissKoreksiBanner()" style="position:absolute; top:10px; right:12px; background:none; border:none; color:#94a3b8; font-size:16px; cursor:pointer; padding:6px; line-height:1; border-radius:6px; transition:color .2s;" onmouseover="this.style.color='#d97706'" onmouseout="this.style.color='#94a3b8'" title="Tutup pemberitahuan">
+            <button type="button" onclick="sirani_dismissKoreksiBanner()" style="position:absolute; top:8px; right:8px; background:none; border:none; color:#94a3b8; font-size:14px; cursor:pointer; padding:4px; line-height:1; border-radius:4px; transition:color .15s;" onmouseover="this.style.color='#d97706'" onmouseout="this.style.color='#94a3b8'" title="Tutup pemberitahuan">
               <i class="bi bi-x-lg"></i>
             </button>
             {{-- Indikator Garis Durasi Waktu 10 Detik --}}
-            <div style="position:absolute; bottom:0; left:0; right:0; height:3.5px; background:rgba(217,119,6,0.18); overflow:hidden;">
-              <div id="koreksiBannerProgressBar" style="height:100%; width:100%; background:linear-gradient(90deg, #f59e0b, #d97706); transition:width 10s linear;"></div>
+            <div style="position:absolute; bottom:0; left:0; right:0; height:2.5px; background:rgba(217,119,6,0.12); overflow:hidden;">
+              <div id="koreksiBannerProgressBar" style="height:100%; width:100%; background:#f59e0b; transition:width 10s linear;"></div>
             </div>
           </div>
         @endif
@@ -1977,22 +2028,76 @@
     }
 
     /**
+     * Sembunyikan banner ajakan notifikasi
+     */
+    function sirani_dismissNotifBanner() {
+      const nisn = sirani_getNisnAktif();
+      if (nisn) localStorage.setItem('sirani_notif_banner_dismissed_' + nisn, '1');
+      const b = document.getElementById('siraniBannerNotif');
+      if (b) {
+        b.style.opacity = '0';
+        b.style.transform = 'translateY(-6px)';
+        setTimeout(() => { b.style.display = 'none'; }, 220);
+      }
+    }
+
+    /**
+     * Sembunyikan banner status aktif
+     */
+    function sirani_dismissNotifBannerAktif() {
+      const nisn = sirani_getNisnAktif();
+      if (nisn) localStorage.setItem('sirani_notif_aktif_dismissed_' + nisn, '1');
+      const b = document.getElementById('siraniBannerNotifAktif');
+      if (b) {
+        b.style.opacity = '0';
+        b.style.transform = 'translateY(-6px)';
+        setTimeout(() => { b.style.display = 'none'; }, 220);
+      }
+    }
+
+    /**
      * Periksa status notifikasi & auto-sinkron ke server agar notifikasi background selalu masuk
      */
     function sirani_checkNotifStatus(swReg) {
       if (!('PushManager' in window) || !('Notification' in window)) return;
       const nisn = sirani_getNisnAktif();
 
+      const bannerNotif      = document.getElementById('siraniBannerNotif');
+      const bannerNotifAktif = document.getElementById('siraniBannerNotifAktif');
+      const isDismissedPrompt = nisn && localStorage.getItem('sirani_notif_banner_dismissed_' + nisn) === '1';
+      const isDismissedAktif  = nisn && localStorage.getItem('sirani_notif_aktif_dismissed_' + nisn) === '1';
+
       if (Notification.permission === 'granted') {
         sirani_getOrRegisterPushSubscription({ forceRefresh: false })
           .then(async function(sub) {
             if (sub) {
               await sirani_syncSubscriptionToServer(sub, nisn);
+              if (bannerNotif) bannerNotif.style.display = 'none';
+              if (bannerNotifAktif && !isDismissedAktif) {
+                bannerNotifAktif.style.display = 'flex';
+              }
             }
           })
           .catch(function(err) {
             console.warn('Auto sync push subscription error:', err);
           });
+      } else if (Notification.permission === 'default') {
+        if (bannerNotif && !isDismissedPrompt) {
+          bannerNotif.style.display = 'flex';
+        }
+        if (bannerNotifAktif) bannerNotifAktif.style.display = 'none';
+      } else if (Notification.permission === 'denied') {
+        if (bannerNotif && !isDismissedPrompt) {
+          bannerNotif.style.display = 'flex';
+          const txt = bannerNotif.querySelector('.sirani-notif-desc');
+          if (txt) txt.innerHTML = '<span style="color:#ef4444;font-weight:700;">Izin dinonaktifkan di browser.</span> Buka setelan browser/ikon gembok untuk mengizinkan.';
+          const btn = document.getElementById('btnAktifkanNotif');
+          if (btn) {
+            btn.innerHTML = '<i class="bi bi-gear-fill"></i> <span>Panduan</span>';
+            btn.onclick = () => openNotifSettingsModal('bantuan');
+          }
+        }
+        if (bannerNotifAktif) bannerNotifAktif.style.display = 'none';
       }
     }
 
@@ -2000,9 +2105,19 @@
      * Minta izin notifikasi dan daftarkan perangkat
      */
     async function sirani_requestPushPermission(isUserAction = true) {
+      const btn = document.getElementById('btnAktifkanNotif');
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<i class="bi bi-hourglass-split"></i> <span>Memproses...</span>';
+      }
+
       try {
         const permission = await Notification.requestPermission();
         if (permission !== 'granted') {
+          if (btn) {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="bi bi-bell-fill"></i> <span>Aktifkan</span>';
+          }
           if (isUserAction) {
             alert('Izin notifikasi belum diizinkan. Silakan aktifkan izin notifikasi pada bilah alamat / setelan HP Anda.');
           }
@@ -2015,6 +2130,16 @@
           await sirani_syncSubscriptionToServer(subscription, nisn);
         }
 
+        // Update UI Banner
+        const bannerNotif      = document.getElementById('siraniBannerNotif');
+        const bannerNotifAktif = document.getElementById('siraniBannerNotifAktif');
+        if (bannerNotif)      bannerNotif.style.display      = 'none';
+        if (bannerNotifAktif) bannerNotifAktif.style.display = 'flex';
+        if (nisn) {
+          localStorage.removeItem('sirani_notif_banner_dismissed_' + nisn);
+          localStorage.removeItem('sirani_notif_aktif_dismissed_' + nisn);
+        }
+
         if (isUserAction) {
           alert('Notifikasi Berhasil Diaktifkan!\n\nHP Anda sekarang siap menerima pemberitahuan kehadiran siswa dan pengumuman sekolah langsung di bilah notifikasi.');
         }
@@ -2023,6 +2148,10 @@
 
       } catch (err) {
         console.error('Gagal subscribe push:', err);
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = '<i class="bi bi-bell-fill"></i> <span>Aktifkan</span>';
+        }
         if (isUserAction) {
           alert('Gagal mengaktifkan notifikasi:\n\n' + err.message);
         }
@@ -2046,6 +2175,11 @@
             body: JSON.stringify({ endpoint }),
           });
         }
+        const bannerNotif      = document.getElementById('siraniBannerNotif');
+        const bannerNotifAktif = document.getElementById('siraniBannerNotifAktif');
+        if (bannerNotifAktif) bannerNotifAktif.style.display = 'none';
+        if (bannerNotif)      bannerNotif.style.display      = 'flex';
+
         const nisn = sirani_getNisnAktif();
         if (nisn) localStorage.setItem('sirani_push_dismissed_' + nisn, '1');
       } catch (err) {
@@ -3927,7 +4061,7 @@
       if (!toast) {
         toast = document.createElement('div');
         toast.id = 'siraniInAppToast';
-        toast.style.cssText = 'position:fixed; top:16px; left:50%; transform:translateX(-50%) translateY(-120%); z-index:999999; width:calc(100% - 32px); max-width:440px; background:rgba(15, 23, 42, 0.96); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px); color:#ffffff; border-radius:14px; padding:12px 16px; box-shadow:0 12px 30px rgba(0,0,0,0.4); border:1px solid rgba(255,255,255,0.18); transition:transform .35s cubic-bezier(0.16, 1, 0.3, 1), opacity .35s ease; opacity:0; pointer-events:auto; cursor:pointer;';
+        toast.style.cssText = 'position:fixed; top:16px; left:50%; transform:translateX(-50%) translateY(-120%); z-index:999999; width:calc(100% - 28px); max-width:420px; background:rgba(15, 23, 42, 0.94); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px); color:#ffffff; border-radius:14px; padding:12px 14px; box-shadow:0 12px 32px -4px rgba(15, 23, 42, 0.35); border:1px solid rgba(255,255,255,0.12); transition:transform .35s cubic-bezier(0.16, 1, 0.3, 1), opacity .35s ease; opacity:0; pointer-events:auto; cursor:pointer;';
         document.body.appendChild(toast);
         toast.addEventListener('click', function() {
           toast.style.transform = 'translateX(-50%) translateY(-120%)';
@@ -3942,20 +4076,20 @@
       }
 
       toast.innerHTML = `
-        <div style="display:flex; align-items:flex-start; gap:10px;">
-          <div style="width:34px; height:34px; border-radius:8px; background:linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0;">
-            🔔
+        <div style="display:flex; align-items:flex-start; gap:11px;">
+          <div style="width:34px; height:34px; border-radius:10px; background:rgba(16, 185, 129, 0.16); border:1px solid rgba(16, 185, 129, 0.3); color:#34d399; display:flex; align-items:center; justify-content:center; font-size:15px; flex-shrink:0;">
+            <i class="bi bi-bell-fill"></i>
           </div>
           <div style="flex:1; min-width:0;">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:2px;">
-              <span style="font-size:11px; font-weight:800; color:#93c5fd; letter-spacing:0.5px; text-transform:uppercase;">SIRANI NOTIFIKASI</span>
-              <span style="font-size:10px; color:#94a3b8;">Baru Saja</span>
+              <span style="font-size:10px; font-weight:800; color:#34d399; letter-spacing:0.5px; text-transform:uppercase;">SIRANI NOTIFIKASI</span>
+              <span style="font-size:10px; color:#94a3b8; display:flex; align-items:center; gap:4px;">Baru Saja <i class="bi bi-x-lg" style="font-size:10px; margin-left:4px; opacity:0.7;"></i></span>
             </div>
-            <div style="font-size:12.5px; font-weight:800; color:#ffffff; line-height:1.3; margin-bottom:2px;">
-              ${esc(title || 'SIRANI — Presensi Siswa')}
+            <div style="font-size:12.5px; font-weight:800; color:#ffffff; line-height:1.35; margin-bottom:2px; letter-spacing:-0.2px;">
+              \${esc(title || 'SIRANI — Presensi Siswa')}
             </div>
-            <div style="font-size:11.5px; color:#cbd5e1; line-height:1.4;">
-              ${esc(body || '')}
+            <div style="font-size:11.5px; color:#cbd5e1; line-height:1.45;">
+              \${esc(body || '')}
             </div>
           </div>
         </div>
