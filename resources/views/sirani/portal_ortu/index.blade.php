@@ -655,16 +655,16 @@
           <div class="table-wrap">
             @if($periode === 'tahunan')
               {{-- 1. REKAP TAHUNAN (JUMLAH PER BULAN) --}}
-              <table>
+              <table class="table-rekap-periode">
                 <thead>
                   <tr>
-                    <th style="min-width:110px; white-space:nowrap;">Bulan</th>
-                    <th style="min-width:55px; text-align:center; white-space:nowrap;">Hadir</th>
-                    <th style="min-width:55px; text-align:center; white-space:nowrap;">Telat</th>
-                    <th style="min-width:75px; text-align:center; white-space:nowrap;">Izin / Sakit</th>
-                    <th style="min-width:75px; text-align:center; white-space:nowrap;">Alpha / Bolos</th>
-                    <th style="min-width:65px; text-align:center; white-space:nowrap;">Total</th>
-                    <th style="min-width:85px; text-align:center; white-space:nowrap;">Kedisiplinan</th>
+                    <th>Bulan</th>
+                    <th><span class="col-text-full">Hadir</span><span class="col-text-short" title="Hadir Tepat">Hdr</span></th>
+                    <th><span class="col-text-full">Telat</span><span class="col-text-short" title="Terlambat">Tlt</span></th>
+                    <th><span class="col-text-full">Izin / Sakit</span><span class="col-text-short" title="Izin & Sakit">I/S</span></th>
+                    <th><span class="col-text-full">Alpha / Bolos</span><span class="col-text-short" title="Alpha & Bolos">A/B</span></th>
+                    <th><span class="col-text-full">Total</span><span class="col-text-short" title="Total Hari">Tot</span></th>
+                    <th><span class="col-text-full">Kedisiplinan</span><span class="col-text-short" title="Persentase Kehadiran">%</span></th>
                   </tr>
                 </thead>
                 <tbody>
@@ -680,25 +680,18 @@
                       $totSemua += $rb['total'];
                     @endphp
                     <tr>
-                      <td style="white-space:nowrap;">
-                        <strong style="color:var(--text); font-size:13px;">{{ $rb['bulan_nama'] }}</strong>
+                      <td>
+                        <strong style="color:var(--text); font-size:12.5px;">
+                          <span class="col-text-full">{{ $rb['bulan_nama'] }}</span>
+                          <span class="col-text-short">{{ substr($rb['bulan_nama'], 0, 3) }}</span>
+                        </strong>
                       </td>
-                      <td style="text-align:center; font-family:var(--font-mono); font-weight:800; font-size:13px; color:var(--text);">
-                        {{ $rb['hadir'] }}
-                      </td>
-                      <td style="text-align:center; font-family:var(--font-mono); font-weight:800; font-size:13px; color:var(--text);">
-                        {{ $rb['terlambat'] }}
-                      </td>
-                      <td style="text-align:center; font-family:var(--font-mono); font-weight:800; font-size:13px; color:var(--text);">
-                        {{ $rb['izin'] + $rb['sakit'] }}
-                      </td>
-                      <td style="text-align:center; font-family:var(--font-mono); font-weight:800; font-size:13px; color:var(--text);">
-                        {{ $rb['alpha'] + $rb['bolos'] }}
-                      </td>
-                      <td style="text-align:center; font-family:var(--font-mono); font-weight:800; font-size:13px; color:var(--text);">
-                        {{ $rb['total'] }}
-                      </td>
-                      <td style="text-align:center; white-space:nowrap; font-family:var(--font-mono); font-weight:800; font-size:13px; color:var(--text);">
+                      <td class="cell-num">{{ $rb['hadir'] }}</td>
+                      <td class="cell-num">{{ $rb['terlambat'] }}</td>
+                      <td class="cell-num">{{ $rb['izin'] + $rb['sakit'] }}</td>
+                      <td class="cell-num">{{ $rb['alpha'] + $rb['bolos'] }}</td>
+                      <td class="cell-num">{{ $rb['total'] }}</td>
+                      <td class="cell-persen">
                         @if($rb['total'] > 0)
                           {{ $rb['persen'] }}%
                         @else
@@ -707,34 +700,34 @@
                       </td>
                     </tr>
                   @endforeach
-                  <tr style="background:var(--bg-subtle); font-weight:800; border-top:2px solid var(--border);">
-                    <td style="white-space:nowrap; font-weight:900; color:var(--text);">
-                      <i class="bi bi-calculator" style="color:var(--gold);"></i> TOTAL 1 TAHUN
+                  <tr class="tr-total-rekap">
+                    <td>
+                      <i class="bi bi-calculator" style="color:var(--gold);"></i> 
+                      <span class="col-text-full">TOTAL 1 TAHUN</span>
+                      <span class="col-text-short">TOTAL</span>
                     </td>
-                    <td style="text-align:center; font-family:var(--font-mono); font-weight:900; color:var(--text);">{{ $totHadir }}</td>
-                    <td style="text-align:center; font-family:var(--font-mono); font-weight:900; color:var(--text);">{{ $totTelat }}</td>
-                    <td style="text-align:center; font-family:var(--font-mono); font-weight:900; color:var(--text);">{{ $totIzinSakit }}</td>
-                    <td style="text-align:center; font-family:var(--font-mono); font-weight:900; color:var(--text);">{{ $totAlphaBolos }}</td>
-                    <td style="text-align:center; font-family:var(--font-mono); font-weight:900; color:var(--text);">{{ $totSemua }}</td>
-                    <td style="text-align:center; font-family:var(--font-mono); font-weight:900; font-size:13.5px; color:var(--text);">
-                      {{ $stats['persen'] }}%
-                    </td>
+                    <td class="cell-num">{{ $totHadir }}</td>
+                    <td class="cell-num">{{ $totTelat }}</td>
+                    <td class="cell-num">{{ $totIzinSakit }}</td>
+                    <td class="cell-num">{{ $totAlphaBolos }}</td>
+                    <td class="cell-num">{{ $totSemua }}</td>
+                    <td class="cell-persen-total">{{ $stats['persen'] }}%</td>
                   </tr>
                 </tbody>
               </table>
 
             @elseif($periode === 'bulanan')
               {{-- 2. REKAP BULANAN (JUMLAH PER MINGGU SEPERTI TAHUNAN) --}}
-              <table>
+              <table class="table-rekap-periode">
                 <thead>
                   <tr>
-                    <th style="min-width:120px; white-space:nowrap;">Minggu</th>
-                    <th style="min-width:55px; text-align:center; white-space:nowrap;">Hadir</th>
-                    <th style="min-width:55px; text-align:center; white-space:nowrap;">Telat</th>
-                    <th style="min-width:75px; text-align:center; white-space:nowrap;">Izin / Sakit</th>
-                    <th style="min-width:75px; text-align:center; white-space:nowrap;">Alpha / Bolos</th>
-                    <th style="min-width:65px; text-align:center; white-space:nowrap;">Total</th>
-                    <th style="min-width:85px; text-align:center; white-space:nowrap;">Kedisiplinan</th>
+                    <th>Minggu</th>
+                    <th><span class="col-text-full">Hadir</span><span class="col-text-short" title="Hadir Tepat">Hdr</span></th>
+                    <th><span class="col-text-full">Telat</span><span class="col-text-short" title="Terlambat">Tlt</span></th>
+                    <th><span class="col-text-full">Izin / Sakit</span><span class="col-text-short" title="Izin & Sakit">I/S</span></th>
+                    <th><span class="col-text-full">Alpha / Bolos</span><span class="col-text-short" title="Alpha & Bolos">A/B</span></th>
+                    <th><span class="col-text-full">Total</span><span class="col-text-short" title="Total Hari">Tot</span></th>
+                    <th><span class="col-text-full">Kedisiplinan</span><span class="col-text-short" title="Persentase Kehadiran">%</span></th>
                   </tr>
                 </thead>
                 <tbody>
@@ -750,26 +743,19 @@
                       $totSemuaM += $rm['total'];
                     @endphp
                     <tr>
-                      <td style="white-space:nowrap;">
-                        <strong style="color:var(--text); font-size:13px;">{{ $rm['minggu_nama'] }}</strong>
-                        <div style="font-size:11px; color:var(--text-3); font-family:var(--font-mono);">({{ $rm['rentang'] }})</div>
+                      <td>
+                        <strong style="color:var(--text); font-size:12.5px;">
+                          <span class="col-text-full">{{ $rm['minggu_nama'] }}</span>
+                          <span class="col-text-short">M-{{ $loop->iteration }}</span>
+                        </strong>
+                        <div class="col-sub-rentang">{{ $rm['rentang'] }}</div>
                       </td>
-                      <td style="text-align:center; font-family:var(--font-mono); font-weight:800; font-size:13px; color:var(--text);">
-                        {{ $rm['hadir'] }}
-                      </td>
-                      <td style="text-align:center; font-family:var(--font-mono); font-weight:800; font-size:13px; color:var(--text);">
-                        {{ $rm['terlambat'] }}
-                      </td>
-                      <td style="text-align:center; font-family:var(--font-mono); font-weight:800; font-size:13px; color:var(--text);">
-                        {{ $rm['izin'] + $rm['sakit'] }}
-                      </td>
-                      <td style="text-align:center; font-family:var(--font-mono); font-weight:800; font-size:13px; color:var(--text);">
-                        {{ $rm['alpha'] + $rm['bolos'] }}
-                      </td>
-                      <td style="text-align:center; font-family:var(--font-mono); font-weight:800; font-size:13px; color:var(--text);">
-                        {{ $rm['total'] }}
-                      </td>
-                      <td style="text-align:center; white-space:nowrap; font-family:var(--font-mono); font-weight:800; font-size:13px; color:var(--text);">
+                      <td class="cell-num">{{ $rm['hadir'] }}</td>
+                      <td class="cell-num">{{ $rm['terlambat'] }}</td>
+                      <td class="cell-num">{{ $rm['izin'] + $rm['sakit'] }}</td>
+                      <td class="cell-num">{{ $rm['alpha'] + $rm['bolos'] }}</td>
+                      <td class="cell-num">{{ $rm['total'] }}</td>
+                      <td class="cell-persen">
                         @if($rm['total'] > 0)
                           {{ $rm['persen'] }}%
                         @else
@@ -778,18 +764,18 @@
                       </td>
                     </tr>
                   @endforeach
-                  <tr style="background:var(--bg-subtle); font-weight:800; border-top:2px solid var(--border);">
-                    <td style="white-space:nowrap; font-weight:900; color:var(--text);">
-                      <i class="bi bi-calculator" style="color:var(--gold);"></i> TOTAL 1 BULAN
+                  <tr class="tr-total-rekap">
+                    <td>
+                      <i class="bi bi-calculator" style="color:var(--gold);"></i> 
+                      <span class="col-text-full">TOTAL 1 BULAN</span>
+                      <span class="col-text-short">TOTAL</span>
                     </td>
-                    <td style="text-align:center; font-family:var(--font-mono); font-weight:900; color:var(--text);">{{ $totHadirM }}</td>
-                    <td style="text-align:center; font-family:var(--font-mono); font-weight:900; color:var(--text);">{{ $totTelatM }}</td>
-                    <td style="text-align:center; font-family:var(--font-mono); font-weight:900; color:var(--text);">{{ $totIzinSakitM }}</td>
-                    <td style="text-align:center; font-family:var(--font-mono); font-weight:900; color:var(--text);">{{ $totAlphaBolosM }}</td>
-                    <td style="text-align:center; font-family:var(--font-mono); font-weight:900; color:var(--text);">{{ $totSemuaM }}</td>
-                    <td style="text-align:center; font-family:var(--font-mono); font-weight:900; font-size:13.5px; color:var(--text);">
-                      {{ $stats['persen'] }}%
-                    </td>
+                    <td class="cell-num">{{ $totHadirM }}</td>
+                    <td class="cell-num">{{ $totTelatM }}</td>
+                    <td class="cell-num">{{ $totIzinSakitM }}</td>
+                    <td class="cell-num">{{ $totAlphaBolosM }}</td>
+                    <td class="cell-num">{{ $totSemuaM }}</td>
+                    <td class="cell-persen-total">{{ $stats['persen'] }}%</td>
                   </tr>
                 </tbody>
               </table>
@@ -805,14 +791,14 @@
                 </div>
 
                 <div id="wrapRincianHarianBulanan" style="display:none; border-top:1px solid var(--border);">
-                  <table>
+                  <table class="table-log-harian">
                     <thead>
                       <tr>
-                        <th style="min-width:110px; white-space:nowrap;">Hari &amp; Tanggal</th>
-                        <th style="min-width:65px; text-align:center; white-space:nowrap;">Masuk</th>
-                        <th style="min-width:65px; text-align:center; white-space:nowrap;">Pulang</th>
-                        <th style="min-width:105px; text-align:center; white-space:nowrap;">Status</th>
-                        <th style="min-width:130px;">Keterangan</th>
+                        <th>Hari &amp; Tanggal</th>
+                        <th>Masuk</th>
+                        <th>Pulang</th>
+                        <th>Status</th>
+                        <th>Keterangan</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -822,50 +808,47 @@
                           $namaHari = format_hari_indo($cDate);
                         @endphp
                         <tr>
-                          <td style="white-space:nowrap;">
-                            <strong style="color:var(--text); font-size:12.5px; display:block; line-height:1.25;">{{ $namaHari }}</strong>
-                            <span style="font-size:11px; color:var(--text-3); font-family:var(--font-mono); line-height:1.25;">{{ $cDate->locale('id')->translatedFormat('d M Y') }}</span>
+                          <td class="cell-tgl">
+                            <strong class="tgl-hari">{{ $namaHari }}</strong>
+                            <span class="tgl-full col-text-full">{{ $cDate->locale('id')->translatedFormat('d M Y') }}</span>
+                            <span class="tgl-short col-text-short">{{ $cDate->format('d/m') }}</span>
                           </td>
-                          <td style="text-align:center; white-space:nowrap;">
-                            <span style="font-family:var(--font-mono); font-weight:800; font-size:12.5px; color:var(--text);">
-                              {{ $abs->jam_masuk ? substr($abs->jam_masuk, 0, 5) : '—' }}
-                            </span>
+                          <td class="cell-jam">
+                            {{ $abs->jam_masuk ? substr($abs->jam_masuk, 0, 5) : '—' }}
                           </td>
-                          <td style="text-align:center; white-space:nowrap;">
-                            <span style="font-family:var(--font-mono); font-weight:800; font-size:12.5px; color:var(--text);">
-                              {{ $abs->jam_pulang ? substr($abs->jam_pulang, 0, 5) : '—' }}
-                            </span>
+                          <td class="cell-jam">
+                            {{ $abs->jam_pulang ? substr($abs->jam_pulang, 0, 5) : '—' }}
                           </td>
-                          <td style="text-align:center; white-space:nowrap;">
+                          <td class="cell-status" style="text-align:center;">
                             @if($abs->status === 'hadir')
-                              <span style="font-weight:800; font-size:12px; color:#16a34a;"><i class="bi bi-check-circle-fill"></i> Hadir</span>
+                              <span class="status-badge-pill pill-hadir-mini"><i class="bi bi-check-circle-fill"></i> Hadir</span>
                             @elseif($abs->status === 'terlambat')
-                              <span style="font-weight:800; font-size:12px; color:#d97706;"><i class="bi bi-clock-history"></i> Terlambat</span>
+                              <span class="status-badge-pill pill-telat-mini"><i class="bi bi-clock-history"></i> Telat</span>
                             @elseif($abs->status === 'izin')
-                              <span style="font-weight:800; font-size:12px; color:#0284c7;"><i class="bi bi-info-circle-fill"></i> Izin</span>
+                              <span class="status-badge-pill pill-izin-mini"><i class="bi bi-info-circle-fill"></i> Izin</span>
                             @elseif($abs->status === 'sakit')
-                              <span style="font-weight:800; font-size:12px; color:#8b5cf6;"><i class="bi bi-heart-pulse-fill"></i> Sakit</span>
+                              <span class="status-badge-pill pill-sakit-mini"><i class="bi bi-heart-pulse-fill"></i> Sakit</span>
                             @elseif(in_array($abs->status, ['dispen', 'dispensasi']))
-                              <span style="font-weight:800; font-size:12px; color:#0d9488;"><i class="bi bi-award-fill"></i> Dispensasi</span>
+                              <span class="status-badge-pill pill-dispen-mini"><i class="bi bi-award-fill"></i> Dispen</span>
                             @elseif($abs->status === 'bolos')
-                              <span style="font-weight:800; font-size:12px; color:#dc2626;"><i class="bi bi-exclamation-triangle-fill"></i> Bolos</span>
+                              <span class="status-badge-pill pill-bolos-mini"><i class="bi bi-exclamation-triangle-fill"></i> Bolos</span>
                             @elseif($abs->status === 'alpha')
-                              <span style="font-weight:800; font-size:12px; color:#ef4444;"><i class="bi bi-x-circle-fill"></i> Alpha</span>
+                              <span class="status-badge-pill pill-alpha-mini"><i class="bi bi-x-circle-fill"></i> Alpha</span>
                             @else
-                              <span style="font-weight:800; font-size:12px; color:var(--text-2);">{{ ucfirst($abs->status) }}</span>
+                              <span class="status-badge-pill pill-default-mini">{{ ucfirst($abs->status) }}</span>
                             @endif
                           </td>
-                          <td style="font-size:11.5px; color:var(--text-2); line-height:1.35; max-width:260px;">
+                          <td class="cell-ket">
                             @if($abs->keterangan)
-                              <span style="font-weight:600; color:var(--text);"><i class="bi bi-chat-left-text-fill" style="color:var(--gold); font-size:10.5px; margin-right:4px;"></i>{{ $abs->keterangan }}</span>
+                              <span class="ket-text has-ket"><i class="bi bi-chat-left-text-fill"></i> {{ $abs->keterangan }}</span>
                             @elseif($abs->status === 'bolos')
-                              <span style="color:#991B1B; font-weight:600;"><i class="bi bi-exclamation-triangle-fill"></i> Tidak tap pulang (tanpa izin piket)</span>
+                              <span class="ket-text" style="color:#991B1B;">Tidak tap pulang</span>
                             @elseif($abs->status === 'alpha')
-                              <span style="color:#DC2626; font-weight:600;"><i class="bi bi-x-circle-fill"></i> Tidak hadir tanpa keterangan</span>
+                              <span class="ket-text" style="color:#DC2626;">Tidak hadir tanpa ket.</span>
                             @elseif($abs->status === 'terlambat')
-                              <span style="color:var(--amber); font-weight:600;"><i class="bi bi-clock-history"></i> Terlambat masuk gerbang</span>
+                              <span class="ket-text" style="color:var(--amber);">Terlambat masuk</span>
                             @elseif($abs->status === 'hadir')
-                              <span style="color:var(--text-3);"><i class="bi bi-check2"></i> Hadir reguler</span>
+                              <span class="ket-text" style="color:var(--text-3);">Hadir tepat</span>
                             @else
                               -
                             @endif
@@ -880,17 +863,14 @@
             @else
               {{-- 3. REKAP HARIAN & MINGGUAN (TABEL RINCIAN LOG TANGGAL) --}}
               @if($absensis->count() > 0)
-                <div class="mobile-scroll-hint">
-                  <i class="bi bi-arrows-expand"></i> Geser tabel ke samping untuk melihat data lengkap
-                </div>
-                <table>
+                <table class="table-log-harian">
                   <thead>
                     <tr>
-                      <th style="min-width:110px; white-space:nowrap;">Hari &amp; Tanggal</th>
-                      <th style="min-width:65px; text-align:center; white-space:nowrap;">Masuk</th>
-                      <th style="min-width:65px; text-align:center; white-space:nowrap;">Pulang</th>
-                      <th style="min-width:105px; text-align:center; white-space:nowrap;">Status</th>
-                      <th style="min-width:130px;">Keterangan</th>
+                      <th>Hari &amp; Tanggal</th>
+                      <th>Masuk</th>
+                      <th>Pulang</th>
+                      <th>Status</th>
+                      <th>Keterangan</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -900,50 +880,47 @@
                         $namaHari = format_hari_indo($cDate);
                       @endphp
                       <tr>
-                        <td style="white-space:nowrap;">
-                          <strong style="color:var(--text); font-size:12.5px; display:block; line-height:1.25;">{{ $namaHari }}</strong>
-                          <span style="font-size:11px; color:var(--text-3); font-family:var(--font-mono); line-height:1.25;">{{ $cDate->locale('id')->translatedFormat('d M Y') }}</span>
+                        <td class="cell-tgl">
+                          <strong class="tgl-hari">{{ $namaHari }}</strong>
+                          <span class="tgl-full col-text-full">{{ $cDate->locale('id')->translatedFormat('d M Y') }}</span>
+                          <span class="tgl-short col-text-short">{{ $cDate->format('d/m') }}</span>
                         </td>
-                        <td style="text-align:center; white-space:nowrap;">
-                          <span style="font-family:var(--font-mono); font-weight:800; font-size:12.5px; color:var(--text);">
-                            {{ $abs->jam_masuk ? substr($abs->jam_masuk, 0, 5) : '—' }}
-                          </span>
+                        <td class="cell-jam">
+                          {{ $abs->jam_masuk ? substr($abs->jam_masuk, 0, 5) : '—' }}
                         </td>
-                        <td style="text-align:center; white-space:nowrap;">
-                          <span style="font-family:var(--font-mono); font-weight:800; font-size:12.5px; color:var(--text);">
-                            {{ $abs->jam_pulang ? substr($abs->jam_pulang, 0, 5) : '—' }}
-                          </span>
+                        <td class="cell-jam">
+                          {{ $abs->jam_pulang ? substr($abs->jam_pulang, 0, 5) : '—' }}
                         </td>
-                        <td style="text-align:center; white-space:nowrap;">
+                        <td class="cell-status" style="text-align:center;">
                           @if($abs->status === 'hadir')
-                            <span style="font-weight:800; font-size:12px; color:#16a34a;"><i class="bi bi-check-circle-fill"></i> Hadir</span>
+                            <span class="status-badge-pill pill-hadir-mini"><i class="bi bi-check-circle-fill"></i> Hadir</span>
                           @elseif($abs->status === 'terlambat')
-                            <span style="font-weight:800; font-size:12px; color:#d97706;"><i class="bi bi-clock-history"></i> Terlambat</span>
+                            <span class="status-badge-pill pill-telat-mini"><i class="bi bi-clock-history"></i> Telat</span>
                           @elseif($abs->status === 'izin')
-                            <span style="font-weight:800; font-size:12px; color:#0284c7;"><i class="bi bi-info-circle-fill"></i> Izin</span>
+                            <span class="status-badge-pill pill-izin-mini"><i class="bi bi-info-circle-fill"></i> Izin</span>
                           @elseif($abs->status === 'sakit')
-                            <span style="font-weight:800; font-size:12px; color:#8b5cf6;"><i class="bi bi-heart-pulse-fill"></i> Sakit</span>
+                            <span class="status-badge-pill pill-sakit-mini"><i class="bi bi-heart-pulse-fill"></i> Sakit</span>
                           @elseif(in_array($abs->status, ['dispen', 'dispensasi']))
-                            <span style="font-weight:800; font-size:12px; color:#0d9488;"><i class="bi bi-award-fill"></i> Dispensasi</span>
+                            <span class="status-badge-pill pill-dispen-mini"><i class="bi bi-award-fill"></i> Dispen</span>
                           @elseif($abs->status === 'bolos')
-                            <span style="font-weight:800; font-size:12px; color:#dc2626;"><i class="bi bi-exclamation-triangle-fill"></i> Bolos</span>
+                            <span class="status-badge-pill pill-bolos-mini"><i class="bi bi-exclamation-triangle-fill"></i> Bolos</span>
                           @elseif($abs->status === 'alpha')
-                            <span style="font-weight:800; font-size:12px; color:#ef4444;"><i class="bi bi-x-circle-fill"></i> Alpha</span>
+                            <span class="status-badge-pill pill-alpha-mini"><i class="bi bi-x-circle-fill"></i> Alpha</span>
                           @else
-                            <span style="font-weight:800; font-size:12px; color:var(--text-2);">{{ ucfirst($abs->status) }}</span>
+                            <span class="status-badge-pill pill-default-mini">{{ ucfirst($abs->status) }}</span>
                           @endif
                         </td>
-                        <td style="font-size:11.5px; color:var(--text-2); line-height:1.35; max-width:260px;">
+                        <td class="cell-ket">
                           @if($abs->keterangan)
-                            <span style="font-weight:600; color:var(--text);"><i class="bi bi-chat-left-text-fill" style="color:var(--gold); font-size:10.5px; margin-right:4px;"></i>{{ $abs->keterangan }}</span>
+                            <span class="ket-text has-ket"><i class="bi bi-chat-left-text-fill"></i> {{ $abs->keterangan }}</span>
                           @elseif($abs->status === 'bolos')
-                            <span style="color:#991B1B; font-weight:600;"><i class="bi bi-exclamation-triangle-fill"></i> Tidak tap pulang (tanpa izin piket)</span>
+                            <span class="ket-text" style="color:#991B1B;">Tidak tap pulang</span>
                           @elseif($abs->status === 'alpha')
-                            <span style="color:#DC2626; font-weight:600;"><i class="bi bi-x-circle-fill"></i> Tidak hadir tanpa keterangan</span>
+                            <span class="ket-text" style="color:#DC2626;">Tidak hadir tanpa ket.</span>
                           @elseif($abs->status === 'terlambat')
-                            <span style="color:var(--amber); font-weight:600;"><i class="bi bi-clock-history"></i> Terlambat masuk gerbang</span>
+                            <span class="ket-text" style="color:var(--amber);">Terlambat masuk</span>
                           @elseif($abs->status === 'hadir')
-                            <span style="color:var(--text-3);"><i class="bi bi-check2"></i> Hadir reguler</span>
+                            <span class="ket-text" style="color:var(--text-3);">Hadir tepat</span>
                           @else
                             -
                           @endif

@@ -1478,7 +1478,7 @@
     }
     table {
       width: 100%;
-      min-width: 440px;
+      min-width: 0;
       border-collapse: collapse;
       font-size: 12.5px;
     }
@@ -1486,16 +1486,16 @@
       background: #F1F5F9;
       color: var(--text-2);
       font-weight: 800;
-      font-size: 10.5px;
+      font-size: 11px;
       text-transform: uppercase;
-      letter-spacing: 0.5px;
-      padding: 9px 10px;
+      letter-spacing: 0.3px;
+      padding: 9px 8px;
       text-align: left;
       border-bottom: 1px solid var(--border);
-      white-space: nowrap;
+      vertical-align: middle;
     }
     td {
-      padding: 9px 10px;
+      padding: 9px 8px;
       border-bottom: 1px solid var(--border);
       color: var(--text);
       vertical-align: middle;
@@ -1503,28 +1503,315 @@
     tbody tr:last-child td { border-bottom: none; }
     tbody tr:hover { background: #FAFBFD; }
 
-    /* ─── Mobile Scroll Hint ─── */
-    .mobile-scroll-hint {
-      display: none;
-      padding: 6px 10px;
-      background: var(--bg-subtle);
-      border-bottom: 1px solid var(--border);
-      font-size: 10.5px;
-      color: var(--text-3);
+    /* ─── Tabel Rekap Periode (Tahunan & Bulanan) ─── */
+    .table-rekap-periode {
+      width: 100% !important;
+      max-width: 100% !important;
+      min-width: 0 !important;
+      table-layout: fixed;
+      border-collapse: collapse;
+    }
+    .table-rekap-periode th,
+    .table-rekap-periode td {
+      padding: 9px 6px;
+      vertical-align: middle;
+    }
+    .table-rekap-periode th:nth-child(1),
+    .table-rekap-periode td:nth-child(1) {
+      width: 22%;
+      text-align: left;
+    }
+    .table-rekap-periode th:nth-child(2),
+    .table-rekap-periode td:nth-child(2),
+    .table-rekap-periode th:nth-child(3),
+    .table-rekap-periode td:nth-child(3),
+    .table-rekap-periode th:nth-child(4),
+    .table-rekap-periode td:nth-child(4),
+    .table-rekap-periode th:nth-child(5),
+    .table-rekap-periode td:nth-child(5),
+    .table-rekap-periode th:nth-child(6),
+    .table-rekap-periode td:nth-child(6) {
+      width: 12.6%;
       text-align: center;
     }
+    .table-rekap-periode th:nth-child(7),
+    .table-rekap-periode td:nth-child(7) {
+      width: 15%;
+      text-align: center;
+    }
+
+    .cell-num {
+      font-family: var(--font-mono);
+      font-weight: 800;
+      font-size: 13px;
+      color: var(--text);
+      text-align: center;
+    }
+    .cell-persen {
+      font-family: var(--font-mono);
+      font-weight: 800;
+      font-size: 12.5px;
+      color: var(--text);
+      text-align: center;
+    }
+    .tr-total-rekap {
+      background: var(--bg-subtle) !important;
+      font-weight: 800;
+      border-top: 2px solid var(--border);
+    }
+    .tr-total-rekap td {
+      font-weight: 900;
+      color: var(--text);
+    }
+    .cell-persen-total {
+      font-family: var(--font-mono);
+      font-weight: 900;
+      font-size: 13px;
+      color: var(--text);
+      text-align: center;
+    }
+    .col-sub-rentang {
+      font-size: 10.5px;
+      color: var(--text-3);
+      font-family: var(--font-mono);
+      line-height: 1.15;
+      margin-top: 1px;
+    }
+
+    /* ─── Tabel Log Harian & Mingguan ─── */
+    .table-log-harian {
+      width: 100% !important;
+      max-width: 100% !important;
+      min-width: 0 !important;
+      table-layout: fixed;
+      border-collapse: collapse;
+      font-size: 12px;
+    }
+    .table-log-harian th,
+    .table-log-harian td {
+      padding: 8px 6px;
+      vertical-align: middle;
+    }
+    .table-log-harian th:nth-child(1),
+    .table-log-harian td:nth-child(1) {
+      width: 23%;
+      text-align: left;
+    }
+    .table-log-harian th:nth-child(2),
+    .table-log-harian td:nth-child(2),
+    .table-log-harian th:nth-child(3),
+    .table-log-harian td:nth-child(3) {
+      width: 13.5%;
+      text-align: center;
+    }
+    .table-log-harian th:nth-child(4),
+    .table-log-harian td:nth-child(4) {
+      width: 19%;
+      text-align: center;
+    }
+    .table-log-harian th:nth-child(5),
+    .table-log-harian td:nth-child(5) {
+      width: 31%;
+      text-align: left;
+    }
+
+    .cell-tgl .tgl-hari {
+      color: var(--text);
+      font-size: 12.5px;
+      display: block;
+      line-height: 1.2;
+    }
+    .cell-tgl .tgl-full {
+      font-size: 11px;
+      color: var(--text-3);
+      font-family: var(--font-mono);
+      display: block;
+      line-height: 1.2;
+    }
+    .cell-tgl .tgl-short {
+      font-size: 10.5px;
+      color: var(--text-3);
+      font-family: var(--font-mono);
+      display: none;
+      line-height: 1.2;
+    }
+    .cell-jam {
+      font-family: var(--font-mono);
+      font-weight: 800;
+      font-size: 12px;
+      color: var(--text);
+      text-align: center;
+    }
+    .cell-ket {
+      font-size: 11px;
+      color: var(--text-2);
+      line-height: 1.3;
+      word-break: break-word;
+    }
+    .ket-text {
+      display: inline-block;
+      font-weight: 600;
+    }
+    .ket-text.has-ket {
+      color: var(--text);
+    }
+    .ket-text.has-ket i {
+      color: var(--gold);
+      font-size: 10px;
+      margin-right: 3px;
+    }
+
+    /* Status Mini Pills */
+    .status-badge-pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      padding: 3px 6px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 800;
+      white-space: nowrap;
+      line-height: 1.2;
+    }
+    .pill-hadir-mini { background: rgba(22, 163, 74, 0.12); color: #15803d; }
+    .pill-telat-mini { background: rgba(217, 119, 6, 0.12); color: #b45309; }
+    .pill-izin-mini { background: rgba(2, 132, 199, 0.12); color: #0369a1; }
+    .pill-sakit-mini { background: rgba(139, 92, 246, 0.12); color: #6d28d9; }
+    .pill-dispen-mini { background: rgba(13, 148, 136, 0.12); color: #0f766e; }
+    .pill-bolos-mini { background: rgba(220, 38, 38, 0.14); color: #991b1b; }
+    .pill-alpha-mini { background: rgba(239, 68, 68, 0.14); color: #b91c1c; }
+    .pill-default-mini { background: var(--bg-subtle); color: var(--text-2); }
+
+    /* Kontrol Singkatan Responsif Mobile */
+    .col-text-short { display: none; }
+    .col-text-full { display: inline; }
+
+    /* ─── Mobile Scroll Hint (Hidden / Ditiadakan Karena Tabel Sudah Pas Layar) ─── */
+    .mobile-scroll-hint {
+      display: none !important;
+    }
+
     @media (max-width: 768px) {
-      .mobile-scroll-hint { display: block; }
+      .container {
+        padding: 16px 10px 40px !important;
+      }
+      .panel {
+        border-radius: 14px !important;
+        margin-bottom: 16px !important;
+      }
+      .panel-title {
+        padding: 12px 14px !important;
+        font-size: 13px !important;
+      }
+      .mobile-scroll-hint { display: none !important; }
       table {
-        min-width: 420px;
+        min-width: 0 !important;
         font-size: 11.5px;
       }
-      th {
-        padding: 8px 6px;
-        font-size: 10px;
+    }
+
+    @media (max-width: 640px) {
+      .container {
+        padding: 12px 8px 36px !important;
       }
-      td {
-        padding: 8px 6px;
+      .panel {
+        border-radius: 12px !important;
+        margin-bottom: 14px !important;
+      }
+      .panel-title {
+        padding: 10px 10px !important;
+        font-size: 12px !important;
+      }
+      .col-text-short {
+        display: inline !important;
+      }
+      .col-text-full {
+        display: none !important;
+      }
+      .cell-tgl .tgl-full {
+        display: none !important;
+      }
+      .cell-tgl .tgl-short {
+        display: block !important;
+      }
+
+      /* Padding hemat di ponsel */
+      .table-rekap-periode th,
+      .table-rekap-periode td {
+        padding: 8px 2px !important;
+        font-size: 11px !important;
+      }
+      .table-rekap-periode th:nth-child(1),
+      .table-rekap-periode td:nth-child(1) {
+        width: 22% !important;
+        padding-left: 6px !important;
+      }
+      .table-rekap-periode th:nth-child(2),
+      .table-rekap-periode td:nth-child(2),
+      .table-rekap-periode th:nth-child(3),
+      .table-rekap-periode td:nth-child(3),
+      .table-rekap-periode th:nth-child(4),
+      .table-rekap-periode td:nth-child(4),
+      .table-rekap-periode th:nth-child(5),
+      .table-rekap-periode td:nth-child(5),
+      .table-rekap-periode th:nth-child(6),
+      .table-rekap-periode td:nth-child(6) {
+        width: 12.6% !important;
+      }
+      .table-rekap-periode th:nth-child(7),
+      .table-rekap-periode td:nth-child(7) {
+        width: 15% !important;
+        padding-right: 4px !important;
+      }
+      .cell-num {
+        font-size: 11.5px !important;
+      }
+      .cell-persen, .cell-persen-total {
+        font-size: 11px !important;
+      }
+
+      /* Log Harian di Mobile */
+      .table-log-harian th,
+      .table-log-harian td {
+        padding: 7px 3px !important;
+        font-size: 10.5px !important;
+      }
+      .table-log-harian th:nth-child(1),
+      .table-log-harian td:nth-child(1) {
+        width: 22% !important;
+        padding-left: 5px !important;
+      }
+      .table-log-harian th:nth-child(2),
+      .table-log-harian td:nth-child(2),
+      .table-log-harian th:nth-child(3),
+      .table-log-harian td:nth-child(3) {
+        width: 13.5% !important;
+      }
+      .table-log-harian th:nth-child(4),
+      .table-log-harian td:nth-child(4) {
+        width: 20% !important;
+      }
+      .table-log-harian th:nth-child(5),
+      .table-log-harian td:nth-child(5) {
+        width: 31% !important;
+        padding-right: 5px !important;
+      }
+      .cell-tgl .tgl-hari {
+        font-size: 11px !important;
+      }
+      .cell-jam {
+        font-size: 11px !important;
+      }
+      .status-badge-pill {
+        padding: 2px 4px !important;
+        font-size: 9.5px !important;
+      }
+      .status-badge-pill i {
+        font-size: 9px !important;
+      }
+      .cell-ket {
+        font-size: 10px !important;
       }
     }
 
