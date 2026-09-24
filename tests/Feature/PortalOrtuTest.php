@@ -199,5 +199,58 @@ class PortalOrtuTest extends TestCase
         $response->assertSee('Catatan Kedisiplinan Siswa');
         $response->assertSee('Petugas Sholat Berjamaah');
         $response->assertSee('Apresiasi &amp; Self-Reward', false);
+        $response->assertSee('Skala Tahap Pembinaan Karakter');
+        $response->assertSee('Peluang Pemulihan Poin (Restorative Justice)');
+    }
+
+    public function test_portal_ortu_menampilkan_rincian_kejadian_dan_kontak_wali_kelas()
+    {
+        $ta = TahunAjaran::create(['nama' => '2026/2027 Ganjil', 'is_active' => true]);
+        $jurusan = Jurusan::create(['kode_jurusan' => 'TKJ', 'nama_jurusan' => 'Teknik Komputer']);
+        $guru = Guru::create([
+            'nip'   => '198001012010011001',
+            'nama'  => 'Budi Santoso, S.Pd',
+            'no_hp' => '081234567890',
+        ]);
+
+        $rombel = Rombel::create([
+            'nama_rombel'     => 'XII TKJ 1',
+            'tingkat'         => 12,
+            'jurusan_id'      => $jurusan->id,
+            'tahun_ajaran_id' => $ta->id,
+            'wali_kelas_id'   => $guru->id,
+        ]);
+
+        $siswa = Siswa::create([
+            'nis'       => '1007',
+            'nisn'      => '0012345684',
+            'nama'      => 'Fajar Nugraha',
+            'status'    => 'aktif',
+            'rombel_id' => $rombel->id,
+        ]);
+
+        SiswaRombel::create([
+            'siswa_id'           => $siswa->id,
+            'rombel_id'          => $rombel->id,
+            'tahun_ajaran_id'    => $ta->id,
+            'status_keanggotaan' => 'aktif',
+        ]);
+
+        Absensi::create([
+            'pemilik_type' => 'siswa',
+            'pemilik_id'   => $siswa->id,
+            'tanggal'      => Carbon::today()->toDateString(),
+            'jam_masuk'    => '07:35:00',
+            'status'       => 'terlambat',
+            'sumber_absen' => 'rfid',
+            'keterangan'   => 'Macet di jalan raya',
+        ]);
+
+        $response = $this->get('/cek-presensi/0012345684');
+        $response->assertOk();
+        $response->assertSee('Terlambat Masuk');
+        $response->assertSee('Macet di jalan raya');
+        $response->assertSee('Konsultasi Wali Kelas');
+        $response->assertSee('Budi Santoso, S.Pd');
     }
 }

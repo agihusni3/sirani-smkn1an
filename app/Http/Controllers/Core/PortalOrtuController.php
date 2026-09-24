@@ -30,6 +30,8 @@ class PortalOrtuController extends Controller
         $waliKelas = null;
         $todayAbsensi = null;
         $kasusDisiplin = null;
+        $rincianPelanggaran = collect();
+        $katalogRewardsList = collect();
         $absensis = collect();
         $izins = collect();
         $rekapBulananTahunan = [];
@@ -165,17 +167,77 @@ class PortalOrtuController extends Controller
                 try {
                     $kasusDisiplin = \App\Models\KasusDisiplin::syncFromPresensi($siswa->id);
                     $kasusDisiplin->loadMissing([
-                        'rewards' => fn($q) => $q->orderBy('tanggal', 'desc')->take(10),
-                        'pelanggarans' => fn($q) => $q->orderBy('tanggal', 'desc')->take(10),
+                        'rewards' => fn($q) => $q->orderBy('tanggal', 'desc')->take(20),
+                        'pelanggarans' => fn($q) => $q->orderBy('tanggal', 'desc')->take(20),
                     ]);
                 } catch (\Throwable $e) {
                     $kasusDisiplin = \App\Models\KasusDisiplin::where('siswa_id', $siswa->id)
                         ->with([
-                            'rewards' => fn($q) => $q->orderBy('tanggal', 'desc')->take(10),
-                            'pelanggarans' => fn($q) => $q->orderBy('tanggal', 'desc')->take(10),
+                            'rewards' => fn($q) => $q->orderBy('tanggal', 'desc')->take(20),
+                            'pelanggarans' => fn($q) => $q->orderBy('tanggal', 'desc')->take(20),
                         ])
                         ->first();
                 }
+
+                // Susun Kronologis Detail Rincian Pelanggaran & Presensi Terkait Disiplin
+                $pengaturanDisiplin = \App\Models\PengaturanDisiplin::getPengaturan();
+                $absensiPelanggaran = Absensi::where('pemilik_type', 'siswa')
+                    ->where('pemilik_id', $siswa->id)
+                    ->whereIn('status', ['bolos', 'alpha', 'terlambat'])
+                    ->orderBy('tanggal', 'desc')
+                    ->take(50)
+                    ->get();
+
+                $rincianPelanggaran = collect();
+                foreach ($absensiPelanggaran as $ab) {
+                    $poin = match($ab->status) {
+                        'bolos'     => (int)($pengaturanDisiplin->bobot_bolos ?? 15),
+                        'alpha'     => (int)($pengaturanDisiplin->bobot_alpha ?? 10),
+                        'terlambat' => (int)($pengaturanDisiplin->bobot_terlambat ?? 3),
+                        default     => 0,
+                    };
+                    $label = match($ab->status) {
+                        'bolos'     => 'Bolos Jam Pelajaran',
+                        'alpha'     => 'Alpha (Tidak Hadir)',
+                        'terlambat' => 'Terlambat Masuk',
+                        default     => ucfirst($ab->status),
+                    };
+                    $rincianPelanggaran->push((object)[
+                        'id'         => 'abs-' . $ab->id,
+                        'tipe'       => 'presensi',
+                        'status'     => $ab->status,
+                        'judul'      => $label,
+                        'poin'       => $poin,
+                        'tanggal'    => $ab->tanggal,
+                        'jam'        => $ab->status === 'terlambat' ? ($ab->jam_masuk ? substr($ab->jam_masuk, 0, 5) : null) : ($ab->jam_pulang ? substr($ab->jam_pulang, 0, 5) : null),
+                        'sumber'     => $ab->sumber_absen_label,
+                        'keterangan' => $ab->keterangan,
+                    ]);
+                }
+
+                if ($kasusDisiplin && $kasusDisiplin->pelanggarans) {
+                    foreach ($kasusDisiplin->pelanggarans as $pel) {
+                        $tglStr = $pel->tanggal ? \Carbon\Carbon::parse($pel->tanggal)->toDateString() : ($pel->created_at ? $pel->created_at->toDateString() : null);
+                        $rincianPelanggaran->push((object)[
+                            'id'         => 'pel-' . $pel->id,
+                            'tipe'       => 'tata_tertib',
+                            'status'     => 'tata_tertib',
+                            'judul'      => $pel->nama_pelanggaran,
+                            'poin'       => (int)$pel->poin_ditambah,
+                            'tanggal'    => $tglStr,
+                            'jam'        => null,
+                            'sumber'     => $pel->dicatat_oleh ?: 'Tim Ketertiban',
+                            'keterangan' => $pel->catatan,
+                        ]);
+                    }
+                }
+                $rincianPelanggaran = $rincianPelanggaran->sortByDesc('tanggal')->values();
+
+                // Daftar Panduan Reward / Pemulihan Poin Aktif
+                $katalogRewardsList = \App\Models\KatalogReward::where('is_active', true)
+                    ->orderBy('poin_deduksi', 'desc')
+                    ->take(6)
+                    ->get();
 
                 // Rekapitulasi Jumlah per Bulan untuk Laporan Tahunan
                 $rekapBulananTahunan = [];
@@ -370,6 +432,8 @@ class PortalOrtuController extends Controller
             'pengumumans',
             'kasusDisiplin',
             'pengaturanDisiplin',
+            'rincianPelanggaran',
+            'katalogRewardsList',
             'rekapBulananTahunan',
             'rekapMingguanBulanan',
             'modeAkses',

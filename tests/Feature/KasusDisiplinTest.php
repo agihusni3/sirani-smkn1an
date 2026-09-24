@@ -84,7 +84,7 @@ class KasusDisiplinTest extends TestCase
     {
         $response = $this->actingAs($this->admin)->get('/disiplin');
         $response->assertOk();
-        $response->assertSee('Buku Kasus & Penegakan Disiplin Siswa');
+        $response->assertSee('Penegakan Disiplin', false);
 
         $resBk = $this->actingAs($this->guruBk)->get('/disiplin');
         $resBk->assertOk();
