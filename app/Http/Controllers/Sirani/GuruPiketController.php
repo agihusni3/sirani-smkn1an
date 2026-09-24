@@ -422,6 +422,181 @@ class GuruPiketController extends Controller
     }
 
     /**
+     * Koreksi Presensi Masal (Bulk Correction) dari Meja Piket
+     */
+    public function koreksiMassal(Request $request)
+    {
+        $user = auth()->user();
+        $today = Carbon::today()->toDateString();
+
+        // Otorisasi: hanya guru piket hari ini / Panitia Sumatif / Admin
+        $canKoreksi = $user && (
+            $user->isAdmin() || 
+            $user->isPiketHariIni()
+        );
+
+        if (!$canKoreksi) {
+            return redirect()->back()->with('error', 'Akses ditolak: Hanya Guru Piket bertugas hari ini yang berwenang melakukan koreksi presensi.');
+        }
+
+        $request->validate([
+            'siswa_ids'   => 'required|array|min:1',
+            'siswa_ids.*' => 'required|exists:siswas,id',
+            'status'      => 'required|string|in:hadir,terlambat,alpha,sakit,izin,dispen,dispensasi,bolos,titip_kartu',
+            'jam_masuk'   => 'nullable|string',
+            'jam_pulang'  => 'nullable|string',
+            'keterangan'  => 'nullable|string|max:500',
+        ]);
+
+        $siswaIds = array_values(array_unique($request->input('siswa_ids')));
+        $statusInput = $request->input('status');
+        $rawKet = trim($request->input('keterangan') ?? '');
+        $jamMasuk = $request->input('jam_masuk');
+        $jamPulang = $request->input('jam_pulang');
+        $pencatat = $user->name ?? 'Guru Piket';
+
+        $isInterfensiTitipKartu = false;
+        $status = $statusInput;
+
+        if ($status === 'titip_kartu') {
+            $status = 'alpha';
+            $jamMasuk = null;
+            $jamPulang = null;
+            $isInterfensiTitipKartu = true;
+            $ketFinal = $rawKet ?: "Dibatalkan oleh Guru Piket — Terindikasi Titip Kartu Presensi ({$pencatat})";
+        } elseif (in_array($status, ['alpha', 'reset'])) {
+            $status = 'alpha';
+            $jamMasuk = null;
+            $jamPulang = null;
+            $ketFinal = $rawKet ?: "Koreksi Masal: Dikembalikan ke Alpha / Belum Scan ({$pencatat})";
+        } elseif (in_array($status, ['sakit', 'izin', 'dispen', 'dispensasi'])) {
+            $status = ($status === 'dispensasi') ? 'dispen' : $status;
+            if (empty($jamMasuk)) $jamMasuk = null;
+            if (empty($jamPulang)) $jamPulang = null;
+            $ketFinal = $rawKet ?: "Koreksi Masal (" . ucfirst($status) . ") oleh {$pencatat}";
+        } elseif ($status === 'hadir') {
+            if (empty($jamMasuk)) $jamMasuk = '07:10:00';
+            $ketFinal = $rawKet ?: "Koreksi Masal Hadir oleh {$pencatat}";
+        } elseif ($status === 'terlambat') {
+            if (empty($jamMasuk)) $jamMasuk = Carbon::now()->format('H:i:s');
+            $ketFinal = $rawKet ?: "Koreksi Masal Terlambat oleh {$pencatat}";
+        } elseif ($status === 'bolos') {
+            if (empty($jamMasuk)) $jamMasuk = '07:10:00';
+            $jamPulang = null;
+            $ketFinal = $rawKet ?: "Koreksi Masal Bolos oleh {$pencatat}";
+        } else {
+            $ketFinal = $rawKet ?: "Koreksi Masal oleh {$pencatat}";
+        }
+
+        $sumberInput = $isInterfensiTitipKartu ? 'interfensi_titip_kartu' : 'koreksi_piket_manual';
+        $taAktif = TahunAjaran::where('is_active', true)->first();
+        $updatedCount = 0;
+
+        foreach ($siswaIds as $sId) {
+            $siswaObj = Siswa::find($sId);
+            if (!$siswaObj) continue;
+
+            $siswaRombel = $siswaObj->siswaRombels()
+                ->where('status_keanggotaan', 'aktif')
+                ->when($taAktif, fn($q) => $q->where('tahun_ajaran_id', $taAktif->id))
+                ->first();
+            $siswaRombelId = $siswaRombel?->id;
+
+            Absensi::updateOrCreate(
+                [
+                    'pemilik_type' => 'siswa',
+                    'pemilik_id'   => $siswaObj->id,
+                    'tanggal'      => $today,
+                ],
+                [
+                    'siswa_rombel_id' => $siswaRombelId,
+                    'status'          => $status,
+                    'jam_masuk'       => $jamMasuk,
+                    'jam_pulang'      => $jamPulang,
+                    'sumber_absen'    => $sumberInput,
+                    'keterangan'      => $ketFinal,
+                ]
+            );
+
+            // Sinkronkan ke IzinSiswa jika izin/sakit/dispen
+            if (in_array($status, ['izin', 'sakit', 'dispen'])) {
+                IzinSiswa::updateOrCreate(
+                    [
+                        'siswa_id' => $siswaObj->id,
+                        'tanggal'  => $today,
+                    ],
+                    [
+                        'jenis'          => $status,
+                        'status'         => 'disetujui',
+                        'keterangan'     => $ketFinal,
+                        'disetujui_oleh' => $pencatat,
+                    ]
+                );
+            } else {
+                IzinSiswa::where('siswa_id', $siswaObj->id)->where('tanggal', $today)->delete();
+            }
+
+            // Sinkronisasi Kasus Disiplin
+            KasusDisiplin::syncFromPresensi($siswaObj->id);
+
+            // Kirim notifikasi ortu & push
+            $nisn = $siswaObj->nisn ?: $siswaObj->nis;
+            if ($nisn) {
+                try {
+                    $labelStatus = match($status) {
+                        'hadir'     => 'Hadir Tepat Waktu',
+                        'terlambat' => 'Terlambat',
+                        'izin'      => 'Izin',
+                        'sakit'     => 'Sakit',
+                        'dispen'    => 'Dispensasi',
+                        'alpha'     => 'Alpha',
+                        'bolos'     => 'Bolos',
+                        default     => ucfirst($status),
+                    };
+
+                    $ikon = match($status) {
+                        'hadir'     => '✅',
+                        'terlambat' => '⏰',
+                        'izin'      => '📋',
+                        'sakit'     => '🏥',
+                        'dispen'    => '🎗️',
+                        'alpha'     => '❌',
+                        'bolos'     => '⚠️',
+                        default     => '📝',
+                    };
+
+                    NotifikasiOrtu::create([
+                        'siswa_id'  => $siswaObj->id,
+                        'judul'     => "{$ikon} Koreksi Presensi: {$siswaObj->nama} ({$labelStatus})",
+                        'pesan'     => "Data kehadiran ananda tanggal {$today} diperbarui menjadi {$labelStatus}. Catatan: {$ketFinal}",
+                        'kategori'  => 'koreksi_presensi',
+                        'channel'   => 'in_app',
+                        'status'    => 'terkirim',
+                        'tanggal'   => $today,
+                    ]);
+
+                    \App\Services\PushNotificationService::sendToSiswa(
+                        $nisn,
+                        "{$ikon} Koreksi Presensi: {$siswaObj->nama} ({$labelStatus})",
+                        "Data kehadiran ananda tanggal {$today} diperbarui menjadi {$labelStatus}. Catatan: {$ketFinal}",
+                        '/presensi-siswa/' . urlencode($nisn)
+                    );
+                } catch (\Throwable $e) {}
+            }
+
+            $updatedCount++;
+        }
+
+        \App\Models\AuditLog::catat(
+            $isInterfensiTitipKartu ? 'interfensi_piket_massal' : 'koreksi_presensi_piket_massal',
+            'absensi',
+            "Guru Piket ({$pencatat}) melakukan koreksi presensi masal untuk {$updatedCount} siswa menjadi status {$status}. Catatan: {$ketFinal}"
+        );
+
+        return redirect()->back()->with('success', "Koreksi masal berhasil! Sebanyak {$updatedCount} siswa telah disesuaikan menjadi status " . strtoupper($status) . ".");
+    }
+
+    /**
      * Buka atau Tutup Sesi Gerbang Presensi oleh Guru Piket / Admin
      */
     public function toggleSesiGerbang(Request $request)

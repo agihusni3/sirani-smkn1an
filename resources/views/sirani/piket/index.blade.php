@@ -425,10 +425,35 @@
     {{-- ══ 4. VIEW 1: TABEL PRESENSI SISWA ══ --}}
     <div id="view-siswa" class="piket-view-pane">
       <div class="piket-table-container">
+        {{-- Toolbar Seleksi Masal Siswa --}}
+        @if($canKoreksi ?? false)
+          <div id="bulkToolbarPiket" style="display:none; margin:0 0 12px 0; padding:10px 16px; background:linear-gradient(135deg, rgba(37,99,235,0.08) 0%, rgba(59,130,246,0.03) 100%); border:1.5px solid rgba(37,99,235,0.3); border-radius:10px; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;">
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span style="width:24px; height:24px; border-radius:6px; background:#2563eb; color:#fff; display:inline-flex; align-items:center; justify-content:center; font-size:12px; font-weight:800;" id="bulkToolbarCount">0</span>
+              <span style="font-size:13px; font-weight:700; color:var(--text);">Siswa dipilih untuk tindakan masal</span>
+            </div>
+            <div style="display:flex; align-items:center; gap:8px;">
+              <button type="button" onclick="openKoreksiMasalModal()" class="btn-gradient-koreksi" style="padding:6px 14px; font-size:12.5px; border-radius:8px; display:inline-flex; align-items:center; gap:6px;">
+                <i class="bi bi-pencil-square"></i> Koreksi Masal
+              </button>
+              <button type="button" onclick="clearSelectedPiketSiswa()" class="btn btn-sm btn-outline" style="border-radius:8px; font-size:12px; font-weight:700;">
+                Batal
+              </button>
+            </div>
+          </div>
+        @endif
+
         <div class="table-responsive">
           <table class="data-table" id="tableSiswaPiket">
             <thead>
               <tr>
+                <th style="width:38px; text-align:center;">
+                  @if($canKoreksi ?? false)
+                    <input type="checkbox" id="checkAllPiketSiswa" onchange="toggleSelectAllPiketSiswa(this)" style="cursor:pointer; width:16px; height:16px; accent-color:#2563eb;" title="Pilih Semua Siswa">
+                  @else
+                    -
+                  @endif
+                </th>
                 <th style="width:40px; text-align:center;">No</th>
                 <th>Peserta Didik</th>
                 <th style="width:120px;">Kelas / Rombel</th>
@@ -449,7 +474,12 @@
                   if (str_starts_with($hpClean, '0')) $hpClean = '62' . substr($hpClean, 1);
                 @endphp
                 <tr class="row-siswa-absen" data-status="{{ $ab->status }}" data-pulang="{{ $ab->jam_pulang ? 'pulang' : 'belum' }}" data-has-masuk="{{ $ab->jam_masuk ? '1' : '0' }}">
-                  <td style="text-align:center; font-weight:700; color:var(--text-3); font-size:12px;">{{ $idx + 1 }}</td>
+                  <td style="text-align:center;">
+                    @if($canKoreksi ?? false)
+                      <input type="checkbox" class="cb-piket-siswa" value="{{ $ab->pemilik_id ?: ($ab->siswa_id ?: $ab->siswa?->id) }}" data-nama="{{ $ab->siswa?->nama ?? '—' }}" data-rombel="{{ $rombel }}" onchange="handleSingleSelectPiketSiswa(this)" style="cursor:pointer; width:16px; height:16px; accent-color:#2563eb;">
+                    @endif
+                  </td>
+                  <td class="col-nomor" style="text-align:center; font-weight:700; color:var(--text-3); font-size:12px;">{{ $idx + 1 }}</td>
                   <td>
                     <div style="display:flex; align-items:center; gap:10px;">
                       <img src="{{ $ab->siswa?->foto_url }}" alt="{{ $ab->siswa?->nama }}" style="width:30px; height:40px; aspect-ratio:3/4; border-radius:6px; object-fit:cover; object-position:center 20%; border:1.5px solid var(--border-2); flex-shrink:0;" />
@@ -541,7 +571,12 @@
                   if (str_starts_with($hpClean, '0')) $hpClean = '62' . substr($hpClean, 1);
                 @endphp
                 <tr class="row-siswa-belum-hadir" data-status="belum_hadir" data-pulang="belum" data-has-masuk="0">
-                  <td style="text-align:center; font-weight:700; color:var(--text-3); font-size:12px;">{{ $absensiHariIni->count() + $idx2 + 1 }}</td>
+                  <td style="text-align:center;">
+                    @if($canKoreksi ?? false)
+                      <input type="checkbox" class="cb-piket-siswa" value="{{ $sb->id }}" data-nama="{{ $sb->nama ?? '—' }}" data-rombel="{{ $rombel }}" onchange="handleSingleSelectPiketSiswa(this)" style="cursor:pointer; width:16px; height:16px; accent-color:#2563eb;">
+                    @endif
+                  </td>
+                  <td class="col-nomor" style="text-align:center; font-weight:700; color:var(--text-3); font-size:12px;">{{ $absensiHariIni->count() + $idx2 + 1 }}</td>
                   <td>
                     <div style="display:flex; align-items:center; gap:10px;">
                       <img src="{{ $sb->foto_url }}" alt="{{ $sb->nama }}" style="width:30px; height:40px; aspect-ratio:3/4; border-radius:6px; object-fit:cover; object-position:center 20%; border:1.5px dashed var(--border-2); opacity:0.8; flex-shrink:0;" />
@@ -592,7 +627,7 @@
               {{-- 3. Empty State jika tidak ada data presensi --}}
               @if($absensiHariIni->isEmpty() && $siswaBelumHadirList->isEmpty())
                 <tr class="empty-row">
-                  <td colspan="7" style="text-align:center; padding: 48px 20px;">
+                  <td colspan="8" style="text-align:center; padding: 48px 20px;">
                     <div style="width: 54px; height: 54px; border-radius: 50%; background: rgba(239, 68, 68, 0.08); color: #dc2626; display: inline-flex; align-items: center; justify-content: center; font-size: 26px; margin-bottom: 12px;">
                       <i class="bi bi-calendar-x"></i>
                     </div>
@@ -1188,9 +1223,13 @@
       matchingRows.forEach((row, idx) => {
         if (idx >= startIndex && idx < endIndex) {
           row.style.display = '';
-          const firstTd = row.querySelector('td:first-child');
-          if (firstTd && !isNaN(parseInt(firstTd.innerText))) {
-            firstTd.innerText = idx + 1;
+          const noTd = row.querySelector('td.col-nomor') || row.querySelector('td:first-child');
+          if (noTd && !isNaN(parseInt(noTd.innerText))) {
+            noTd.innerText = idx + 1;
+          }
+          const cb = row.querySelector('.cb-piket-siswa');
+          if (cb && typeof selectedPiketSiswa !== 'undefined') {
+            cb.checked = selectedPiketSiswa.has(cb.value);
           }
         }
       });
@@ -1687,6 +1726,121 @@
         </button>
       </div>
     </form>
+  </div>
+</div>
+
+{{-- MODAL KOREKSI PRESENSI MASAL MEJA PIKET --}}
+<div class="modal-overlay" id="modalKoreksiMasalPiket">
+  <div class="modal-card" style="max-width:540px; padding:24px; border-radius:14px; background:var(--bg-2); border:1px solid var(--border); box-shadow:var(--shadow-lg);">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px; border-bottom:1px solid var(--border); padding-bottom:12px;">
+      <div style="display:flex; align-items:center; gap:8px;">
+        <div style="width:34px; height:34px; border-radius:8px; background:rgba(37,99,235,0.12); color:#2563eb; display:flex; align-items:center; justify-content:center; font-size:17px;">
+          <i class="bi bi-check2-square"></i>
+        </div>
+        <div>
+          <h3 style="font-size:16.5px; font-weight:900; color:var(--text); margin:0;">
+            Koreksi Presensi Masal
+          </h3>
+          <div style="font-size:11.5px; color:var(--text-3); font-weight:600;">Perbarui status kehadiran banyak siswa sekaligus</div>
+        </div>
+      </div>
+      <button type="button" class="btn btn-sm btn-outline" onclick="closeModal('modalKoreksiMasalPiket')" style="width:34px; height:34px; padding:0; display:flex; align-items:center; justify-content:center; border-radius:8px; border:1px solid var(--border-2); color:var(--text);"><i class="bi bi-x-lg" style="font-size:14px;"></i></button>
+    </div>
+
+    <form id="formKoreksiMasalPiket" action="{{ route('piket.koreksi-massal') }}" method="POST">
+      @csrf
+      {{-- Hidden container untuk input siswa_ids[] --}}
+      <div id="koreksiMasalHiddenIds"></div>
+
+      {{-- Preview Siswa Terpilih --}}
+      <div style="margin-bottom:16px; background:var(--bg-3); border:1px solid var(--border-2); border-radius:10px; padding:12px 14px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+          <span style="font-size:11px; font-weight:800; text-transform:uppercase; color:var(--text-2); letter-spacing:.03em;">
+            SISWA TERPILIH (<span id="koreksiMasalCountBadge">0</span>)
+          </span>
+          <button type="button" onclick="clearSelectedPiketSiswa()" style="background:none; border:none; color:#ef4444; font-size:11px; font-weight:700; cursor:pointer; padding:0;">
+            Kosongkan Pilihan
+          </button>
+        </div>
+        <div id="koreksiMasalListPreview" style="max-height:95px; overflow-y:auto; display:flex; flex-wrap:wrap; gap:5px; font-size:11.5px;">
+        </div>
+      </div>
+
+      {{-- Status Presensi Target --}}
+      <div class="form-group" style="margin-bottom:12px;">
+        <label style="font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:.03em; color:var(--text-2); margin-bottom:5px; display:block;">UBAH STATUS KEHADIRAN MENJADI <span style="color:var(--red);">*</span></label>
+        <select name="status" id="koreksiMasalStatus" required style="width:100%; height:42px; background:var(--bg-3); border:1px solid var(--border-2); border-radius:8px; padding:0 12px; font-weight:800; color:var(--text); font-size:13px;" onchange="handleKoreksiMasalStatusChange(this.value)">
+          <option value="hadir">Hadir Tepat Waktu</option>
+          <option value="terlambat">Datang Terlambat</option>
+          <option value="izin">Izin</option>
+          <option value="sakit">Sakit</option>
+          <option value="dispen">Dispensasi (Lomba / Kegiatan Sekolah)</option>
+          <option value="alpha">Alpha / Belum Hadir</option>
+          <option value="titip_kartu">Dibatalkan — Terindikasi Titip Kartu (Alpha)</option>
+          <option value="bolos">Bolos Kelas</option>
+        </select>
+      </div>
+
+      {{-- Quick Action Preset Chips --}}
+      <div style="margin-bottom:14px; display:flex; flex-wrap:wrap; gap:6px;">
+        <button type="button" onclick="setPresetKoreksiMasal('dispen')" class="btn btn-sm btn-outline" style="border-radius:6px; font-size:11px; font-weight:700; background:rgba(13,148,136,0.1); color:#0d9488; border-color:rgba(13,148,136,0.3);">
+          Dispensasi Masal
+        </button>
+        <button type="button" onclick="setPresetKoreksiMasal('izin')" class="btn btn-sm btn-outline" style="border-radius:6px; font-size:11px; font-weight:700; background:rgba(2,132,199,0.1); color:#0284c7; border-color:rgba(2,132,199,0.3);">
+          Izin Masal
+        </button>
+        <button type="button" onclick="setPresetKoreksiMasal('hadir')" class="btn btn-sm btn-outline" style="border-radius:6px; font-size:11px; font-weight:700; background:rgba(22,163,74,0.1); color:#16a34a; border-color:rgba(22,163,74,0.3);">
+          Hadir Masal
+        </button>
+        <button type="button" onclick="setPresetKoreksiMasal('alpha')" class="btn-chip-alpha">
+          Alpha Masal
+        </button>
+        <button type="button" onclick="setPresetKoreksiMasal('titip_kartu')" class="btn-chip-titip">
+          Titip Kartu
+        </button>
+      </div>
+
+      {{-- Waktu Masuk & Pulang --}}
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:14px;">
+        <div>
+          <label style="font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:.03em; color:var(--text-2); margin-bottom:5px; display:block;">Jam Masuk</label>
+          <input type="time" name="jam_masuk" id="koreksiMasalJamMasuk" style="width:100%; height:40px; background:var(--bg-3); border:1px solid var(--border-2); border-radius:8px; padding:0 12px; color:var(--text); font-size:13px; font-family:var(--font-mono); font-weight:700;" />
+        </div>
+        <div>
+          <label style="font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:.03em; color:var(--text-2); margin-bottom:5px; display:block;">Jam Pulang</label>
+          <input type="time" name="jam_pulang" id="koreksiMasalJamPulang" style="width:100%; height:40px; background:var(--bg-3); border:1px solid var(--border-2); border-radius:8px; padding:0 12px; color:var(--text); font-size:13px; font-family:var(--font-mono); font-weight:700;" />
+        </div>
+      </div>
+
+      {{-- Keterangan Alasan Koreksi --}}
+      <div class="form-group" style="margin-bottom:20px;">
+        <label style="font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:.03em; color:var(--text-2); margin-bottom:5px; display:block;">ALASAN / CATATAN KOREKSI MASAL</label>
+        <input type="text" name="keterangan" id="koreksiMasalKeterangan" placeholder="Contoh: Dispensasi Kegiatan Lomba SMK / Validasi Masal Piket" style="width:100%; height:42px; background:var(--bg-3); border:1px solid var(--border-2); border-radius:8px; padding:0 14px; color:var(--text); font-size:13px; font-weight:600;" />
+      </div>
+
+      <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid var(--border); padding-top:14px;">
+        <button type="button" class="btn btn-outline" onclick="closeModal('modalKoreksiMasalPiket')" style="height:40px; padding:0 18px; font-weight:800; border-radius:8px;">Batal</button>
+        <button type="submit" class="btn-gradient-simpan" style="height:40px; padding:0 20px; font-weight:800; border-radius:8px;">
+          <i class="bi bi-check-all" style="font-size:16px; margin-right:4px;"></i> Terapkan Koreksi Masal
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+{{-- FLOATING BULK ACTION BAR UNTUK KOREKSI MASAL --}}
+<div id="floatingBulkActionPiket" style="display:none; position:fixed; bottom:24px; left:50%; transform:translateX(-50%); z-index:999; background:var(--bg-surface, #0f172a); color:#fff; border:1.5px solid rgba(37,99,235,0.45); border-radius:14px; padding:10px 18px; box-shadow:0 10px 30px rgba(0,0,0,0.35); align-items:center; gap:16px; backdrop-filter:blur(10px);">
+  <div style="display:flex; align-items:center; gap:8px;">
+    <span style="width:26px; height:26px; border-radius:50%; background:#2563eb; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:12px;" id="floatingBulkCount">0</span>
+    <span style="font-weight:700; font-size:13.5px;">Siswa Dipilih</span>
+  </div>
+  <div style="display:flex; align-items:center; gap:8px;">
+    <button type="button" onclick="openKoreksiMasalModal()" style="background:linear-gradient(135deg, #2563eb, #1d4ed8); color:#fff; border:none; padding:8px 16px; border-radius:8px; font-weight:800; font-size:13px; cursor:pointer; display:inline-flex; align-items:center; gap:6px; box-shadow:0 3px 10px rgba(37,99,235,0.3);">
+      <i class="bi bi-pencil-square"></i> Koreksi Masal
+    </button>
+    <button type="button" onclick="clearSelectedPiketSiswa()" style="background:rgba(255,255,255,0.1); color:#cbd5e1; border:none; padding:8px 12px; border-radius:8px; font-weight:700; font-size:12.5px; cursor:pointer;">
+      Batal
+    </button>
   </div>
 </div>
 
@@ -2333,6 +2487,154 @@
       if (val === 'titip_kartu' && keterangan && !keterangan.value) {
         keterangan.value = 'Dibatalkan oleh Guru Piket — Terindikasi Titip Kartu Presensi';
       }
+    }
+  }
+
+  // ── PENGELOLA SELEKSI MASAL MEJA PIKET ──
+  const selectedPiketSiswa = new Map();
+
+  function toggleSelectAllPiketSiswa(master) {
+    const isChecked = master.checked;
+    const cbs = document.querySelectorAll('#tableSiswaPiket tbody tr .cb-piket-siswa');
+    cbs.forEach(cb => {
+      const row = cb.closest('tr');
+      if (!row || row.style.display !== 'none') {
+        cb.checked = isChecked;
+        const id = cb.value;
+        const nama = cb.getAttribute('data-nama') || 'Siswa';
+        const rombel = cb.getAttribute('data-rombel') || '';
+        if (isChecked) {
+          selectedPiketSiswa.set(id, { id, nama, rombel });
+        } else {
+          selectedPiketSiswa.delete(id);
+        }
+      }
+    });
+    renderBulkActionUI();
+  }
+
+  function handleSingleSelectPiketSiswa(cb) {
+    const id = cb.value;
+    const nama = cb.getAttribute('data-nama') || 'Siswa';
+    const rombel = cb.getAttribute('data-rombel') || '';
+    if (cb.checked) {
+      selectedPiketSiswa.set(id, { id, nama, rombel });
+    } else {
+      selectedPiketSiswa.delete(id);
+    }
+    renderBulkActionUI();
+  }
+
+  function clearSelectedPiketSiswa() {
+    selectedPiketSiswa.clear();
+    const master = document.getElementById('checkAllPiketSiswa');
+    if (master) master.checked = false;
+    document.querySelectorAll('.cb-piket-siswa').forEach(cb => cb.checked = false);
+    renderBulkActionUI();
+  }
+
+  function renderBulkActionUI() {
+    const count = selectedPiketSiswa.size;
+    const floatingBar = document.getElementById('floatingBulkActionPiket');
+    const floatingBadge = document.getElementById('floatingBulkCount');
+    const toolbar = document.getElementById('bulkToolbarPiket');
+    const toolbarBadge = document.getElementById('bulkToolbarCount');
+    const master = document.getElementById('checkAllPiketSiswa');
+
+    if (count > 0) {
+      if (floatingBar) floatingBar.style.display = 'flex';
+      if (floatingBadge) floatingBadge.textContent = count;
+      if (toolbar) toolbar.style.display = 'flex';
+      if (toolbarBadge) toolbarBadge.textContent = count;
+    } else {
+      if (floatingBar) floatingBar.style.display = 'none';
+      if (toolbar) toolbar.style.display = 'none';
+      if (master) master.checked = false;
+    }
+  }
+
+  function openKoreksiMasalModal() {
+    if (selectedPiketSiswa.size === 0) {
+      alert('Pilih minimal satu siswa untuk melakukan koreksi masal.');
+      return;
+    }
+
+    const container = document.getElementById('koreksiMasalHiddenIds');
+    const preview = document.getElementById('koreksiMasalListPreview');
+    const countBadge = document.getElementById('koreksiMasalCountBadge');
+
+    if (container) container.innerHTML = '';
+    if (preview) preview.innerHTML = '';
+    if (countBadge) countBadge.textContent = selectedPiketSiswa.size;
+
+    selectedPiketSiswa.forEach(item => {
+      if (container) {
+        const inp = document.createElement('input');
+        inp.type = 'hidden';
+        inp.name = 'siswa_ids[]';
+        inp.value = item.id;
+        container.appendChild(inp);
+      }
+      if (preview) {
+        const pill = document.createElement('span');
+        pill.style.cssText = 'background:var(--bg-2); border:1px solid var(--border); padding:3px 8px; border-radius:6px; color:var(--text); font-weight:700; display:inline-flex; align-items:center; gap:4px;';
+        pill.innerHTML = `<span style="max-width:140px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${item.nama}</span> <small style="color:var(--text-3);">(${item.rombel})</small>`;
+        preview.appendChild(pill);
+      }
+    });
+
+    const statusVal = document.getElementById('koreksiMasalStatus')?.value || 'hadir';
+    handleKoreksiMasalStatusChange(statusVal);
+    openModal('modalKoreksiMasalPiket');
+  }
+
+  function setPresetKoreksiMasal(preset) {
+    const statusSelect = document.getElementById('koreksiMasalStatus');
+    const jamMasuk = document.getElementById('koreksiMasalJamMasuk');
+    const jamPulang = document.getElementById('koreksiMasalJamPulang');
+    const keterangan = document.getElementById('koreksiMasalKeterangan');
+
+    if (preset === 'dispen') {
+      if (statusSelect) statusSelect.value = 'dispen';
+      if (jamMasuk) jamMasuk.value = '';
+      if (jamPulang) jamPulang.value = '';
+      if (keterangan) keterangan.value = 'Dispensasi Masal Kegiatan Sekolah';
+    } else if (preset === 'izin') {
+      if (statusSelect) statusSelect.value = 'izin';
+      if (jamMasuk) jamMasuk.value = '';
+      if (jamPulang) jamPulang.value = '';
+      if (keterangan) keterangan.value = 'Izin Masal';
+    } else if (preset === 'hadir') {
+      if (statusSelect) statusSelect.value = 'hadir';
+      if (jamMasuk) jamMasuk.value = '07:10';
+      if (jamPulang) jamPulang.value = '';
+      if (keterangan) keterangan.value = 'Validasi Kehadiran Masal Guru Piket';
+    } else if (preset === 'alpha') {
+      if (statusSelect) statusSelect.value = 'alpha';
+      if (jamMasuk) jamMasuk.value = '';
+      if (jamPulang) jamPulang.value = '';
+      if (keterangan) keterangan.value = 'Validasi Alpha Masal Guru Piket';
+    } else if (preset === 'titip_kartu') {
+      if (statusSelect) statusSelect.value = 'titip_kartu';
+      if (jamMasuk) jamMasuk.value = '';
+      if (jamPulang) jamPulang.value = '';
+      if (keterangan) keterangan.value = 'Dibatalkan Guru Piket — Terindikasi Titip Kartu Presensi';
+    }
+  }
+
+  function handleKoreksiMasalStatusChange(val) {
+    const jamMasuk = document.getElementById('koreksiMasalJamMasuk');
+    const jamPulang = document.getElementById('koreksiMasalJamPulang');
+    const keterangan = document.getElementById('koreksiMasalKeterangan');
+
+    if (['alpha', 'titip_kartu', 'izin', 'sakit', 'dispen'].includes(val)) {
+      if (jamMasuk) jamMasuk.value = '';
+      if (jamPulang) jamPulang.value = '';
+    } else if (val === 'hadir' && jamMasuk && !jamMasuk.value) {
+      jamMasuk.value = '07:10';
+    } else if (val === 'terlambat' && jamMasuk && !jamMasuk.value) {
+      const now = new Date();
+      jamMasuk.value = String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0');
     }
   }
 </script>
