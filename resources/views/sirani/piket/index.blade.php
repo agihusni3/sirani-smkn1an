@@ -90,7 +90,7 @@
     </div>
 
     {{-- ══ NOTIFIKASI MODE PEKAN SUMATIF (STS / SAS) AKTIF ══ --}}
-    @if($modeUjian)
+    @if($modeUjian && $modeUjian->isAktifHariIni($today))
       <div class="piket-exam-banner no-print" style="margin-bottom:14px; display:flex; align-items:center; justify-content:space-between; gap:16px; padding:14px 18px; border-radius:12px; background:linear-gradient(135deg, rgba(79, 70, 229, 0.10) 0%, rgba(147, 51, 234, 0.08) 100%); border:1.5px solid rgba(99, 102, 241, 0.35); box-shadow:0 3px 12px -2px rgba(99, 102, 241, 0.12);">
         <div style="display:flex; align-items:center; gap:12px;">
           <div style="width:40px; height:40px; border-radius:10px; background:linear-gradient(135deg, #4f46e5, #7c3aed); display:flex; align-items:center; justify-content:center; font-size:20px; color:#fff; flex-shrink:0; box-shadow:0 3px 8px rgba(79, 70, 229, 0.3);">
@@ -114,18 +114,6 @@
             </div>
           </div>
         </div>
-        <div style="display:flex; align-items:center; gap:8px; flex-shrink:0;">
-          @if($siswaSusulan->isNotEmpty())
-            <button type="button" class="btn btn-sm" onclick="showTabSusulan()" style="background:rgba(239, 68, 68, 0.12); color:#dc2626; border:1px solid rgba(239, 68, 68, 0.3); padding:6px 12px; border-radius:8px; font-weight:700; font-size:11.5px; cursor:pointer;">
-              <i class="bi bi-clipboard2-check-fill"></i> {{ $siswaSusulan->count() }} Ujian Susulan
-            </button>
-          @endif
-          @if(auth()->user()->isAdmin() || auth()->user()->isWakaKurikulum())
-            <button type="button" class="btn btn-sm" onclick="openModal('modalKelolaModeUjian')" style="background:#4f46e5; color:#fff; border:none; padding:6px 12px; border-radius:8px; font-weight:700; font-size:11.5px; cursor:pointer;">
-              <i class="bi bi-gear-fill"></i> Atur Sumatif
-            </button>
-          @endif
-        </div>
       </div>
     @endif
 
@@ -137,8 +125,8 @@
       @endphp
       <div class="piket-officers-banner no-print">
         <div class="piket-officers-label">
-          <span class="duty-pulsing-dot" style="{{ $modeUjian ? 'background:#8b5cf6;' : '' }}"></span>
-          <span>{{ $modeUjian ? 'PANITIA PELAKSANA SUMATIF BERTUGAS:' : 'GURU PIKET HARI INI:' }}</span>
+          <span class="duty-pulsing-dot" style="{{ ($modeUjian && $modeUjian->isAktifHariIni($today)) ? 'background:#8b5cf6;' : '' }}"></span>
+          <span>{{ ($modeUjian && $modeUjian->isAktifHariIni($today)) ? 'PANITIA PELAKSANA SUMATIF BERTUGAS:' : 'GURU PIKET HARI INI:' }}</span>
           <span class="piket-duty-summary">({{ $piketBertugas }}/{{ $totalPiket }} Bertugas)</span>
         </div>
         <div class="piket-officers-tags">
@@ -335,7 +323,7 @@
             <i class="bi bi-person-badge-fill"></i> Guru &amp; Pegawai
             <span class="piket-segmented-count">{{ $isLibur ? $absensiGuruHariIni->count() : ($guruBelumHadirList->count() + $absensiGuruHariIni->count()) }}</span>
           </button>
-          @if($modeUjian)
+          @if($modeUjian && $modeUjian->isAktifHariIni($today))
           <button type="button" class="piket-segmented-btn piket-main-btn" id="btnViewSusulan" onclick="switchMainView('susulan', this)" style="border-left: 1px solid var(--border-2);">
             <i class="bi bi-mortarboard-fill" style="color:#7c3aed;"></i> Ujian Susulan
             <span class="piket-segmented-count" style="background:rgba(239, 68, 68, 0.15); color:#dc2626; font-weight:800;">{{ $siswaSusulan->count() }}</span>

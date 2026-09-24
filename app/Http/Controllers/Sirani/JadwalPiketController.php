@@ -68,7 +68,7 @@ class JadwalPiketController extends Controller
             'jam_pulang_mulai'          => $jamPulang,
             'panitia_guru_ids'          => array_map('intval', $request->input('panitia_guru_ids', [])),
             'nonaktifkan_piket_reguler' => $request->boolean('nonaktifkan_piket_reguler', true),
-            'is_active'                 => $request->boolean('is_active', true),
+            'is_aktif'                  => $request->boolean('is_aktif', $request->boolean('is_active', true)),
             'keterangan'                => $request->input('keterangan'),
         ];
 
