@@ -1784,16 +1784,16 @@
       {{-- Quick Action Preset Chips --}}
       <div style="margin-bottom:14px; display:flex; flex-wrap:wrap; gap:6px;">
         <button type="button" onclick="setPresetKoreksiMasal('dispen')" class="btn btn-sm btn-outline" style="border-radius:6px; font-size:11px; font-weight:700; background:rgba(13,148,136,0.1); color:#0d9488; border-color:rgba(13,148,136,0.3);">
-          Dispensasi Masal
+          Dispensasi
         </button>
         <button type="button" onclick="setPresetKoreksiMasal('izin')" class="btn btn-sm btn-outline" style="border-radius:6px; font-size:11px; font-weight:700; background:rgba(2,132,199,0.1); color:#0284c7; border-color:rgba(2,132,199,0.3);">
-          Izin Masal
+          Izin
         </button>
         <button type="button" onclick="setPresetKoreksiMasal('hadir')" class="btn btn-sm btn-outline" style="border-radius:6px; font-size:11px; font-weight:700; background:rgba(22,163,74,0.1); color:#16a34a; border-color:rgba(22,163,74,0.3);">
-          Hadir Masal
+          Hadir
         </button>
         <button type="button" onclick="setPresetKoreksiMasal('alpha')" class="btn-chip-alpha">
-          Alpha Masal
+          Alpha
         </button>
         <button type="button" onclick="setPresetKoreksiMasal('titip_kartu')" class="btn-chip-titip">
           Titip Kartu
@@ -1814,8 +1814,8 @@
 
       {{-- Keterangan Alasan Koreksi --}}
       <div class="form-group" style="margin-bottom:20px;">
-        <label style="font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:.03em; color:var(--text-2); margin-bottom:5px; display:block;">ALASAN / CATATAN KOREKSI MASAL</label>
-        <input type="text" name="keterangan" id="koreksiMasalKeterangan" placeholder="Contoh: Dispensasi Kegiatan Lomba SMK / Validasi Masal Piket" style="width:100%; height:42px; background:var(--bg-3); border:1px solid var(--border-2); border-radius:8px; padding:0 14px; color:var(--text); font-size:13px; font-weight:600;" />
+        <label style="font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:.03em; color:var(--text-2); margin-bottom:5px; display:block;">ALASAN / CATATAN KOREKSI</label>
+        <input type="text" name="keterangan" id="koreksiMasalKeterangan" placeholder="Contoh: Dispensasi Kegiatan Lomba SMK / Validasi Guru Piket" style="width:100%; height:42px; background:var(--bg-3); border:1px solid var(--border-2); border-radius:8px; padding:0 14px; color:var(--text); font-size:13px; font-weight:600;" />
       </div>
 
       <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid var(--border); padding-top:14px;">
@@ -2598,22 +2598,22 @@
       if (statusSelect) statusSelect.value = 'dispen';
       if (jamMasuk) jamMasuk.value = '';
       if (jamPulang) jamPulang.value = '';
-      if (keterangan) keterangan.value = 'Dispensasi Masal Kegiatan Sekolah';
+      if (keterangan) keterangan.value = 'Dispensasi Kegiatan Sekolah';
     } else if (preset === 'izin') {
       if (statusSelect) statusSelect.value = 'izin';
       if (jamMasuk) jamMasuk.value = '';
       if (jamPulang) jamPulang.value = '';
-      if (keterangan) keterangan.value = 'Izin Masal';
+      if (keterangan) keterangan.value = 'Izin';
     } else if (preset === 'hadir') {
       if (statusSelect) statusSelect.value = 'hadir';
       if (jamMasuk) jamMasuk.value = '07:10';
       if (jamPulang) jamPulang.value = '';
-      if (keterangan) keterangan.value = 'Validasi Kehadiran Masal Guru Piket';
+      if (keterangan) keterangan.value = 'Validasi Kehadiran Guru Piket';
     } else if (preset === 'alpha') {
       if (statusSelect) statusSelect.value = 'alpha';
       if (jamMasuk) jamMasuk.value = '';
       if (jamPulang) jamPulang.value = '';
-      if (keterangan) keterangan.value = 'Validasi Alpha Masal Guru Piket';
+      if (keterangan) keterangan.value = 'Validasi Alpha Guru Piket';
     } else if (preset === 'titip_kartu') {
       if (statusSelect) statusSelect.value = 'titip_kartu';
       if (jamMasuk) jamMasuk.value = '';

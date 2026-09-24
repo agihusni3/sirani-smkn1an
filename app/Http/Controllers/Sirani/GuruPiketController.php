@@ -468,24 +468,24 @@ class GuruPiketController extends Controller
             $status = 'alpha';
             $jamMasuk = null;
             $jamPulang = null;
-            $ketFinal = $rawKet ?: "Koreksi Masal: Dikembalikan ke Alpha / Belum Scan ({$pencatat})";
+            $ketFinal = $rawKet ?: "Koreksi: Dikembalikan ke Alpha / Belum Scan ({$pencatat})";
         } elseif (in_array($status, ['sakit', 'izin', 'dispen', 'dispensasi'])) {
             $status = ($status === 'dispensasi') ? 'dispen' : $status;
             if (empty($jamMasuk)) $jamMasuk = null;
             if (empty($jamPulang)) $jamPulang = null;
-            $ketFinal = $rawKet ?: "Koreksi Masal (" . ucfirst($status) . ") oleh {$pencatat}";
+            $ketFinal = $rawKet ?: "Koreksi (" . ucfirst($status) . ") oleh {$pencatat}";
         } elseif ($status === 'hadir') {
             if (empty($jamMasuk)) $jamMasuk = '07:10:00';
-            $ketFinal = $rawKet ?: "Koreksi Masal Hadir oleh {$pencatat}";
+            $ketFinal = $rawKet ?: "Koreksi Hadir oleh {$pencatat}";
         } elseif ($status === 'terlambat') {
             if (empty($jamMasuk)) $jamMasuk = Carbon::now()->format('H:i:s');
-            $ketFinal = $rawKet ?: "Koreksi Masal Terlambat oleh {$pencatat}";
+            $ketFinal = $rawKet ?: "Koreksi Terlambat oleh {$pencatat}";
         } elseif ($status === 'bolos') {
             if (empty($jamMasuk)) $jamMasuk = '07:10:00';
             $jamPulang = null;
-            $ketFinal = $rawKet ?: "Koreksi Masal Bolos oleh {$pencatat}";
+            $ketFinal = $rawKet ?: "Koreksi Bolos oleh {$pencatat}";
         } else {
-            $ketFinal = $rawKet ?: "Koreksi Masal oleh {$pencatat}";
+            $ketFinal = $rawKet ?: "Koreksi oleh {$pencatat}";
         }
 
         $sumberInput = $isInterfensiTitipKartu ? 'interfensi_titip_kartu' : 'koreksi_piket_manual';
