@@ -824,7 +824,7 @@ class LaporanController extends Controller
         }
 
         $request->validate([
-            'status'     => 'required|in:hadir,terlambat,alpha,sakit,izin,dispen,bolos',
+            'status'     => 'required|in:hadir,terlambat,alpha,sakit,izin,dispen,dispensasi,bolos',
             'jam_masuk'  => 'nullable',
             'jam_pulang' => 'nullable',
             'keterangan' => 'nullable|string|max:500',
@@ -837,7 +837,8 @@ class LaporanController extends Controller
         $jamMasuk = $request->input('jam_masuk');
         $jamPulang = $request->input('jam_pulang');
 
-        if (in_array($status, ['alpha', 'sakit', 'izin', 'dispen'])) {
+        if (in_array($status, ['alpha', 'sakit', 'izin', 'dispen', 'dispensasi'])) {
+            $status = ($status === 'dispensasi') ? 'dispen' : $status;
             // Untuk tidak hadir / izin / sakit / dispen / alpha, jika jam tidak diisi spesifik, set null
             if (empty($jamMasuk)) $jamMasuk = null;
             if (empty($jamPulang)) $jamPulang = null;
@@ -870,14 +871,15 @@ class LaporanController extends Controller
                 $siswaId = $siswaObj->id;
 
                 // 1. Sinkronisasi IzinSiswa
-                if (in_array($status, ['izin', 'sakit', 'dispen'])) {
+                if (in_array($status, ['izin', 'sakit', 'dispen', 'dispensasi'])) {
+                    $jenisIzin = ($status === 'dispen') ? 'dispensasi' : $status;
                     IzinSiswa::updateOrCreate(
                         [
                             'siswa_id' => $siswaId,
                             'tanggal'  => $absensi->tanggal,
                         ],
                         [
-                            'jenis'          => $status,
+                            'jenis'          => $jenisIzin,
                             'status'         => 'disetujui',
                             'keterangan'     => $keterangan ?: 'Koreksi perizinan manual oleh guru piket',
                             'disetujui_oleh' => auth()->user()?->name ?? 'Guru Piket / Admin',

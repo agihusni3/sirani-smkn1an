@@ -561,9 +561,9 @@ class NotifikasiDraftService
         $kategori = match ($status) {
             'alpha'          => 'alpha',
             'terlambat'      => 'terlambat',
-            'sakit'          => 'sakit',
-            'izin', 'dispen' => 'izin',
-            'bolos'          => 'bolos',
+            'sakit'                       => 'sakit',
+            'izin', 'dispen', 'dispensasi' => 'izin',
+            'bolos'                       => 'bolos',
             default          => null,
         };
 

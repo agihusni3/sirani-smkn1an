@@ -899,10 +899,10 @@
                 @php
                   $rombel = $s->siswa?->rombelAktif?->rombel?->nama ?? ($s->siswa?->siswaRombels?->first()?->rombel?->nama ?? '-');
                   $badgeKategori = match($s->jenis_izin) {
-                    'sakit'  => 'badge-warning',
-                    'izin'   => 'badge-info',
-                    'dispen' => 'badge-primary',
-                    default  => 'badge-secondary',
+                    'sakit'                => 'badge-warning',
+                    'izin'                 => 'badge-info',
+                    'dispen', 'dispensasi' => 'badge-primary',
+                    default                => 'badge-secondary',
                   };
                   $waOrtu = $s->siswa?->no_hp_ortu ?? $s->siswa?->no_hp ?? null;
                   $waClean = $waOrtu ? preg_replace('/^0/', '62', preg_replace('/[^0-9]/', '', $waOrtu)) : '';
@@ -1416,8 +1416,11 @@
     const elNama = document.getElementById('koreksiPiketNama');
     if (elNama) elNama.value = nama || '';
 
+    let normalizedStatus = status || 'hadir';
+    if (normalizedStatus === 'dispensasi') normalizedStatus = 'dispen';
+
     const elStatus = document.getElementById('koreksiPiketStatus');
-    if (elStatus) elStatus.value = status || 'hadir';
+    if (elStatus) elStatus.value = normalizedStatus;
 
     const elMasuk = document.getElementById('koreksiPiketJamMasuk');
     if (elMasuk) elMasuk.value = jamMasuk ? jamMasuk.substring(0, 5) : '';
@@ -1428,6 +1431,7 @@
     const elKet = document.getElementById('koreksiPiketKeterangan');
     if (elKet) elKet.value = keterangan || '';
 
+    handleKoreksiStatusChange(normalizedStatus);
     openModal('modalKoreksiPiket');
   }
   const openKoreksiPiketModal = openKoreksiModal;
@@ -1690,6 +1694,9 @@
 
       {{-- Quick Action Intervensi Chips --}}
       <div style="margin-bottom:14px; display:flex; flex-wrap:wrap; gap:6px;">
+        <button type="button" onclick="setPresetKoreksi('dispen')" class="btn btn-sm btn-outline" style="border-radius:6px; font-size:11px; font-weight:700; background:rgba(13,148,136,0.1); color:#0d9488; border-color:rgba(13,148,136,0.3);" data-tooltip="Set ke status Dispensasi">
+          Dispensasi
+        </button>
         <button type="button" onclick="setPresetKoreksi('titip_kartu')" class="btn-chip-titip" data-tooltip="Tandai kehadiran dibatalkan akibat titip kartu" title="Tandai kehadiran dibatalkan akibat titip kartu">
           Intervensi Titip Kartu
         </button>
@@ -2459,18 +2466,23 @@
     const jamPulang = document.getElementById('koreksiPiketJamPulang');
     const keterangan = document.getElementById('koreksiPiketKeterangan');
 
-    if (preset === 'titip_kartu') {
-      statusSelect.value = 'titip_kartu';
+    if (preset === 'dispen') {
+      if (statusSelect) statusSelect.value = 'dispen';
+      if (jamMasuk) jamMasuk.value = '';
+      if (jamPulang) jamPulang.value = '';
+      if (keterangan) keterangan.value = 'Dispensasi Kegiatan Sekolah';
+    } else if (preset === 'titip_kartu') {
+      if (statusSelect) statusSelect.value = 'titip_kartu';
       if (jamMasuk) jamMasuk.value = '';
       if (jamPulang) jamPulang.value = '';
       if (keterangan) keterangan.value = 'Dibatalkan oleh Guru Piket — Terindikasi Titip Kartu Presensi';
     } else if (preset === 'alpha') {
-      statusSelect.value = 'alpha';
+      if (statusSelect) statusSelect.value = 'alpha';
       if (jamMasuk) jamMasuk.value = '';
       if (jamPulang) jamPulang.value = '';
       if (keterangan) keterangan.value = 'Intervensi Piket: Dikembalikan ke Status Alpha / Belum Scan';
     } else if (preset === 'bolos') {
-      statusSelect.value = 'bolos';
+      if (statusSelect) statusSelect.value = 'bolos';
       if (jamPulang) jamPulang.value = '';
       if (keterangan) keterangan.value = 'Intervensi Piket: Siswa Bolos Kelas / Meninggalkan Sekolah';
     }
@@ -2481,7 +2493,7 @@
     const jamPulang = document.getElementById('koreksiPiketJamPulang');
     const keterangan = document.getElementById('koreksiPiketKeterangan');
 
-    if (val === 'titip_kartu' || val === 'alpha') {
+    if (val === 'titip_kartu' || val === 'alpha' || val === 'dispen' || val === 'izin' || val === 'sakit') {
       if (jamMasuk) jamMasuk.value = '';
       if (jamPulang) jamPulang.value = '';
       if (val === 'titip_kartu' && keterangan && !keterangan.value) {

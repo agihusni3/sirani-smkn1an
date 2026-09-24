@@ -270,7 +270,7 @@ class GuruPiketController extends Controller
         }
 
         $request->validate([
-            'status'     => 'required|in:hadir,terlambat,alpha,sakit,izin,dispen,bolos,titip_kartu,reset',
+            'status'     => 'required|in:hadir,terlambat,alpha,sakit,izin,dispen,dispensasi,bolos,titip_kartu,reset',
             'jam_masuk'  => 'nullable',
             'jam_pulang' => 'nullable',
             'keterangan' => 'nullable|string|max:500',
@@ -295,7 +295,8 @@ class GuruPiketController extends Controller
             $jamMasuk = null;
             $jamPulang = null;
             $ketFinal = $keterangan ?: "Intervensi Piket: Dikembalikan ke Alpha / Belum Scan ({$pencatat})";
-        } elseif (in_array($status, ['sakit', 'izin', 'dispen'])) {
+        } elseif (in_array($status, ['sakit', 'izin', 'dispen', 'dispensasi'])) {
+            $status = ($status === 'dispensasi') ? 'dispen' : $status;
             if (empty($jamMasuk)) $jamMasuk = null;
             if (empty($jamPulang)) $jamPulang = null;
             $ketFinal = $keterangan ?: "Dikoreksi oleh {$pencatat}";
@@ -339,14 +340,15 @@ class GuruPiketController extends Controller
 
             if ($siswaObj) {
                 $siswaId = $siswaObj->id;
-                if (in_array($status, ['izin', 'sakit', 'dispen'])) {
+                if (in_array($status, ['izin', 'sakit', 'dispen', 'dispensasi'])) {
+                    $jenisIzin = ($status === 'dispen') ? 'dispensasi' : $status;
                     IzinSiswa::updateOrCreate(
                         [
                             'siswa_id' => $siswaId,
                             'tanggal'  => $absensi->tanggal,
                         ],
                         [
-                            'jenis'          => $status,
+                            'jenis'          => $jenisIzin,
                             'status'         => 'disetujui',
                             'keterangan'     => $ketFinal,
                             'disetujui_oleh' => $pencatat,
@@ -519,14 +521,15 @@ class GuruPiketController extends Controller
             );
 
             // Sinkronkan ke IzinSiswa jika izin/sakit/dispen
-            if (in_array($status, ['izin', 'sakit', 'dispen'])) {
+            if (in_array($status, ['izin', 'sakit', 'dispen', 'dispensasi'])) {
+                $jenisIzin = ($status === 'dispen') ? 'dispensasi' : $status;
                 IzinSiswa::updateOrCreate(
                     [
                         'siswa_id' => $siswaObj->id,
                         'tanggal'  => $today,
                     ],
                     [
-                        'jenis'          => $status,
+                        'jenis'          => $jenisIzin,
                         'status'         => 'disetujui',
                         'keterangan'     => $ketFinal,
                         'disetujui_oleh' => $pencatat,
@@ -625,7 +628,7 @@ class GuruPiketController extends Controller
 
         $request->validate([
             'siswa_id'       => 'required|exists:siswas,id',
-            'status'         => 'required|in:hadir,terlambat,alpha,sakit,izin,dispen,bolos',
+            'status'         => 'required|in:hadir,terlambat,alpha,sakit,izin,dispen,dispensasi,bolos',
             'jam_masuk'      => 'nullable',
             'keterangan'     => 'nullable|string|max:500',
             'file_pendukung' => 'nullable|file|mimes:pdf,jpg,jpeg,png,webp|max:10240',
@@ -645,7 +648,8 @@ class GuruPiketController extends Controller
         $siswaRombel = $siswa->siswaRombels->where('status_keanggotaan', 'aktif')->first();
         $siswaRombelId = $siswaRombel?->id;
 
-        if (in_array($status, ['alpha', 'sakit', 'izin', 'dispen'])) {
+        if (in_array($status, ['alpha', 'sakit', 'izin', 'dispen', 'dispensasi'])) {
+            $status = ($status === 'dispensasi') ? 'dispen' : $status;
             $jamMasuk = null;
         } elseif ($status === 'hadir' && empty($jamMasuk)) {
             $jamMasuk = '07:10:00';
@@ -674,7 +678,8 @@ class GuruPiketController extends Controller
         );
 
         // Jika status perizinan, sinkronkan ke modul IzinSiswa
-        if (in_array($status, ['izin', 'sakit', 'dispen'])) {
+        if (in_array($status, ['izin', 'sakit', 'dispen', 'dispensasi'])) {
+            $jenisIzin = ($status === 'dispen') ? 'dispensasi' : $status;
             $existing = IzinSiswa::where('siswa_id', $siswa->id)->where('tanggal', $today)->first();
             $finalFile = $filePath ?: ($existing?->file_pendukung);
 
@@ -684,7 +689,7 @@ class GuruPiketController extends Controller
                     'tanggal'  => $today,
                 ],
                 [
-                    'jenis'          => $status,
+                    'jenis'          => $jenisIzin,
                     'status'         => 'disetujui',
                     'keterangan'     => $ketFinal,
                     'file_pendukung' => $finalFile,
