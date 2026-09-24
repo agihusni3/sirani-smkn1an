@@ -261,6 +261,16 @@ class User extends Authenticatable
         return $this->getActiveRole() === 'waka_kesiswaan';
     }
 
+    public function isWakasis(): bool
+    {
+        return $this->isWakaKesiswaan();
+    }
+
+    public function isKepsek(): bool
+    {
+        return $this->isKepalaSekolah();
+    }
+
     public function isWakaKurikulum(): bool
     {
         return $this->getActiveRole() === 'waka_kurikulum';
@@ -308,6 +318,11 @@ class User extends Authenticatable
         return $this->getActiveRole() === 'guru_bk';
     }
 
+    public function isBK(): bool
+    {
+        return $this->isGuruBk();
+    }
+
     public function isWaliKelas(): bool
     {
         // Khusus pengujian unit test mock tanpa profil GTK guru
@@ -326,6 +341,11 @@ class User extends Authenticatable
         }
 
         return false;
+    }
+
+    public function isWali(): bool
+    {
+        return $this->isWaliKelas();
     }
 
     public function isStafTu(): bool

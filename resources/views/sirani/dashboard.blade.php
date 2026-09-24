@@ -132,7 +132,7 @@
     @if(session('error'))<div class="alert-error"><i class="bi bi-exclamation-triangle-fill" style="margin-right:6px;"></i>{{ session('error') }}</div>@endif
 
     {{-- BANNER DEMO BROADCAST NOTIFIKASI WALI MURID (SEMENTARA UNTUK DEMO & PENGUJIAN) --}}
-    @if(auth()->check() && (auth()->user()->isAdmin() || auth()->user()->isKepalaSekolah() || auth()->user()->isWakasis() || auth()->user()->isGuruPiket() || auth()->user()->isWakaKurikulum()))
+    @if(auth()->check() && ($isAdmin || $isKepalaSekolah || $isWakasis || auth()->user()->isGuruPiket() || $isWakaKurikulum))
       <div class="panel no-print" style="background:linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); color:#ffffff; padding:14px 18px; border-radius:var(--r-md); margin-bottom:18px; box-shadow:0 6px 18px rgba(124,58,237,0.25); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
         <div style="display:flex; align-items:center; gap:12px;">
           <div style="width:42px; height:42px; border-radius:10px; background:rgba(255,255,255,0.18); display:flex; align-items:center; justify-content:center; font-size:20px; flex-shrink:0;">

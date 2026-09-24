@@ -15,7 +15,7 @@
     {{-- HEADER --}}
     @php
       $currentUser = auth()->user();
-      $canManagePengumuman = $currentUser && ($currentUser->isAdmin() || $currentUser->isWakasis() || $currentUser->isWakaKurikulum());
+      $canManagePengumuman = $currentUser && ($currentUser->isAdmin() || $currentUser->isWakaKesiswaan() || $currentUser->isWakaKurikulum());
     @endphp
 
     {{-- ULTRA COMPACT SLIM HEADER BAR --}}
