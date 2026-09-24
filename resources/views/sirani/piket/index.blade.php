@@ -166,16 +166,26 @@
 
     {{-- ══ NOTIFIKASI HARI LIBUR SEKOLAH ══ --}}
     @if($isLibur)
-      <div class="piket-holiday-banner no-print" style="margin-bottom:18px; display:flex; align-items:center; gap:14px; padding:14px 18px; border-radius:12px; background:rgba(239, 68, 68, 0.08); border:1px solid rgba(239, 68, 68, 0.22); color:#991b1b;">
-        <div style="width:40px; height:40px; border-radius:10px; background:rgba(239, 68, 68, 0.15); display:flex; align-items:center; justify-content:center; font-size:20px; color:#dc2626; flex-shrink:0;">
-          <i class="bi bi-calendar-x-fill"></i>
+      <div class="piket-holiday-banner no-print" style="margin-bottom:18px; display:flex; align-items:center; justify-content:space-between; gap:14px; padding:14px 18px; border-radius:12px; background:rgba(239, 68, 68, 0.08); border:1px solid rgba(239, 68, 68, 0.22); color:#991b1b;">
+        <div style="display:flex; align-items:center; gap:14px;">
+          <div style="width:40px; height:40px; border-radius:10px; background:rgba(239, 68, 68, 0.15); display:flex; align-items:center; justify-content:center; font-size:20px; color:#dc2626; flex-shrink:0;">
+            <i class="bi bi-calendar-x-fill"></i>
+          </div>
+          <div style="font-size:13px; line-height:1.45;">
+            <strong style="font-size:14px; display:block; margin-bottom:2px; color:#b91c1c;">
+              Hari Ini Libur Sekolah: {{ $liburDetail->nama_libur ?? (\App\Models\HariLibur::isWeekend($today) ? 'Libur Akhir Pekan (' . now()->locale('id')->isoFormat('dddd') . ')' : 'Libur Terjadwal') }}
+            </strong>
+            <span>Seluruh peserta didik dan dewan guru bebas kewajiban presensi. Status Alpha otomatis dinonaktifkan untuk hari libur / akhir pekan.</span>
+          </div>
         </div>
-        <div style="flex:1; font-size:13px; line-height:1.45;">
-          <strong style="font-size:14px; display:block; margin-bottom:2px; color:#b91c1c;">
-            Hari Ini Libur Sekolah: {{ $liburDetail->nama_libur ?? (\App\Models\HariLibur::isWeekend($today) ? 'Libur Akhir Pekan (' . now()->locale('id')->isoFormat('dddd') . ')' : 'Libur Terjadwal') }}
-          </strong>
-          <span>Seluruh peserta didik dan dewan guru bebas kewajiban presensi. Status Alpha otomatis dinonaktifkan untuk hari libur / akhir pekan.</span>
-        </div>
+        @if($liburDetail && (auth()->user()->isAdmin() || auth()->user()->isPiketHariIni() || auth()->user()->isKepalaSekolah()))
+          <form action="{{ route('piket.batal-libur-darurat', $liburDetail->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin membatalkan status libur untuk hari ini dan mengaktifkan jadwal sekolah kembali?');" style="margin:0; flex-shrink:0;">
+            @csrf
+            <button type="submit" class="btn btn-sm" style="background:#fee2e2; color:#b91c1c; border:1px solid #fca5a5; font-size:11.5px; font-weight:800; border-radius:6px; padding:6px 12px; cursor:pointer;" title="Batalkan status libur darurat dan kembalikan jadwal presensi normal">
+              <i class="bi bi-arrow-counterclockwise"></i> Batalkan Libur
+            </button>
+          </form>
+        @endif
       </div>
     @endif
 
@@ -347,6 +357,11 @@
           @if(auth()->user()->isAdmin() || auth()->user()->isWakaKurikulum())
             <button type="button" class="btn-gradient-manual" onclick="openModal('modalKelolaModeUjian')" data-tooltip="Konfigurasi Mode Pekan Sumatif (STS / SAS) & Panitia" title="Konfigurasi Mode Pekan Sumatif (STS / SAS) & Panitia" style="background:linear-gradient(135deg, #4f46e5, #7c3aed); border-color:#6366f1;">
               Mode Sumatif
+            </button>
+          @endif
+          @if(!$isLibur && (auth()->user()->isAdmin() || auth()->user()->isPiketHariIni() || auth()->user()->isKepalaSekolah()))
+            <button type="button" class="btn-gradient-danger" onclick="openModal('modalLiburDarurat')" data-tooltip="Liburkan sekolah mendadak hari ini & bersihkan status Alpha" title="Liburkan sekolah mendadak hari ini & bersihkan status Alpha" style="background:linear-gradient(135deg, #ef4444, #dc2626); color:#fff; border:none; padding:7px 13px; border-radius:8px; font-weight:700; font-size:12px; cursor:pointer; display:inline-flex; align-items:center; gap:5px; box-shadow:0 2px 6px rgba(239, 68, 68, 0.25);">
+              <i class="bi bi-calendar-x-fill"></i> Liburkan Hari Ini
             </button>
           @endif
         </div>
@@ -1528,6 +1543,74 @@
     updatePmSelect();
   });
 </script>
+
+{{-- MODAL LIBUR DARURAT / MENDADAK --}}
+<div class="modal-overlay" id="modalLiburDarurat">
+  <div class="modal-card" style="max-width:520px; padding:24px; border-top:4px solid #dc2626;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+      <div style="display:flex; align-items:center; gap:10px;">
+        <div style="width:38px; height:38px; border-radius:10px; background:#fee2e2; color:#dc2626; display:flex; align-items:center; justify-content:center; font-size:18px;">
+          <i class="bi bi-exclamation-triangle-fill"></i>
+        </div>
+        <div>
+          <h3 style="font-size:16px; font-weight:900; color:var(--text); margin:0;">Liburkan Sekolah Hari Ini</h3>
+          <div style="font-size:11.5px; color:var(--text-3);">Akomodasi Libur Mendadak / Darurat Khusus Sekolah</div>
+        </div>
+      </div>
+      <button type="button" class="btn btn-sm btn-outline" onclick="closeModal('modalLiburDarurat')"><i class="bi bi-x-lg"></i></button>
+    </div>
+
+    <form method="POST" action="{{ route('piket.libur-darurat') }}">
+      @csrf
+      <div style="display:flex; flex-direction:column; gap:14px;">
+        
+        <div style="background:#fef2f2; border:1px solid #fecaca; border-radius:8px; padding:12px; font-size:12px; color:#991b1b; line-height:1.5;">
+          <strong><i class="bi bi-shield-check"></i> Mekanisme Pengamanan Alpha Otomatis:</strong>
+          <ul style="margin:6px 0 0 16px; padding:0;">
+            <li>Status <strong>Alpha</strong> siswa &amp; guru hari ini akan <strong>dibatalkan &amp; dihapus otomatis</strong>.</li>
+            <li>Poin pelanggaran kedisiplinan siswa akibat Alpha hari ini akan <strong>direset kembali</strong>.</li>
+            <li>Draf pesan WhatsApp Alpha ke wali murid yang belum terkirim akan <strong>dibatalkan</strong>.</li>
+          </ul>
+        </div>
+
+        <div class="form-group" style="margin-bottom:0;">
+          <label style="font-size:11.5px; font-weight:700; text-transform:uppercase; color:var(--text-2); margin-bottom:4px; display:block;">
+            Nama / Perihal Libur <span style="color:var(--red);">*</span>
+          </label>
+          <input 
+            type="text" 
+            name="nama_libur" 
+            value="Libur Khusus Sekolah" 
+            placeholder="Misal: Bencana Banjir / Rapat Dinas Mendadak / Cuaca Ekstrem" 
+            required 
+            style="width:100%; height:40px; background:var(--bg-3); border:1px solid var(--border-2); border-radius:var(--r-sm); padding:0 12px; color:var(--text); font-size:13px; font-weight:700;"
+          />
+        </div>
+
+        <div class="form-group" style="margin-bottom:0;">
+          <label style="font-size:11.5px; font-weight:700; text-transform:uppercase; color:var(--text-2); margin-bottom:4px; display:block;">
+            Keterangan / Alasan Libur Mendadak
+          </label>
+          <textarea 
+            name="keterangan" 
+            rows="3" 
+            placeholder="Tuliskan alasan resmi mengapa proses KBM diliburkan hari ini..." 
+            style="width:100%; background:var(--bg-3); border:1px solid var(--border-2); border-radius:var(--r-sm); padding:8px 12px; color:var(--text); font-size:12.5px; font-family:inherit; resize:none;"
+          ></textarea>
+        </div>
+
+        <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:8px;">
+          <button type="button" class="btn btn-outline" onclick="closeModal('modalLiburDarurat')" style="padding:8px 16px; font-size:12.5px; font-weight:700;">
+            Batal
+          </button>
+          <button type="submit" class="btn btn-danger" style="background:#dc2626; color:#fff; border:none; padding:8px 18px; font-size:12.5px; font-weight:800; border-radius:8px; display:inline-flex; align-items:center; gap:6px; cursor:pointer;">
+            <i class="bi bi-calendar-x-fill"></i> Konfirmasi Liburkan Hari Ini
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
 
 {{-- MODAL PRESENSI MANUAL MEJA PIKET --}}
 <div class="modal-overlay" id="modalPresensiManual">

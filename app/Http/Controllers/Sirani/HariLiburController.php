@@ -124,10 +124,43 @@ class HariLiburController extends Controller
             'created_by'      => $petugas,
         ]);
 
+        // Rollback otomatis status Alpha jika ada presensi yang terlanjur terkunci pada rentang tanggal tersebut
+        $rollback = \App\Services\HariLiburService::rollbackAlphaHariLibur($tglMulai, $tglSelesai);
+        $extraMsg = '';
+        if ($rollback['siswa_alpha_dibatalkan'] > 0 || $rollback['guru_alpha_dibatalkan'] > 0) {
+            $extraMsg = " (Otomatis membatalkan {$rollback['siswa_alpha_dibatalkan']} Alpha siswa & {$rollback['guru_alpha_dibatalkan']} Alpha guru).";
+        }
+
         return redirect()->route('admin.hari-libur.index', [
             'bulan' => Carbon::parse($tglMulai)->month,
             'tahun' => Carbon::parse($tglMulai)->year,
-        ])->with('success', 'Hari libur "' . $request->input('nama_libur') . '" berhasil ditambahkan ke kalender!');
+        ])->with('success', 'Hari libur "' . $request->input('nama_libur') . '" berhasil ditambahkan ke kalender!' . $extraMsg);
+    }
+
+    /**
+     * Tetapkan libur darurat hari ini langsung dari Kalender Libur.
+     */
+    public function liburDarurat(Request $request)
+    {
+        $request->validate([
+            'nama_libur' => 'required|string|max:255',
+            'keterangan' => 'nullable|string|max:255',
+        ]);
+
+        $res = \App\Services\HariLiburService::tetapkanLiburDarurat(
+            $request->input('nama_libur', 'Libur Khusus Sekolah'),
+            $request->input('keterangan'),
+            auth()->user()->name ?? 'Administrator'
+        );
+
+        $msg = "🚨 Hari ini berhasil ditetapkan sebagai Libur Darurat: \"{$res['libur']->nama_libur}\". ";
+        if ($res['siswa_alpha_dibatalkan'] > 0 || $res['guru_alpha_dibatalkan'] > 0) {
+            $msg .= "Sebanyak {$res['siswa_alpha_dibatalkan']} status Alpha siswa & {$res['guru_alpha_dibatalkan']} Alpha guru berhasil dibatalkan otomatis.";
+        } else {
+            $msg .= "Tidak ada status Alpha yang perlu dibatalkan.";
+        }
+
+        return redirect()->back()->with('success', $msg);
     }
 
     /**

@@ -1007,5 +1007,57 @@ class GuruPiketController extends Controller
         \App\Models\AuditLog::catat('flagging_wa_manual', 'piket', "WA Massal dipicu manual oleh {$user->name}: {$output}");
         return redirect()->back()->with('success', "📱 WA Pengingat berhasil dikirim. {$output}");
     }
+
+    /**
+     * Tetapkan status libur mendadak / darurat hari ini langsung dari meja piket.
+     * Otomatis membatalkan status Alpha yang terlanjur terbuat & reset poin kedisiplinan.
+     */
+    public function liburDarurat(Request $request)
+    {
+        $user = auth()->user();
+        $isAuthorized = $user && ($user->isAdmin() || $user->isPiketHariIni() || $user->isKepalaSekolah());
+        if (!$isAuthorized) {
+            return redirect()->back()->with('error', 'Akses ditolak. Hanya Guru Piket yang bertugas atau Administrator yang berhak menetapkan libur.');
+        }
+
+        $request->validate([
+            'nama_libur' => 'required|string|max:255',
+            'keterangan' => 'nullable|string|max:255',
+        ]);
+
+        $namaLibur  = $request->input('nama_libur', 'Libur Darurat Sekolah');
+        $keterangan = $request->input('keterangan');
+
+        $res = \App\Services\HariLiburService::tetapkanLiburDarurat(
+            $namaLibur,
+            $keterangan,
+            $user->name
+        );
+
+        $msg = "🚨 Sekolah berhasil diliburkan hari ini: \"{$res['libur']->nama_libur}\". ";
+        if ($res['siswa_alpha_dibatalkan'] > 0 || $res['guru_alpha_dibatalkan'] > 0) {
+            $msg .= "Sebanyak {$res['siswa_alpha_dibatalkan']} status Alpha siswa & {$res['guru_alpha_dibatalkan']} Alpha guru berhasil dibatalkan otomatis.";
+        } else {
+            $msg .= "Seluruh presensi hari ini dinyatakan bebas tugas/libur.";
+        }
+
+        return redirect()->back()->with('success', $msg);
+    }
+
+    /**
+     * Batalkan status libur darurat hari ini.
+     */
+    public function batalLiburDarurat($id)
+    {
+        $user = auth()->user();
+        $isAuthorized = $user && ($user->isAdmin() || $user->isPiketHariIni() || $user->isKepalaSekolah());
+        if (!$isAuthorized) {
+            return redirect()->back()->with('error', 'Akses ditolak.');
+        }
+
+        \App\Services\HariLiburService::batalkanLiburDarurat($id, $user->name);
+
+        return redirect()->back()->with('success', "✅ Status libur darurat sekolah berhasil dibatalkan. Jadwal presensi kembali normal.");
+    }
 }
 

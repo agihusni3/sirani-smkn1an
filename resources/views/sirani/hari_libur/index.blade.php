@@ -33,6 +33,12 @@
 
         <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
           @if($canManageLibur)
+            @if(!\App\Models\HariLibur::isLibur())
+              <button type="button" class="btn btn-sm btn-danger" onclick="openModalLiburDarurat()" style="height:32px; padding:0 12px; font-size:11.5px; font-weight:800; display:inline-flex; align-items:center; gap:5px; border-radius:6px; cursor:pointer; background:#dc2626; color:#fff; border:none; box-shadow:0 2px 5px rgba(220,38,38,0.25);" title="Liburkan sekolah mendadak hari ini & bersihkan status Alpha">
+                <i class="bi bi-calendar-x-fill"></i> Libur Darurat Hari Ini
+              </button>
+            @endif
+
             <button type="button" class="btn btn-sm btn-gold" onclick="openModalTambahLibur()" style="height:32px; padding:0 12px; font-size:11.5px; font-weight:800; display:inline-flex; align-items:center; gap:5px; border-radius:6px; cursor:pointer;">
               <i class="bi bi-plus-circle-fill"></i> Tambah Libur
             </button>
@@ -260,6 +266,49 @@
     </div>
   </div>
 
+  {{-- MODAL LIBUR DARURAT HARI INI --}}
+  <div class="modal-overlay" id="modalLiburDarurat">
+    <div class="modal-card" style="max-width:520px; padding:24px; border-top:4px solid #dc2626;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+        <h3 style="font-size:17px; font-weight:900; color:var(--text); margin:0; display:flex; align-items:center; gap:8px;">
+          <i class="bi bi-exclamation-triangle-fill" style="color:#dc2626;"></i> Libur Darurat Hari Ini
+        </h3>
+        <button type="button" class="btn btn-sm btn-outline" onclick="closeModalLiburDarurat()">
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>
+
+      <form action="{{ route('admin.hari-libur.darurat') }}" method="POST">
+        @csrf
+        <div style="background:#fef2f2; border:1px solid #fecaca; border-radius:8px; padding:12px; font-size:12px; color:#991b1b; line-height:1.5; margin-bottom:14px;">
+          <strong><i class="bi bi-shield-check"></i> Mekanisme Pengamanan Alpha Otomatis:</strong>
+          <ul style="margin:6px 0 0 16px; padding:0;">
+            <li>Status <strong>Alpha</strong> siswa &amp; guru hari ini akan <strong>dibatalkan &amp; dihapus otomatis</strong>.</li>
+            <li>Poin pelanggaran kedisiplinan siswa akibat Alpha hari ini akan <strong>direset kembali</strong>.</li>
+            <li>Draf pesan WhatsApp Alpha ke wali murid yang belum terkirim akan <strong>dibatalkan</strong>.</li>
+          </ul>
+        </div>
+
+        <div style="margin-bottom:14px;">
+          <label class="form-label" style="font-weight:700; font-size:12.5px; margin-bottom:4px; display:block;">Nama / Perihal Libur <span style="color:var(--red);">*</span></label>
+          <input type="text" name="nama_libur" class="input-field" value="Libur Khusus Sekolah" placeholder="Contoh: Bencana Alam / Rapat Dinas Mendadak" required style="width:100%;" />
+        </div>
+
+        <div style="margin-bottom:20px;">
+          <label class="form-label" style="font-weight:700; font-size:12.5px; margin-bottom:4px; display:block;">Alasan / Keterangan (Opsional)</label>
+          <textarea name="keterangan" class="input-field" rows="3" placeholder="Tuliskan keterangan mendadak libur hari ini..." style="width:100%; resize:none;"></textarea>
+        </div>
+
+        <div style="display:flex; justify-content:flex-end; gap:8px;">
+          <button type="button" class="btn btn-outline" onclick="closeModalLiburDarurat()">Batal</button>
+          <button type="submit" class="btn btn-danger" style="background:#dc2626; color:#fff; border:none; padding:8px 16px; font-weight:800; border-radius:6px; cursor:pointer;">
+            <i class="bi bi-calendar-x-fill"></i> Konfirmasi Liburkan Hari Ini
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <script>
     function openModalTambahLibur() {
       document.getElementById('modalTambahLibur')?.classList.add('active');
@@ -267,11 +316,23 @@
     function closeModalTambahLibur() {
       document.getElementById('modalTambahLibur')?.classList.remove('active');
     }
+    function openModalLiburDarurat() {
+      document.getElementById('modalLiburDarurat')?.classList.add('active');
+    }
+    function closeModalLiburDarurat() {
+      document.getElementById('modalLiburDarurat')?.classList.remove('active');
+    }
     document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') closeModalTambahLibur();
+      if (e.key === 'Escape') {
+        closeModalTambahLibur();
+        closeModalLiburDarurat();
+      }
     });
     document.getElementById('modalTambahLibur')?.addEventListener('click', (e) => {
       if (e.target.id === 'modalTambahLibur') closeModalTambahLibur();
+    });
+    document.getElementById('modalLiburDarurat')?.addEventListener('click', (e) => {
+      if (e.target.id === 'modalLiburDarurat') closeModalLiburDarurat();
     });
   </script>
 @endif

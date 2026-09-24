@@ -608,6 +608,8 @@ Route::middleware('auth')->group(function () {
         Route::post('/piket/set-status-guru', [GuruPiketController::class, 'storeStatusGuruCepat'])->name('piket.set-status-guru');
         Route::post('/piket/kunci-alpha', [GuruPiketController::class, 'kunciAlphaSekarang'])->name('piket.kunci-alpha');
         Route::post('/piket/flagging-wa', [GuruPiketController::class, 'flaggingWaMassal'])->name('piket.flagging-wa');
+        Route::post('/piket/libur-darurat', [GuruPiketController::class, 'liburDarurat'])->name('piket.libur-darurat');
+        Route::post('/piket/batal-libur-darurat/{id}', [GuruPiketController::class, 'batalLiburDarurat'])->name('piket.batal-libur-darurat');
     });
 
     // 12. Audit Trail System (Admin, Kepala Sekolah & Waka Kesiswaan)
@@ -662,6 +664,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/hari-libur', [HariLiburController::class, 'store'])->name('admin.hari-libur.store');
         Route::delete('/hari-libur/{id}', [HariLiburController::class, 'destroy'])->name('admin.hari-libur.destroy');
         Route::post('/hari-libur/preset', [HariLiburController::class, 'isiPreset'])->name('admin.hari-libur.preset');
+        Route::post('/hari-libur/darurat', [HariLiburController::class, 'liburDarurat'])->name('admin.hari-libur.darurat');
     });
 
     // 15. Pengaturan Profil & Backup (Admin only)
