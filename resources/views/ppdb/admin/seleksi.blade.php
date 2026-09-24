@@ -1020,7 +1020,7 @@
 
         <div id="w_guide_tsm" style="display:none; background:#f8fafc; border-left:3px solid #d97706; padding:10px 12px; border-radius:0 6px 6px 0; margin-bottom:10px; font-size:12px; color:#1e293b; line-height:1.45;">
           <div style="font-weight:800; color:#b45309; margin-bottom:4px; display:flex; align-items:center; gap:6px;">
-            <i class="bi bi-gear-wide-connected"></i> PANDUAN KHUSUS JURUSAN TSM (TEKNIK &amp; BISNIS SEPEDA MOTOR):
+            <i class="bi bi-gear-wide-connected"></i> PANDUAN KHUSUS JURUSAN TSM (TEKNIK SEPEDA MOTOR):
           </div>
           &bull; <strong>Cek Fisik &amp; Persepsi:</strong> {{ $mw['kejuruan_tsm']['uji_fisik'] ?? 'Bebas Buta Warna MUTLAK' }}<br>
           &bull; <strong>Pertanyaan Pemandu:</strong><br>
@@ -1722,7 +1722,7 @@
       document.getElementById('w_label_jurusan_aktif').innerText = 'APHP — Agribisnis Pengolahan Hasil Pertanian';
     } else if (strJurusan.includes('TSM') || strJurusan.includes('SEPEDA MOTOR') || strJurusan.includes('OTOMOTIF')) {
       document.getElementById('w_guide_tsm').style.display = 'block';
-      document.getElementById('w_label_jurusan_aktif').innerText = 'TSM — Teknik & Bisnis Sepeda Motor';
+      document.getElementById('w_label_jurusan_aktif').innerText = 'TSM — Teknik Sepeda Motor';
     } else {
       document.getElementById('w_guide_general').style.display = 'block';
       document.getElementById('w_label_jurusan_aktif').innerText = pendaftar.jurusan1_nama || 'Umum Kejuruan';

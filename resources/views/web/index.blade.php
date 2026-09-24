@@ -231,7 +231,7 @@
             </div>
 
             <!-- CARD 3: TSM -->
-            <div class="deck-card" tabindex="0" role="button" aria-expanded="false" aria-label="Teknik & Bisnis Sepeda Motor">
+            <div class="deck-card" tabindex="0" role="button" aria-expanded="false" aria-label="Teknik Sepeda Motor">
                 <img src="{{ asset('images/web/jurusan_tsm.jpg') }}" alt="Bengkel Teknik Sepeda Motor" class="deck-bg-img">
                 <div class="deck-overlay"></div>
 
@@ -247,7 +247,7 @@
                     <div class="deck-top-badge amber">
                         ⚙️ 03 / AUTOMOTIVE ENGINEERING
                     </div>
-                    <h3 class="deck-title">Teknik &amp; Bisnis Sepeda Motor (TSM)</h3>
+                    <h3 class="deck-title">Teknik Sepeda Motor (TSM)</h3>
                     <p class="deck-desc">
                         Teknologi injeksi bahan bakar elektronik (EFI), diagnostik kelistrikan komputerisasi, overhaul mesin presisi, dan tata kelola manajemen bengkel resmi berlisensi.
                     </p>

@@ -229,7 +229,7 @@ class SituanEKabinetTest extends TestCase
             'tanggal_dokumen'  => '2026-02-01',
             'tanggal_berakhir' => '2029-02-01',
             'file_dokumen'     => $file,
-            'keterangan'       => 'Kerjasama guru magang dan sertifikasi kompetensi keahlian TBSM',
+            'keterangan'       => 'Kerjasama guru magang dan sertifikasi kompetensi keahlian TSM',
         ]);
 
         $response->assertRedirect(route('situan.ekabinet.index', ['tab' => 'mou']));

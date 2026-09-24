@@ -1226,7 +1226,7 @@
 
           <div class="mb-2">
             <label class="form-label fw-semibold text-dark" style="font-size:12.5px;">Ruang Lingkup Kerjasama / Catatan</label>
-            <textarea name="keterangan" class="form-control ek-form-control" rows="2" style="height:auto;" placeholder="Contoh: Kerjasama magang siswa TKRO/TBSM, guru tamu industri..."></textarea>
+            <textarea name="keterangan" class="form-control ek-form-control" rows="2" style="height:auto;" placeholder="Contoh: Kerjasama magang siswa TSM/RPL, guru tamu industri..."></textarea>
           </div>
         </div>
         <div class="modal-footer">

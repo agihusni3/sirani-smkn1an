@@ -1,7 +1,7 @@
 @extends('web.layouts.app')
 
 @section('title', 'Konsentrasi Keahlian Vokasi — SMKN 1 Air Naningan')
-@section('meta_description', 'Tiga program keahlian kejuruan: Rekayasa Perangkat Lunak (RPL), Agro-Teknologi Pangan (APHP), dan Teknik Otomotif Sepeda Motor (TSM).')
+@section('meta_description', 'Tiga program keahlian kejuruan: Rekayasa Perangkat Lunak (RPL), Agro-Teknologi Pangan (APHP), dan Teknik Sepeda Motor (TSM).')
 
 @section('content')
 <div class="container" style="padding-top: 40px; padding-bottom: 60px;">

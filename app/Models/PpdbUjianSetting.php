@@ -110,7 +110,7 @@ class PpdbUjianSetting extends Model
                 ],
             ],
             'kejuruan_tsm' => [
-                'judul'      => 'Kesiapan Kejuruan TSM (Teknik & Bisnis Sepeda Motor)',
+                'judul'      => 'Kesiapan Kejuruan TSM (Teknik Sepeda Motor)',
                 'pertanyaan' => [
                     'Apakah Anda siap menghadapi oli, debu, dan kotoran saat membongkar mesin di bengkel?',
                     'Siapkah mematuhi SOP Keselamatan Kerja (K3) bengkel secara ketat (wearpack, sepatu safety)?',
