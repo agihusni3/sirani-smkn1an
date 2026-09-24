@@ -101,3 +101,37 @@ if (!function_exists('format_narasi_kbm')) {
         return $output;
     }
 }
+
+if (!function_exists('format_hari_indo')) {
+    /**
+     * Konversi hari ke Bahasa Indonesia (Senin, Selasa, Rabu, Kamis, Jumat, Sabtu, Minggu)
+     */
+    function format_hari_indo($date): string
+    {
+        if (!$date) return '—';
+        $carbon = $date instanceof \Carbon\Carbon ? $date : \Carbon\Carbon::parse($date);
+        $days = [
+            'Sunday'    => 'Minggu',
+            'Monday'    => 'Senin',
+            'Tuesday'   => 'Selasa',
+            'Wednesday' => 'Rabu',
+            'Thursday'  => 'Kamis',
+            'Friday'    => 'Jumat',
+            'Saturday'  => 'Sabtu',
+        ];
+        return $days[$carbon->format('l')] ?? $carbon->locale('id')->translatedFormat('l');
+    }
+}
+
+if (!function_exists('format_tanggal_indo')) {
+    /**
+     * Format tanggal lengkap Bahasa Indonesia: "Kamis, 24 September 2026"
+     */
+    function format_tanggal_indo($date, bool $withDay = true): string
+    {
+        if (!$date) return '—';
+        $carbon = $date instanceof \Carbon\Carbon ? $date : \Carbon\Carbon::parse($date);
+        $dayPart = $withDay ? format_hari_indo($carbon) . ', ' : '';
+        return $dayPart . $carbon->locale('id')->translatedFormat('d F Y');
+    }
+}

@@ -196,8 +196,8 @@ class PortalOrtuTest extends TestCase
 
         $response = $this->get('/cek-presensi/0012345683');
         $response->assertOk();
-        $response->assertSee('Portofolio Karakter & Kredit Kedisiplinan');
+        $response->assertSee('Catatan Kedisiplinan Siswa');
         $response->assertSee('Petugas Sholat Berjamaah');
-        $response->assertSee('Apresiasi & Self-Reward');
+        $response->assertSee('Apresiasi &amp; Self-Reward', false);
     }
 }

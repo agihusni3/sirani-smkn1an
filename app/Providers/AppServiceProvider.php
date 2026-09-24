@@ -23,6 +23,11 @@ class AppServiceProvider extends ServiceProvider
     {
         \Illuminate\Pagination\Paginator::defaultView('partials.pagination');
 
+        // Set locale Bahasa Indonesia untuk tanggal & waktu
+        \Carbon\Carbon::setLocale('id');
+        \Illuminate\Support\Facades\App::setLocale('id');
+        setlocale(LC_TIME, 'id_ID.utf8', 'id_ID', 'id', 'ind');
+
         // Standarisasi helper format nama
         \Illuminate\Support\Facades\Blade::directive('formatNama', function ($expression) {
             return "<?php echo \App\Support\NamaFormatter::format($expression); ?>";

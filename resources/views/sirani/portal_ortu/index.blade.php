@@ -346,7 +346,7 @@
                 </div>
                 <div style="display:flex; align-items:center; gap:6px;">
                   <span style="font-size:11.5px; color:var(--text-3, #64748b); font-family:var(--font-mono); font-weight:700;">
-                    {{ \Carbon\Carbon::parse($koreksiTerbaru->tanggal)->translatedFormat('l, d F Y') }}
+                    {{ format_tanggal_indo($koreksiTerbaru->tanggal) }}
                   </span>
                   <span id="koreksiBannerTimerBadge" style="font-size:10px; color:#b45309; font-weight:800; background:rgba(217,119,6,0.18); padding:1px 6px; border-radius:4px; font-family:var(--font-mono);" title="Banner akan tertutup otomatis">10s</span>
                 </div>
@@ -604,13 +604,13 @@
               <table>
                 <thead>
                   <tr>
-                    <th style="width:160px; white-space:nowrap;">Bulan</th>
-                    <th style="width:90px; text-align:center; white-space:nowrap;">Hadir</th>
-                    <th style="width:90px; text-align:center; white-space:nowrap;">Terlambat</th>
-                    <th style="width:110px; text-align:center; white-space:nowrap;">Izin / Sakit</th>
-                    <th style="width:110px; text-align:center; white-space:nowrap;">Alpha / Bolos</th>
-                    <th style="width:100px; text-align:center; white-space:nowrap;">Total Hari</th>
-                    <th style="width:130px; text-align:center; white-space:nowrap;">Kedisiplinan</th>
+                    <th style="min-width:110px; white-space:nowrap;">Bulan</th>
+                    <th style="min-width:55px; text-align:center; white-space:nowrap;">Hadir</th>
+                    <th style="min-width:55px; text-align:center; white-space:nowrap;">Telat</th>
+                    <th style="min-width:75px; text-align:center; white-space:nowrap;">Izin / Sakit</th>
+                    <th style="min-width:75px; text-align:center; white-space:nowrap;">Alpha / Bolos</th>
+                    <th style="min-width:65px; text-align:center; white-space:nowrap;">Total</th>
+                    <th style="min-width:85px; text-align:center; white-space:nowrap;">Kedisiplinan</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -678,60 +678,64 @@
                 <table>
                   <thead>
                     <tr>
-                      <th style="width:170px; white-space:nowrap;">Hari &amp; Tanggal</th>
-                      <th style="width:110px; text-align:center; white-space:nowrap;">Jam Masuk</th>
-                      <th style="width:110px; text-align:center; white-space:nowrap;">Jam Pulang</th>
-                      <th style="width:170px; text-align:center; white-space:nowrap;">Status Kehadiran</th>
-                      <th style="min-width:180px;">Keterangan / Alasan</th>
+                      <th style="min-width:110px; white-space:nowrap;">Hari &amp; Tanggal</th>
+                      <th style="min-width:65px; text-align:center; white-space:nowrap;">Masuk</th>
+                      <th style="min-width:65px; text-align:center; white-space:nowrap;">Pulang</th>
+                      <th style="min-width:105px; text-align:center; white-space:nowrap;">Status</th>
+                      <th style="min-width:130px;">Keterangan</th>
                     </tr>
                   </thead>
                   <tbody>
                     @foreach($absensis as $abs)
+                      @php
+                        $cDate = \Carbon\Carbon::parse($abs->tanggal);
+                        $namaHari = format_hari_indo($cDate);
+                      @endphp
                       <tr>
                         <td style="white-space:nowrap;">
-                          <strong style="color:var(--text); font-size:13px;">{{ \Carbon\Carbon::parse($abs->tanggal)->translatedFormat('l') }}</strong>
-                          <div style="font-size:11.5px; color:var(--text-3); font-family:var(--font-mono); margin-top:2px;">{{ \Carbon\Carbon::parse($abs->tanggal)->translatedFormat('d M Y') }}</div>
+                          <strong style="color:var(--text); font-size:12.5px; display:block; line-height:1.25;">{{ $namaHari }}</strong>
+                          <span style="font-size:11px; color:var(--text-3); font-family:var(--font-mono); line-height:1.25;">{{ $cDate->locale('id')->translatedFormat('d M Y') }}</span>
                         </td>
                         <td style="text-align:center; white-space:nowrap;">
-                          <span style="font-family:var(--font-mono); font-weight:800; font-size:13px; color:var(--text); white-space:nowrap;">
-                            {{ $abs->jam_masuk ? substr($abs->jam_masuk, 0, 5).' WIB' : '—' }}
+                          <span style="font-family:var(--font-mono); font-weight:800; font-size:12.5px; color:var(--text);">
+                            {{ $abs->jam_masuk ? substr($abs->jam_masuk, 0, 5) : '—' }}
                           </span>
                         </td>
                         <td style="text-align:center; white-space:nowrap;">
-                          <span style="font-family:var(--font-mono); font-weight:800; font-size:13px; color:var(--text); white-space:nowrap;">
-                            {{ $abs->jam_pulang ? substr($abs->jam_pulang, 0, 5).' WIB' : '—' }}
+                          <span style="font-family:var(--font-mono); font-weight:800; font-size:12.5px; color:var(--text);">
+                            {{ $abs->jam_pulang ? substr($abs->jam_pulang, 0, 5) : '—' }}
                           </span>
                         </td>
                         <td style="text-align:center; white-space:nowrap;">
                           @if($abs->status === 'hadir')
-                            <span style="font-weight:800; font-size:12.5px; color:#16a34a;"><i class="bi bi-check-circle-fill"></i> Hadir Tepat Waktu</span>
+                            <span style="font-weight:800; font-size:12px; color:#16a34a;"><i class="bi bi-check-circle-fill"></i> Hadir</span>
                           @elseif($abs->status === 'terlambat')
-                            <span style="font-weight:800; font-size:12.5px; color:#d97706;"><i class="bi bi-clock-history"></i> Terlambat</span>
+                            <span style="font-weight:800; font-size:12px; color:#d97706;"><i class="bi bi-clock-history"></i> Terlambat</span>
                           @elseif($abs->status === 'izin')
-                            <span style="font-weight:800; font-size:12.5px; color:#0284c7;"><i class="bi bi-info-circle-fill"></i> Izin</span>
+                            <span style="font-weight:800; font-size:12px; color:#0284c7;"><i class="bi bi-info-circle-fill"></i> Izin</span>
                           @elseif($abs->status === 'sakit')
-                            <span style="font-weight:800; font-size:12.5px; color:#8b5cf6;"><i class="bi bi-heart-pulse-fill"></i> Sakit</span>
+                            <span style="font-weight:800; font-size:12px; color:#8b5cf6;"><i class="bi bi-heart-pulse-fill"></i> Sakit</span>
                           @elseif(in_array($abs->status, ['dispen', 'dispensasi']))
-                            <span style="font-weight:800; font-size:12.5px; color:#0d9488;"><i class="bi bi-award-fill"></i> Dispensasi</span>
+                            <span style="font-weight:800; font-size:12px; color:#0d9488;"><i class="bi bi-award-fill"></i> Dispensasi</span>
                           @elseif($abs->status === 'bolos')
-                            <span style="font-weight:800; font-size:12.5px; color:#dc2626;"><i class="bi bi-exclamation-triangle-fill"></i> Bolos</span>
+                            <span style="font-weight:800; font-size:12px; color:#dc2626;"><i class="bi bi-exclamation-triangle-fill"></i> Bolos</span>
                           @elseif($abs->status === 'alpha')
-                            <span style="font-weight:800; font-size:12.5px; color:#ef4444;"><i class="bi bi-x-circle-fill"></i> Alpha</span>
+                            <span style="font-weight:800; font-size:12px; color:#ef4444;"><i class="bi bi-x-circle-fill"></i> Alpha</span>
                           @else
-                            <span style="font-weight:800; font-size:12.5px; color:var(--text-2);">{{ ucfirst($abs->status) }}</span>
+                            <span style="font-weight:800; font-size:12px; color:var(--text-2);">{{ ucfirst($abs->status) }}</span>
                           @endif
 
                           @if(in_array($abs->sumber_absen, ['koreksi_piket_manual', 'interfensi_titip_kartu', 'manual_izin_piket']) || str_contains(strtolower($abs->keterangan ?? ''), 'koreksi') || str_contains(strtolower($abs->keterangan ?? ''), 'intervensi') || str_contains(strtolower($abs->keterangan ?? ''), 'validasi'))
-                            <div style="margin-top:4px;">
-                              <span style="background:rgba(217,119,6,0.12); color:#b45309; border:1px solid rgba(217,119,6,0.25); padding:1.5px 7px; border-radius:5px; font-size:10px; font-weight:800; display:inline-flex; align-items:center; gap:3px;">
+                            <div style="margin-top:2px;">
+                              <span style="background:rgba(217,119,6,0.12); color:#b45309; border:1px solid rgba(217,119,6,0.25); padding:1px 5px; border-radius:4px; font-size:9.5px; font-weight:800; display:inline-flex; align-items:center; gap:2px;">
                                 <i class="bi bi-pencil-square"></i> Koreksi Piket
                               </span>
                             </div>
                           @endif
                         </td>
-                        <td style="font-size:12.5px; color:var(--text-2); min-width:180px;">
+                        <td style="font-size:11.5px; color:var(--text-2); line-height:1.35; max-width:260px;">
                           @if($abs->keterangan)
-                            <span style="font-weight:600; color:var(--text);"><i class="bi bi-chat-left-text-fill" style="color:var(--gold); font-size:11px; margin-right:4px;"></i>{{ $abs->keterangan }}</span>
+                            <span style="font-weight:600; color:var(--text);"><i class="bi bi-chat-left-text-fill" style="color:var(--gold); font-size:10.5px; margin-right:4px;"></i>{{ $abs->keterangan }}</span>
                           @elseif($abs->status === 'bolos')
                             <span style="color:#991B1B; font-weight:600;"><i class="bi bi-exclamation-triangle-fill"></i> Tidak tap pulang (tanpa izin piket)</span>
                           @elseif($abs->status === 'alpha')
@@ -739,7 +743,7 @@
                           @elseif($abs->status === 'terlambat')
                             <span style="color:var(--amber); font-weight:600;"><i class="bi bi-clock-history"></i> Terlambat masuk gerbang</span>
                           @elseif($abs->status === 'hadir')
-                            <span style="color:var(--text-3);"><i class="bi bi-check2"></i> Hadir pembelajaran reguler</span>
+                            <span style="color:var(--text-3);"><i class="bi bi-check2"></i> Hadir reguler</span>
                           @else
                             -
                           @endif

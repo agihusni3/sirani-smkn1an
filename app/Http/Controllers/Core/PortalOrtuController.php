@@ -18,7 +18,7 @@ class PortalOrtuController extends Controller
     public function index(Request $request)
     {
         $keyword = trim($request->get('keyword') ?: $request->get('nis') ?: $request->get('nisn') ?: '');
-        $periode = $request->get('periode', 'bulanan');
+        $periode = $request->get('periode', 'harian');
         $tanggal = $request->get('tanggal', Carbon::today()->toDateString());
         $tanggalMulai = $request->get('tanggal_mulai', Carbon::today()->startOfWeek()->toDateString());
         $tanggalSelesai = $request->get('tanggal_selesai', Carbon::today()->endOfWeek()->toDateString());
@@ -91,17 +91,17 @@ class PortalOrtuController extends Controller
                 if ($periode === 'harian') {
                     $startDate = $tanggal;
                     $endDate = $tanggal;
-                    $periodeText = 'Harian: ' . Carbon::parse($tanggal)->translatedFormat('l, d F Y');
+                    $periodeText = 'Harian: ' . format_tanggal_indo($tanggal);
                 } elseif ($periode === 'mingguan') {
                     $startDate = $tanggalMulai;
                     $endDate = $tanggalSelesai;
-                    $periodeText = 'Mingguan: ' . Carbon::parse($startDate)->translatedFormat('d M Y') . ' s/d ' . Carbon::parse($endDate)->translatedFormat('d M Y');
+                    $periodeText = 'Mingguan: ' . Carbon::parse($startDate)->locale('id')->translatedFormat('d M Y') . ' s/d ' . Carbon::parse($endDate)->locale('id')->translatedFormat('d M Y');
                 } elseif ($periode === 'tahunan') {
                     $startDate = "{$tahunSelected}-01-01";
                     $endDate = "{$tahunSelected}-12-31";
                     $periodeText = "Tahunan: Tahun {$tahunSelected}";
                 } else {
-                    // Bulanan (default)
+                    // Bulanan
                     try {
                         $startOfMonth = Carbon::createFromFormat('Y-m', $bulanSelected)->startOfMonth();
                         $endOfMonth = Carbon::createFromFormat('Y-m', $bulanSelected)->endOfMonth();
@@ -112,7 +112,7 @@ class PortalOrtuController extends Controller
                     }
                     $startDate = $startOfMonth->toDateString();
                     $endDate = $endOfMonth->toDateString();
-                    $periodeText = 'Bulanan: ' . Carbon::parse($startOfMonth)->translatedFormat('F Y');
+                    $periodeText = 'Bulanan: ' . Carbon::parse($startOfMonth)->locale('id')->translatedFormat('F Y');
                 }
 
                 $absensis = Absensi::where('pemilik_type', 'siswa')
