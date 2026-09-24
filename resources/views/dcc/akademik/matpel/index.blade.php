@@ -97,53 +97,63 @@
       <div class="akademik-table-wrap">
         <table class="akademik-table">
           <thead>
-            <tr>
-              <th style="width:40px;">No</th>
-              <th>Kode</th>
-              <th>Nama Mata Pelajaran</th>
-              <th>Jenis</th>
-              <th>Ruangan / Lab</th>
-              <th>Tingkat Kelas</th>
-              <th>Guru Pengampu</th>
-              <th>Beban JP</th>
-              <th>Jurusan</th>
-              <th style="width:90px; text-align:center;">Aksi</th>
+            <tr style="background:#f8fafc; border-bottom:1px solid #e2e8f0; font-size:11.5px; text-transform:uppercase; letter-spacing:0.5px; color:#64748b;">
+              <th style="width:44px; text-align:center; padding:12px 14px;">No</th>
+              <th style="width:65px; text-align:center; padding:12px 14px;">Kode</th>
+              <th style="padding:12px 14px;">Nama Mata Pelajaran</th>
+              <th style="padding:12px 14px;">Jenis</th>
+              <th style="padding:12px 14px;">Ruangan / Lab</th>
+              <th style="padding:12px 14px;">Tingkat Kelas</th>
+              <th style="padding:12px 14px;">Guru Pengampu</th>
+              <th style="padding:12px 14px;">Beban JP</th>
+              <th style="padding:12px 14px;">Jurusan</th>
+              <th style="width:90px; text-align:center; padding:12px 14px;">Aksi</th>
             </tr>
           </thead>
           <tbody>
             @foreach($mapels as $idx => $m)
-              <tr>
-                <td>{{ $mapels->firstItem() + $idx }}</td>
-                <td><code style="font-weight:700; color:var(--ak-primary);">{{ $m->kode_mapel }}</code></td>
-                <td style="font-weight:700; color:var(--ak-dark);">{{ $m->nama_mapel }}</td>
+              <tr style="border-bottom:1px solid #f1f5f9;">
+                <td style="text-align:center; color:#64748b; font-weight:600; font-size:12.5px;">{{ $mapels->firstItem() + $idx }}</td>
+                <td style="text-align:center;">
+                  <span style="font-weight:800; font-size:13px; color:#6366f1; font-family:var(--font-mono, monospace);">{{ $m->kode_mapel }}</span>
+                </td>
+                <td style="font-weight:700; font-size:13px; color:#0f172a;">{{ $m->nama_mapel }}</td>
                 <td>
-                  @if($m->jenis == 'umum')
-                    <span class="ak-badge ak-badge-secondary">Umum</span>
-                  @elseif($m->jenis == 'kejuruan')
-                    <span class="ak-badge ak-badge-primary">Kejuruan</span>
-                  @elseif($m->jenis == 'pilihan')
-                    <span class="ak-badge ak-badge-info" style="background:#e0f2fe; color:#0369a1; border:1px solid #bae6fd;">Pilihan</span>
-                  @elseif($m->jenis == 'p5bk')
-                    <span class="ak-badge ak-badge-warning">P5BK</span>
-                  @else
-                    <span class="ak-badge ak-badge-success">PKL</span>
-                  @endif
+                  @php
+                    $jenisLabel = match($m->jenis) {
+                      'kejuruan' => 'Kejuruan',
+                      'pilihan'  => 'Pilihan',
+                      'p5bk'     => 'P5BK',
+                      'pkl'      => 'PKL',
+                      default    => 'Umum',
+                    };
+                    $jenisColor = match($m->jenis) {
+                      'kejuruan' => '#6d28d9',
+                      'pilihan'  => '#0284c7',
+                      'p5bk'     => '#b45309',
+                      'pkl'      => '#15803d',
+                      default    => '#475569',
+                    };
+                  @endphp
+                  <span style="font-weight:600; font-size:12.5px; color:{{ $jenisColor }};">{{ $jenisLabel }}</span>
                 </td>
                 <td>
                   @if($m->resource_key)
-                    <span class="ak-badge" style="background:#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe; font-size:11px; font-weight:700;">
-                      {{ $m->resource_label }}
+                    <span style="font-weight:600; font-size:12.5px; color:#2563eb; display:inline-flex; align-items:center; gap:5px;">
+                      <i class="bi bi-display" style="font-size:13px;"></i> {{ $m->resource_label }}
                     </span>
                   @else
-                    <span style="font-size:11.5px; color:#94a3b8;">Kelas Biasa</span>
+                    <span style="color:#64748b; font-size:12.5px;">Kelas Biasa</span>
                   @endif
                 </td>
                 <td>
-                  <div style="display:flex; flex-wrap:wrap; gap:4px;">
-                    @foreach($m->tingkat_array as $t)
-                      <span class="ak-badge ak-badge-secondary" style="font-size:11px; font-weight:700;">Kelas {{ $t }}</span>
-                    @endforeach
-                  </div>
+                  <span style="font-weight:600; font-size:12.5px; color:#334155;">
+                    @if(!empty($m->tingkat_array))
+                      Kelas {{ implode(', ', $m->tingkat_array) }}
+                    @else
+                      -
+                    @endif
+                  </span>
                 </td>
                 <td>
                   @php
@@ -156,30 +166,26 @@
 
                   @if($groupedGurus->isEmpty())
                     <div style="display:flex; flex-direction:column; gap:2px;">
-                      <span style="font-size:11px; color:#94a3b8; font-style:italic;">Belum di-plot</span>
-                      <a href="{{ route('akademik.jadwal.index', ['tab' => 'distribusi']) }}" style="font-size:10px; color:var(--ak-primary); text-decoration:none; font-weight:700;">
-                        + Plot Guru di Langkah 2 &rarr;
+                      <span style="font-size:11.5px; color:#94a3b8; font-style:italic;">Belum di-plot</span>
+                      <a href="{{ route('akademik.jadwal.index', ['tab' => 'distribusi']) }}" style="font-size:11px; color:#4f46e5; text-decoration:none; font-weight:600; display:inline-flex; align-items:center; gap:2px;">
+                        + Plot Guru di Langkah 2 <i class="bi bi-arrow-right-short"></i>
                       </a>
                     </div>
                   @else
-                    <div style="display:flex; flex-direction:column; gap:6px;">
+                    <div style="display:flex; flex-direction:column; gap:4px;">
                       @foreach($groupedGurus as $guruId => $distList)
                         @php
                           $guru = $distList->first()->guru;
                           $uniqueRombels = $distList->pluck('rombel.nama_rombel')->filter()->unique()->values();
                         @endphp
-                        <div style="font-size:11.5px; line-height:1.25;">
-                          <div style="font-weight:700; color:var(--ak-dark); display:flex; align-items:center; gap:4px;">
-                            <i class="bi bi-person-check text-success" style="font-size:12px;"></i>
+                        <div style="font-size:12px; line-height:1.35;">
+                          <div style="font-weight:700; color:#1e293b; display:flex; align-items:center; gap:5px;">
+                            <i class="bi bi-person-check text-success" style="font-size:12.5px;"></i>
                             <span>{{ $guru?->nama ?? '-' }}</span>
                           </div>
                           @if($uniqueRombels->isNotEmpty())
-                            <div style="display:flex; flex-wrap:wrap; gap:3px; margin-top:2px; margin-left:16px;">
-                              @foreach($uniqueRombels as $rName)
-                                <span class="ak-badge" style="background:#f1f5f9; color:#475569; font-size:9.5px; font-weight:700; padding:1px 5px; border:1px solid #e2e8f0;">
-                                  {{ $rName }}
-                                </span>
-                              @endforeach
+                            <div style="font-size:11px; color:#64748b; margin-left:17px;">
+                              {{ $uniqueRombels->join(', ') }}
                             </div>
                           @endif
                         </div>
@@ -187,18 +193,18 @@
                     </div>
                   @endif
                 </td>
-                <td style="font-weight:700;">{{ $m->jumlah_jam_per_minggu }} JP</td>
-                <td>{{ $m->jurusan?->nama_jurusan ?? 'Semua Jurusan' }}</td>
+                <td style="font-weight:700; font-size:12.5px; color:#0f172a; white-space:nowrap;">{{ $m->jumlah_jam_per_minggu }} JP</td>
+                <td style="color:#475569; font-size:12.5px;">{{ $m->jurusan?->nama_jurusan ?? 'Semua Jurusan' }}</td>
                 <td style="text-align:center;">
                   <div style="display:flex; justify-content:center; gap:6px;">
-                    <button type="button" class="ak-btn ak-btn-secondary ak-btn-sm" data-bs-toggle="modal" data-bs-target="#modalEditMapel{{ $m->id }}" title="Ubah">
-                      <i class="bi bi-pencil"></i>
+                    <button type="button" class="btn btn-sm btn-icon" data-bs-toggle="modal" data-bs-target="#modalEditMapel{{ $m->id }}" title="Ubah" style="width:30px; height:30px; padding:0; border-radius:6px; border:1px solid #e2e8f0; background:#f8fafc; color:#475569; display:inline-flex; align-items:center; justify-content:center; transition:all 0.15s;">
+                      <i class="bi bi-pencil" style="font-size:12px;"></i>
                     </button>
                     <form action="{{ route('akademik.matpel.destroy', $m->id) }}" method="POST" onsubmit="return confirm('Hapus mata pelajaran ini?')" style="margin:0;">
                       @csrf
                       @method('DELETE')
-                      <button type="submit" class="ak-btn ak-btn-secondary ak-btn-sm text-danger" title="Hapus">
-                        <i class="bi bi-trash"></i>
+                      <button type="submit" class="btn btn-sm btn-icon" title="Hapus" style="width:30px; height:30px; padding:0; border-radius:6px; border:1px solid #fecdd3; background:#fff1f2; color:#e11d48; display:inline-flex; align-items:center; justify-content:center; transition:all 0.15s;">
+                        <i class="bi bi-trash" style="font-size:12px;"></i>
                       </button>
                     </form>
                   </div>
