@@ -91,6 +91,17 @@ class DeployController extends Controller
             $logs['migrate_error'] = $e->getMessage();
         }
 
+        // 4. Jalankan Seeder jika diminta
+        if ($request->has('run_seed') || $request->has('seed')) {
+            $seedClass = $request->input('seed') ?: $request->query('seed') ?: 'AbsensiEnamBulanSeeder';
+            try {
+                Artisan::call('db:seed', ['--class' => $seedClass, '--force' => true]);
+                $logs['seed'] = trim(Artisan::output());
+            } catch (\Throwable $e) {
+                $logs['seed_error'] = $e->getMessage();
+            }
+        }
+
         // Pastikan symlink storage terhubung untuk aset foto
         try {
             Artisan::call('storage:link');
@@ -98,7 +109,7 @@ class DeployController extends Controller
             // Abaikan jika symlink sudah ada
         }
 
-        // 3. Bersihkan & Segarkan Cache Laravel
+        // 5. Bersihkan & Segarkan Cache Laravel
         try {
             Artisan::call('optimize:clear');
             Artisan::call('config:cache');
@@ -109,7 +120,26 @@ class DeployController extends Controller
             $logs['cache_error'] = $e->getMessage();
         }
 
-        // 5. Ambil informasi commit terbaru
+        // 6. Diagnostik Database & Siswa
+        try {
+            $targetKeyword = $request->input('keyword') ?: $request->query('keyword') ?: '104137013';
+            $searchedSiswa = \App\Models\Siswa::where('nisn', $targetKeyword)
+                ->orWhere('id', $targetKeyword)
+                ->first(['id', 'nisn', 'nama', 'status']);
+
+            $logs['db_diagnostics'] = [
+                'total_siswas'   => \App\Models\Siswa::count(),
+                'total_rombels'  => \App\Models\Rombel::count(),
+                'total_absensis' => \App\Models\Absensi::count(),
+                'total_gurus'    => \App\Models\Guru::count(),
+                'searched_siswa' => $searchedSiswa,
+                'sample_nisn'    => \App\Models\Siswa::limit(5)->pluck('nisn', 'nama'),
+            ];
+        } catch (\Throwable $e) {
+            $logs['db_diagnostics_error'] = $e->getMessage();
+        }
+
+        // 7. Ambil informasi commit terbaru
         exec(sprintf('cd %s && git -c safe.directory=* log -1 --pretty=format:"%%h - %%s (%%cr)" 2>&1', escapeshellarg($basePath)), $commitOut);
         $latestCommit = !empty($commitOut) ? implode(' ', $commitOut) : 'Unknown';
 
