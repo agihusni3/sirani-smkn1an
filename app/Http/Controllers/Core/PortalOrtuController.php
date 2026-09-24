@@ -55,8 +55,18 @@ class PortalOrtuController extends Controller
         $codeValue = '';
 
         if ($keyword !== '') {
-            // Pencarian siswa hanya berdasarkan NISN saja
-            $siswa = Siswa::where('nisn', $keyword)
+            $cleanKeyword = trim($keyword);
+            $digitsOnly = preg_replace('/[^0-9]/', '', $cleanKeyword);
+            $candidateNisns = array_unique(array_filter([
+                $cleanKeyword,
+                $digitsOnly,
+                $digitsOnly !== '' ? ltrim($digitsOnly, '0') : null,
+                $digitsOnly !== '' ? str_pad($digitsOnly, 10, '0', STR_PAD_LEFT) : null,
+            ]));
+
+            // Pencarian siswa berdasarkan NISN (fleksibel awalan 0 atau 10 digit NISN standar)
+            $siswa = Siswa::whereIn('nisn', $candidateNisns)
+                ->orWhere('id', $cleanKeyword)
                 ->with('kartuRfid')
                 ->first();
 
@@ -464,7 +474,15 @@ class PortalOrtuController extends Controller
         }
 
         $cleanKeyword = preg_replace('/[^a-zA-Z0-9]/', '', $keyword);
-        $siswa = Siswa::where('nisn', $cleanKeyword)
+        $digitsOnly = preg_replace('/[^0-9]/', '', $cleanKeyword);
+        $candidateNisns = array_unique(array_filter([
+            $cleanKeyword,
+            $digitsOnly,
+            $digitsOnly !== '' ? ltrim($digitsOnly, '0') : null,
+            $digitsOnly !== '' ? str_pad($digitsOnly, 10, '0', STR_PAD_LEFT) : null,
+        ]));
+
+        $siswa = Siswa::whereIn('nisn', $candidateNisns)
             ->orWhere('nis', $cleanKeyword)
             ->orWhere('id', $cleanKeyword)
             ->first();
