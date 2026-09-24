@@ -4086,10 +4086,10 @@
               <span style="font-size:10px; color:#94a3b8; display:flex; align-items:center; gap:4px;">Baru Saja <i class="bi bi-x-lg" style="font-size:10px; margin-left:4px; opacity:0.7;"></i></span>
             </div>
             <div style="font-size:12.5px; font-weight:800; color:#ffffff; line-height:1.35; margin-bottom:2px; letter-spacing:-0.2px;">
-              \${esc(title || 'SIRANI — Presensi Siswa')}
+              ${esc(title || 'SIRANI — Presensi Siswa')}
             </div>
             <div style="font-size:11.5px; color:#cbd5e1; line-height:1.45;">
-              \${esc(body || '')}
+              ${esc(body || '')}
             </div>
           </div>
         </div>
