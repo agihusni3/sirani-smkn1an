@@ -93,6 +93,9 @@ class PortalOrtuController extends Controller
 
                 $rombel = $siswaRombel?->rombel;
                 $waliKelas = $rombel?->waliKelas;
+                if (!$waliKelas && $rombel?->wali_kelas_id) {
+                    $waliKelas = \App\Models\Guru::find($rombel->wali_kelas_id);
+                }
 
                 // Absensi Hari Ini
                 $todayAbsensi = Absensi::where('pemilik_type', 'siswa')

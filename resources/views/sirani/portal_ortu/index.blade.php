@@ -231,7 +231,7 @@
           <div class="portal-tab-icon">
             <i class="bi bi-shield-check"></i>
             @if(isset($kasusDisiplin) && $kasusDisiplin->total_poin_pelanggaran > 0)
-              <span class="portal-tab-badge danger">{{ $kasusDisiplin->total_poin_pelanggaran }} pt</span>
+              <span class="portal-tab-badge danger">{{ $kasusDisiplin->total_poin_pelanggaran }} Poin</span>
             @endif
           </div>
           <div class="portal-tab-content">
@@ -480,7 +480,11 @@
                     @if($waliKelas->no_hp)
                       @php
                         $hpWaliClean = preg_replace('/[^0-9]/', '', $waliKelas->no_hp);
-                        if (str_starts_with($hpWaliClean, '0')) $hpWaliClean = '62' . substr($hpWaliClean, 1);
+                        if (str_starts_with($hpWaliClean, '0')) {
+                          $hpWaliClean = '62' . substr($hpWaliClean, 1);
+                        } elseif (str_starts_with($hpWaliClean, '8')) {
+                          $hpWaliClean = '62' . $hpWaliClean;
+                        }
                         $pesanWaWali = rawurlencode("Halo Bapak/Ibu Wali Kelas {$waliKelas->nama}, saya orang tua dari {$siswa->nama} (Kelas " . ($rombel->nama_rombel ?? '-') . "). Ingin berkonsultasi mengenai kehadiran/perkembangan belajar ananda.");
                       @endphp
                       <a href="https://wa.me/{{ $hpWaliClean }}?text={{ $pesanWaWali }}" target="_blank" class="tag-pill" style="color:#16A34A; font-weight:800;" title="Konsultasi WhatsApp dengan Wali Kelas">
@@ -942,108 +946,129 @@
       </div>
       </div>
 
-      {{-- TAB 2: CATATAN KEDISIPLINAN SISWA --}}
+      {{-- TAB 2: CATATAN KEDISIPLINAN & KARAKTER SISWA --}}
       <div id="section-disiplin-wrap" style="display: none;">
         @php
-          $poinBersih = $kasusDisiplin ? $kasusDisiplin->poin_bersih : 0;
-          $totalPelanggaran = $kasusDisiplin ? $kasusDisiplin->total_poin_pelanggaran : 0;
-          $totalPemulihan = $kasusDisiplin ? $kasusDisiplin->total_poin_pemulihan : 0;
-          $a1 = $pengaturanDisiplin->ambang_tahap_1_wali ?? 10;
-          $a2 = $pengaturanDisiplin->ambang_tahap_2_bk ?? 30;
-          $a3 = $pengaturanDisiplin->ambang_tahap_3_wakasis ?? 50;
-          $a4 = $pengaturanDisiplin->ambang_tahap_4_kepsek ?? 75;
+          $poinBersih = $kasusDisiplin ? (int)$kasusDisiplin->poin_bersih : 0;
+          $totalPelanggaran = $kasusDisiplin ? (int)$kasusDisiplin->total_poin_pelanggaran : 0;
+          $totalPemulihan = $kasusDisiplin ? (int)$kasusDisiplin->total_poin_pemulihan : 0;
+          $a2 = (int)($pengaturanDisiplin->ambang_tahap_2_bk ?? 30);
+          $a3 = (int)($pengaturanDisiplin->ambang_tahap_3_wakasis ?? 50);
+          $a4 = (int)($pengaturanDisiplin->ambang_tahap_4_kepsek ?? 75);
 
-          // Status & Level Tracker
+          // Status & Level Bimbingan
           if ($poinBersih == 0) {
               $statusBadgeColor = '#16a34a';
               $statusBgColor = 'rgba(22, 163, 74, 0.08)';
               $statusBorderColor = 'rgba(22, 163, 74, 0.25)';
               $statusLabel = 'Tertib & Bebas Masalah (0 Poin)';
-              $statusDesc = 'Ananda tidak memiliki poin pelanggaran aktif. Pertahankan kedisiplinan belajar dan kehadiran ananda!';
+              $statusDesc = 'Ananda tertib hadir dan tidak memiliki poin pelanggaran aktif saat ini. Sekolah mengapresiasi ketertiban belajar ananda!';
               $currentStep = 0;
           } elseif ($poinBersih < $a2) {
               $statusBadgeColor = '#2563eb';
               $statusBgColor = 'rgba(37, 99, 235, 0.08)';
               $statusBorderColor = 'rgba(37, 99, 235, 0.25)';
-              $statusLabel = 'Tahap 1: Bimbingan Wali Kelas (' . $poinBersih . ' Poin)';
-              $statusDesc = 'Poin pelanggaran ringan. Pendampingan dan pembinaan diarahkan langsung bersama Wali Kelas.';
+              $statusLabel = 'Tahap 1: Pendampingan Wali Kelas (' . $poinBersih . ' Poin)';
+              $statusDesc = 'Poin pelanggaran tergolong ringan. Pembinaan dan pendampingan dapat dikonsultasikan bersama Wali Kelas.';
               $currentStep = 1;
           } elseif ($poinBersih < $a3) {
               $statusBadgeColor = '#d97706';
               $statusBgColor = 'rgba(217, 119, 6, 0.08)';
               $statusBorderColor = 'rgba(217, 119, 6, 0.25)';
               $statusLabel = 'Tahap 2: Bimbingan Konseling BK (' . $poinBersih . ' Poin)';
-              $statusDesc = 'Poin membutuhkan perhatian khusus. Guru Bimbingan Konseling (BK) mendampingi evaluasi ketertiban siswa.';
+              $statusDesc = 'Poin memerlukan perhatian bersama. Guru Bimbingan Konseling (BK) turut mendampingi evaluasi kedisiplinan siswa.';
               $currentStep = 2;
           } elseif ($poinBersih < $a4) {
               $statusBadgeColor = '#ea580c';
               $statusBgColor = 'rgba(234, 88, 12, 0.08)';
               $statusBorderColor = 'rgba(234, 88, 12, 0.25)';
               $statusLabel = 'Tahap 3: Pembinaan Kesiswaan (' . $poinBersih . ' Poin)';
-              $statusDesc = 'Poin kedisiplinan dalam pembinaan intensif Waka Kesiswaan dan musyawarah bersama wali murid.';
+              $statusDesc = 'Poin kedisiplinan dalam pembinaan intensif Tim Kesiswaan bersama orang tua/wali murid.';
               $currentStep = 3;
           } else {
               $statusBadgeColor = '#dc2626';
               $statusBgColor = 'rgba(220, 38, 38, 0.08)';
               $statusBorderColor = 'rgba(220, 38, 38, 0.25)';
-              $statusLabel = 'Tahap 4: Penanganan Kepala Sekolah (' . $poinBersih . ' Poin)';
-              $statusDesc = 'Poin mencapai batas kritis. Penanganan formal langsung dalam supervisi Kepala Sekolah.';
+              $statusLabel = 'Tahap 4: Pengawasan Kepala Sekolah (' . $poinBersih . ' Poin)';
+              $statusDesc = 'Poin kedisiplinan mencapai batas maksimal. Pembinaan formal langsung dalam arahan Kepala Sekolah.';
               $currentStep = 4;
           }
+
+          // Data Wali Kelas untuk tombol WhatsApp
+          $waliNama = $waliKelas ? ($waliKelas->nama_lengkap_gelar ?: $waliKelas->nama) : ($rombel?->waliKelas?->nama ?? null);
+          $waliHp = $waliKelas ? $waliKelas->no_hp : ($rombel?->waliKelas?->no_hp ?? null);
+          $cleanWa = null;
+          if ($waliHp) {
+              $cleanWa = preg_replace('/[^0-9]/', '', $waliHp);
+              if (str_starts_with($cleanWa, '0')) {
+                  $cleanWa = '62' . substr($cleanWa, 1);
+              } elseif (str_starts_with($cleanWa, '8')) {
+                  $cleanWa = '62' . $cleanWa;
+              }
+          }
+          $siswaNama = $siswa ? $siswa->nama : 'Siswa';
+          $rombelNama = $rombel ? $rombel->nama_rombel : '-';
+          $waGreeting = "Halo Bapak/Ibu {$waliNama}, perkenalkan saya orang tua/wali dari {$siswaNama} (Kelas {$rombelNama}). Saya ingin berkonsultasi mengenai kehadiran dan perkembangan ananda di sekolah. Terima kasih.";
+          $waText = rawurlencode($waGreeting);
         @endphp
 
         <div class="dossier-card" id="portofolio-karakter" style="margin-top: 0px; scroll-margin-top: 70px; display: block;">
           {{-- Header Section --}}
-          <div class="dossier-header" style="border-bottom:none; margin-bottom:16px; padding-bottom:0;">
+          <div class="dossier-header" style="border-bottom:none; margin-bottom:14px; padding-bottom:0;">
             <div>
               <div style="display:flex; align-items:center; gap:8px;">
-                <span style="display:inline-flex; align-items:center; justify-content:center; width:28px; height:28px; border-radius:8px; background:var(--bg-subtle); color:var(--text); font-size:15px;">
+                <span style="display:inline-flex; align-items:center; justify-content:center; width:30px; height:30px; border-radius:8px; background:var(--bg-subtle); color:var(--text); font-size:16px;">
                   <i class="bi bi-shield-check"></i>
                 </span>
-                <h3 style="font-size:15.5px; font-weight:800; color:var(--text); margin:0;">Catatan Kedisiplinan Siswa</h3>
+                <h3 style="font-size:16px; font-weight:800; color:var(--text); margin:0;">Catatan Kedisiplinan Siswa</h3>
               </div>
-              <p style="font-size:12px; color:var(--text-3); margin-top:4px; margin-bottom:0;">Transparansi poin kedisiplinan, rincian tanggal ketidakhadiran, serta apresiasi perilaku positif</p>
+              <p style="font-size:12px; color:var(--text-3); margin-top:4px; margin-bottom:0;">
+                Transparansi catatan ketertiban, catatan kehadiran, serta penghargaan perilaku positif ananda
+              </p>
             </div>
             <div>
               <span style="display:inline-flex; align-items:center; gap:6px; font-weight:800; font-size:12px; color:{{ $statusBadgeColor }}; background:{{ $statusBgColor }}; border:1px solid {{ $statusBorderColor }}; padding:6px 12px; border-radius:20px;">
                 @if($currentStep == 0)
                   <i class="bi bi-check-circle-fill"></i>
                 @else
-                  <i class="bi bi-exclamation-triangle-fill"></i>
+                  <i class="bi bi-info-circle-fill"></i>
                 @endif
                 {{ $statusLabel }}
               </span>
             </div>
           </div>
 
-          {{-- 3 Ringkasan Angka Disiplin --}}
-          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:12px; margin-bottom:18px;">
-            <div style="background:var(--bg-subtle); border:1px solid var(--border); border-radius:var(--r-md); padding:12px 14px; display:flex; align-items:center; justify-content:space-between;">
+          {{-- 3 Ringkasan Angka Disiplin (Mudah Dipahami Pengguna Baru) --}}
+          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:12px; margin-bottom:12px;">
+            <div style="background:var(--bg-subtle); border:1px solid var(--border); border-radius:var(--r-md); padding:14px; display:flex; align-items:center; justify-content:space-between;">
               <div>
                 <span style="font-size:11px; font-weight:700; color:var(--text-3); text-transform:uppercase; letter-spacing:0.5px; display:block;">Poin Pelanggaran</span>
-                <span style="font-size:18px; font-weight:900; font-family:var(--font-mono); color:var(--red);">+{{ $totalPelanggaran }} pt</span>
+                <span style="font-size:20px; font-weight:900; font-family:var(--font-mono); color:var(--red);">+{{ $totalPelanggaran }} Poin</span>
+                <span style="font-size:10.5px; color:var(--text-3); display:block; margin-top:2px;">Akumulasi ketidakhadiran</span>
               </div>
-              <div style="width:36px; height:36px; border-radius:10px; background:rgba(220, 38, 38, 0.1); color:var(--red); display:flex; align-items:center; justify-content:center; font-size:16px;">
+              <div style="width:38px; height:38px; border-radius:10px; background:rgba(220, 38, 38, 0.1); color:var(--red); display:flex; align-items:center; justify-content:center; font-size:18px;">
                 <i class="bi bi-shield-exclamation"></i>
               </div>
             </div>
 
-            <div style="background:var(--bg-subtle); border:1px solid var(--border); border-radius:var(--r-md); padding:12px 14px; display:flex; align-items:center; justify-content:space-between;">
+            <div style="background:var(--bg-subtle); border:1px solid var(--border); border-radius:var(--r-md); padding:14px; display:flex; align-items:center; justify-content:space-between;">
               <div>
                 <span style="font-size:11px; font-weight:700; color:var(--text-3); text-transform:uppercase; letter-spacing:0.5px; display:block;">Poin Pemulihan</span>
-                <span style="font-size:18px; font-weight:900; font-family:var(--font-mono); color:var(--green);">-{{ $totalPemulihan }} pt</span>
+                <span style="font-size:20px; font-weight:900; font-family:var(--font-mono); color:var(--green);">-{{ $totalPemulihan }} Poin</span>
+                <span style="font-size:10.5px; color:var(--text-3); display:block; margin-top:2px;">Dari reward perilaku positif</span>
               </div>
-              <div style="width:36px; height:36px; border-radius:10px; background:rgba(22, 163, 74, 0.1); color:var(--green); display:flex; align-items:center; justify-content:center; font-size:16px;">
+              <div style="width:38px; height:38px; border-radius:10px; background:rgba(22, 163, 74, 0.1); color:var(--green); display:flex; align-items:center; justify-content:center; font-size:18px;">
                 <i class="bi bi-award"></i>
               </div>
             </div>
 
-            <div style="background:var(--bg-subtle); border:1px solid {{ $statusBorderColor }}; border-radius:var(--r-md); padding:12px 14px; display:flex; align-items:center; justify-content:space-between;">
+            <div style="background:var(--bg-subtle); border:1px solid {{ $statusBorderColor }}; border-radius:var(--r-md); padding:14px; display:flex; align-items:center; justify-content:space-between;">
               <div>
-                <span style="font-size:11px; font-weight:700; color:var(--text-3); text-transform:uppercase; letter-spacing:0.5px; display:block;">Poin Bersih Aktif</span>
-                <span style="font-size:18px; font-weight:900; font-family:var(--font-mono); color:{{ $statusBadgeColor }};">{{ $poinBersih }} pt</span>
+                <span style="font-size:11px; font-weight:700; color:var(--text-3); text-transform:uppercase; letter-spacing:0.5px; display:block;">Sisa Poin Aktif</span>
+                <span style="font-size:20px; font-weight:900; font-family:var(--font-mono); color:{{ $statusBadgeColor }};">{{ $poinBersih }} Poin</span>
+                <span style="font-size:10.5px; color:var(--text-3); display:block; margin-top:2px;">Poin berjalan yang dipantau</span>
               </div>
-              <div style="width:36px; height:36px; border-radius:10px; background:{{ $statusBgColor }}; color:{{ $statusBadgeColor }}; display:flex; align-items:center; justify-content:center; font-size:16px;">
+              <div style="width:38px; height:38px; border-radius:10px; background:{{ $statusBgColor }}; color:{{ $statusBadgeColor }}; display:flex; align-items:center; justify-content:center; font-size:18px;">
                 @if($poinBersih == 0)
                   <i class="bi bi-shield-fill-check"></i>
                 @else
@@ -1053,64 +1078,42 @@
             </div>
           </div>
 
-          {{-- Level Meter / Stepper Tahapan Bimbingan --}}
-          <div style="background:var(--bg-subtle); border:1px solid var(--border); border-radius:var(--r-md); padding:14px 16px; margin-bottom:18px;">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; flex-wrap:wrap; gap:6px;">
-              <span style="font-size:12px; font-weight:800; color:var(--text);">
-                <i class="bi bi-diagram-3-fill" style="color:var(--text-3); margin-right:4px;"></i> Skala Tahap Pembinaan Karakter
-              </span>
-              <span style="font-size:11px; color:var(--text-3);">
-                Ambang batas eskalasi ketertiban sekolah
-              </span>
+          {{-- Penjelasan Singkat Formula & Status Bimbingan --}}
+          <div style="background:{{ $statusBgColor }}; border:1px solid {{ $statusBorderColor }}; border-radius:var(--r-md); padding:12px 16px; margin-bottom:18px; display:flex; align-items:flex-start; gap:12px;">
+            <div style="width:28px; height:28px; border-radius:50%; background:{{ $statusBadgeColor }}; color:#fff; display:flex; align-items:center; justify-content:center; font-size:14px; flex-shrink:0; margin-top:2px;">
+              @if($poinBersih == 0)
+                <i class="bi bi-check-lg"></i>
+              @else
+                <i class="bi bi-info"></i>
+              @endif
             </div>
-
-            {{-- 4 Tahap Bar --}}
-            <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:6px; margin-bottom:10px;">
-              {{-- Tahap 1: Wali Kelas --}}
-              @php $isStep1 = ($poinBersih >= 1 && $poinBersih < $a2); @endphp
-              <div style="border-radius:6px; padding:6px 8px; text-align:center; font-size:10.5px; border:1px solid {{ $currentStep == 1 ? '#2563eb' : 'var(--border)' }}; background:{{ $currentStep == 1 ? 'rgba(37, 99, 235, 0.12)' : ($currentStep > 1 ? 'rgba(37, 99, 235, 0.05)' : 'var(--bg-card)') }};">
-                <strong style="color:{{ $currentStep >= 1 ? '#2563eb' : 'var(--text-3)' }}; display:block;">Tahap 1</strong>
-                <span style="color:var(--text-2); font-size:9.5px;">Wali Kelas (1–{{ $a2 - 1 }} pt)</span>
-              </div>
-
-              {{-- Tahap 2: BK --}}
-              <div style="border-radius:6px; padding:6px 8px; text-align:center; font-size:10.5px; border:1px solid {{ $currentStep == 2 ? '#d97706' : 'var(--border)' }}; background:{{ $currentStep == 2 ? 'rgba(217, 119, 6, 0.12)' : ($currentStep > 2 ? 'rgba(217, 119, 6, 0.05)' : 'var(--bg-card)') }};">
-                <strong style="color:{{ $currentStep >= 2 ? '#d97706' : 'var(--text-3)' }}; display:block;">Tahap 2</strong>
-                <span style="color:var(--text-2); font-size:9.5px;">Guru BK ({{ $a2 }}–{{ $a3 - 1 }} pt)</span>
-              </div>
-
-              {{-- Tahap 3: Wakasis --}}
-              <div style="border-radius:6px; padding:6px 8px; text-align:center; font-size:10.5px; border:1px solid {{ $currentStep == 3 ? '#ea580c' : 'var(--border)' }}; background:{{ $currentStep == 3 ? 'rgba(234, 88, 12, 0.12)' : ($currentStep > 3 ? 'rgba(234, 88, 12, 0.05)' : 'var(--bg-card)') }};">
-                <strong style="color:{{ $currentStep >= 3 ? '#ea580c' : 'var(--text-3)' }}; display:block;">Tahap 3</strong>
-                <span style="color:var(--text-2); font-size:9.5px;">Kesiswaan ({{ $a3 }}–{{ $a4 - 1 }} pt)</span>
-              </div>
-
-              {{-- Tahap 4: Kepsek --}}
-              <div style="border-radius:6px; padding:6px 8px; text-align:center; font-size:10.5px; border:1px solid {{ $currentStep == 4 ? '#dc2626' : 'var(--border)' }}; background:{{ $currentStep == 4 ? 'rgba(220, 38, 38, 0.12)' : 'var(--bg-card)' }};">
-                <strong style="color:{{ $currentStep >= 4 ? '#dc2626' : 'var(--text-3)' }}; display:block;">Tahap 4</strong>
-                <span style="color:var(--text-2); font-size:9.5px;">Kepsek (≥ {{ $a4 }} pt)</span>
+            <div style="flex:1;">
+              <strong style="color:var(--text); font-size:13px; display:block;">
+                {{ $poinBersih == 0 ? 'Kedisiplinan Sangat Baik' : $statusLabel }}
+              </strong>
+              <p style="font-size:12px; color:var(--text-2); margin:3px 0 0; line-height:1.45;">
+                {{ $statusDesc }}
+              </p>
+              <div style="font-size:11px; color:var(--text-3); margin-top:6px; font-family:var(--font-mono);">
+                Perhitungan: Pelanggaran (+{{ $totalPelanggaran }} Poin) – Pemulihan (-{{ $totalPemulihan }} Poin) = <strong>{{ $poinBersih }} Poin Aktif</strong>
               </div>
             </div>
-
-            <p style="font-size:11.5px; color:var(--text-2); margin:0; line-height:1.4;">
-              <i class="bi bi-info-circle" style="color:var(--text-3); margin-right:4px;"></i> {{ $statusDesc }}
-            </p>
           </div>
 
-          {{-- Body 2 Kolom --}}
+          {{-- Body 2 Kolom Bersih & Jelas --}}
           <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(300px, 1fr)); gap:16px;">
             
-            {{-- Kolom Kiri: Rincian Kejadian & Ketidakhadiran (Kronologis Detail) --}}
+            {{-- Kolom Kiri: Riwayat Catatan Kejadian (Pelanggaran) --}}
             <div style="background:var(--bg-subtle); border:1px solid var(--border); border-radius:var(--r-md); padding:16px;">
               <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
                 <div>
                   <span style="font-size:13px; font-weight:800; color:var(--text); display:block;">
-                    Rincian Kejadian &amp; Pelanggaran
+                    Riwayat Catatan Kejadian
                   </span>
-                  <span style="font-size:10.5px; color:var(--text-3);">Kronologis kejadian berdasarkan data presensi &amp; catatan sekolah</span>
+                  <span style="font-size:10.5px; color:var(--text-3);">Kronologis ketidakhadiran &amp; tata tertib siswa</span>
                 </div>
-                <span style="font-weight:900; font-size:12.5px; font-family:var(--font-mono); color:var(--red); background:rgba(220,38,38,0.08); border:1px solid rgba(220,38,38,0.2); padding:3px 8px; border-radius:6px; flex-shrink:0;">
-                  +{{ $totalPelanggaran }} pt
+                <span style="font-weight:900; font-size:12px; font-family:var(--font-mono); color:var(--red); background:rgba(220,38,38,0.08); border:1px solid rgba(220,38,38,0.2); padding:3px 8px; border-radius:6px; flex-shrink:0;">
+                  +{{ $totalPelanggaran }} Poin
                 </span>
               </div>
 
@@ -1173,36 +1176,11 @@
                           </div>
                         </div>
                         <span style="font-weight:900; font-size:11.5px; font-family:var(--font-mono); color:{{ $iconColor }}; flex-shrink:0; background:{{ $bgBadge }}; padding:2px 7px; border-radius:6px; border:1px solid {{ $borderBadge }};">
-                          +{{ $item->poin }} pt
+                          +{{ $item->poin }} Poin
                         </span>
                       </div>
                     </div>
                   @endforeach
-                </div>
-              @elseif($kasusDisiplin && ($kasusDisiplin->total_alpha > 0 || $kasusDisiplin->total_bolos > 0 || $kasusDisiplin->total_terlambat > 0))
-                {{-- Fallback ringkasan jika rincian presensi sedang diproses --}}
-                <div style="display:flex; flex-direction:column; gap:6px; font-size:11.5px;">
-                  @if($kasusDisiplin->total_alpha > 0)
-                    <div style="display:flex; justify-content:space-between; align-items:center; background:var(--bg-card); border:1px solid var(--border); padding:8px 12px; border-radius:8px;">
-                      <span style="color:var(--text); font-weight:600;"><i class="bi bi-x-circle-fill" style="color:var(--red); margin-right:6px;"></i> Alpha (Tidak Hadir):</span>
-                      <strong style="color:var(--red); font-family:var(--font-mono);">{{ $kasusDisiplin->total_alpha }} hari ({{ $kasusDisiplin->total_alpha * ($pengaturanDisiplin->bobot_alpha ?? 10) }} pt)</strong>
-                    </div>
-                  @endif
-                  @if($kasusDisiplin->total_bolos > 0)
-                    <div style="display:flex; justify-content:space-between; align-items:center; background:var(--bg-card); border:1px solid var(--border); padding:8px 12px; border-radius:8px;">
-                      <span style="color:var(--text); font-weight:600;"><i class="bi bi-sign-stop-fill" style="color:var(--red); margin-right:6px;"></i> Bolos Jam Pelajaran:</span>
-                      <strong style="color:var(--red); font-family:var(--font-mono);">{{ $kasusDisiplin->total_bolos }} kali ({{ $kasusDisiplin->total_bolos * ($pengaturanDisiplin->bobot_bolos ?? 15) }} pt)</strong>
-                    </div>
-                  @endif
-                  @if($kasusDisiplin->total_terlambat > 0)
-                    @php
-                      $hLate = max(0, $kasusDisiplin->total_terlambat - ($pengaturanDisiplin->toleransi_terlambat_piket ?? 2));
-                    @endphp
-                    <div style="display:flex; justify-content:space-between; align-items:center; background:var(--bg-card); border:1px solid var(--border); padding:8px 12px; border-radius:8px;">
-                      <span style="color:var(--text); font-weight:600;"><i class="bi bi-clock-history" style="color:var(--amber); margin-right:6px;"></i> Keterlambatan:</span>
-                      <strong style="color:var(--amber); font-family:var(--font-mono);">{{ $kasusDisiplin->total_terlambat }} kali ({{ $hLate * ($pengaturanDisiplin->bobot_terlambat ?? 3) }} pt)</strong>
-                    </div>
-                  @endif
                 </div>
               @else
                 <div style="text-align:center; padding:28px 16px; background:var(--bg-card); border:1px solid var(--border); border-radius:10px;">
@@ -1217,16 +1195,16 @@
               @endif
             </div>
 
-            {{-- Kolom Kanan: Apresiasi & Peluang Pemulihan Poin (Restorative Justice) --}}
+            {{-- Kolom Kanan: Apresiasi & Cara Pemulihan Poin --}}
             <div style="background:var(--bg-subtle); border:1px solid var(--border); border-radius:var(--r-md); padding:16px;">
               <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
                 <div>
                   <span style="font-size:13px; font-weight:800; color:var(--text); display:block;">
-                    Apresiasi &amp; Self-Reward
+                    Apresiasi &amp; Pemulihan Poin
                   </span>
-                  <span style="font-size:10.5px; color:var(--text-3);">Penghargaan perilaku positif &amp; pemulihan poin</span>
+                  <span style="font-size:10.5px; color:var(--text-3);">Penghargaan perilaku positif &amp; pengurangan poin</span>
                 </div>
-                <span style="font-weight:900; font-size:12.5px; font-family:var(--font-mono); color:var(--green); background:rgba(22,163,74,0.08); border:1px solid rgba(22,163,74,0.2); padding:3px 8px; border-radius:6px; flex-shrink:0;">
+                <span style="font-weight:900; font-size:12px; font-family:var(--font-mono); color:var(--green); background:rgba(22,163,74,0.08); border:1px solid rgba(22,163,74,0.2); padding:3px 8px; border-radius:6px; flex-shrink:0;">
                   -{{ $totalPemulihan }} Poin
                 </span>
               </div>
@@ -1260,99 +1238,83 @@
                 </div>
               @endif
 
-              {{-- Panduan Peluang Pemulihan Poin (Restoratif) --}}
+              {{-- Panduan Ringkas Cara Pemulihan Poin --}}
               <div style="background:var(--bg-card); border:1px solid var(--border); border-radius:10px; padding:12px 14px;">
-                <div style="display:flex; align-items:center; gap:6px; margin-bottom:8px;">
-                  <i class="bi bi-lightbulb-fill" style="color:var(--gold); font-size:14px;"></i>
-                  <span style="font-size:11.5px; font-weight:800; color:var(--text);">Peluang Pemulihan Poin (Restorative Justice)</span>
+                <div style="display:flex; align-items:center; gap:6px; margin-bottom:6px;">
+                  <i class="bi bi-lightbulb-fill" style="color:var(--gold); font-size:13px;"></i>
+                  <span style="font-size:11.5px; font-weight:800; color:var(--text);">Cara Memulihkan Poin Kedisiplinan:</span>
                 </div>
-                <p style="font-size:11px; color:var(--text-2); margin-bottom:10px; line-height:1.45;">
-                  Poin ketidakhadiran dapat dipulihkan secara edukatif oleh ananda melalui komitmen perilaku positif:
+                <p style="font-size:11px; color:var(--text-2); margin-bottom:8px; line-height:1.4;">
+                  Siswa dapat mengurangi poin pelanggaran melalui komitmen dan kebiasaan positif di sekolah:
                 </p>
 
-                <div style="display:flex; flex-direction:column; gap:6px; font-size:11px;">
-                  <div style="display:flex; align-items:flex-start; gap:8px; padding:6px 8px; border-radius:6px; background:var(--bg-subtle);">
-                    <i class="bi bi-clock-check-fill" style="color:var(--green); font-size:13px; margin-top:2px; flex-shrink:0;"></i>
-                    <div style="flex:1; line-height:1.35;">
-                      <strong style="color:var(--text); display:block;">Kehadiran Disiplin Beruntun (Streak)</strong>
-                      <span style="color:var(--text-3); font-size:10px;">Hadir tepat waktu berturut-turut tanpa terlambat</span>
+                <div style="display:flex; flex-direction:column; gap:5px; font-size:11px;">
+                  <div style="display:flex; align-items:center; justify-content:space-between; padding:5px 8px; border-radius:6px; background:var(--bg-subtle);">
+                    <div style="display:flex; align-items:center; gap:6px;">
+                      <i class="bi bi-clock-check-fill" style="color:var(--green); font-size:12px;"></i>
+                      <span style="color:var(--text); font-weight:600;">Hadir Tepat Waktu (1 Minggu Tanpa Terlambat)</span>
                     </div>
-                    <span style="font-weight:800; font-size:10.5px; font-family:var(--font-mono); color:var(--green); flex-shrink:0;">-5 pt</span>
+                    <span style="font-weight:800; font-family:var(--font-mono); color:var(--green); font-size:10.5px;">-5 Poin</span>
                   </div>
 
-                  <div style="display:flex; align-items:flex-start; gap:8px; padding:6px 8px; border-radius:6px; background:var(--bg-subtle);">
-                    <i class="bi bi-heart-fill" style="color:#0284c7; font-size:13px; margin-top:2px; flex-shrink:0;"></i>
-                    <div style="flex:1; line-height:1.35;">
-                      <strong style="color:var(--text); display:block;">Karakter, Ibadah &amp; Hafalan</strong>
-                      <span style="color:var(--text-3); font-size:10px;">Petugas sholat berjamaah / muadzin / hafalan doa</span>
+                  <div style="display:flex; align-items:center; justify-content:space-between; padding:5px 8px; border-radius:6px; background:var(--bg-subtle);">
+                    <div style="display:flex; align-items:center; gap:6px;">
+                      <i class="bi bi-heart-fill" style="color:#0284c7; font-size:12px;"></i>
+                      <span style="color:var(--text); font-weight:600;">Keaktifan Ibadah, Muadzin &amp; Karakter</span>
                     </div>
-                    <span style="font-weight:800; font-size:10.5px; font-family:var(--font-mono); color:var(--green); flex-shrink:0;">-5 s/d -10 pt</span>
+                    <span style="font-weight:800; font-family:var(--font-mono); color:var(--green); font-size:10.5px;">-5 s/d -10 Poin</span>
                   </div>
 
-                  <div style="display:flex; align-items:flex-start; gap:8px; padding:6px 8px; border-radius:6px; background:var(--bg-subtle);">
-                    <i class="bi bi-tree-fill" style="color:#059669; font-size:13px; margin-top:2px; flex-shrink:0;"></i>
-                    <div style="flex:1; line-height:1.35;">
-                      <strong style="color:var(--text); display:block;">Bakti Sosial &amp; Lingkungan Sekolah</strong>
-                      <span style="color:var(--text-3); font-size:10px;">Gotong royong kebersihan, taman, atau perpustakaan</span>
+                  <div style="display:flex; align-items:center; justify-content:space-between; padding:5px 8px; border-radius:6px; background:var(--bg-subtle);">
+                    <div style="display:flex; align-items:center; gap:6px;">
+                      <i class="bi bi-tree-fill" style="color:#059669; font-size:12px;"></i>
+                      <span style="color:var(--text); font-weight:600;">Gotong Royong &amp; Kepedulian Lingkungan</span>
                     </div>
-                    <span style="font-weight:800; font-size:10.5px; font-family:var(--font-mono); color:var(--green); flex-shrink:0;">-5 s/d -10 pt</span>
+                    <span style="font-weight:800; font-family:var(--font-mono); color:var(--green); font-size:10.5px;">-5 s/d -10 Poin</span>
                   </div>
 
-                  <div style="display:flex; align-items:flex-start; gap:8px; padding:6px 8px; border-radius:6px; background:var(--bg-subtle);">
-                    <i class="bi bi-trophy-fill" style="color:var(--gold); font-size:13px; margin-top:2px; flex-shrink:0;"></i>
-                    <div style="flex:1; line-height:1.35;">
-                      <strong style="color:var(--text); display:block;">Prestasi Lomba &amp; Bakat Kejuaraan</strong>
-                      <span style="color:var(--text-3); font-size:10px;">Juara lomba akademik, kompetensi kejuruan, atau seni/olahraga</span>
+                  <div style="display:flex; align-items:center; justify-content:space-between; padding:5px 8px; border-radius:6px; background:var(--bg-subtle);">
+                    <div style="display:flex; align-items:center; gap:6px;">
+                      <i class="bi bi-trophy-fill" style="color:var(--gold); font-size:12px;"></i>
+                      <span style="color:var(--text); font-weight:600;">Prestasi Lomba &amp; Kejuruan</span>
                     </div>
-                    <span style="font-weight:800; font-size:10.5px; font-family:var(--font-mono); color:var(--green); flex-shrink:0;">-10 s/d -20 pt</span>
+                    <span style="font-weight:800; font-family:var(--font-mono); color:var(--green); font-size:10.5px;">-10 s/d -20 Poin</span>
                   </div>
                 </div>
               </div>
             </div>
           </div>
 
-          {{-- Card Kolaborasi & Konsultasi Wali Kelas --}}
-          @php
-            $waliNama = $waliKelas ? ($waliKelas->nama_lengkap_gelar ?: $waliKelas->nama) : null;
-            $waliHp = $waliKelas ? $waliKelas->no_hp : null;
-            $cleanWa = null;
-            if ($waliHp) {
-                $cleanWa = preg_replace('/[^0-9]/', '', $waliHp);
-                if (str_starts_with($cleanWa, '0')) {
-                    $cleanWa = '62' . substr($cleanWa, 1);
-                } elseif (!str_starts_with($cleanWa, '62')) {
-                    $cleanWa = '62' . $cleanWa;
-                }
-            }
-            $siswaNama = $siswa ? $siswa->nama : 'Siswa';
-            $rombelNama = $rombel ? $rombel->nama_rombel : '';
-            $waText = rawurlencode("Halo Bapak/Ibu {$waliNama}, perkenalkan saya orang tua/wali dari {$siswaNama} ({$rombelNama}). Saya ingin berkonsultasi mengenai perkembangan dan kedisiplinan ananda di sekolah. Terima kasih.");
-          @endphp
-
+          {{-- Card Kolaborasi & Konsultasi Wali Kelas (Langsung Terhubung ke Nomor Wali Kelas) --}}
           <div style="margin-top:16px; background:var(--bg-subtle); border:1px solid var(--border); border-radius:var(--r-md); padding:14px 18px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
             <div style="display:flex; align-items:center; gap:12px; flex:1; min-width:240px;">
-              <div style="width:42px; height:42px; border-radius:12px; background:var(--bg-card); border:1px solid var(--border); color:var(--text); display:flex; align-items:center; justify-content:center; font-size:18px; flex-shrink:0;">
-                <i class="bi bi-person-video3"></i>
+              <div style="width:44px; height:44px; border-radius:12px; background:var(--bg-card); border:1px solid var(--border); color:var(--text); display:flex; align-items:center; justify-content:center; font-size:20px; flex-shrink:0;">
+                <i class="bi bi-person-badge"></i>
               </div>
               <div>
-                <span style="font-size:11px; font-weight:700; color:var(--text-3); text-transform:uppercase; letter-spacing:0.5px; display:block;">Pusat Konsultasi &amp; Pembinaan Siswa</span>
-                <strong style="font-size:13px; color:var(--text); display:block; line-height:1.3;">
-                  {{ $waliNama ? 'Wali Kelas: ' . $waliNama : 'Wali Kelas ' . ($rombelNama ?: 'Siswa') }}
+                <span style="font-size:10.5px; font-weight:700; color:var(--text-3); text-transform:uppercase; letter-spacing:0.5px; display:block;">Pusat Konsultasi Wali Kelas</span>
+                <strong style="font-size:13.5px; color:var(--text); display:block; line-height:1.3;">
+                  {{ $waliNama ? $waliNama : 'Wali Kelas ' . $rombelNama }}
                 </strong>
-                <span style="font-size:11px; color:var(--text-2);">
-                  Sekolah dan wali kelas siap berkolaborasi bersama keluarga demi masa depan dan karakter terbaik ananda.
+                <span style="font-size:11.5px; color:var(--text-2);">
+                  Wali Kelas {{ $rombelNama }} · Siap berkolaborasi bersama orang tua/wali demi perkembangan ananda.
                 </span>
+                @if($waliHp)
+                  <div style="font-size:11px; color:var(--text-3); font-family:var(--font-mono); margin-top:2px;">
+                    <i class="bi bi-whatsapp" style="color:#16a34a; margin-right:3px;"></i> No. WhatsApp: {{ $waliHp }}
+                  </div>
+                @endif
               </div>
             </div>
 
             @if($cleanWa)
-              <a href="https://wa.me/{{ $cleanWa }}?text={{ $waText }}" target="_blank" rel="noopener noreferrer" style="display:inline-flex; align-items:center; gap:8px; background:#16a34a; color:#ffffff; font-size:12.5px; font-weight:800; padding:9px 16px; border-radius:8px; text-decoration:none; box-shadow:0 2px 6px rgba(22, 163, 74, 0.25); transition:transform 0.15s ease;" onmouseover="this.style.transform='translateY(-1px)'" onmouseout="this.style.transform='none'">
-                <i class="bi bi-whatsapp" style="font-size:15px;"></i>
+              <a href="https://wa.me/{{ $cleanWa }}?text={{ $waText }}" target="_blank" rel="noopener noreferrer" style="display:inline-flex; align-items:center; gap:8px; background:#16a34a; color:#ffffff; font-size:12.5px; font-weight:800; padding:10px 18px; border-radius:8px; text-decoration:none; box-shadow:0 2px 6px rgba(22, 163, 74, 0.25); transition:transform 0.15s ease;" onmouseover="this.style.transform='translateY(-1px)'" onmouseout="this.style.transform='none'">
+                <i class="bi bi-whatsapp" style="font-size:16px;"></i>
                 <span>Konsultasi Wali Kelas</span>
               </a>
             @else
               <span style="font-size:11.5px; color:var(--text-3); display:inline-flex; align-items:center; gap:5px;">
-                <i class="bi bi-telephone"></i> Konsultasi dapat dilakukan melalui sekolah pada jam operasional
+                <i class="bi bi-telephone"></i> Nomor WhatsApp Wali Kelas sedang dalam pembaruan data
               </span>
             @endif
           </div>

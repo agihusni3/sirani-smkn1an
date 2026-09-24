@@ -198,9 +198,8 @@ class PortalOrtuTest extends TestCase
         $response->assertOk();
         $response->assertSee('Catatan Kedisiplinan Siswa');
         $response->assertSee('Petugas Sholat Berjamaah');
-        $response->assertSee('Apresiasi &amp; Self-Reward', false);
-        $response->assertSee('Skala Tahap Pembinaan Karakter');
-        $response->assertSee('Peluang Pemulihan Poin (Restorative Justice)');
+        $response->assertSee('Apresiasi &amp; Pemulihan Poin', false);
+        $response->assertSee('Cara Memulihkan Poin Kedisiplinan');
     }
 
     public function test_portal_ortu_menampilkan_rincian_kejadian_dan_kontak_wali_kelas()
