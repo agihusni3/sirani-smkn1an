@@ -50,6 +50,17 @@ class ModeUjian extends Model
     }
 
     /**
+     * Cek apakah instansi ini aktif pada hari ini / tanggal tertentu.
+     */
+    public function isAktifHariIni(?string $tanggal = null): bool
+    {
+        $dateStr = $tanggal ?: Carbon::today()->toDateString();
+        return (bool) $this->is_aktif 
+            && $this->tanggal_mulai <= $dateStr 
+            && $this->tanggal_selesai >= $dateStr;
+    }
+
+    /**
      * Cek apakah guru tertentu terdaftar sebagai Panitia Ujian yang aktif hari ini.
      */
     public static function isPanitiaAktif(?int $guruId, ?string $tanggal = null): bool

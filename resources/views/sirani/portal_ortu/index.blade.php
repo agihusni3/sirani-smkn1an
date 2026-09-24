@@ -399,7 +399,7 @@
                   <span style="font-size:11px; color:var(--text-3, #64748b); font-family:var(--font-mono); font-weight:600;">
                     {{ format_tanggal_indo($koreksiTerbaru->tanggal) }}
                   </span>
-                  <span id="koreksiBannerTimerBadge" style="font-size:9.5px; color:#b45309; font-weight:800; background:rgba(217,119,6,0.15); padding:1px 5px; border-radius:3px; font-family:var(--font-mono);" title="Banner akan tertutup otomatis">10s</span>
+                  <span id="koreksiBannerTimerBadge" style="font-size:9.5px; color:#b45309; font-weight:800; background:rgba(217,119,6,0.15); padding:1px 5px; border-radius:3px; font-family:var(--font-mono);" title="Banner akan tertutup otomatis">20s</span>
                 </div>
               </div>
               <div style="font-size:12px; color:var(--text-2, #334155); line-height:1.45;">
@@ -415,9 +415,9 @@
             <button type="button" onclick="sirani_dismissKoreksiBanner()" style="position:absolute; top:8px; right:8px; background:none; border:none; color:#94a3b8; font-size:14px; cursor:pointer; padding:4px; line-height:1; border-radius:4px; transition:color .15s;" onmouseover="this.style.color='#d97706'" onmouseout="this.style.color='#94a3b8'" title="Tutup pemberitahuan">
               <i class="bi bi-x-lg"></i>
             </button>
-            {{-- Indikator Garis Durasi Waktu 10 Detik --}}
+            {{-- Indikator Garis Durasi Waktu 20 Detik --}}
             <div style="position:absolute; bottom:0; left:0; right:0; height:2.5px; background:rgba(217,119,6,0.12); overflow:hidden;">
-              <div id="koreksiBannerProgressBar" style="height:100%; width:100%; background:#f59e0b; transition:width 10s linear;"></div>
+              <div id="koreksiBannerProgressBar" style="height:100%; width:100%; background:#f59e0b; transition:width 20s linear;"></div>
             </div>
           </div>
         @endif
@@ -4108,7 +4108,7 @@
       toast._dismissTimer = setTimeout(() => {
         toast.style.transform = 'translateX(-50%) translateY(-120%)';
         toast.style.opacity = '0';
-      }, 10000);
+      }, 20000);
     }
 
     // Fungsi tutup & animasi dismiss banner koreksi presensi
@@ -4176,7 +4176,7 @@
       }, 50);
 
       // Hitung mundur angka detik setiap 1 detik
-      let sisaDetik = 10;
+      let sisaDetik = 20;
       const timerInt = setInterval(() => {
         sisaDetik--;
         if (badge) badge.textContent = sisaDetik + 's';
@@ -4185,11 +4185,11 @@
         }
       }, 1000);
 
-      // Hilang otomatis tepat setelah 10 detik
+      // Hilang otomatis tepat setelah 20 detik
       setTimeout(() => {
         clearInterval(timerInt);
         sirani_dismissKoreksiBanner();
-      }, 10000);
+      }, 20000);
     }
 
     // Unlock Web Audio & HTML5 Audio pada interaksi pengguna pertama di mobile browser

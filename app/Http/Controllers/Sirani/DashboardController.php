@@ -800,7 +800,25 @@ class DashboardController extends Controller
             ->limit(10)
             ->get();
 
-        return view('sirani.jadwal_sekolah.index', compact('today', 'jadwalHariIni', 'taAktif', 'riwayatJadwal', 'jadwalMingguanList'));
+        // Status libur hari ini
+        $isLibur = \App\Models\HariLibur::isLibur($today);
+        $liburDetail = \App\Models\HariLibur::where('tanggal', $today)->first();
+
+        // Mode Ujian / Sumatif
+        $modeUjian = \App\Models\ModeUjian::getModeAktif($today) ?? \App\Models\ModeUjian::latest()->first();
+        $semuaGuru = \App\Models\Guru::where('is_active', true)->orderBy('nama')->get(['id', 'nama']);
+
+        return view('sirani.jadwal_sekolah.index', compact(
+            'today',
+            'jadwalHariIni',
+            'taAktif',
+            'riwayatJadwal',
+            'jadwalMingguanList',
+            'isLibur',
+            'liburDetail',
+            'modeUjian',
+            'semuaGuru'
+        ));
     }
 
     /**

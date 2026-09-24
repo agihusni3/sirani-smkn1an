@@ -354,16 +354,6 @@
           <button type="button" class="btn-gradient-izin" onclick="openModal('modalCatatIzinPiket')" data-tooltip="Catat surat keterangan perizinan atau sakit harian" title="Catat surat keterangan perizinan atau sakit harian">
             Catat Izin
           </button>
-          @if(auth()->user()->isAdmin() || auth()->user()->isWakaKurikulum())
-            <button type="button" class="btn-gradient-manual" onclick="openModal('modalKelolaModeUjian')" data-tooltip="Konfigurasi Mode Pekan Sumatif (STS / SAS) & Panitia" title="Konfigurasi Mode Pekan Sumatif (STS / SAS) & Panitia" style="background:linear-gradient(135deg, #4f46e5, #7c3aed); border-color:#6366f1;">
-              Mode Sumatif
-            </button>
-          @endif
-          @if(!$isLibur && (auth()->user()->isAdmin() || auth()->user()->isPiketHariIni() || auth()->user()->isKepalaSekolah()))
-            <button type="button" class="btn-gradient-danger" onclick="openModal('modalLiburDarurat')" data-tooltip="Liburkan sekolah mendadak hari ini & bersihkan status Alpha" title="Liburkan sekolah mendadak hari ini & bersihkan status Alpha" style="background:linear-gradient(135deg, #ef4444, #dc2626); color:#fff; border:none; padding:7px 13px; border-radius:8px; font-weight:700; font-size:12px; cursor:pointer; display:inline-flex; align-items:center; gap:5px; box-shadow:0 2px 6px rgba(239, 68, 68, 0.25);">
-              <i class="bi bi-calendar-x-fill"></i> Liburkan Hari Ini
-            </button>
-          @endif
         </div>
       </div>
 
