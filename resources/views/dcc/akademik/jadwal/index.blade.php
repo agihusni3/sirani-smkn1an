@@ -498,22 +498,23 @@ function tambahIstirahat(hari) {
       $rombelXII_RPL = $rombels->firstWhere('nama_rombel', 'XII RPL');
 
       $displayDays = $hariFilter ? [strtoupper($hariFilter)] : ['SENIN', 'SELASA', 'RABU', 'KAMIS', 'JUMAT'];
+      $defaultScheduleTimes = \App\Models\AkademikJadwalWaktu::defaultSchedule();
     @endphp
 
     <table class="roster-table">
       <colgroup>
-        <col style="width: 4%;">
         <col style="width: 3.5%;">
-        <col style="width: 7.5%;">
+        <col style="width: 3.5%;">
+        <col style="width: 8%;">
         <col style="width: 10%;">
         <col style="width: 10%;">
         <col style="width: 10%;">
         <col style="width: 10%;">
         <col style="width: 10%;">
         <col style="width: 10%;">
-        <col style="width: 5%;">
-        <col style="width: 5%;">
-        <col style="width: 15%;">
+        <col style="width: 4.5%;">
+        <col style="width: 4.5%;">
+        <col style="width: 16%;">
       </colgroup>
       <thead>
         <tr>
@@ -526,14 +527,14 @@ function tambahIstirahat(hari) {
           <th rowspan="2" class="roster-th-piket"><i class="bi bi-shield-check me-1"></i> PETUGAS PIKET</th>
         </tr>
         <tr>
-          <th class="roster-th-sub-aphp">APHP</th>
-          <th class="roster-th-sub-rpl">RPL</th>
-          <th class="roster-th-sub-tsm">TSM</th>
-          <th class="roster-th-sub-aphp">APHP</th>
-          <th class="roster-th-sub-rpl">RPL</th>
-          <th class="roster-th-sub-tsm">TSM</th>
-          <th class="roster-th-sub-aphp">APHP</th>
-          <th class="roster-th-sub-rpl">RPL</th>
+          <th class="roster-th-sub"><span class="sub-pill pill-aphp">APHP</span></th>
+          <th class="roster-th-sub"><span class="sub-pill pill-rpl">RPL</span></th>
+          <th class="roster-th-sub"><span class="sub-pill pill-tsm">TSM</span></th>
+          <th class="roster-th-sub"><span class="sub-pill pill-aphp">APHP</span></th>
+          <th class="roster-th-sub"><span class="sub-pill pill-rpl">RPL</span></th>
+          <th class="roster-th-sub"><span class="sub-pill pill-tsm">TSM</span></th>
+          <th class="roster-th-sub"><span class="sub-pill pill-pkl">APHP</span></th>
+          <th class="roster-th-sub"><span class="sub-pill pill-pkl">RPL</span></th>
         </tr>
       </thead>
       <tbody>
@@ -549,10 +550,8 @@ function tambahIstirahat(hari) {
           {{-- Jam 0 (Upacara / Apel / Lampung Mengaji) --}}
           <tr>
             <th rowspan="{{ $totalDayRows }}" class="roster-day-side">
-              <div class="roster-day-letters">
-                @for($i=0; $i<strlen($day); $i++)
-                  <span>{{ $day[$i] }}</span>
-                @endfor
+              <div class="roster-day-badge day-badge-{{ strtolower($day) }}">
+                {{ $day }}
               </div>
             </th>
             <td class="roster-cell-jam">0</td>
@@ -570,23 +569,25 @@ function tambahIstirahat(hari) {
             </td>
             {{-- Petugas Piket --}}
             <td rowspan="{{ $totalDayRows }}" class="roster-cell-piket">
-              <div class="roster-piket-mini-card">
-                <div class="roster-piket-badge-waka">Waka Piket</div>
-                <div class="roster-piket-name-waka" title="{{ $piket?->wakaPiket?->nama ?? '-' }}">
-                  {{ $piket?->wakaPiket?->nama ?? '-' }}
+              <div class="roster-piket-box">
+                <div class="roster-piket-card-waka">
+                  <span class="roster-piket-role-tag waka">Waka Piket</span>
+                  <div class="roster-piket-name-waka" title="{{ $piket?->wakaPiket?->nama ?? '-' }}">
+                    {{ $piket?->wakaPiket?->nama ?? '-' }}
+                  </div>
                 </div>
-              </div>
-              <div class="roster-piket-mini-card">
-                <div class="roster-piket-badge-guru">Guru Piket</div>
-                <div class="roster-piket-list">
-                  @forelse($piket?->guru_list ?? [] as $gp)
-                    <div class="roster-piket-item" title="{{ $gp->nama }}">
-                      <i class="bi bi-person-check-fill text-success" style="font-size:10.5px; flex-shrink:0;"></i>
-                      <span>{{ $gp->nama }}</span>
-                    </div>
-                  @empty
-                    <div style="font-style:italic; color:#94a3b8; font-size:10.5px;">Belum diatur</div>
-                  @endforelse
+                <div class="roster-piket-card-guru">
+                  <span class="roster-piket-role-tag guru">Guru Piket</span>
+                  <div class="roster-piket-guru-list">
+                    @forelse($piket?->guru_list ?? [] as $gp)
+                      <div class="roster-piket-guru-item" title="{{ $gp->nama }}">
+                        <i class="bi bi-person-check-fill text-success" style="font-size:10.5px; flex-shrink:0;"></i>
+                        <span>{{ $gp->nama }}</span>
+                      </div>
+                    @empty
+                      <div style="font-style:italic; color:#94a3b8; font-size:10px;">Belum diatur</div>
+                    @endforelse
+                  </div>
                 </div>
               </div>
             </td>
@@ -596,9 +597,9 @@ function tambahIstirahat(hari) {
           @for($jam = 1; $jam <= $maxJam; $jam++)
             {{-- Istirahat Pertama --}}
             @if(($day !== 'JUMAT' && $jam == 4) || ($day === 'JUMAT' && $jam == 4))
-              <tr>
-                <td class="roster-cell-jam" style="background:#fee2e2; color:#991b1b;">-</td>
-                <td class="roster-cell-pukul" style="background:#fee2e2; color:#991b1b;">
+              <tr class="roster-row-break">
+                <td class="roster-cell-jam">-</td>
+                <td class="roster-cell-pukul">
                   {{ $day === 'SENIN' ? '10.00 - 10.20' : ($day === 'JUMAT' ? '09.40 - 10.00' : '09.50 - 10.05') }}
                 </td>
                 <td colspan="6" class="roster-banner-istirahat">
@@ -609,9 +610,9 @@ function tambahIstirahat(hari) {
 
             {{-- Istirahat Kedua --}}
             @if($day !== 'JUMAT' && $jam == 8)
-              <tr>
-                <td class="roster-cell-jam" style="background:#fee2e2; color:#991b1b;">-</td>
-                <td class="roster-cell-pukul" style="background:#fee2e2; color:#991b1b;">
+              <tr class="roster-row-break">
+                <td class="roster-cell-jam">-</td>
+                <td class="roster-cell-pukul">
                   {{ $day === 'SENIN' ? '12.40 - 13.10' : '12.25 - 12.55' }}
                 </td>
                 <td colspan="6" class="roster-banner-istirahat">
@@ -620,21 +621,23 @@ function tambahIstirahat(hari) {
               </tr>
             @endif
 
+            @php
+              $jamPukul = $slotsMatrix[$day][$jam][$rombelX_APHP?->id]->pukul 
+                ?? ($jadwalWaktu[$day][$jam] ?? ($defaultScheduleTimes[$day][$jam] ?? ''));
+            @endphp
             <tr>
               <td class="roster-cell-jam">{{ $jam }}</td>
-              <td class="roster-cell-pukul">
-                {{ $slotsMatrix[$day][$jam][$rombelX_APHP?->id]->pukul ?? '' }}
-              </td>
+              <td class="roster-cell-pukul">{{ $jamPukul }}</td>
 
               {{-- Render 6 Class Columns --}}
               @php
                 $rombelList = [
-                  ['r' => $rombelX_APHP, 'bg' => '#fffbeb'],
-                  ['r' => $rombelX_RPL,  'bg' => '#f0f9ff'],
-                  ['r' => $rombelX_TSM,  'bg' => '#fff7ed'],
-                  ['r' => $rombelXI_APHP,'bg' => '#fffbeb'],
-                  ['r' => $rombelXI_RPL, 'bg' => '#f0f9ff'],
-                  ['r' => $rombelXI_TSM, 'bg' => '#fff7ed'],
+                  ['r' => $rombelX_APHP],
+                  ['r' => $rombelX_RPL],
+                  ['r' => $rombelX_TSM],
+                  ['r' => $rombelXI_APHP],
+                  ['r' => $rombelXI_RPL],
+                  ['r' => $rombelXI_TSM],
                 ];
               @endphp
 
@@ -646,7 +649,6 @@ function tambahIstirahat(hari) {
                   $slotId = $slot?->id ?? 0;
                 @endphp
                 <td class="roster-cell-slot {{ $isLocked ? 'roster-cell-locked' : '' }} {{ !$canEditJadwal ? 'roster-cell-readonly' : '' }}"
-                    style="background:{{ $isLocked ? '#fffbeb' : $item['bg'] }}; {{ !$canEditJadwal ? 'cursor:default;' : '' }}"
                     @if($canEditJadwal)
                     onclick="openSlotModal('{{ $day }}', {{ $jam }}, {{ $rmb?->id ?? 0 }}, '{{ addslashes($rmb?->nama_rombel ?? '') }}', '{{ $slot?->guru_id ?? '' }}', '{{ $slot?->mata_pelajaran_id ?? '' }}', '{{ addslashes($slot?->kegiatan_khusus ?? '') }}', {{ $isLocked ? 'true' : 'false' }}, {{ $slotId }})"
                     title="{{ $slot ? ($slot->guru?->nama . ' - ' . ($slot->mataPelajaran?->nama_mapel ?? $slot->singkatan_mapel) . ($isLocked ? ' [🔒 DIKUNCI / KEEP]' : '')) : 'Klik untuk atur slot ini' }}"
@@ -664,13 +666,13 @@ function tambahIstirahat(hari) {
                         {{ $slot->singkatan_mapel ?? $slot->kegiatan_khusus }}
                       </span>
                       @if($slot->resource_key === 'LAB_KOMPUTER')
-                        <span style="font-size:9px; background:#0284c7; color:#fff; padding:1px 4px; border-radius:3px; font-weight:800; white-space:nowrap;" title="Praktik di Lab Komputer">LAB KOMP</span>
+                        <span class="roster-lab-badge badge-lab-komp" title="Praktik di Lab Komputer">LAB KOMP</span>
                       @elseif($slot->resource_key === 'LAB_APHP')
-                        <span style="font-size:9px; background:#059669; color:#fff; padding:1px 4px; border-radius:3px; font-weight:800; white-space:nowrap;" title="Praktik di Lab APHP">LAB APHP</span>
+                        <span class="roster-lab-badge badge-lab-aphp" title="Praktik di Lab APHP">LAB APHP</span>
                       @elseif($slot->resource_key === 'BENGKEL_TSM')
-                        <span style="font-size:9px; background:#d97706; color:#fff; padding:1px 4px; border-radius:3px; font-weight:800; white-space:nowrap;" title="Praktik di Bengkel TSM">BENGKEL TSM</span>
+                        <span class="roster-lab-badge badge-bengkel" title="Praktik di Bengkel TSM">BENGKEL TSM</span>
                       @elseif($slot->resource_key)
-                        <span style="font-size:9px; background:#6366f1; color:#fff; padding:1px 4px; border-radius:3px; font-weight:800; white-space:nowrap;" title="{{ $slot->resource_key }}">{{ $slot->resource_key }}</span>
+                        <span class="roster-lab-badge badge-custom" title="{{ $slot->resource_key }}">{{ $slot->resource_key }}</span>
                       @endif
                       @if($isLocked && $canEditJadwal)
                         <span class="roster-lock-badge" title="Slot ini dikunci (KEEP)">🔒</span>
@@ -679,7 +681,7 @@ function tambahIstirahat(hari) {
                   @else
                     @if($canEditJadwal)
                       <div class="roster-empty-slot">
-                        <i class="bi bi-plus-lg"></i>
+                        <i class="bi bi-plus"></i>
                         <span>Isi</span>
                       </div>
                     @else
@@ -694,7 +696,10 @@ function tambahIstirahat(hari) {
               {{-- Kelas XII (PKL) spanning full day --}}
               @if($jam === 1)
                 <td rowspan="{{ $pklRowSpan }}" colspan="2" class="roster-cell-pkl-unified">
-                  PRAKTIK &nbsp; KERJA &nbsp; LAPANGAN &nbsp; (PKL)
+                  <div class="roster-pkl-unified-box">
+                    <span class="roster-pkl-title">PRAKTIK KERJA LAPANGAN</span>
+                    <span class="roster-pkl-sub">(PKL)</span>
+                  </div>
                 </td>
               @endif
             </tr>
@@ -704,7 +709,11 @@ function tambahIstirahat(hari) {
         {{-- Sabtu --}}
         @if(!$hariFilter || $hariFilter === 'SABTU')
           <tr>
-            <th class="roster-day-side" style="padding:10px;">SABTU</th>
+            <th class="roster-day-side" style="padding:10px;">
+              <div class="roster-day-badge day-badge-sabtu" style="writing-mode:horizontal-tb; transform:none; padding:4px 8px;">
+                SABTU
+              </div>
+            </th>
             <td colspan="10" style="background:linear-gradient(135deg, #4f46e5 0%, #3730a3 100%); color:#fff; font-weight:800; padding:10px; font-size:12px; letter-spacing:2px; text-transform:uppercase;">
               <i class="bi bi-trophy-fill me-2"></i> EKSTRAKURIKULER & PENGEMBANGAN DIRI
             </td>
