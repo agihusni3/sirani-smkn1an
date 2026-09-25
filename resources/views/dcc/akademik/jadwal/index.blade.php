@@ -521,20 +521,20 @@ function tambahIstirahat(hari) {
           <th rowspan="2" class="roster-th-dark">HARI</th>
           <th rowspan="2" class="roster-th-dark">JAM</th>
           <th rowspan="2" class="roster-th-dark">PUKUL</th>
-          <th colspan="3" class="roster-th-kelas-x">KELAS X / PROGRAM KEAHLIAN</th>
-          <th colspan="3" class="roster-th-kelas-xi">KELAS XI / PROGRAM KEAHLIAN</th>
-          <th colspan="2" class="roster-th-kelas-xii">KELAS XII / PKL</th>
+          <th colspan="3" class="roster-th-kelas-x roster-col-divider">KELAS X / PROGRAM KEAHLIAN</th>
+          <th colspan="3" class="roster-th-kelas-xi roster-col-divider">KELAS XI / PROGRAM KEAHLIAN</th>
+          <th colspan="2" class="roster-th-kelas-xii roster-col-divider">KELAS XII / PKL</th>
           <th rowspan="2" class="roster-th-piket"><i class="bi bi-shield-check me-1"></i> PETUGAS PIKET</th>
         </tr>
         <tr>
-          <th class="roster-th-sub"><span class="sub-pill pill-aphp">APHP</span></th>
-          <th class="roster-th-sub"><span class="sub-pill pill-rpl">RPL</span></th>
-          <th class="roster-th-sub"><span class="sub-pill pill-tsm">TSM</span></th>
-          <th class="roster-th-sub"><span class="sub-pill pill-aphp">APHP</span></th>
-          <th class="roster-th-sub"><span class="sub-pill pill-rpl">RPL</span></th>
-          <th class="roster-th-sub"><span class="sub-pill pill-tsm">TSM</span></th>
-          <th class="roster-th-sub"><span class="sub-pill pill-pkl">APHP</span></th>
-          <th class="roster-th-sub"><span class="sub-pill pill-pkl">RPL</span></th>
+          <th class="roster-th-sub th-sub-aphp"><span class="sub-pill pill-aphp">APHP</span></th>
+          <th class="roster-th-sub th-sub-rpl"><span class="sub-pill pill-rpl">RPL</span></th>
+          <th class="roster-th-sub th-sub-tsm roster-col-divider"><span class="sub-pill pill-tsm">TSM</span></th>
+          <th class="roster-th-sub th-sub-aphp"><span class="sub-pill pill-aphp">APHP</span></th>
+          <th class="roster-th-sub th-sub-rpl"><span class="sub-pill pill-rpl">RPL</span></th>
+          <th class="roster-th-sub th-sub-tsm roster-col-divider"><span class="sub-pill pill-tsm">TSM</span></th>
+          <th class="roster-th-sub th-sub-pkl"><span class="sub-pill pill-pkl">APHP</span></th>
+          <th class="roster-th-sub th-sub-pkl roster-col-divider"><span class="sub-pill pill-pkl">RPL</span></th>
         </tr>
       </thead>
       <tbody>
@@ -558,7 +558,7 @@ function tambahIstirahat(hari) {
             <td class="roster-cell-pukul">
               {{ $day === 'SENIN' ? '07.15 - 08.15' : ($isJumat ? '07.15 - 08.00' : '07.15 - 07.30') }}
             </td>
-            <td colspan="8" class="{{ $day === 'SENIN' ? 'roster-banner-upacara' : ($isJumat ? 'roster-banner-jumat' : 'roster-banner-apel') }}">
+            <td colspan="8" class="{{ $day === 'SENIN' ? 'roster-banner-upacara' : ($isJumat ? 'roster-banner-jumat' : 'roster-banner-apel') }} roster-col-divider">
               @if($day === 'SENIN')
                 <i class="bi bi-flag-fill me-1"></i> UPACARA BENDERA
               @elseif($isJumat)
@@ -602,7 +602,7 @@ function tambahIstirahat(hari) {
                 <td class="roster-cell-pukul">
                   {{ $day === 'SENIN' ? '10.00 - 10.20' : ($day === 'JUMAT' ? '09.40 - 10.00' : '09.50 - 10.05') }}
                 </td>
-                <td colspan="6" class="roster-banner-istirahat">
+                <td colspan="6" class="roster-banner-istirahat roster-col-divider">
                   <i class="bi bi-cup-hot-fill me-1"></i> ISTIRAHAT PERTAMA
                 </td>
               </tr>
@@ -615,7 +615,7 @@ function tambahIstirahat(hari) {
                 <td class="roster-cell-pukul">
                   {{ $day === 'SENIN' ? '12.40 - 13.10' : '12.25 - 12.55' }}
                 </td>
-                <td colspan="6" class="roster-banner-istirahat">
+                <td colspan="6" class="roster-banner-istirahat roster-col-divider">
                   <i class="bi bi-cup-hot-fill me-1"></i> ISTIRAHAT KEDUA
                 </td>
               </tr>
@@ -632,12 +632,12 @@ function tambahIstirahat(hari) {
               {{-- Render 6 Class Columns --}}
               @php
                 $rombelList = [
-                  ['r' => $rombelX_APHP],
-                  ['r' => $rombelX_RPL],
-                  ['r' => $rombelX_TSM],
-                  ['r' => $rombelXI_APHP],
-                  ['r' => $rombelXI_RPL],
-                  ['r' => $rombelXI_TSM],
+                  ['r' => $rombelX_APHP, 'jurusan' => 'aphp', 'is_last' => false],
+                  ['r' => $rombelX_RPL,  'jurusan' => 'rpl',  'is_last' => false],
+                  ['r' => $rombelX_TSM,  'jurusan' => 'tsm',  'is_last' => true],
+                  ['r' => $rombelXI_APHP,'jurusan' => 'aphp', 'is_last' => false],
+                  ['r' => $rombelXI_RPL, 'jurusan' => 'rpl',  'is_last' => false],
+                  ['r' => $rombelXI_TSM, 'jurusan' => 'tsm',  'is_last' => true],
                 ];
               @endphp
 
@@ -647,8 +647,10 @@ function tambahIstirahat(hari) {
                   $slot = ($rmb) ? ($slotsMatrix[$day][$jam][$rmb->id] ?? null) : null;
                   $isLocked = (bool)($slot?->is_locked);
                   $slotId = $slot?->id ?? 0;
+                  $jurusan = $item['jurusan'];
+                  $isLast = $item['is_last'];
                 @endphp
-                <td class="roster-cell-slot {{ $isLocked ? 'roster-cell-locked' : '' }} {{ !$canEditJadwal ? 'roster-cell-readonly' : '' }}"
+                <td class="roster-cell-slot slot-{{ $jurusan }} {{ $isLast ? 'roster-col-divider' : '' }} {{ $isLocked ? 'roster-cell-locked' : '' }} {{ !$canEditJadwal ? 'roster-cell-readonly' : '' }}"
                     @if($canEditJadwal)
                     onclick="openSlotModal('{{ $day }}', {{ $jam }}, {{ $rmb?->id ?? 0 }}, '{{ addslashes($rmb?->nama_rombel ?? '') }}', '{{ $slot?->guru_id ?? '' }}', '{{ $slot?->mata_pelajaran_id ?? '' }}', '{{ addslashes($slot?->kegiatan_khusus ?? '') }}', {{ $isLocked ? 'true' : 'false' }}, {{ $slotId }})"
                     title="{{ $slot ? ($slot->guru?->nama . ' - ' . ($slot->mataPelajaran?->nama_mapel ?? $slot->singkatan_mapel) . ($isLocked ? ' [🔒 DIKUNCI / KEEP]' : '')) : 'Klik untuk atur slot ini' }}"
