@@ -57,36 +57,50 @@
 
     {{-- Banner Mode Sumatif Aktif jika ada --}}
     @if($modeUjianAktif)
-      <div class="panel no-print" style="margin-bottom:14px; background:linear-gradient(135deg, rgba(79, 70, 229, 0.08) 0%, rgba(147, 51, 234, 0.06) 100%); border:1.5px solid rgba(99, 102, 241, 0.3); border-radius:var(--r-md); padding:14px 18px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
-        <div style="display:flex; align-items:center; gap:12px;">
-          <div style="width:40px; height:40px; border-radius:10px; background:linear-gradient(135deg, #4f46e5, #7c3aed); display:flex; align-items:center; justify-content:center; font-size:20px; color:#fff; flex-shrink:0;">
+      <div class="panel no-print" style="margin-bottom:14px; background:linear-gradient(135deg, rgba(79, 70, 229, 0.08) 0%, rgba(124, 58, 237, 0.05) 100%); border:1px solid rgba(99, 102, 241, 0.28); border-radius:12px; padding:12px 18px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:14px; box-shadow:0 2px 10px -2px rgba(99, 102, 241, 0.08);">
+        <div style="display:flex; align-items:center; gap:12px; min-width:280px; flex:1;">
+          <div style="width:38px; height:38px; border-radius:10px; background:linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); display:flex; align-items:center; justify-content:center; font-size:18px; color:#ffffff; flex-shrink:0; box-shadow:0 3px 8px rgba(79, 70, 229, 0.28);">
             <i class="bi bi-mortarboard-fill"></i>
           </div>
-          <div>
-            <div style="display:flex; align-items:center; gap:8px; margin-bottom:2px; flex-wrap:wrap;">
-              <strong style="font-size:14px; color:#3730a3;">
-                MODE PEKAN SUMATIF AKTIF: {{ $modeUjianAktif->nama_ujian }}
-              </strong>
-              <span style="font-size:11px; padding:1px 7px; border-radius:5px; background:#4f46e5; color:#fff; font-weight:700;">
-                {{ $modeUjianAktif->tipe }}
+          <div style="display:flex; flex-direction:column; gap:2px;">
+            <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+              <span style="font-size:10.5px; font-weight:800; text-transform:uppercase; letter-spacing:0.4px; padding:2px 8px; border-radius:6px; background:#4f46e5; color:#ffffff; display:inline-flex; align-items:center; gap:4px;">
+                <span style="width:5px; height:5px; border-radius:50%; background:#4ade80;"></span>
+                {{ $modeUjianAktif->tipe ?? 'SUMATIF' }} AKTIF
               </span>
-              <span style="font-size:12px; color:#4338ca;">
-                ({{ \Carbon\Carbon::parse($modeUjianAktif->tanggal_mulai)->locale('id')->isoFormat('D MMM') }} - {{ \Carbon\Carbon::parse($modeUjianAktif->tanggal_selesai)->locale('id')->isoFormat('D MMM Y') }})
+              <span style="font-size:13.5px; font-weight:800; color:var(--text, #1e1b4b); letter-spacing:-0.2px;">
+                {{ $modeUjianAktif->nama_ujian }}
               </span>
             </div>
-            <div style="font-size:12px; color:var(--text-2);">
-              <strong>Jam Pulang Sumatif: {{ substr($modeUjianAktif->jam_pulang_mulai, 0, 5) }} WIB</strong>
-              • Jadwal piket reguler dinonaktifkan sementara dan digantikan oleh <span style="color:#4338ca; font-weight:700;">Panitia Sumatif ({{ $modeUjianAktif->daftar_panitia->count() }} Guru)</span> tanpa merusak plotting semester.
+            <div style="font-size:11.5px; color:var(--text-3, #64748b); display:flex; align-items:center; gap:6px;">
+              <i class="bi bi-calendar-range"></i>
+              <span>{{ \Carbon\Carbon::parse($modeUjianAktif->tanggal_mulai)->locale('id')->isoFormat('D MMM') }} – {{ \Carbon\Carbon::parse($modeUjianAktif->tanggal_selesai)->locale('id')->isoFormat('D MMM Y') }}</span>
+              <span style="color:var(--border-2, #cbd5e1);">•</span>
+              <span><i class="bi bi-people-fill text-indigo-500"></i> Panitia: <strong style="color:var(--text, #0f172a);">{{ $modeUjianAktif->daftar_panitia->count() }} Guru</strong></span>
             </div>
           </div>
         </div>
-        @if($canManagePiket)
-          <div style="display:flex; gap:8px;">
-            <button type="button" onclick="toggleModalModeUjian(true)" class="btn btn-sm btn-outline" style="font-size:11.5px; font-weight:700;">
-              <i class="bi bi-pencil-square"></i> Kelola Mode Sumatif
-            </button>
+
+        <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+          {{-- Highlight Jam Pulang Sumatif --}}
+          <div style="display:inline-flex; align-items:center; gap:9px; background:var(--bg-2, #ffffff); border:1px solid rgba(99, 102, 241, 0.25); padding:6px 14px; border-radius:10px; box-shadow:0 2px 6px rgba(0,0,0,0.03);">
+            <div style="width:26px; height:26px; border-radius:7px; background:rgba(79, 70, 229, 0.12); color:#4f46e5; display:flex; align-items:center; justify-content:center; font-size:13px;">
+              <i class="bi bi-clock-fill"></i>
+            </div>
+            <div>
+              <div style="font-size:9.5px; font-weight:800; text-transform:uppercase; color:var(--text-3, #64748b); letter-spacing:0.4px;">Jam Pulang Siswa</div>
+              <div style="font-size:13.5px; font-weight:900; color:#4338ca; font-family:var(--font-mono, monospace); line-height:1.1;">
+                {{ substr($modeUjianAktif->jam_pulang_mulai, 0, 5) }} <span style="font-size:10px; font-weight:700;">WIB</span>
+              </div>
+            </div>
           </div>
-        @endif
+
+          @if($canManagePiket)
+            <button type="button" onclick="toggleModalModeUjian(true)" class="btn btn-sm btn-outline" style="font-size:11.5px; font-weight:700; height:38px; display:inline-flex; align-items:center; gap:6px;">
+              <i class="bi bi-pencil-square"></i> Kelola
+            </button>
+          @endif
+        </div>
       </div>
     @endif
 

@@ -73,24 +73,46 @@
 
     {{-- BANNER NOTIFIKASI MODE SUMATIF AKTIF JIKA ADA --}}
     @if($modeUjian && $modeUjian->isAktifHariIni($today))
-      <div style="margin-bottom:14px; display:flex; align-items:center; justify-content:space-between; gap:14px; padding:12px 16px; border-radius:12px; background:linear-gradient(135deg, rgba(79, 70, 229, 0.10) 0%, rgba(147, 51, 234, 0.08) 100%); border:1.5px solid rgba(99, 102, 241, 0.35);">
-        <div style="display:flex; align-items:center; gap:10px;">
-          <div style="width:36px; height:36px; border-radius:8px; background:linear-gradient(135deg, #4f46e5, #7c3aed); display:flex; align-items:center; justify-content:center; font-size:18px; color:#fff; flex-shrink:0;">
+      <div style="margin-bottom:14px; display:flex; align-items:center; justify-content:space-between; gap:14px; padding:12px 18px; border-radius:12px; background:linear-gradient(135deg, rgba(79, 70, 229, 0.08) 0%, rgba(124, 58, 237, 0.05) 100%); border:1px solid rgba(99, 102, 241, 0.28); box-shadow:0 2px 10px -2px rgba(99, 102, 241, 0.08); flex-wrap:wrap;">
+        <div style="display:flex; align-items:center; gap:12px; min-width:280px; flex:1;">
+          <div style="width:38px; height:38px; border-radius:10px; background:linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); display:flex; align-items:center; justify-content:center; font-size:18px; color:#ffffff; flex-shrink:0; box-shadow:0 3px 8px rgba(79, 70, 229, 0.28);">
             <i class="bi bi-mortarboard-fill"></i>
           </div>
-          <div>
+          <div style="display:flex; flex-direction:column; gap:2px;">
             <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-              <strong style="font-size:13.5px; color:#3730a3;">MODE PEKAN SUMATIF AKTIF: {{ $modeUjian->nama_ujian }}</strong>
-              <span style="font-size:10.5px; padding:1px 6px; border-radius:4px; background:#4f46e5; color:#fff; font-weight:700;">{{ $modeUjian->tipe }}</span>
+              <span style="font-size:10.5px; font-weight:800; text-transform:uppercase; letter-spacing:0.4px; padding:2px 8px; border-radius:6px; background:#4f46e5; color:#ffffff; display:inline-flex; align-items:center; gap:4px;">
+                <span style="width:5px; height:5px; border-radius:50%; background:#4ade80;"></span>
+                {{ $modeUjian->tipe ?? 'SUMATIF' }} AKTIF
+              </span>
+              <span style="font-size:13.5px; font-weight:800; color:var(--text, #1e1b4b); letter-spacing:-0.2px;">
+                {{ $modeUjian->nama_ujian }}
+              </span>
             </div>
-            <div style="font-size:12px; color:#4b5563; margin-top:1px;">
-              Jam Pulang Gerbang Sumatif: <strong style="color:#4338ca;">{{ substr($modeUjian->jam_pulang_mulai, 0, 5) }} WIB</strong> • Berlangsung {{ \Carbon\Carbon::parse($modeUjian->tanggal_mulai)->locale('id')->isoFormat('D MMM') }} s.d. {{ \Carbon\Carbon::parse($modeUjian->tanggal_selesai)->locale('id')->isoFormat('D MMM Y') }}
+            <div style="font-size:11.5px; color:var(--text-3, #64748b); display:flex; align-items:center; gap:6px;">
+              <i class="bi bi-calendar-range"></i>
+              <span>{{ \Carbon\Carbon::parse($modeUjian->tanggal_mulai)->locale('id')->isoFormat('D MMM') }} – {{ \Carbon\Carbon::parse($modeUjian->tanggal_selesai)->locale('id')->isoFormat('D MMM Y') }}</span>
             </div>
           </div>
         </div>
-        <button type="button" class="btn btn-sm" onclick="openModal('modalKelolaModeUjian')" style="background:#4f46e5; color:#fff; border:none; padding:6px 12px; border-radius:6px; font-weight:700; font-size:11.5px; cursor:pointer; flex-shrink:0;">
-          <i class="bi bi-gear-fill"></i> Kelola
-        </button>
+
+        <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+          {{-- Highlight Jam Pulang Sumatif --}}
+          <div style="display:inline-flex; align-items:center; gap:9px; background:var(--bg-2, #ffffff); border:1px solid rgba(99, 102, 241, 0.25); padding:6px 14px; border-radius:10px; box-shadow:0 2px 6px rgba(0,0,0,0.03);">
+            <div style="width:26px; height:26px; border-radius:7px; background:rgba(79, 70, 229, 0.12); color:#4f46e5; display:flex; align-items:center; justify-content:center; font-size:13px;">
+              <i class="bi bi-clock-fill"></i>
+            </div>
+            <div>
+              <div style="font-size:9.5px; font-weight:800; text-transform:uppercase; color:var(--text-3, #64748b); letter-spacing:0.4px;">Jam Pulang Siswa</div>
+              <div style="font-size:13.5px; font-weight:900; color:#4338ca; font-family:var(--font-mono, monospace); line-height:1.1;">
+                {{ substr($modeUjian->jam_pulang_mulai, 0, 5) }} <span style="font-size:10px; font-weight:700;">WIB</span>
+              </div>
+            </div>
+          </div>
+
+          <button type="button" class="btn btn-sm btn-outline" onclick="openModal('modalKelolaModeUjian')" style="font-size:11.5px; font-weight:700; height:38px; display:inline-flex; align-items:center; gap:6px;">
+            <i class="bi bi-gear-fill"></i> Kelola
+          </button>
+        </div>
       </div>
     @endif
 
