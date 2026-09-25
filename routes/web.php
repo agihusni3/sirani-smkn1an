@@ -543,6 +543,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/pengumuman', [PengumumanController::class, 'index'])->name('pengumuman.index');
         Route::post('/pengumuman', [PengumumanController::class, 'store'])->name('pengumuman.store');
         Route::post('/pengumuman/{id}/toggle', [PengumumanController::class, 'toggleStatus'])->name('pengumuman.toggle');
+        Route::delete('/pengumuman/bulk-delete', [PengumumanController::class, 'bulkDestroy'])->name('pengumuman.bulk-destroy')->middleware('role:admin,waka_kesiswaan,waka_kurikulum,guru_piket');
         Route::delete('/pengumuman/{id}', [PengumumanController::class, 'destroy'])->name('pengumuman.destroy')->middleware('role:admin,waka_kesiswaan,waka_kurikulum,guru_piket');
     });
 

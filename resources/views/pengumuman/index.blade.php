@@ -104,18 +104,18 @@
 
     @if($canManagePengumuman)
     <!-- FORM BUAT PENGUMUMAN BARU (COLLAPSIBLE) -->
-    <div class="panel" id="panelPengumuman" style="{{ (isset($errors) && $errors->any()) ? 'display:block;' : 'display:none;' }} margin-bottom: 20px; border-color: var(--border); background: var(--bg-2);">
-      <div class="panel-title" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px; padding-bottom:12px; border-bottom:1px solid var(--border);">
-        <div style="display:flex; align-items:center; gap:8px;">
-          <div class="stat-icon" style="width:36px; height:36px; border-radius:8px; background:rgba(0,0,0,0.06); color:#000000; display:flex; align-items:center; justify-content:center; font-size:18px;">
-            <i class="bi bi-send-plus-fill"></i>
+    <div class="panel" id="panelPengumuman" style="{{ (isset($errors) && $errors->any()) ? 'display:block;' : 'display:none;' }} margin-bottom: 20px; border-color: var(--border); background: var(--bg-2); border-radius: 12px; box-shadow: var(--shadow-sm);">
+      <div class="panel-title" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; padding-bottom:12px; border-bottom:1px solid var(--border);">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <div style="width:36px; height:36px; border-radius:10px; background:linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); color:#ffffff; display:flex; align-items:center; justify-content:center; font-size:17px; box-shadow:0 3px 8px rgba(79,70,229,0.25);">
+            <i class="bi bi-megaphone-fill"></i>
           </div>
           <div>
-            <span style="font-weight:800; font-size:15px; color:var(--text);">Formulir Penerbitan Pengumuman &amp; Broadcast</span>
-            <div style="font-size:12px; color:var(--text-3);">Kirim pesan resmi instan atau tayangkan banner pengumuman di portal dan gerbang.</div>
+            <span style="font-weight:900; font-size:15px; color:var(--text); letter-spacing:-0.2px;">Formulir Pengumuman Baru</span>
+            <div style="font-size:11.5px; color:var(--text-3);">Buat pengumuman untuk siswa, wali murid, atau seluruh warga sekolah.</div>
           </div>
         </div>
-        <button type="button" onclick="toggleFormPengumuman(false)" class="btn btn-outline" style="height:32px; width:32px; padding:0; display:inline-flex; align-items:center; justify-content:center; border-radius:6px; color:var(--text-3);" title="Tutup Form">
+        <button type="button" onclick="toggleFormPengumuman(false)" class="btn btn-outline" style="height:32px; width:32px; padding:0; display:inline-flex; align-items:center; justify-content:center; border-radius:8px; color:var(--text-3);" title="Tutup Form">
           <i class="bi bi-x-lg"></i>
         </button>
       </div>
@@ -123,50 +123,37 @@
       <form action="{{ route('pengumuman.store') }}" method="POST" enctype="multipart/form-data">
         @csrf
         
-        {{-- Template Pesan Siap Pakai --}}
-        <div style="background: var(--bg-2); border: 1px solid var(--border); border-radius: 8px; padding: 12px 16px; margin-bottom: 16px;">
-          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
-            <div>
-              <strong style="font-size:12.5px; color:var(--text);">Template Pesan Siap Pakai:</strong>
-              <div style="font-size:11px; color:var(--text-3);">Pilih template resmi di bawah untuk mengisi formulir secara otomatis.</div>
-            </div>
-            <select id="selectTemplatePesan" onchange="applyTemplate(this.value)" class="input-field" style="max-width:320px; font-weight:700; height:34px; font-size:12px;">
-              <option value="">-- Pilih Template Pesan Resmi --</option>
-              <option value="upacara">Upacara Bendera &amp; Seragam Sekolah</option>
-              <option value="ujian">Asesmen / Ujian Semester (KBM)</option>
-              <option value="libur_rapat">Belajar Mandiri di Rumah (Rapat Guru)</option>
-              <option value="disiplin">Himbauan Kedisiplinan &amp; Tata Tertib</option>
-              <option value="rapor">Undangan Pertemuan Wali Murid &amp; Rapor</option>
-              <option value="pkl">Pembekalan &amp; Persiapan PKL Industri</option>
-              <option value="praktik_bengkel">Perlengkapan Praktik Bengkel (Khusus Siswa)</option>
-              <option value="alumni">Pengambilan Ijazah &amp; Cap 3 Jari (Alumni)</option>
-            </select>
+        {{-- Template Pesan Cepat (Ringkas, tanpa dobel tombol) --}}
+        <div style="background:var(--bg-3); border:1px solid var(--border); border-radius:8px; padding:10px 14px; margin-bottom:14px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <i class="bi bi-lightning-charge-fill" style="color:#f59e0b; font-size:16px;"></i>
+            <span style="font-size:12.5px; font-weight:800; color:var(--text);">Template Pesan Cepat:</span>
+            <span style="font-size:11px; color:var(--text-3);">(Pilihan otomatis untuk mengisi formulir)</span>
           </div>
-          
-          {{-- Tombol Pill Template --}}
-          <div style="display:flex; flex-wrap:wrap; gap:6px; margin-top:10px;">
-            <button type="button" onclick="applyTemplate('upacara')" class="btn btn-sm btn-outline" style="font-size:11px; padding:4px 10px; border-radius:14px; background:var(--bg-card);">Upacara &amp; Seragam</button>
-            <button type="button" onclick="applyTemplate('ujian')" class="btn btn-sm btn-outline" style="font-size:11px; padding:4px 10px; border-radius:14px; background:var(--bg-card);">Ujian Semester</button>
-            <button type="button" onclick="applyTemplate('libur_rapat')" class="btn btn-sm btn-outline" style="font-size:11px; padding:4px 10px; border-radius:14px; background:var(--bg-card);">Belajar Mandiri</button>
-            <button type="button" onclick="applyTemplate('disiplin')" class="btn btn-sm btn-outline" style="font-size:11px; padding:4px 10px; border-radius:14px; background:var(--bg-card);">Kedisiplinan</button>
-            <button type="button" onclick="applyTemplate('rapor')" class="btn btn-sm btn-outline" style="font-size:11px; padding:4px 10px; border-radius:14px; background:var(--bg-card);">Ambil Rapor</button>
-            <button type="button" onclick="applyTemplate('pkl')" class="btn btn-sm btn-outline" style="font-size:11px; padding:4px 10px; border-radius:14px; background:var(--bg-card);">PKL Industri</button>
-            <button type="button" onclick="applyTemplate('praktik_bengkel')" class="btn btn-sm btn-outline" style="font-size:11px; padding:4px 10px; border-radius:14px; background:var(--bg-card);">Praktik Bengkel</button>
-            <button type="button" onclick="applyTemplate('alumni')" class="btn btn-sm btn-outline" style="font-size:11px; padding:4px 10px; border-radius:14px; background:var(--bg-card);">Alumni Ijazah</button>
-          </div>
+          <select id="selectTemplatePesan" onchange="applyTemplate(this.value)" class="input-field" style="max-width:320px; font-weight:600; height:32px; font-size:11.5px;">
+            <option value="">-- Pilih Template (Opsional) --</option>
+            <option value="upacara">Upacara Bendera &amp; Seragam</option>
+            <option value="ujian">Asesmen / Ujian Semester</option>
+            <option value="libur_rapat">Belajar Mandiri di Rumah</option>
+            <option value="disiplin">Himbauan Kedisiplinan &amp; Tata Tertib</option>
+            <option value="rapor">Undangan Pertemuan Wali Murid</option>
+            <option value="pkl">Pembekalan PKL Industri</option>
+            <option value="praktik_bengkel">Perlengkapan Praktik Bengkel</option>
+            <option value="alumni">Pengambilan Ijazah (Alumni)</option>
+          </select>
         </div>
         
         <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap:14px; margin-bottom:14px;">
           
           {{-- Judul Pengumuman --}}
           <div style="grid-column: 1 / -1;">
-            <label class="form-label" style="font-weight:700; font-size:12px; display:block; margin-bottom:4px;">Judul / Topik Pengumuman <span style="color:var(--red);">*</span></label>
-            <input type="text" name="judul" id="inputJudulPengumuman" required placeholder="Contoh: Pemberitahuan Kegiatan Upacara Hari Pahlawan & Jadwal KBM" class="input-field" style="width:100%; font-weight:700;" value="{{ old('judul') }}" />
+            <label class="form-label" style="font-weight:800; font-size:12px; display:block; margin-bottom:4px; color:var(--text);">Judul / Topik Pengumuman <span style="color:var(--red);">*</span></label>
+            <input type="text" name="judul" id="inputJudulPengumuman" required placeholder="Contoh: Pemberitahuan Kegiatan Upacara Hari Pahlawan" class="input-field" style="width:100%; font-weight:700;" value="{{ old('judul') }}" />
           </div>
 
           {{-- Kategori --}}
           <div>
-            <label class="form-label" style="font-weight:700; font-size:12px; display:block; margin-bottom:4px;">Kategori Pengumuman <span style="color:var(--red);">*</span></label>
+            <label class="form-label" style="font-weight:800; font-size:12px; display:block; margin-bottom:4px; color:var(--text);">Kategori <span style="color:var(--red);">*</span></label>
             <select name="kategori" id="selectKategoriPengumuman" class="input-field" style="width:100%; font-weight:600;" required>
               <option value="umum" {{ old('kategori') === 'umum' ? 'selected' : '' }}>Pengumuman Umum</option>
               <option value="kedisiplinan" {{ old('kategori') === 'kedisiplinan' ? 'selected' : '' }}>Kedisiplinan &amp; Tata Tertib</option>
@@ -178,7 +165,7 @@
 
           {{-- Target Penerima --}}
           <div>
-            <label class="form-label" style="font-weight:700; font-size:12px; display:block; margin-bottom:4px;">Target Penerima Pesan <span style="color:var(--red);">*</span></label>
+            <label class="form-label" style="font-weight:800; font-size:12px; display:block; margin-bottom:4px; color:var(--text);">Target Penerima <span style="color:var(--red);">*</span></label>
             <select name="target_tipe" id="targetTipeSelect" class="input-field" style="width:100%; font-weight:700;" onchange="handleTargetChange(this.value)" required>
               <option value="semua">Seluruh Siswa &amp; Orang Tua</option>
               <option value="tingkat">Berdasarkan Tingkat Kelas (X / XI / XII)</option>
@@ -192,8 +179,7 @@
 
           {{-- Dynamic Target ID --}}
           <div id="targetDetailBox" style="display:none;">
-            <label class="form-label" id="targetDetailLabel" style="font-weight:700; font-size:12px; display:block; margin-bottom:4px;">Pilih Detail Target</label>
-            
+            <label class="form-label" id="targetDetailLabel" style="font-weight:800; font-size:12px; display:block; margin-bottom:4px; color:var(--text);">Pilih Detail Target</label>
             <select name="target_id" id="targetIdSelect" class="input-field" style="width:100%;">
               {{-- Options injected by JavaScript --}}
             </select>
@@ -201,96 +187,94 @@
 
           {{-- Tanggal Mulai --}}
           <div>
-            <label class="form-label" style="font-weight:700; font-size:12px; display:block; margin-bottom:4px;">Tanggal Mulai Tayang</label>
+            <label class="form-label" style="font-weight:800; font-size:12px; display:block; margin-bottom:4px; color:var(--text);">Tanggal Mulai Tayang</label>
             <input type="date" name="tanggal_mulai" class="input-field" style="width:100%;" value="{{ date('Y-m-d') }}" />
           </div>
 
           {{-- Tanggal Selesai (Opsional) --}}
           <div>
-            <label class="form-label" style="font-weight:700; font-size:12px; display:block; margin-bottom:4px;">Tanggal Berakhir (Opsional)</label>
+            <label class="form-label" style="font-weight:800; font-size:12px; display:block; margin-bottom:4px; color:var(--text);">Tanggal Berakhir (Opsional)</label>
             <input type="date" name="tanggal_selesai" class="input-field" style="width:100%;" placeholder="Kosongkan jika berlaku terus" />
           </div>
         </div>
 
         {{-- Isi Pesan --}}
         <div style="margin-bottom:14px;">
-          <label class="form-label" style="font-weight:700; font-size:12px; display:flex; justify-content:space-between; margin-bottom:4px;">
+          <label class="form-label" style="font-weight:800; font-size:12px; display:flex; justify-content:space-between; margin-bottom:4px; color:var(--text);">
             <span>Isi Pesan Pengumuman <span style="color:var(--red);">*</span></span>
-            <span style="color:var(--text-3); font-size:11px; font-weight:400;">Gunakan *teks tebal* untuk penekanan di WhatsApp</span>
+            <span style="color:var(--text-3); font-size:11px; font-weight:400;">Gunakan *teks tebal* untuk penekanan</span>
           </label>
-          <textarea name="isi_pesan" id="textareaIsiPesan" rows="6" required class="input-field" style="width:100%; font-family:var(--font); line-height:1.4;" placeholder="Tuliskan isi pengumuman secara rinci dan jelas... Contoh: Diberitahukan kepada seluruh siswa bahwa pada hari Senin tanggal 28 Agustus 2026 wajib mengenakan pakaian seragam Pramuka lengkap beserta atribut topi dan dasi...">{{ old('isi_pesan') }}</textarea>
+          <textarea name="isi_pesan" id="textareaIsiPesan" rows="5" required class="input-field" style="width:100%; font-family:var(--font); line-height:1.45;" placeholder="Tuliskan isi pengumuman secara rinci dan jelas...">{{ old('isi_pesan') }}</textarea>
         </div>
 
-        {{-- Upload Poster / Banner Gambar (Opsional) --}}
-        <div style="margin-bottom:14px; background:var(--bg-3); border:1px dashed var(--border-2); border-radius:8px; padding:12px 16px;">
-          <label class="form-label" style="font-weight:700; font-size:12px; display:flex; justify-content:space-between; margin-bottom:6px;">
-            <span>Upload Poster / Banner Gambar (Opsional)</span>
+        {{-- Upload Poster / Banner Gambar (Opsional) - Desain Ringkas --}}
+        <div style="margin-bottom:14px; background:var(--bg-3); border:1px dashed var(--border-2); border-radius:8px; padding:10px 14px;">
+          <label class="form-label" style="font-weight:800; font-size:12px; display:flex; justify-content:space-between; margin-bottom:6px; color:var(--text);">
+            <span>Lampirkan Poster / Banner (Opsional)</span>
             <span style="color:var(--text-3); font-size:11px; font-weight:400;">Maks. 3 MB (JPG, PNG, WEBP)</span>
           </label>
-          <div style="display:flex; align-items:center; gap:14px; flex-wrap:wrap;">
-            <div id="banner_preview_box" style="width:120px; height:68px; border-radius:6px; border:1px solid var(--border); background:var(--bg-2); display:flex; align-items:center; justify-content:center; overflow:hidden; flex-shrink:0;">
-              <span style="font-size:10.5px; color:var(--text-3); text-align:center;">Pratinjau Banner</span>
+          <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+            <div id="banner_preview_box" style="width:70px; height:45px; border-radius:6px; border:1px solid var(--border); background:var(--bg-2); display:flex; align-items:center; justify-content:center; overflow:hidden; flex-shrink:0;">
+              <span style="font-size:10px; color:var(--text-3); text-align:center;">Pratinjau</span>
             </div>
-            <div style="flex:1; min-width:220px;">
-              <input type="file" name="banner_gambar" id="inputBannerGambar" accept="image/*" class="input-field" style="width:100%; height:38px; padding:4px 8px; font-size:12px;" onchange="previewBannerImage(this)" />
-              <div style="font-size:11px; color:var(--text-3); margin-top:4px;">
-                Gambar ini akan ditampilkan sebagai poster visual di <strong>Portal Siswa &amp; Wali Murid</strong>.
-              </div>
+            <div style="flex:1; min-width:200px;">
+              <input type="file" name="banner_gambar" id="inputBannerGambar" accept="image/*" class="input-field" style="width:100%; height:34px; padding:4px 8px; font-size:11.5px;" onchange="previewBannerImage(this)" />
             </div>
           </div>
         </div>
 
-        {{-- Pilihan Saluran Publikasi --}}
-        <div style="background:var(--bg-2); border:1px solid var(--border); border-radius:8px; padding:14px 16px; margin-bottom:16px;">
-          <div style="font-size:12px; font-weight:800; text-transform:uppercase; color:var(--text-2); margin-bottom:10px;">
-            Saluran Pengiriman &amp; Publikasi
+        {{-- Pilihan Saluran Publikasi (Default: Hanya Portal yang dicentang!) --}}
+        <div style="background:var(--bg-2); border:1px solid var(--border); border-radius:8px; padding:12px 16px; margin-bottom:16px;">
+          <div style="font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:0.5px; color:var(--text-2); margin-bottom:10px;">
+            Saluran Pengiriman &amp; Publikasi:
           </div>
           
-          <div style="display:flex; flex-direction:column; gap:12px;">
-            {{-- Checkbox WA & Opsi Penerima --}}
-            <div style="border-bottom:1px solid var(--border); padding-bottom:10px;">
-              <label style="display:inline-flex; align-items:center; gap:8px; font-size:13px; font-weight:800; cursor:pointer; color:var(--text);">
-                <input type="checkbox" name="kirim_wa" id="checkboxKirimWa" value="1" checked onchange="document.getElementById('waTargetOptions').style.display = this.checked ? 'block' : 'none';" style="width:16px; height:16px; accent-color:var(--text);" />
-                <span>Kirim Broadcast WhatsApp Massal</span>
+          <div style="display:flex; flex-direction:column; gap:10px;">
+            {{-- 1. Portal Siswa & Wali Murid (DEFAULT TERCENTANG) --}}
+            <label style="display:inline-flex; align-items:center; gap:8px; font-size:12.5px; font-weight:800; cursor:pointer; color:var(--text);">
+              <input type="checkbox" name="tampil_portal" value="1" checked style="width:16px; height:16px; accent-color:var(--primary, #4f46e5);" />
+              <span>Tampilkan di Portal Siswa &amp; Wali Murid <span style="font-size:10.5px; font-weight:700; color:#16a34a; background:rgba(34,197,94,0.12); padding:1px 6px; border-radius:4px; margin-left:4px;">(Default Utama)</span></span>
+            </label>
+
+            {{-- 2. Running Text Kios (Default TIDAK dicentang) --}}
+            <label style="display:inline-flex; align-items:center; gap:8px; font-size:12.5px; font-weight:600; cursor:pointer; color:var(--text-2);">
+              <input type="checkbox" name="tampil_kios" value="1" style="width:16px; height:16px; accent-color:var(--primary, #4f46e5);" />
+              <span>Tampilkan Running Text di Layar Kios Gerbang</span>
+            </label>
+
+            {{-- 3. Broadcast WhatsApp (Default TIDAK dicentang) --}}
+            <div style="border-top:1px dashed var(--border); padding-top:8px;">
+              <label style="display:inline-flex; align-items:center; gap:8px; font-size:12.5px; font-weight:600; cursor:pointer; color:var(--text-2);">
+                <input type="checkbox" name="kirim_wa" id="checkboxKirimWa" value="1" onchange="document.getElementById('waTargetOptions').style.display = this.checked ? 'block' : 'none';" style="width:16px; height:16px; accent-color:var(--primary, #4f46e5);" />
+                <span>Kirim juga Broadcast WhatsApp Massal (Opsional)</span>
               </label>
 
-              {{-- Pilihan Penerima WA --}}
-              <div id="waTargetOptions" style="margin-left:24px; margin-top:8px; background:var(--bg-3); padding:10px 14px; border-radius:6px; border:1px solid var(--border);">
-                <div style="font-size:11px; font-weight:700; color:var(--text-3); margin-bottom:6px;">PILIH TUJUAN NOMOR WHATSAPP:</div>
-                <div style="display:flex; flex-wrap:wrap; gap:16px;">
-                  <label style="display:inline-flex; align-items:center; gap:6px; font-size:12px; font-weight:700; cursor:pointer; color:var(--text);">
-                    <input type="radio" name="target_penerima_wa" value="ortu" checked style="accent-color:var(--text);" />
+              {{-- Pilihan Penerima WA (Hanya tampil jika dicentang) --}}
+              <div id="waTargetOptions" style="display:none; margin-left:24px; margin-top:8px; background:var(--bg-3); padding:10px 14px; border-radius:6px; border:1px solid var(--border);">
+                <div style="font-size:10.5px; font-weight:800; color:var(--text-3); margin-bottom:6px;">TUJUAN NOMOR WHATSAPP:</div>
+                <div style="display:flex; flex-wrap:wrap; gap:14px;">
+                  <label style="display:inline-flex; align-items:center; gap:5px; font-size:11.5px; font-weight:700; cursor:pointer; color:var(--text);">
+                    <input type="radio" name="target_penerima_wa" value="ortu" checked style="accent-color:var(--primary, #4f46e5);" />
                     <span>Orang Tua / Wali Saja</span>
                   </label>
-                  <label style="display:inline-flex; align-items:center; gap:6px; font-size:12px; font-weight:700; cursor:pointer; color:var(--text);">
-                    <input type="radio" name="target_penerima_wa" value="siswa" style="accent-color:var(--text);" />
-                    <span>Siswa Pribadi Saja (Tanpa melibatkan Ortu)</span>
+                  <label style="display:inline-flex; align-items:center; gap:5px; font-size:11.5px; font-weight:700; cursor:pointer; color:var(--text);">
+                    <input type="radio" name="target_penerima_wa" value="siswa" style="accent-color:var(--primary, #4f46e5);" />
+                    <span>Siswa Pribadi Saja</span>
                   </label>
-                  <label style="display:inline-flex; align-items:center; gap:6px; font-size:12px; font-weight:700; cursor:pointer; color:var(--text);">
-                    <input type="radio" name="target_penerima_wa" value="keduanya" style="accent-color:var(--text);" />
-                    <span>Kirim ke Keduanya (Ortu &amp; Siswa)</span>
+                  <label style="display:inline-flex; align-items:center; gap:5px; font-size:11.5px; font-weight:700; cursor:pointer; color:var(--text);">
+                    <input type="radio" name="target_penerima_wa" value="keduanya" style="accent-color:var(--primary, #4f46e5);" />
+                    <span>Kirim ke Keduanya</span>
                   </label>
                 </div>
               </div>
             </div>
-
-            <div style="display:flex; flex-wrap:wrap; gap:16px;">
-              <label style="display:inline-flex; align-items:center; gap:8px; font-size:12.5px; font-weight:700; cursor:pointer; color:var(--text);">
-                <input type="checkbox" name="tampil_portal" value="1" checked style="width:16px; height:16px; accent-color:#000000;" />
-                <span>Tampilkan Banner di Portal Siswa &amp; Wali Murid</span>
-              </label>
-              <label style="display:inline-flex; align-items:center; gap:8px; font-size:12.5px; font-weight:700; cursor:pointer; color:var(--text);">
-                <input type="checkbox" name="tampil_kios" value="1" checked style="width:16px; height:16px; accent-color:#000000;" />
-                <span>Tampilkan Running Text di Layar Kios Gerbang</span>
-              </label>
-            </div>
           </div>
         </div>
 
-        <div style="display:flex; justify-content:flex-end; gap:8px; border-top:1px solid var(--border); padding-top:14px;">
-          <button type="button" onclick="toggleFormPengumuman(false)" class="btn btn-outline">Batal</button>
-          <button type="submit" class="btn btn-gold" style="font-weight:800; padding:0 20px;">
-            Terbitkan &amp; Kirim Pengumuman
+        <div style="display:flex; justify-content:flex-end; gap:8px; border-top:1px solid var(--border); padding-top:12px;">
+          <button type="button" onclick="toggleFormPengumuman(false)" class="btn btn-outline" style="font-size:12px;">Batal</button>
+          <button type="submit" class="btn btn-gold" style="font-weight:800; font-size:12px; padding:0 18px;">
+            <i class="bi bi-send-fill" style="margin-right:4px;"></i> Terbitkan Pengumuman
           </button>
         </div>
       </form>
@@ -301,12 +285,24 @@
     <div class="panel" style="padding:0; overflow:hidden; border:1px solid var(--border); border-radius:var(--r-md); box-shadow:var(--shadow-sm); background:var(--bg-2); margin-bottom:24px;">
       {{-- Header & Toolbar Terpadu --}}
       <div style="padding:8px 12px; border-bottom:1px solid var(--border); background:var(--surface); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
-        <div style="font-weight:800; font-size:13.5px; color:var(--text); display:flex; align-items:center; gap:6px;">
-          <i class="bi bi-collection-fill" style="color:#000000;"></i>
-          <span>Daftar Pengumuman Terbit</span>
-          <span style="background:var(--bg-3); border:1px solid var(--border-2); color:var(--text-2); font-size:10.5px; font-weight:700; padding:1px 6px; border-radius:4px;" class="font-mono">
-            {{ $pengumumans->total() }}
-          </span>
+        <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+          <div style="font-weight:800; font-size:13.5px; color:var(--text); display:flex; align-items:center; gap:6px;">
+            <i class="bi bi-collection-fill" style="color:var(--text);"></i>
+            <span>Daftar Pengumuman Terbit</span>
+            <span style="background:var(--bg-3); border:1px solid var(--border-2); color:var(--text-2); font-size:10.5px; font-weight:700; padding:1px 6px; border-radius:4px;" class="font-mono">
+              {{ $pengumumans->total() }}
+            </span>
+          </div>
+
+          {{-- Bulk Action Bar (Muncul jika ada pengumuman yang dipilih) --}}
+          @if($canManagePengumuman)
+            <div id="bulkActionWrap" style="display:none; align-items:center; gap:8px; background:rgba(239, 68, 68, 0.08); border:1px solid rgba(239, 68, 68, 0.28); padding:3px 10px; border-radius:6px;">
+              <span style="font-size:11.5px; font-weight:700; color:#dc2626;"><span id="selectedCountText">0</span> dipilih</span>
+              <button type="button" onclick="submitBulkDelete()" class="btn btn-sm btn-danger" style="background:#dc2626; color:#ffffff; border:none; padding:3px 8px; border-radius:5px; font-weight:800; font-size:11px; cursor:pointer; display:inline-flex; align-items:center; gap:4px;" title="Hapus seluruh pengumuman yang dicentang">
+                <i class="bi bi-trash3-fill"></i> Hapus Terpilih
+              </button>
+            </div>
+          @endif
         </div>
 
         {{-- Filter Kategori --}}
@@ -342,6 +338,11 @@
         <table class="data-table" style="margin:0;">
           <thead>
             <tr>
+              @if($canManagePengumuman)
+                <th style="width:36px; text-align:center;">
+                  <input type="checkbox" id="checkAllPengumuman" onchange="toggleCheckAllPengumuman(this)" style="cursor:pointer; width:15px; height:15px; accent-color:var(--primary, #4f46e5);" title="Pilih Semua">
+                </th>
+              @endif
               <th style="width:40px; text-align:center;">#</th>
               <th>Topik &amp; Isi Pengumuman</th>
               <th>Kategori</th>
@@ -361,6 +362,11 @@
                 $badge = $p->kategori_badge;
               @endphp
               <tr>
+                @if($canManagePengumuman)
+                  <td style="text-align:center;">
+                    <input type="checkbox" class="pengumuman-select-item" value="{{ $p->id }}" onchange="onPengumumanSelectChange()" style="cursor:pointer; width:15px; height:15px; accent-color:var(--primary, #4f46e5);">
+                  </td>
+                @endif
                 <td style="text-align:center; font-weight:700; color:var(--text-3); font-size:12px;">
                   {{ $pengumumans->firstItem() + $idx }}
                 </td>
@@ -394,19 +400,19 @@
                 </td>
                 <td>
                   <div style="display:flex; gap:4px; flex-wrap:wrap;">
-                    @if($p->kirim_wa)
-                      <span style="color:var(--text); font-size:11px; font-weight:800;">
-                        WA
-                      </span>
-                    @endif
                     @if($p->tampil_portal)
-                      <span style="color:var(--text); font-size:11px; font-weight:800;">
+                      <span style="color:var(--text); font-size:11px; font-weight:800; background:rgba(34,197,94,0.12); color:#15803d; padding:1px 6px; border-radius:4px;">
                         Portal
                       </span>
                     @endif
                     @if($p->tampil_kios)
-                      <span style="color:var(--text); font-size:11px; font-weight:800;">
+                      <span style="color:var(--text); font-size:11px; font-weight:800; background:rgba(79,70,229,0.12); color:#4338ca; padding:1px 6px; border-radius:4px;">
                         Kios
+                      </span>
+                    @endif
+                    @if($p->kirim_wa)
+                      <span style="color:var(--text); font-size:11px; font-weight:800; background:rgba(16,185,129,0.12); color:#047857; padding:1px 6px; border-radius:4px;">
+                        WA
                       </span>
                     @endif
                   </div>
@@ -457,7 +463,7 @@
               </tr>
             @empty
               <tr>
-                <td colspan="9" style="text-align:center; padding:36px; color:var(--text-3);">
+                <td colspan="{{ $canManagePengumuman ? 10 : 9 }}" style="text-align:center; padding:36px; color:var(--text-3);">
                   <i class="bi bi-megaphone" style="font-size:32px; opacity:0.4;"></i>
                   <div style="font-weight:700; margin-top:8px; font-size:14px; color:var(--text);">Belum ada pengumuman yang diterbitkan</div>
                   <p style="font-size:12px; margin-top:4px;">Klik tombol "+ Buat Pengumuman Baru" di atas untuk mengirim broadcast.</p>
@@ -467,6 +473,15 @@
           </tbody>
         </table>
       </div>
+
+      {{-- Hidden Bulk Delete Form --}}
+      @if($canManagePengumuman)
+        <form id="formBulkDeletePengumuman" action="{{ route('pengumuman.bulk-destroy') }}" method="POST" style="display:none;">
+          @csrf
+          @method('DELETE')
+          <div id="bulkDeleteContainer"></div>
+        </form>
+      @endif
 
       @if($pengumumans->hasPages())
         <div style="padding:14px 18px; border-top:1px solid var(--border); display:flex; justify-content:center;">
@@ -478,6 +493,51 @@
 </div>
 
 <script>
+  // Bulk selection handler
+  function toggleCheckAllPengumuman(master) {
+    const items = document.querySelectorAll('.pengumuman-select-item');
+    items.forEach(cb => cb.checked = master.checked);
+    onPengumumanSelectChange();
+  }
+
+  function onPengumumanSelectChange() {
+    const checkedItems = document.querySelectorAll('.pengumuman-select-item:checked');
+    const count = checkedItems.length;
+    const wrap = document.getElementById('bulkActionWrap');
+    const countText = document.getElementById('selectedCountText');
+    const master = document.getElementById('checkAllPengumuman');
+
+    if (countText) countText.textContent = count;
+    if (wrap) wrap.style.display = count > 0 ? 'inline-flex' : 'none';
+
+    const allItems = document.querySelectorAll('.pengumuman-select-item');
+    if (master && allItems.length > 0) {
+      master.checked = (count === allItems.length);
+      master.indeterminate = (count > 0 && count < allItems.length);
+    }
+  }
+
+  function submitBulkDelete() {
+    const selected = Array.from(document.querySelectorAll('.pengumuman-select-item:checked')).map(cb => cb.value);
+    if (selected.length === 0) {
+      alert('Pilih minimal satu pengumuman untuk dihapus.');
+      return;
+    }
+    if (!confirm('Apakah Anda yakin ingin menghapus ' + selected.length + ' pengumuman yang dipilih? Tindakan ini tidak dapat dibatalkan.')) {
+      return;
+    }
+    const form = document.getElementById('formBulkDeletePengumuman');
+    const container = document.getElementById('bulkDeleteContainer');
+    container.innerHTML = '';
+    selected.forEach(id => {
+      const input = document.createElement('input');
+      input.type = 'hidden';
+      input.name = 'ids[]';
+      input.value = id;
+      container.appendChild(input);
+    });
+    form.submit();
+  }
   const rombelsData = @json($rombels);
   const jurusansData = @json($jurusans);
 

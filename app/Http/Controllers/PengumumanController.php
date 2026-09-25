@@ -290,6 +290,29 @@ class PengumumanController extends Controller
     }
 
     /**
+     * Hapus Pengumuman Terpilih (Bulk Delete)
+     */
+    public function bulkDestroy(Request $request)
+    {
+        $ids = $request->input('ids', []);
+        if (empty($ids) || !is_array($ids)) {
+            return redirect()->back()->with('error', 'Tidak ada pengumuman yang dipilih untuk dihapus.');
+        }
+
+        $items = Pengumuman::whereIn('id', $ids)->get();
+        $count = 0;
+        foreach ($items as $item) {
+            if ($item->banner_gambar && \Illuminate\Support\Facades\Storage::disk('public')->exists($item->banner_gambar)) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($item->banner_gambar);
+            }
+            $item->delete();
+            $count++;
+        }
+
+        return redirect()->route('pengumuman.index')->with('success', "{$count} pengumuman terpilih berhasil dihapus.");
+    }
+
+    /**
      * Hapus Pengumuman
      */
     public function destroy($id)
