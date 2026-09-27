@@ -150,8 +150,7 @@ Route::get('/qr/{type}/{id}', [\App\Http\Controllers\Sirani\RfidController::clas
 // Autentikasi (Login & Logout - Proteksi Anti Brute Force)
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:60,1');
-
-Route::match(['get', 'post'], '/logout', [AuthController::class, 'logout'])->name('logout');
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 use App\Http\Controllers\Core\AdminPortalController;
 
@@ -183,6 +182,7 @@ Route::middleware('auth')->group(function () {
     Route::middleware('role:admin,staf_tu')->group(function () {
         Route::post('/api/v1/rfid-pair', [\App\Http\Controllers\Sirani\RfidController::class, 'pair'])->middleware('throttle:60,1')->name('api.rfid.pair');
         Route::post('/api/v1/rfid-unpair', [\App\Http\Controllers\Sirani\RfidController::class, 'unpair'])->middleware('throttle:60,1')->name('api.rfid.unpair');
+        Route::post('/api/push-broadcast-demo', [\App\Http\Controllers\Api\PushSubscriptionController::class, 'broadcastDemo'])->name('api.push.broadcast.demo');
     });
 
     // 0c. Pengaturan Profil & Ganti Password Mandiri (Semua Pengguna Terautentikasi)

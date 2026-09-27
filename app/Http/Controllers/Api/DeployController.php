@@ -93,7 +93,7 @@ class DeployController extends Controller
 
         // 4. Jalankan Seeder jika diminta
         if ($request->has('run_seed') || $request->has('seed')) {
-            $seedClass = $request->input('seed') ?: $request->query('seed') ?: 'AbsensiEnamBulanSeeder';
+            $seedClass = $request->input('seed') ?: $request->query('seed') ?: 'DatabaseSeeder';
             try {
                 Artisan::call('db:seed', ['--class' => $seedClass, '--force' => true]);
                 $logs['seed'] = trim(Artisan::output());

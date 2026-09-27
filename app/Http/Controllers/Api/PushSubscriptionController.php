@@ -142,6 +142,14 @@ class PushSubscriptionController extends Controller
      */
     public function broadcastDemo(Request $request)
     {
+        $user = auth()->user();
+        if (!$user || (!$user->isAdmin() && !$user->isStafTu() && !$user->isGuru())) {
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'Unauthorized: Hanya administrator atau staf sekolah yang berhak mengirim notifikasi broadcast.'
+            ], 403);
+        }
+
         $title = trim($request->input('title') ?: '🔔 [DEMO SIRANI] Uji Coba Notifikasi Wali Murid');
         $body  = trim($request->input('body') ?: 'Halo Bapak/Ibu Wali Murid! Notifikasi kehadiran & kedisiplinan siswa SMKN 1 Air Naningan berhasil aktif di HP Anda. Terima kasih.');
         $url   = trim($request->input('url') ?: '/cek-presensi');

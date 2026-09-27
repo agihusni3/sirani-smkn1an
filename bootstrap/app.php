@@ -18,20 +18,10 @@ return Application::configure(basePath: dirname(__DIR__))
             'role.admin'    => \App\Http\Middleware\RoleAdminMiddleware::class,
             'track.visitor' => \App\Http\Middleware\TrackWebsiteVisitor::class,
         ]);
-        // Kecualikan CSRF untuk endpoint login, face login, dan logout (mencegah error 419 jika tab terbuka lama / sesi expired)
+        // Toleransi CSRF khusus endpoint login publik (mencegah error 419 jika tab terbuka lama) & rute API stateless
         $middleware->validateCsrfTokens(except: [
             '/login',
             'login',
-            '/login/face',
-            'login/face',
-            '/login/rfid',
-            'login/rfid',
-            '/login/*',
-            'login/*',
-            '/logout',
-            'logout',
-            '/notifikasi/demo-push-walimurid',
-            'notifikasi/demo-push-walimurid',
             '/api/*',
             'api/*',
         ]);
