@@ -102,6 +102,19 @@ class DeployController extends Controller
             }
         }
 
+        // 4b. Bersihkan rekaman absensi & buku kasus jika diminta secara eksplisit
+        if ($request->has('clear_absensi') || $request->has('clear_data')) {
+            try {
+                Artisan::call('sirani:clear-absensi', [
+                    '--force'      => true,
+                    '--with-kasus' => true,
+                ]);
+                $logs['clear_absensi'] = trim(Artisan::output());
+            } catch (\Throwable $e) {
+                $logs['clear_absensi_error'] = $e->getMessage();
+            }
+        }
+
         // Pastikan symlink storage terhubung untuk aset foto
         try {
             Artisan::call('storage:link');
