@@ -442,29 +442,56 @@ class AkademikPerangkatController extends Controller
     public function storeKktp(Request $request, $id)
     {
         $perangkat = AkademikPerangkatAjar::findOrFail($id);
+        $user = auth()->user();
+
+        // Validasi hak akses
+        if ($user->isGuru() && !$user->isAdmin() && !$user->isWakaKurikulum() && $user->guru_id != $perangkat->guru_id) {
+            return back()->with('error', 'Anda tidak memiliki hak akses untuk mengubah kriteria KKTP ini.');
+        }
 
         $validated = $request->validate([
-            'atp_item_id' => 'required|exists:akademik_atp_items,id',
+            'atp_item_id' => 'nullable|exists:akademik_atp_items,id',
             'pendekatan' => 'required|in:interval_nilai,rubrik,deskripsi',
             'keterangan_tuntas' => 'nullable|string',
             'keterangan_remedial' => 'nullable|string',
-            'skala_kriteria' => 'nullable|string', // JSON atau text deskripsi
+            'skala_kriteria' => 'nullable|string',
         ]);
+
+        $atpItemId = !empty($validated['atp_item_id']) ? $validated['atp_item_id'] : null;
 
         $kktp = AkademikKktpItem::updateOrCreate(
             [
                 'perangkat_id' => $perangkat->id,
-                'atp_item_id' => $validated['atp_item_id'],
+                'atp_item_id' => $atpItemId,
             ],
             [
                 'pendekatan' => $validated['pendekatan'],
-                'keterangan_tuntas' => $validated['keterangan_tuntas'],
-                'keterangan_remedial' => $validated['keterangan_remedial'],
-                'skala_kriteria' => !empty($validated['skala_kriteria']) ? json_decode($validated['skala_kriteria'], true) : null,
+                'keterangan_tuntas' => $validated['keterangan_tuntas'] ?? null,
+                'keterangan_remedial' => $validated['keterangan_remedial'] ?? null,
+                'skala_kriteria' => !empty($validated['skala_kriteria']) ? (is_array($validated['skala_kriteria']) ? $validated['skala_kriteria'] : json_decode($validated['skala_kriteria'], true)) : null,
             ]
         );
 
         return back()->with('success', 'Kriteria Ketercapaian Tujuan Pembelajaran (KKTP) berhasil disimpan.');
+    }
+
+    /**
+     * Hapus Kriteria Ketercapaian Tujuan Pembelajaran (KKTP)
+     */
+    public function destroyKktp($id, $kktpId)
+    {
+        $perangkat = AkademikPerangkatAjar::findOrFail($id);
+        $user = auth()->user();
+
+        // Validasi hak akses
+        if ($user->isGuru() && !$user->isAdmin() && !$user->isWakaKurikulum() && $user->guru_id != $perangkat->guru_id) {
+            return back()->with('error', 'Anda tidak memiliki hak akses untuk menghapus kriteria KKTP ini.');
+        }
+
+        $kktp = AkademikKktpItem::where('perangkat_id', $perangkat->id)->findOrFail($kktpId);
+        $kktp->delete();
+
+        return back()->with('success', 'Kriteria Ketercapaian Tujuan Pembelajaran (KKTP) berhasil dihapus.');
     }
 
     /**

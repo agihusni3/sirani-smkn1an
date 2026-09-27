@@ -359,6 +359,7 @@ Route::middleware('auth')->group(function () {
             Route::post('/perangkat/{id}/modul', [\App\Http\Controllers\Akademik\AkademikPerangkatController::class, 'storeModul'])->name('akademik.perangkat.modul.store');
             Route::delete('/perangkat/{id}/modul/{modulId}', [\App\Http\Controllers\Akademik\AkademikPerangkatController::class, 'destroyModul'])->name('akademik.perangkat.modul.destroy');
             Route::post('/perangkat/{id}/kktp', [\App\Http\Controllers\Akademik\AkademikPerangkatController::class, 'storeKktp'])->name('akademik.perangkat.kktp.store');
+            Route::delete('/perangkat/{id}/kktp/{kktpId}', [\App\Http\Controllers\Akademik\AkademikPerangkatController::class, 'destroyKktp'])->name('akademik.perangkat.kktp.destroy');
             Route::post('/perangkat/{id}/ajukan', [\App\Http\Controllers\Akademik\AkademikPerangkatController::class, 'ajukan'])->name('akademik.perangkat.ajukan');
             Route::delete('/perangkat/{id}', [\App\Http\Controllers\Akademik\AkademikPerangkatController::class, 'destroy'])->name('akademik.perangkat.destroy');
         });
