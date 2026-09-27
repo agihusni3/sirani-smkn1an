@@ -322,7 +322,7 @@
   </div>
 
   <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
-    <button type="button" class="ak-btn ak-btn-primary" data-bs-toggle="modal" data-bs-target="#modalInputSoal" style="font-size:12.5px; padding:7px 15px; font-weight:800;">
+    <button type="button" class="ak-btn ak-btn-primary" onclick="bukaModalTambahSoal()" style="font-size:12.5px; padding:7px 15px; font-weight:800;">
       <i class="bi bi-plus-lg me-1"></i>
       <span>Input Butir Soal</span>
     </button>
@@ -366,7 +366,7 @@
       <span class="ak-badge ak-badge-success" style="font-size:11px;">Total: {{ $totalBobot }} Poin</span>
     </div>
     <div style="display:flex; align-items:center; gap:8px;">
-      <button type="button" class="ak-btn ak-btn-primary" data-bs-toggle="modal" data-bs-target="#modalInputSoal" style="font-size:12.5px; padding:6px 14px; font-weight:700;">
+      <button type="button" class="ak-btn ak-btn-primary" onclick="bukaModalTambahSoal()" style="font-size:12.5px; padding:6px 14px; font-weight:700;">
         <i class="bi bi-plus-lg me-1"></i> Input Butir Soal
       </button>
       <button type="button" onclick="bukaModalBankSoal()" class="ak-btn ak-btn-secondary" style="font-size:12.5px; padding:6px 14px; font-weight:700;">
@@ -386,7 +386,7 @@
           Mulai tambahkan butir pertanyaan pilihan ganda dengan klik tombol di bawah ini atau panggil dari Bank Soal yang telah tersedia.
         </p>
         <div style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
-          <button type="button" class="ak-btn ak-btn-primary" data-bs-toggle="modal" data-bs-target="#modalInputSoal" style="font-weight:700; padding:9px 18px;">
+          <button type="button" class="ak-btn ak-btn-primary" onclick="bukaModalTambahSoal()" style="font-weight:700; padding:9px 18px;">
             <i class="bi bi-plus-lg me-1"></i> Input Butir Soal Pertama
           </button>
           @if($bankSoals->isNotEmpty())
@@ -409,13 +409,21 @@
                   Bobot: {{ $soal->bobot }} Poin
                 </span>
               </div>
-              <form action="{{ route('akademik.asesmen.soal.destroy', [$asesmen->id, $soal->id]) }}" method="POST" onsubmit="return confirm('Hapus butir soal no {{ $idx + 1 }}?')" style="margin:0;">
-                @csrf
-                @method('DELETE')
-                <button type="submit" class="ak-btn ak-btn-secondary ak-btn-sm text-danger" title="Hapus Soal" style="padding:4px 10px; font-size:12px;">
-                  <i class="bi bi-trash me-1"></i> Hapus
+              <div style="display:flex; align-items:center; gap:6px;">
+                <button type="button" class="ak-btn ak-btn-secondary ak-btn-sm" title="Edit Butir Soal" 
+                        data-soal="{{ json_encode($soal) }}"
+                        onclick="handleEditBtnClick(this)"
+                        style="padding:4px 10px; font-size:12px; font-weight:700; color:#2563eb; border-color:#cbd5e1;">
+                  <i class="bi bi-pencil-square me-1"></i> Edit
                 </button>
-              </form>
+                <form action="{{ route('akademik.asesmen.soal.destroy', [$asesmen->id, $soal->id]) }}" method="POST" onsubmit="return confirm('Hapus butir soal no {{ $idx + 1 }}?')" style="margin:0;">
+                  @csrf
+                  @method('DELETE')
+                  <button type="submit" class="ak-btn ak-btn-secondary ak-btn-sm text-danger" title="Hapus Soal" style="padding:4px 10px; font-size:12px; font-weight:700; border-color:#fca5a5;">
+                    <i class="bi bi-trash me-1"></i> Hapus
+                  </button>
+                </form>
+              </div>
             </div>
 
             {{-- Teks Pertanyaan --}}
@@ -463,8 +471,9 @@
 <div class="modal fade" id="modalInputSoal" tabindex="-1" aria-labelledby="modalInputSoalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg modal-dialog-scrollable">
     <div class="modal-content" style="border-radius:14px; border:1px solid #cbd5e1; overflow:hidden;">
-      <form action="{{ route('akademik.asesmen.soal.store', $asesmen->id) }}" method="POST" id="formTambahSoal" enctype="multipart/form-data" onsubmit="return validasiFormSoal(event)">
+      <form action="{{ route('akademik.asesmen.soal.store', $asesmen->id) }}" method="POST" id="formSoal" enctype="multipart/form-data" onsubmit="return validasiFormSoal(event)">
         @csrf
+        <div id="methodSpoofContainer"></div>
         <input type="hidden" name="tipe" value="pilihan_ganda">
         <input type="hidden" name="kunci_jawaban" id="inputKunciJawaban" value="{{ old('kunci_jawaban', 'A') }}">
 
@@ -472,9 +481,9 @@
           <div>
             <h5 class="modal-title" id="modalInputSoalLabel" style="font-weight:800; font-size:16px; color:#0f172a; display:flex; align-items:center; gap:8px; margin:0;">
               <i class="bi bi-pencil-square text-primary"></i>
-              <span>Input Butir Pertanyaan No. {{ $nomorBerikutnya }}</span>
+              <span id="modalSoalTitle">Input Butir Pertanyaan No. {{ $nomorBerikutnya }}</span>
             </h5>
-            <div style="font-size:12px; color:#64748b; margin-top:3px;">
+            <div id="modalSoalSubtitle" style="font-size:12px; color:#64748b; margin-top:3px;">
               Tuliskan pertanyaan, pilihan opsi A–E, dan tentukan kunci jawaban benar.
             </div>
           </div>
@@ -494,6 +503,23 @@
               <textarea name="pertanyaan" id="inputPertanyaan" class="editor-textarea" rows="4" 
                         placeholder="Tuliskan butir soal di sini..." 
                         required oninput="updateLivePreview()">{{ old('pertanyaan') }}</textarea>
+
+              {{-- Box Gambar Yang Sedang Terpasang (Mode Edit) --}}
+              <div id="boxExistingGambar" style="display:none; padding:10px 14px; background:#f8fafc; border-top:1px solid #e2e8f0;">
+                <div style="display:flex; align-items:center; justify-content:space-between; max-width:360px; background:#ffffff; border:1px solid #cbd5e1; border-radius:8px; padding:6px 10px;">
+                  <div style="display:flex; align-items:center; gap:8px;">
+                    <img id="imgExistingTarget" src="" style="width:40px; height:40px; border-radius:6px; object-fit:cover; border:1px solid #e2e8f0;">
+                    <div>
+                      <div style="font-size:12px; font-weight:700; color:#334155;">Gambar Saat Ini</div>
+                      <div style="font-size:11px; color:#64748b;">Terpasang pada butir soal</div>
+                    </div>
+                  </div>
+                  <label style="display:flex; align-items:center; gap:5px; font-size:11.5px; font-weight:700; color:#dc2626; cursor:pointer; margin:0;">
+                    <input type="checkbox" name="hapus_gambar" id="chkHapusGambar" value="1">
+                    <span>Hapus</span>
+                  </label>
+                </div>
+              </div>
 
               {{-- 2. Box Preview Gambar Terpilih --}}
               <div id="boxPreviewGambar" style="display:none; padding:10px 14px; background:#f8fafc; border-top:1px solid #e2e8f0;">
@@ -673,11 +699,11 @@
           <div style="display:grid; grid-template-columns: 1fr 2.5fr; gap:12px; margin-bottom:8px;">
             <div>
               <label class="ak-form-label" style="font-size:12.5px; font-weight:800;">Bobot Nilai</label>
-              <input type="number" name="bobot" class="ak-input" value="{{ old('bobot', 1) }}" min="1" required style="font-size:14px; font-weight:800; text-align:center;">
+              <input type="number" name="bobot" id="inputBobot" class="ak-input" value="{{ old('bobot', 1) }}" min="1" required style="font-size:14px; font-weight:800; text-align:center;">
             </div>
             <div>
               <label class="ak-form-label" style="font-size:12.5px; font-weight:800;">Pembahasan (Opsional)</label>
-              <input type="text" name="pembahasan" class="ak-input" placeholder="Penjelasan jawaban untuk siswa..." value="{{ old('pembahasan') }}">
+              <input type="text" name="pembahasan" id="inputPembahasan" class="ak-input" placeholder="Penjelasan jawaban untuk siswa..." value="{{ old('pembahasan') }}">
             </div>
           </div>
         </div>
@@ -688,7 +714,7 @@
           </button>
           <button type="submit" class="ak-btn ak-btn-primary" style="padding:9px 22px; font-size:13.5px; font-weight:800;">
             <i class="bi bi-check2-circle me-1"></i>
-            <span>Simpan Butir Soal No. {{ $nomorBerikutnya }}</span>
+            <span id="btnSubmitSoalText">Simpan Butir Soal No. {{ $nomorBerikutnya }}</span>
           </button>
         </div>
       </form>
@@ -698,6 +724,83 @@
 
 <script>
   let isArabMode = false;
+  const urlStoreSoal = "{{ route('akademik.asesmen.soal.store', $asesmen->id) }}";
+  const nomorBerikutnyaSoal = "{{ $nomorBerikutnya }}";
+
+  // CRUD MODAL HANDLERS
+  function bukaModalTambahSoal() {
+    const form = document.getElementById('formSoal');
+    form.action = urlStoreSoal;
+    document.getElementById('methodSpoofContainer').innerHTML = '';
+    document.getElementById('modalSoalTitle').innerText = 'Input Butir Pertanyaan No. ' + nomorBerikutnyaSoal;
+    document.getElementById('modalSoalSubtitle').innerText = 'Tuliskan pertanyaan, pilihan opsi A–E, dan tentukan kunci jawaban benar.';
+    document.getElementById('btnSubmitSoalText').innerText = 'Simpan Butir Soal No. ' + nomorBerikutnyaSoal;
+
+    document.getElementById('inputPertanyaan').value = '';
+    ['A', 'B', 'C', 'D', 'E'].forEach(letter => {
+      document.getElementById('opsi_' + letter).value = '';
+    });
+    setKunciJawaban('A');
+    document.getElementById('inputBobot').value = '1';
+    document.getElementById('inputPembahasan').value = '';
+
+    hapusUploadGambar();
+    const boxExisting = document.getElementById('boxExistingGambar');
+    if (boxExisting) boxExisting.style.display = 'none';
+    const chkHapus = document.getElementById('chkHapusGambar');
+    if (chkHapus) chkHapus.checked = false;
+
+    updateLivePreview();
+    const modalEl = document.getElementById('modalInputSoal');
+    bootstrap.Modal.getOrCreateInstance(modalEl).show();
+  }
+
+  function handleEditBtnClick(btn) {
+    try {
+      const soalData = JSON.parse(btn.getAttribute('data-soal'));
+      bukaModalEditSoal(soalData);
+    } catch (e) {
+      console.error('Gagal membaca data soal untuk diedit:', e);
+    }
+  }
+
+  function bukaModalEditSoal(soal) {
+    const form = document.getElementById('formSoal');
+    form.action = `/dcc/akademik/asesmen/{{ $asesmen->id }}/soal/${soal.id}`;
+    document.getElementById('methodSpoofContainer').innerHTML = '<input type="hidden" name="_method" value="PUT">';
+    document.getElementById('modalSoalTitle').innerText = 'Edit Butir Pertanyaan No. ' + (soal.nomor || '');
+    document.getElementById('modalSoalSubtitle').innerText = 'Perbarui teks butir soal, opsi jawaban, kunci jawaban, dan bobot nilai.';
+    document.getElementById('btnSubmitSoalText').innerText = 'Perbarui Butir Soal No. ' + (soal.nomor || '');
+
+    document.getElementById('inputPertanyaan').value = soal.pertanyaan || '';
+    document.getElementById('opsi_A').value = soal.opsi_a || '';
+    document.getElementById('opsi_B').value = soal.opsi_b || '';
+    document.getElementById('opsi_C').value = soal.opsi_c || '';
+    document.getElementById('opsi_D').value = soal.opsi_d || '';
+    document.getElementById('opsi_E').value = soal.opsi_e || '';
+
+    setKunciJawaban(soal.kunci_jawaban || 'A');
+    document.getElementById('inputBobot').value = soal.bobot || 1;
+    document.getElementById('inputPembahasan').value = soal.pembahasan || '';
+
+    hapusUploadGambar();
+
+    const boxExisting = document.getElementById('boxExistingGambar');
+    const imgExisting = document.getElementById('imgExistingTarget');
+    const chkHapus = document.getElementById('chkHapusGambar');
+    if (chkHapus) chkHapus.checked = false;
+
+    if (soal.gambar_url) {
+      if (imgExisting) imgExisting.src = soal.gambar_url;
+      if (boxExisting) boxExisting.style.display = 'block';
+    } else {
+      if (boxExisting) boxExisting.style.display = 'none';
+    }
+
+    updateLivePreview();
+    const modalEl = document.getElementById('modalInputSoal');
+    bootstrap.Modal.getOrCreateInstance(modalEl).show();
+  }
 
   // 1. SELEKSI KUNCI JAWABAN LANGSUNG (TAMPILAN HIJAU EMERALD)
   function setKunciJawaban(kunci) {

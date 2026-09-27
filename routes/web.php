@@ -431,6 +431,7 @@ Route::middleware('auth')->group(function () {
             Route::delete('/asesmen/{id}', [\App\Http\Controllers\Akademik\AkademikAsesmenController::class, 'destroy'])->name('akademik.asesmen.destroy');
             Route::get('/asesmen/{id}/soal', [\App\Http\Controllers\Akademik\AkademikAsesmenController::class, 'soal'])->name('akademik.asesmen.soal');
             Route::post('/asesmen/{id}/soal', [\App\Http\Controllers\Akademik\AkademikAsesmenController::class, 'storeSoal'])->name('akademik.asesmen.soal.store');
+            Route::put('/asesmen/{id}/soal/{soalId}', [\App\Http\Controllers\Akademik\AkademikAsesmenController::class, 'updateSoal'])->name('akademik.asesmen.soal.update');
             Route::post('/asesmen/{id}/import-bank-soal', [\App\Http\Controllers\Akademik\AkademikAsesmenController::class, 'importFromBankSoal'])->name('akademik.asesmen.soal.import_bank');
             Route::delete('/asesmen/{id}/soal/{soalId}', [\App\Http\Controllers\Akademik\AkademikAsesmenController::class, 'destroySoal'])->name('akademik.asesmen.soal.destroy');
             Route::post('/asesmen/{id}/toggle', [\App\Http\Controllers\Akademik\AkademikAsesmenController::class, 'toggleStatus'])->name('akademik.asesmen.toggle');

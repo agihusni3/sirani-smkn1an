@@ -293,6 +293,70 @@ class AkademikAsesmenController extends Controller
         return redirect()->back()->with('success', 'Butir soal no. ' . $nomor . ' berhasil disimpan ke asesmen & tersimpan di Bank Soal.');
     }
 
+    public function updateSoal(Request $request, $id, $soalId)
+    {
+        $asesmen = AkademikAsesmenOnline::findOrFail($id);
+        $this->authorizeAsesmen($asesmen);
+        $soal = AkademikAsesmenSoal::where('asesmen_id', $id)->findOrFail($soalId);
+
+        $request->validate([
+            'pertanyaan' => 'required|string',
+            'tipe' => 'required|in:pilihan_ganda,essay,benar_salah',
+            'opsi_a' => 'required_if:tipe,pilihan_ganda|nullable|string',
+            'opsi_b' => 'required_if:tipe,pilihan_ganda|nullable|string',
+            'opsi_c' => 'nullable|string',
+            'opsi_d' => 'nullable|string',
+            'opsi_e' => 'nullable|string',
+            'kunci_jawaban' => 'required|string|max:5',
+            'bobot' => 'required|integer|min:1',
+            'pembahasan' => 'nullable|string',
+            'gambar' => 'nullable|image|mimes:jpeg,png,jpg,webp,gif|max:3072',
+            'gambar_url' => 'nullable|string',
+        ]);
+
+        $gambarUrl = $soal->gambar_url;
+        if ($request->boolean('hapus_gambar')) {
+            $gambarUrl = null;
+        } elseif ($request->hasFile('gambar')) {
+            $path = $request->file('gambar')->store('asesmen_soal', 'public');
+            $gambarUrl = '/storage/' . $path;
+        } elseif ($request->filled('gambar_url')) {
+            $gambarUrl = $request->gambar_url;
+        }
+
+        if ($request->tipe === 'pilihan_ganda') {
+            $kunci = strtoupper($request->kunci_jawaban);
+            $kunciField = 'opsi_' . strtolower($kunci);
+            if (empty(trim($request->input($kunciField) ?? ''))) {
+                return redirect()->back()
+                    ->withInput()
+                    ->with('error', "Gagal Memperbarui: Anda memilih Kunci Jawaban '{$kunci}', tetapi teks Pilihan Jawaban {$kunci} masih kosong!");
+            }
+        }
+
+        $soal->update([
+            'pertanyaan' => $request->pertanyaan,
+            'tipe' => $request->tipe,
+            'gambar_url' => $gambarUrl,
+            'opsi_a' => $request->opsi_a,
+            'opsi_b' => $request->opsi_b,
+            'opsi_c' => $request->opsi_c,
+            'opsi_d' => $request->opsi_d,
+            'opsi_e' => $request->opsi_e,
+            'kunci_jawaban' => strtoupper($request->kunci_jawaban),
+            'bobot' => $request->bobot,
+            'pembahasan' => $request->pembahasan,
+        ]);
+
+        // Auto-update status validasi jika paket sudah memenuhi syarat
+        $audit = $asesmen->fresh()->cekKelayakanSoal();
+        if ($audit['is_valid'] && $asesmen->status_validasi === 'draft') {
+            $asesmen->update(['status_validasi' => 'siap_diujikan']);
+        }
+
+        return redirect()->back()->with('success', 'Butir soal no. ' . $soal->nomor . ' berhasil diperbarui.');
+    }
+
     public function importFromBankSoal(Request $request, $id)
     {
         $asesmen = AkademikAsesmenOnline::findOrFail($id);
