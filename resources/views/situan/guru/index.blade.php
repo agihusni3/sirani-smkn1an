@@ -587,13 +587,12 @@
           <thead>
             <tr>
               <th style="width:36px; text-align:center;">No</th>
-              <th>Pendidik &amp; Legalitas</th>
+              <th>Pendidik</th>
               <th>Penugasan &amp; Mapel</th>
-              <th>Kepegawaian &amp; Kualifikasi</th>
-              <th style="text-align:center;">Sertifikat Pelatihan</th>
-              <th>Akun Akses</th>
+              <th>Kepegawaian</th>
+              <th>Akun</th>
               <th style="text-align:center;">Status</th>
-              <th style="width:80px; text-align:center;">Aksi</th>
+              <th style="width:110px; text-align:center;">Aksi</th>
             </tr>
           </thead>
           <tbody>
@@ -602,18 +601,20 @@
                 $cleanHp = preg_replace('/[^0-9]/', '', $g->no_hp ?? '');
                 if (str_starts_with($cleanHp, '0')) { $cleanHp = '62' . substr($cleanHp, 1); }
                 $kartu = $g->kartuRfid;
+                $tugasList = !empty($g->list_tugas_tambahan) ? $g->list_tugas_tambahan : ($g->rombelWali ? ['Wali ' . $g->rombelWali->nama_rombel] : []);
+                $mapelList = !empty($g->list_mapel) ? $g->list_mapel : ($g->mapel_diampu ? array_filter(array_map('trim', explode(',', $g->mapel_diampu))) : []);
               @endphp
               <tr>
                 <td style="text-align:center; font-weight:700; color:var(--text); font-family:var(--font-mono); font-size:12px; vertical-align:middle;">
                   {{ $gurus->firstItem() + $idx }}
                 </td>
                 <td style="vertical-align:middle; padding:12px 12px;">
-                  <div style="display:flex; align-items:flex-start; gap:11px;">
-                    <div class="avatar-circle avatar-md" style="margin-top:2px; flex-shrink:0;">
+                  <div style="display:flex; align-items:center; gap:11px;">
+                    <div class="avatar-circle avatar-md" style="flex-shrink:0;">
                       <img src="{{ $g->foto_url }}" alt="{{ $g->nama }}" class="avatar-img" />
                     </div>
                     <div style="min-width:0; flex:1;">
-                      <div style="font-weight:800; font-size:13.5px; color:var(--text); line-height:1.3;">
+                      <div style="font-weight:800; font-size:13.5px; color:#000000; line-height:1.3;">
                         {{ $g->nama_lengkap_gelar }}
                       </div>
                       <div style="font-size:11px; font-family:var(--font-mono); color:var(--text-3); margin-top:2px;">
@@ -623,134 +624,109 @@
                         @endif
                       </div>
 
-                      {{-- Badges Meta: WhatsApp, Kartu RFID, & Tugas Tambahan --}}
-                      <div style="display:flex; flex-wrap:wrap; align-items:center; gap:5px; margin-top:5px;">
-                        @if($g->no_hp)
-                          <a href="https://wa.me/{{ $cleanHp }}" target="_blank" 
-                             style="font-size:10.5px; font-weight:700; font-family:var(--font-mono); text-decoration:none; display:inline-flex; align-items:center; gap:3px; color:#15803d; background:#dcfce7; border:1px solid rgba(22,163,74,0.3); border-radius:4px; padding:1px 6px; transition:all .15s ease;"
-                             title="Kirim Pesan WhatsApp: {{ $g->no_hp }}">
-                            <i class="bi bi-whatsapp"></i> {{ $g->no_hp }}
-                          </a>
-                        @endif
-
-                        @if($kartu)
-                          @if($isAdmin || $isStafTu)
-                            <button type="button"
-                              onclick="openRfidPairModal('guru', {{ $g->id }}, '{{ addslashes($g->nama) }}', '{{ $g->nip ? 'NIP: ' . $g->nip : $g->label_kepegawaian }}', '{{ $g->foto_url }}', '{{ $kartu->uid }}')"
-                              style="background:rgba(16,185,129,0.08); border:1px solid rgba(16,185,129,0.3); border-radius:4px; padding:1px 6px; font-size:10.5px; font-weight:700; color:#065f46; cursor:pointer; font-family:var(--font-mono); display:inline-flex; align-items:center; gap:3px; transition:all .15s ease;"
-                              title="Kartu RFID: {{ $kartu->uid }} (Klik untuk ubah / lepas)">
-                              <i class="bi bi-broadcast" style="color:#10b981;"></i> {{ $kartu->uid }}
-                            </button>
-                          @else
-                            <span style="background:rgba(16,185,129,0.08); border:1px solid rgba(16,185,129,0.3); border-radius:4px; padding:1px 6px; font-size:10.5px; font-weight:700; color:#065f46; font-family:var(--font-mono); display:inline-flex; align-items:center; gap:3px;">
-                              <i class="bi bi-broadcast" style="color:#10b981;"></i> {{ $kartu->uid }}
-                            </span>
+                      @if($g->no_hp || $kartu)
+                        <div style="display:flex; align-items:center; gap:8px; margin-top:3px; font-size:11px; color:var(--text-3);">
+                          @if($g->no_hp)
+                            <a href="https://wa.me/{{ $cleanHp }}" target="_blank" style="color:var(--text-2); text-decoration:none; display:inline-flex; align-items:center; gap:3px;" title="WhatsApp: {{ $g->no_hp }}">
+                              <i class="bi bi-whatsapp" style="color:#16a34a; font-size:11px;"></i> {{ $g->no_hp }}
+                            </a>
                           @endif
-                        @else
-                          @if($isAdmin || $isStafTu)
-                            <button type="button"
-                              onclick="openRfidPairModal('guru', {{ $g->id }}, '{{ addslashes($g->nama) }}', '{{ $g->nip ? 'NIP: ' . $g->nip : $g->label_kepegawaian }}', '{{ $g->foto_url }}', '')"
-                              style="background:var(--bg-3); border:1px dashed var(--border-2); border-radius:4px; padding:1px 6px; font-size:10px; font-weight:700; color:var(--text-3); cursor:pointer; display:inline-flex; align-items:center; gap:3px; transition:all .15s ease;"
-                              title="Daftarkan Kartu RFID Guru">
-                              <i class="bi bi-plus-circle"></i> Pasang RFID
-                            </button>
+                          @if($g->no_hp && $kartu)
+                            <span style="color:var(--border-2);">•</span>
                           @endif
-                        @endif
-
-                        @if(!empty($g->list_tugas_tambahan))
-                          @foreach($g->list_tugas_tambahan as $tgs)
-                            <span style="font-size:10px; font-weight:700; color:#b45309; background:#fef3c7; border:1px solid rgba(217,119,6,0.25); border-radius:4px; padding:1px 5px; display:inline-flex; align-items:center; gap:3px;" title="{{ $g->sk_tugas_tambahan ? 'SK: ' . $g->sk_tugas_tambahan : 'Tugas Tambahan' }}">
-                              <i class="bi bi-star-fill" style="font-size:8px;"></i> {{ $tgs }}
-                            </span>
-                          @endforeach
-                        @elseif($g->rombelWali)
-                          <span style="font-size:10px; font-weight:700; color:var(--text-2); background:var(--bg-3); border:1px solid var(--border); border-radius:4px; padding:1px 5px; display:inline-flex; align-items:center; gap:3px;">
-                            <i class="bi bi-mortarboard-fill" style="font-size:9px;"></i> Wali: {{ $g->rombelWali->nama_rombel }}
-                          </span>
-                        @endif
-                      </div>
+                          @if($kartu)
+                            @if($isAdmin || $isStafTu)
+                              <button type="button"
+                                onclick="openRfidPairModal('guru', {{ $g->id }}, '{{ addslashes($g->nama) }}', '{{ $g->nip ? 'NIP: ' . $g->nip : $g->label_kepegawaian }}', '{{ $g->foto_url }}', '{{ $kartu->uid }}')"
+                                style="background:none; border:none; padding:0; cursor:pointer; font-size:11px; font-family:var(--font-mono); color:var(--text-3); display:inline-flex; align-items:center; gap:3px;"
+                                title="Kartu RFID: {{ $kartu->uid }} (Klik untuk ubah / lepas)">
+                                <i class="bi bi-broadcast" style="color:#059669; font-size:10px;"></i> {{ $kartu->uid }}
+                              </button>
+                            @else
+                              <span style="font-family:var(--font-mono); display:inline-flex; align-items:center; gap:3px;">
+                                <i class="bi bi-broadcast" style="color:#059669; font-size:10px;"></i> {{ $kartu->uid }}
+                              </span>
+                            @endif
+                          @endif
+                        </div>
+                      @endif
                     </div>
                   </div>
                 </td>
                 <td style="vertical-align:middle; padding:12px 12px;">
-                  <div style="font-size:12.5px; font-weight:700; color:var(--text);">{{ $g->jabatan }}</div>
-                  @if(!empty($g->list_mapel))
-                    <div style="display:flex; flex-wrap:wrap; gap:3px; margin-top:4px; align-items:center;">
-                      @foreach($g->list_mapel as $mpl)
-                        <span style="font-size:10px; font-weight:700; background:rgba(37,99,235,0.08); color:#2563eb; border:1px solid rgba(37,99,235,0.2); padding:1px 5px; border-radius:4px; display:inline-flex; align-items:center; gap:3px;">
-                          <i class="bi bi-book-half" style="font-size:8.5px;"></i> {{ $mpl }}
-                        </span>
-                      @endforeach
-                      @if($g->jjm)
-                        <span style="font-size:9.5px; font-weight:800; color:var(--text-3); background:var(--bg-3); padding:1px 5px; border-radius:4px; border:1px solid var(--border);" title="Total Jam Mengajar per Minggu">
+                  @if(!empty($tugasList))
+                    <div style="font-size:12.5px; font-weight:700; color:#000000;">
+                      {{ implode(', ', $tugasList) }}
+                    </div>
+                    @if(!empty($mapelList))
+                      <div style="font-size:11.5px; color:var(--text-2); margin-top:2px;">
+                        {{ implode(', ', $mapelList) }} {{ $g->jjm ? '• ' . $g->jjm . ' JP' : '' }}
+                      </div>
+                    @endif
+                  @else
+                    <div style="font-size:12.5px; font-weight:700; color:#000000;">
+                      {{ $g->jabatan ?: (!empty($mapelList) ? 'Guru ' . implode(', ', $mapelList) : 'Tenaga Pendidik') }}
+                    </div>
+                    @if(!empty($mapelList))
+                      @php
+                        $mapelStr = implode(', ', $mapelList);
+                        $sudahAda = str_contains(strtolower($g->jabatan ?? ''), strtolower($mapelStr));
+                      @endphp
+                      @if(!$sudahAda)
+                        <div style="font-size:11.5px; color:var(--text-2); margin-top:2px;">
+                          {{ $mapelStr }} {{ $g->jjm ? '• ' . $g->jjm . ' JP' : '' }}
+                        </div>
+                      @elseif($g->jjm)
+                        <div style="font-size:11.5px; color:var(--text-3); margin-top:2px;">
                           {{ $g->jjm }} JP
-                        </span>
+                        </div>
                       @endif
-                    </div>
-                  @elseif($g->mapel_diampu)
-                    <div style="font-size:11px; color:var(--text-2); margin-top:2px;">
-                      Mapel: <strong>{{ $g->mapel_diampu }}</strong> {{ $g->jjm ? '(' . $g->jjm . ' JP)' : '' }}
-                    </div>
+                    @endif
                   @endif
                 </td>
                 <td style="vertical-align:middle; padding:12px 12px;">
-                  <div style="display:flex; flex-direction:column; gap:3px;">
-                    <div>
-                      <span style="font-size:11.5px; font-weight:800; color:var(--text); text-transform:uppercase;">
+                  <div style="display:flex; flex-direction:column; gap:2px;">
+                    <div style="display:flex; align-items:center; gap:6px;">
+                      <span style="font-size:12px; font-weight:700; color:#000000;">
                         {{ $g->label_kepegawaian }}
                       </span>
                       @if($g->golongan_pangkat)
                         <span style="font-size:11px; color:var(--text-3);">({{ $g->golongan_pangkat }})</span>
                       @endif
                     </div>
-                    <div>
-                      @if($g->status_sertifikasi === 'sudah')
-                        <span class="badge-sertifikasi-sudah" title="Nomor Serdik: {{ $g->nomor_serdik ?: 'Terdaftar' }}">
+                    @if($g->status_sertifikasi === 'sudah')
+                      <div style="margin-top:1px;">
+                        <span style="color:#16a34a; font-size:11px; font-weight:700; display:inline-flex; align-items:center; gap:3px;" title="Nomor Serdik: {{ $g->nomor_serdik ?: 'Terdaftar' }}">
                           <i class="bi bi-patch-check-fill"></i> Sertifikasi
                         </span>
-                      @else
-                        <span class="badge-sertifikasi-belum">
-                          Belum Sertifikasi
-                        </span>
-                      @endif
-                    </div>
+                      </div>
+                    @endif
                     @if($g->pendidikan_terakhir)
-                      <div style="font-size:10.5px; color:var(--text-3);">
+                      <div style="font-size:11px; color:var(--text-3); margin-top:1px;">
                         {{ $g->pendidikan_terakhir }} {{ $g->jurusan_kuliah ? '- ' . $g->jurusan_kuliah : '' }}
                       </div>
                     @endif
                   </div>
                 </td>
 
-                {{-- Kolom Sertifikat Pelatihan --}}
-                <td style="vertical-align:middle; text-align:center; padding:10px 12px; white-space:nowrap;">
-                  <button type="button" onclick="openPortofolioModal({{ json_encode($g) }}, {{ json_encode($g->sertifikats) }})" class="btn-sertifikat-portofolio" title="Buka &amp; Kelola Portofolio Sertifikat Pelatihan Guru">
-                    <i class="bi bi-award"></i>
-                    <span>{{ $g->sertifikats->count() }} Sertifikat</span>
-                  </button>
-                </td>
-
                 {{-- Kolom Akun Akses SIRANI --}}
                 <td style="vertical-align:middle; padding:10px 12px; white-space:nowrap;">
                   @if($g->user)
+                    @php
+                      $uname = $g->user->username ?: ($g->user->email ? explode('@', $g->user->email)[0] : '-');
+                    @endphp
                     @if($isAdmin)
-                      <button type="button" onclick="openAkunModal({{ json_encode($g) }})" style="background:transparent; border:none; padding:2px 0; font-size:12px; font-weight:700; color:var(--text); cursor:pointer; white-space:nowrap; text-align:left;" title="Klik untuk atur akun (Nickname: {{ $g->user->username }})">
-                        <span style="text-transform:capitalize; display:block;">{{ str_replace('_', ' ', $g->user->role) }}</span>
-                        <span style="font-size:10.5px; color:var(--text-3); font-family:var(--font-mono); font-weight:600;">{{ $g->user->username ?: ($g->user->email ? explode('@', $g->user->email)[0] : '-') }}</span>
+                      <button type="button" onclick="openAkunModal({{ json_encode($g) }})" style="background:none; border:none; padding:0; font-size:12px; font-weight:700; color:#000000; cursor:pointer; font-family:var(--font-mono); display:inline-flex; align-items:center; gap:4px;" title="Atur Akun Login: {{ $uname }}">
+                        <span>{{ $uname }}</span>
                       </button>
                     @else
-                      <div>
-                        <span style="font-size:12px; font-weight:700; color:var(--text); text-transform:capitalize; display:block;">
-                          {{ str_replace('_', ' ', $g->user->role) }}
-                        </span>
-                        <span style="font-size:10.5px; color:var(--text-3); font-family:var(--font-mono);">
-                          {{ $g->user->username ?: ($g->user->email ? explode('@', $g->user->email)[0] : '-') }}
-                        </span>
-                      </div>
+                      <span style="font-size:12px; font-weight:600; color:#000000; font-family:var(--font-mono);">
+                        {{ $uname }}
+                      </span>
                     @endif
                   @else
                     @if($isAdmin)
-                      <button type="button" onclick="openAkunModal({{ json_encode($g) }})" style="background:transparent; border:none; padding:4px 0; font-size:11.5px; font-weight:800; color:var(--text-2); cursor:pointer; white-space:nowrap;" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--text-2)'" title="Buat Akun Login dengan Nickname/Username">
+                      <button type="button" onclick="openAkunModal({{ json_encode($g) }})" style="background:none; border:none; padding:0; font-size:11.5px; font-weight:700; color:#0284c7; cursor:pointer;" title="Buat Akun Login">
                         + Buat Akun
                       </button>
                     @else
@@ -775,23 +751,29 @@
                   <div style="display:flex; gap:4px; justify-content:center; align-items:center;">
                     <a href="{{ route('guru.biodata.cetak', ['id' => $g->id]) }}" target="_blank"
                        class="btn-icon"
-                       style="width:30px; height:30px; text-decoration:none; color:#0284c7; background:rgba(2,132,199,0.08); border:1px solid rgba(2,132,199,0.25); border-radius:6px; display:inline-flex; align-items:center; justify-content:center; transition:all .15s ease;"
-                       title="Cetak Lembar Biodata GTK Resmi (PDF/A4 Format Dapodik/BKN)">
-                       <i class="bi bi-file-earmark-person-fill"></i>
+                       style="width:28px; height:28px; text-decoration:none; color:#0284c7; background:rgba(2,132,199,0.08); border:1px solid rgba(2,132,199,0.25); border-radius:6px; display:inline-flex; align-items:center; justify-content:center; transition:all .15s ease;"
+                       title="Cetak Lembar Biodata GTK">
+                       <i class="bi bi-file-earmark-person-fill" style="font-size:12px;"></i>
                     </a>
                     <a href="{{ route('kartu.digital.guru', ['id' => $g->id]) }}" target="_blank"
                        class="btn-icon btn-icon-view"
-                       style="width:30px; height:30px; text-decoration:none;"
+                       style="width:28px; height:28px; text-decoration:none; display:inline-flex; align-items:center; justify-content:center;"
                        title="Lihat Barcode &amp; Kartu Digital Guru">
-                       <i class="bi bi-qr-code-scan"></i>
+                       <i class="bi bi-qr-code-scan" style="font-size:12px;"></i>
                     </a>
-                    <button type="button" onclick="openEditGuru({{ json_encode($g) }})" class="btn-icon btn-icon-edit" style="width:30px; height:30px;" title="Edit Data GTK Lengkap">
-                      <i class="bi bi-pencil-square"></i>
+                    <button type="button" onclick="openPortofolioModal({{ json_encode($g) }}, {{ json_encode($g->sertifikats) }})"
+                       class="btn-icon"
+                       style="width:28px; height:28px; color:#2563eb; background:rgba(37,99,235,0.08); border:1px solid rgba(37,99,235,0.25); border-radius:6px; display:inline-flex; align-items:center; justify-content:center; cursor:pointer;"
+                       title="Portofolio Sertifikat ({{ $g->sertifikats->count() }})">
+                       <i class="bi bi-award-fill" style="font-size:12px;"></i>
+                    </button>
+                    <button type="button" onclick="openEditGuru({{ json_encode($g) }})" class="btn-icon btn-icon-edit" style="width:28px; height:28px; display:inline-flex; align-items:center; justify-content:center;" title="Edit Data GTK Lengkap">
+                      <i class="bi bi-pencil-square" style="font-size:12px;"></i>
                     </button>
                     <form action="/guru/{{ $g->id }}" method="POST" onsubmit="return confirm('Hapus data GTK {{ $g->nama }}?')" style="display:inline; margin:0;">
                       @csrf @method('DELETE')
-                      <button type="submit" class="btn-icon btn-icon-danger" style="width:30px; height:30px;" title="Hapus GTK">
-                        <i class="bi bi-trash3-fill"></i>
+                      <button type="submit" class="btn-icon btn-icon-danger" style="width:28px; height:28px; display:inline-flex; align-items:center; justify-content:center;" title="Hapus GTK">
+                        <i class="bi bi-trash3-fill" style="font-size:12px;"></i>
                       </button>
                     </form>
                   </div>
@@ -799,7 +781,7 @@
               </tr>
             @empty
               <tr>
-                <td colspan="8" style="text-align:center; padding:36px; color:var(--text-3);">
+                <td colspan="7" style="text-align:center; padding:36px; color:var(--text-3);">
                   <i class="bi bi-person-x" style="font-size:32px; opacity:0.4;"></i>
                   <div style="font-weight:700; margin-top:8px; font-size:14px; color:var(--text);">Tidak ada data GTK yang cocok</div>
                   <p style="font-size:12px; margin-top:4px;">Coba gunakan kata kunci pencarian lain atau klik Reset.</p>
