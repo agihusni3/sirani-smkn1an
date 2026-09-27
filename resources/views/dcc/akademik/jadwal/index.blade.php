@@ -72,23 +72,22 @@
   {{-- ========================================================================= --}}
   {{-- PENUGASAN JADWAL GURU PIKET                                               --}}
   {{-- ========================================================================= --}}
-  <div class="akademik-card" style="margin-bottom:20px;">
-    <div class="akademik-card-header" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; padding:16px 20px; background:#ffffff;">
+  <div class="akademik-card" style="margin-bottom:16px;">
+    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; padding:16px 20px; background:#ffffff; border-radius:12px;">
       <div>
-        <h2 style="font-weight:800; font-size:18px; color:#000; margin:0; display:flex; align-items:center; gap:8px;">
-          <i class="bi bi-person-badge"></i>
-          Penugasan Jadwal Waka &amp; Guru Piket Harian
+        <h2 style="font-weight:700; font-size:17px; color:#0f172a; margin:0;">
+          Jadwal Guru Piket
         </h2>
-        <div style="font-size:12px; color:#6b7280; margin-top:3px;">
-          Tahun Ajaran <b>{{ $ta?->tahun_ajaran ?? '2025/2026' }}</b> · Semester <b>{{ $semester == 1 ? '1 (Ganjil)' : '2 (Genap)' }}</b> — Pengawasan kehadiran guru, keterlambatan siswa, dan ketertiban KBM harian.
+        <div style="font-size:12px; color:#64748b; margin-top:3px;">
+          Tahun Ajaran {{ $ta?->tahun_ajaran ?? '2025/2026' }} · Semester {{ $semester == 1 ? '1 (Ganjil)' : '2 (Genap)' }}
         </div>
       </div>
       <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
         <div class="btn-group" role="group">
-          <a href="{{ route('akademik.jadwal.index', ['tab' => 'piket', 'semester' => 1]) }}" class="ak-btn {{ $semester == 1 ? 'ak-btn-primary' : 'ak-btn-secondary' }}" style="font-size:12px; padding:6px 12px;">
+          <a href="{{ route('akademik.jadwal.index', ['tab' => 'piket', 'semester' => 1]) }}" class="ak-btn {{ $semester == 1 ? 'ak-btn-primary' : 'ak-btn-secondary' }}" style="font-size:12px; padding:5px 12px;">
             Sem 1 (Ganjil)
           </a>
-          <a href="{{ route('akademik.jadwal.index', ['tab' => 'piket', 'semester' => 2]) }}" class="ak-btn {{ $semester == 2 ? 'ak-btn-primary' : 'ak-btn-secondary' }}" style="font-size:12px; padding:6px 12px;">
+          <a href="{{ route('akademik.jadwal.index', ['tab' => 'piket', 'semester' => 2]) }}" class="ak-btn {{ $semester == 2 ? 'ak-btn-primary' : 'ak-btn-secondary' }}" style="font-size:12px; padding:5px 12px;">
             Sem 2 (Genap)
           </a>
         </div>
@@ -97,16 +96,16 @@
           @csrf
           <input type="hidden" name="tahun_ajaran_id" value="{{ $ta?->id ?? 1 }}">
           <input type="hidden" name="semester" value="{{ $semester }}">
-          <button type="submit" class="ak-btn" style="font-size:12px; font-weight:700; background:#f0fdf4; color:#15803d; border:1px solid #bbf7d0;" title="Sinkronkan ulang seluruh penugasan piket ke Meja Piket SIRANI">
-            <i class="bi bi-arrow-repeat me-1"></i> Sinkronkan ke SIRANI
+          <button type="submit" class="ak-btn ak-btn-secondary" style="font-size:12px; padding:5px 12px;" title="Sinkronkan ulang seluruh penugasan piket ke Meja Piket SIRANI">
+            Sinkronkan ke SIRANI
           </button>
         </form>
         @endif
-        <a href="{{ route('piket.index') }}" target="_blank" class="ak-btn ak-btn-secondary" style="font-size:12.5px; font-weight:700;" title="Buka layar operasional Meja Piket">
-          <i class="bi bi-box-arrow-up-right me-1"></i> Buka Meja Piket SIRANI
+        <a href="{{ route('piket.index') }}" target="_blank" class="ak-btn ak-btn-secondary" style="font-size:12px; padding:5px 12px;" title="Buka layar operasional Meja Piket">
+          Buka Meja Piket SIRANI
         </a>
-        <a href="{{ route('akademik.jadwal.index', ['tab' => 'roster', 'semester' => $semester]) }}" class="ak-btn ak-btn-secondary" style="font-size:12.5px; font-weight:700;">
-          <i class="bi bi-arrow-left me-1"></i> Kembali ke Roster Jadwal
+        <a href="{{ route('akademik.jadwal.index', ['tab' => 'roster', 'semester' => $semester]) }}" class="ak-btn ak-btn-secondary" style="font-size:12px; padding:5px 12px;">
+          Kembali ke Roster
         </a>
       </div>
     </div>
@@ -959,61 +958,48 @@ function tambahIstirahat(hari) {
 {{-- TAB 3: JADWAL GURU PIKET                                                  --}}
 {{-- ========================================================================= --}}
 @if($tab === 'piket')
-<div class="akademik-card" style="margin-bottom:24px;">
-  <div class="akademik-card-header" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
-    <div>
-      <h3 style="font-weight:800; font-size:16px; margin:0; color:var(--ak-dark); display:flex; align-items:center; gap:8px;">
-        <i class="bi bi-person-badge-fill text-success"></i> Penugasan Waka &amp; Guru Piket Mingguan
-      </h3>
-      <div style="font-size:12px; color:#64748b; margin-top:2px;">
-        Atur jadwal petugas piket harian untuk menjaga kedisiplinan dan kelancaran KBM di SMKN 1 Air Naningan.
-      </div>
-    </div>
-    <div style="display:flex; align-items:center; gap:8px;">
-      <span class="badge" style="background:#dcfce7; color:#15803d; border:1px solid #86efac; font-size:11.5px; font-weight:700; padding:6px 12px; border-radius:8px; display:inline-flex; align-items:center; gap:6px;">
-        <i class="bi bi-patch-check-fill text-success"></i> Terhubung &amp; Sinkron Otomatis ke Meja Piket SIRANI
-      </span>
-    </div>
-  </div>
-  <div class="akademik-card-body" style="padding:0;">
-    <table class="table table-bordered mb-0" style="font-size:12.5px;">
-      <thead style="background:#f8fafc;">
-        <tr>
-          <th style="width:120px;">Hari</th>
-          <th style="width:250px;">Waka Piket</th>
-          <th>Daftar Guru Piket</th>
+<div class="akademik-card" style="margin-bottom:24px; padding:0; overflow:hidden; border:1px solid #e2e8f0; border-radius:12px; background:#ffffff;">
+  <div style="overflow-x:auto;">
+    <table style="width:100%; border-collapse:collapse; font-size:13px; text-align:left;">
+      <thead>
+        <tr style="border-bottom:1px solid #e2e8f0; background:#fafafa;">
+          <th style="padding:14px 20px; font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; color:#64748b; width:130px;">Hari</th>
+          <th style="padding:14px 20px; font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; color:#64748b; width:250px;">Waka Piket</th>
+          <th style="padding:14px 20px; font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; color:#64748b;">Daftar Guru Piket</th>
           @if($canEditJadwal || ($user && ($user->isWakaKesiswaan() || $user->hasAvailableRole('waka_kesiswaan'))))
-          <th style="width:90px; text-align:center;">Aksi</th>
+          <th style="padding:14px 20px; font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; color:#64748b; width:80px; text-align:right;">Aksi</th>
           @endif
         </tr>
       </thead>
       <tbody>
         @foreach(['SENIN', 'SELASA', 'RABU', 'KAMIS', 'JUMAT'] as $d)
           @php $pkt = $guruPikets->get($d); @endphp
-          <tr>
-            <td style="font-weight:800; color:var(--ak-primary); font-size:13px;">{{ $d }}</td>
-            <td style="font-weight:700;">
+          <tr style="border-bottom:1px solid #f1f5f9; transition:background 0.15s ease;" onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background='transparent'">
+            <td style="padding:15px 20px; font-weight:600; color:#0f172a; font-size:13px;">
+              {{ ucfirst(strtolower($d)) }}
+            </td>
+            <td style="padding:15px 20px; font-weight:500; color:#1e293b;">
               @if($pkt?->wakaPiket)
-                <i class="bi bi-shield-check text-primary me-1"></i> {{ $pkt->wakaPiket->nama }}
+                {{ $pkt->wakaPiket->nama }}
               @else
-                <span style="color:#94a3b8; font-style:italic;">Belum diatur</span>
+                <span style="color:#94a3b8;">—</span>
               @endif
             </td>
-            <td>
+            <td style="padding:15px 20px;">
               <div style="display:flex; flex-wrap:wrap; gap:6px;">
                 @forelse($pkt?->guru_list ?? [] as $gp)
-                  <span class="ak-badge ak-badge-secondary" style="font-size:11.5px;">
-                    <i class="bi bi-person-check text-success me-1"></i> {{ $gp->nama }}
+                  <span style="display:inline-block; background:#f1f5f9; color:#334155; font-size:12px; font-weight:500; padding:3px 9px; border-radius:6px;">
+                    {{ $gp->nama }}
                   </span>
                 @empty
-                  <span style="color:#94a3b8; font-style:italic; font-size:12px;">Belum ada guru piket</span>
+                  <span style="color:#94a3b8; font-size:12px;">—</span>
                 @endforelse
               </div>
             </td>
             @if($canEditJadwal || ($user && ($user->isWakaKesiswaan() || $user->hasAvailableRole('waka_kesiswaan'))))
-            <td style="text-align:center;">
-              <button type="button" class="ak-btn ak-btn-secondary ak-btn-sm" data-bs-toggle="modal" data-bs-target="#modalPiket{{ $d }}" title="Ubah Petugas Piket">
-                <i class="bi bi-pencil"></i> Ubah
+            <td style="padding:15px 20px; text-align:right;">
+              <button type="button" class="ak-btn ak-btn-secondary ak-btn-sm" data-bs-toggle="modal" data-bs-target="#modalPiket{{ $d }}" style="padding:4px 12px; font-size:12px; font-weight:500; border-radius:6px;">
+                Ubah
               </button>
             </td>
             @endif
@@ -1023,21 +1009,21 @@ function tambahIstirahat(hari) {
           {{-- Modal Edit Piket --}}
           <div class="modal fade" id="modalPiket{{ $d }}" tabindex="-1" aria-hidden="true">
             <div class="modal-dialog">
-              <div class="modal-content" style="border-radius:14px;">
+              <div class="modal-content" style="border-radius:12px; border:1px solid #e2e8f0;">
                 <form action="{{ route('akademik.jadwal.piket.store') }}" method="POST">
                   @csrf
                   <input type="hidden" name="tahun_ajaran_id" value="{{ $ta?->id ?? 1 }}">
                   <input type="hidden" name="semester" value="{{ $semester }}">
                   <input type="hidden" name="hari" value="{{ $d }}">
 
-                  <div class="modal-header">
-                    <h5 class="modal-title" style="font-weight:800; font-size:16px;">Atur Petugas Piket - {{ $d }}</h5>
+                  <div class="modal-header" style="border-bottom:1px solid #f1f5f9; padding:14px 20px;">
+                    <h5 class="modal-title" style="font-weight:700; font-size:15px; color:#0f172a;">Atur Petugas Piket — {{ ucfirst(strtolower($d)) }}</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                   </div>
-                  <div class="modal-body">
-                    <div style="margin-bottom:12px;">
-                      <label class="ak-form-label">Waka Piket</label>
-                      <select name="waka_piket_id" class="ak-select">
+                  <div class="modal-body" style="padding:18px 20px;">
+                    <div style="margin-bottom:14px;">
+                      <label class="ak-form-label" style="font-size:12px; font-weight:600; color:#475569; margin-bottom:6px;">Waka Piket</label>
+                      <select name="waka_piket_id" class="ak-select" style="border-radius:8px;">
                         <option value="">-- Pilih Waka Piket --</option>
                         @foreach($gurus as $g)
                           <option value="{{ $g->id }}" {{ $pkt?->waka_piket_id == $g->id ? 'selected' : '' }}>
@@ -1046,21 +1032,21 @@ function tambahIstirahat(hari) {
                         @endforeach
                       </select>
                     </div>
-                    <div style="margin-bottom:12px;">
-                      <label class="ak-form-label">Guru Piket (Pilih Beberapa)</label>
-                      <div style="max-height:160px; overflow-y:auto; border:1px solid #cbd5e1; border-radius:8px; padding:8px; display:grid; grid-template-columns:1fr 1fr; gap:6px;">
+                    <div>
+                      <label class="ak-form-label" style="font-size:12px; font-weight:600; color:#475569; margin-bottom:6px;">Guru Piket</label>
+                      <div style="max-height:180px; overflow-y:auto; border:1px solid #e2e8f0; border-radius:8px; padding:10px; display:grid; grid-template-columns:1fr 1fr; gap:8px; background:#fafafa;">
                         @foreach($gurus as $g)
-                          <label style="display:flex; align-items:center; gap:6px; font-size:12px; font-weight:600; cursor:pointer; margin:0;">
-                            <input type="checkbox" name="guru_ids[]" value="{{ $g->id }}" {{ in_array($g->id, $pkt?->guru_ids ?? []) ? 'checked' : '' }} style="cursor:pointer; width:15px; height:15px;">
+                          <label style="display:flex; align-items:center; gap:6px; font-size:12px; font-weight:500; color:#334155; cursor:pointer; margin:0;">
+                            <input type="checkbox" name="guru_ids[]" value="{{ $g->id }}" {{ in_array($g->id, $pkt?->guru_ids ?? []) ? 'checked' : '' }} style="cursor:pointer; width:15px; height:15px; accent-color:#0f172a;">
                             <span>{{ $g->nama }}</span>
                           </label>
                         @endforeach
                       </div>
                     </div>
                   </div>
-                  <div class="modal-footer">
-                    <button type="button" class="ak-btn ak-btn-secondary" data-bs-dismiss="modal">Batal</button>
-                    <button type="submit" class="ak-btn ak-btn-primary">Simpan Petugas Piket</button>
+                  <div class="modal-footer" style="border-top:1px solid #f1f5f9; padding:12px 20px;">
+                    <button type="button" class="ak-btn ak-btn-secondary" data-bs-dismiss="modal" style="font-size:12px; padding:6px 14px;">Batal</button>
+                    <button type="submit" class="ak-btn ak-btn-primary" style="font-size:12px; padding:6px 14px;">Simpan Perubahan</button>
                   </div>
                 </form>
               </div>
@@ -1070,26 +1056,6 @@ function tambahIstirahat(hari) {
         @endforeach
       </tbody>
     </table>
-  </div>
-</div>
-
-{{-- Banner Semua Alur Kurikulum Selesai --}}
-<div class="akademik-card" style="margin-top:24px; background:linear-gradient(135deg, #f8fafc, #f1f5f9); border:1px solid #cbd5e1; padding:20px 24px; border-radius:14px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px;">
-  <div>
-    <div style="font-weight:900; font-size:16px; color:#1e293b; display:flex; align-items:center; gap:8px;">
-      <i class="bi bi-patch-check-fill text-primary"></i> 4 Tahapan Alur Kurikulum Terintegrasi
-    </div>
-    <div style="font-size:13px; color:#475569; margin-top:4px; max-width:650px;">
-      Struktur Mata Pelajaran, SK Pembagian Tugas Guru, Jadwal Roster KBM, dan Penugasan Guru Piket telah siap digunakan untuk operasional sekolah SMKN 1 Air Naningan.
-    </div>
-  </div>
-  <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
-    <a href="{{ route('akademik.jadwal.index', ['tab' => 'roster', 'semester' => $semester]) }}" class="ak-btn ak-btn-secondary" style="font-size:13px; font-weight:700;">
-      <i class="bi bi-arrow-left me-1"></i> Lihat Roster Jadwal
-    </a>
-    <a href="{{ route('akademik.dashboard') }}" class="ak-btn ak-btn-primary" style="font-size:13px; font-weight:700; padding:10px 22px;">
-      <i class="bi bi-speedometer2 me-1"></i> Dashboard Akademik
-    </a>
   </div>
 </div>
 @endif
