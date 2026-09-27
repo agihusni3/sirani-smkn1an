@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>INSTRUMEN &amp; RUBRIK WAWANCARA PPDB — {{ $pendaftar ? $pendaftar->nama_lengkap : 'SMKN 1 AIR NANINGAN' }}</title>
+    <title>PPDB</title>
     <style>
         @page {
             size: A4 portrait;

@@ -9,7 +9,7 @@
   $sppds = $suratTugas->sppds;
 @endphp
 
-@section('title', 'Paket Cetak 3-in-1 — ' . $suratTugas->nomor_surat_tugas)
+@section('title', 'SITUAN')
 @section('toolbar_title', 'Paket Lengkap 3-in-1: Surat Tugas + SPPD + Visum')
 
 @push('styles')

@@ -8,7 +8,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>{{ $isEdit ? 'Edit Soal' : 'Tambah Soal' }} CBT PPDB — SMKN 1 Air Naningan</title>
+  <title>PPDB</title>
   @include('partials.styles')
   <link rel="stylesheet" href="{{ asset('css/admin-ppdb.css') }}?v={{ $cssVersion }}">
 </head>

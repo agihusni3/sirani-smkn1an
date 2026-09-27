@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Tambah Artikel Berita — SIRANI SMKN 1 Air Naningan</title>
+  <title>WEB</title>
   @include('partials.styles')
 </head>
 <body>

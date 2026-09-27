@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <title>Capaian Pembelajaran (CP) — {{ $perangkat->mataPelajaran?->nama_mapel }}</title>
+  <title>AKADEMIK</title>
   <style>
     @page {
       size: A4 portrait;

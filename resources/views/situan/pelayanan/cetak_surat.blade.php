@@ -15,7 +15,7 @@
   $backLabel = 'Kembali ke Layanan Siswa';
 @endphp
 
-@section('title', ($pelayanan->suratKeluar?->nomor_surat_lengkap ?? 'Surat Keterangan') . ' — ' . ($pelayanan->siswa?->nama ?? 'Siswa'))
+@section('title', 'SITUAN') . ' — ' . ($pelayanan->siswa?->nama ?? 'Siswa'))
 @section('toolbar_title', 'Surat Pelayanan Siswa & Suket Resmi')
 
 @push('styles')

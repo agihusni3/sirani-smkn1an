@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <title>Lembar Pengesahan Perangkat Pembelajaran — {{ $perangkat->mataPelajaran?->nama_mapel }}</title>
+  <title>AKADEMIK</title>
   <style>
     @page {
       size: A4 portrait;

@@ -1,6 +1,6 @@
 @extends('web.layouts.app')
 
-@section('title', 'Ruang Ujian CBT Seleksi PPDB 2026 — SMKN 1 Air Naningan')
+@section('title', 'PPDB')
 @section('meta_description', 'Portal akses ujian seleksi tertulis online CBT PPDB SMKN 1 Air Naningan. Masukkan nomor pendaftaran resmi untuk memulai tes.')
 
 @section('content')

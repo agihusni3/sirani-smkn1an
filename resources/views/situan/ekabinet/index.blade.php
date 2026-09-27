@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'E-Kabinet & E-Arsip Digital — SITUAN SMKN 1 AN')
+@section('title', 'SITUAN')
 
 @push('styles')
 <style>

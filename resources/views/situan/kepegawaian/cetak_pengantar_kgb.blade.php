@@ -5,7 +5,7 @@
   $backLabel = 'Kembali ke Radar KGB';
 @endphp
 
-@section('title', 'Surat Pengantar KGB — ' . $guru->nama)
+@section('title', 'SITUAN')
 @section('toolbar_title', 'Surat Pengantar Usul KGB — ' . $guru->nama)
 
 @push('styles')

@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="csrf-token" content="{{ csrf_token() }}" />
-  <title>Pusat Manajemen Kartu RFID — SMKN 1 Air Naningan</title>
+  <title>SIRANI</title>
   @include('partials.styles')
   <link rel="stylesheet" href="{{ asset('css/situan-app.css') }}?v={{ filemtime(public_path('css/situan-app.css')) }}">
   <link rel="stylesheet" href="{{ asset('css/rfid.css') }}?v={{ filemtime(public_path('css/rfid.css')) }}">

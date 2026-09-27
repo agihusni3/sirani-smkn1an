@@ -5,7 +5,7 @@
   $backLabel = 'Kembali ke Data Siswa';
 @endphp
 
-@section('title', 'Surat Keterangan Bebas Masalah — ' . $siswa->nama)
+@section('title', 'SITUAN')
 @section('toolbar_title', 'Surat Keterangan Bebas Masalah & Resume Presensi — ' . $siswa->nama)
 
 @push('styles')

@@ -1,6 +1,6 @@
 @extends('layouts.dokumen_a4')
 
-@section('title', 'Surat Dinas — ' . $surat->nomor_surat_lengkap)
+@section('title', 'SITUAN')
 
 @section('content')
   {{-- BARIS KEPALA SURAT DINAS (NOMOR & TUJUAN) --}}

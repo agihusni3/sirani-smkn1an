@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <title>Perangkat Pembelajaran — {{ $perangkat->mataPelajaran?->nama_mapel }}</title>
+  <title>AKADEMIK</title>
   <style>
     @page { size: A4 portrait; margin: 15mm 18mm 15mm 20mm; }
     * { box-sizing: border-box; }

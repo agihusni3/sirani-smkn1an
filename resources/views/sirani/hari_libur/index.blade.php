@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Kalender Akademik — SIRANI</title>
+  <title>SIRANI</title>
   @include('partials.styles')
   <link rel="stylesheet" href="{{ asset('css/hari-libur.css') }}?v={{ filemtime(public_path('css/hari-libur.css')) }}">
 </head>

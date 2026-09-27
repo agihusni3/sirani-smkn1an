@@ -1,6 +1,6 @@
 @extends('web.layouts.app')
 
-@section('title', 'Penerimaan Peserta Didik Baru (PPDB) 2026/2027 — SMKN 1 Air Naningan')
+@section('title', 'PPDB') 2026/2027 — SMKN 1 Air Naningan')
 @section('meta_description', 'Portal resmi PPDB Online SMKN 1 Air Naningan Tahun Pelajaran 2026/2027. Pendaftaran mandiri mudah, transparan, dan bebas biaya.')
 
 @section('content')

@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <title>Lembar Disposisi — Agenda #{{ str_pad((string)$surat->nomor_agenda, 3, '0', STR_PAD_LEFT) }}/{{ $surat->tahun_agenda }}</title>
+  <title>SITUAN</title>
   <style>
     @page {
       size: A5 portrait;

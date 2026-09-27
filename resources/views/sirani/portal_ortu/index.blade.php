@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>{{ $siswa ? ($modeAkses === 'siswa' ? 'Kartu & Presensi Siswa '.$siswa->nama.' — SIRANI' : 'Rekap Kehadiran '.$siswa->nama.' — Monitoring Absen Mandiri') : 'Monitoring Absen Mandiri — SMKN 1 Air Naningan' }}</title>
+  <title>SIRANI</title>
   
   {{-- PWA Meta Tags --}}
   <link rel="manifest" href="/manifest.json" />

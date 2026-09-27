@@ -1,6 +1,6 @@
 @extends('web.layouts.app')
 
-@section('title', 'Pendaftaran Berhasil — PPDB SMKN 1 Air Naningan')
+@section('title', 'PPDB')
 
 @section('content')
 <div class="container" style="padding-top: 40px; padding-bottom: 60px; max-width: 820px;">

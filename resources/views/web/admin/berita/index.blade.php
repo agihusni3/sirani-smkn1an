@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Dasbor Publikasi Berita &amp; Humas — SMKN 1 Air Naningan</title>
+  <title>WEB</title>
   @include('partials.styles')
   <style>
     .humas-hero-bar {

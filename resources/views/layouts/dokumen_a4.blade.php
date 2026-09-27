@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>@yield('title', 'Dokumen Resmi — ' . config('app.name', 'SMKN 1 Air Naningan'))</title>
+  <title>SITUAN</title>
   
   {{-- Google Fonts: Serif Resmi & Sans-Serif untuk Antarmuka Layar --}}
   <link rel="preconnect" href="https://fonts.googleapis.com">

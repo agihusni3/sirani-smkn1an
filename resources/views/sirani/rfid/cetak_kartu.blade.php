@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Cetak Kartu Identitas e-KTP Standar - {{ $sekolah->nama_sekolah ?? 'SMKN 1 AIR NANINGAN' }}</title>
+  <title>SIRANI</title>
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

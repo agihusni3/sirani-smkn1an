@@ -1,6 +1,6 @@
 @extends('web.layouts.app')
 
-@section('title', 'Formulir Pendaftaran Siswa Baru — PPDB 2026/2027')
+@section('title', 'PPDB')
 @section('meta_description', 'Isi data diri dan berkas persyaratan pendaftaran calon peserta didik baru SMKN 1 Air Naningan.')
 
 @section('content')

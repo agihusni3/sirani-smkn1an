@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Perizinan Siswa & Guru — SMKN 1 Air Naningan</title>
+  <title>SIRANI</title>
   @include('partials.styles')
   <link rel="stylesheet" href="{{ asset('css/izin-siswa.css') }}?v={{ filemtime(public_path('css/izin-siswa.css')) }}">
 </head>

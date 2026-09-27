@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Pusat Pengumuman &amp; Broadcast — SMKN 1 Air Naningan</title>
+  <title>SIRANI</title>
   @include('partials.styles')
   <link rel="stylesheet" href="{{ asset('css/pengumuman.css') }}?v={{ filemtime(public_path('css/pengumuman.css')) }}">
 </head>

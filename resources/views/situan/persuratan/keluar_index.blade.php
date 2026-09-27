@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Buku Agenda Surat Keluar — SITUAN SMKN 1 AN')
+@section('title', 'SITUAN')
 
 @section('content')
 <div class="container-fluid px-3 px-md-4 py-4">

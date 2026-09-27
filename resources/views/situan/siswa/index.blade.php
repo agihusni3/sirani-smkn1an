@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Master Data Siswa — SITUAN SMKN 1 Air Naningan</title>
+  <title>SITUAN</title>
   @include('partials.styles')
   <link rel="stylesheet" href="{{ asset('css/situan-app.css') }}?v={{ filemtime(public_path('css/situan-app.css')) }}">
   <link rel="stylesheet" href="{{ asset('css/siswa.css') }}?v={{ filemtime(public_path('css/siswa.css')) }}">

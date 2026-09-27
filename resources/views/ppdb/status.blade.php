@@ -1,6 +1,6 @@
 @extends('web.layouts.app')
 
-@section('title', 'Cek Status Pendaftaran & Hasil Seleksi — PPDB 2026/2027')
+@section('title', 'PPDB')
 @section('meta_description', 'Pantau status verifikasi berkas, jadwal tes, ruang CBT, dan pengumuman hasil kelulusan PPDB SMKN 1 Air Naningan secara mandiri.')
 
 @section('content')

@@ -8,7 +8,7 @@
   $isMulti = $anggotas->count() > 1;
 @endphp
 
-@section('title', 'Surat Tugas — ' . $suratTugas->nomor_surat_tugas)
+@section('title', 'SITUAN')
 @section('toolbar_title', 'Surat Perintah Tugas (SPT) Resmi')
 
 @push('styles')

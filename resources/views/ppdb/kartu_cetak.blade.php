@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KARTU BUKTI PENDAFTARAN & JADWAL SELEKSI — {{ $pendaftar->no_pendaftaran ?? $pendaftar->nomor_pendaftaran }}</title>
+    <title>PPDB</title>
     <style>
         /* Standar Halaman A4: 210mm x 297mm */
         @page {

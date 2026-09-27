@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Pencadangan &amp; Auto-Backup Database — SMKN 1 Air Naningan</title>
+  <title>DCC</title>
   @include('partials.styles')
   <link rel="stylesheet" href="{{ asset('css/situan-app.css') }}?v={{ filemtime(public_path('css/situan-app.css')) }}">
   <link rel="stylesheet" href="{{ asset('css/backup.css') }}?v={{ filemtime(public_path('css/backup.css')) }}">

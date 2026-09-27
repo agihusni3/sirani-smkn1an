@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Seleksi CBT & Wawancara PPDB 2026 — SMKN 1 Air Naningan</title>
+  <title>PPDB</title>
   @include('partials.styles')
   <link rel="stylesheet" href="{{ asset('css/admin-ppdb.css') }}?v={{ file_exists(public_path('css/admin-ppdb.css')) ? filemtime(public_path('css/admin-ppdb.css')) : time() }}">
 </head>

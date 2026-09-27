@@ -7,7 +7,7 @@
   $otherAnggotas = $suratTugas->anggotas->where('id', '!=', $sppd->surat_tugas_anggota_id);
 @endphp
 
-@section('title', 'SPPD & Visum — ' . $sppd->nomor_sppd)
+@section('title', 'SITUAN')
 @section('toolbar_title', 'SPPD Lembar I & II (Visum Lengkap)')
 
 @push('styles')

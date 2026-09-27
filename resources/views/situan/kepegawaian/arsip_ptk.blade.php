@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Lemari Berkas Digital PTK — ' . $guru->nama)
+@section('title', 'SITUAN')
 
 @section('content')
 <div class="container-fluid px-3 px-md-4 py-4">
