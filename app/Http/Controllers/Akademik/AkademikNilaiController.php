@@ -20,16 +20,24 @@ class AkademikNilaiController extends Controller
         $user = auth()->user();
         $guruId = $user?->guru_id;
 
-        $query = AkademikDistribusiMengajar::with(['mataPelajaran', 'rombel', 'guru'])
-            ->when($ta, fn($q) => $q->where('tahun_ajaran_id', $ta->id));
+        $query = AkademikDistribusiMengajar::with([
+                'mataPelajaran', 
+                'rombel' => fn($q) => $q->withCount(['siswas' => fn($sq) => $sq->whereIn('status', ['aktif', 'pkl'])]), 
+                'guru'
+            ])
+            ->when($ta, fn($q) => $q->where('tahun_ajaran_id', $ta->id))
+            ->orderBy('mata_pelajaran_id')
+            ->orderBy('semester')
+            ->orderBy('rombel_id');
 
         if ($guruId && !$user->isAdmin() && !$user->isWakaKurikulum()) {
             $query->where('guru_id', $guruId);
         }
 
         $distribusis = $query->get();
+        $groupedByMapel = $distribusis->groupBy('mata_pelajaran_id');
 
-        return view('dcc.akademik.nilai.index', compact('distribusis', 'ta'));
+        return view('dcc.akademik.nilai.index', compact('distribusis', 'groupedByMapel', 'ta'));
     }
 
     protected function authorizeDistribusi(AkademikDistribusiMengajar $distribusi): void
