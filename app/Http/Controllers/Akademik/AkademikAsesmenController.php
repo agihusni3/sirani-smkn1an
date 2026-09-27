@@ -135,6 +135,35 @@ class AkademikAsesmenController extends Controller
             ->with('success', 'Paket asesmen berhasil dibuat! Silakan mulai menyusun butir soal pada langkah ini.');
     }
 
+    public function update(Request $request, $id)
+    {
+        $asesmen = AkademikAsesmenOnline::findOrFail($id);
+        $this->authorizeAsesmen($asesmen);
+
+        $validated = $request->validate([
+            'judul' => 'required|string|max:255',
+            'jenis' => 'required|in:kuis,ulangan_harian,pts,pas,tugas',
+            'durasi_menit' => 'required|integer|min:1|max:300',
+            'passing_grade' => 'required|integer|min:0|max:100',
+        ]);
+
+        $asesmen->update($validated);
+
+        return back()->with('success', 'Paket asesmen berhasil diperbarui.');
+    }
+
+    public function destroy($id)
+    {
+        $asesmen = AkademikAsesmenOnline::findOrFail($id);
+        $this->authorizeAsesmen($asesmen);
+
+        $asesmen->hasils()->delete();
+        $asesmen->soals()->delete();
+        $asesmen->delete();
+
+        return back()->with('success', 'Paket asesmen berhasil dihapus.');
+    }
+
     protected function authorizeAsesmen(AkademikAsesmenOnline $asesmen): void
     {
         $user = auth()->user();

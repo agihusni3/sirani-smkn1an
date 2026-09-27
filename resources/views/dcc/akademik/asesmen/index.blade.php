@@ -84,8 +84,70 @@
         Belum ada asesmen online yang dibuat. Klik tombol "Buat Asesmen Online Baru" di atas.
       </div>
     @else
-      <div class="akademik-table-wrap">
-        <table class="akademik-table">
+      <style>
+        .table-asesmen-minimal {
+          width: 100%;
+          border-collapse: collapse;
+          font-size: 13px;
+          text-align: left;
+        }
+        .table-asesmen-minimal th {
+          padding: 14px 18px;
+          font-size: 11px;
+          font-weight: 700;
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
+          color: #000000;
+          background: #fafafa;
+          border-bottom: 1px solid #e5e7eb;
+        }
+        .table-asesmen-minimal td {
+          padding: 16px 18px;
+          vertical-align: middle;
+          border-bottom: 1px solid #f3f4f6;
+          color: #000000;
+          background: transparent;
+        }
+        .asesmen-row {
+          transition: background-color 0.15s ease;
+        }
+        .asesmen-row:hover {
+          background-color: #f9fafb !important;
+        }
+        .btn-horev {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          padding: 5px 12px;
+          font-size: 12px;
+          font-weight: 600;
+          color: #000000;
+          background: transparent;
+          border: 1px solid #000000;
+          border-radius: 6px;
+          text-decoration: none;
+          cursor: pointer;
+          transition: all 0.15s ease;
+          white-space: nowrap;
+          line-height: 1.2;
+        }
+        .btn-horev:hover {
+          background: #000000;
+          color: #ffffff !important;
+        }
+        .btn-horev-danger {
+          color: #000000;
+          border-color: #000000;
+        }
+        .btn-horev-danger:hover {
+          background: #000000;
+          color: #ffffff !important;
+          border-color: #000000;
+        }
+      </style>
+
+      <div class="akademik-table-wrap" style="overflow-x:auto;">
+        <table class="table-asesmen-minimal">
           <thead>
             <tr>
               <th style="width:40px;">No</th>
@@ -95,106 +157,127 @@
               <th>Butir Soal</th>
               <th>Peserta Selesai</th>
               <th>Status Ujian</th>
-              <th style="width:190px; text-align:center;">Aksi &amp; Ujian</th>
+              <th style="text-align:right; width:340px;">Aksi &amp; Ujian</th>
             </tr>
           </thead>
           <tbody>
             @foreach($asesmens as $idx => $a)
-              <tr>
-                <td>{{ $asesmens->firstItem() + $idx }}</td>
+              <tr class="asesmen-row">
+                <td style="color:#000000; font-weight:600;">{{ $asesmens->firstItem() + $idx }}</td>
                 <td>
-                  <div style="font-weight:700; color:var(--ak-dark); font-size:14px;">{{ $a->judul }}</div>
-                  <div style="display:flex; align-items:center; gap:6px; margin-top:4px; flex-wrap:wrap;">
-                    <span style="font-size:11px; color:#64748b;">KKM: <strong>{{ $a->passing_grade }}</strong></span>
-                    @if($a->status_validasi === 'siap_diujikan')
-                      <span class="ak-badge ak-badge-success" style="font-size:9.5px; padding:2px 6px;" title="Butir soal telah divalidasi dan memenuhi syarat kelayakan ujian">
-                        <i class="bi bi-patch-check-fill me-1"></i>Valid
-                      </span>
-                    @elseif($a->status_validasi === 'perlu_revisi')
-                      <span class="ak-badge ak-badge-danger" style="font-size:9.5px; padding:2px 6px;" title="Butir soal perlu revisi pengawas">
-                        <i class="bi bi-exclamation-triangle-fill me-1"></i>Revisi
-                      </span>
-                    @else
-                      <span class="ak-badge ak-badge-warning" style="font-size:9.5px; padding:2px 6px;" title="Soal masih dalam proses penyusunan draft">
-                        <i class="bi bi-pencil me-1"></i>Draft
-                      </span>
-                    @endif
-                    @if($a->anti_cheat_mode)
-                      <span class="ak-badge ak-badge-danger" style="font-size:9.5px; padding:2px 6px;">
-                        <i class="bi bi-shield-lock-fill me-1"></i>Anti-Curang
-                      </span>
-                    @endif
-                    @if($a->token_ujian)
-                      <span class="ak-badge ak-badge-secondary" style="font-size:9.5px; padding:2px 6px; font-family:monospace;">
-                        <i class="bi bi-key me-1"></i>{{ $a->token_ujian }}
-                      </span>
-                    @endif
+                  <div style="font-weight:700; color:#000000; font-size:14px; line-height:1.3;">
+                    {{ $a->judul }}
                   </div>
                 </td>
                 <td>
-                  <div style="font-weight:700; color:var(--ak-primary);">{{ $a->distribusi?->mataPelajaran?->nama_mapel ?? '-' }}</div>
-                  <div style="display:flex; align-items:center; gap:4px; margin-top:3px; flex-wrap:wrap;">
-                    @php
-                      $targetRombels = $a->getTargetRombels();
-                    @endphp
+                  <div style="font-weight:600; color:#000000; font-size:13px;">
+                    {{ $a->distribusi?->mataPelajaran?->nama_mapel ?? '-' }}
+                  </div>
+                  <div style="color:#000000; font-size:12px; margin-top:2px;">
+                    @php $targetRombels = $a->getTargetRombels(); @endphp
                     @if($targetRombels->count() > 1)
-                      <span class="ak-badge ak-badge-info" style="font-size:11px;" title="{{ $a->rombel_names }}">
-                        <i class="bi bi-people-fill me-1"></i>{{ $targetRombels->count() }} Rombel: {{ $a->rombel_names }}
-                      </span>
+                      {{ $targetRombels->count() }} Rombel: {{ $a->rombel_names }}
                     @else
-                      <span class="ak-badge ak-badge-secondary">
-                        {{ $targetRombels->first()?->nama_rombel ?? ($a->distribusi?->rombel?->nama_rombel ?? '-') }}
-                      </span>
-                    @endif
-
-                    @if($a->target_tipe === 'siswa_terpilih')
-                      <span class="ak-badge ak-badge-warning" style="font-size:9.5px; padding:2px 6px;" title="Hanya siswa tertentu yang ditugaskan (Remedial/Susulan)">
-                        <i class="bi bi-person-check-fill me-1"></i>{{ count($a->target_siswa_ids ?? []) }} Siswa
-                      </span>
+                      {{ $targetRombels->first()?->nama_rombel ?? ($a->distribusi?->rombel?->nama_rombel ?? '-') }}
                     @endif
                   </div>
                 </td>
                 <td>
-                  <span class="ak-badge ak-badge-primary" style="text-transform:uppercase;">
+                  <div style="font-weight:600; color:#000000; text-transform:uppercase; font-size:13px;">
                     {{ str_replace('_', ' ', $a->jenis) }}
-                  </span>
-                  <div style="font-size:11px; color:#64748b; margin-top:2px;">
-                    <i class="bi bi-clock me-1"></i>{{ $a->durasi_menit }} Menit
+                  </div>
+                  <div style="color:#000000; font-size:12px; margin-top:2px;">
+                    {{ $a->durasi_menit }} Menit
                   </div>
                 </td>
                 <td>
-                  <a href="{{ route('akademik.asesmen.soal', $a->id) }}" class="ak-badge {{ $a->soals_count > 0 ? 'ak-badge-success' : 'ak-badge-warning' }}" style="text-decoration:none;" title="Kelola Butir Soal">
-                    <i class="bi bi-question-circle me-1"></i>{{ $a->soals_count }} Soal
+                  <a href="{{ route('akademik.asesmen.soal', $a->id) }}" style="color:#000000; font-weight:600; font-size:13px; text-decoration:none;" title="Kelola Butir Soal">
+                    {{ $a->soals_count }} Soal
                   </a>
                 </td>
                 <td>
-                  <a href="{{ route('akademik.asesmen.hasil', $a->id) }}" class="ak-badge ak-badge-primary" style="text-decoration:none;" title="Lihat Rekap Nilai">
-                    <i class="bi bi-people me-1"></i>{{ $a->hasils_count }} Siswa
+                  <a href="{{ route('akademik.asesmen.hasil', $a->id) }}" style="color:#000000; font-weight:600; font-size:13px; text-decoration:none;" title="Lihat Rekap Nilai">
+                    {{ $a->hasils_count }} Siswa
                   </a>
                 </td>
                 <td>
                   <form action="{{ route('akademik.asesmen.toggle', $a->id) }}" method="POST" style="margin:0;">
                     @csrf
-                    <button type="submit" class="ak-btn ak-btn-sm {{ $a->is_active ? 'ak-btn-primary' : 'ak-btn-secondary' }}" title="Klik untuk mengubah status aktif">
-                      <i class="bi {{ $a->is_active ? 'bi-toggle-on' : 'bi-toggle-off' }}"></i>
-                      <span>{{ $a->is_active ? 'Aktif' : 'Nonaktif' }}</span>
+                    <button type="submit" style="background:none; border:none; padding:0; color:#000000; font-size:13px; font-weight:600; cursor:pointer; text-decoration:underline;" title="Klik untuk mengubah status aktif">
+                      {{ $a->is_active ? 'Aktif' : 'Nonaktif' }}
                     </button>
                   </form>
                 </td>
-                <td style="text-align:center;">
-                  <div style="display:flex; justify-content:center; gap:6px;">
-                    <a href="{{ route('akademik.asesmen.soal', $a->id) }}" class="ak-btn ak-btn-secondary ak-btn-sm" title="Tahap 2: Kelola &amp; Validasi Butir Soal">
-                      <i class="bi bi-card-checklist"></i>
+                <td style="text-align:right;">
+                  <div style="display:flex; justify-content:flex-end; align-items:center; gap:6px; flex-wrap:wrap;">
+                    <button type="button" class="btn-horev" data-bs-toggle="modal" data-bs-target="#modalEditAsesmen{{ $a->id }}" title="Edit Asesmen">
+                      Edit
+                    </button>
+                    <a href="{{ route('akademik.asesmen.soal', $a->id) }}" class="btn-horev" title="Kelola Butir Soal">
+                      Soal
                     </a>
-                    <a href="{{ route('akademik.asesmen.penugasan', $a->id) }}" class="ak-btn ak-btn-secondary ak-btn-sm" title="Tahap 3: Atur Sesi Penugasan &amp; Jadwal">
-                      <i class="bi bi-send-check"></i>
+                    <a href="{{ route('akademik.asesmen.penugasan', $a->id) }}" class="btn-horev" title="Atur Sesi &amp; Penugasan Rombel">
+                      Penugasan
                     </a>
-                    <a href="{{ route('akademik.asesmen.hasil', $a->id) }}" class="ak-btn ak-btn-secondary ak-btn-sm" title="Pantau Hasil Siswa">
-                      <i class="bi bi-bar-chart"></i>
+                    <a href="{{ route('akademik.asesmen.hasil', $a->id) }}" class="btn-horev" title="Pantau Hasil &amp; Nilai Siswa">
+                      Hasil
                     </a>
-                    <a href="{{ route('akademik.asesmen.kerjakan', $a->id) }}" class="ak-btn ak-btn-primary ak-btn-sm" title="Simulasi Ujian CBT">
-                      <i class="bi bi-play-circle"></i>
+                    <a href="{{ route('akademik.asesmen.kerjakan', $a->id) }}" class="btn-horev" title="Simulasi Ujian CBT">
+                      Ujian
                     </a>
+                    <form action="{{ route('akademik.asesmen.destroy', $a->id) }}" method="POST" style="margin:0; display:inline;" onsubmit="return confirm('Hapus paket asesmen {{ addslashes($a->judul) }} beserta seluruh butir soal?')">
+                      @csrf
+                      @method('DELETE')
+                      <button type="submit" class="btn-horev btn-horev-danger" title="Hapus Asesmen">
+                        Hapus
+                      </button>
+                    </form>
+                  </div>
+
+                  {{-- Modal Edit Asesmen --}}
+                  <div class="modal fade" id="modalEditAsesmen{{ $a->id }}" tabindex="-1" aria-hidden="true" style="text-align:left;">
+                    <div class="modal-dialog">
+                      <div class="modal-content" style="border-radius:12px; border:1px solid #000000;">
+                        <form action="{{ route('akademik.asesmen.update', $a->id) }}" method="POST">
+                          @csrf
+                          @method('PUT')
+                          <div class="modal-header" style="border-bottom:1px solid #e5e7eb; padding:14px 20px;">
+                            <h5 class="modal-title" style="font-weight:700; font-size:15px; color:#000000;">Edit Paket Asesmen</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                          </div>
+                          <div class="modal-body" style="padding:20px;">
+                            <div style="margin-bottom:14px;">
+                              <label class="ak-form-label" style="color:#000000; font-weight:600; font-size:12px; margin-bottom:6px;">Judul Asesmen</label>
+                              <input type="text" name="judul" class="ak-input" value="{{ $a->judul }}" required style="color:#000000; border-color:#d1d5db;">
+                            </div>
+                            <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:14px;">
+                              <div>
+                                <label class="ak-form-label" style="color:#000000; font-weight:600; font-size:12px; margin-bottom:6px;">Jenis Asesmen</label>
+                                <select name="jenis" class="ak-select" required style="color:#000000; border-color:#d1d5db;">
+                                  <option value="kuis" {{ $a->jenis === 'kuis' ? 'selected' : '' }}>Kuis Harian</option>
+                                  <option value="ulangan_harian" {{ $a->jenis === 'ulangan_harian' ? 'selected' : '' }}>Ulangan Harian (UH)</option>
+                                  <option value="pts" {{ $a->jenis === 'pts' ? 'selected' : '' }}>STS (Sumatif Tengah Semester)</option>
+                                  <option value="pas" {{ $a->jenis === 'pas' ? 'selected' : '' }}>SAS (Sumatif Akhir Semester)</option>
+                                  <option value="tugas" {{ $a->jenis === 'tugas' ? 'selected' : '' }}>Tugas Daring</option>
+                                </select>
+                              </div>
+                              <div>
+                                <label class="ak-form-label" style="color:#000000; font-weight:600; font-size:12px; margin-bottom:6px;">Durasi (Menit)</label>
+                                <input type="number" name="durasi_menit" class="ak-input" value="{{ $a->durasi_menit }}" min="1" max="300" required style="color:#000000; border-color:#d1d5db;">
+                              </div>
+                            </div>
+                            <div>
+                              <label class="ak-form-label" style="color:#000000; font-weight:600; font-size:12px; margin-bottom:6px;">Nilai KKM (Passing Grade)</label>
+                              <input type="number" name="passing_grade" class="ak-input" value="{{ $a->passing_grade }}" min="0" max="100" required style="color:#000000; border-color:#d1d5db;">
+                            </div>
+                          </div>
+                          <div class="modal-footer" style="border-top:1px solid #e5e7eb; padding:12px 20px;">
+                            <button type="button" class="btn-horev" data-bs-dismiss="modal">Batal</button>
+                            <button type="submit" class="btn-horev" style="background:#000000; color:#ffffff;">Simpan Perubahan</button>
+                          </div>
+                        </form>
+                      </div>
+                    </div>
                   </div>
                 </td>
               </tr>

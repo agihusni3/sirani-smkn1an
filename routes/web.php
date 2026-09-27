@@ -427,6 +427,8 @@ Route::middleware('auth')->group(function () {
         Route::middleware('role:admin,waka_kurikulum,kaprog,guru')->group(function () {
             Route::get('/asesmen/create', [\App\Http\Controllers\Akademik\AkademikAsesmenController::class, 'create'])->name('akademik.asesmen.create');
             Route::post('/asesmen', [\App\Http\Controllers\Akademik\AkademikAsesmenController::class, 'store'])->name('akademik.asesmen.store');
+            Route::put('/asesmen/{id}', [\App\Http\Controllers\Akademik\AkademikAsesmenController::class, 'update'])->name('akademik.asesmen.update');
+            Route::delete('/asesmen/{id}', [\App\Http\Controllers\Akademik\AkademikAsesmenController::class, 'destroy'])->name('akademik.asesmen.destroy');
             Route::get('/asesmen/{id}/soal', [\App\Http\Controllers\Akademik\AkademikAsesmenController::class, 'soal'])->name('akademik.asesmen.soal');
             Route::post('/asesmen/{id}/soal', [\App\Http\Controllers\Akademik\AkademikAsesmenController::class, 'storeSoal'])->name('akademik.asesmen.soal.store');
             Route::post('/asesmen/{id}/import-bank-soal', [\App\Http\Controllers\Akademik\AkademikAsesmenController::class, 'importFromBankSoal'])->name('akademik.asesmen.soal.import_bank');
