@@ -38,7 +38,7 @@ class AkademikP5bkController extends Controller
             'Kebekerjaan (Khas SMK)',
         ];
 
-        return view('dcc.akademik.p5bk.index', compact('proyeks', 'rombels', 'ta', 'temas'));
+        return view('akademik.p5bk.index', compact('proyeks', 'rombels', 'ta', 'temas'));
     }
 
     public function storeProyek(Request $request)
@@ -72,7 +72,7 @@ class AkademikP5bkController extends Controller
             ->get()
             ->keyBy('siswa_id');
 
-        return view('dcc.akademik.p5bk.penilaian', compact('proyek', 'siswas', 'existingNilai'));
+        return view('akademik.p5bk.penilaian', compact('proyek', 'siswas', 'existingNilai'));
     }
 
     public function storeNilai(Request $request, $id)

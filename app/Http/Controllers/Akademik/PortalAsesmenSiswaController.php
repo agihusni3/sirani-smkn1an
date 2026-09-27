@@ -24,7 +24,7 @@ class PortalAsesmenSiswaController extends Controller
             session()->forget(['cbt_siswa_id', 'cbt_siswa_nama', 'cbt_siswa_nisn']);
         }
 
-        return view('dcc.akademik.asesmen.siswa.login');
+        return view('akademik.asesmen.siswa.login');
     }
 
     /**
@@ -177,7 +177,7 @@ class PortalAsesmenSiswaController extends Controller
             ->get()
             ->keyBy('asesmen_id');
 
-        return view('dcc.akademik.asesmen.siswa.dashboard', compact('siswa', 'asesmens', 'hasils'));
+        return view('akademik.asesmen.siswa.dashboard', compact('siswa', 'asesmens', 'hasils'));
     }
 
     /**
@@ -282,7 +282,7 @@ class PortalAsesmenSiswaController extends Controller
         // Tandai bahwa ini sesi pengerjaan siswa publik
         $isSiswaPortal = true;
 
-        return view('dcc.akademik.asesmen.kerjakan', compact('asesmen', 'soals', 'siswa', 'hasil', 'opsiAcakPerSoal', 'isSiswaPortal'));
+        return view('akademik.asesmen.kerjakan', compact('asesmen', 'soals', 'siswa', 'hasil', 'opsiAcakPerSoal', 'isSiswaPortal'));
     }
 
     /**

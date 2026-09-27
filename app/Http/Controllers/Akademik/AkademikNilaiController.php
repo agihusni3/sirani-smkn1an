@@ -40,7 +40,7 @@ class AkademikNilaiController extends Controller
         $distribusis = $query->get();
         $groupedByMapel = $distribusis->groupBy('mata_pelajaran_id');
 
-        return view('dcc.akademik.nilai.index', compact('distribusis', 'groupedByMapel', 'ta'));
+        return view('akademik.nilai.index', compact('distribusis', 'groupedByMapel', 'ta'));
     }
 
     protected function authorizeDistribusi(AkademikDistribusiMengajar $distribusi): void
@@ -82,7 +82,7 @@ class AkademikNilaiController extends Controller
             'Sumatif Akhir Semester (SAS)',
         ];
 
-        return view('dcc.akademik.nilai.input', compact('distribusi', 'siswas', 'existingNilai', 'namaPenilaians'));
+        return view('akademik.nilai.input', compact('distribusi', 'siswas', 'existingNilai', 'namaPenilaians'));
     }
 
     public function storeNilai(Request $request, $distribusiId)
@@ -364,7 +364,7 @@ class AkademikNilaiController extends Controller
             ->get()
             ->groupBy('siswa_id');
 
-        return view('dcc.akademik.nilai.leger', compact(
+        return view('akademik.nilai.leger', compact(
             'rombels', 'selectedRombel', 'distribusis', 'siswas', 'legers', 'semester', 'ta'
         ));
     }

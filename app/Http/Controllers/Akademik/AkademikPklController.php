@@ -38,7 +38,7 @@ class AkademikPklController extends Controller
             ->orderBy('nama')
             ->get();
 
-        return view('dcc.akademik.pkl.index', compact('tempats', 'siswaPkls', 'gurus', 'siswas', 'ta'));
+        return view('akademik.pkl.index', compact('tempats', 'siswaPkls', 'gurus', 'siswas', 'ta'));
     }
 
     public function storeTempat(Request $request)

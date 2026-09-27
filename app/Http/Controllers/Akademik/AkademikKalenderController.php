@@ -153,7 +153,7 @@ class AkademikKalenderController extends Controller
             }
         }
 
-        return view('dcc.akademik.kalender.index', [
+        return view('akademik.kalender.index', [
             'tahunAjarans' => $tahunAjarans,
             'selectedTa' => $selectedTa,
             'semester' => $semester,

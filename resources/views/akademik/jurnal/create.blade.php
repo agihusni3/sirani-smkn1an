@@ -1,0 +1,255 @@
+@extends('akademik.layout')
+
+@section('title', 'Isi Jurnal KBM Harian')
+@section('breadcrumb', 'Isi Jurnal KBM')
+
+@section('content')
+<div class="akademik-page-head">
+  <div>
+    <h1 class="akademik-page-title">Input Jurnal KBM &amp; Presensi Siswa</h1>
+    <div class="akademik-page-desc">
+      Catat ringkasan topik materi yang diajarkan dan verifikasi kehadiran siswa di kelas.
+    </div>
+  </div>
+
+  <a href="{{ route('akademik.jurnal.index') }}" class="ak-btn ak-btn-secondary">
+    <i class="bi bi-arrow-left"></i>
+    <span>Kembali</span>
+  </a>
+</div>
+
+{{-- Step 1: Pilih Kelas & Mapel --}}
+<div class="akademik-card" style="margin-bottom:20px;">
+  <div class="akademik-card-header">
+    <h3 class="akademik-card-title">
+      <i class="bi bi-1-circle text-primary"></i>
+      <span>Pilih Jadwal &amp; Rombel Mengajar</span>
+    </h3>
+  </div>
+  <div class="akademik-card-body">
+    <form action="{{ route('akademik.jurnal.create') }}" method="GET" id="formPilihDistribusi">
+      <div style="max-width:600px;">
+        <label class="ak-form-label">Jadwal Mapel &amp; Rombel</label>
+        @if($distribusis->isEmpty())
+          <div class="alert alert-warning d-flex align-items-center gap-2 mb-0" style="border-radius:8px; font-size:12.5px; font-weight:600;">
+            <i class="bi bi-exclamation-triangle-fill text-warning"></i>
+            <span>Belum ada jadwal alokasi mengajar untuk akun Anda pada SK Pembagian Tugas Tahun Ajaran ini. Silakan hubungi Waka Kurikulum atau Administrator.</span>
+          </div>
+        @else
+          <select name="distribusi_id" class="ak-select" onchange="this.form.submit()" required>
+            <option value="">-- Pilih Mata Pelajaran &amp; Rombel --</option>
+            @foreach($distribusis as $d)
+              <option value="{{ $d->id }}" {{ (request('distribusi_id') == $d->id || ($selectedDistribusi && $selectedDistribusi->id == $d->id)) ? 'selected' : '' }}>
+                {{ $d->rombel?->nama_rombel }} — {{ $d->mataPelajaran?->nama_mapel }} ({{ $d->guru?->nama }})
+              </option>
+            @endforeach
+          </select>
+          <span style="font-size:12px; color:#64748b; margin-top:4px; display:block;">
+            Pilih salah satu jadwal mengajar untuk memuat daftar siswa rombel bersangkutan.
+          </span>
+        @endif
+      </div>
+    </form>
+  </div>
+</div>
+
+@if($selectedDistribusi)
+  <form action="{{ route('akademik.jurnal.store') }}" method="POST">
+    @csrf
+    <input type="hidden" name="distribusi_id" value="{{ $selectedDistribusi->id }}">
+
+    {{-- Step 2: Detail Sesi KBM --}}
+    <div class="akademik-card" style="margin-bottom:20px;">
+      <div class="akademik-card-header">
+        <h3 class="akademik-card-title">
+          <i class="bi bi-2-circle text-primary"></i>
+          <span>Materi &amp; Pelaksanaan Pembelajaran</span>
+        </h3>
+        <span class="ak-badge ak-badge-primary">{{ $selectedDistribusi->rombel?->nama_rombel }} · {{ $selectedDistribusi->mataPelajaran?->nama_mapel }}</span>
+      </div>
+      <div class="akademik-card-body">
+        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap:16px; margin-bottom:16px;">
+          <div>
+            <label class="ak-form-label">Tanggal Pelaksanaan</label>
+            <input type="date" name="tanggal" class="ak-input" value="{{ date('Y-m-d') }}" required>
+          </div>
+          <div>
+            <label class="ak-form-label">Pertemuan Ke-</label>
+            <input type="number" name="pertemuan_ke" class="ak-input" value="{{ $pertemuanKe }}" min="1" required>
+          </div>
+          <div>
+            <label class="ak-form-label">Metode Pembelajaran (Opsional)</label>
+            <input type="text" name="metode_pembelajaran" class="ak-input" placeholder="Ceramah, Praktik, Diskusi...">
+          </div>
+        </div>
+
+        @if($selectedDistribusi->mataPelajaran?->deskripsi_cp)
+          <div style="background:#f0fdf4; border:1.5px solid #bbf7d0; border-radius:8px; padding:12px 14px; margin-bottom:16px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; flex-wrap:wrap; gap:6px;">
+              <span style="font-size:11px; font-weight:800; color:#166534; text-transform:uppercase; display:inline-flex; align-items:center; gap:5px;">
+                <i class="bi bi-bullseye text-success"></i> Capaian Pembelajaran (CP) — {{ $selectedDistribusi->mataPelajaran->fase_label }}
+              </span>
+              <button type="button" class="btn btn-sm btn-outline-success" style="font-size:11px; padding:2px 10px; font-weight:700; border-radius:6px;" onclick="copyCpToMateri()">
+                <i class="bi bi-clipboard-plus me-1"></i> Rujuk ke Materi Ajar
+              </button>
+            </div>
+            <div id="textDeskripsiCp" style="font-size:12px; color:#1e293b; line-height:1.5;">
+              {{ $selectedDistribusi->mataPelajaran->deskripsi_cp }}
+            </div>
+          </div>
+        @endif
+
+        {{-- Integrasi Perangkat Pembelajaran: Rujuk Tujuan Pembelajaran (ATP) --}}
+        @if(isset($atpList) && $atpList->isNotEmpty())
+          <div style="background:#f0fdf4; border:1.5px solid #86efac; border-radius:8px; padding:12px 16px; margin-bottom:16px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; flex-wrap:wrap; gap:6px;">
+              <span style="font-size:11.5px; font-weight:800; color:#166534; text-transform:uppercase; display:inline-flex; align-items:center; gap:6px;">
+                <i class="bi bi-patch-check-fill text-success"></i> Rujuk Tujuan Pembelajaran (ATP) Perangkat Ajar
+              </span>
+              <span class="badge" style="background:#dcfce7; color:#166534; font-size:11px;">Kurikulum Merdeka</span>
+            </div>
+            <select class="ak-select" id="select_tp_rujukan" onchange="applyTpRujukan(this)" style="background:#ffffff; border-color:#86efac; font-size:13px;">
+              <option value="">-- Pilih Butir TP (Materi Otomatis Terisi) --</option>
+              @foreach($atpList as $tp)
+                <option value="{{ $tp->id }}"
+                  data-materi="{{ $tp->materi_pokok }} — {{ $tp->tujuan_pembelajaran }}"
+                  data-profil="{{ $tp->profil_pancasila }}">
+                  {{ $tp->kode_tp }}: {{ $tp->materi_pokok }} ({{ $tp->alokasi_jp }} JP)
+                </option>
+              @endforeach
+            </select>
+            <div style="font-size:11.5px; color:#15803d; margin-top:4px;">
+              Memilih TP akan otomatis mengisi materi pokok pembelajaran pada form di bawah.
+            </div>
+          </div>
+        @endif
+
+        <div style="margin-bottom:16px;">
+          <label class="ak-form-label">Materi Pokok / Pembahasan <span class="text-danger">*</span></label>
+          <textarea name="materi_ajar" id="input_materi_ajar" class="ak-textarea" rows="3" placeholder="Tuliskan pokok materi / modul ajar / kompetensi yang diajarkan pada sesi ini..." required></textarea>
+        </div>
+
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:16px;">
+          <div>
+            <label class="ak-form-label">Catatan Guru / Kejadian di Kelas</label>
+            <textarea name="catatan_guru" class="ak-textarea" rows="2" placeholder="Catatan keaktifan siswa, kendala perangkat..."></textarea>
+          </div>
+          <div>
+            <label class="ak-form-label">Refleksi / Tindak Lanjut Guru</label>
+            <textarea name="refleksi" class="ak-textarea" rows="2" placeholder="Tindak lanjut untuk pertemuan berikutnya..."></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {{-- Step 3: Presensi Siswa Sesi Ini --}}
+    <div class="akademik-card">
+      <div class="akademik-card-header">
+        <h3 class="akademik-card-title">
+          <i class="bi bi-3-circle text-primary"></i>
+          <span>Presensi Kehadiran Siswa ({{ $siswas->count() }} Siswa)</span>
+        </h3>
+        <button type="button" class="ak-btn ak-btn-secondary ak-btn-sm" onclick="setAllStatus('hadir')">
+          <i class="bi bi-check-all"></i>
+          <span>Set Semua Hadir</span>
+        </button>
+      </div>
+      <div class="akademik-card-body" style="padding:0;">
+        @if($siswas->isEmpty())
+          <div style="padding:30px; text-align:center; color:#64748b;">
+            Belum ada siswa aktif terdaftar di rombel ini.
+          </div>
+        @else
+          <div class="akademik-table-wrap">
+            <table class="akademik-table">
+              <thead>
+                <tr>
+                  <th style="width:40px;">No</th>
+                  <th>NISN</th>
+                  <th>Nama Lengkap Siswa</th>
+                  <th style="width:340px; text-align:center;">Status Kehadiran</th>
+                  <th>Keterangan</th>
+                </tr>
+              </thead>
+              <tbody>
+                @foreach($siswas as $idx => $s)
+                  <tr>
+                    <td>{{ $idx + 1 }}</td>
+                    <td><code>{{ $s->nisn ?? '-' }}</code></td>
+                    <td style="font-weight:700; color:var(--ak-dark);">{{ $s->nama_lengkap }}</td>
+                    <td style="text-align:center;">
+                      <div style="display:inline-flex; gap:14px; align-items:center;">
+                        <label style="cursor:pointer; display:flex; align-items:center; gap:4px; font-weight:600; font-size:12px; color:#059669;">
+                          <input type="radio" name="kehadiran[{{ $s->id }}]" value="hadir" checked class="radio-status-hadir">
+                          Hadir
+                        </label>
+                        <label style="cursor:pointer; display:flex; align-items:center; gap:4px; font-weight:600; font-size:12px; color:#2563eb;">
+                          <input type="radio" name="kehadiran[{{ $s->id }}]" value="izin">
+                          Izin
+                        </label>
+                        <label style="cursor:pointer; display:flex; align-items:center; gap:4px; font-weight:600; font-size:12px; color:#d97706;">
+                          <input type="radio" name="kehadiran[{{ $s->id }}]" value="sakit">
+                          Sakit
+                        </label>
+                        <label style="cursor:pointer; display:flex; align-items:center; gap:4px; font-weight:600; font-size:12px; color:#dc2626;">
+                          <input type="radio" name="kehadiran[{{ $s->id }}]" value="alfa">
+                          Alfa
+                        </label>
+                      </div>
+                    </td>
+                    <td>
+                      <input type="text" name="keterangan[{{ $s->id }}]" class="ak-input" style="padding:4px 8px; font-size:12px;" placeholder="Ket. khusus (opsional)">
+                    </td>
+                  </tr>
+                @endforeach
+              </tbody>
+            </table>
+          </div>
+
+          <div style="padding:20px; border-top:1px solid var(--ak-slate-200); display:flex; justify-content:flex-end; gap:10px;">
+            <a href="{{ route('akademik.jurnal.index') }}" class="ak-btn ak-btn-secondary">Batal</a>
+            <button type="submit" class="ak-btn ak-btn-primary">
+              <i class="bi bi-save"></i>
+              <span>Simpan Jurnal &amp; Presensi KBM</span>
+            </button>
+          </div>
+        @endif
+      </div>
+    </div>
+  </form>
+@endif
+
+@push('scripts')
+<script>
+  function setAllStatus(val) {
+    document.querySelectorAll('.radio-status-' + val).forEach(el => el.checked = true);
+  }
+
+  function copyCpToMateri() {
+    const cpText = document.getElementById('textDeskripsiCp')?.innerText?.trim();
+    const materiEl = document.getElementById('input_materi_ajar');
+    if (cpText && materiEl) {
+      const snippet = cpText.length > 150 ? cpText.substring(0, 145) + '...' : cpText;
+      if (materiEl.value.trim() === '') {
+        materiEl.value = 'Materi berbasis CP: ' + snippet;
+      } else {
+        materiEl.value += '\nTarget CP: ' + snippet;
+      }
+      materiEl.focus();
+    }
+  }
+
+  function applyTpRujukan(el) {
+    const selected = el.options[el.selectedIndex];
+    if (selected && selected.value) {
+      const materi = selected.getAttribute('data-materi');
+      const materiEl = document.getElementById('input_materi_ajar');
+      if (materi && materiEl) {
+        materiEl.value = materi;
+        materiEl.focus();
+      }
+    }
+  }
+</script>
+@endpush
+@endsection

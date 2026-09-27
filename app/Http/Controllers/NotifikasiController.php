@@ -133,7 +133,7 @@ class NotifikasiController extends Controller
         }
         $siswasPembinaan = $siswaQuery->orderBy('nama')->get();
 
-        return view('notifikasi.index', compact(
+        return view('sirani.notifikasi.index', compact(
             'notifikasis',
             'status',
             'kategori',

@@ -71,7 +71,7 @@ class PengumumanController extends Controller
         $statWaTerkirim = Pengumuman::sum('total_terkirim');
         $statPortal = Pengumuman::forPortal()->count();
 
-        return view('pengumuman.index', compact(
+        return view('sirani.pengumuman.index', compact(
             'pengumumans',
             'rombels',
             'jurusans',

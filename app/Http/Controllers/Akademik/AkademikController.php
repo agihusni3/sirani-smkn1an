@@ -109,7 +109,7 @@ class AkademikController extends Controller
             ->where(fn($q) => $q->whereNull('ditutup_pada')->orWhere('ditutup_pada', '>=', now()))
             ->latest()->limit(4)->get();
 
-        return view('dcc.akademik.dashboard', compact(
+        return view('akademik.dashboard', compact(
             'ta', 'kalender', 'agendaKaldikTerdekat',
             'totalMapel', 'totalDistribusi', 'totalGuru', 'totalGuruMengajar', 'totalRombel', 'totalNilai',
             'jurnalHariIni', 'totalJadwalHariIni', 'asesmenAktif', 'siswaPklAktif',

@@ -233,7 +233,7 @@ class AkademikJadwalController extends Controller
 
         $masterTugasTambahan = AkademikMasterTugasTambahan::where('is_active', true)->orderBy('urutan')->orderBy('nama_tugas')->get();
 
-        return view('dcc.akademik.jadwal.index', compact(
+        return view('akademik.jadwal.index', compact(
             'distribusis', 'ta', 'gurus', 'rombels', 'mapels', 'semester', 'rekapJjm',
             'tahunAjarans', 'tab', 'hariFilter', 'slotsMatrix', 'guruPikets',
             'jadwalWaktu', 'jadwalWaktuFull', 'matrixDistribusi', 'rekapBebanGuru',
@@ -1033,7 +1033,7 @@ class AkademikJadwalController extends Controller
             ->get()
             ->keyBy('hari');
 
-        return view('dcc.akademik.jadwal.cetak', compact(
+        return view('akademik.jadwal.cetak', compact(
             'ta', 'semester', 'gurus', 'rombels', 'mapels', 'slotsMatrix', 'guruPikets'
         ));
     }
@@ -1115,7 +1115,7 @@ class AkademikJadwalController extends Controller
             ];
         });
 
-        return view('dcc.akademik.jadwal.cetak_sk', compact(
+        return view('akademik.jadwal.cetak_sk', compact(
             'ta', 'semester', 'sekolah', 'dataGuruSk', 'daftarWali', 'rombels'
         ));
     }
@@ -1157,7 +1157,7 @@ class AkademikJadwalController extends Controller
             $jadwalWaktu[$w->hari][$w->jam_ke] = $w->pukul;
         }
 
-        return view('dcc.akademik.jadwal.cetak_kelas', compact(
+        return view('akademik.jadwal.cetak_kelas', compact(
             'ta', 'semester', 'sekolah', 'rombels', 'activeRombels', 'slotsMatrix', 'jadwalWaktu', 'selectedRombelId'
         ));
     }
@@ -1194,7 +1194,7 @@ class AkademikJadwalController extends Controller
             $jadwalWaktu[$w->hari][$w->jam_ke] = $w->pukul;
         }
 
-        return view('dcc.akademik.jadwal.cetak_lab', compact(
+        return view('akademik.jadwal.cetak_lab', compact(
             'ta', 'semester', 'sekolah', 'resourceKey', 'resourceLabel', 'labMatrix', 'jadwalWaktu'
         ));
     }

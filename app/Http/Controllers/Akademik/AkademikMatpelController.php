@@ -50,7 +50,7 @@ class AkademikMatpelController extends Controller
         $mapels = $query->orderBy('jenis')->orderBy('nama_mapel')->paginate(20)->withQueryString();
         $tahunAjarans = TahunAjaran::orderByDesc('id')->get();
 
-        return view('dcc.akademik.matpel.index', compact('mapels', 'ta', 'jurusans', 'tahunAjarans'));
+        return view('akademik.matpel.index', compact('mapels', 'ta', 'jurusans', 'tahunAjarans'));
     }
 
     public function store(Request $request)

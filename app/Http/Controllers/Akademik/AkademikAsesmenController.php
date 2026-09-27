@@ -62,7 +62,7 @@ class AkademikAsesmenController extends Controller
 
         $asesmens = $query->latest()->paginate(15)->withQueryString();
 
-        return view('dcc.akademik.asesmen.index', compact('asesmens', 'filterMapels', 'filterRombels', 'ta'));
+        return view('akademik.asesmen.index', compact('asesmens', 'filterMapels', 'filterRombels', 'ta'));
     }
 
     public function create(Request $request)
@@ -82,7 +82,7 @@ class AkademikAsesmenController extends Controller
         // Mapel unik yang diampu guru
         $mapels = $distribusis->pluck('mataPelajaran')->filter()->unique('id')->sortBy('nama_mapel')->values();
 
-        return view('dcc.akademik.asesmen.create', compact('mapels', 'ta'));
+        return view('akademik.asesmen.create', compact('mapels', 'ta'));
     }
 
     public function store(Request $request)
@@ -198,7 +198,7 @@ class AkademikAsesmenController extends Controller
         // Teks pertanyaan yang sudah ada di asesmen saat ini (untuk penandaan duplikasi)
         $existingPertanyaans = $asesmen->soals->pluck('pertanyaan')->map(fn($p) => trim(strip_tags($p)))->toArray();
 
-        return view('dcc.akademik.asesmen.soal', compact('asesmen', 'totalBobot', 'nomorBerikutnya', 'auditKelayakan', 'bankSoals', 'existingPertanyaans'));
+        return view('akademik.asesmen.soal', compact('asesmen', 'totalBobot', 'nomorBerikutnya', 'auditKelayakan', 'bankSoals', 'existingPertanyaans'));
     }
 
     public function storeSoal(Request $request, $id)
@@ -523,7 +523,7 @@ class AkademikAsesmenController extends Controller
             ->get(['id', 'nama', 'nisn'])
             ->groupBy(fn($s) => $s->rombels->first()?->id);
 
-        return view('dcc.akademik.asesmen.penugasan', compact(
+        return view('akademik.asesmen.penugasan', compact(
             'asesmen', 'availableRombels', 'currentTargetRombelIds', 'siswasPerRombel'
         ));
     }
@@ -625,7 +625,7 @@ class AkademikAsesmenController extends Controller
         $totalMelanggar = $hasils->where('jumlah_pelanggaran', '>', 0)->count();
         $totalCurang = $hasils->where('status_kejujuran', 'terindikasi_curang')->count();
 
-        return view('dcc.akademik.asesmen.hasil', compact(
+        return view('akademik.asesmen.hasil', compact(
             'asesmen', 'siswas', 'hasils', 'totalSiswa', 'totalMengerjakan', 'rataRata', 'tuntas', 'totalMelanggar', 'totalCurang', 'targetRombels', 'selectedRombelId'
         ));
     }
@@ -756,7 +756,7 @@ class AkademikAsesmenController extends Controller
             }
         }
 
-        return view('dcc.akademik.asesmen.kerjakan', compact('asesmen', 'soals', 'siswa', 'hasil', 'opsiAcakPerSoal'));
+        return view('akademik.asesmen.kerjakan', compact('asesmen', 'soals', 'siswa', 'hasil', 'opsiAcakPerSoal'));
     }
 
     public function submitJawaban(Request $request, $id)
@@ -958,7 +958,7 @@ class AkademikAsesmenController extends Controller
         $bankSoals = $query->latest()->paginate(20)->withQueryString();
         $allMapels = AkademikMataPelajaran::where('is_active', true)->orderBy('nama_mapel')->get();
 
-        return view('dcc.akademik.asesmen.bank_soal', compact('bankSoals', 'allMapels'));
+        return view('akademik.asesmen.bank_soal', compact('bankSoals', 'allMapels'));
     }
 
     public function destroyBankSoal($id)

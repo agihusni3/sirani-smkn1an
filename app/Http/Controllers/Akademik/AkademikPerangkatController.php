@@ -95,7 +95,7 @@ class AkademikPerangkatController extends Controller
         $gurus = Guru::where('status', 'aktif')->orderBy('nama')->get();
         $mapels = AkademikMataPelajaran::where('is_active', true)->orderBy('nama_mapel')->get();
 
-        return view('dcc.akademik.perangkat.index', compact(
+        return view('akademik.perangkat.index', compact(
             'perangkats',
             'myDistribusis',
             'tahunAktif',
@@ -189,7 +189,7 @@ class AkademikPerangkatController extends Controller
         $kelengkapan = $perangkat->kelengkapan;
         $statusBadge = $perangkat->status_badge;
 
-        return view('dcc.akademik.perangkat.show', compact(
+        return view('akademik.perangkat.show', compact(
             'perangkat',
             'kelengkapan',
             'statusBadge',
@@ -579,7 +579,7 @@ class AkademikPerangkatController extends Controller
         // Pastikan QR token ada
         $qrToken = $perangkat->generateQrToken();
 
-        return view('dcc.akademik.perangkat.cetak_pengesahan', compact(
+        return view('akademik.perangkat.cetak_pengesahan', compact(
             'perangkat',
             'sekolah',
             'qrToken'
@@ -740,7 +740,7 @@ class AkademikPerangkatController extends Controller
             $templateElemenCp = is_array($selectedMapel->elemen_cp) ? $selectedMapel->elemen_cp : (json_decode($selectedMapel->elemen_cp, true) ?? []);
         }
 
-        return view('dcc.akademik.perangkat.cp', array_merge($ctx, [
+        return view('akademik.perangkat.cp', array_merge($ctx, [
             'selectedMapel'    => $selectedMapel,
             'isOwner'          => $isOwner,
             'canEdit'          => $canEdit,
@@ -759,7 +759,7 @@ class AkademikPerangkatController extends Controller
         $atpItems = $ctx['activePerangkat']?->atpItems()->orderBy('urutan')->get() ?? collect([]);
         $totalJp = $atpItems->sum('alokasi_jp');
 
-        return view('dcc.akademik.perangkat.atp', array_merge($ctx, [
+        return view('akademik.perangkat.atp', array_merge($ctx, [
             'atpItems' => $atpItems,
             'totalJp' => $totalJp,
         ]));
@@ -798,7 +798,7 @@ class AkademikPerangkatController extends Controller
         $jamPerMinggu = $activePerangkat?->distribusiMengajar?->total_jam_per_minggu ?? 4;
         $totalJpSemester = $rpePekanEfektif * $jamPerMinggu;
 
-        return view('dcc.akademik.perangkat.prota_promes', array_merge($ctx, [
+        return view('akademik.perangkat.prota_promes', array_merge($ctx, [
             'atpItems' => $atpItems,
             'rpePekanEfektif' => $rpePekanEfektif,
             'rpeCadangan' => $rpeCadangan,
@@ -820,7 +820,7 @@ class AkademikPerangkatController extends Controller
         $modulAjars = $ctx['activePerangkat']?->modulAjars()->with('atpItem')->orderBy('pertemuan_ke_mulai')->get() ?? collect([]);
         $atpItems = $ctx['activePerangkat']?->atpItems()->orderBy('urutan')->get() ?? collect([]);
 
-        return view('dcc.akademik.perangkat.modul_ajar', array_merge($ctx, [
+        return view('akademik.perangkat.modul_ajar', array_merge($ctx, [
             'modulAjars' => $modulAjars,
             'atpItems' => $atpItems,
         ]));
@@ -835,7 +835,7 @@ class AkademikPerangkatController extends Controller
         $kktpItems = $ctx['activePerangkat']?->kktpItems()->with('atpItem')->get() ?? collect([]);
         $atpItems = $ctx['activePerangkat']?->atpItems()->orderBy('urutan')->get() ?? collect([]);
 
-        return view('dcc.akademik.perangkat.kktp', array_merge($ctx, [
+        return view('akademik.perangkat.kktp', array_merge($ctx, [
             'kktpItems' => $kktpItems,
             'atpItems' => $atpItems,
         ]));
@@ -882,7 +882,7 @@ class AkademikPerangkatController extends Controller
 
         $gurus = Guru::where('status', 'aktif')->orderBy('nama')->get();
 
-        return view('dcc.akademik.perangkat.supervisi', compact(
+        return view('akademik.perangkat.supervisi', compact(
             'perangkats', 'stats', 'semester', 'tahunAktif', 'gurus', 'isAdminOrWaka', 'isGuru'
         ));
     }
@@ -1060,7 +1060,7 @@ class AkademikPerangkatController extends Controller
             $activeCpText = $perangkat->resolved_cp;
             $activeElemen = $perangkat->resolved_elemen_cp;
 
-            $pdf = Pdf::loadView('dcc.akademik.perangkat.export.pdf_cp', compact(
+            $pdf = Pdf::loadView('akademik.perangkat.export.pdf_cp', compact(
                 'perangkat', 'sekolah', 'logoProvBase64', 'logoSekolahBase64',
                 'activeCpText', 'activeElemen'
             ))->setPaper('a4', 'portrait');
@@ -1227,7 +1227,7 @@ class AkademikPerangkatController extends Controller
             $modulAjars = $perangkat->modulAjars()->with('atpItem')->orderBy('pertemuan_ke_mulai')->get();
             $kktpItems  = $perangkat->kktpItems()->with('atpItem')->get();
 
-            $pdf = Pdf::loadView('dcc.akademik.perangkat.export.pdf_lengkap', compact(
+            $pdf = Pdf::loadView('akademik.perangkat.export.pdf_lengkap', compact(
                 'perangkat', 'sekolah', 'qrToken', 'atpItems', 'modulAjars', 'kktpItems',
                 'logoProvBase64', 'logoSekolahBase64'
             ))->setPaper('a4', 'portrait');

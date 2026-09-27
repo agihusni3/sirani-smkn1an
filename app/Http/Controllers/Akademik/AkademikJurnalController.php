@@ -53,7 +53,7 @@ class AkademikJurnalController extends Controller
         $today = Carbon::today()->toDateString();
         $totalJurnalHariIni = AkademikJurnalKbm::whereDate('tanggal', $today)->count();
 
-        return view('dcc.akademik.jurnal.index', compact(
+        return view('akademik.jurnal.index', compact(
             'jurnals', 'ta', 'gurus', 'rombels', 'totalJurnalHariIni', 'today'
         ));
     }
@@ -106,7 +106,7 @@ class AkademikJurnalController extends Controller
             }
         }
 
-        return view('dcc.akademik.jurnal.create', compact('distribusis', 'selectedDistribusi', 'siswas', 'pertemuanKe', 'perangkatAjar', 'atpList', 'modulList'));
+        return view('akademik.jurnal.create', compact('distribusis', 'selectedDistribusi', 'siswas', 'pertemuanKe', 'perangkatAjar', 'atpList', 'modulList'));
     }
 
     public function store(Request $request)
@@ -170,7 +170,7 @@ class AkademikJurnalController extends Controller
             'alfa' => $jurnal->kehadirans->where('status', 'alfa')->count(),
         ];
 
-        return view('dcc.akademik.jurnal.show', compact('jurnal', 'rekap'));
+        return view('akademik.jurnal.show', compact('jurnal', 'rekap'));
     }
 
     public function destroy($id)
