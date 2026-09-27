@@ -173,7 +173,7 @@
     @php
       $mapel = $items->first()->mataPelajaran;
       $namaMapel = $mapel?->nama_mapel ?? 'Mata Pelajaran #' . $mapelId;
-      $guruNames = $items->pluck('guru.nama')->filter()->unique()->values();
+      $guruNames = $items->map(fn($d) => $d->guru?->nama_lengkap_gelar ?? $d->guru?->nama)->filter()->unique()->values();
       $isFirst = $loop->first;
     @endphp
 
@@ -200,8 +200,9 @@
             @php
               $jmlSiswa = $d->rombel?->siswas_count ?? 0;
               $namaRombel = $d->rombel?->nama_rombel ?? 'Kelas';
+              $guruDisplay = $d->guru?->nama_lengkap_gelar ?? $d->guru?->nama;
             @endphp
-            <div class="class-card item-kelas-card" data-search="{{ strtolower($namaRombel . ' ' . $namaMapel . ' semester ' . $d->semester . ' ' . ($d->guru?->nama ?? '')) }}">
+            <div class="class-card item-kelas-card" data-search="{{ strtolower($namaRombel . ' ' . $namaMapel . ' semester ' . $d->semester . ' ' . ($guruDisplay ?? '')) }}">
               <div class="class-card-head">
                 <span style="font-size:13px; font-weight:800; color:#000000;">
                   {{ $namaRombel }}
@@ -213,8 +214,8 @@
 
               <div class="class-card-body">
                 <div>{{ $d->total_jam_per_minggu ?? 4 }} JP/Minggu · {{ $jmlSiswa }} Siswa</div>
-                @if($guruNames->count() > 1 && $d->guru)
-                  <div style="color:#64748b; margin-top:4px;">{{ $d->guru->nama }}</div>
+                @if($guruNames->count() > 1 && $guruDisplay)
+                  <div style="color:#64748b; margin-top:4px;">{{ $guruDisplay }}</div>
                 @endif
               </div>
 

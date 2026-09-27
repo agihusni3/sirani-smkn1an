@@ -141,11 +141,23 @@ class Guru extends Model
     }
 
     /**
-     * Format nama guru/pegawai selalu dalam format Title Case standar resmi.
+     * Format nama guru/pegawai selalu dalam format Title Case standar resmi beserta gelar jika ada.
      */
     public function getNamaAttribute(?string $value): string
     {
-        return \App\Support\NamaFormatter::format($value ?? ($this->attributes['nama'] ?? ''));
+        $raw = $value ?? ($this->attributes['nama'] ?? '');
+        $depan = trim($this->attributes['gelar_depan'] ?? '');
+        $belakang = trim($this->attributes['gelar_belakang'] ?? '');
+
+        $formatted = \App\Support\NamaFormatter::format($raw);
+        if (!empty($depan) && !str_starts_with(strtolower($formatted), strtolower($depan))) {
+            $formatted = $depan . ' ' . $formatted;
+        }
+        if (!empty($belakang) && !str_ends_with(strtolower($formatted), strtolower($belakang))) {
+            $formatted = rtrim($formatted, ', ') . ', ' . $belakang;
+        }
+
+        return \App\Support\NamaFormatter::format($formatted);
     }
 
     /**

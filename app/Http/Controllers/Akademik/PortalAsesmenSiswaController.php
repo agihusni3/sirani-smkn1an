@@ -340,6 +340,9 @@ class PortalAsesmenSiswaController extends Controller
             ]
         );
 
+        // Auto-sinkronisasi nilai ujian ke Buku Nilai & Leger
+        AkademikNilaiController::syncSingleAsesmenToNilai($asesmen, $siswaId, $nilaiAkhir);
+
         session()->forget("cbt_token_valid_{$id}");
 
         if ($request->wantsJson()) {

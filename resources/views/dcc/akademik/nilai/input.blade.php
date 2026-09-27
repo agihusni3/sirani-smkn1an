@@ -8,18 +8,25 @@
   <div>
     <h1 class="akademik-page-title">{{ $distribusi->mataPelajaran?->nama_mapel }}</h1>
     <div class="akademik-page-desc">
-      Kelas <strong>{{ $distribusi->rombel?->nama_rombel }}</strong> · Semester {{ $distribusi->semester }} · Guru: {{ $distribusi->guru?->nama }}
+      Kelas <strong>{{ $distribusi->rombel?->nama_rombel }}</strong> · Semester {{ $distribusi->semester }} · Guru: <strong>{{ $distribusi->guru?->nama_lengkap_gelar ?: $distribusi->guru?->nama }}</strong>
     </div>
   </div>
 
-  <div style="display:flex; gap:10px;">
-    <a href="{{ route('akademik.nilai.index') }}" class="ak-btn ak-btn-secondary">
-      <i class="bi bi-arrow-left"></i>
-      <span>Kembali</span>
-    </a>
+  <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+    <form action="{{ route('akademik.nilai.sinkron_cbt', $distribusi->id) }}" method="POST" onsubmit="return confirm('Tarik dan sinkronkan hasil ujian asesmen CBT online ke buku nilai kelas ini?')" style="margin:0;">
+      @csrf
+      <button type="submit" class="ak-btn ak-btn-primary" style="font-weight:700;">
+        <i class="bi bi-cloud-arrow-down-fill me-1"></i>
+        <span>Tarik Nilai dari Asesmen CBT</span>
+      </button>
+    </form>
     <a href="{{ route('akademik.nilai.leger', ['rombel_id' => $distribusi->rombel_id, 'semester' => $distribusi->semester]) }}" class="ak-btn ak-btn-secondary">
       <i class="bi bi-table"></i>
       <span>Leger Kelas Ini</span>
+    </a>
+    <a href="{{ route('akademik.nilai.index') }}" class="ak-btn ak-btn-secondary">
+      <i class="bi bi-arrow-left"></i>
+      <span>Kembali</span>
     </a>
   </div>
 </div>
@@ -91,7 +98,21 @@
                   </td>
                   @foreach($namaPenilaians as $penilaian)
                     @php
-                      $currVal = $scores->get($penilaian)?->nilai ?? '';
+                      $currRecord = $scores->get($penilaian);
+                      $currVal = $currRecord?->nilai ?? '';
+                      // Smart Fallback jika data tersimpan dengan judul asesmen CBT kustom
+                      if ($currVal === '') {
+                        foreach ($scores as $sRecord) {
+                          $sNama = strtolower($sRecord->nama_penilaian ?? '');
+                          if (str_contains(strtolower($penilaian), 'sts') && (str_contains($sNama, 'sts') || str_contains($sNama, 'tengah') || str_contains($sNama, 'pts'))) {
+                            $currVal = $sRecord->nilai;
+                            break;
+                          } elseif (str_contains(strtolower($penilaian), 'sas') && (str_contains($sNama, 'sas') || str_contains($sNama, 'akhir') || str_contains($sNama, 'pas'))) {
+                            $currVal = $sRecord->nilai;
+                            break;
+                          }
+                        }
+                      }
                     @endphp
                     <td style="text-align:center;">
                       <input type="number" step="0.1" min="0" max="100"

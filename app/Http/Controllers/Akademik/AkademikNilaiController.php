@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Akademik;
 
 use App\Http\Controllers\Controller;
+use App\Models\AkademikAsesmenOnline;
+use App\Models\AkademikAsesmenHasil;
 use App\Models\AkademikDistribusiMengajar;
 use App\Models\AkademikLeger;
 use App\Models\AkademikNilai;
@@ -11,6 +13,7 @@ use App\Models\Siswa;
 use App\Models\TahunAjaran;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class AkademikNilaiController extends Controller
 {
@@ -162,6 +165,178 @@ class AkademikNilaiController extends Controller
             DB::rollBack();
             return redirect()->back()->with('error', 'Gagal menyimpan nilai: ' . $e->getMessage());
         }
+    }
+
+    public function syncFromCBT(Request $request, $distribusiId)
+    {
+        $distribusi = AkademikDistribusiMengajar::with(['mataPelajaran', 'rombel'])->findOrFail($distribusiId);
+        $this->authorizeDistribusi($distribusi);
+
+        $siswas = Siswa::whereHas('rombels', fn($q) => $q->where('rombels.id', $distribusi->rombel_id))
+            ->whereIn('status', ['aktif', 'pkl'])
+            ->pluck('id');
+
+        // Cari semua asesmen yang berkaitan dengan mata pelajaran ini pada semester dan tahun ajaran aktif
+        $asesmens = AkademikAsesmenOnline::where('semester', $distribusi->semester)
+            ->whereHas('distribusi', function($q) use ($distribusi) {
+                $q->where('mata_pelajaran_id', $distribusi->mata_pelajaran_id)
+                  ->where('tahun_ajaran_id', $distribusi->tahun_ajaran_id);
+            })
+            ->get();
+
+        $syncedCount = 0;
+        foreach ($asesmens as $asesmen) {
+            $targetRombels = $asesmen->target_rombel_ids ?? [$asesmen->distribusi?->rombel_id];
+            $targetRombels = array_map('intval', (array) $targetRombels);
+
+            if (!empty($targetRombels) && !in_array((int) $distribusi->rombel_id, $targetRombels)) {
+                continue;
+            }
+
+            $hasils = AkademikAsesmenHasil::where('asesmen_id', $asesmen->id)
+                ->whereIn('siswa_id', $siswas)
+                ->where('is_selesai', true)
+                ->get();
+
+            foreach ($hasils as $h) {
+                self::syncSingleAsesmenToNilai($asesmen, $h->siswa_id, $h->nilai);
+                $syncedCount++;
+            }
+        }
+
+        if ($syncedCount === 0) {
+            return redirect()->back()->with('warning', 'Tidak ditemukan hasil tes asesmen CBT yang selesai untuk mata pelajaran dan rombel ini.');
+        }
+
+        return redirect()->back()->with('success', "Berhasil menyinkronkan {$syncedCount} nilai dari hasil tes asesmen CBT ke Buku Nilai & Leger.");
+    }
+
+    public static function resolveNamaPenilaian(AkademikAsesmenOnline $asesmen): array
+    {
+        $jenis = strtolower(trim($asesmen->jenis ?? ''));
+        $judul = strtolower(trim($asesmen->judul ?? ''));
+
+        if ($jenis === 'pts' || str_contains($judul, 'tengah semester') || str_contains($judul, 'sts') || str_contains($judul, 'pts')) {
+            return [
+                'nama' => 'Sumatif Tengah Semester (STS)',
+                'jenis' => 'sumatif'
+            ];
+        }
+
+        if ($jenis === 'pas' || str_contains($judul, 'akhir semester') || str_contains($judul, 'sas') || str_contains($judul, 'pas')) {
+            return [
+                'nama' => 'Sumatif Akhir Semester (SAS)',
+                'jenis' => 'sumatif'
+            ];
+        }
+
+        if (str_contains($judul, 'formatif 2') || str_contains($judul, 'praktik') || str_contains($judul, 'proyek')) {
+            return [
+                'nama' => 'Formatif 2 (Praktik/Proyek)',
+                'jenis' => 'formatif'
+            ];
+        }
+
+        if (str_contains($judul, 'formatif 3') || str_contains($judul, 'diskusi') || str_contains($judul, 'portofolio')) {
+            return [
+                'nama' => 'Formatif 3 (Diskusi/Portofolio)',
+                'jenis' => 'formatif'
+            ];
+        }
+
+        return [
+            'nama' => 'Formatif 1 (Tugas/Kuis)',
+            'jenis' => 'formatif'
+        ];
+    }
+
+    public static function syncSingleAsesmenToNilai(AkademikAsesmenOnline $asesmen, $siswaId, $nilaiAkhir): void
+    {
+        try {
+            $mapping = self::resolveNamaPenilaian($asesmen);
+            $namaPenilaian = $mapping['nama'];
+            $jenisPenilaian = $mapping['jenis'];
+
+            $siswa = Siswa::with('rombels')->find($siswaId);
+            $studentRombelId = $siswa?->rombels?->first()?->id;
+
+            $distribusi = null;
+            if ($asesmen->distribusi) {
+                $distribusi = AkademikDistribusiMengajar::where('mata_pelajaran_id', $asesmen->distribusi->mata_pelajaran_id)
+                    ->when($studentRombelId, fn($q) => $q->where('rombel_id', $studentRombelId))
+                    ->where('tahun_ajaran_id', $asesmen->distribusi->tahun_ajaran_id)
+                    ->where('semester', $asesmen->semester)
+                    ->first();
+            }
+
+            if (!$distribusi) {
+                $distribusi = $asesmen->distribusi;
+            }
+
+            if (!$distribusi) {
+                return;
+            }
+
+            AkademikNilai::updateOrCreate(
+                [
+                    'distribusi_id' => $distribusi->id,
+                    'siswa_id' => $siswaId,
+                    'semester' => $asesmen->semester,
+                    'nama_penilaian' => $namaPenilaian,
+                ],
+                [
+                    'jenis_penilaian' => $jenisPenilaian,
+                    'nilai' => $nilaiAkhir,
+                    'deskripsi_capaian' => "Hasil asesmen CBT ({$asesmen->judul}): Skor {$nilaiAkhir}",
+                ]
+            );
+
+            self::kalkulasiLegerSiswa($distribusi, $siswaId);
+        } catch (\Throwable $e) {
+            Log::error("Gagal syncSingleAsesmenToNilai: " . $e->getMessage());
+        }
+    }
+
+    public static function kalkulasiLegerSiswa(AkademikDistribusiMengajar $distribusi, $siswaId): void
+    {
+        $allNilais = AkademikNilai::where('distribusi_id', $distribusi->id)
+            ->where('siswa_id', $siswaId)
+            ->where('semester', $distribusi->semester)
+            ->get();
+
+        $formatifScores = $allNilais->where('jenis_penilaian', 'formatif')->pluck('nilai')->map(fn($v) => floatval($v))->all();
+        $sumatifScores = $allNilais->where('jenis_penilaian', 'sumatif')->pluck('nilai')->map(fn($v) => floatval($v))->all();
+
+        $formatifAvg = count($formatifScores) > 0 ? array_sum($formatifScores) / count($formatifScores) : 0;
+        $sumatifAvg = count($sumatifScores) > 0 ? array_sum($sumatifScores) / count($sumatifScores) : 0;
+
+        $nilaiAkhir = ($formatifAvg > 0 && $sumatifAvg > 0)
+            ? round(($formatifAvg * 0.5) + ($sumatifAvg * 0.5), 2)
+            : round(max($formatifAvg, $sumatifAvg), 2);
+
+        $predikat = 'D';
+        if ($nilaiAkhir >= 85) $predikat = 'A';
+        elseif ($nilaiAkhir >= 75) $predikat = 'B';
+        elseif ($nilaiAkhir >= 65) $predikat = 'C';
+
+        $passingGrade = $distribusi->mataPelajaran?->passing_grade ?? 75;
+        $statusLulus = $nilaiAkhir >= $passingGrade;
+
+        AkademikLeger::updateOrCreate(
+            [
+                'distribusi_id' => $distribusi->id,
+                'siswa_id' => $siswaId,
+                'semester' => $distribusi->semester,
+            ],
+            [
+                'nilai_formatif_avg' => round($formatifAvg, 2),
+                'nilai_sumatif_avg' => round($sumatifAvg, 2),
+                'nilai_akhir' => $nilaiAkhir,
+                'predikat' => $predikat,
+                'deskripsi_rapor' => 'Capaian kompetensi berdasarkan asesmen formatif & sumatif.',
+                'status_lulus' => $statusLulus,
+            ]
+        );
     }
 
     public function leger(Request $request)

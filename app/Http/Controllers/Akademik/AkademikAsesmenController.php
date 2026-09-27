@@ -640,34 +640,11 @@ class AkademikAsesmenController extends Controller
             return redirect()->back()->with('error', 'Belum ada siswa yang menyelesaikan asesmen ini.');
         }
 
-        $jenisNilai = in_array($asesmen->jenis, ['pts', 'pas']) ? 'sumatif' : 'formatif';
-
-        // Petakan distribusi_id per rombel untuk mapel ini
-        $mapelId = $asesmen->distribusi->mata_pelajaran_id;
-        $distribusisByRombel = AkademikDistribusiMengajar::where('mata_pelajaran_id', $mapelId)
-            ->where('tahun_ajaran_id', $asesmen->distribusi->tahun_ajaran_id)
-            ->pluck('id', 'rombel_id');
-
         foreach ($hasils as $h) {
-            $studentRombelId = $h->siswa?->rombels?->first()?->id;
-            $distId = $distribusisByRombel[$studentRombelId] ?? $asesmen->distribusi_id;
-
-            AkademikNilai::updateOrCreate(
-                [
-                    'distribusi_id' => $distId,
-                    'siswa_id' => $h->siswa_id,
-                    'semester' => $asesmen->semester,
-                    'nama_penilaian' => $asesmen->judul,
-                ],
-                [
-                    'jenis_penilaian' => $jenisNilai,
-                    'nilai' => $h->nilai,
-                    'deskripsi_capaian' => "Hasil asesmen online ({$asesmen->judul}): Skor {$h->nilai}",
-                ]
-            );
+            AkademikNilaiController::syncSingleAsesmenToNilai($asesmen, $h->siswa_id, $h->nilai);
         }
 
-        return redirect()->back()->with('success', "Nilai dari {$hasils->count()} siswa berhasil ditransfer ke Buku Nilai & Leger Siswa untuk masing-masing rombel.");
+        return redirect()->back()->with('success', "Nilai dari {$hasils->count()} siswa berhasil ditransfer dan disinkronkan ke Buku Nilai & Leger Siswa untuk masing-masing rombel.");
     }
 
     /**
@@ -835,6 +812,9 @@ class AkademikAsesmenController extends Controller
                 'status_kejujuran' => $statusKejujuran,
             ]
         );
+
+        // Auto-sinkronisasi nilai ujian ke Buku Nilai & Leger
+        AkademikNilaiController::syncSingleAsesmenToNilai($asesmen, $siswaId, $nilaiAkhir);
 
         if ($request->wantsJson()) {
             return response()->json([

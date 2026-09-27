@@ -386,6 +386,7 @@ Route::middleware('auth')->group(function () {
             Route::get('/nilai', [\App\Http\Controllers\Akademik\AkademikNilaiController::class, 'index'])->name('akademik.nilai.index');
             Route::get('/nilai/input/{distribusiId}', [\App\Http\Controllers\Akademik\AkademikNilaiController::class, 'inputNilai'])->name('akademik.nilai.input');
             Route::post('/nilai/store/{distribusiId}', [\App\Http\Controllers\Akademik\AkademikNilaiController::class, 'storeNilai'])->name('akademik.nilai.store');
+            Route::post('/nilai/sinkron-cbt/{distribusiId}', [\App\Http\Controllers\Akademik\AkademikNilaiController::class, 'syncFromCBT'])->name('akademik.nilai.sinkron_cbt');
         });
         Route::get('/nilai/leger', [\App\Http\Controllers\Akademik\AkademikNilaiController::class, 'leger'])
             ->name('akademik.nilai.leger')
