@@ -518,9 +518,9 @@ function tambahIstirahat(hari) {
       </colgroup>
       <thead>
         <tr>
-          <th rowspan="2" class="roster-th-dark">HARI</th>
-          <th rowspan="2" class="roster-th-dark">JAM</th>
-          <th rowspan="2" class="roster-th-dark">PUKUL</th>
+          <th rowspan="2" class="roster-th-identitas"><i class="bi bi-calendar3 me-1"></i> HARI</th>
+          <th rowspan="2" class="roster-th-identitas"><i class="bi bi-hash me-1"></i> JAM</th>
+          <th rowspan="2" class="roster-th-identitas"><i class="bi bi-clock me-1"></i> PUKUL</th>
           <th colspan="3" class="roster-th-kelas-x roster-col-divider">KELAS X / PROGRAM KEAHLIAN</th>
           <th colspan="3" class="roster-th-kelas-xi roster-col-divider">KELAS XI / PROGRAM KEAHLIAN</th>
           <th colspan="2" class="roster-th-kelas-xii roster-col-divider">KELAS XII / PKL</th>
