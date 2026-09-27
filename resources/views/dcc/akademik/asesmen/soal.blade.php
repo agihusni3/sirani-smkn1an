@@ -321,7 +321,15 @@
     </div>
   </div>
 
-  <div style="display:flex; gap:8px; align-items:center;">
+  <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+    <button type="button" class="ak-btn ak-btn-primary" data-bs-toggle="modal" data-bs-target="#modalInputSoal" style="font-size:12.5px; padding:7px 15px; font-weight:800;">
+      <i class="bi bi-plus-lg me-1"></i>
+      <span>Input Butir Soal</span>
+    </button>
+    <button type="button" onclick="bukaModalBankSoal()" class="ak-btn ak-btn-secondary" style="font-size:12.5px; padding:7px 13px; font-weight:700;">
+      <i class="bi bi-box-arrow-in-down-right text-primary me-1"></i>
+      <span>Panggil Bank Soal ({{ $bankSoals->count() }})</span>
+    </button>
     <a href="{{ route('akademik.asesmen.index') }}" class="ak-btn ak-btn-secondary" style="font-size:12.5px; padding:7px 13px;">
       <i class="bi bi-arrow-left"></i>
       <span>Kembali</span>
@@ -347,318 +355,345 @@
 {{-- Step Indicator --}}
 @include('dcc.akademik.asesmen.partials.wizard_steps', ['step' => 2])
 
-{{-- Main Grid --}}
-<div class="soal-layout-grid">
-
-  {{-- Left Column: Form Editor Soal --}}
-  <div class="panel-card">
-    <div class="panel-card-head">
-      <h3 class="panel-card-title">
-        <i class="bi bi-plus-circle text-primary"></i>
-        <span>Tambah Butir Pertanyaan No. {{ $nomorBerikutnya }}</span>
+{{-- Main Page: Full-Width Daftar Soal Asesmen --}}
+<div class="panel-card" style="margin-bottom:24px;">
+  <div class="panel-card-head" style="padding:16px 20px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+    <div style="display:flex; align-items:center; gap:10px;">
+      <h3 class="panel-card-title" style="font-size:16px; font-weight:800; color:#0f172a; margin:0; display:flex; align-items:center; gap:8px;">
+        <i class="bi bi-collection text-primary"></i>
+        <span>Daftar Soal Asesmen ({{ $asesmen->soals->count() }})</span>
       </h3>
-      <button type="button" onclick="bukaModalBankSoal()" class="ak-btn ak-btn-secondary" style="padding:5px 12px; font-size:12px; font-weight:700;">
-        <i class="bi bi-box-arrow-in-down-right text-primary me-1"></i>
-        <span>Panggil dari Bank Soal ({{ $bankSoals->count() }})</span>
+      <span class="ak-badge ak-badge-success" style="font-size:11px;">Total: {{ $totalBobot }} Poin</span>
+    </div>
+    <div style="display:flex; align-items:center; gap:8px;">
+      <button type="button" class="ak-btn ak-btn-primary" data-bs-toggle="modal" data-bs-target="#modalInputSoal" style="font-size:12.5px; padding:6px 14px; font-weight:700;">
+        <i class="bi bi-plus-lg me-1"></i> Input Butir Soal
+      </button>
+      <button type="button" onclick="bukaModalBankSoal()" class="ak-btn ak-btn-secondary" style="font-size:12.5px; padding:6px 14px; font-weight:700;">
+        <i class="bi bi-box-arrow-in-down-right text-primary me-1"></i> Panggil Bank Soal ({{ $bankSoals->count() }})
       </button>
     </div>
+  </div>
 
-    <div class="panel-card-body">
+  <div class="panel-card-body" style="padding:20px;" id="savedQuestionsContainer">
+    @if($asesmen->soals->isEmpty())
+      <div style="padding:60px 20px; text-align:center; color:#64748b;">
+        <div style="width:64px; height:64px; border-radius:50%; background:#f1f5f9; color:#94a3b8; display:flex; align-items:center; justify-content:center; margin:0 auto 16px; font-size:28px;">
+          <i class="bi bi-file-earmark-plus"></i>
+        </div>
+        <h4 style="font-size:17px; font-weight:800; color:#0f172a; margin-bottom:6px;">Belum Ada Butir Soal</h4>
+        <p style="font-size:13.5px; color:#64748b; max-width:440px; margin:0 auto 20px; line-height:1.5;">
+          Mulai tambahkan butir pertanyaan pilihan ganda dengan klik tombol di bawah ini atau panggil dari Bank Soal yang telah tersedia.
+        </p>
+        <div style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
+          <button type="button" class="ak-btn ak-btn-primary" data-bs-toggle="modal" data-bs-target="#modalInputSoal" style="font-weight:700; padding:9px 18px;">
+            <i class="bi bi-plus-lg me-1"></i> Input Butir Soal Pertama
+          </button>
+          @if($bankSoals->isNotEmpty())
+            <button type="button" onclick="bukaModalBankSoal()" class="ak-btn ak-btn-secondary" style="font-weight:700; padding:9px 18px;">
+              <i class="bi bi-box-arrow-in-down-right text-primary me-1"></i> Panggil dari Bank Soal ({{ $bankSoals->count() }})
+            </button>
+          @endif
+        </div>
+      </div>
+    @else
+      <div style="display:flex; flex-direction:column; gap:16px;">
+        @foreach($asesmen->soals as $idx => $soal)
+          <div class="saved-soal-card" style="padding:18px 20px; border-radius:12px; border:1px solid #e2e8f0; background:#ffffff;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; border-bottom:1px solid #f1f5f9; padding-bottom:10px;">
+              <div style="display:flex; align-items:center; gap:10px;">
+                <span style="font-size:14px; font-weight:800; color:#0f172a;">
+                  No. {{ $idx + 1 }}
+                </span>
+                <span style="font-size:12px; font-weight:600; color:#64748b; background:#f1f5f9; padding:3px 8px; border-radius:6px;">
+                  Bobot: {{ $soal->bobot }} Poin
+                </span>
+              </div>
+              <form action="{{ route('akademik.asesmen.soal.destroy', [$asesmen->id, $soal->id]) }}" method="POST" onsubmit="return confirm('Hapus butir soal no {{ $idx + 1 }}?')" style="margin:0;">
+                @csrf
+                @method('DELETE')
+                <button type="submit" class="ak-btn ak-btn-secondary ak-btn-sm text-danger" title="Hapus Soal" style="padding:4px 10px; font-size:12px;">
+                  <i class="bi bi-trash me-1"></i> Hapus
+                </button>
+              </form>
+            </div>
+
+            {{-- Teks Pertanyaan --}}
+            <div class="render-math-target" style="font-size:14.5px; font-weight:600; color:#0f172a; margin-bottom:14px; line-height:1.6;">
+              {!! $soal->pertanyaan !!}
+            </div>
+
+            @if($soal->gambar_url)
+              <div style="margin-bottom:14px; max-width:340px;">
+                <img src="{{ $soal->gambar_url }}" alt="Gambar Soal" style="width:100%; border-radius:8px; border:1px solid #cbd5e1;">
+              </div>
+            @endif
+
+            {{-- Pilihan Opsi A - E --}}
+            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:8px; margin-bottom:10px; font-size:13px;">
+              @foreach(['A' => $soal->opsi_a, 'B' => $soal->opsi_b, 'C' => $soal->opsi_c, 'D' => $soal->opsi_d, 'E' => $soal->opsi_e] as $abjad => $teksOpsi)
+                @if(!empty($teksOpsi))
+                  @php $isKunci = ($soal->kunci_jawaban == $abjad); @endphp
+                  <div class="render-math-target" style="display:flex; align-items:flex-start; gap:8px; padding:9px 14px; border-radius:8px; border:1px solid {{ $isKunci ? '#86efac' : '#e2e8f0' }}; background:{{ $isKunci ? '#f0fdf4' : '#fafafa' }};">
+                    <span style="font-weight:800; color:{{ $isKunci ? '#15803d' : '#0f172a' }}; min-width:18px;">{{ $abjad }}.</span>
+                    <span style="flex:1; color:{{ $isKunci ? '#14532d' : '#334155' }}; font-weight:{{ $isKunci ? '700' : '500' }};">{{ $teksOpsi }}</span>
+                    @if($isKunci)
+                      <span style="font-size:11px; font-weight:800; color:#15803d; background:#dcfce7; padding:2px 7px; border-radius:4px; white-space:nowrap;">
+                        <i class="bi bi-check-circle-fill me-1"></i>Kunci Benar
+                      </span>
+                    @endif
+                  </div>
+                @endif
+              @endforeach
+            </div>
+
+            @if($soal->pembahasan)
+              <div style="margin-top:10px; padding:8px 14px; background:#f8fafc; border-left:3px solid #3b82f6; border-radius:4px; font-size:12.5px; color:#475569;">
+                <strong style="color:#1e3a8a;">Pembahasan:</strong> {{ $soal->pembahasan }}
+              </div>
+            @endif
+          </div>
+        @endforeach
+      </div>
+    @endif
+  </div>
+</div>
+
+{{-- Modal Popup Input Butir Soal --}}
+<div class="modal fade" id="modalInputSoal" tabindex="-1" aria-labelledby="modalInputSoalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-scrollable">
+    <div class="modal-content" style="border-radius:14px; border:1px solid #cbd5e1; overflow:hidden;">
       <form action="{{ route('akademik.asesmen.soal.store', $asesmen->id) }}" method="POST" id="formTambahSoal" enctype="multipart/form-data" onsubmit="return validasiFormSoal(event)">
         @csrf
         <input type="hidden" name="tipe" value="pilihan_ganda">
         <input type="hidden" name="kunci_jawaban" id="inputKunciJawaban" value="{{ old('kunci_jawaban', 'A') }}">
 
-        {{-- Section 1: Pertanyaan Editor Shell --}}
-        <div style="margin-bottom:18px;">
-          <label class="ak-form-label" style="font-size:13px; font-weight:800; color:#0f172a; margin-bottom:8px; display:block;">
-            Teks Pertanyaan / Soal <span class="text-danger">*</span>
-          </label>
+        <div class="modal-header" style="background:#fafafa; border-bottom:1px solid #e2e8f0; padding:16px 20px;">
+          <div>
+            <h5 class="modal-title" id="modalInputSoalLabel" style="font-weight:800; font-size:16px; color:#0f172a; display:flex; align-items:center; gap:8px; margin:0;">
+              <i class="bi bi-pencil-square text-primary"></i>
+              <span>Input Butir Pertanyaan No. {{ $nomorBerikutnya }}</span>
+            </h5>
+            <div style="font-size:12px; color:#64748b; margin-top:3px;">
+              Tuliskan pertanyaan, pilihan opsi A–E, dan tentukan kunci jawaban benar.
+            </div>
+          </div>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
 
-          {{-- Editor Container Shell --}}
-          <div class="editor-shell">
-            {{-- 1. Area Textarea Penulisan Soal di Atas --}}
-            <textarea name="pertanyaan" id="inputPertanyaan" class="editor-textarea" rows="4" 
-                      placeholder="Tuliskan butir soal di sini..." 
-                      required oninput="updateLivePreview()">{{ old('pertanyaan') }}</textarea>
+        <div class="modal-body" style="padding:20px;">
+          {{-- Section 1: Pertanyaan Editor Shell --}}
+          <div style="margin-bottom:18px;">
+            <label class="ak-form-label" style="font-size:13px; font-weight:800; color:#0f172a; margin-bottom:8px; display:block;">
+              Teks Pertanyaan / Soal <span class="text-danger">*</span>
+            </label>
 
-            {{-- 2. Box Preview Gambar Terpilih --}}
-            <div id="boxPreviewGambar" style="display:none; padding:10px 14px; background:#f8fafc; border-top:1px solid #e2e8f0;">
-              <div style="display:flex; align-items:center; justify-content:space-between; max-width:320px; background:#ffffff; border:1px solid #cbd5e1; border-radius:8px; padding:6px 10px;">
-                <div style="display:flex; align-items:center; gap:8px; overflow:hidden;">
-                  <img id="imgPreviewTarget" src="" style="width:40px; height:40px; border-radius:6px; object-fit:cover; border:1px solid #e2e8f0;">
-                  <div style="font-size:12px; font-weight:700; color:#334155; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:180px;" id="infoNamaGambar"></div>
+            {{-- Editor Container Shell --}}
+            <div class="editor-shell">
+              {{-- 1. Area Textarea Penulisan Soal di Atas --}}
+              <textarea name="pertanyaan" id="inputPertanyaan" class="editor-textarea" rows="4" 
+                        placeholder="Tuliskan butir soal di sini..." 
+                        required oninput="updateLivePreview()">{{ old('pertanyaan') }}</textarea>
+
+              {{-- 2. Box Preview Gambar Terpilih --}}
+              <div id="boxPreviewGambar" style="display:none; padding:10px 14px; background:#f8fafc; border-top:1px solid #e2e8f0;">
+                <div style="display:flex; align-items:center; justify-content:space-between; max-width:320px; background:#ffffff; border:1px solid #cbd5e1; border-radius:8px; padding:6px 10px;">
+                  <div style="display:flex; align-items:center; gap:8px; overflow:hidden;">
+                    <img id="imgPreviewTarget" src="" style="width:40px; height:40px; border-radius:6px; object-fit:cover; border:1px solid #e2e8f0;">
+                    <div style="font-size:12px; font-weight:700; color:#334155; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:180px;" id="infoNamaGambar"></div>
+                  </div>
+                  <button type="button" onclick="hapusUploadGambar()" style="background:#fee2e2; color:#dc2626; border:1px solid #fca5a5; border-radius:6px; padding:4px 8px; font-size:11px; font-weight:700; cursor:pointer;">
+                    <i class="bi bi-trash"></i>
+                  </button>
                 </div>
-                <button type="button" onclick="hapusUploadGambar()" style="background:#fee2e2; color:#dc2626; border:1px solid #fca5a5; border-radius:6px; padding:4px 8px; font-size:11px; font-weight:700; cursor:pointer;">
-                  <i class="bi bi-trash"></i>
+              </div>
+
+              {{-- 3. Toolbar Pengaturan Huruf, Format, Gambar & Mode di Bawah Textarea --}}
+              <div class="editor-toolbar">
+                {{-- Text Format --}}
+                <button type="button" class="tool-btn" onclick="wrapText('<b>', '</b>')" title="Tebal (Bold)"><b>B</b></button>
+                <button type="button" class="tool-btn" onclick="wrapText('<i>', '</i>')" title="Miring (Italic)"><i>I</i></button>
+                <button type="button" class="tool-btn" onclick="wrapText('<u>', '</u>')" title="Garis Bawah (Underline)"><u>U</u></button>
+                <button type="button" class="tool-btn" onclick="wrapText('<s>', '</s>')" title="Coret (Strikethrough)"><s>S</s></button>
+                <button type="button" class="tool-btn" onclick="wrapText('<sup>', '</sup>')" title="Pangkat (x²)">x²</button>
+                <button type="button" class="tool-btn" onclick="wrapText('<sub>', '</sub>')" title="Indeks (x₂)">x₂</button>
+
+                <span class="tool-sep"></span>
+
+                {{-- Font Size --}}
+                <select id="selectFontSize" onchange="setFontSize(this.value)" class="tool-select" title="Ukuran Font">
+                  <option value="14px">Font: Normal</option>
+                  <option value="16px">Font: Sedang</option>
+                  <option value="18px">Font: Besar</option>
+                </select>
+
+                <span class="tool-sep"></span>
+
+                {{-- Alignment --}}
+                <button type="button" class="tool-btn" onclick="setTextAlign('left')" title="Rata Kiri"><i class="bi bi-text-left"></i></button>
+                <button type="button" class="tool-btn" onclick="setTextAlign('center')" title="Rata Tengah"><i class="bi bi-text-center"></i></button>
+                <button type="button" class="tool-btn" onclick="setTextAlign('right')" title="Rata Kanan"><i class="bi bi-text-right"></i></button>
+
+                <span class="tool-sep"></span>
+
+                {{-- Insert Image Trigger --}}
+                <button type="button" class="tool-btn" style="color:#2563eb;" onclick="document.getElementById('fileGambarSoal').click()" title="Sisipkan Gambar">
+                  <i class="bi bi-image"></i>
+                  <span>+ Gambar</span>
+                </button>
+
+                {{-- Arabic Harakat Trigger --}}
+                <button type="button" class="tool-btn" onclick="toggleDrawer('harakatDrawer')" title="Sisipkan Harakat Arab" style="font-family:'Amiri', serif;">
+                  <span>َ ِ ُ Harakat</span>
+                </button>
+
+                <span class="tool-sep"></span>
+
+                {{-- Arab & Rumus Buttons --}}
+                <button type="button" class="tool-btn" id="btnToggleArab" onclick="toggleModeArab()" title="Mode Penulisan Teks Arab">
+                  <span style="font-family:'Amiri', serif; font-size:13.5px;">ع</span> Arab (RTL)
+                </button>
+                <button type="button" class="tool-btn" id="btnToggleMath" onclick="toggleDrawer('mathDrawer')" title="Simbol & Rumus Matematika">
+                  <span style="font-weight:900;">∑</span> Rumus (LaTeX)
+                </button>
+
+                {{-- Native file input hidden strictly without overriding --}}
+                <input type="file" name="gambar" id="fileGambarSoal" accept="image/*" onchange="previewUploadGambar(this)" 
+                       style="display:none !important; visibility:hidden !important; position:absolute !important; width:0 !important; height:0 !important; opacity:0 !important; pointer-events:none !important;">
+              </div>
+
+              {{-- 4. Drawer 1: Harakat Arab --}}
+              <div id="harakatDrawer" class="editor-drawer">
+                <span style="font-size:11px; font-weight:700; color:#64748b; width:100%; margin-bottom:2px;">Klik untuk menyisipkan harakat:</span>
+                <button type="button" class="drawer-chip-btn" onclick="insertChar('َ')">َ Fathah</button>
+                <button type="button" class="drawer-chip-btn" onclick="insertChar('ِ')">ِ Kasrah</button>
+                <button type="button" class="drawer-chip-btn" onclick="insertChar('ُ')">ُ Dhammah</button>
+                <button type="button" class="drawer-chip-btn" onclick="insertChar('ْ')">ْ Sukun</button>
+                <button type="button" class="drawer-chip-btn" onclick="insertChar('ّ')">ّ Tasydid</button>
+                <button type="button" class="drawer-chip-btn" onclick="insertChar('ً')">ً Tanwin</button>
+                <button type="button" class="drawer-chip-btn" onclick="insertChar('﷽ ')">﷽</button>
+                <button type="button" class="drawer-chip-btn" onclick="insertChar('؟')">؟</button>
+                <button type="button" class="drawer-chip-btn" onclick="insertChar('،')">،</button>
+              </div>
+
+              {{-- 5. Drawer 2: Rumus KaTeX --}}
+              <div id="mathDrawer" class="editor-drawer" style="background:#eff6ff; border-color:#bfdbfe;">
+                <span style="font-size:11px; font-weight:700; color:#1e40af; width:100%; margin-bottom:2px;">Klik untuk menyisipkan simbol/formula:</span>
+                <button type="button" class="drawer-chip-btn" onclick="insertChar('$\\frac{a}{b}$')">a/b (Pecahan)</button>
+                <button type="button" class="drawer-chip-btn" onclick="insertChar('$\\sqrt{x}$')">√x (Akar)</button>
+                <button type="button" class="drawer-chip-btn" onclick="insertChar('$x^{2}$')">x²</button>
+                <button type="button" class="drawer-chip-btn" onclick="insertChar('$x_{1}$')">x₁</button>
+                <button type="button" class="drawer-chip-btn" onclick="insertChar('×')">×</button>
+                <button type="button" class="drawer-chip-btn" onclick="insertChar('÷')">÷</button>
+                <button type="button" class="drawer-chip-btn" onclick="insertChar('±')">±</button>
+                <button type="button" class="drawer-chip-btn" onclick="insertChar('≤')">≤</button>
+                <button type="button" class="drawer-chip-btn" onclick="insertChar('≥')">≥</button>
+                <button type="button" class="drawer-chip-btn" onclick="insertChar('≠')">≠</button>
+                <button type="button" class="drawer-chip-btn" onclick="insertChar('°')">°</button>
+                <button type="button" class="drawer-chip-btn" onclick="insertChar('π')">π</button>
+                <button type="button" class="drawer-chip-btn" onclick="insertChar('$\\sum$')">∑</button>
+                <button type="button" class="drawer-chip-btn" onclick="insertChar('$\\int$')">∫</button>
+              </div>
+
+              {{-- 6. Live Render Preview (Pratinjau hanya tampil jika ada teks) --}}
+              <div class="live-preview-box" id="livePreviewBox" style="display:none;">
+                <div class="live-preview-head">
+                  <span><i class="bi bi-eye me-1"></i> Pratinjau Tampilan Siswa</span>
+                  <span id="previewTagArab" style="display:none; color:#059669; background:#ecfdf5; padding:1px 6px; border-radius:4px;">Mode Arab</span>
+                </div>
+                <div id="livePreviewContainer" style="color:#0f172a; line-height:1.6; min-height:22px;"></div>
+              </div>
+            </div>
+          </div>
+
+          {{-- Section 2: Pilihan Jawaban A, B, C, D, E --}}
+          <div style="margin-bottom:18px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+              <label class="ak-form-label" style="font-size:13px; font-weight:800; color:#0f172a; margin:0;">
+                Pilihan Jawaban &amp; Kunci Benar <span class="text-danger">*</span>
+              </label>
+              <div style="font-size:11.5px; color:#059669; font-weight:700;">
+                <i class="bi bi-check-circle-fill me-1"></i> Klik opsi untuk menandai kunci
+              </div>
+            </div>
+
+            <div style="display:flex; flex-direction:column; gap:8px;">
+              {{-- OPSI A --}}
+              <div class="option-row" id="card_opsi_A" onclick="setKunciJawaban('A')">
+                <button type="button" class="option-badge-btn" id="badge_abjad_A" onclick="setKunciJawaban('A'); event.stopPropagation();">A</button>
+                <input type="text" name="opsi_a" id="opsi_A" class="option-input" placeholder="Pilihan A (Wajib)" value="{{ old('opsi_a') }}" required oninput="cekKesesuaianKunci()" onclick="event.stopPropagation()">
+                <button type="button" class="option-key-btn" id="btn_kunci_A" onclick="setKunciJawaban('A'); event.stopPropagation();">
+                  <i class="bi bi-circle"></i> <span>Kunci</span>
+                </button>
+              </div>
+
+              {{-- OPSI B --}}
+              <div class="option-row" id="card_opsi_B" onclick="setKunciJawaban('B')">
+                <button type="button" class="option-badge-btn" id="badge_abjad_B" onclick="setKunciJawaban('B'); event.stopPropagation();">B</button>
+                <input type="text" name="opsi_b" id="opsi_B" class="option-input" placeholder="Pilihan B (Wajib)" value="{{ old('opsi_b') }}" required oninput="cekKesesuaianKunci()" onclick="event.stopPropagation()">
+                <button type="button" class="option-key-btn" id="btn_kunci_B" onclick="setKunciJawaban('B'); event.stopPropagation();">
+                  <i class="bi bi-circle"></i> <span>Kunci</span>
+                </button>
+              </div>
+
+              {{-- OPSI C --}}
+              <div class="option-row" id="card_opsi_C" onclick="setKunciJawaban('C')">
+                <button type="button" class="option-badge-btn" id="badge_abjad_C" onclick="setKunciJawaban('C'); event.stopPropagation();">C</button>
+                <input type="text" name="opsi_c" id="opsi_C" class="option-input" placeholder="Pilihan C (Opsional)" value="{{ old('opsi_c') }}" oninput="cekKesesuaianKunci()" onclick="event.stopPropagation()">
+                <button type="button" class="option-key-btn" id="btn_kunci_C" onclick="setKunciJawaban('C'); event.stopPropagation();">
+                  <i class="bi bi-circle"></i> <span>Kunci</span>
+                </button>
+              </div>
+
+              {{-- OPSI D --}}
+              <div class="option-row" id="card_opsi_D" onclick="setKunciJawaban('D')">
+                <button type="button" class="option-badge-btn" id="badge_abjad_D" onclick="setKunciJawaban('D'); event.stopPropagation();">D</button>
+                <input type="text" name="opsi_d" id="opsi_D" class="option-input" placeholder="Pilihan D (Opsional)" value="{{ old('opsi_d') }}" oninput="cekKesesuaianKunci()" onclick="event.stopPropagation()">
+                <button type="button" class="option-key-btn" id="btn_kunci_D" onclick="setKunciJawaban('D'); event.stopPropagation();">
+                  <i class="bi bi-circle"></i> <span>Kunci</span>
+                </button>
+              </div>
+
+              {{-- OPSI E --}}
+              <div class="option-row" id="card_opsi_E" onclick="setKunciJawaban('E')">
+                <button type="button" class="option-badge-btn" id="badge_abjad_E" onclick="setKunciJawaban('E'); event.stopPropagation();">E</button>
+                <input type="text" name="opsi_e" id="opsi_E" class="option-input" placeholder="Pilihan E (Opsional)" value="{{ old('opsi_e') }}" oninput="cekKesesuaianKunci()" onclick="event.stopPropagation()">
+                <button type="button" class="option-key-btn" id="btn_kunci_E" onclick="setKunciJawaban('E'); event.stopPropagation();">
+                  <i class="bi bi-circle"></i> <span>Kunci</span>
                 </button>
               </div>
             </div>
 
-            {{-- 3. Toolbar Pengaturan Huruf, Format, Gambar & Mode di Bawah Textarea --}}
-            <div class="editor-toolbar">
-              {{-- Text Format --}}
-              <button type="button" class="tool-btn" onclick="wrapText('<b>', '</b>')" title="Tebal (Bold)"><b>B</b></button>
-              <button type="button" class="tool-btn" onclick="wrapText('<i>', '</i>')" title="Miring (Italic)"><i>I</i></button>
-              <button type="button" class="tool-btn" onclick="wrapText('<u>', '</u>')" title="Garis Bawah (Underline)"><u>U</u></button>
-              <button type="button" class="tool-btn" onclick="wrapText('<s>', '</s>')" title="Coret (Strikethrough)"><s>S</s></button>
-              <button type="button" class="tool-btn" onclick="wrapText('<sup>', '</sup>')" title="Pangkat (x²)">x²</button>
-              <button type="button" class="tool-btn" onclick="wrapText('<sub>', '</sub>')" title="Indeks (x₂)">x₂</button>
-
-              <span class="tool-sep"></span>
-
-              {{-- Font Size --}}
-              <select id="selectFontSize" onchange="setFontSize(this.value)" class="tool-select" title="Ukuran Font">
-                <option value="14px">Font: Normal</option>
-                <option value="16px">Font: Sedang</option>
-                <option value="18px">Font: Besar</option>
-              </select>
-
-              <span class="tool-sep"></span>
-
-              {{-- Alignment --}}
-              <button type="button" class="tool-btn" onclick="setTextAlign('left')" title="Rata Kiri"><i class="bi bi-text-left"></i></button>
-              <button type="button" class="tool-btn" onclick="setTextAlign('center')" title="Rata Tengah"><i class="bi bi-text-center"></i></button>
-              <button type="button" class="tool-btn" onclick="setTextAlign('right')" title="Rata Kanan"><i class="bi bi-text-right"></i></button>
-
-              <span class="tool-sep"></span>
-
-              {{-- Insert Image Trigger --}}
-              <button type="button" class="tool-btn" style="color:#2563eb;" onclick="document.getElementById('fileGambarSoal').click()" title="Sisipkan Gambar">
-                <i class="bi bi-image"></i>
-                <span>+ Gambar</span>
-              </button>
-
-              {{-- Arabic Harakat Trigger --}}
-              <button type="button" class="tool-btn" onclick="toggleDrawer('harakatDrawer')" title="Sisipkan Harakat Arab" style="font-family:'Amiri', serif;">
-                <span>َ ِ ُ Harakat</span>
-              </button>
-
-              <span class="tool-sep"></span>
-
-              {{-- Arab & Rumus Buttons --}}
-              <button type="button" class="tool-btn" id="btnToggleArab" onclick="toggleModeArab()" title="Mode Penulisan Teks Arab">
-                <span style="font-family:'Amiri', serif; font-size:13.5px;">ع</span> Arab (RTL)
-              </button>
-              <button type="button" class="tool-btn" id="btnToggleMath" onclick="toggleDrawer('mathDrawer')" title="Simbol & Rumus Matematika">
-                <span style="font-weight:900;">∑</span> Rumus (LaTeX)
-              </button>
-
-              {{-- Native file input hidden strictly without overriding --}}
-              <input type="file" name="gambar" id="fileGambarSoal" accept="image/*" onchange="previewUploadGambar(this)" 
-                     style="display:none !important; visibility:hidden !important; position:absolute !important; width:0 !important; height:0 !important; opacity:0 !important; pointer-events:none !important;">
+            <div id="kunciWarning" style="display:none; color:#dc2626; font-size:12px; font-weight:700; margin-top:8px;">
+              ⚠️ Peringatan: Opsi yang Anda jadikan kunci jawaban saat ini masih kosong!
             </div>
+          </div>
 
-            {{-- 4. Drawer 1: Harakat Arab --}}
-            <div id="harakatDrawer" class="editor-drawer">
-              <span style="font-size:11px; font-weight:700; color:#64748b; width:100%; margin-bottom:2px;">Klik untuk menyisipkan harakat:</span>
-              <button type="button" class="drawer-chip-btn" onclick="insertChar('َ')">َ Fathah</button>
-              <button type="button" class="drawer-chip-btn" onclick="insertChar('ِ')">ِ Kasrah</button>
-              <button type="button" class="drawer-chip-btn" onclick="insertChar('ُ')">ُ Dhammah</button>
-              <button type="button" class="drawer-chip-btn" onclick="insertChar('ْ')">ْ Sukun</button>
-              <button type="button" class="drawer-chip-btn" onclick="insertChar('ّ')">ّ Tasydid</button>
-              <button type="button" class="drawer-chip-btn" onclick="insertChar('ً')">ً Tanwin</button>
-              <button type="button" class="drawer-chip-btn" onclick="insertChar('﷽ ')">﷽</button>
-              <button type="button" class="drawer-chip-btn" onclick="insertChar('؟')">؟</button>
-              <button type="button" class="drawer-chip-btn" onclick="insertChar('،')">،</button>
+          {{-- Section 3: Bobot & Pembahasan --}}
+          <div style="display:grid; grid-template-columns: 1fr 2.5fr; gap:12px; margin-bottom:8px;">
+            <div>
+              <label class="ak-form-label" style="font-size:12.5px; font-weight:800;">Bobot Nilai</label>
+              <input type="number" name="bobot" class="ak-input" value="{{ old('bobot', 1) }}" min="1" required style="font-size:14px; font-weight:800; text-align:center;">
             </div>
-
-            {{-- 5. Drawer 2: Rumus KaTeX --}}
-            <div id="mathDrawer" class="editor-drawer" style="background:#eff6ff; border-color:#bfdbfe;">
-              <span style="font-size:11px; font-weight:700; color:#1e40af; width:100%; margin-bottom:2px;">Klik untuk menyisipkan simbol/formula:</span>
-              <button type="button" class="drawer-chip-btn" onclick="insertChar('$\\frac{a}{b}$')">a/b (Pecahan)</button>
-              <button type="button" class="drawer-chip-btn" onclick="insertChar('$\\sqrt{x}$')">√x (Akar)</button>
-              <button type="button" class="drawer-chip-btn" onclick="insertChar('$x^{2}$')">x²</button>
-              <button type="button" class="drawer-chip-btn" onclick="insertChar('$x_{1}$')">x₁</button>
-              <button type="button" class="drawer-chip-btn" onclick="insertChar('×')">×</button>
-              <button type="button" class="drawer-chip-btn" onclick="insertChar('÷')">÷</button>
-              <button type="button" class="drawer-chip-btn" onclick="insertChar('±')">±</button>
-              <button type="button" class="drawer-chip-btn" onclick="insertChar('≤')">≤</button>
-              <button type="button" class="drawer-chip-btn" onclick="insertChar('≥')">≥</button>
-              <button type="button" class="drawer-chip-btn" onclick="insertChar('≠')">≠</button>
-              <button type="button" class="drawer-chip-btn" onclick="insertChar('°')">°</button>
-              <button type="button" class="drawer-chip-btn" onclick="insertChar('π')">π</button>
-              <button type="button" class="drawer-chip-btn" onclick="insertChar('$\\sum$')">∑</button>
-              <button type="button" class="drawer-chip-btn" onclick="insertChar('$\\int$')">∫</button>
-            </div>
-
-            {{-- 6. Live Render Preview (Pratinjau hanya tampil jika ada teks) --}}
-            <div class="live-preview-box" id="livePreviewBox" style="display:none;">
-              <div class="live-preview-head">
-                <span><i class="bi bi-eye me-1"></i> Pratinjau Tampilan Siswa</span>
-                <span id="previewTagArab" style="display:none; color:#059669; background:#ecfdf5; padding:1px 6px; border-radius:4px;">Mode Arab</span>
-              </div>
-              <div id="livePreviewContainer" style="color:#0f172a; line-height:1.6; min-height:22px;"></div>
+            <div>
+              <label class="ak-form-label" style="font-size:12.5px; font-weight:800;">Pembahasan (Opsional)</label>
+              <input type="text" name="pembahasan" class="ak-input" placeholder="Penjelasan jawaban untuk siswa..." value="{{ old('pembahasan') }}">
             </div>
           </div>
         </div>
 
-        {{-- Section 2: Pilihan Jawaban A, B, C, D, E --}}
-        <div style="margin-bottom:18px;">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-            <label class="ak-form-label" style="font-size:13px; font-weight:800; color:#0f172a; margin:0;">
-              Pilihan Jawaban &amp; Kunci Benar <span class="text-danger">*</span>
-            </label>
-            <div style="font-size:11.5px; color:#059669; font-weight:700;">
-              <i class="bi bi-check-circle-fill me-1"></i> Klik opsi untuk menandai kunci
-            </div>
-          </div>
-
-          <div style="display:flex; flex-direction:column; gap:8px;">
-            {{-- OPSI A --}}
-            <div class="option-row" id="card_opsi_A" onclick="setKunciJawaban('A')">
-              <button type="button" class="option-badge-btn" id="badge_abjad_A" onclick="setKunciJawaban('A'); event.stopPropagation();">A</button>
-              <input type="text" name="opsi_a" id="opsi_A" class="option-input" placeholder="Pilihan A (Wajib)" value="{{ old('opsi_a') }}" required oninput="cekKesesuaianKunci()" onclick="event.stopPropagation()">
-              <button type="button" class="option-key-btn" id="btn_kunci_A" onclick="setKunciJawaban('A'); event.stopPropagation();">
-                <i class="bi bi-circle"></i> <span>Kunci</span>
-              </button>
-            </div>
-
-            {{-- OPSI B --}}
-            <div class="option-row" id="card_opsi_B" onclick="setKunciJawaban('B')">
-              <button type="button" class="option-badge-btn" id="badge_abjad_B" onclick="setKunciJawaban('B'); event.stopPropagation();">B</button>
-              <input type="text" name="opsi_b" id="opsi_B" class="option-input" placeholder="Pilihan B (Wajib)" value="{{ old('opsi_b') }}" required oninput="cekKesesuaianKunci()" onclick="event.stopPropagation()">
-              <button type="button" class="option-key-btn" id="btn_kunci_B" onclick="setKunciJawaban('B'); event.stopPropagation();">
-                <i class="bi bi-circle"></i> <span>Kunci</span>
-              </button>
-            </div>
-
-            {{-- OPSI C --}}
-            <div class="option-row" id="card_opsi_C" onclick="setKunciJawaban('C')">
-              <button type="button" class="option-badge-btn" id="badge_abjad_C" onclick="setKunciJawaban('C'); event.stopPropagation();">C</button>
-              <input type="text" name="opsi_c" id="opsi_C" class="option-input" placeholder="Pilihan C (Opsional)" value="{{ old('opsi_c') }}" oninput="cekKesesuaianKunci()" onclick="event.stopPropagation()">
-              <button type="button" class="option-key-btn" id="btn_kunci_C" onclick="setKunciJawaban('C'); event.stopPropagation();">
-                <i class="bi bi-circle"></i> <span>Kunci</span>
-              </button>
-            </div>
-
-            {{-- OPSI D --}}
-            <div class="option-row" id="card_opsi_D" onclick="setKunciJawaban('D')">
-              <button type="button" class="option-badge-btn" id="badge_abjad_D" onclick="setKunciJawaban('D'); event.stopPropagation();">D</button>
-              <input type="text" name="opsi_d" id="opsi_D" class="option-input" placeholder="Pilihan D (Opsional)" value="{{ old('opsi_d') }}" oninput="cekKesesuaianKunci()" onclick="event.stopPropagation()">
-              <button type="button" class="option-key-btn" id="btn_kunci_D" onclick="setKunciJawaban('D'); event.stopPropagation();">
-                <i class="bi bi-circle"></i> <span>Kunci</span>
-              </button>
-            </div>
-
-            {{-- OPSI E --}}
-            <div class="option-row" id="card_opsi_E" onclick="setKunciJawaban('E')">
-              <button type="button" class="option-badge-btn" id="badge_abjad_E" onclick="setKunciJawaban('E'); event.stopPropagation();">E</button>
-              <input type="text" name="opsi_e" id="opsi_E" class="option-input" placeholder="Pilihan E (Opsional)" value="{{ old('opsi_e') }}" oninput="cekKesesuaianKunci()" onclick="event.stopPropagation()">
-              <button type="button" class="option-key-btn" id="btn_kunci_E" onclick="setKunciJawaban('E'); event.stopPropagation();">
-                <i class="bi bi-circle"></i> <span>Kunci</span>
-              </button>
-            </div>
-          </div>
-
-          <div id="kunciWarning" style="display:none; color:#dc2626; font-size:12px; font-weight:700; margin-top:8px;">
-            ⚠️ Peringatan: Opsi yang Anda jadikan kunci jawaban saat ini masih kosong!
-          </div>
+        <div class="modal-footer" style="background:#fafafa; border-top:1px solid #e2e8f0; padding:12px 20px; display:flex; justify-content:space-between; align-items:center;">
+          <button type="button" class="ak-btn ak-btn-secondary" data-bs-dismiss="modal">
+            Batal
+          </button>
+          <button type="submit" class="ak-btn ak-btn-primary" style="padding:9px 22px; font-size:13.5px; font-weight:800;">
+            <i class="bi bi-check2-circle me-1"></i>
+            <span>Simpan Butir Soal No. {{ $nomorBerikutnya }}</span>
+          </button>
         </div>
-
-        {{-- Section 3: Bobot & Pembahasan --}}
-        <div style="display:grid; grid-template-columns: 1fr 2.5fr; gap:12px; margin-bottom:18px;">
-          <div>
-            <label class="ak-form-label" style="font-size:12.5px; font-weight:800;">Bobot Nilai</label>
-            <input type="number" name="bobot" class="ak-input" value="{{ old('bobot', 1) }}" min="1" required style="font-size:14px; font-weight:800; text-align:center;">
-          </div>
-          <div>
-            <label class="ak-form-label" style="font-size:12.5px; font-weight:800;">Pembahasan (Opsional)</label>
-            <input type="text" name="pembahasan" class="ak-input" placeholder="Penjelasan jawaban untuk siswa..." value="{{ old('pembahasan') }}">
-          </div>
-        </div>
-
-        {{-- Submit Button --}}
-        <button type="submit" class="ak-btn ak-btn-primary" style="width:100%; padding:11px; font-size:14px; font-weight:800; justify-content:center; border-radius:10px;">
-          <i class="bi bi-check2-circle me-1"></i>
-          <span>Simpan Butir Soal No. {{ $nomorBerikutnya }}</span>
-        </button>
       </form>
     </div>
   </div>
-
-  {{-- Right Column: Daftar Butir Soal Asesmen Ini --}}
-  <div class="panel-card">
-    <div class="panel-card-head">
-      <h3 class="panel-card-title">
-        <i class="bi bi-collection text-primary"></i>
-        <span>Daftar Soal Asesmen Ini ({{ $asesmen->soals->count() }})</span>
-      </h3>
-      <span class="ak-badge ak-badge-success" style="font-size:11px;">Total: {{ $totalBobot }} Poin</span>
-    </div>
-
-    <div class="panel-card-body" style="padding:16px; max-height:820px; overflow-y:auto;" id="savedQuestionsContainer">
-      @if($asesmen->soals->isEmpty())
-        <div style="padding:44px 20px; text-align:center; color:#64748b;">
-          <div style="width:54px; height:54px; border-radius:50%; background:#f1f5f9; color:#94a3b8; display:flex; align-items:center; justify-content:center; margin:0 auto 12px; font-size:24px;">
-            <i class="bi bi-file-earmark-plus"></i>
-          </div>
-          <h5 style="font-size:15px; font-weight:800; color:#1e293b; margin-bottom:4px;">Belum Ada Butir Soal</h5>
-          <p style="font-size:12.5px; color:#64748b; max-width:320px; margin:0 auto 14px; line-height:1.5;">
-            Tulis pertanyaan di sebelah kiri atau panggil butir soal yang sudah tersimpan di Bank Soal.
-          </p>
-          @if($bankSoals->isNotEmpty())
-            <button type="button" onclick="bukaModalBankSoal()" class="ak-btn ak-btn-secondary ak-btn-sm" style="font-weight:700;">
-              <i class="bi bi-box-arrow-in-down-right text-primary me-1"></i> Panggil dari Bank Soal ({{ $bankSoals->count() }})
-            </button>
-          @endif
-        </div>
-      @else
-        <div style="display:flex; flex-direction:column; gap:12px;">
-          @foreach($asesmen->soals as $idx => $soal)
-            <div class="saved-soal-card">
-              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-                <span class="ak-badge ak-badge-primary" style="font-size:11px;">
-                  Soal #{{ $idx + 1 }} · {{ $soal->bobot }} Poin
-                </span>
-                <form action="{{ route('akademik.asesmen.soal.destroy', [$asesmen->id, $soal->id]) }}" method="POST" onsubmit="return confirm('Hapus butir soal no {{ $idx + 1 }}?')" style="margin:0;">
-                  @csrf
-                  @method('DELETE')
-                  <button type="submit" class="ak-btn ak-btn-secondary ak-btn-sm text-danger" title="Hapus Soal" style="padding:3px 8px; font-size:11px;">
-                    <i class="bi bi-trash"></i>
-                  </button>
-                </form>
-              </div>
-
-              {{-- Teks Soal --}}
-              <div class="render-math-target" style="font-size:13.5px; font-weight:700; color:#0f172a; margin-bottom:8px; line-height:1.5;">
-                {!! $soal->pertanyaan !!}
-              </div>
-
-              @if($soal->gambar_url)
-                <div style="margin-bottom:8px; max-width:240px;">
-                  <img src="{{ $soal->gambar_url }}" alt="Gambar Soal" style="width:100%; border-radius:6px; border:1px solid #cbd5e1;">
-                </div>
-              @endif
-
-              {{-- Pilihan Opsi & Kunci --}}
-              <div style="display:flex; flex-direction:column; gap:4px; font-size:12px;">
-                @foreach(['A' => $soal->opsi_a, 'B' => $soal->opsi_b, 'C' => $soal->opsi_c, 'D' => $soal->opsi_d, 'E' => $soal->opsi_e] as $abjad => $teksOpsi)
-                  @if(!empty($teksOpsi))
-                    @php $isKunci = ($soal->kunci_jawaban == $abjad); @endphp
-                    <div class="render-math-target" style="display:flex; align-items:center; gap:6px; padding:3px 8px; border-radius:6px; {{ $isKunci ? 'font-weight:800; color:#065f46; background:#ecfdf5; border:1px solid #a7f3d0;' : 'color:#475569;' }}">
-                      <strong style="width:16px;">{{ $abjad }}.</strong>
-                      <span style="flex:1;">{{ $teksOpsi }}</span>
-                      @if($isKunci)
-                        <i class="bi bi-check-circle-fill text-success" title="Kunci Jawaban"></i>
-                      @endif
-                    </div>
-                  @endif
-                @endforeach
-              </div>
-
-              @if($soal->pembahasan)
-                <div style="margin-top:8px; padding:6px 10px; background:#f8fafc; border-radius:6px; font-size:11.5px; color:#64748b;">
-                  <strong style="color:#334155;">Pembahasan:</strong> {{ $soal->pembahasan }}
-                </div>
-              @endif
-            </div>
-          @endforeach
-        </div>
-      @endif
-    </div>
-  </div>
-
 </div>
 
 <script>
