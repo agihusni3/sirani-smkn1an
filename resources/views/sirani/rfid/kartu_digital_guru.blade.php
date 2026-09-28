@@ -295,12 +295,15 @@
         if (zoomContainer && !zoomContainer.hasChildNodes()) {
           new QRCode(zoomContainer, {
             text: "{{ $codeValue }}",
-            width: 240,
-            height: 240,
+            width: 220,
+            height: 220,
             colorDark: "#000000",
             colorLight: "#ffffff",
-            correctLevel: QRCode.CorrectLevel.H
+            correctLevel: (typeof QRCode.CorrectLevel !== 'undefined') ? QRCode.CorrectLevel.M : 0
           });
+          setTimeout(() => {
+            zoomContainer.querySelectorAll('canvas').forEach(c => c.remove());
+          }, 30);
         }
 
         // Haptic feedback
@@ -390,9 +393,9 @@
       <div style="font-size:15px; font-weight:900; color:#0f172a; margin-top:2px; letter-spacing:0.5px;">SCANNER GERBANG &amp; KIOSK</div>
     </div>
     <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; flex:1; width:100%;">
-      <div style="background:#ffffff; padding:18px 18px 12px; border-radius:24px; box-shadow:0 16px 50px rgba(0,0,0,0.12), 0 0 0 10px #f8fafc; border:2px solid #e2e8f0; display:inline-block; max-width:92vw;">
-        <div id="zoomedQrContainerGuru" style="min-width:240px; min-height:240px; display:flex; align-items:center; justify-content:center; margin:0 auto;"></div>
-        <div style="font-family:var(--font-mono); font-size:22px; font-weight:900; letter-spacing:3px; color:#0f172a; margin-top:10px; text-align:center;">{{ $codeValue }}</div>
+      <div style="background:#ffffff; padding:20px 20px 14px; border-radius:24px; box-shadow:0 16px 50px rgba(0,0,0,0.08), 0 0 0 8px #f1f5f9; border:2px solid #e2e8f0; display:inline-block; max-width:88vw; text-align:center;">
+        <div id="zoomedQrContainerGuru" style="width:220px; height:220px; max-width:65vw; max-height:65vw; display:flex; align-items:center; justify-content:center; margin:0 auto; overflow:hidden;"></div>
+        <div style="font-family:var(--font-mono); font-size:20px; font-weight:900; letter-spacing:3px; color:#0f172a; margin-top:10px; text-align:center;">{{ $codeValue }}</div>
       </div>
       <div style="margin-top:14px; text-align:center;">
         <div style="font-size:18px; font-weight:900; color:#0f172a; line-height:1.2;">{{ $guru->nama }}</div>

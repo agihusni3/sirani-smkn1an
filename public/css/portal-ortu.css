@@ -1027,16 +1027,30 @@
       flex: 1;
       width: 100%;
     }
+    #zoomedQrContainer,
+    #zoomedQrContainerGuru {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto;
+      background: #ffffff;
+    }
     #zoomedQrContainer canvas,
-    #zoomedQrContainer img {
+    #zoomedQrContainerGuru canvas {
+      display: none !important; /* qrcode.js mengekspor ke img; sembunyikan canvas agar tidak ganda */
+    }
+    #zoomedQrContainer img,
+    #zoomedQrContainerGuru img {
       display: block !important;
       margin: 0 auto;
-      max-width: 100%;
-      height: auto;
+      width: 220px !important;
+      height: 220px !important;
+      max-width: 65vw !important;
+      max-height: 65vw !important;
       image-rendering: -webkit-optimize-contrast;
       image-rendering: crisp-edges;
       image-rendering: pixelated;
-      filter: contrast(1.08) brightness(1.02);
     }
     .zoom-overlay-footer {
       text-align: center;
