@@ -1614,7 +1614,7 @@
               height: 190,
               colorDark: '#000000',
               colorLight: '#ffffff',
-              correctLevel: (typeof QRCode.CorrectLevel !== 'undefined') ? QRCode.CorrectLevel.M : 0
+              correctLevel: (typeof QRCode.CorrectLevel !== 'undefined') ? QRCode.CorrectLevel.H : 2
             });
           } catch(e) {
             console.warn('QR render error:', e);
@@ -1634,7 +1634,7 @@
               height: 220,
               colorDark: '#000000',
               colorLight: '#ffffff',
-              correctLevel: (typeof QRCode.CorrectLevel !== 'undefined') ? QRCode.CorrectLevel.M : 0
+              correctLevel: (typeof QRCode.CorrectLevel !== 'undefined') ? QRCode.CorrectLevel.H : 2
             });
             // Hapus canvas yang disembunyikan qrcode.js agar tidak ganda di DOM
             setTimeout(() => {
@@ -2845,11 +2845,16 @@
       <div style="font-size:15px; font-weight:900; color:#0f172a; margin-top:2px; letter-spacing:0.5px;">SCANNER GERBANG &amp; KIOSK</div>
     </div>
     <div class="zoom-overlay-body">
-      <div style="background:#ffffff; padding:20px 20px 14px; border-radius:24px; box-shadow:0 16px 50px rgba(0,0,0,0.08), 0 0 0 8px #f1f5f9; border:2px solid #e2e8f0; display:inline-block; max-width:88vw; text-align:center;">
+      {{-- KARTU QR MURNI: QUIET ZONE STERIL (AREA PUTIH BERSIH TANPA TEKS/NOISE UNTUK SCANNER GERBANG) --}}
+      <div style="background:#ffffff; padding:22px; border-radius:24px; box-shadow:0 16px 50px rgba(0,0,0,0.06), 0 0 0 8px #f8fafc; border:2px solid #e2e8f0; display:inline-block; max-width:88vw; text-align:center;">
         <div id="zoomedQrContainer" style="width:220px; height:220px; max-width:65vw; max-height:65vw; display:flex; align-items:center; justify-content:center; margin:0 auto; overflow:hidden;"></div>
-        <div style="font-family:var(--font-mono); font-size:20px; font-weight:900; letter-spacing:3px; color:#0f172a; margin-top:10px; text-align:center;">{{ $codeValue }}</div>
       </div>
-      <div style="margin-top:14px; text-align:center;">
+      {{-- IDENTITAS SISWA & NOMOR ID DILUAR KARTU QR --}}
+      <div style="margin-top:16px; text-align:center;">
+        <div style="display:inline-flex; align-items:center; gap:6px; background:#f1f5f9; color:#0f172a; padding:5px 16px; border-radius:12px; font-family:var(--font-mono); font-size:17px; font-weight:900; letter-spacing:2.5px; margin-bottom:8px; border:1px solid #cbd5e1;">
+          <i class="bi bi-upc-scan" style="font-size:14px; color:#475569;"></i>
+          <span>{{ $codeValue }}</span>
+        </div>
         <div style="font-size:18px; font-weight:900; color:#0f172a; line-height:1.2;">{{ $siswa->nama }}</div>
         <div style="font-size:13px; font-weight:700; color:#64748b; margin-top:3px;">
           @if($siswa->status === 'lulus')
