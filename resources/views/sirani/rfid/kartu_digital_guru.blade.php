@@ -89,16 +89,16 @@
           <i class="bi bi-broadcast-pin"></i> SCANNER GERBANG &amp; KIOSK
         </div>
         
-        <div style="background:#ffffff; padding:12px; border-radius:14px; border:1px solid #cbd5e1; box-shadow:0 4px 16px rgba(0,0,0,0.06); display:inline-flex; align-items:center; justify-content:center;">
-          <div id="qrContainer"></div>
+        <div onclick="toggleQrFullscreenZoomGuru(true)" title="Sentuh untuk zoom &amp; maksimalkan kecerahan" style="background:#ffffff; padding:12px; border-radius:14px; border:1px solid #cbd5e1; box-shadow:0 4px 16px rgba(0,0,0,0.06); display:inline-flex; align-items:center; justify-content:center; cursor:pointer; transition:transform 0.2s;" onmouseover="this.style.transform='scale(1.02)'" onmouseout="this.style.transform=''">
+          <div id="qrContainer" style="cursor:pointer;"></div>
         </div>
 
-        <div style="font-family:var(--font-mono); font-size:14px; font-weight:900; color:var(--text); letter-spacing:.05em; margin-top:10px;">
+        <div class="qr-code-number-label" style="font-family:var(--font-mono); font-size:14px; font-weight:900; color:var(--text); letter-spacing:.05em; margin-top:10px;">
           {{ $codeValue }}
         </div>
 
-        <div class="scan-hint" style="margin-top:10px;">
-          <i class="bi bi-brightness-high-fill" style="color:#eab308;"></i> Tingkatkan kecerahan layar HP saat memindai pada scanner gerbang sekolah.
+        <div class="scan-hint" onclick="toggleQrFullscreenZoomGuru(true)" style="margin-top:10px; cursor:pointer;" title="Sentuh untuk zoom &amp; maksimalkan kecerahan">
+          <i class="bi bi-arrows-fullscreen" style="color:#0284c7;"></i> Sentuh QR untuk memperbesar &amp; maksimalkan kecerahan
         </div>
       </div>
 
@@ -278,7 +278,136 @@
         correctLevel: QRCode.CorrectLevel.H
       });
     });
+
+    let _origThemeColorGuru = '#0F172A';
+    let _screenWakeLockGuru = null;
+
+    async function toggleQrFullscreenZoomGuru(isOpen) {
+      const overlay = document.getElementById('qrZoomOverlayGuru');
+      if (!overlay) return;
+
+      if (isOpen) {
+        overlay.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+
+        // Render QR besar
+        const zoomContainer = document.getElementById('zoomedQrContainerGuru');
+        if (zoomContainer && !zoomContainer.hasChildNodes()) {
+          new QRCode(zoomContainer, {
+            text: "{{ $codeValue }}",
+            width: 240,
+            height: 240,
+            colorDark: "#000000",
+            colorLight: "#ffffff",
+            correctLevel: QRCode.CorrectLevel.H
+          });
+        }
+
+        // Haptic feedback
+        if ('vibrate' in navigator) {
+          try { navigator.vibrate(40); } catch(e) {}
+        }
+
+        // Ubah meta theme-color ke #FFFFFF
+        const metaTheme = document.querySelector('meta[name="theme-color"]');
+        if (metaTheme) {
+          _origThemeColorGuru = metaTheme.getAttribute('content') || '#0F172A';
+          metaTheme.setAttribute('content', '#FFFFFF');
+        }
+
+        // Fullscreen API (layar penuh putih memicu kecerahan maksimal)
+        try {
+          const reqFs = overlay.requestFullscreen || overlay.webkitRequestFullscreen || overlay.mozRequestFullScreen || overlay.msRequestFullscreen;
+          if (reqFs && !document.fullscreenElement && !document.webkitFullscreenElement) {
+            await reqFs.call(overlay);
+          }
+        } catch(fsErr) {}
+
+        // Screen WakeLock API
+        try {
+          if ('wakeLock' in navigator && navigator.wakeLock) {
+            _screenWakeLockGuru = await navigator.wakeLock.request('screen');
+          }
+        } catch(err) {}
+
+        // Bridge native app jika ada
+        try {
+          if (window.Android && typeof window.Android.setMaxBrightness === 'function') {
+            window.Android.setMaxBrightness(true);
+          }
+        } catch(e) {}
+
+      } else {
+        overlay.style.display = 'none';
+        document.body.style.overflow = '';
+
+        const metaTheme = document.querySelector('meta[name="theme-color"]');
+        if (metaTheme) {
+          metaTheme.setAttribute('content', _origThemeColorGuru);
+        }
+
+        try {
+          if (document.fullscreenElement || document.webkitFullscreenElement) {
+            const exitFs = document.exitFullscreen || document.webkitExitFullscreen || document.mozCancelFullScreen || document.msExitFullscreen;
+            if (exitFs) await exitFs.call(document);
+          }
+        } catch(fsErr) {}
+
+        if (_screenWakeLockGuru !== null) {
+          try {
+            await _screenWakeLockGuru.release();
+            _screenWakeLockGuru = null;
+          } catch(err) {}
+        }
+
+        try {
+          if (window.Android && typeof window.Android.setMaxBrightness === 'function') {
+            window.Android.setMaxBrightness(false);
+          }
+        } catch(e) {}
+      }
+    }
+    window.toggleQrFullscreenZoomGuru = toggleQrFullscreenZoomGuru;
+
+    document.addEventListener('fullscreenchange', () => {
+      if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+        const overlay = document.getElementById('qrZoomOverlayGuru');
+        if (overlay && overlay.style.display === 'flex') {
+          toggleQrFullscreenZoomGuru(false);
+        }
+      }
+    });
   </script>
+
+  {{-- FULLSCREEN AUTO-ZOOM & MAX BRIGHTNESS (PURE WHITE SCREEN) OVERLAY UNTUK GURU --}}
+  <div id="qrZoomOverlayGuru" onclick="toggleQrFullscreenZoomGuru(false)" title="Sentuh untuk tutup &amp; kembalikan kecerahan normal" style="display:none; position:fixed; inset:0; width:100vw; height:100vh; height:100dvh; z-index:9999999; background:#ffffff !important; color:#0f172a; flex-direction:column; align-items:center; justify-content:space-between; padding:24px 20px; user-select:none; cursor:pointer; box-shadow:inset 0 0 0 100vmax #ffffff;">
+    <div style="text-align:center; width:100%;">
+      <div style="display:inline-flex; align-items:center; gap:6px; background:#fef08a; color:#854d0e; padding:4px 14px; border-radius:20px; font-size:11px; font-weight:800; margin-bottom:8px; border:1px solid #facc15; box-shadow:0 2px 10px rgba(234,179,8,0.25);">
+        <i class="bi bi-brightness-high-fill" style="color:#ca8a04; font-size:13px;"></i>
+        <span>Kecerahan Layar Maksimal (100%)</span>
+      </div>
+      <div style="font-size:11px; font-weight:800; color:#64748b; letter-spacing:1.5px; text-transform:uppercase;">SMK NEGERI 1 AIR NANINGAN</div>
+      <div style="font-size:15px; font-weight:900; color:#0f172a; margin-top:2px; letter-spacing:0.5px;">SCANNER GERBANG &amp; KIOSK</div>
+    </div>
+    <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; flex:1; width:100%;">
+      <div style="background:#ffffff; padding:18px 18px 12px; border-radius:24px; box-shadow:0 16px 50px rgba(0,0,0,0.12), 0 0 0 10px #f8fafc; border:2px solid #e2e8f0; display:inline-block; max-width:92vw;">
+        <div id="zoomedQrContainerGuru" style="min-width:240px; min-height:240px; display:flex; align-items:center; justify-content:center; margin:0 auto;"></div>
+        <div style="font-family:var(--font-mono); font-size:22px; font-weight:900; letter-spacing:3px; color:#0f172a; margin-top:10px; text-align:center;">{{ $codeValue }}</div>
+      </div>
+      <div style="margin-top:14px; text-align:center;">
+        <div style="font-size:18px; font-weight:900; color:#0f172a; line-height:1.2;">{{ $guru->nama }}</div>
+        <div style="font-size:13px; font-weight:700; color:#64748b; margin-top:3px;">
+          NIP: {{ $guru->nip ?: '-' }} · {{ $guru->jabatan ?? 'Guru / Pendidik' }}
+        </div>
+      </div>
+    </div>
+    <div style="text-align:center; width:100%;">
+      <div style="display:inline-flex; align-items:center; gap:8px; background:#0f172a; color:#ffffff; padding:10px 22px; border-radius:30px; font-size:12px; font-weight:800; box-shadow:0 4px 18px rgba(0,0,0,0.25);">
+        <i class="bi bi-fullscreen-exit"></i>
+        <span>Sentuh layar untuk tutup &amp; kembalikan kecerahan</span>
+      </div>
+    </div>
+  </div>
 </body>
 </html>
 

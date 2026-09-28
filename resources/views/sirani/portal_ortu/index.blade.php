@@ -1643,6 +1643,8 @@
       }
     }
 
+    let _origThemeColorPortal = '#0F172A';
+
     // AUTO-ZOOM & MAX BRIGHTNESS TOGGLE
     async function toggleQrFullscreenZoom(isOpen) {
       const overlay = document.getElementById('qrZoomOverlay');
@@ -1653,7 +1655,30 @@
         document.body.style.overflow = 'hidden';
         renderPortalQrCode();
 
-        // Aktifkan Screen WakeLock API agar layar HP tetap menyala terang (tidak mati/redup saat antre scan)
+        // 1. Getar haptic singkat jika didukung device
+        if ('vibrate' in navigator) {
+          try { navigator.vibrate(40); } catch(e) {}
+        }
+
+        // 2. Ubah meta theme-color ke #FFFFFF agar bar browser atas & bawah HP ikut terang maksimal
+        const metaTheme = document.querySelector('meta[name="theme-color"]');
+        if (metaTheme) {
+          _origThemeColorPortal = metaTheme.getAttribute('content') || '#0F172A';
+          metaTheme.setAttribute('content', '#FFFFFF');
+        }
+
+        // 3. Masuk ke Fullscreen API (Layar penuh 100% putih memicu emisi kecerahan maksimal panel HP)
+        try {
+          const el = overlay;
+          const reqFs = el.requestFullscreen || el.webkitRequestFullscreen || el.mozRequestFullScreen || el.msRequestFullscreen;
+          if (reqFs && !document.fullscreenElement && !document.webkitFullscreenElement) {
+            await reqFs.call(el);
+          }
+        } catch(fsErr) {
+          console.log('Fullscreen request skipped or denied:', fsErr);
+        }
+
+        // 4. Aktifkan Screen WakeLock API agar layar HP tidak redup atau mati saat antre scan gerbang
         try {
           if ('wakeLock' in navigator && navigator.wakeLock) {
             screenWakeLock = await navigator.wakeLock.request('screen');
@@ -1661,20 +1686,69 @@
         } catch(err) {
           console.log('WakeLock not supported or denied', err);
         }
+
+        // 5. Dukungan bridge native app jika berjalan di WebView / APK Android
+        try {
+          if (window.Android && typeof window.Android.setMaxBrightness === 'function') {
+            window.Android.setMaxBrightness(true);
+          }
+        } catch(e) {}
+
       } else {
         overlay.style.display = 'none';
         document.body.style.overflow = '';
 
-        // Lepaskan WakeLock (kecerahan kembali normal)
+        // 1. Kembalikan meta theme-color ke warna semula
+        const metaTheme = document.querySelector('meta[name="theme-color"]');
+        if (metaTheme) {
+          metaTheme.setAttribute('content', _origThemeColorPortal);
+        }
+
+        // 2. Keluar dari Fullscreen API
+        try {
+          if (document.fullscreenElement || document.webkitFullscreenElement) {
+            const exitFs = document.exitFullscreen || document.webkitExitFullscreen || document.mozCancelFullScreen || document.msExitFullscreen;
+            if (exitFs) {
+              await exitFs.call(document);
+            }
+          }
+        } catch(fsErr) {}
+
+        // 3. Lepaskan WakeLock (kecerahan kembali normal)
         if (screenWakeLock !== null) {
           try {
             await screenWakeLock.release();
             screenWakeLock = null;
           } catch(err) {}
         }
+
+        // 4. Kembalikan kecerahan normal native app jika ada bridge
+        try {
+          if (window.Android && typeof window.Android.setMaxBrightness === 'function') {
+            window.Android.setMaxBrightness(false);
+          }
+        } catch(e) {}
       }
     }
     window.toggleQrFullscreenZoom = toggleQrFullscreenZoom;
+
+    // Sinkronkan jika user menutup fullscreen via tombol Back Android / gesture swipe
+    document.addEventListener('fullscreenchange', () => {
+      if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+        const overlay = document.getElementById('qrZoomOverlay');
+        if (overlay && overlay.style.display === 'flex') {
+          toggleQrFullscreenZoom(false);
+        }
+      }
+    });
+    document.addEventListener('webkitfullscreenchange', () => {
+      if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+        const overlay = document.getElementById('qrZoomOverlay');
+        if (overlay && overlay.style.display === 'flex') {
+          toggleQrFullscreenZoom(false);
+        }
+      }
+    });
 
     // SIMPAN GAMBAR KARTU SISWA UTUH KE GALERI HP
     async function downloadSiswaFullCard() {
@@ -2759,11 +2833,15 @@
   {{-- FULLSCREEN AUTO-ZOOM & MAX BRIGHTNESS (PURE WHITE SCREEN) OVERLAY --}}
   <div id="qrZoomOverlay" onclick="toggleQrFullscreenZoom(false)" title="Sentuh untuk minimize &amp; kembalikan kecerahan normal">
     <div class="zoom-overlay-header">
+      <div style="display:inline-flex; align-items:center; gap:6px; background:#fef08a; color:#854d0e; padding:4px 14px; border-radius:20px; font-size:11px; font-weight:800; margin-bottom:8px; border:1px solid #facc15; box-shadow:0 2px 10px rgba(234,179,8,0.25);">
+        <i class="bi bi-brightness-high-fill" style="color:#ca8a04; font-size:13px;"></i>
+        <span>Kecerahan Layar Maksimal (100%)</span>
+      </div>
       <div style="font-size:11px; font-weight:800; color:#64748b; letter-spacing:1.5px; text-transform:uppercase;">SMK NEGERI 1 AIR NANINGAN</div>
       <div style="font-size:15px; font-weight:900; color:#0f172a; margin-top:2px; letter-spacing:0.5px;">SCANNER GERBANG &amp; KIOSK</div>
     </div>
     <div class="zoom-overlay-body">
-      <div style="background:#ffffff; padding:18px 18px 12px; border-radius:24px; box-shadow:0 16px 50px rgba(0,0,0,0.12); border:2px solid #e2e8f0; display:inline-block; max-width:92vw;">
+      <div style="background:#ffffff; padding:18px 18px 12px; border-radius:24px; box-shadow:0 16px 50px rgba(0,0,0,0.12), 0 0 0 10px #f8fafc; border:2px solid #e2e8f0; display:inline-block; max-width:92vw;">
         <div id="zoomedQrContainer" style="min-width:240px; min-height:240px; display:flex; align-items:center; justify-content:center; margin:0 auto;"></div>
         <div style="font-family:var(--font-mono); font-size:22px; font-weight:900; letter-spacing:3px; color:#0f172a; margin-top:10px; text-align:center;">{{ $codeValue }}</div>
       </div>
@@ -2780,8 +2858,8 @@
     </div>
     <div class="zoom-overlay-footer">
       <div style="display:inline-flex; align-items:center; gap:8px; background:#0f172a; color:#ffffff; padding:10px 22px; border-radius:30px; font-size:12px; font-weight:800; box-shadow:0 4px 18px rgba(0,0,0,0.25);">
-        <i class="bi bi-hand-index-thumb"></i>
-        <span>Sentuh layar untuk minimize &amp; kembalikan kecerahan</span>
+        <i class="bi bi-fullscreen-exit"></i>
+        <span>Sentuh layar untuk tutup &amp; kembalikan kecerahan</span>
       </div>
     </div>
   </div>
