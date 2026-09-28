@@ -2349,13 +2349,13 @@
           <label style="font-size:11.5px; font-weight:800; text-transform:uppercase; color:var(--text); margin-bottom:5px; display:block;">
             Tanggal Mulai <span style="color:var(--red);">*</span>
           </label>
-          <input type="date" name="tanggal_mulai" value="{{ $modeUjian->tanggal_mulai ?? '2026-09-21' }}" required class="form-control" style="width:100%; height:38px; border-radius:6px; border:1px solid var(--border-2); padding:0 10px; font-size:13px;" />
+          <input type="date" name="tanggal_mulai" value="{{ $modeUjian?->tanggal_mulai ? \Carbon\Carbon::parse($modeUjian->tanggal_mulai)->format('Y-m-d') : '2026-09-21' }}" required class="form-control" style="width:100%; height:38px; border-radius:6px; border:1px solid var(--border-2); padding:0 10px; font-size:13px;" />
         </div>
         <div class="form-group">
           <label style="font-size:11.5px; font-weight:800; text-transform:uppercase; color:var(--text); margin-bottom:5px; display:block;">
             Tanggal Selesai <span style="color:var(--red);">*</span>
           </label>
-          <input type="date" name="tanggal_selesai" value="{{ $modeUjian->tanggal_selesai ?? '2026-09-25' }}" required class="form-control" style="width:100%; height:38px; border-radius:6px; border:1px solid var(--border-2); padding:0 10px; font-size:13px;" />
+          <input type="date" name="tanggal_selesai" value="{{ $modeUjian?->tanggal_selesai ? \Carbon\Carbon::parse($modeUjian->tanggal_selesai)->format('Y-m-d') : '2026-09-25' }}" required class="form-control" style="width:100%; height:38px; border-radius:6px; border:1px solid var(--border-2); padding:0 10px; font-size:13px;" />
         </div>
         <div class="form-group">
           <label style="font-size:11.5px; font-weight:800; text-transform:uppercase; color:#4f46e5; margin-bottom:5px; display:block;">
@@ -2382,16 +2382,20 @@
         </div>
 
         @php
-          $selectedPanitiaIds = $modeUjian->panitia_guru_ids ?? [];
+          $selectedPanitiaIds = array_map('intval', (array)($modeUjian->panitia_guru_ids ?? []));
         @endphp
         <div style="max-height:180px; overflow-y:auto; border:1px solid var(--border-2); border-radius:8px; padding:8px 12px; background:var(--bg-2); display:grid; grid-template-columns:repeat(auto-fill, minmax(240px, 1fr)); gap:6px;" id="listPanitiaChecklist">
-          @foreach($semuaGuru as $g)
-            @php $checked = in_array($g->id, $selectedPanitiaIds); @endphp
+          @forelse($semuaGuru as $g)
+            @php $checked = in_array((int)$g->id, $selectedPanitiaIds, true); @endphp
             <label class="panitia-item-label" style="display:flex; align-items:center; gap:8px; padding:4px 6px; border-radius:6px; cursor:pointer; font-size:12px; background:{{ $checked ? 'rgba(79, 70, 229, 0.08)' : 'transparent' }};">
               <input type="checkbox" name="panitia_guru_ids[]" value="{{ $g->id }}" {{ $checked ? 'checked' : '' }} style="accent-color:#4f46e5;">
               <span class="panitia-nama" style="font-weight:{{ $checked ? '700' : '500' }}; color:var(--text);">{{ $g->nama }}</span>
             </label>
-          @endforeach
+          @empty
+            <div style="grid-column:1 / -1; padding:12px; text-align:center; color:var(--text-3); font-size:12px;">
+              Tidak ada data guru aktif yang tersedia.
+            </div>
+          @endforelse
         </div>
       </div>
 

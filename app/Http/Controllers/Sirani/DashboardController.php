@@ -806,7 +806,7 @@ class DashboardController extends Controller
 
         // Mode Ujian / Sumatif
         $modeUjian = \App\Models\ModeUjian::getModeAktif($today) ?? \App\Models\ModeUjian::latest()->first();
-        $semuaGuru = \App\Models\Guru::where('is_active', true)->orderBy('nama')->get(['id', 'nama']);
+        $semuaGuru = \App\Models\Guru::where('status', 'aktif')->orderBy('nama')->get(['id', 'nama']);
 
         return view('sirani.jadwal_sekolah.index', compact(
             'today',
