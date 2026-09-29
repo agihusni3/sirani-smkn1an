@@ -330,6 +330,77 @@ class DeployController extends Controller
                 })->values();
             }
 
+            // Rombel & Distribusi Siswa
+            $rombels = \DB::table('rombels')->get();
+            $rombelStats = [];
+            foreach ($rombels as $r) {
+                $anggotaAktif = \DB::table('siswa_rombels')
+                    ->where('rombel_id', $r->id)
+                    ->where('status_keanggotaan', 'aktif')
+                    ->count();
+                $wali = null;
+                if (!empty($r->wali_kelas_id)) {
+                    $wali = \DB::table('gurus')->where('id', $r->wali_kelas_id)->value('nama');
+                }
+                $rombelStats[] = [
+                    'id' => $r->id,
+                    'nama' => $r->nama ?? ($r->nama_rombel ?? 'Rombel #' . $r->id),
+                    'tingkat' => $r->tingkat ?? '-',
+                    'jurusan' => $r->jurusan ?? '-',
+                    'wali_kelas' => $wali ?? 'Belum ditentukan',
+                    'jumlah_siswa_aktif' => $anggotaAktif,
+                ];
+            }
+
+            // Absensi
+            $totalAbsensi = 0;
+            $statusAbsensi = [];
+            $rentangAbsensi = null;
+            $siswaAktifBelumPernahAbsen = [];
+            if (\Illuminate\Support\Facades\Schema::hasTable('absensis')) {
+                $totalAbsensi = \DB::table('absensis')->count();
+                $statusAbsensi = \DB::table('absensis')
+                    ->select('status', \DB::raw('count(*) as total'))
+                    ->groupBy('status')
+                    ->pluck('total', 'status')
+                    ->toArray();
+                $minDate = \DB::table('absensis')->min('tanggal');
+                $maxDate = \DB::table('absensis')->max('tanggal');
+                $rentangAbsensi = [
+                    'pertama' => $minDate,
+                    'terakhir' => $maxDate,
+                ];
+                $siswaPernahAbsen = \DB::table('absensis')->distinct()->pluck('siswa_id')->toArray();
+                $siswaAktifBelumPernahAbsen = $allSiswas->where('status', 'aktif')
+                    ->whereNotIn('id', $siswaPernahAbsen)
+                    ->map(fn($s) => ['id' => $s->id, 'nama' => $s->nama, 'nisn' => $s->nisn])
+                    ->values()
+                    ->toArray();
+            }
+
+            // Guru
+            $guruStats = [
+                'total_guru' => 0,
+                'guru_tanpa_nip' => 0,
+            ];
+            if (\Illuminate\Support\Facades\Schema::hasTable('gurus')) {
+                $guruStats['total_guru'] = \DB::table('gurus')->count();
+                $guruStats['guru_tanpa_nip'] = \DB::table('gurus')
+                    ->where(function($q) {
+                        $q->whereNull('nip')->orWhere('nip', '');
+                    })->count();
+            }
+
+            // Demografi & Kelengkapan Lainnya
+            $jkStats = $allSiswas->groupBy('jenis_kelamin')->map->count()->toArray();
+            $agamaStats = $allSiswas->groupBy('agama')->map->count()->toArray();
+            $tanpaTglLahir = $allSiswas->filter(fn($s) => empty($s->tanggal_lahir))->count();
+            $tanpaTempatLahir = $allSiswas->filter(fn($s) => empty($s->tempat_lahir))->count();
+            $tanpaAlamat = $allSiswas->filter(fn($s) => empty($s->alamat))->count();
+            $tanpaNamaAyah = $allSiswas->filter(fn($s) => empty($s->nama_ayah))->count();
+            $tanpaNamaIbu = $allSiswas->filter(fn($s) => empty($s->nama_ibu))->count();
+            $penerimaPipCount = $allSiswas->filter(fn($s) => !empty($s->penerima_pip) && $s->penerima_pip != '0')->count();
+
             return response()->json([
                 'status' => 'success',
                 'database' => \DB::connection()->getDatabaseName(),
@@ -348,6 +419,16 @@ class DeployController extends Controller
                     'tanpa_nik_count' => $tanpaNikCount,
                     'tanpa_foto_count' => $tanpaFotoCount,
                     'aktif_tanpa_kelas_count' => count($tanpaKelas),
+                    'tanpa_tgl_lahir_count' => $tanpaTglLahir,
+                    'tanpa_tempat_lahir_count' => $tanpaTempatLahir,
+                    'tanpa_alamat_count' => $tanpaAlamat,
+                    'tanpa_nama_ayah_count' => $tanpaNamaAyah,
+                    'tanpa_nama_ibu_count' => $tanpaNamaIbu,
+                    'penerima_pip_count' => $penerimaPipCount,
+                    'total_rombel' => count($rombelStats),
+                    'total_absensi' => $totalAbsensi,
+                    'siswa_aktif_belum_pernah_absen_count' => count($siswaAktifBelumPernahAbsen),
+                    'total_guru' => $guruStats['total_guru'],
                 ],
                 'details' => [
                     'nisn_null' => $nisnNull,
@@ -355,8 +436,20 @@ class DeployController extends Controller
                     'nisn_bukan_10_digit' => $nisnBukan10Digit,
                     'nisn_duplikat' => $nisnDuplikat,
                     'nama_duplikat' => $namaDuplikat,
-                    'nama_all_caps' => array_slice($allCaps, 0, 30),
+                    'nama_all_caps_sample' => array_slice($allCaps, 0, 20),
                     'aktif_tanpa_kelas' => $tanpaKelas,
+                    'rombel_distribution' => $rombelStats,
+                    'demografi' => [
+                        'jenis_kelamin' => $jkStats,
+                        'agama' => $agamaStats,
+                    ],
+                    'absensi' => [
+                        'total' => $totalAbsensi,
+                        'per_status' => $statusAbsensi,
+                        'rentang' => $rentangAbsensi,
+                        'siswa_aktif_belum_pernah_absen' => array_slice($siswaAktifBelumPernahAbsen, 0, 15),
+                    ],
+                    'guru' => $guruStats,
                 ]
             ]);
         } catch (\Throwable $e) {
