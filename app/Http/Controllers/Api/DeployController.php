@@ -39,6 +39,11 @@ class DeployController extends Controller
             return $this->auditSiswa();
         }
 
+        // ── ACTION: Audit Barcode Siswa (sinkronisasi barcode & RFID) ──
+        if ($request->input('action') === 'audit_barcode') {
+            return $this->auditBarcode();
+        }
+
         // ── ACTION: Fix Data Siswa (jalankan perbaikan langsung di produksi) ──
         if ($request->input('action') === 'fix_siswa') {
             return $this->fixSiswa();
@@ -515,5 +520,186 @@ class DeployController extends Controller
             ], 500);
         }
     }
+
+    /**
+     * Audit Barcode & RFID Siswa secara mendalam pada database produksi.
+     */
+    public function auditBarcode()
+    {
+        try {
+            $hasKartuRfidTable = \Illuminate\Support\Facades\Schema::hasTable('kartu_rfids');
+            $allSiswas = \DB::table('siswas')->get();
+            $activeSiswas = $allSiswas->where('status', 'aktif');
+            $totalActive = $activeSiswas->count();
+
+            $kartuRfids = $hasKartuRfidTable ? \DB::table('kartu_rfids')->get() : collect();
+
+            // 1. Audit Kartu RFID / Barcode Terdaftar di kartu_rfids
+            $siswaCards = $kartuRfids->where('pemilik_type', 'siswa');
+            $guruCards = $kartuRfids->where('pemilik_type', 'guru');
+
+            $siswaCardsActive = $siswaCards->where('status', 'aktif');
+            $siswaCardsNonaktif = $siswaCards->where('status', '!=', 'aktif');
+
+            // Cek orphan cards
+            $allSiswaIds = $allSiswas->pluck('id')->toArray();
+            $orphanSiswaCards = $siswaCards->whereNotIn('pemilik_id', $allSiswaIds)->values()->toArray();
+
+            // Cek kartu ganda per siswa
+            $cardGroupedBySiswa = $siswaCardsActive->groupBy('pemilik_id');
+            $siswaWithMultipleCards = [];
+            foreach ($cardGroupedBySiswa as $sid => $cards) {
+                if ($cards->count() > 1) {
+                    $siswaObj = $allSiswas->firstWhere('id', $sid);
+                    $siswaWithMultipleCards[] = [
+                        'siswa_id' => $sid,
+                        'nama' => $siswaObj?->nama ?? 'Unknown',
+                        'total_kartu' => $cards->count(),
+                        'uids' => $cards->pluck('uid')->toArray(),
+                    ];
+                }
+            }
+
+            // Cek UID duplikat di tabel kartu_rfids
+            $uidGroup = $kartuRfids->groupBy('uid');
+            $duplicateUids = [];
+            foreach ($uidGroup as $uid => $cards) {
+                if ($cards->count() > 1) {
+                    $duplicateUids[] = [
+                        'uid' => $uid,
+                        'count' => $cards->count(),
+                        'cards' => $cards->toArray(),
+                    ];
+                }
+            }
+
+            // 2. Audit Keselarasan Siswa Aktif vs Barcode / Scan Ready
+            $scanReadySiswa = [];
+            $unscannableSiswa = [];
+            $barcodeTypeDistribution = [
+                'registered_rfid_card' => 0,
+                'barcode_nisn' => 0,
+                'barcode_fallback_id' => 0,
+                'unscannable' => 0,
+            ];
+
+            $siswaRombelMap = [];
+            if (\Illuminate\Support\Facades\Schema::hasTable('siswa_rombels') && \Illuminate\Support\Facades\Schema::hasTable('rombels')) {
+                $srList = \DB::table('siswa_rombels')
+                    ->where('status_keanggotaan', 'aktif')
+                    ->join('rombels', 'siswa_rombels.rombel_id', '=', 'rombels.id')
+                    ->select('siswa_rombels.siswa_id', 'rombels.nama_rombel')
+                    ->get();
+                foreach ($srList as $sr) {
+                    $siswaRombelMap[$sr->siswa_id] = $sr->nama_rombel;
+                }
+            }
+
+            foreach ($activeSiswas as $s) {
+                $card = $siswaCardsActive->firstWhere('pemilik_id', $s->id);
+                $nisn = trim((string)($s->nisn ?? ''));
+                $rombelNama = $siswaRombelMap[$s->id] ?? 'Tanpa Rombel';
+
+                $scannable = false;
+                $activeMethod = null;
+                $codeToPrint = null;
+                $scanSource = null;
+
+                if ($card) {
+                    $activeMethod = 'Kartu RFID/Barcode Terdaftar (UID: ' . $card->uid . ')';
+                    $codeToPrint = $card->uid;
+                    $scanSource = 'kartu_rfids';
+                    $barcodeTypeDistribution['registered_rfid_card']++;
+                    $scannable = true;
+                } elseif ($nisn !== '') {
+                    $activeMethod = 'Barcode Standar NISN (' . $nisn . ')';
+                    $codeToPrint = $nisn;
+                    $scanSource = 'nisn';
+                    $barcodeTypeDistribution['barcode_nisn']++;
+                    $scannable = true;
+                } else {
+                    $activeMethod = 'Barcode Fallback ID (SISWA-' . $s->id . ')';
+                    $codeToPrint = 'SISWA-' . $s->id;
+                    $scanSource = 'fallback_id';
+                    $barcodeTypeDistribution['barcode_fallback_id']++;
+                    $scannable = true;
+                }
+
+                // Cek potensi konflik jika NISN siswa sama dengan UID kartu orang lain
+                $conflictCard = $kartuRfids->firstWhere('uid', $nisn);
+                $hasConflict = false;
+                $conflictDetail = null;
+                if ($conflictCard && $conflictCard->pemilik_id != $s->id) {
+                    $hasConflict = true;
+                    $conflictDetail = "NISN bentrok dengan UID kartu milik " . $conflictCard->pemilik_type . " ID #" . $conflictCard->pemilik_id;
+                }
+
+                $info = [
+                    'id' => $s->id,
+                    'nama' => $s->nama,
+                    'nisn' => $nisn ?: null,
+                    'rombel' => $rombelNama,
+                    'active_method' => $activeMethod,
+                    'code_to_print' => $codeToPrint,
+                    'scan_source' => $scanSource,
+                    'has_rfid_card' => (bool)$card,
+                    'has_conflict' => $hasConflict,
+                    'conflict_detail' => $conflictDetail,
+                ];
+
+                if ($scannable && !$hasConflict) {
+                    $scanReadySiswa[] = $info;
+                } else {
+                    $barcodeTypeDistribution['unscannable']++;
+                    $unscannableSiswa[] = $info;
+                }
+            }
+
+            // 3. Riwayat Absensi & Sumber Scan
+            $sumberAbsenStats = [];
+            if (\Illuminate\Support\Facades\Schema::hasTable('absensis')) {
+                $sumberAbsenStats = \DB::table('absensis')
+                    ->where('pemilik_type', 'siswa')
+                    ->select('sumber_absen', \DB::raw('count(*) as count'))
+                    ->groupBy('sumber_absen')
+                    ->pluck('count', 'sumber_absen')
+                    ->toArray();
+            }
+
+            return response()->json([
+                'status' => 'success',
+                'summary' => [
+                    'total_siswa_aktif' => $totalActive,
+                    'total_kartu_di_tabel_rfid' => $kartuRfids->count(),
+                    'kartu_siswa_aktif' => $siswaCardsActive->count(),
+                    'kartu_siswa_nonaktif' => $siswaCardsNonaktif->count(),
+                    'kartu_guru_terdaftar' => $guruCards->count(),
+                    'kartu_orphan_count' => count($orphanSiswaCards),
+                    'siswa_kartu_ganda_count' => count($siswaWithMultipleCards),
+                    'uid_duplikat_count' => count($duplicateUids),
+                    'total_siswa_siap_scan' => count($scanReadySiswa),
+                    'total_siswa_tidak_bisa_scan' => count($unscannableSiswa),
+                    'metode_distribusi' => $barcodeTypeDistribution,
+                    'riwayat_sumber_absen' => $sumberAbsenStats,
+                ],
+                'details' => [
+                    'orphan_cards' => $orphanSiswaCards,
+                    'siswa_multiple_cards' => $siswaWithMultipleCards,
+                    'duplicate_uids' => $duplicateUids,
+                    'unscannable_siswa' => $unscannableSiswa,
+                    'sample_scan_ready' => array_slice($scanReadySiswa, 0, 15),
+                    'sample_kartu_rfid_terdaftar' => $siswaCardsActive->take(10)->values(),
+                ]
+            ]);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => $e->getMessage(),
+                'line' => $e->getLine(),
+                'file' => $e->getFile(),
+            ], 500);
+        }
+    }
 }
+
 
