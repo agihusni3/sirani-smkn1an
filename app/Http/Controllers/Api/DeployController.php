@@ -111,6 +111,18 @@ class DeployController extends Controller
             $logs['migrate_error'] = $e->getMessage();
         }
 
+        // 3b. Pastikan SQLite di server menggunakan WAL mode & busy_timeout tinggi
+        try {
+            if (config('database.default') === 'sqlite') {
+                \Illuminate\Support\Facades\DB::statement('PRAGMA journal_mode=WAL;');
+                \Illuminate\Support\Facades\DB::statement('PRAGMA busy_timeout=15000;');
+                \Illuminate\Support\Facades\DB::statement('PRAGMA synchronous=NORMAL;');
+                $logs['sqlite_wal'] = 'SQLite WAL mode dan busy_timeout=15000 berhasil diaktifkan.';
+            }
+        } catch (\Throwable $e) {
+            $logs['sqlite_wal_error'] = $e->getMessage();
+        }
+
         // 4. Jalankan Seeder jika diminta
         if ($request->has('run_seed') || $request->has('seed')) {
             $seedClass = $request->input('seed') ?: $request->query('seed') ?: 'DatabaseSeeder';

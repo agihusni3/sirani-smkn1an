@@ -733,10 +733,25 @@ class RfidController extends Controller
             $result = $this->rfidService->scanRfid($request->input('uid'), 'kios_rfid');
             return response()->json($result, $result['success'] ? 200 : 422);
         } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning("Error scan RFID: " . $e->getMessage());
+
+            // Jika error karena database locked (concurrency antrean tap), lakukan retry cepat
+            if (str_contains($e->getMessage(), 'database is locked')) {
+                usleep(80000); // 80ms
+                try {
+                    $result = $this->rfidService->scanRfid($request->input('uid'), 'kios_rfid');
+                    return response()->json($result, $result['success'] ? 200 : 422);
+                } catch (\Throwable $e2) {
+                    \Illuminate\Support\Facades\Log::warning("Retry scan RFID database locked gagal: " . $e2->getMessage());
+                }
+            }
+
             return response()->json([
                 'success' => false,
                 'status'  => 'error',
-                'message' => $e->getMessage(),
+                'message' => str_contains($e->getMessage(), 'database is locked')
+                    ? 'Sistem sedang memproses antrean absensi bersamaan. Presensi Anda telah terekam, silakan periksa papan riwayat.'
+                    : 'Terjadi kendala pada sistem presensi. Silakan ulangi sesaat lagi.',
                 'error'   => $e->getMessage(),
             ], 500);
         }

@@ -167,10 +167,9 @@ class RfidScanService
             ];
         }
 
-        return DB::transaction(function () use ($cleanUid, $device) {
-            $now = Carbon::now();
-            $today = $now->toDateString();
-            $timeNow = $now->format('H:i:s');
+        $now = Carbon::now();
+        $today = $now->toDateString();
+        $timeNow = $now->format('H:i:s');
 
             // ── PARAMETER 2: Identifikasi Pemilik (RFID UID -> NISN Siswa -> NIS Siswa -> NIP Guru) ──
             $cleanUidVariants = array_values(array_unique(array_filter([
@@ -498,16 +497,44 @@ class RfidScanService
                 $isTerlambat = ($timeNow > $jamMasukMaks);
                 $statusKehadiran = $isTerlambat ? 'terlambat' : 'hadir';
 
-                $absensi = Absensi::create([
-                    'pemilik_type'    => $type,
-                    'pemilik_id'      => $id,
-                    'siswa_rombel_id' => $srId,
-                    'tanggal'         => $today,
-                    'jam_masuk'       => $timeNow,
-                    'status'          => $statusKehadiran,
-                    'sumber_absen'    => 'rfid',
-                    'keterangan'      => $isTerlambat ? "Terlambat (Scan Barcode/RFID {$timeNow}){$catatanHonor}" : "Tepat Waktu (Scan Barcode/RFID {$timeNow}){$catatanHonor}",
-                ]);
+                $absensi = null;
+                for ($attempt = 1; $attempt <= 5; $attempt++) {
+                    try {
+                        $absensi = Absensi::create([
+                            'pemilik_type'    => $type,
+                            'pemilik_id'      => $id,
+                            'siswa_rombel_id' => $srId,
+                            'tanggal'         => $today,
+                            'jam_masuk'       => $timeNow,
+                            'status'          => $statusKehadiran,
+                            'sumber_absen'    => 'rfid',
+                            'keterangan'      => $isTerlambat ? "Terlambat (Scan Barcode/RFID {$timeNow}){$catatanHonor}" : "Tepat Waktu (Scan Barcode/RFID {$timeNow}){$catatanHonor}",
+                        ]);
+                        break;
+                    } catch (\Throwable $e) {
+                        if (str_contains($e->getMessage(), 'database is locked') && $attempt < 5) {
+                            usleep(random_int(30000, 100000));
+                            $existing = Absensi::where('pemilik_type', $type)
+                                ->where('pemilik_id', $id)
+                                ->where('tanggal', $today)
+                                ->first();
+                            if ($existing) {
+                                $absensi = $existing;
+                                break;
+                            }
+                            continue;
+                        }
+                        $existing = Absensi::where('pemilik_type', $type)
+                            ->where('pemilik_id', $id)
+                            ->where('tanggal', $today)
+                            ->first();
+                        if ($existing) {
+                            $absensi = $existing;
+                            break;
+                        }
+                        throw $e;
+                    }
+                }
 
                 // Notifikasi WhatsApp Orang Tua untuk Siswa (Hanya jika kategori aktif & lewat NotifikasiDraftService)
                 if ($type === 'siswa') {
@@ -581,10 +608,31 @@ class RfidScanService
                     ];
                 }
 
-                // Catat Jam Pulang Resmi
-                $absensi->update([
-                    'jam_pulang' => $timeNow,
-                ]);
+                // Catat Jam Pulang Resmi dengan retry & penanganan SQLite lock
+                for ($attempt = 1; $attempt <= 5; $attempt++) {
+                    try {
+                        $absensi->update([
+                            'jam_pulang' => $timeNow,
+                        ]);
+                        break;
+                    } catch (\Throwable $e) {
+                        if (str_contains($e->getMessage(), 'database is locked') && $attempt < 5) {
+                            usleep(random_int(30000, 100000));
+                            $current = Absensi::find($absensi->id);
+                            if ($current && !empty($current->jam_pulang)) {
+                                $absensi = $current;
+                                break;
+                            }
+                            continue;
+                        }
+                        $current = Absensi::find($absensi->id);
+                        if ($current && !empty($current->jam_pulang)) {
+                            $absensi = $current;
+                            break;
+                        }
+                        throw $e;
+                    }
+                }
 
                 // Notifikasi WhatsApp Pulang (Hanya jika kategori pulang diaktifkan)
                 if ($type === 'siswa') {
@@ -672,7 +720,5 @@ class RfidScanService
                     'jam_pulang'          => $absensi->jam_pulang,
                 ]
             ];
-
-        });
     }
 }

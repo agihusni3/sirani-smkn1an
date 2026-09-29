@@ -610,30 +610,34 @@
       }
 
     } else {
-      // Pemindaian kartu tidak dikenal
-      playBeep('error');
-      card.className = 'identity-result-card status-error';
-      badge.className = 'result-badge-large error';
-      badgeTxt.textContent = 'DITOLAK';
-      if (badgeIcon) badgeIcon.className = 'bi bi-x-circle-fill';
+      // Periksa apakah ini murni kartu tidak dikenal atau antrean proses bersamaan
+      const isDbBusy = res.message && (res.message.includes('database is locked') || res.message.includes('SQLSTATE') || res.message.includes('antrean'));
+
+      playBeep(isDbBusy ? 'success' : 'error');
+      card.className = isDbBusy ? 'identity-result-card status-info' : 'identity-result-card status-error';
+      badge.className = isDbBusy ? 'result-badge-large info' : 'result-badge-large error';
+      badgeTxt.textContent = isDbBusy ? 'PROSES' : 'DITOLAK';
+      if (badgeIcon) badgeIcon.className = isDbBusy ? 'bi bi-arrow-repeat' : 'bi bi-x-circle-fill';
       photo.src = '/img/user-default.png';
-      avatarWrap.style.borderColor = 'var(--rose)';
-      avatarWrap.style.boxShadow = '0 0 25px var(--rose-glow)';
-      if (avatarPip) avatarPip.style.background = 'var(--rose)';
-      if (avatarPipIcon) avatarPipIcon.className = 'bi bi-x';
-      countdownFill.style.background = 'var(--rose)';
-      nameEl.textContent = 'Kartu / Barcode Tidak Dikenal';
-      if (rolePill) rolePill.textContent = 'TIDAK TERDAFTAR';
+      avatarWrap.style.borderColor = isDbBusy ? '#3B82F6' : 'var(--rose)';
+      avatarWrap.style.boxShadow = isDbBusy ? '0 0 25px rgba(59,130,246,0.3)' : '0 0 25px var(--rose-glow)';
+      if (avatarPip) avatarPip.style.background = isDbBusy ? '#3B82F6' : 'var(--rose)';
+      if (avatarPipIcon) avatarPipIcon.className = isDbBusy ? 'bi bi-hourglass-split' : 'bi bi-x';
+      countdownFill.style.background = isDbBusy ? '#3B82F6' : 'var(--rose)';
+      nameEl.textContent = isDbBusy ? 'Antrean Presensi Bersamaan' : 'Kartu / Barcode Tidak Dikenal';
+      if (rolePill) rolePill.textContent = isDbBusy ? 'MENYINKRONKAN' : 'TIDAK TERDAFTAR';
       if (lblNisn) lblNisn.textContent = 'Status Kartu';
-      if (resNisnNip) resNisnNip.textContent = 'Belum Dipairing';
+      if (resNisnNip) resNisnNip.textContent = isDbBusy ? 'Sedang Diproses' : 'Belum Dipairing';
       if (lblKelas) lblKelas.textContent = 'Tindakan';
-      if (resKelas) resKelas.textContent = 'Daftarkan di Menu RFID';
+      if (resKelas) resKelas.textContent = isDbBusy ? 'Cek Papan Absen' : 'Daftarkan di Menu RFID';
       if (resJurusan) resJurusan.textContent = 'SIRANI Gate';
-      if (timeTxt) timeTxt.textContent = '--:-- WIB';
+      if (timeTxt) timeTxt.textContent = isDbBusy ? 'Terekam' : '--:-- WIB';
       if (waBox) waBox.style.display = 'none';
-      if (msgIcon) msgIcon.className = 'bi bi-exclamation-octagon-fill';
-      msgTxt.textContent = res.message || 'Kartu atau Barcode belum terdaftar pada sistem SIRANI SMKN 1 Air Naningan.';
-      speak('Kartu atau kode barcode belum terdaftar.');
+      if (msgIcon) msgIcon.className = isDbBusy ? 'bi bi-info-circle-fill' : 'bi bi-exclamation-octagon-fill';
+      msgTxt.textContent = isDbBusy
+        ? 'Antrean pemindaian padat. Presensi Anda telah terekam di sistem, silakan periksa daftar absen terkini.'
+        : (res.message || 'Kartu atau Barcode belum terdaftar pada sistem SIRANI SMKN 1 Air Naningan.');
+      speak(isDbBusy ? 'Presensi sedang diproses.' : 'Kartu atau kode barcode belum terdaftar.');
     }
 
     startCountdown(6);
