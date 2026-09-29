@@ -172,8 +172,14 @@ class RfidScanService
             $today = $now->toDateString();
             $timeNow = $now->format('H:i:s');
 
-            // ── PARAMETER 2: Identifikasi Pemilik (RFID UID -> NIS Siswa -> NIP Guru) ──
-            $kartu = KartuRfid::where('uid', $cleanUid)->where('status', 'aktif')->first();
+            // ── PARAMETER 2: Identifikasi Pemilik (RFID UID -> NISN Siswa -> NIS Siswa -> NIP Guru) ──
+            $cleanUidVariants = array_values(array_unique(array_filter([
+                $cleanUid,
+                ltrim($cleanUid, '0'),
+                ctype_digit($cleanUid) ? str_pad($cleanUid, 10, '0', STR_PAD_LEFT) : null,
+            ])));
+
+            $kartu = KartuRfid::whereIn('uid', $cleanUidVariants)->where('status', 'aktif')->first();
 
             $person = null;
             $type = null;
@@ -186,14 +192,17 @@ class RfidScanService
                 $type = $kartu->pemilik_type;
                 $id   = $kartu->pemilik_id;
             } else {
-                // Fallback A: Cek apakah kode barcode adalah NISN Siswa
-                $siswaByNisn = Siswa::where('nisn', $cleanUid)->first();
+                // Fallback A: Cek apakah kode barcode adalah NISN Siswa (dukung 9 digit & 10 digit leading zero)
+                $siswaByNisn = Siswa::whereIn('nisn', $cleanUidVariants)->first();
                 if ($siswaByNisn) {
                     $type = 'siswa';
                     $id   = $siswaByNisn->id;
                 } else {
-                    // Fallback B: Cek apakah kode barcode adalah NIS Siswa
-                    $siswaByNis = Siswa::where('nis', $cleanUid)->first();
+                    // Fallback B: Cek apakah kode barcode adalah NIS Siswa (jika kolom tersedia)
+                    $siswaByNis = null;
+                    if (\Illuminate\Support\Facades\Schema::hasColumn('siswas', 'nis')) {
+                        $siswaByNis = Siswa::whereIn('nis', $cleanUidVariants)->first();
+                    }
                     if ($siswaByNis) {
                         $type = 'siswa';
                         $id   = $siswaByNis->id;
@@ -207,7 +216,7 @@ class RfidScanService
                         }
                     } else {
                         // Fallback D: Cek apakah kode barcode adalah NIP Guru
-                        $guruByNip = Guru::where('nip', $cleanUid)->first();
+                        $guruByNip = Guru::whereIn('nip', $cleanUidVariants)->first();
                         if ($guruByNip) {
                             $type = 'guru';
                             $id   = $guruByNip->id;
