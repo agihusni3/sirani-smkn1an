@@ -44,6 +44,11 @@ class DeployController extends Controller
             return $this->auditBarcode();
         }
 
+        // ── ACTION: Audit Tanda Baca Petik (') dan Karakter Khusus ──
+        if ($request->input('action') === 'audit_tanda_baca') {
+            return $this->auditTandaBaca();
+        }
+
         // ── ACTION: Fix Data Siswa (jalankan perbaikan langsung di produksi) ──
         if ($request->input('action') === 'fix_siswa') {
             return $this->fixSiswa();
@@ -689,6 +694,104 @@ class DeployController extends Controller
                     'unscannable_siswa' => $unscannableSiswa,
                     'sample_scan_ready' => array_slice($scanReadySiswa, 0, 15),
                     'sample_kartu_rfid_terdaftar' => $siswaCardsActive->take(10)->values(),
+                ]
+            ]);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => $e->getMessage(),
+                'line' => $e->getLine(),
+                'file' => $e->getFile(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Audit khusus tanda baca petik (') dan karakter khusus di database produksi.
+     */
+    public function auditTandaBaca()
+    {
+        try {
+            $quotes = ["'", "’", "‘", "`", '"', "\\"];
+            $containsQuote = function (?string $val) use ($quotes) {
+                if ($val === null || $val === '') return false;
+                foreach ($quotes as $q) {
+                    if (str_contains($val, $q)) return true;
+                }
+                return false;
+            };
+
+            // 1. Siswa
+            $allSiswas = \DB::table('siswas')->get();
+            $siswaHits = [];
+            foreach ($allSiswas as $s) {
+                $fieldsWithQuote = [];
+                $fieldsToCheck = ['nama', 'nisn', 'nik', 'tempat_lahir', 'alamat', 'nama_ayah', 'nama_ibu', 'asal_sekolah'];
+                foreach ($fieldsToCheck as $f) {
+                    $val = (string)($s->{$f} ?? '');
+                    if ($containsQuote($val)) {
+                        $fieldsWithQuote[$f] = $val;
+                    }
+                }
+
+                if (!empty($fieldsWithQuote)) {
+                    $siswaHits[] = [
+                        'id' => $s->id,
+                        'nama' => $s->nama,
+                        'status' => $s->status,
+                        'fields' => $fieldsWithQuote,
+                    ];
+                }
+            }
+
+            // 2. Guru
+            $guruHits = [];
+            if (\Illuminate\Support\Facades\Schema::hasTable('gurus')) {
+                $allGurus = \DB::table('gurus')->get();
+                foreach ($allGurus as $g) {
+                    $fieldsWithQuote = [];
+                    foreach (['nama', 'nip', 'nuptk', 'alamat'] as $f) {
+                        $val = (string)($g->{$f} ?? '');
+                        if ($containsQuote($val)) {
+                            $fieldsWithQuote[$f] = $val;
+                        }
+                    }
+                    if (!empty($fieldsWithQuote)) {
+                        $guruHits[] = [
+                            'id' => $g->id,
+                            'nama' => $g->nama,
+                            'fields' => $fieldsWithQuote,
+                        ];
+                    }
+                }
+            }
+
+            // 3. Rombels
+            $rombelHits = [];
+            if (\Illuminate\Support\Facades\Schema::hasTable('rombels')) {
+                $rombels = \DB::table('rombels')->get();
+                foreach ($rombels as $r) {
+                    $namaRombel = (string)($r->nama_rombel ?? ($r->nama ?? ''));
+                    if ($containsQuote($namaRombel)) {
+                        $rombelHits[] = [
+                            'id' => $r->id,
+                            'nama_rombel' => $namaRombel,
+                        ];
+                    }
+                }
+            }
+
+            return response()->json([
+                'status' => 'success',
+                'summary' => [
+                    'total_siswa_dengan_tanda_baca' => count($siswaHits),
+                    'total_guru_dengan_tanda_baca' => count($guruHits),
+                    'total_rombel_dengan_tanda_baca' => count($rombelHits),
+                ],
+                'details' => [
+                    'siswa' => $siswaHits,
+                    'guru' => $guruHits,
+                    'rombel' => $rombelHits,
                 ]
             ]);
         } catch (\Throwable $e) {
