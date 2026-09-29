@@ -34,6 +34,16 @@ class DeployController extends Controller
             ], 403);
         }
 
+        // ── ACTION: Audit Data Siswa (tanpa deploy) ──
+        if ($request->input('action') === 'audit_siswa') {
+            return $this->auditSiswa();
+        }
+
+        // ── ACTION: Fix Data Siswa (jalankan perbaikan langsung di produksi) ──
+        if ($request->input('action') === 'fix_siswa') {
+            return $this->fixSiswa();
+        }
+
         @set_time_limit(300);
         @ini_set('max_execution_time', '300');
 
@@ -179,4 +189,230 @@ class DeployController extends Controller
             'details'       => $logs,
         ]);
     }
+
+    /**
+     * Audit Data Siswa langsung di database produksi (MySQL).
+     */
+    public function auditSiswa()
+    {
+        try {
+            $allSiswas = \DB::table('siswas')->get();
+            $totalSiswa = $allSiswas->count();
+            $totalAktif = $allSiswas->where('status', 'aktif')->count();
+            $totalNonAktif = $totalSiswa - $totalAktif;
+
+            $nisnNull = [];
+            $nisnNonNumeric = [];
+            $nisnBukan10Digit = [];
+            $nisnMap = [];
+            $namaMap = [];
+            $allCaps = [];
+            $tanpaHpOrtuCount = 0;
+            $tanpaNikCount = 0;
+            $tanpaFotoCount = 0;
+
+            foreach ($allSiswas as $s) {
+                $nisn = trim((string)($s->nisn ?? ''));
+                $nama = trim((string)($s->nama ?? ''));
+                $hpOrtu = trim((string)($s->no_hp_ortu ?? ''));
+                $nik = trim((string)($s->nik ?? ''));
+                $foto = trim((string)($s->foto ?? ''));
+
+                // NISN check
+                if ($nisn === '') {
+                    $nisnNull[] = [
+                        'id' => $s->id,
+                        'nama' => $s->nama,
+                        'status' => $s->status,
+                        'nik' => $s->nik ?? null,
+                    ];
+                } else {
+                    if (!ctype_digit($nisn)) {
+                        $nisnNonNumeric[] = [
+                            'id' => $s->id,
+                            'nama' => $s->nama,
+                            'nisn' => $nisn,
+                            'status' => $s->status,
+                        ];
+                    }
+                    if (strlen($nisn) !== 10) {
+                        $nisnBukan10Digit[] = [
+                            'id' => $s->id,
+                            'nama' => $s->nama,
+                            'nisn' => $nisn,
+                            'length' => strlen($nisn),
+                            'status' => $s->status,
+                        ];
+                    }
+                    $nisnMap[$nisn][] = [
+                        'id' => $s->id,
+                        'nama' => $s->nama,
+                        'status' => $s->status,
+                    ];
+                }
+
+                // Nama check
+                $namaLower = mb_strtolower($nama);
+                $namaMap[$namaLower][] = [
+                    'id' => $s->id,
+                    'nama' => $s->nama,
+                    'nisn' => $nisn,
+                    'status' => $s->status,
+                ];
+
+                // ALL CAPS check
+                if (preg_match('/[A-Za-z]/', $nama) && $nama === mb_strtoupper($nama)) {
+                    $allCaps[] = [
+                        'id' => $s->id,
+                        'nama' => $s->nama,
+                        'nisn' => $nisn,
+                    ];
+                }
+
+                // Kelengkapan
+                if ($s->status === 'aktif') {
+                    if ($hpOrtu === '' || str_contains(strtolower($hpOrtu), 'gaada') || $hpOrtu === '-' || strlen(preg_replace('/[^0-9]/', '', $hpOrtu)) < 9) {
+                        $tanpaHpOrtuCount++;
+                    }
+                }
+
+                if ($nik === '') {
+                    $tanpaNikCount++;
+                }
+
+                if ($foto === '') {
+                    $tanpaFotoCount++;
+                }
+            }
+
+            // Duplikat NISN
+            $nisnDuplikat = [];
+            foreach ($nisnMap as $nisnVal => $list) {
+                if (count($list) > 1) {
+                    $nisnDuplikat[] = [
+                        'nisn' => $nisnVal,
+                        'count' => count($list),
+                        'siswas' => $list,
+                    ];
+                }
+            }
+
+            // Duplikat Nama
+            $namaDuplikat = [];
+            foreach ($namaMap as $n => $list) {
+                if (count($list) > 1) {
+                    $namaDuplikat[] = [
+                        'nama' => $list[0]['nama'],
+                        'count' => count($list),
+                        'siswas' => $list,
+                    ];
+                }
+            }
+
+            // Siswa aktif tanpa kelas
+            $activeSiswaIds = $allSiswas->where('status', 'aktif')->pluck('id')->toArray();
+            $assignedSiswaIds = \DB::table('siswa_rombels')
+                ->whereIn('siswa_id', $activeSiswaIds)
+                ->where('status_keanggotaan', 'aktif')
+                ->pluck('siswa_id')
+                ->unique()
+                ->toArray();
+            $unassignedIds = array_diff($activeSiswaIds, $assignedSiswaIds);
+
+            $tanpaKelas = [];
+            if (!empty($unassignedIds)) {
+                $tanpaKelas = $allSiswas->whereIn('id', $unassignedIds)->map(function ($s) {
+                    return [
+                        'id' => $s->id,
+                        'nama' => $s->nama,
+                        'nisn' => $s->nisn,
+                    ];
+                })->values();
+            }
+
+            return response()->json([
+                'status' => 'success',
+                'database' => \DB::connection()->getDatabaseName(),
+                'driver' => \DB::connection()->getDriverName(),
+                'summary' => [
+                    'total_siswa' => $totalSiswa,
+                    'total_aktif' => $totalAktif,
+                    'total_non_aktif' => $totalNonAktif,
+                    'nisn_null_count' => count($nisnNull),
+                    'nisn_non_numeric_count' => count($nisnNonNumeric),
+                    'nisn_bukan_10_digit_count' => count($nisnBukan10Digit),
+                    'nisn_duplikat_count' => count($nisnDuplikat),
+                    'nama_duplikat_count' => count($namaDuplikat),
+                    'nama_all_caps_count' => count($allCaps),
+                    'aktif_tanpa_hp_ortu_count' => $tanpaHpOrtuCount,
+                    'tanpa_nik_count' => $tanpaNikCount,
+                    'tanpa_foto_count' => $tanpaFotoCount,
+                    'aktif_tanpa_kelas_count' => count($tanpaKelas),
+                ],
+                'details' => [
+                    'nisn_null' => $nisnNull,
+                    'nisn_non_numeric' => $nisnNonNumeric,
+                    'nisn_bukan_10_digit' => $nisnBukan10Digit,
+                    'nisn_duplikat' => $nisnDuplikat,
+                    'nama_duplikat' => $namaDuplikat,
+                    'nama_all_caps' => array_slice($allCaps, 0, 30),
+                    'aktif_tanpa_kelas' => $tanpaKelas,
+                ]
+            ]);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => $e->getMessage(),
+                'line' => $e->getLine(),
+                'file' => $e->getFile(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Fix Data Siswa (format nama & bersihkan field kontak kotor).
+     */
+    public function fixSiswa()
+    {
+        try {
+            $updatedNames = 0;
+            $updatedPhones = 0;
+            $allSiswas = \DB::table('siswas')->get();
+
+            foreach ($allSiswas as $s) {
+                $updates = [];
+                if (class_exists(\App\Support\NamaFormatter::class)) {
+                    $formattedName = \App\Support\NamaFormatter::format($s->nama);
+                    if ($formattedName !== $s->nama) {
+                        $updates['nama'] = $formattedName;
+                        $updatedNames++;
+                    }
+                }
+
+                $hp = trim((string)($s->no_hp_ortu ?? ''));
+                if (in_array(strtolower($hp), ['gaada', '-', 'tidak ada', '0'])) {
+                    $updates['no_hp_ortu'] = null;
+                    $updatedPhones++;
+                }
+
+                if (!empty($updates)) {
+                    $updates['updated_at'] = now();
+                    \DB::table('siswas')->where('id', $s->id)->update($updates);
+                }
+            }
+
+            return response()->json([
+                'status' => 'success',
+                'message' => "Berhasil merapikan data siswa produksi: {$updatedNames} nama diformat, {$updatedPhones} kontak diperbaiki.",
+                'updated_names' => $updatedNames,
+                'updated_phones' => $updatedPhones,
+            ]);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => $e->getMessage(),
+            ], 500);
+        }
+    }
 }
+
