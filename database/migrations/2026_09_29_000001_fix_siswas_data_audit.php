@@ -57,6 +57,14 @@ return new class extends Migration
         DB::statement("UPDATE siswas SET nama = 'Ellisa Dwi Rahmawati' WHERE id = 542 AND nama = 'ELLISA DWI RAHMAWATI'");
 
         // ============================================================
+        // FIX 5: No HP Ortu berisi teks tidak valid -> NULL
+        //   - ID 428: Muhamad Rasidy Adit Tia  (no_hp_ortu: 'gaada')
+        //   - ID 479: Dafit Irwansyah           (no_hp_ortu: '-')
+        // ============================================================
+        DB::statement("UPDATE siswas SET no_hp_ortu = NULL WHERE id = 428 AND no_hp_ortu = 'gaada'");
+        DB::statement("UPDATE siswas SET no_hp_ortu = NULL WHERE id = 479 AND no_hp_ortu = '-'");
+
+        // ============================================================
         // CATATAN: Nama dengan tanda kutip (') TIDAK diubah
         //   - Al'Fadzrian, Safi'I, Ma'Ruf, A'An = VALID (nama Arab)
         //
