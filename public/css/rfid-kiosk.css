@@ -1137,6 +1137,13 @@
       transform: translateY(-2px);
       box-shadow: 0 6px 18px rgba(220, 38, 38, 0.12);
     }
+    .failed-scan-card.card-warning {
+      background: rgba(245, 158, 11, 0.05);
+      border-color: rgba(245, 158, 11, 0.25);
+    }
+    .failed-scan-card.card-warning:hover {
+      box-shadow: 0 6px 18px rgba(245, 158, 11, 0.12);
+    }
     .failed-icon-badge {
       width: 40px;
       height: 40px;
@@ -1148,6 +1155,10 @@
       justify-content: center;
       font-size: 20px;
       flex-shrink: 0;
+    }
+    .failed-icon-badge.badge-warning {
+      background: rgba(245, 158, 11, 0.15);
+      color: #f59e0b;
     }
     .failed-info {
       flex: 1;
@@ -1183,6 +1194,19 @@
       background: var(--rose);
       color: #fff;
       margin-bottom: 6px;
+    }
+    .failed-reason-tag.tag-warning {
+      background: #f59e0b;
+      color: #fff;
+    }
+    .failed-reason-tag.tag-rose {
+      background: var(--rose);
+      color: #fff;
+    }
+    .failed-reason-tag.tag-neutral {
+      background: var(--surface-2);
+      color: var(--text-muted);
+      border: 1px solid var(--card-border);
     }
     .failed-desc {
       font-size: 12px;

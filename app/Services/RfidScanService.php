@@ -37,6 +37,30 @@ class RfidScanService
     }
 
     /**
+     * Dapatkan label kategori / alasan ringkas untuk pemindaian yang ditolak/gagal.
+     */
+    public static function getReasonLabel(string $type): string
+    {
+        return match ($type) {
+            'belum_waktunya_pulang'   => 'Belum Waktunya Pulang',
+            'kartu_tidak_dikenal'     => 'Kartu Belum Terdaftar',
+            'di_luar_jam_operasional' => 'Di Luar Jam Operasional',
+            'jam_tutup_terlewat'      => 'Gerbang Ditutup',
+            'siswa_nonaktif'          => 'Siswa Non-Aktif',
+            'guru_nonaktif'           => 'Guru Non-Aktif',
+            'tanpa_jam_masuk'         => 'Belum Presensi Masuk',
+            'verifikasi_piket'        => 'Perlu Verifikasi Piket',
+            'invalid_input'           => 'Format Tidak Valid',
+            'sudah_lengkap'           => 'Presensi Sudah Lengkap',
+            'hari_libur'              => 'Hari Libur',
+            'status_khusus'           => 'Izin / Sakit / Dispen',
+            'tercatat_alpha'          => 'Tercatat Alpha',
+            'cooldown_double_scan'    => 'Tap Terlalu Cepat',
+            default                   => 'Pemindaian Ditolak',
+        };
+    }
+
+    /**
      * Catat log pemindaian yang gagal / ditolak ke Cache hari ini untuk pemantauan real-time gerbang.
      */
     public static function recordFailedScan(string $uid, array $res): void
@@ -48,23 +72,27 @@ class RfidScanService
             if (!is_array($failedList)) $failedList = [];
 
             $d = $res['data'] ?? null;
+            $type = $res['type'] ?? 'gagal';
             $msg = $res['message'] ?? 'Pemindaian ditolak sistem';
             $jam = now()->format('H:i');
+            $reasonLabel = static::getReasonLabel($type);
+
             $entry = [
-                'id'        => uniqid('fail_'),
-                'time'      => $jam,
-                'jam'       => $jam,
-                'timestamp' => now()->timestamp,
-                'uid'       => strtoupper(trim($uid)),
-                'type'      => $res['type'] ?? 'gagal',
-                'message'   => $msg,
-                'pesan'     => $msg,
-                'alasan'    => $msg,
-                'nama'      => $d['nama'] ?? null,
-                'rombel'    => $d['rombel_atau_jabatan'] ?? ($d['sub'] ?? null),
-                'sub'       => $d['sub'] ?? ($d['rombel_atau_jabatan'] ?? null),
-                'identitas' => $d['identitas'] ?? null,
-                'foto'      => $d['foto'] ?? ($d['foto_url'] ?? '/img/user-default.png'),
+                'id'              => uniqid('fail_'),
+                'time'            => $jam,
+                'jam'             => $jam,
+                'timestamp'       => now()->timestamp,
+                'uid'             => strtoupper(trim($uid)),
+                'type'            => $type,
+                'message'         => $msg,
+                'pesan'           => $msg,
+                'alasan'          => $reasonLabel,
+                'nama'            => $d['nama'] ?? null,
+                'rombel'          => $d['rombel_atau_jabatan'] ?? ($d['sub'] ?? null),
+                'sub'             => $d['sub'] ?? ($d['rombel_atau_jabatan'] ?? null),
+                'identitas'       => $d['identitas'] ?? null,
+                'foto'            => $d['foto'] ?? ($d['foto_url'] ?? '/img/user-default.png'),
+                'is_unregistered' => empty($d['nama']) || $type === 'kartu_tidak_dikenal',
             ];
 
             array_unshift($failedList, $entry);
@@ -83,7 +111,35 @@ class RfidScanService
         try {
             $today = Carbon::today()->toDateString();
             $list = \Illuminate\Support\Facades\Cache::get('rfid_failed_scans_' . $today, []);
-            return is_array($list) ? $list : [];
+            if (!is_array($list)) return [];
+
+            return array_map(function ($item) {
+                if (!is_array($item)) return $item;
+
+                $type = $item['type'] ?? 'gagal';
+                $reasonLabel = static::getReasonLabel($type);
+
+                // Jika alasan masih berupa kalimat pesan lama yang panjang, ganti dengan label ringkas
+                if (empty($item['alasan']) || strlen($item['alasan']) > 35) {
+                    $item['alasan'] = $reasonLabel;
+                }
+
+                // Sederhanakan pesan jika ada teks panjang/desimal dari cache lama
+                if (!empty($item['pesan'])) {
+                    $item['pesan'] = preg_replace('/^Anda sudah presensi masuk pukul [0-9:]+\s*WIB\.\s*/i', '', $item['pesan']);
+                    $item['pesan'] = preg_replace_callback('/\(Kurang\s+([0-9.]+)\s*menit\)/i', function ($m) {
+                        $min = max(1, (int) round((float) $m[1]));
+                        return "(kurang {$min} menit lagi)";
+                    }, $item['pesan']);
+                    $item['message'] = $item['pesan'];
+                }
+
+                if (!isset($item['is_unregistered'])) {
+                    $item['is_unregistered'] = empty($item['nama']) || $type === 'kartu_tidak_dikenal';
+                }
+
+                return $item;
+            }, $list);
         } catch (\Throwable $e) {
             return [];
         }
@@ -504,12 +560,14 @@ class RfidScanService
 
                 // Validasi: Belum Waktunya Pulang (< jamPulangMulai)
                 if ($now->lessThan($jamPulangJadwal)) {
-                    $selisihMenit = $now->diffInMinutes($jamPulangJadwal);
+                    $selisihDetik = $now->diffInRealSeconds($jamPulangJadwal);
+                    $selisihMenit = max(1, (int) ceil($selisihDetik / 60));
+                    $menitLabel = $selisihMenit === 1 ? 'kurang 1 menit lagi' : "kurang {$selisihMenit} menit lagi";
                     return [
                         'success' => true,
                         'status'  => 'info',
                         'type'    => 'belum_waktunya_pulang',
-                        'message' => "Anda sudah presensi masuk pukul {$absensi->jam_masuk} WIB. Kepulangan dimulai pukul " . substr($jamPulangMulai, 0, 5) . " WIB (Kurang {$selisihMenit} menit).",
+                        'message' => "Kepulangan dimulai pukul " . substr($jamPulangMulai, 0, 5) . " WIB ({$menitLabel}).",
                         'data'    => $formatProfileData('sudah_masuk', $absensi->jam_masuk, $absensi->jam_masuk, null, 'SUDAH MASUK'),
                     ];
                 }

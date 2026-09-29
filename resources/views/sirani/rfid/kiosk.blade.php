@@ -550,7 +550,11 @@
         countdownFill.style.background = '#3B82F6';
         if (msgIcon) msgIcon.className = 'bi bi-info-circle-fill';
         msgTxt.textContent = res.message || 'Anda sudah melakukan presensi masuk.';
-        speak(`${salam}, ${speechNama}, Anda sudah tercatat presensi masuk.`);
+        if (res.type === 'belum_waktunya_pulang') {
+          speak(`Perhatian, ${speechNama}, belum waktunya jam kepulangan.`);
+        } else {
+          speak(`${salam}, ${speechNama}, Anda sudah tercatat presensi masuk.`);
+        }
       } else if (st === 'terlambat') {
         card.className = 'identity-result-card status-terlambat';
         badge.className = 'result-badge-large terlambat';
@@ -881,13 +885,51 @@
       const nama = item.nama || 'Kartu Tidak Dikenal';
       const uid = item.uid || '-';
       const sub = item.rombel || item.identitas || 'Pengguna Tidak Terdaftar';
-      const alasan = item.alasan || item.pesan || 'Kartu belum terdaftar di sistem';
       const jam = item.jam || '--:--';
-      const waOrtu = item.no_hp_ortu || '';
       const hpClean = item.hp_clean || '';
 
+      // Tentukan label kategori/alasan ringkas untuk badge
+      let reasonTag = item.alasan || 'Pemindaian Ditolak';
+      if (item.type === 'belum_waktunya_pulang') {
+        reasonTag = 'Belum Waktunya Pulang';
+      } else if (item.type === 'kartu_tidak_dikenal' || !item.nama || item.nama === 'Kartu Tidak Dikenal') {
+        reasonTag = 'Kartu Belum Terdaftar';
+      } else if (item.type === 'di_luar_jam_operasional') {
+        reasonTag = 'Di Luar Jam Operasional';
+      } else if (item.type === 'jam_tutup_terlewat') {
+        reasonTag = 'Gerbang Ditutup';
+      } else if (item.type === 'siswa_nonaktif') {
+        reasonTag = 'Siswa Non-Aktif';
+      } else if (item.type === 'guru_nonaktif') {
+        reasonTag = 'Guru Non-Aktif';
+      } else if (item.type === 'tanpa_jam_masuk') {
+        reasonTag = 'Belum Presensi Masuk';
+      } else if (item.type === 'sudah_lengkap') {
+        reasonTag = 'Presensi Sudah Lengkap';
+      } else if (reasonTag.length > 35) {
+        reasonTag = 'Pemindaian Ditolak';
+      }
+
+      // Bersihkan pesan dari angka desimal float dan awalan berulang (untuk entri dari cache lama)
+      let pesan = item.pesan || item.message || '';
+      pesan = pesan.replace(/^Anda sudah presensi masuk pukul [0-9:]+\s*WIB\.\s*/i, '');
+      pesan = pesan.replace(/\(Kurang\s+([0-9.]+)\s*menit\)/i, function(match, num) {
+        const rounded = Math.max(1, Math.round(parseFloat(num)));
+        return `(kurang ${rounded} menit lagi)`;
+      });
+      if (!pesan || pesan.toLowerCase() === reasonTag.toLowerCase()) {
+        pesan = item.type === 'belum_waktunya_pulang' ? 'Menunggu jadwal kepulangan resmi' : reasonTag;
+      }
+
+      const isBelumPulang = (item.type === 'belum_waktunya_pulang');
+      const isUnregistered = (item.is_unregistered === true || item.type === 'kartu_tidak_dikenal' || !item.nama || item.nama === 'Kartu Tidak Dikenal');
+      const tagClass = isBelumPulang ? 'tag-warning' : (isUnregistered ? 'tag-rose' : 'tag-neutral');
+      const iconClass = isBelumPulang ? 'bi bi-hourglass-split' : 'bi bi-exclamation-octagon-fill';
+      const iconBadgeClass = isBelumPulang ? 'failed-icon-badge badge-warning' : 'failed-icon-badge';
+
       let actionButtons = '';
-      if (uid && uid !== '-') {
+      // Tombol Salin UID & Daftarkan Kartu HANYA muncul untuk kartu baru yang BELUM TERDAFTAR
+      if (isUnregistered && uid && uid !== '-') {
         actionButtons += `
           <button type="button" class="btn-action-sm" onclick="copyUid('${escapeHtml(uid)}')">
             <i class="bi bi-copy"></i> Salin UID: ${escapeHtml(uid)}
@@ -896,9 +938,9 @@
             <i class="bi bi-credit-card-2-front"></i> Daftarkan Kartu
           </a>
         `;
-      }
-      if (hpClean) {
-        const pesanWa = encodeURIComponent(`Assalamu'alaikum Wr. Wb. Pemberitahuan Smart Gate SMKN 1 Air Naningan: Kartu absensi ananda ${nama} (${sub}) gagal dipindai pada ${jam} WIB dengan keterangan: "${alasan}". Mohon konfirmasi atau hubungi pihak sekolah.`);
+      } else if (!isUnregistered && hpClean && !isBelumPulang) {
+        // Hubungi Ortu hanya jika ada kendala kedisiplinan/kesalahan kartu, bukan tap sebelum bel pulang
+        const pesanWa = encodeURIComponent(`Assalamu'alaikum Wr. Wb. Pemberitahuan Smart Gate SMKN 1 Air Naningan: Presensi ananda ${nama} (${sub}) mengalami kendala pada ${jam} WIB (${reasonTag}). Mohon konfirmasi atau hubungi pihak sekolah.`);
         actionButtons += `
           <a href="https://wa.me/${hpClean}?text=${pesanWa}" target="_blank" class="btn-action-sm btn-wa">
             <i class="bi bi-whatsapp"></i> Hubungi Ortu
@@ -907,22 +949,22 @@
       }
 
       html += `
-        <div class="failed-scan-card">
-          <div class="failed-icon-badge">
-            <i class="bi bi-exclamation-octagon-fill"></i>
+        <div class="failed-scan-card ${isBelumPulang ? 'card-warning' : ''}">
+          <div class="${iconBadgeClass}">
+            <i class="${iconClass}"></i>
           </div>
           <div class="failed-info">
             <div class="failed-header-row">
               <span class="failed-name">${escapeHtml(nama)}</span>
               <span class="failed-time">${escapeHtml(jam)} WIB</span>
             </div>
-            <span class="failed-reason-tag">${escapeHtml(alasan)}</span>
+            <div>
+              <span class="failed-reason-tag ${tagClass}">${escapeHtml(reasonTag)}</span>
+            </div>
             <div class="failed-desc">
-              Keterangan: ${escapeHtml(item.pesan || alasan)} &bull; ${escapeHtml(sub)}
+              ${escapeHtml(pesan)} &bull; <strong>${escapeHtml(sub)}</strong>
             </div>
-            <div class="failed-actions">
-              ${actionButtons}
-            </div>
+            ${actionButtons ? `<div class="failed-actions">${actionButtons}</div>` : ''}
           </div>
         </div>
       `;
