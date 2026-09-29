@@ -339,14 +339,18 @@ class DeployController extends Controller
                     ->where('status_keanggotaan', 'aktif')
                     ->count();
                 $wali = null;
-                if (!empty($r->wali_kelas_id)) {
+                if (!empty($r->wali_kelas_id ?? null)) {
                     $wali = \DB::table('gurus')->where('id', $r->wali_kelas_id)->value('nama');
+                }
+                $jurusan = null;
+                if (!empty($r->jurusan_id ?? null) && \Illuminate\Support\Facades\Schema::hasTable('jurusans')) {
+                    $jurusan = \DB::table('jurusans')->where('id', $r->jurusan_id)->value('nama_jurusan');
                 }
                 $rombelStats[] = [
                     'id' => $r->id,
-                    'nama' => $r->nama ?? ($r->nama_rombel ?? 'Rombel #' . $r->id),
+                    'nama' => $r->nama_rombel ?? ($r->nama ?? 'Rombel #' . $r->id),
                     'tingkat' => $r->tingkat ?? '-',
-                    'jurusan' => $r->jurusan ?? '-',
+                    'jurusan' => $jurusan ?? ($r->jurusan ?? '-'),
                     'wali_kelas' => $wali ?? 'Belum ditentukan',
                     'jumlah_siswa_aktif' => $anggotaAktif,
                 ];
@@ -370,7 +374,11 @@ class DeployController extends Controller
                     'pertama' => $minDate,
                     'terakhir' => $maxDate,
                 ];
-                $siswaPernahAbsen = \DB::table('absensis')->distinct()->pluck('siswa_id')->toArray();
+                $siswaPernahAbsen = \DB::table('absensis')
+                    ->where('pemilik_type', 'siswa')
+                    ->distinct()
+                    ->pluck('pemilik_id')
+                    ->toArray();
                 $siswaAktifBelumPernahAbsen = $allSiswas->where('status', 'aktif')
                     ->whereNotIn('id', $siswaPernahAbsen)
                     ->map(fn($s) => ['id' => $s->id, 'nama' => $s->nama, 'nisn' => $s->nisn])
