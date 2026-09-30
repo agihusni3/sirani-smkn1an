@@ -94,7 +94,7 @@ class PengumumanController extends Controller
         $request->validate([
             'judul'           => 'required|string|max:200',
             'isi_pesan'       => 'required|string',
-            'banner_gambar'   => 'nullable|image|mimes:jpeg,png,jpg,webp|max:3072',
+            'banner_gambar'   => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
             'kategori'        => 'required|in:umum,kedisiplinan,kegiatan,akademik,darurat',
             'target_tipe'     => 'required|in:semua,tingkat,rombel,jurusan,alumni',
             'target_id'       => 'nullable|string',
