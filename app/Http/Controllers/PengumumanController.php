@@ -100,6 +100,9 @@ class PengumumanController extends Controller
             'target_id'       => 'nullable|string',
             'tanggal_mulai'   => 'nullable|date',
             'tanggal_selesai' => 'nullable|date|after_or_equal:tanggal_mulai',
+        ], [
+            'banner_gambar.max'   => 'Ukuran file banner gambar melebihi batas 2 MB. Mohon gunakan gambar yang lebih ringkas.',
+            'banner_gambar.image' => 'File lampiran harus berupa format gambar (JPG, JPEG, PNG, WEBP).',
         ]);
 
         $targetTipe = $request->input('target_tipe');

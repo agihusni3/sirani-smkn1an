@@ -120,7 +120,7 @@
         </button>
       </div>
 
-      <form action="{{ route('pengumuman.store') }}" method="POST" enctype="multipart/form-data">
+      <form action="{{ route('pengumuman.store') }}" method="POST" enctype="multipart/form-data" id="formPengumuman" onsubmit="return validatePengumumanSubmit(this)">
         @csrf
         
         {{-- Template Pesan Cepat (Ringkas, tanpa dobel tombol) --}}
@@ -207,18 +207,19 @@
           <textarea name="isi_pesan" id="textareaIsiPesan" rows="5" required class="input-field" style="width:100%; font-family:var(--font); line-height:1.45;" placeholder="Tuliskan isi pengumuman secara rinci dan jelas...">{{ old('isi_pesan') }}</textarea>
         </div>
 
-        {{-- Upload Poster / Banner Gambar (Opsional) - Desain Ringkas --}}
+        {{-- Upload Poster / Banner Gambar (Opsional) - Desain Ringkas & Auto Kompresi --}}
         <div style="margin-bottom:14px; background:var(--bg-3); border:1px dashed var(--border-2); border-radius:8px; padding:10px 14px;">
           <label class="form-label" style="font-weight:800; font-size:12px; display:flex; justify-content:space-between; margin-bottom:6px; color:var(--text);">
             <span>Lampirkan Poster / Banner (Opsional)</span>
-            <span style="color:var(--text-3); font-size:11px; font-weight:400;">Maks. 3 MB (JPG, PNG, WEBP)</span>
+            <span style="color:var(--text-3); font-size:11px; font-weight:400;">Otomatis dikompres &amp; dioptimalkan (&lt; 2 MB)</span>
           </label>
           <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
             <div id="banner_preview_box" style="width:70px; height:45px; border-radius:6px; border:1px solid var(--border); background:var(--bg-2); display:flex; align-items:center; justify-content:center; overflow:hidden; flex-shrink:0;">
               <span style="font-size:10px; color:var(--text-3); text-align:center;">Pratinjau</span>
             </div>
             <div style="flex:1; min-width:200px;">
-              <input type="file" name="banner_gambar" id="inputBannerGambar" accept="image/*" class="input-field" style="width:100%; height:34px; padding:4px 8px; font-size:11.5px;" onchange="previewBannerImage(this)" />
+              <input type="file" name="banner_gambar" id="inputBannerGambar" accept="image/*" class="input-field" style="width:100%; height:34px; padding:4px 8px; font-size:11.5px;" onchange="previewAndCompressBanner(this)" />
+              <div id="compressStatusText" style="display:none; font-size:11px; font-weight:700; margin-top:4px;"></div>
             </div>
           </div>
         </div>
@@ -273,7 +274,7 @@
 
         <div style="display:flex; justify-content:flex-end; gap:8px; border-top:1px solid var(--border); padding-top:12px;">
           <button type="button" onclick="toggleFormPengumuman(false)" class="btn btn-outline" style="font-size:12px;">Batal</button>
-          <button type="submit" class="btn btn-gold" style="font-weight:800; font-size:12px; padding:0 18px;">
+          <button type="submit" id="btnSubmitPengumuman" class="btn btn-gold" style="font-weight:800; font-size:12px; padding:0 18px;">
             <i class="bi bi-send-fill" style="margin-right:4px;"></i> Terbitkan Pengumuman
           </button>
         </div>
@@ -699,17 +700,147 @@
     document.getElementById('panelPengumuman').scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
-  function previewBannerImage(input) {
+  let isCompressingBanner = false;
+
+  async function previewAndCompressBanner(input) {
     const box = document.getElementById('banner_preview_box');
-    if (input.files && input.files[0]) {
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        box.innerHTML = `<img src="${e.target.result}" alt="Preview" style="width:100%; height:100%; object-fit:cover;" />`;
-      };
-      reader.readAsDataURL(input.files[0]);
-    } else {
-      box.innerHTML = `<span style="font-size:10.5px; color:var(--text-3); text-align:center;">Pratinjau Banner</span>`;
+    const statusText = document.getElementById('compressStatusText');
+    const submitBtn = document.getElementById('btnSubmitPengumuman');
+
+    if (!input.files || !input.files[0]) {
+      box.innerHTML = `<span style="font-size:10px; color:var(--text-3); text-align:center;">Pratinjau</span>`;
+      if (statusText) { statusText.style.display = 'none'; statusText.innerHTML = ''; }
+      return;
     }
+
+    const file = input.files[0];
+    const originalSizeKb = Math.round(file.size / 1024);
+
+    // Tampilkan preview instan
+    const initialUrl = URL.createObjectURL(file);
+    box.innerHTML = `<img src="${initialUrl}" alt="Preview" style="width:100%; height:100%; object-fit:cover;" />`;
+
+    // Jika gambar sudah kecil (< 250 KB), tidak perlu dikompres
+    if (file.size <= 250 * 1024) {
+      if (statusText) {
+        statusText.style.display = 'block';
+        statusText.style.color = '#16a34a';
+        statusText.innerHTML = `<i class="bi bi-check-circle-fill"></i> Ukuran: <b>${originalSizeKb} KB</b> (Optimal)`;
+      }
+      return;
+    }
+
+    // Indikator proses kompresi
+    isCompressingBanner = true;
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.style.opacity = '0.6';
+    }
+    if (statusText) {
+      statusText.style.display = 'block';
+      statusText.style.color = '#d97706';
+      statusText.innerHTML = `<i class="bi bi-hourglass-split"></i> Mengompresi &amp; mengoptimalkan gambar (${originalSizeKb} KB)...`;
+    }
+
+    try {
+      const compressedBlob = await compressImageFile(file, 1600, 0.82);
+      const newSizeKb = Math.round(compressedBlob.size / 1024);
+
+      // Ganti file input menggunakan DataTransfer
+      if (window.DataTransfer) {
+        const dt = new DataTransfer();
+        const baseName = file.name.substring(0, file.name.lastIndexOf('.')) || 'banner';
+        const newFile = new File([compressedBlob], baseName + '.jpg', {
+          type: 'image/jpeg',
+          lastModified: Date.now()
+        });
+        dt.items.add(newFile);
+        input.files = dt.files;
+      }
+
+      // Perbarui preview
+      const compressedUrl = URL.createObjectURL(compressedBlob);
+      box.innerHTML = `<img src="${compressedUrl}" alt="Preview" style="width:100%; height:100%; object-fit:cover;" />`;
+
+      if (statusText) {
+        statusText.style.display = 'block';
+        statusText.style.color = '#16a34a';
+        statusText.innerHTML = `<i class="bi bi-shield-check"></i> Berhasil dioptimalkan: <s>${originalSizeKb} KB</s> ➔ <b>${newSizeKb} KB</b> (Siap diunggah)`;
+      }
+    } catch (err) {
+      console.warn('Kompresi browser dilewati:', err);
+      if (statusText) {
+        statusText.style.display = 'block';
+        statusText.style.color = 'var(--text-2)';
+        statusText.innerHTML = `Ukuran berkas: ${originalSizeKb} KB`;
+      }
+    } finally {
+      isCompressingBanner = false;
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.style.opacity = '1';
+      }
+    }
+  }
+
+  function compressImageFile(file, maxDimension = 1600, quality = 0.82) {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      const objectUrl = URL.createObjectURL(file);
+      img.onload = () => {
+        URL.revokeObjectURL(objectUrl);
+        let width = img.naturalWidth || img.width;
+        let height = img.naturalHeight || img.height;
+
+        if (width > maxDimension || height > maxDimension) {
+          if (width > height) {
+            height = Math.round((height * maxDimension) / width);
+            width = maxDimension;
+          } else {
+            width = Math.round((width * maxDimension) / height);
+            height = maxDimension;
+          }
+        }
+
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, width, height);
+        ctx.drawImage(img, 0, 0, width, height);
+
+        canvas.toBlob((blob) => {
+          if (blob) {
+            resolve(blob);
+          } else {
+            reject(new Error('Gagal mengonversi canvas ke blob'));
+          }
+        }, 'image/jpeg', quality);
+      };
+      img.onerror = (e) => reject(e);
+      img.src = objectUrl;
+    });
+  }
+
+  function previewBannerImage(input) {
+    previewAndCompressBanner(input);
+  }
+
+  function validatePengumumanSubmit(form) {
+    if (isCompressingBanner) {
+      alert('Mohon tunggu sejenak, gambar poster sedang dioptimalkan...');
+      return false;
+    }
+    const input = document.getElementById('inputBannerGambar');
+    if (input && input.files && input.files[0]) {
+      const sizeMb = input.files[0].size / (1024 * 1024);
+      if (sizeMb > 2) {
+        alert('Ukuran gambar masih melebihi 2 MB (' + sizeMb.toFixed(1) + ' MB). Silakan gunakan gambar yang lebih kecil.');
+        return false;
+      }
+    }
+    return true;
   }
 </script>
 
