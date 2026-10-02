@@ -291,7 +291,7 @@ class Guru extends Model
         $cleanName = preg_replace('/\b(Drs|Dra|Ir|Prof|Dr|H|Hj)\.\s*/i', '', $this->nama);
         $cleanName = preg_replace('/,.*$/', '', $cleanName); // Hapus gelar belakang seperti ', S.Pd', ', S.T.', ', M.Pd'
         $namaEncoded = urlencode($cleanName ?: $this->nama);
-        return "https://ui-avatars.com/api/?name={$namaEncoded}&background=3B82F6&color=ffffff&bold=true&size=200";
+        return "https://ui-avatars.com/api/?name={$namaEncoded}&background=1e293b&color=ffffff&bold=true&size=200";
     }
 
     public function getPangkatAttribute(): ?string

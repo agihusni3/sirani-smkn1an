@@ -128,7 +128,7 @@ class Siswa extends Model
         }
 
         $namaEncoded = urlencode($this->nama);
-        return "https://ui-avatars.com/api/?name={$namaEncoded}&background=CA8A04&color=ffffff&bold=true&size=200";
+        return "https://ui-avatars.com/api/?name={$namaEncoded}&background=334155&color=ffffff&bold=true&size=200";
     }
 
     public function siswaRombel(): HasMany

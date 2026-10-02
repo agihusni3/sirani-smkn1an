@@ -64,7 +64,7 @@
 
           <!-- 2. Batas Masuk Toleransi -->
           <div class="piket-time-card" title="Batas toleransi jam masuk kehadiran">
-            <i class="bi bi-alarm piket-time-icon" style="color:#0284c7;"></i>
+            <i class="bi bi-alarm piket-time-icon" style="color:var(--text-3);"></i>
             <div class="piket-time-meta">
               <span class="piket-time-label">BATAS MASUK</span>
               <div class="piket-time-val-wrap">
@@ -76,7 +76,7 @@
 
           <!-- 3. Jam Tutup Gerbang -->
           <div class="piket-time-card" title="Jadwal penutupan gerbang sekolah">
-            <i class="bi bi-door-closed piket-time-icon" style="color:#f59e0b;"></i>
+            <i class="bi bi-door-closed piket-time-icon" style="color:var(--text-3);"></i>
             <div class="piket-time-meta">
               <span class="piket-time-label">TUTUP GERBANG</span>
               <div class="piket-time-val-wrap">
@@ -196,63 +196,63 @@
     {{-- KPI Grid Peserta Didik --}}
     <div class="piket-kpi-grid no-print" id="kpiGridSiswa">
       <!-- 1. Tingkat Kehadiran -->
-      <div class="piket-kpi-card" onclick="selectSiswaFilter('all')">
+      <div class="piket-kpi-card active" data-kpi="all" onclick="selectSiswaFilter('all')">
         <div class="piket-kpi-top">
           <span>Tingkat Kehadiran</span>
-          <i class="bi bi-pie-chart-fill" style="color:#059669;"></i>
+          <i class="bi bi-pie-chart" style="color:var(--text-3);"></i>
         </div>
-        <div class="piket-kpi-value" style="color:#059669;">{{ $persenKehadiran }}%</div>
+        <div class="piket-kpi-value">{{ $persenKehadiran }}%</div>
         <div class="piket-kpi-sub">{{ $isLibur ? 'Hari Libur Sekolah' : ($hadirTepat + $terlambat) . ' dari ' . $totalSiswaAktif . ' siswa' }}</div>
       </div>
 
       <!-- 2. Hadir Tepat Waktu -->
-      <div class="piket-kpi-card" onclick="selectSiswaFilter('hadir')">
+      <div class="piket-kpi-card" data-kpi="hadir" onclick="selectSiswaFilter('hadir')">
         <div class="piket-kpi-top">
           <span>Hadir Tepat</span>
-          <i class="bi bi-check2-circle" style="color:#10B981;"></i>
+          <i class="bi bi-check2-circle" style="color:var(--text-3);"></i>
         </div>
         <div class="piket-kpi-value">{{ $hadirTepat }}</div>
         <div class="piket-kpi-sub">Batas {{ substr($jadwal->jam_masuk_toleransi ?? '07:15', 0, 5) }} WIB</div>
       </div>
 
       <!-- 3. Terlambat -->
-      <div class="piket-kpi-card" onclick="selectSiswaFilter('terlambat')">
+      <div class="piket-kpi-card" data-kpi="terlambat" onclick="selectSiswaFilter('terlambat')">
         <div class="piket-kpi-top">
           <span>Terlambat</span>
-          <i class="bi bi-clock-history" style="color:#F59E0B;"></i>
+          <i class="bi bi-clock-history" style="color:var(--text-3);"></i>
         </div>
-        <div class="piket-kpi-value" style="color:#D97706;">{{ $terlambat }}</div>
+        <div class="piket-kpi-value">{{ $terlambat }}</div>
         <div class="piket-kpi-sub">Lewat batas pagi</div>
       </div>
 
       <!-- 4. Izin & Sakit -->
-      <div class="piket-kpi-card" onclick="selectSiswaFilter('izin')">
+      <div class="piket-kpi-card" data-kpi="izin" onclick="selectSiswaFilter('izin')">
         <div class="piket-kpi-top">
           <span>Izin &amp; Sakit</span>
-          <i class="bi bi-file-earmark-medical-fill" style="color:#2563EB;"></i>
+          <i class="bi bi-file-earmark-medical" style="color:var(--text-3);"></i>
         </div>
-        <div class="piket-kpi-value" style="color:#2563EB;">{{ $izinCount }}</div>
+        <div class="piket-kpi-value">{{ $izinCount }}</div>
         <div class="piket-kpi-sub">{{ $izinCount > 0 ? $izinCount . ' surat izin / sakit' : 'Tidak ada izin' }}</div>
       </div>
 
       <!-- 5. Alpha / Belum Scan -->
-      <div class="piket-kpi-card" onclick="selectSiswaFilter('belum_hadir')">
+      <div class="piket-kpi-card" data-kpi="belum_hadir" onclick="selectSiswaFilter('belum_hadir')">
         <div class="piket-kpi-top">
           <span>{{ $isLibur ? 'Alpha / Belum Hadir' : ($isAfter0900 ? 'Alpha / Belum Hadir' : 'Belum Scan') }}</span>
-          <i class="bi bi-exclamation-octagon-fill" style="color:{{ $alphaCount > 0 ? '#DC2626' : 'var(--text-3)' }};"></i>
+          <i class="bi bi-exclamation-circle" style="color:var(--text-3);"></i>
         </div>
-        <div class="piket-kpi-value" style="color:{{ $alphaCount > 0 ? '#DC2626' : 'inherit' }};">{{ $alphaCount }}</div>
+        <div class="piket-kpi-value">{{ $alphaCount }}</div>
         <div class="piket-kpi-sub">{{ $isLibur ? 'Hari Libur (Bebas Presensi)' : ($isAfter0900 ? 'Status terkunci (09:00)' : 'Otomatis Alpha 09:00') }}</div>
       </div>
 
       <!-- 6. Belum Scan Pulang -->
-      <div class="piket-kpi-card" onclick="selectSiswaFilter('belum_pulang')" style="border:{{ $sudahLewatJamTutup ? '1.5px solid #000000' : '1px solid var(--border-2)' }};">
+      <div class="piket-kpi-card" data-kpi="belum_pulang" onclick="selectSiswaFilter('belum_pulang')">
         <div class="piket-kpi-top">
           <span>Blm Scan Pulang</span>
-          <i class="bi bi-door-open-fill" style="color:#06B6D4;"></i>
+          <i class="bi bi-door-open" style="color:var(--text-3);"></i>
         </div>
-        <div class="piket-kpi-value" style="color:#0891B2;">{{ $siswaBelumScanPulang }}</div>
-        <div class="piket-kpi-sub" style="color:{{ $sudahLewatJamTutup ? '#000000' : 'var(--text-3)' }}; font-weight:{{ $sudahLewatJamTutup ? '800' : '600' }};">
+        <div class="piket-kpi-value">{{ $siswaBelumScanPulang }}</div>
+        <div class="piket-kpi-sub">
           {{ $sudahLewatJamTutup ? 'Lewat jam pulang' : 'Tampilkan di tabel' }}
         </div>
       </div>
@@ -261,70 +261,69 @@
     {{-- KPI Grid Guru & Pegawai --}}
     <div class="piket-kpi-grid no-print" id="kpiGridGuru" style="display:none;">
       <!-- 1. Tingkat Kehadiran Guru -->
-      <div class="piket-kpi-card" onclick="selectGuruFilter('all')">
+      <div class="piket-kpi-card active" data-kpi-guru="all" onclick="selectGuruFilter('all')">
         <div class="piket-kpi-top">
           <span>Tingkat Kehadiran</span>
-          <i class="bi bi-pie-chart-fill" style="color:#059669;"></i>
+          <i class="bi bi-pie-chart" style="color:var(--text-3);"></i>
         </div>
-        <div class="piket-kpi-value" style="color:#059669;">{{ $guruPersenKehadiran }}%</div>
+        <div class="piket-kpi-value">{{ $guruPersenKehadiran }}%</div>
         <div class="piket-kpi-sub">{{ $isLibur ? 'Hari Libur Sekolah' : $guruHadirTotal . ' dari ' . $totalGuruAktif . ' guru' }}</div>
       </div>
 
       <!-- 2. Hadir Tepat Waktu Guru -->
-      <div class="piket-kpi-card" onclick="selectGuruFilter('hadir')">
+      <div class="piket-kpi-card" data-kpi-guru="hadir" onclick="selectGuruFilter('hadir')">
         <div class="piket-kpi-top">
           <span>Hadir Tepat</span>
-          <i class="bi bi-check2-circle" style="color:#10B981;"></i>
+          <i class="bi bi-check2-circle" style="color:var(--text-3);"></i>
         </div>
         <div class="piket-kpi-value">{{ $guruHadirTepat }}</div>
         <div class="piket-kpi-sub">Batas {{ substr($jadwal->jam_masuk_toleransi ?? '07:15', 0, 5) }} WIB</div>
       </div>
 
       <!-- 3. Terlambat Guru -->
-      <div class="piket-kpi-card" onclick="selectGuruFilter('terlambat')">
+      <div class="piket-kpi-card" data-kpi-guru="terlambat" onclick="selectGuruFilter('terlambat')">
         <div class="piket-kpi-top">
           <span>Terlambat</span>
-          <i class="bi bi-clock-history" style="color:#F59E0B;"></i>
+          <i class="bi bi-clock-history" style="color:var(--text-3);"></i>
         </div>
-        <div class="piket-kpi-value" style="color:#D97706;">{{ $guruTerlambat }}</div>
+        <div class="piket-kpi-value">{{ $guruTerlambat }}</div>
         <div class="piket-kpi-sub">Lewat batas pagi</div>
       </div>
 
       <!-- 4. Izin, Sakit & Dinas Luar Guru -->
-      <div class="piket-kpi-card" onclick="selectGuruFilter('izin')">
+      <div class="piket-kpi-card" data-kpi-guru="izin" onclick="selectGuruFilter('izin')">
         <div class="piket-kpi-top">
           <span>Izin &amp; Dinas</span>
-          <i class="bi bi-file-earmark-medical-fill" style="color:#2563EB;"></i>
+          <i class="bi bi-file-earmark-medical" style="color:var(--text-3);"></i>
         </div>
-        <div class="piket-kpi-value" style="color:#2563EB;">{{ $guruIzinSakit }}</div>
+        <div class="piket-kpi-value">{{ $guruIzinSakit }}</div>
         <div class="piket-kpi-sub">{{ $guruIzinSakit > 0 ? $guruIzinSakit . ' izin / sakit / dinas' : 'Tidak ada izin' }}</div>
       </div>
 
       <!-- 5. Belum Hadir / Alpha Guru -->
-      <div class="piket-kpi-card" onclick="selectGuruFilter('belum_hadir')">
+      <div class="piket-kpi-card" data-kpi-guru="belum_hadir" onclick="selectGuruFilter('belum_hadir')">
         <div class="piket-kpi-top">
           <span>{{ $isLibur ? 'Belum Hadir' : ($isAfter0900 ? 'Alpha / Belum Hadir' : 'Belum Hadir') }}</span>
-          <i class="bi bi-exclamation-octagon-fill" style="color:{{ $guruBelumHadirCount > 0 ? '#DC2626' : 'var(--text-3)' }};"></i>
+          <i class="bi bi-exclamation-circle" style="color:var(--text-3);"></i>
         </div>
-        <div class="piket-kpi-value" style="color:{{ $guruBelumHadirCount > 0 ? '#DC2626' : 'inherit' }};">{{ $guruBelumHadirCount }}</div>
+        <div class="piket-kpi-value">{{ $guruBelumHadirCount }}</div>
         <div class="piket-kpi-sub">{{ $isLibur ? 'Hari Libur (Bebas Presensi)' : ($isAfter0900 ? 'Status terkunci (09:00)' : 'Otomatis Alpha 09:00') }}</div>
       </div>
 
       <!-- 6. Sudah Scan Pulang Guru -->
-      <div class="piket-kpi-card" onclick="selectGuruFilter('pulang')">
+      <div class="piket-kpi-card" data-kpi-guru="pulang" onclick="selectGuruFilter('pulang')">
         <div class="piket-kpi-top">
           <span>Sudah Pulang</span>
-          <i class="bi bi-door-closed-fill" style="color:#06B6D4;"></i>
+          <i class="bi bi-door-closed" style="color:var(--text-3);"></i>
         </div>
-        <div class="piket-kpi-value" style="color:#0891B2;">{{ $guruSudahPulang }}</div>
+        <div class="piket-kpi-value">{{ $guruSudahPulang }}</div>
         <div class="piket-kpi-sub">Telah scan pulang</div>
       </div>
     </div>
 
-    {{-- ══ 4. UNIFIED CONTROL TOOLBAR ══ --}}
+    {{-- ══ 4. UNIFIED CONTROL TOOLBAR (SINGLE ROW CLEAN) ══ --}}
     <div class="piket-unified-toolbar no-print">
-      {{-- Baris 1: Tab Switcher Peserta Didik & Guru (Kiri) + Semua Tombol Aksi (Kanan) --}}
-      <div class="piket-toolbar-actions-row">
+      <div class="piket-toolbar-actions-row" style="border-bottom:none; padding-bottom:0;">
         <div class="piket-segmented-tabs">
           <button type="button" class="piket-segmented-btn piket-main-btn active" id="btnViewSiswa" onclick="switchMainView('siswa', this)">
             <i class="bi bi-people-fill"></i> Peserta Didik
@@ -336,93 +335,47 @@
           </button>
           @if($modeUjian && $modeUjian->isAktifHariIni($today))
           <button type="button" class="piket-segmented-btn piket-main-btn" id="btnViewSusulan" onclick="switchMainView('susulan', this)" style="border-left: 1px solid var(--border-2);">
-            <i class="bi bi-mortarboard-fill" style="color:#7c3aed;"></i> Ujian Susulan
-            <span class="piket-segmented-count" style="background:rgba(239, 68, 68, 0.15); color:#dc2626; font-weight:800;">{{ $siswaSusulan->count() }}</span>
+            <i class="bi bi-mortarboard-fill"></i> Ujian Susulan
+            <span class="piket-segmented-count">{{ $siswaSusulan->count() }}</span>
           </button>
           @endif
         </div>
 
-        <div class="piket-toolbar-btns">
-          {{-- Akses Menuju Notifikasi WhatsApp --}}
-          <a href="{{ route('notifikasi.index') }}" class="btn-gradient-notif" data-tooltip="Buka panel notifikasi WhatsApp & kirim pesan pengingat" title="Buka panel notifikasi WhatsApp & kirim pesan pengingat">
-            Notifikasi
-          </a>
-          <button type="button" class="btn-gradient-manual" onclick="openModal('modalPresensiManual')" data-tooltip="Input presensi kehadiran manual siswa atau guru" title="Input presensi kehadiran manual siswa atau guru">
-            Presensi Manual
-          </button>
-          <button type="button" class="btn-gradient-izin" onclick="openModal('modalCatatIzinPiket')" data-tooltip="Catat surat keterangan perizinan atau sakit harian" title="Catat surat keterangan perizinan atau sakit harian">
-            Catat Izin
-          </button>
+        <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+          {{-- Search Bar --}}
+          <div class="piket-search-box">
+            <i class="bi bi-search piket-search-icon"></i>
+            <input type="text" id="searchSiswaPiket" oninput="searchSiswaPiketTable()" class="piket-search-input" placeholder="Cari nama, NISN, rombel..." autocomplete="off" />
+            <button type="button" class="piket-search-clear" onclick="clearPiketSearch()" title="Hapus pencarian">&times;</button>
+          </div>
+
+          <div class="piket-toolbar-btns">
+            <button type="button" class="btn-gradient-manual" onclick="openModal('modalPresensiManual')" title="Input presensi kehadiran manual">
+              <i class="bi bi-person-check-fill"></i> Presensi Manual
+            </button>
+            <button type="button" class="btn-gradient-izin" onclick="openModal('modalCatatIzinPiket')" title="Catat surat keterangan izin / sakit">
+              <i class="bi bi-file-earmark-medical"></i> Catat Izin
+            </button>
+          </div>
         </div>
       </div>
 
-      {{-- Baris 2: Filter Chips di Kiri, Search Bar di Kanan --}}
-      <div class="piket-toolbar-filters-row">
-        <div id="filterChipsSiswa" class="piket-chips-strip filter-pills">
-          <button type="button" class="piket-chip filter-pill active" data-filter="all" onclick="filterSiswaTable('all', this)">
-            <span>Semua</span>
-            <span class="piket-chip-badge">{{ $isLibur ? $absensiHariIni->count() : $totalSiswaAktif }}</span>
-          </button>
-          <button type="button" class="piket-chip filter-pill" data-filter="hadir" onclick="filterSiswaTable('hadir', this)">
-            <span>Hadir Tepat</span>
-            <span class="piket-chip-badge">{{ $hadirTepat }}</span>
-          </button>
-          <button type="button" class="piket-chip filter-pill" data-filter="terlambat" onclick="filterSiswaTable('terlambat', this)">
-            <span>Terlambat</span>
-            <span class="piket-chip-badge">{{ $terlambat }}</span>
-          </button>
-          <button type="button" class="piket-chip filter-pill" data-filter="izin" onclick="filterSiswaTable('izin', this)">
-            <span>Izin &amp; Sakit</span>
-            <span class="piket-chip-badge">{{ $izinCount }}</span>
-          </button>
-          <button type="button" class="piket-chip filter-pill" data-filter="belum_hadir" onclick="filterSiswaTable('belum_hadir', this)">
-            <span>{{ $isLibur ? 'Alpha / Belum Hadir' : ($isAfter0900 ? 'Alpha / Belum Hadir' : 'Belum Scan') }}</span>
-            <span class="piket-chip-badge" style="color:{{ $alphaCount > 0 ? '#DC2626' : 'inherit' }}; font-weight:800;">
-              {{ $alphaCount }}
-            </span>
-          </button>
-          <button type="button" class="piket-chip filter-pill" data-filter="belum_pulang" onclick="filterSiswaTable('belum_pulang', this)">
-            <span>Blm Scan Pulang</span>
-            <span class="piket-chip-badge">{{ $siswaBelumScanPulang }}</span>
-          </button>
-        </div>
-
-        {{-- Filter Chips Strip untuk Guru (disembunyikan saat tab siswa aktif) --}}
-        <div id="filterChipsGuru" class="piket-chips-strip filter-pills" style="display:none;">
-          <button type="button" class="piket-chip filter-pill active" data-filter="all" onclick="filterGuruTable('all', this)">
-            <span>Semua Guru</span>
-            <span class="piket-chip-badge">{{ $isLibur ? $absensiGuruHariIni->count() : $totalGuruAktif }}</span>
-          </button>
-          <button type="button" class="piket-chip filter-pill" data-filter="hadir" onclick="filterGuruTable('hadir', this)">
-            <span>Hadir Tepat</span>
-            <span class="piket-chip-badge">{{ $guruHadirTepat }}</span>
-          </button>
-          <button type="button" class="piket-chip filter-pill" data-filter="terlambat" onclick="filterGuruTable('terlambat', this)">
-            <span>Terlambat</span>
-            <span class="piket-chip-badge">{{ $guruTerlambat }}</span>
-          </button>
-          <button type="button" class="piket-chip filter-pill" data-filter="belum_hadir" onclick="filterGuruTable('belum_hadir', this)">
-            <span>{{ $isLibur ? 'Belum Hadir' : ($isAfter0900 ? 'Alpha / Belum Hadir' : 'Belum Hadir') }}</span>
-            <span class="piket-chip-badge" style="color:{{ $guruBelumHadirCount > 0 ? '#DC2626' : 'inherit' }}; font-weight:800;">
-              {{ $guruBelumHadirCount }}
-            </span>
-          </button>
-          <button type="button" class="piket-chip filter-pill" data-filter="izin" onclick="filterGuruTable('izin', this)">
-            <span>Izin / Dinas</span>
-            <span class="piket-chip-badge">{{ $guruIzinSakit }}</span>
-          </button>
-          <button type="button" class="piket-chip filter-pill" data-filter="pulang" onclick="filterGuruTable('pulang', this)">
-            <span>Sudah Pulang</span>
-            <span class="piket-chip-badge">{{ $guruSudahPulang }}</span>
-          </button>
-        </div>
-
-        {{-- Search Bar --}}
-        <div class="piket-search-box">
-          <i class="bi bi-search piket-search-icon"></i>
-          <input type="text" id="searchSiswaPiket" oninput="searchSiswaPiketTable()" class="piket-search-input" placeholder="Cari nama, NISN, rombel..." autocomplete="off" />
-          <button type="button" class="piket-search-clear" onclick="clearPiketSearch()" title="Hapus pencarian">&times;</button>
-        </div>
+      {{-- Hidden filter chips container for internal JS compatibility --}}
+      <div id="filterChipsSiswa" class="filter-pills" style="display:none;">
+        <button type="button" class="filter-pill active" data-filter="all" onclick="filterSiswaTable('all', this)"></button>
+        <button type="button" class="filter-pill" data-filter="hadir" onclick="filterSiswaTable('hadir', this)"></button>
+        <button type="button" class="filter-pill" data-filter="terlambat" onclick="filterSiswaTable('terlambat', this)"></button>
+        <button type="button" class="filter-pill" data-filter="izin" onclick="filterSiswaTable('izin', this)"></button>
+        <button type="button" class="filter-pill" data-filter="belum_hadir" onclick="filterSiswaTable('belum_hadir', this)"></button>
+        <button type="button" class="filter-pill" data-filter="belum_pulang" onclick="filterSiswaTable('belum_pulang', this)"></button>
+      </div>
+      <div id="filterChipsGuru" class="filter-pills" style="display:none;">
+        <button type="button" class="filter-pill active" data-filter="all" onclick="filterGuruTable('all', this)"></button>
+        <button type="button" class="filter-pill" data-filter="hadir" onclick="filterGuruTable('hadir', this)"></button>
+        <button type="button" class="filter-pill" data-filter="terlambat" onclick="filterGuruTable('terlambat', this)"></button>
+        <button type="button" class="filter-pill" data-filter="belum_hadir" onclick="filterGuruTable('belum_hadir', this)"></button>
+        <button type="button" class="filter-pill" data-filter="izin" onclick="filterGuruTable('izin', this)"></button>
+        <button type="button" class="filter-pill" data-filter="pulang" onclick="filterGuruTable('pulang', this)"></button>
       </div>
     </div>
 
@@ -493,8 +446,8 @@
                           <span style="font-family:var(--font-mono);">NISN: {{ $ab->siswa?->nisn ?? ($ab->siswa?->nis ?? '-') }}</span>
                           @if($hpClean)
                             <span style="color:var(--border-2);">·</span>
-                            <a href="https://wa.me/{{ $hpClean }}" target="_blank" style="color:#16A34A; text-decoration:none; font-weight:600; display:inline-flex; align-items:center; gap:3px;">
-                              <i class="bi bi-whatsapp"></i> <span style="font-family:var(--font-mono);">{{ $hp }}</span>
+                            <a href="https://wa.me/{{ $hpClean }}" target="_blank" style="color:var(--text-2); text-decoration:none; font-weight:600; display:inline-flex; align-items:center; gap:4px;">
+                              <i class="bi bi-whatsapp" style="color:#16a34a; font-size:12px;"></i> <span style="font-family:var(--font-mono);">{{ $hp }}</span>
                             </a>
                           @endif
                         </div>
@@ -590,8 +543,8 @@
                           <span style="font-family:var(--font-mono);">NISN: {{ $sb->nisn ?? ($sb->nis ?? '-') }}</span>
                           @if($hpClean)
                             <span style="color:var(--border-2);">·</span>
-                            <a href="https://wa.me/{{ $hpClean }}" target="_blank" style="color:#16A34A; text-decoration:none; font-weight:600; display:inline-flex; align-items:center; gap:3px;">
-                              <i class="bi bi-whatsapp"></i> <span style="font-family:var(--font-mono);">{{ $hp }}</span>
+                            <a href="https://wa.me/{{ $hpClean }}" target="_blank" style="color:var(--text-2); text-decoration:none; font-weight:600; display:inline-flex; align-items:center; gap:4px;">
+                              <i class="bi bi-whatsapp" style="color:#16a34a; font-size:12px;"></i> <span style="font-family:var(--font-mono);">{{ $hp }}</span>
                             </a>
                           @endif
                         </div>
@@ -702,8 +655,8 @@
                           <span style="font-family:var(--font-mono);">NIP: {{ $ag->guru?->nip ?: '-' }}</span>
                           @if($hpGuru)
                             <span style="color:var(--border-2);">·</span>
-                            <a href="https://wa.me/{{ $hpGuru }}" target="_blank" style="color:#16A34A; text-decoration:none; font-weight:600; display:inline-flex; align-items:center; gap:3px;">
-                              <i class="bi bi-whatsapp"></i> <span style="font-family:var(--font-mono);">{{ $ag->guru?->no_hp }}</span>
+                            <a href="https://wa.me/{{ $hpGuru }}" target="_blank" style="color:var(--text-2); text-decoration:none; font-weight:600; display:inline-flex; align-items:center; gap:4px;">
+                              <i class="bi bi-whatsapp" style="color:#16a34a; font-size:12px;"></i> <span style="font-family:var(--font-mono);">{{ $ag->guru?->no_hp }}</span>
                             </a>
                           @endif
                         </div>
@@ -788,8 +741,8 @@
                           <span style="font-family:var(--font-mono);">NIP: {{ $gb->nip ?: '-' }}</span>
                           @if($hpGuru)
                             <span style="color:var(--border-2);">·</span>
-                            <a href="https://wa.me/{{ $hpGuru }}" target="_blank" style="color:#16A34A; text-decoration:none; font-weight:600; display:inline-flex; align-items:center; gap:3px;">
-                              <i class="bi bi-whatsapp"></i> <span style="font-family:var(--font-mono);">{{ $gb->no_hp }}</span>
+                            <a href="https://wa.me/{{ $hpGuru }}" target="_blank" style="color:var(--text-2); text-decoration:none; font-weight:600; display:inline-flex; align-items:center; gap:4px;">
+                              <i class="bi bi-whatsapp" style="color:#16a34a; font-size:12px;"></i> <span style="font-family:var(--font-mono);">{{ $gb->no_hp }}</span>
                             </a>
                           @endif
                         </div>
@@ -1000,8 +953,8 @@
     if (siswaPane) siswaPane.style.display = view === 'siswa' ? '' : 'none';
     if (guruPane)  guruPane.style.display  = view === 'guru'  ? '' : 'none';
     if (susulanPane) susulanPane.style.display = view === 'susulan' ? '' : 'none';
-    if (chipsSiswa) chipsSiswa.style.display = view === 'siswa' ? 'flex' : 'none';
-    if (chipsGuru)  chipsGuru.style.display  = view === 'guru'  ? 'flex' : 'none';
+    if (chipsSiswa) chipsSiswa.style.display = 'none';
+    if (chipsGuru)  chipsGuru.style.display  = 'none';
     if (kpiSiswa) kpiSiswa.style.display = (view === 'siswa' || view === 'susulan') ? 'grid' : 'none';
     if (kpiGuru)  kpiGuru.style.display  = view === 'guru'  ? 'grid' : 'none';
 
@@ -1039,6 +992,11 @@
     // Switch to siswa view
     switchMainView('siswa', document.getElementById('btnViewSiswa'));
 
+    // Highlight active KPI card
+    document.querySelectorAll('#kpiGridSiswa .piket-kpi-card').forEach(card => {
+      card.classList.toggle('active', card.getAttribute('data-kpi') === status);
+    });
+
     // Find and click the matching filter pill
     const pills = document.querySelectorAll('#filterChipsSiswa .filter-pill');
     pills.forEach(pill => {
@@ -1054,6 +1012,11 @@
   function selectGuruFilter(status) {
     // Switch to guru view
     switchMainView('guru', document.getElementById('btnViewGuru'));
+
+    // Highlight active Guru KPI card
+    document.querySelectorAll('#kpiGridGuru .piket-kpi-card').forEach(card => {
+      card.classList.toggle('active', card.getAttribute('data-kpi-guru') === status);
+    });
 
     // Find and click the matching filter pill
     const pills = document.querySelectorAll('#filterChipsGuru .filter-pill');

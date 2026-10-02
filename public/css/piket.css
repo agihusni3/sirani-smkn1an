@@ -56,17 +56,17 @@
 
     /* ══ GRADIENT ACTION BUTTONS & BEAUTIFIED HOVER TOOLTIPS ══ */
     .btn-gradient-koreksi {
-      background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%) !important;
-      color: #ffffff !important;
-      border: none !important;
+      background: var(--bg-2, #f1f5f9) !important;
+      color: var(--text, #0f172a) !important;
+      border: 1px solid var(--border-2, #cbd5e1) !important;
       border-radius: 6px !important;
       font-size: 11px !important;
-      font-weight: 800 !important;
-      letter-spacing: 0.02em !important;
-      padding: 5px 12px !important;
+      font-weight: 700 !important;
+      letter-spacing: 0.01em !important;
+      padding: 4px 10px !important;
       cursor: pointer !important;
-      box-shadow: 0 2px 6px rgba(37, 99, 235, 0.28) !important;
-      transition: all .2s cubic-bezier(.4, 0, .2, 1) !important;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04) !important;
+      transition: all .15s ease !important;
       display: inline-flex !important;
       align-items: center !important;
       justify-content: center !important;
@@ -75,28 +75,29 @@
       outline: none !important;
     }
     .btn-gradient-koreksi:hover {
-      background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%) !important;
-      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.45) !important;
-      transform: translateY(-1.5px) !important;
-      color: #ffffff !important;
+      background: var(--surface, #ffffff) !important;
+      border-color: var(--text-3, #94a3b8) !important;
+      color: var(--text, #0f172a) !important;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08) !important;
+      transform: translateY(-1px) !important;
     }
     .btn-gradient-koreksi:active {
       transform: translateY(0) !important;
-      box-shadow: 0 1px 3px rgba(37, 99, 235, 0.3) !important;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04) !important;
     }
 
     .btn-gradient-status {
-      background: linear-gradient(135deg, #059669 0%, #047857 100%) !important;
-      color: #ffffff !important;
-      border: none !important;
+      background: var(--surface, #ffffff) !important;
+      color: var(--text, #0f172a) !important;
+      border: 1px solid var(--border-2, #cbd5e1) !important;
       border-radius: 6px !important;
       font-size: 11px !important;
-      font-weight: 800 !important;
-      letter-spacing: 0.02em !important;
-      padding: 5px 12px !important;
+      font-weight: 700 !important;
+      letter-spacing: 0.01em !important;
+      padding: 4px 10px !important;
       cursor: pointer !important;
-      box-shadow: 0 2px 6px rgba(5, 150, 105, 0.28) !important;
-      transition: all .2s cubic-bezier(.4, 0, .2, 1) !important;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04) !important;
+      transition: all .15s ease !important;
       display: inline-flex !important;
       align-items: center !important;
       justify-content: center !important;
@@ -105,29 +106,30 @@
       outline: none !important;
     }
     .btn-gradient-status:hover {
-      background: linear-gradient(135deg, #047857 0%, #065f46 100%) !important;
-      box-shadow: 0 4px 12px rgba(5, 150, 105, 0.45) !important;
-      transform: translateY(-1.5px) !important;
-      color: #ffffff !important;
+      background: var(--bg-2, #f8fafc) !important;
+      border-color: var(--text-3, #94a3b8) !important;
+      color: var(--text, #0f172a) !important;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08) !important;
+      transform: translateY(-1px) !important;
     }
     .btn-gradient-status:active {
       transform: translateY(0) !important;
-      box-shadow: 0 1px 3px rgba(5, 150, 105, 0.3) !important;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04) !important;
     }
 
     /* Toolbar Gradient Action Buttons */
     .btn-gradient-notif {
-      background: linear-gradient(135deg, #16a34a 0%, #15803d 100%) !important;
-      color: #ffffff !important;
-      border: none !important;
+      background: var(--surface, #ffffff) !important;
+      color: var(--text, #0f172a) !important;
+      border: 1px solid var(--border-2, #cbd5e1) !important;
       border-radius: var(--r-sm) !important;
       height: 32px !important;
       font-size: 12px !important;
-      font-weight: 800 !important;
+      font-weight: 700 !important;
       padding: 0 14px !important;
       cursor: pointer !important;
-      box-shadow: 0 2px 6px rgba(22, 163, 74, 0.25) !important;
-      transition: all .2s cubic-bezier(.4, 0, .2, 1) !important;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04) !important;
+      transition: all .15s ease !important;
       display: inline-flex !important;
       align-items: center !important;
       justify-content: center !important;
@@ -135,24 +137,24 @@
       position: relative !important;
     }
     .btn-gradient-notif:hover {
-      background: linear-gradient(135deg, #15803d 0%, #166534 100%) !important;
-      box-shadow: 0 4px 12px rgba(22, 163, 74, 0.4) !important;
-      transform: translateY(-1.5px) !important;
-      color: #ffffff !important;
+      background: var(--bg-2, #f8fafc) !important;
+      border-color: var(--text-3, #94a3b8) !important;
+      transform: translateY(-1px) !important;
+      color: var(--text, #0f172a) !important;
     }
 
     .btn-gradient-manual {
-      background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%) !important;
+      background: var(--text, #0f172a) !important;
       color: #ffffff !important;
-      border: 1px solid rgba(255, 255, 255, 0.15) !important;
+      border: 1px solid var(--text, #0f172a) !important;
       border-radius: var(--r-sm) !important;
       height: 32px !important;
       font-size: 12px !important;
-      font-weight: 800 !important;
+      font-weight: 700 !important;
       padding: 0 14px !important;
       cursor: pointer !important;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25) !important;
-      transition: all .2s cubic-bezier(.4, 0, .2, 1) !important;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12) !important;
+      transition: all .15s ease !important;
       display: inline-flex !important;
       align-items: center !important;
       justify-content: center !important;
@@ -160,24 +162,25 @@
       position: relative !important;
     }
     .btn-gradient-manual:hover {
-      background: linear-gradient(135deg, #334155 0%, #1e293b 100%) !important;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4) !important;
-      transform: translateY(-1.5px) !important;
+      background: #334155 !important;
+      border-color: #334155 !important;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2) !important;
+      transform: translateY(-1px) !important;
       color: #ffffff !important;
     }
 
     .btn-gradient-izin {
-      background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%) !important;
-      color: #ffffff !important;
-      border: none !important;
+      background: var(--surface, #ffffff) !important;
+      color: var(--text, #0f172a) !important;
+      border: 1px solid var(--border-2, #cbd5e1) !important;
       border-radius: var(--r-sm) !important;
       height: 32px !important;
       font-size: 12px !important;
-      font-weight: 800 !important;
+      font-weight: 700 !important;
       padding: 0 14px !important;
       cursor: pointer !important;
-      box-shadow: 0 2px 6px rgba(2, 132, 199, 0.25) !important;
-      transition: all .2s cubic-bezier(.4, 0, .2, 1) !important;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04) !important;
+      transition: all .15s ease !important;
       display: inline-flex !important;
       align-items: center !important;
       justify-content: center !important;
@@ -185,10 +188,11 @@
       position: relative !important;
     }
     .btn-gradient-izin:hover {
-      background: linear-gradient(135deg, #0369a1 0%, #075985 100%) !important;
-      box-shadow: 0 4px 12px rgba(2, 132, 199, 0.4) !important;
-      transform: translateY(-1.5px) !important;
-      color: #ffffff !important;
+      background: var(--bg-2, #f8fafc) !important;
+      border-color: var(--text-3, #94a3b8) !important;
+      color: var(--text, #0f172a) !important;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08) !important;
+      transform: translateY(-1px) !important;
     }
 
     /* Modal Submit Gradient Button */
@@ -554,8 +558,13 @@
       box-shadow: var(--shadow-sm);
     }
     .piket-kpi-card:hover {
-      border-color: #000000;
+      border-color: var(--text-2);
       transform: translateY(-1px);
+    }
+    .piket-kpi-card.active {
+      background: var(--surface);
+      border: 1.5px solid var(--text, #0f172a);
+      box-shadow: 0 0 0 1px var(--text, #0f172a);
     }
     .piket-kpi-top {
       display: flex;
