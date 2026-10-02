@@ -827,41 +827,9 @@ class RfidController extends Controller
         // 2. Log Percobaan Gagal Absen / Ditolak hari ini
         $failedScans = \App\Services\RfidScanService::getFailedScansToday();
 
-        // 3. Siswa yang Belum Hadir / Belum Absen Hari Ini
+        // 3. Siswa yang Belum Hadir (Ditiadakan dari Kios agar pemuatan feed lebih cepat dan ringan)
         $isLibur = \App\Models\HariLibur::isLibur($today);
-        if ($isLibur) {
-            $belumHadir = collect();
-        } else {
-            $hadirSiswaIds = Absensi::where('tanggal', $today)
-                ->where('pemilik_type', 'siswa')
-                ->whereNotNull('jam_masuk')
-                ->pluck('pemilik_id')
-                ->toArray();
-
-            $belumHadir = Siswa::whereIn('status', ['aktif', 'pkl'])
-                ->whereNotIn('id', $hadirSiswaIds)
-                ->with(['siswaRombels' => function ($q) {
-                    $q->where('status_keanggotaan', 'aktif')->with('rombel');
-                }])
-                ->get()
-                ->map(function ($s) {
-                    $hpClean = preg_replace('/[^0-9]/', '', $s->no_hp_ortu ?? ($s->no_hp_siswa ?? ''));
-                    if (str_starts_with($hpClean, '0')) $hpClean = '62' . substr($hpClean, 1);
-                    return [
-                        'id'         => $s->id,
-                        'nama'       => $s->nama,
-                        'nisn'       => $s->nisn ?: $s->nis,
-                        'rombel'     => $s->siswaRombels->first()?->rombel?->nama_rombel ?? 'Tanpa Rombel',
-                        'foto'       => $s->foto_url,
-                        'no_hp_ortu' => $s->no_hp_ortu,
-                        'hp_clean'   => $hpClean,
-                    ];
-                })
-                ->sortBy(function ($s) {
-                    return ($s['rombel'] ?? '') . ' ' . ($s['nama'] ?? '');
-                })
-                ->values();
-        }
+        $belumHadir = collect();
 
         // 4. Statistik Ringkas
         $totalHadir = Absensi::where('tanggal', $today)->where('status', 'hadir')->count();

@@ -238,10 +238,6 @@
             <div class="monitor-stat-val c-rose" id="mStatGagal">0</div>
             <div class="monitor-stat-lbl">Gagal Scan</div>
           </div>
-          <div class="monitor-stat-item" onclick="switchMonitorTab('belum')" style="cursor:pointer;" title="Klik untuk pantau Siswa Belum Hadir">
-            <div class="monitor-stat-val c-slate" id="mStatBelum">{{ ($isLibur ?? false) ? 0 : ($totalBelumHadirHariIni ?? 0) }}</div>
-            <div class="monitor-stat-lbl">Belum Hadir</div>
-          </div>
         </div>
 
         <!-- Tab Buttons Navigation -->
@@ -256,11 +252,6 @@
             <span>Gagal Scan</span>
             <span class="tab-badge danger" id="badgeTabGagal">0</span>
           </button>
-          <button type="button" class="monitor-tab-btn" id="tabBtnBelum" onclick="switchMonitorTab('belum')">
-            <i class="bi bi-person-x-fill"></i>
-            <span>Belum Hadir</span>
-            <span class="tab-badge" id="badgeTabBelum">{{ ($isLibur ?? false) ? 0 : ($totalBelumHadirHariIni ?? 0) }}</span>
-          </button>
         </div>
 
         <!-- Tab Content 1: Live Feed Siswa yang Baru Hadir (Default Aktif) -->
@@ -273,19 +264,6 @@
         <!-- Tab Content 2: Gagal Absen / Kartu Ditolak -->
         <div class="monitor-drawer-body" id="tabContentGagal" style="display:none;">
           <div id="listFailedScans">
-            <!-- Diisi oleh JS -->
-          </div>
-        </div>
-
-        <!-- Tab Content 3: Belum Hadir Hari Ini -->
-        <div class="monitor-drawer-body" id="tabContentBelum" style="display:none;">
-          <div class="monitor-filter-bar">
-            <input type="text" class="monitor-search-input" id="searchBelumInput" placeholder="Cari nama siswa / NISN..." oninput="filterBelumHadir()" />
-            <select class="monitor-select-rombel" id="filterRombelSelect" onchange="filterBelumHadir()">
-              <option value="">Semua Kelas</option>
-            </select>
-          </div>
-          <div id="listBelumHadir">
             <!-- Diisi oleh JS -->
           </div>
         </div>
@@ -741,8 +719,9 @@
   }
 
   function switchMonitorTab(tabName) {
+    if (tabName === 'belum') tabName = 'live';
     currentMonitorTab = tabName;
-    const tabs = ['gagal', 'belum', 'live'];
+    const tabs = ['gagal', 'live'];
     tabs.forEach(t => {
       const btn = document.getElementById('tabBtn' + t.charAt(0).toUpperCase() + t.slice(1));
       const content = document.getElementById('tabContent' + t.charAt(0).toUpperCase() + t.slice(1));
@@ -751,7 +730,6 @@
     });
 
     if (tabName === 'gagal') renderFailedScans(monitorData.failed_scans || []);
-    if (tabName === 'belum') filterBelumHadir();
     if (tabName === 'live') renderLiveFeed(monitorData.recent_scans || []);
     focusScanner();
   }
@@ -856,12 +834,8 @@
       }
     }
 
-    // Populate rombel options once
-    populateRombelOptions();
-
     // Re-render active tab content
     if (currentMonitorTab === 'gagal') renderFailedScans(monitorData.failed_scans || []);
-    if (currentMonitorTab === 'belum') filterBelumHadir();
     if (currentMonitorTab === 'live') renderLiveFeed(monitorData.recent_scans || []);
   }
 
