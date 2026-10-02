@@ -55,15 +55,15 @@
       <div class="clock-ymd" id="clockDate">{{ $hariIni }}</div>
     </div>
 
-    <!-- Absen Terkini & Pantau Gagal Button -->
-    <button type="button" class="monitor-trigger-btn" id="btnOpenMonitor" onclick="openMonitorDrawer()" title="Absen Terkini & Pantau Gagal">
-      <i class="bi bi-activity" style="color:var(--cyan);"></i>
-      <span class="monitor-btn-label">Absen Terkini</span>
+    <!-- Quick Jump to Monitor on Mobile Only -->
+    <button type="button" class="monitor-trigger-btn mobile-only" id="btnOpenMonitor" onclick="openMonitorDrawer()" title="Lihat Aktivitas Gerbang">
+      <i class="bi bi-clock-history" style="color:var(--cyan);"></i>
+      <span class="monitor-btn-label">Aktivitas</span>
       <span class="monitor-badge-pill" id="headerFailedBadge" style="display:none;">0 Gagal</span>
     </button>
 
     <!-- Voice Announcement Toggle -->
-    <button type="button" class="action-btn" id="btnVoiceToggle" onclick="toggleVoice()" title="Suara Pengumuman (Aktif/Mute)">
+    <button type="button" class="action-btn" id="btnVoiceToggle" onclick="toggleVoice()" title="Suara Panduan (Aktif/Mute)">
       <i class="bi bi-volume-up-fill" id="voiceIcon"></i>
     </button>
 
@@ -78,8 +78,8 @@
     </button>
 
     <!-- Back to Dashboard -->
-    <a href="/sirani" class="action-btn" title="Kembali ke Dasbor SIRANI" style="text-decoration:none;">
-      <i class="bi bi-speedometer2"></i>
+    <a href="/sirani" class="action-btn" title="Kembali ke Dasbor Utama SIRANI" style="text-decoration:none;">
+      <i class="bi bi-house-door-fill"></i>
     </a>
   </div>
 </header>
@@ -113,12 +113,6 @@
           <div class="scanner-status-indicator" id="scannerStatus">
             <span class="pulse-dot"></span>
             <span>PEMINDAI SIAP MENERIMA INPUT</span>
-          </div>
-
-          <div class="scanner-protocols">
-            <span class="protocol-pill"><i class="bi bi-broadcast-pin"></i> RFID 13.56 MHz</span>
-            <span class="protocol-pill"><i class="bi bi-qr-code-scan"></i> Barcode 1D / 2D QR</span>
-            <span class="protocol-pill"><i class="bi bi-cloud-check"></i> Cloud Sync</span>
           </div>
         </div>
 
@@ -195,7 +189,7 @@
               <div class="countdown-caption-bar">
                 <span>Kembali ke mode pemindaian dalam <strong id="countdownSec">5</strong> detik...</span>
                 <button type="button" class="btn-scan-next" onclick="returnToScanner()" title="Kembali ke pemindai sekarang">
-                  <i class="bi bi-arrow-repeat"></i> Scan Berikutnya
+                  <i class="bi bi-upc-scan"></i> Scan Berikutnya
                 </button>
               </div>
             </div>
@@ -243,14 +237,14 @@
         <!-- Tab Buttons Navigation -->
         <div class="monitor-tabs">
           <button type="button" class="monitor-tab-btn active" id="tabBtnLive" onclick="switchMonitorTab('live')">
-            <i class="bi bi-broadcast"></i>
+            <i class="bi bi-clock-history"></i>
             <span>Absen Terkini</span>
             <span class="tab-badge" id="badgeTabLive">0</span>
           </button>
           <button type="button" class="monitor-tab-btn" id="tabBtnGagal" onclick="switchMonitorTab('gagal')">
             <i class="bi bi-exclamation-triangle-fill"></i>
             <span>Gagal Scan</span>
-            <span class="tab-badge danger" id="badgeTabGagal">0</span>
+            <span class="tab-badge" id="badgeTabGagal">0</span>
           </button>
         </div>
 
@@ -723,14 +717,8 @@
   }
 
   function openMonitorDrawer(tab = null) {
-    if (tab) {
-      switchMonitorTab(tab);
-    } else if (monitorData.failed_scans && monitorData.failed_scans.length > 0) {
-      switchMonitorTab('gagal');
-    } else {
-      switchMonitorTab('live');
-    }
-    const el = document.getElementById('kioskColRight') || document.getElementById('kioskColLeft');
+    switchMonitorTab(tab || 'live');
+    const el = document.getElementById('kioskColRight');
     if (el && window.innerWidth <= 1080) {
       el.scrollIntoView({ behavior: 'smooth' });
     }
@@ -816,10 +804,11 @@
 
     // Tab Badges
     const badgeGagal = document.getElementById('badgeTabGagal');
-    const badgeBelum = document.getElementById('badgeTabBelum');
     const badgeLive = document.getElementById('badgeTabLive');
-    if (badgeGagal) badgeGagal.textContent = totalGagal;
-    if (badgeBelum) badgeBelum.textContent = totalBelum;
+    if (badgeGagal) {
+      badgeGagal.textContent = totalGagal;
+      badgeGagal.classList.toggle('danger', totalGagal > 0);
+    }
     if (badgeLive) badgeLive.textContent = (monitorData.recent_scans || []).length;
 
     // Live Ticker Below Scanner
@@ -983,7 +972,7 @@
       container.innerHTML = `
         <div class="drawer-empty-state">
           <div class="drawer-empty-icon" style="color:var(--text-muted);">
-            <i class="bi bi-broadcast"></i>
+            <i class="bi bi-clock-history"></i>
           </div>
           <div class="drawer-empty-title">Belum Ada Aktivitas</div>
           <div class="drawer-empty-desc">

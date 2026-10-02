@@ -758,9 +758,9 @@
       top: -9999px;
     }
 
-    /* ══ MONITOR BUTTON & BADGES IN HEADER ══ */
+    /* ══ MONITOR BUTTON & BADGES IN HEADER (Hanya tampil di mobile/tablet saat tata letak bertumpuk) ══ */
     .monitor-trigger-btn {
-      display: inline-flex;
+      display: none;
       align-items: center;
       gap: 8px;
       padding: 8px 16px;
@@ -1378,6 +1378,9 @@
 
     /* Responsive Media Queries */
     @media (max-width: 1080px) {
+      .monitor-trigger-btn {
+        display: inline-flex;
+      }
       .kiosk-layout-grid {
         grid-template-columns: 1fr;
         gap: 20px;
