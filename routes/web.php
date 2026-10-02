@@ -61,7 +61,7 @@ Route::middleware('track.visitor')->group(function () {
     Route::prefix('ppdb')->name('ppdb.')->group(function () {
         Route::get('/', [PpdbDaftarController::class, 'index'])->name('index');
         Route::get('/daftar', [PpdbDaftarController::class, 'formulir'])->name('formulir');
-        Route::post('/daftar', [PpdbDaftarController::class, 'simpan'])->name('simpan');
+        Route::post('/daftar', [PpdbDaftarController::class, 'simpan'])->middleware('throttle:10,1')->name('simpan');
         Route::get('/sukses/{nomor}', [PpdbDaftarController::class, 'sukses'])->name('sukses');
         Route::get('/status', [PpdbDaftarController::class, 'status'])->name('status');
         Route::get('/cetak-kartu/{nomor}', [PpdbDaftarController::class, 'cetakKartu'])->name('cetak');
@@ -122,9 +122,11 @@ Route::middleware('throttle:120,1')->group(function () {
 Route::prefix('asesmen')->group(function () {
     Route::get('/', [\App\Http\Controllers\Akademik\PortalAsesmenSiswaController::class, 'login'])->name('portal.asesmen.index');
     Route::get('/masuk', [\App\Http\Controllers\Akademik\PortalAsesmenSiswaController::class, 'login'])->name('portal.asesmen.login');
-    Route::post('/masuk', [\App\Http\Controllers\Akademik\PortalAsesmenSiswaController::class, 'masuk'])->name('portal.asesmen.masuk');
+    // Anti Brute Force: Batasi percobaan login CBT siswa via NISN + tanggal lahir
+    Route::post('/masuk', [\App\Http\Controllers\Akademik\PortalAsesmenSiswaController::class, 'masuk'])->middleware('throttle:15,1')->name('portal.asesmen.masuk');
     Route::get('/ruang', [\App\Http\Controllers\Akademik\PortalAsesmenSiswaController::class, 'dashboard'])->name('portal.asesmen.dashboard');
-    Route::post('/{id}/buka', [\App\Http\Controllers\Akademik\PortalAsesmenSiswaController::class, 'konfirmasiToken'])->name('portal.asesmen.buka');
+    // Anti Brute Force: Batasi percobaan input token ujian
+    Route::post('/{id}/buka', [\App\Http\Controllers\Akademik\PortalAsesmenSiswaController::class, 'konfirmasiToken'])->middleware('throttle:10,1')->name('portal.asesmen.buka');
     Route::get('/{id}/ujian', [\App\Http\Controllers\Akademik\PortalAsesmenSiswaController::class, 'ujian'])->name('portal.asesmen.ujian');
     Route::post('/{id}/submit', [\App\Http\Controllers\Akademik\PortalAsesmenSiswaController::class, 'submitJawaban'])->name('portal.asesmen.submit');
     Route::post('/{id}/autosave', [\App\Http\Controllers\Akademik\AkademikAsesmenController::class, 'autosaveJawaban'])->name('portal.asesmen.autosave');
