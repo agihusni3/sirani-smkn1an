@@ -323,7 +323,7 @@
 
     {{-- ══ 4. UNIFIED CONTROL TOOLBAR (SINGLE ROW CLEAN) ══ --}}
     <div class="piket-unified-toolbar no-print">
-      <div class="piket-toolbar-actions-row" style="border-bottom:none; padding-bottom:0;">
+      <div class="piket-toolbar-actions-row">
         <div class="piket-segmented-tabs">
           <button type="button" class="piket-segmented-btn piket-main-btn active" id="btnViewSiswa" onclick="switchMainView('siswa', this)">
             <i class="bi bi-people-fill"></i> Peserta Didik
@@ -341,7 +341,7 @@
           @endif
         </div>
 
-        <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+        <div class="piket-toolbar-right-group">
           {{-- Search Bar --}}
           <div class="piket-search-box">
             <i class="bi bi-search piket-search-icon"></i>
