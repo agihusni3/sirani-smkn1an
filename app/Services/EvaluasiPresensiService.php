@@ -42,6 +42,12 @@ class EvaluasiPresensiService
                 return ['status' => 'skipped', 'message' => 'Belum masuk waktu evaluasi sore (setelah jam tutup sekolah ' . substr($jamBatasEvaluasi, 0, 5) . ')'];
             }
 
+            // Cegah pengulangan evaluasi: jika sudah pernah dievaluasi hari ini dan tidak dipaksa, langsung lewati
+            $cacheKey = 'evaluasi_presensi_ran_' . $dateStr;
+            if (!$force && \Illuminate\Support\Facades\Cache::has($cacheKey)) {
+                return ['status' => 'skipped', 'message' => "Evaluasi presensi tanggal {$dateStr} sudah pernah dijalankan hari ini."];
+            }
+
         } elseif ($targetDate->isFuture()) {
             return ['status' => 'skipped', 'message' => 'Tanggal masa depan'];
         }
@@ -184,6 +190,9 @@ class EvaluasiPresensiService
                 Log::error("Error evaluasi siswa {$membership->siswa_id}: " . $e->getMessage());
             }
         }
+
+        // Tandai di cache bahwa evaluasi untuk tanggal ini sudah selesai (aktif hingga akhir hari)
+        \Illuminate\Support\Facades\Cache::put('evaluasi_presensi_ran_' . $tanggal, true, now()->endOfDay());
 
         return [
             'status' => 'success',

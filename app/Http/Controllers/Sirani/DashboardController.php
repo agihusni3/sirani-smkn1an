@@ -33,18 +33,20 @@ class DashboardController extends Controller
         $siswaAlpha       = Absensi::where('pemilik_type', 'siswa')->where('tanggal', $today)->where('status', 'alpha')->count();
         $persenSekolah    = $totalSiswaActive > 0 ? min(100.0, round((($siswaHadir + $siswaTerlambat) / $totalSiswaActive) * 100, 1)) : 0;
 
-        // Semua siswa aktif beserta rombelnya (hanya kolom yg dibutuhkan JS agar JSON ringan)
-        $semuaSiswaList = Siswa::where('status', 'aktif')
+        // Semua siswa aktif beserta rombelnya (Query tunggal teroptimasi untuk JS & kalkulasi rombel)
+        $allActiveSiswas = Siswa::where('status', 'aktif')
             ->select('id', 'nis', 'nama', 'status_pkl')
             ->with(['siswaRombels' => function ($q) use ($taAktif) {
                 if ($taAktif) {
-                    $q->where('tahun_ajaran_id', $taAktif->id)
-                      ->where('status_keanggotaan', 'aktif')
-                      ->select('id', 'siswa_id', 'rombel_id')
-                      ->with(['rombel:id,nama_rombel']);
+                    $q->where('tahun_ajaran_id', $taAktif->id);
                 }
+                $q->where('status_keanggotaan', 'aktif')
+                  ->select('id', 'siswa_id', 'rombel_id')
+                  ->with(['rombel:id,nama_rombel']);
             }])
             ->get();
+
+        $semuaSiswaList = $allActiveSiswas;
 
         // Daftar absensi siswa hari ini
         $absensiSiswaHariIni = Absensi::with(['siswa', 'siswaRombel.rombel'])
@@ -72,11 +74,7 @@ class DashboardController extends Controller
             ->orderBy('jam_masuk', 'asc')
             ->get();
 
-        // ── 3. SUMMARY PER ROMBEL (BATCH OPTIMIZED & FULLY SYNCED) ──
-        $allActiveSiswas = Siswa::where('status', 'aktif')
-            ->with(['siswaRombels' => function ($q) {
-                $q->where('status_keanggotaan', 'aktif');
-            }])->get();
+        // ── 3. SUMMARY PER ROMBEL (MENGGUNAKAN KOLEKSI AKTIF TUNGGAL) ──
 
         $siswaByRombel = $allActiveSiswas->groupBy(function ($s) {
             return $s->siswaRombels->first()?->rombel_id;
@@ -202,6 +200,22 @@ class DashboardController extends Controller
             $persenHari = $totalSiswaActive > 0 ? min(100.0, round((($h + $t) / $totalSiswaActive) * 100, 1)) : 0;
             $chartPersentase[] = $persenHari;
         }
+
+        // Simpan salinan metrik tren dan KPI skala sekolah (mencegah re-query saat wali kelas piket)
+        $sekolahKPI = [
+            'total_active'   => $totalSiswaActive,
+            'total_pkl'      => $totalSiswaPkl,
+            'hadir'          => $siswaHadir,
+            'terlambat'      => $siswaTerlambat,
+            'izin'           => $siswaIzin,
+            'alpha'          => $siswaAlpha,
+            'persen'         => $persenSekolah,
+            'chart_hadir'    => $chartHadir,
+            'chart_telat'    => $chartTerlambat,
+            'chart_izin'     => $chartIzin,
+            'chart_alpha'    => $chartAlpha,
+            'chart_persen'   => $chartPersentase,
+        ];
 
         // ── 7. TREN KEHADIRAN GURU & PEGAWAI 30 HARI ──
         $trenAbsensiGuru = Absensi::where('pemilik_type', 'guru')
@@ -488,47 +502,24 @@ class DashboardController extends Controller
             $isWaliSedangPiket = \App\Models\JadwalPiket::isGuruPiketHariIni($currentGuru->id, $today);
         }
 
-        // Jika Wali Kelas sedang bertugas piket: override statistik KPI ke skala sekolah penuh
+        // Jika Wali Kelas sedang bertugas piket: gunakan kembali metrik skala sekolah (tanpa query ulang)
         if ($isWaliSedangPiket) {
-            $totalSiswaActive = Siswa::where('status', 'aktif')->count();
-            $totalSiswaPkl    = Siswa::where('status', 'aktif')->where('status_pkl', 'aktif_pkl')->count();
-            $siswaHadir       = Absensi::where('pemilik_type', 'siswa')->where('tanggal', $today)->where('status', 'hadir')->count();
-            $siswaTerlambat   = Absensi::where('pemilik_type', 'siswa')->where('tanggal', $today)->where('status', 'terlambat')->count();
-            $siswaIzin        = Absensi::where('pemilik_type', 'siswa')->where('tanggal', $today)->whereIn('status', ['sakit', 'izin', 'dispen'])->count();
-            $siswaAlpha       = Absensi::where('pemilik_type', 'siswa')->where('tanggal', $today)->where('status', 'alpha')->count();
-            $siswaBolos       = Absensi::where('pemilik_type', 'siswa')->where('tanggal', $today)->where('status', 'bolos')->count();
-            $persenSekolah    = $totalSiswaActive > 0 ? min(100.0, round((($siswaHadir + $siswaTerlambat) / $totalSiswaActive) * 100, 1)) : 0;
+            $totalSiswaActive = $sekolahKPI['total_active'];
+            $totalSiswaPkl    = $sekolahKPI['total_pkl'];
+            $siswaHadir       = $sekolahKPI['hadir'];
+            $siswaTerlambat   = $sekolahKPI['terlambat'];
+            $siswaIzin        = $sekolahKPI['izin'];
+            $siswaAlpha       = $sekolahKPI['alpha'];
+            $siswaBolos       = $todayAbsensis->where('status', 'bolos')->count();
+            $persenSekolah    = $sekolahKPI['persen'];
             $donutSiswaValues = [$siswaHadir, $siswaTerlambat, $siswaIzin, $siswaAlpha, $siswaBolos];
 
-            // Hitung ulang grafik tren 30 hari skala sekolah
-            $trenAbsensiSekolah = Absensi::where('pemilik_type', 'siswa')
-                ->whereBetween('tanggal', [$startDate, $endDate])
-                ->selectRaw("tanggal,
-                    SUM(CASE WHEN status = 'hadir' THEN 1 ELSE 0 END) as hadir,
-                    SUM(CASE WHEN status = 'terlambat' THEN 1 ELSE 0 END) as terlambat,
-                    SUM(CASE WHEN status IN ('sakit', 'izin') THEN 1 ELSE 0 END) as izin,
-                    SUM(CASE WHEN status = 'alpha' THEN 1 ELSE 0 END) as alpha,
-                    SUM(CASE WHEN status = 'bolos' THEN 1 ELSE 0 END) as bolos")
-                ->groupBy('tanggal')
-                ->get()
-                ->keyBy('tanggal');
+            $chartHadir       = $sekolahKPI['chart_hadir'];
+            $chartTerlambat   = $sekolahKPI['chart_telat'];
+            $chartIzin        = $sekolahKPI['chart_izin'];
+            $chartAlpha       = $sekolahKPI['chart_alpha'];
+            $chartPersentase  = $sekolahKPI['chart_persen'];
 
-            $chartHadir = []; $chartTerlambat = []; $chartIzin = []; $chartAlpha = []; $chartPersentase = [];
-            $totalSiswaActiveForChart = $totalSiswaActive;
-            for ($i = 29; $i >= 0; $i--) {
-                $tgl = Carbon::today()->subDays($i);
-                $tglStr = $tgl->toDateString();
-                $record = $trenAbsensiSekolah->get($tglStr);
-                $h = (int) ($record->hadir ?? 0);
-                $t = (int) ($record->terlambat ?? 0);
-                $iz = (int) ($record->izin ?? 0);
-                $a = (int) ($record->alpha ?? 0) + (int) ($record->bolos ?? 0);
-                $chartHadir[] = $h;
-                $chartTerlambat[] = $t;
-                $chartIzin[] = $iz;
-                $chartAlpha[] = $a;
-                $chartPersentase[] = $totalSiswaActiveForChart > 0 ? min(100.0, round((($h + $t) / $totalSiswaActiveForChart) * 100, 1)) : 0;
-            }
 
             // Reset filter rombel ke semua rombel (skala sekolah)
             $chartRombelLabels = $rombelSummary->pluck('nama_rombel')->toArray();

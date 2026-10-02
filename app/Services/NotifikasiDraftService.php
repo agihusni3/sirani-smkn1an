@@ -47,37 +47,49 @@ class NotifikasiDraftService
         $namaJurusan = $rombel && $rombel->jurusan ? $rombel->jurusan->nama_jurusan : '-';
         $namaWali = $waliKelas ? $waliKelas->nama : '-';
 
-        // 3. Hitung akumulasi & rincian pelanggaran dinamis siswa
-        $totalAlpha = Absensi::where('pemilik_type', 'siswa')->where('pemilik_id', $siswa->id)->where('status', 'alpha')->count();
-        $totalBolos = Absensi::where('pemilik_type', 'siswa')->where('pemilik_id', $siswa->id)->where('status', 'bolos')->count();
-        $totalTerlambat = Absensi::where('pemilik_type', 'siswa')->where('pemilik_id', $siswa->id)->where('status', 'terlambat')->count();
-        $totalPelanggaran = $params['total_pelanggaran'] ?? ($totalAlpha + $totalBolos);
+        // 3. Hitung akumulasi & rincian pelanggaran dinamis hanya jika dibutuhkan (panggilan_ortu, alpha, bolos)
+        $butuhRincian = in_array($kategori, ['panggilan_ortu', 'alpha', 'bolos']);
 
-        $riwayatPelanggaran = Absensi::where('pemilik_type', 'siswa')
-            ->where('pemilik_id', $siswa->id)
-            ->whereIn('status', ['alpha', 'bolos'])
-            ->orderBy('tanggal', 'desc')
-            ->take(5)
-            ->get();
+        $totalAlpha = 0;
+        $totalBolos = 0;
+        $totalTerlambat = 0;
+        $totalPelanggaran = 0;
+        $rincianPelanggaran = '-';
+        $tingkatUrgensi = 'NORMAL';
+        $rekomendasiTindakan = '-';
 
-        $rincianList = [];
-        foreach ($riwayatPelanggaran as $p) {
-            $tglFormat = Carbon::parse($p->tanggal)->translatedFormat('d/m/Y (l)');
-            $statusStr = $p->status === 'alpha' ? 'Alpha (Tanpa Keterangan)' : 'Bolos (Pulang Sebelum Waktu)';
-            $rincianList[] = "• {$tglFormat} : {$statusStr}";
-        }
-        $rincianPelanggaran = !empty($rincianList) ? implode("\n", $rincianList) : "• Tanggal {$tanggal} : Pelanggaran tercatat sistem";
+        if ($butuhRincian) {
+            $totalAlpha = Absensi::where('pemilik_type', 'siswa')->where('pemilik_id', $siswa->id)->where('status', 'alpha')->count();
+            $totalBolos = Absensi::where('pemilik_type', 'siswa')->where('pemilik_id', $siswa->id)->where('status', 'bolos')->count();
+            $totalTerlambat = Absensi::where('pemilik_type', 'siswa')->where('pemilik_id', $siswa->id)->where('status', 'terlambat')->count();
+            $totalPelanggaran = $params['total_pelanggaran'] ?? ($totalAlpha + $totalBolos);
 
-        // Tingkat urgensi & rekomendasi tindakan dinamis
-        if ($totalPelanggaran >= 5) {
-            $tingkatUrgensi = 'KRITIS (SP-2 / Peringatan Keras Kesiswaan)';
-            $rekomendasiTindakan = 'Wajib Terbitkan Surat Panggilan Orang Tua Tahap 2 & Konseling Khusus BK';
-        } elseif ($totalPelanggaran >= 3) {
-            $tingkatUrgensi = 'WASPADA (SP-1 / Panggilan Orang Tua Pertama)';
-            $rekomendasiTindakan = 'Terbitkan Surat Panggilan Orang Tua & Pembinaan Wali Kelas';
-        } else {
-            $tingkatUrgensi = 'PERINGATAN AWAL';
-            $rekomendasiTindakan = 'Berikan teguran lisan & pantau kedisiplinan harian';
+            $riwayatPelanggaran = Absensi::where('pemilik_type', 'siswa')
+                ->where('pemilik_id', $siswa->id)
+                ->whereIn('status', ['alpha', 'bolos'])
+                ->orderBy('tanggal', 'desc')
+                ->take(5)
+                ->get();
+
+            $rincianList = [];
+            foreach ($riwayatPelanggaran as $p) {
+                $tglFormat = Carbon::parse($p->tanggal)->translatedFormat('d/m/Y (l)');
+                $statusStr = $p->status === 'alpha' ? 'Alpha (Tanpa Keterangan)' : 'Bolos (Pulang Sebelum Waktu)';
+                $rincianList[] = "• {$tglFormat} : {$statusStr}";
+            }
+            $rincianPelanggaran = !empty($rincianList) ? implode("\n", $rincianList) : "• Tanggal {$tanggal} : Pelanggaran tercatat sistem";
+
+            // Tingkat urgensi & rekomendasi tindakan dinamis
+            if ($totalPelanggaran >= 5) {
+                $tingkatUrgensi = 'KRITIS (SP-2 / Peringatan Keras Kesiswaan)';
+                $rekomendasiTindakan = 'Wajib Terbitkan Surat Panggilan Orang Tua Tahap 2 & Konseling Khusus BK';
+            } elseif ($totalPelanggaran >= 3) {
+                $tingkatUrgensi = 'WASPADA (SP-1 / Panggilan Orang Tua Pertama)';
+                $rekomendasiTindakan = 'Terbitkan Surat Panggilan Orang Tua & Pembinaan Wali Kelas';
+            } else {
+                $tingkatUrgensi = 'PERINGATAN AWAL';
+                $rekomendasiTindakan = 'Berikan teguran lisan & pantau kedisiplinan harian';
+            }
         }
 
         // 4. Ambil template pesan

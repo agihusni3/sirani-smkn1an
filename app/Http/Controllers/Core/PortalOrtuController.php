@@ -176,20 +176,18 @@ class PortalOrtuController extends Controller
                     ->take(10)
                     ->get();
 
-                // Berkas Dossier Karakter & Riwayat Kasus Kedisiplinan Siswa
-                try {
-                    $kasusDisiplin = \App\Models\KasusDisiplin::syncFromPresensi($siswa->id);
-                    $kasusDisiplin->loadMissing([
+                // Berkas Dossier Karakter & Riwayat Kasus Kedisiplinan Siswa (Murni Read-Only tanpa write lock)
+                $kasusDisiplin = \App\Models\KasusDisiplin::where('siswa_id', $siswa->id)
+                    ->with([
                         'rewards' => fn($q) => $q->orderBy('tanggal', 'desc')->take(20),
                         'pelanggarans' => fn($q) => $q->orderBy('tanggal', 'desc')->take(20),
-                    ]);
-                } catch (\Throwable $e) {
-                    $kasusDisiplin = \App\Models\KasusDisiplin::where('siswa_id', $siswa->id)
-                        ->with([
-                            'rewards' => fn($q) => $q->orderBy('tanggal', 'desc')->take(20),
-                            'pelanggarans' => fn($q) => $q->orderBy('tanggal', 'desc')->take(20),
-                        ])
-                        ->first();
+                    ])
+                    ->first();
+
+                if (!$kasusDisiplin) {
+                    $kasusDisiplin = new \App\Models\KasusDisiplin(['siswa_id' => $siswa->id]);
+                    $kasusDisiplin->setRelation('rewards', collect());
+                    $kasusDisiplin->setRelation('pelanggarans', collect());
                 }
 
                 // Susun Kronologis Detail Rincian Pelanggaran & Presensi Terkait Disiplin

@@ -593,8 +593,7 @@ Route::middleware('auth')->group(function () {
     Route::middleware('role:admin,waka_kesiswaan,guru_piket')->group(function () {
         Route::get('/izin-siswa', [\App\Http\Controllers\Sirani\IzinSiswaController::class, 'index'])->name('izin.index');
         Route::get('/izin-siswa/cetak-pdf', [\App\Http\Controllers\Sirani\IzinSiswaController::class, 'cetakPdf'])->name('izin.cetak-pdf');
-        Route::post('/izin-siswa', [\App\Http\Controllers\Sirani\IzinSiswaController::class, 'store'])->name('izin.store');
-        Route::post('/izin-siswa/store', [\App\Http\Controllers\Sirani\IzinSiswaController::class, 'store'])->name('izin-siswa.store');
+        Route::post('/izin-siswa', [\App\Http\Controllers\Sirani\IzinSiswaController::class, 'store'])->name('izin-siswa.store');
         Route::delete('/izin-siswa/{id}', [\App\Http\Controllers\Sirani\IzinSiswaController::class, 'destroy'])->name('izin-siswa.destroy');
         Route::delete('/izin-guru/{id}', [\App\Http\Controllers\Sirani\IzinSiswaController::class, 'destroyGuru'])->name('izin-guru.destroy');
     });
@@ -607,8 +606,7 @@ Route::middleware('auth')->group(function () {
         Route::put('/piket/absensi/{id}', [GuruPiketController::class, 'updateAbsensi'])->name('piket.absensi.update');
         Route::post('/piket/koreksi-massal', [GuruPiketController::class, 'koreksiMassal'])->name('piket.koreksi-massal');
         Route::post('/piket/toggle-gerbang', [GuruPiketController::class, 'toggleSesiGerbang'])->name('piket.toggle-gerbang');
-        Route::post('/piket/validasi-presensi', [GuruPiketController::class, 'validasiPresensiSiswa'])->name('piket.validasi-siswa');
-        Route::post('/piket/validasi-siswa', [GuruPiketController::class, 'validasiPresensiSiswa']);
+        Route::post('/piket/validasi-siswa', [GuruPiketController::class, 'validasiPresensiSiswa'])->name('piket.validasi-siswa');
         Route::post('/piket/kirim-wa', [GuruPiketController::class, 'kirimWaGateway'])->name('piket.kirim-wa');
         Route::post('/piket/alasan-telat', [GuruPiketController::class, 'storeAlasanTelat'])->name('piket.alasan-telat');
         Route::post('/piket/set-status-guru', [GuruPiketController::class, 'storeStatusGuruCepat'])->name('piket.set-status-guru');

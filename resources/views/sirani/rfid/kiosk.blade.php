@@ -839,23 +839,6 @@
     if (currentMonitorTab === 'live') renderLiveFeed(monitorData.recent_scans || []);
   }
 
-  function populateRombelOptions() {
-    if (rombelOptionsPopulated || !monitorData.belum_hadir) return;
-    const select = document.getElementById('filterRombelSelect');
-    if (!select) return;
-
-    const rombels = [...new Set(monitorData.belum_hadir.map(s => s.rombel).filter(Boolean))].sort();
-    if (rombels.length === 0) return;
-
-    select.innerHTML = '<option value="">Semua Kelas (' + monitorData.belum_hadir.length + ')</option>';
-    rombels.forEach(r => {
-      const opt = document.createElement('option');
-      opt.value = r;
-      opt.textContent = r;
-      select.appendChild(opt);
-    });
-    rombelOptionsPopulated = true;
-  }
 
   // Render Tab 1: Gagal Absen & Ditolak
   function renderFailedScans(list) {
@@ -970,97 +953,6 @@
     container.innerHTML = html;
   }
 
-  // Render Tab 2: Belum Hadir Hari Ini
-  function filterBelumHadir() {
-    const searchVal = (document.getElementById('searchBelumInput')?.value || '').toLowerCase().trim();
-    const rombelVal = document.getElementById('filterRombelSelect')?.value || '';
-    const container = document.getElementById('listBelumHadir');
-    if (!container) return;
-
-    let list = monitorData.belum_hadir || [];
-    if (rombelVal) {
-      list = list.filter(s => s.rombel === rombelVal);
-    }
-    if (searchVal) {
-      list = list.filter(s => {
-        const n = (s.nama || '').toLowerCase();
-        const nis = (s.nisn || '').toLowerCase();
-        const r = (s.rombel || '').toLowerCase();
-        return n.includes(searchVal) || nis.includes(searchVal) || r.includes(searchVal);
-      });
-    }
-
-    if (list.length === 0) {
-      const stats = monitorData.stats || {};
-      const isLibur = (monitorData.is_libur !== undefined) ? monitorData.is_libur : (stats.is_libur || false);
-      let emptyTitle = 'Tidak Ada Data Siswa';
-      let emptyDesc = (searchVal || rombelVal) ? 'Tidak ada siswa belum hadir yang cocok dengan filter pencarian.' : 'Semua siswa telah tercatat hadir hari ini!';
-
-      if (isLibur && !searchVal && !rombelVal) {
-        emptyTitle = 'Hari Ini Libur Sekolah';
-        emptyDesc = 'Hari ini libur sekolah / akhir pekan. Tidak ada presensi siswa yang wajib hadir atau dihitung belum hadir.';
-      }
-
-      container.innerHTML = `
-        <div class="drawer-empty-state">
-          <div class="drawer-empty-icon" style="color:var(--cyan);">
-            <i class="bi ${isLibur ? 'bi-calendar-check' : 'bi-people-fill'}"></i>
-          </div>
-          <div class="drawer-empty-title">${emptyTitle}</div>
-          <div class="drawer-empty-desc">
-            ${emptyDesc}
-          </div>
-        </div>
-      `;
-      return;
-    }
-
-    let html = '';
-    list.slice(0, 100).forEach(s => {
-      const nama = s.nama || 'Siswa';
-      const rombel = s.rombel || '-';
-      const nisn = s.nisn || '-';
-      const foto = s.foto || '/img/user-default.png';
-      const hpClean = s.hp_clean || '';
-
-      let waBtn = '';
-      if (hpClean) {
-        const pesanWa = encodeURIComponent(`Assalamu'alaikum Wr. Wb. Pemberitahuan Smart Gate SMKN 1 Air Naningan: Menginformasikan bahwa ananda ${nama} (${rombel}) hingga saat ini belum tercatat melakukan presensi kehadiran di sekolah. Mohon informasi dan konfirmasi kehadiran ananda. Terima kasih.`);
-        waBtn = `
-          <a href="https://wa.me/${hpClean}?text=${pesanWa}" target="_blank" class="btn-action-sm btn-wa" title="Kirim Peringatan WA ke Orang Tua">
-            <i class="bi bi-whatsapp"></i> WA Ortu
-          </a>
-        `;
-      } else {
-        waBtn = `<span class="btn-action-sm" style="opacity:0.5;cursor:default;" title="Nomor WA ortu belum terdaftar"><i class="bi bi-telephone-x"></i> No WA -</span>`;
-      }
-
-      html += `
-        <div class="belum-hadir-card">
-          <img src="${escapeHtml(foto)}" alt="${escapeHtml(nama)}" class="belum-foto-3x4" onerror="this.src='/img/user-default.png'" />
-          <div class="belum-info">
-            <div class="belum-nama">${escapeHtml(nama)}</div>
-            <div class="belum-sub">
-              <strong>${escapeHtml(rombel)}</strong> &bull; NISN: ${escapeHtml(nisn)}
-            </div>
-          </div>
-          <div class="belum-actions">
-            ${waBtn}
-          </div>
-        </div>
-      `;
-    });
-
-    if (list.length > 100) {
-      html += `
-        <div style="text-align:center;padding:12px;font-size:12px;color:var(--text-muted);">
-          Menampilkan 100 dari ${list.length} siswa. Gunakan pencarian atau filter kelas untuk melihat spesifik.
-        </div>
-      `;
-    }
-
-    container.innerHTML = html;
-  }
 
   // Render Tab 3: Semua Aktivitas Live
   function renderLiveFeed(list) {

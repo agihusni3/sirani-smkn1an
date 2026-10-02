@@ -693,8 +693,6 @@ class RfidController extends Controller
         $totalHadirHariIni = Absensi::where('tanggal', $today)->where('status', 'hadir')->count();
         $totalTerlambatHariIni = Absensi::where('tanggal', $today)->where('status', 'terlambat')->count();
         $totalPulangHariIni = Absensi::where('tanggal', $today)->whereNotNull('jam_pulang')->count();
-        $totalBelumHadirHariIni = $isLibur ? 0 : max(0, $totalSiswaAktif - ($totalHadirHariIni + $totalTerlambatHariIni));
-
         // Ambil 5 scan terakhir hari ini
         $initialRecentScans = Absensi::where('tanggal', $today)
             ->whereNotNull('jam_masuk')
@@ -714,7 +712,6 @@ class RfidController extends Controller
             'totalHadirHariIni',
             'totalTerlambatHariIni',
             'totalPulangHariIni',
-            'totalBelumHadirHariIni',
             'initialRecentScans'
         ));
     }
