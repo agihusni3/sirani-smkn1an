@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 
 use App\Models\Absensi;
 use App\Models\Guru;
+use App\Models\IzinGuru;
 use App\Models\IzinSiswa;
 use App\Models\KasusDisiplin;
 use App\Models\NotifikasiOrtu;
@@ -958,6 +959,29 @@ class LaporanController extends Controller
                     \Illuminate\Support\Facades\Log::warning("Gagal kirim push notif koreksi laporan: " . $e->getMessage());
                 }
             }
+        } elseif ($absensi->pemilik_type === 'guru') {
+            // SINKRONISASI UNTUK GURU
+            $guruId = $absensi->pemilik_id;
+            if ($guruId) {
+                if (in_array($status, ['izin', 'sakit', 'dispen', 'cuti'])) {
+                    IzinGuru::updateOrCreate(
+                        [
+                            'guru_id' => $guruId,
+                            'tanggal' => $absensi->tanggal,
+                        ],
+                        [
+                            'jenis'          => $status,
+                            'status'         => 'disetujui',
+                            'keterangan'     => $keterangan ?: 'Koreksi perizinan manual oleh guru piket / admin',
+                            'disetujui_oleh' => auth()->user()?->name ?? 'Guru Piket / Admin',
+                        ]
+                    );
+                } else {
+                    IzinGuru::where('guru_id', $guruId)
+                        ->where('tanggal', $absensi->tanggal)
+                        ->delete();
+                }
+            }
         }
 
         return redirect()->back()->with('success', 'Catatan absensi berhasil dikoreksi dan seluruh modul terkait (Perizinan, Buku Kasus & Peringatan Dasbor) telah tersinkronkan.');
@@ -985,6 +1009,7 @@ class LaporanController extends Controller
         }
 
         $siswaId = $absensi->pemilik_type === 'siswa' ? ($absensi->pemilik_id ?: ($absensi->siswaRombel?->siswa_id)) : null;
+        $guruId  = $absensi->pemilik_type === 'guru' ? $absensi->pemilik_id : null;
         $tanggal = $absensi->tanggal;
 
         $absensi->delete();
@@ -992,6 +1017,8 @@ class LaporanController extends Controller
         if ($siswaId) {
             IzinSiswa::where('siswa_id', $siswaId)->where('tanggal', $tanggal)->delete();
             KasusDisiplin::syncFromPresensi($siswaId);
+        } elseif ($guruId) {
+            IzinGuru::where('guru_id', $guruId)->where('tanggal', $tanggal)->delete();
         }
 
         return redirect()->back()->with('success', 'Catatan absensi berhasil dihapus dan seluruh modul terkait telah disinkronkan.');

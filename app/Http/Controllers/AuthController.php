@@ -74,11 +74,13 @@ class AuthController extends Controller
 
         if ($user) {
             $guru = $user->guru;
+            $isLocalEnv = app()->isLocal() || config('app.debug', false);
+
+            // Validasi kata sandi utama via Hash::check.
+            // Fallback sandi darurat HANYA diizinkan di lingkungan lokal/pengujian, DITUTUP di server produksi.
             $isPasswordValid = Hash::check($password, $user->password)
-                || ($password === 'sandiwali')
-                || ($password === 'password')
-                || ($password === '123456')
-                || ($guru && $guru->nip && $password === $guru->nip);
+                || ($isLocalEnv && in_array($password, ['sandiwali', 'password', '123456'], true))
+                || ($isLocalEnv && $guru && !empty($guru->nip) && $password === $guru->nip);
 
             if ($isPasswordValid) {
                 Auth::login($user, $request->boolean('remember'));

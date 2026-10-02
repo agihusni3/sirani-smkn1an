@@ -157,7 +157,7 @@ class PeringkatController extends Controller
             elseif ($st === 'terlambat') $statsByPemilik[$pid]['terlambat']++;
             elseif ($st === 'izin') $statsByPemilik[$pid]['izin']++;
             elseif ($st === 'sakit') $statsByPemilik[$pid]['sakit']++;
-            elseif ($st === 'dispensasi') $statsByPemilik[$pid]['dispensasi']++;
+            elseif ($st === 'dispensasi' || $st === 'dispen') $statsByPemilik[$pid]['dispensasi']++;
             elseif ($st === 'alpha' || $st === 'alfa') $statsByPemilik[$pid]['alpha']++;
             elseif ($st === 'bolos') $statsByPemilik[$pid]['bolos']++;
 
@@ -354,9 +354,9 @@ class PeringkatController extends Controller
 
             if ($st === 'hadir') $statsByPemilik[$pid]['hadir_tepat']++;
             elseif ($st === 'terlambat') $statsByPemilik[$pid]['terlambat']++;
-            elseif ($st === 'izin') $statsByPemilik[$pid]['izin']++;
+            elseif ($st === 'izin' || $st === 'cuti') $statsByPemilik[$pid]['izin']++;
             elseif ($st === 'sakit') $statsByPemilik[$pid]['sakit']++;
-            elseif ($st === 'dinas_luar' || $st === 'dispensasi') $statsByPemilik[$pid]['dinas_luar']++;
+            elseif ($st === 'dinas_luar' || $st === 'dispensasi' || $st === 'dispen') $statsByPemilik[$pid]['dinas_luar']++;
             elseif ($st === 'alpha' || $st === 'alfa') $statsByPemilik[$pid]['alpha']++;
 
             if (!empty($rec->jam_masuk)) {

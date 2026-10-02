@@ -54,6 +54,18 @@ class DeployController extends Controller
             return $this->fixSiswa();
         }
 
+        // Pengamanan: Jangan izinkan eksekusi shell git pull / build melalui HTTP GET biasa
+        // Deploy mutasi server WAJIB menggunakan HTTP POST
+        if ($request->isMethod('GET') && !$request->filled('action')) {
+            return response()->json([
+                'status'      => 'ready',
+                'message'     => 'SIRANI Webhook aktif dan terotentikasi. Gunakan HTTP POST untuk memicu deploy server.',
+                'server_time' => now()->toDateTimeString(),
+            ]);
+        }
+
+        Log::info('Deploy webhook diterima & divalidasi dari IP ' . $request->ip());
+
         @set_time_limit(300);
         @ini_set('max_execution_time', '300');
 

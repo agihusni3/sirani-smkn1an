@@ -83,7 +83,8 @@ class PushSubscriptionController extends Controller
     {
         $endpoint = trim($request->input('endpoint') ?: '');
         $nisn = trim($request->input('nisn') ?: '');
-        $delay = min(15, max(0, (int) $request->input('delay', 5)));
+        // Batasi delay maksimal 3 detik agar tidak membebani pool worker PHP-FPM server
+        $delay = min(3, max(0, (int) $request->input('delay', 3)));
 
         $sub = null;
         if ($endpoint) {

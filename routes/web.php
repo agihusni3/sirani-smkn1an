@@ -78,8 +78,8 @@ Route::middleware('track.visitor')->group(function () {
 
 
 
-// Monitoring Absen Mandiri Siswa & Orang Tua (Dilindungi Rate Limiting)
-Route::middleware('throttle:300,1')->group(function () {
+// Monitoring Absen Mandiri Siswa & Orang Tua (Dilindungi Rate Limiting ketat anti-scraping)
+Route::middleware('throttle:120,1')->group(function () {
     Route::get('/monitoring-absen', [PortalOrtuController::class, 'index'])->name('monitoring.absen');
     Route::post('/monitoring-absen', [PortalOrtuController::class, 'index'])->name('monitoring.absen.cari');
     Route::get('/monitoring-absen/{nisn}', [PortalOrtuController::class, 'detail'])->name('monitoring.absen.detail');
@@ -147,9 +147,9 @@ Route::get('/qr/{type}/{id}', [\App\Http\Controllers\Sirani\RfidController::clas
     ->where('type', 'guru|siswa')
     ->name('qr.download');
 
-// Autentikasi (Login & Logout - Proteksi Anti Brute Force)
+// Autentikasi (Login & Logout - Proteksi Anti Brute Force Ketat)
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
-Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:60,1');
+Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:10,1');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 use App\Http\Controllers\Core\AdminPortalController;
