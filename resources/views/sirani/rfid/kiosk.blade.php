@@ -405,9 +405,27 @@
   }
 
   // Process RFID / Barcode input
+  let isProcessingScan = false;
+  let lastScannedCode = '';
+  let lastScannedTime = 0;
+
   async function processCode(code) {
     const cleanCode = code.trim();
     if (!cleanCode || cleanCode.length < 3) return;
+
+    const now = Date.now();
+    // Cegah double scan kartu yang sama persis dalam 3 detik
+    if (cleanCode === lastScannedCode && (now - lastScannedTime) < 3000) {
+      return;
+    }
+
+    if (isProcessingScan) {
+      return;
+    }
+
+    isProcessingScan = true;
+    lastScannedCode = cleanCode;
+    lastScannedTime = now;
 
     const ind = document.getElementById('scannerStatus');
     if (ind) ind.innerHTML = '<span class="pulse-dot" style="background:var(--cyan);"></span><span>MEMPROSES DATA PRESENSI...</span>';
@@ -436,6 +454,7 @@
       });
       fetchMonitorFeed();
     } finally {
+      isProcessingScan = false;
       if (ind) ind.innerHTML = '<span class="pulse-dot"></span><span>PEMINDAI SIAP MENERIMA INPUT</span>';
       focusScanner();
     }
@@ -1151,11 +1170,14 @@
     rfidInputEl.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') {
         e.preventDefault();
+        e.stopPropagation();
+        clearTimeout(scannerTimeout);
         const val = rfidInputEl.value.trim();
+        rfidInputEl.value = '';
+        scannerBuffer = '';
         if (val.length >= 3) {
           processCode(val);
         }
-        rfidInputEl.value = '';
       }
     });
     rfidInputEl.addEventListener('input', () => {
@@ -1164,10 +1186,11 @@
       scannerTimeout = setTimeout(() => {
         const val = rfidInputEl.value.trim();
         if (val.length >= 3) {
-          processCode(val);
           rfidInputEl.value = '';
+          scannerBuffer = '';
+          processCode(val);
         }
-      }, 120);
+      }, 150);
     });
   }
 
@@ -1187,15 +1210,12 @@
 
     // Enter key: proses buffer atau submit dari rfidInput
     if (e.key === 'Enter') {
-      if (scannerBuffer.length >= 3) {
-        processCode(scannerBuffer);
-        scannerBuffer = '';
-      } else if (activeTag === 'input' && document.activeElement?.id === 'rfidInput') {
-        const val = document.getElementById('rfidInput')?.value?.trim();
-        if (val && val.length >= 3) {
-          processCode(val);
-          document.getElementById('rfidInput').value = '';
-        }
+      clearTimeout(scannerTimeout);
+      const codeToProcess = scannerBuffer.length >= 3 ? scannerBuffer : (activeTag === 'input' && document.activeElement?.id === 'rfidInput' ? document.getElementById('rfidInput')?.value?.trim() : '');
+      scannerBuffer = '';
+      if (document.getElementById('rfidInput')) document.getElementById('rfidInput').value = '';
+      if (codeToProcess && codeToProcess.length >= 3) {
+        processCode(codeToProcess);
       }
       return;
     }
@@ -1227,10 +1247,12 @@
     clearTimeout(scannerTimeout);
     scannerTimeout = setTimeout(() => {
       if (scannerBuffer.length >= 3) {
-        processCode(scannerBuffer);
+        const toSend = scannerBuffer;
+        scannerBuffer = '';
+        if (document.getElementById('rfidInput')) document.getElementById('rfidInput').value = '';
+        processCode(toSend);
       }
-      scannerBuffer = '';
-    }, 80);
+    }, 150);
   });
 
   document.addEventListener('DOMContentLoaded', () => {

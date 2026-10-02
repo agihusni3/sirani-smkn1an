@@ -29,7 +29,8 @@ class RfidScanService
         $res = $this->executeScanRfid($uid, $device);
 
         // Jika pemindaian gagal, ditolak, atau di luar ketentuan operasional, catat ke log pantau gagal hari ini
-        if (!$res['success'] || in_array($res['type'] ?? '', ['belum_waktunya_pulang', 'di_luar_jam_operasional', 'jam_tutup_terlewat', 'kartu_tidak_dikenal', 'siswa_nonaktif', 'guru_nonaktif', 'tanpa_jam_masuk', 'verifikasi_piket', 'invalid_input'])) {
+        // Catatan: 'belum_waktunya_pulang' BUKAN kegagalan scan (siswa sudah hadir pagi), sehingga tidak dimasukkan ke log gagal
+        if (!$res['success'] || in_array($res['type'] ?? '', ['di_luar_jam_operasional', 'jam_tutup_terlewat', 'kartu_tidak_dikenal', 'siswa_nonaktif', 'guru_nonaktif', 'tanpa_jam_masuk', 'verifikasi_piket', 'invalid_input'])) {
             static::recordFailedScan($uid, $res);
         }
 
@@ -112,6 +113,13 @@ class RfidScanService
             $today = Carbon::today()->toDateString();
             $list = \Illuminate\Support\Facades\Cache::get('rfid_failed_scans_' . $today, []);
             if (!is_array($list)) return [];
+
+            // Filter out pemindaian yang sebenarnya bukan gagal (seperti belum waktunya pulang saat siswa sudah hadir)
+            $list = array_values(array_filter($list, function ($item) {
+                if (!is_array($item)) return false;
+                $type = $item['type'] ?? '';
+                return $type !== 'belum_waktunya_pulang' && $type !== 'cooldown_double_scan';
+            }));
 
             return array_map(function ($item) {
                 if (!is_array($item)) return $item;
@@ -599,11 +607,12 @@ class RfidScanService
                     $selisihDetik = $now->diffInRealSeconds($jamPulangJadwal);
                     $selisihMenit = max(1, (int) ceil($selisihDetik / 60));
                     $menitLabel = $selisihMenit === 1 ? 'kurang 1 menit lagi' : "kurang {$selisihMenit} menit lagi";
+                    $pesanWaktu = "Anda sudah presensi masuk pukul " . substr($absensi->jam_masuk, 0, 5) . " WIB. Kepulangan dimulai pukul " . substr($jamPulangMulai, 0, 5) . " WIB ({$menitLabel}).";
                     return [
                         'success' => true,
                         'status'  => 'info',
                         'type'    => 'belum_waktunya_pulang',
-                        'message' => "Kepulangan dimulai pukul " . substr($jamPulangMulai, 0, 5) . " WIB ({$menitLabel}).",
+                        'message' => $pesanWaktu,
                         'data'    => $formatProfileData('sudah_masuk', $absensi->jam_masuk, $absensi->jam_masuk, null, 'SUDAH MASUK'),
                     ];
                 }
