@@ -382,28 +382,41 @@
     } catch (e) {}
   }
 
-  // Process RFID / Barcode input
-  let isProcessingScan = false;
+  // ── Antrean Pemrosesan Scan RFID / Barcode (Anti-Drop Concurrency) ──
+  const scanQueue = [];
+  let isQueueRunning = false;
   let lastScannedCode = '';
   let lastScannedTime = 0;
 
-  async function processCode(code) {
-    const cleanCode = code.trim();
+  function processCode(code) {
+    const cleanCode = (code || '').trim();
     if (!cleanCode || cleanCode.length < 3) return;
 
     const now = Date.now();
-    // Cegah double scan kartu yang sama persis dalam 3 detik
-    if (cleanCode === lastScannedCode && (now - lastScannedTime) < 3000) {
+    // Cegah double scan kartu yang sama persis dalam 2.5 detik (menghindari duplikasi tap fisik oleh siswa yang sama)
+    if (cleanCode === lastScannedCode && (now - lastScannedTime) < 2500) {
       return;
     }
 
-    if (isProcessingScan) {
+    // Hindari memasukkan kode yang identik ke antrean jika sedang menunggu diproses
+    if (scanQueue.some(item => item.code === cleanCode)) {
       return;
     }
 
-    isProcessingScan = true;
+    // Masukkan ke antrean serial FIFO
+    scanQueue.push({ code: cleanCode, time: now });
+    runScanQueue();
+  }
+
+  async function runScanQueue() {
+    if (isQueueRunning) return;
+    if (scanQueue.length === 0) return;
+
+    isQueueRunning = true;
+    const item = scanQueue.shift();
+    const cleanCode = item.code;
     lastScannedCode = cleanCode;
-    lastScannedTime = now;
+    lastScannedTime = item.time;
 
     const ind = document.getElementById('scannerStatus');
     if (ind) ind.innerHTML = '<span class="pulse-dot" style="background:var(--cyan);"></span><span>MEMPROSES DATA PRESENSI...</span>';
@@ -432,9 +445,16 @@
       });
       fetchMonitorFeed();
     } finally {
-      isProcessingScan = false;
-      if (ind) ind.innerHTML = '<span class="pulse-dot"></span><span>PEMINDAI SIAP MENERIMA INPUT</span>';
+      isQueueRunning = false;
+      if (ind && scanQueue.length === 0) {
+        ind.innerHTML = '<span class="pulse-dot"></span><span>PEMINDAI SIAP MENERIMA INPUT</span>';
+      }
       focusScanner();
+
+      // Jika masih ada kartu dalam antrean, segera jalankan proses berikutnya
+      if (scanQueue.length > 0) {
+        runScanQueue();
+      }
     }
   }
 

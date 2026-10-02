@@ -161,7 +161,15 @@ class RfidScanService
         // ── PARAMETER 1: Sanitasi & Normalisasi Input Barcode / RFID ──
         // Bersihkan whitespace, kontrol karakter ASCII, dan prefix/suffix bawaan scanner USB
         $cleanUid = preg_replace('/[[:^print:]]/', '', trim($uid));
-        $cleanUid = preg_replace('/^\][a-zA-Z0-9]{2}/', '', $cleanUid); // Strip AIM Code Identifier jika ada
+        // Jika input berupa tautan URL (misal scan QR dari layar HP siswa/ortu)
+        if (str_contains($cleanUid, '://') || str_contains($cleanUid, '/')) {
+            if (preg_match('#/(?:portal-siswa|kartu-digital|kartu-digital-guru|presensi-siswa|cek-presensi|qr/[a-z]+)/([a-zA-Z0-9_-]+)#i', $cleanUid, $urlMatch)) {
+                $cleanUid = $urlMatch[1];
+            } elseif (preg_match('#[?&](?:nisn|uid|nis|keyword|id)=([a-zA-Z0-9_-]+)#i', $cleanUid, $urlMatch)) {
+                $cleanUid = $urlMatch[1];
+            }
+        }
+
         $cleanUid = strtoupper(trim($cleanUid));
 
         if (empty($cleanUid)) {
@@ -179,12 +187,14 @@ class RfidScanService
         $today = $now->toDateString();
         $timeNow = $now->format('H:i:s');
 
-            // ── PARAMETER 2: Identifikasi Pemilik (RFID UID -> NISN Siswa -> NIS Siswa -> NIP Guru) ──
-            $cleanUidVariants = array_values(array_unique(array_filter([
-                $cleanUid,
-                ltrim($cleanUid, '0'),
-                ctype_digit($cleanUid) ? str_pad($cleanUid, 10, '0', STR_PAD_LEFT) : null,
-            ])));
+        // ── PARAMETER 2: Identifikasi Pemilik (RFID UID -> NISN Siswa -> NIS Siswa -> NIP Guru) ──
+        $cleanUidVariants = array_values(array_unique(array_filter([
+            $cleanUid,
+            strtoupper($cleanUid),
+            strtolower($cleanUid),
+            ltrim($cleanUid, '0'),
+            ctype_digit($cleanUid) ? str_pad($cleanUid, 10, '0', STR_PAD_LEFT) : null,
+        ])));
 
             $kartu = KartuRfid::whereIn('uid', $cleanUidVariants)->where('status', 'aktif')->first();
 
@@ -268,10 +278,11 @@ class RfidScanService
                     ];
                 }
 
-                $rombelNama = $person->siswaRombels->first()?->rombel?->nama_rombel ?? 'Siswa';
+                $activeSr = $person->siswaRombels->first() ?? $person->siswaRombels()->latest()->with('rombel')->first();
+                $rombelNama = $activeSr?->rombel?->nama_rombel ?? 'Siswa';
                 $identitas = 'NISN: ' . ($person->nisn ?: '-');
                 $rombelOrJabatan = $rombelNama;
-                $srId = $person->siswaRombels->first()?->id;
+                $srId = $activeSr?->id;
             } else {
                 $person = Guru::find($id);
 
@@ -292,7 +303,7 @@ class RfidScanService
             }
 
             // Helper terpusat untuk membungkus profil lengkap dari orang yang di-scan
-            $formatProfileData = function ($status, $jam = null, $jamMasuk = null, $jamPulang = null, $statusLabel = null) use ($person, $type, $rombelOrJabatan, $identitas, $timeNow) {
+            $formatProfileData = function ($status, $jam = null, $jamMasuk = null, $jamPulang = null, $statusLabel = null) use ($person, $type, $rombelOrJabatan, $identitas, $timeNow, $activeSr) {
                 $jurusan = null;
                 $nisn = null;
                 $nis = null;
@@ -300,7 +311,7 @@ class RfidScanService
                 $noHpOrtu = null;
 
                 if ($type === 'siswa') {
-                    $sr = $person->siswaRombels->first();
+                    $sr = $activeSr ?? $person->siswaRombels->first();
                     $jurusan = $sr?->rombel?->jurusan?->nama_jurusan ?? ($sr?->rombel?->nama_rombel ?? '-');
                     $nisn = $person->nisn;
                     $nis = $person->nis;
@@ -460,29 +471,29 @@ class RfidScanService
 
             // ── SCENARIO A: Perekaman Presensi Masuk (Pertama Kali di Hari Ini) ──
             if (!$absensi) {
-                // Jika scan pertama kali terjadi setelah jam 12:00 siang (tidak pernah absen pagi)
-                if ($timeNow >= '12:00:00') {
-                    if ($timeNow >= $jamPulangMulai) {
-                        return [
-                            'success' => false,
-                            'status'  => 'warning',
-                            'type'    => 'tanpa_jam_masuk',
-                            'message' => "Presensi pulang ditolak karena tidak ada rekaman presensi masuk pagi ini.",
-                            'data'    => [
-                                'nama'                => $person->nama,
-                                'tipe'                => $type,
-                                'sub'                 => $rombelOrJabatan,
-                                'identitas'           => $identitas,
-                                'rombel_atau_jabatan' => $rombelOrJabatan,
-                                'foto'                => $person->foto_url,
-                                'foto_url'            => $person->foto_url,
-                                'status'              => 'ditolak',
-                                'jam'                 => $timeNow,
-                            ]
-                        ];
-                    }
+                // Jika waktu scan sudah melewati jam mulai pulang (misal kepulangan hari Jumat 11:10 atau reguler 14:30)
+                if ($timeNow >= $jamPulangMulai) {
+                    return [
+                        'success' => false,
+                        'status'  => 'warning',
+                        'type'    => 'tanpa_jam_masuk',
+                        'message' => "Presensi pulang ditolak karena tidak ada rekaman presensi masuk pagi ini.",
+                        'data'    => [
+                            'nama'                => $person->nama,
+                            'tipe'                => $type,
+                            'sub'                 => $rombelOrJabatan,
+                            'identitas'           => $identitas,
+                            'rombel_atau_jabatan' => $rombelOrJabatan,
+                            'foto'                => $person->foto_url,
+                            'foto_url'            => $person->foto_url,
+                            'status'              => 'ditolak',
+                            'jam'                 => $timeNow,
+                        ]
+                    ];
+                }
 
-                    // Jam 12:00 - jamPulangMulai:
+                // Jika scan pertama kali terjadi setelah jam 12:00 siang (sebelum jam pulang sekolah)
+                if ($timeNow >= '12:00:00') {
                     return [
                         'success' => false,
                         'status'  => 'warning',

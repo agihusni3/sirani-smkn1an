@@ -58,15 +58,21 @@ class JadwalHariIni extends Model
         // Cek apakah tanggal ini berada dalam Mode Ujian (STS / Ujian Sekolah)
         $modeUjian = ModeUjian::getModeAktif($dateStr);
         if ($modeUjian) {
-            return self::create([
-                'tanggal'             => $dateStr,
-                'jam_masuk_toleransi' => $modeUjian->jam_masuk_toleransi,
-                'jam_pulang_mulai'   => $modeUjian->jam_pulang_mulai,
-                'jam_tutup_gerbang'   => $modeUjian->jam_tutup_gerbang,
-                'keterangan'          => "Pekan Ujian: {$modeUjian->nama_ujian}",
-                'diubah_oleh'         => "Mode Ujian Terintegrasi ({$modeUjian->nama_ujian})",
-                'is_sesi_buka'        => true,
-            ]);
+            try {
+                return self::create([
+                    'tanggal'             => $dateStr,
+                    'jam_masuk_toleransi' => $modeUjian->jam_masuk_toleransi,
+                    'jam_pulang_mulai'   => $modeUjian->jam_pulang_mulai,
+                    'jam_tutup_gerbang'   => $modeUjian->jam_tutup_gerbang,
+                    'keterangan'          => "Pekan Ujian: {$modeUjian->nama_ujian}",
+                    'diubah_oleh'         => "Mode Ujian Terintegrasi ({$modeUjian->nama_ujian})",
+                    'is_sesi_buka'        => true,
+                ]);
+            } catch (\Throwable $e) {
+                $existing = self::where('tanggal', $dateStr)->first();
+                if ($existing) return $existing;
+                throw $e;
+            }
         }
 
         // Ambil konfigurasi jam operasional mingguan jika ada (Senin - Jumat)
@@ -95,15 +101,21 @@ class JadwalHariIni extends Model
             $ket = $isJumat ? 'Jadwal Hari Jumat (Pulang Cepat)' : 'Jadwal Reguler';
         }
 
-        return self::create([
-            'tanggal' => $dateStr,
-            'jam_masuk_toleransi' => $jamMasuk,
-            'jam_pulang_mulai' => $jamPulang,
-            'jam_tutup_gerbang' => $jamTutup,
-            'keterangan' => $ket,
-            'diubah_oleh' => "Sistem Otomatis (Template {$namaHari})",
-            'is_sesi_buka' => true,
-        ]);
+        try {
+            return self::create([
+                'tanggal' => $dateStr,
+                'jam_masuk_toleransi' => $jamMasuk,
+                'jam_pulang_mulai' => $jamPulang,
+                'jam_tutup_gerbang' => $jamTutup,
+                'keterangan' => $ket,
+                'diubah_oleh' => "Sistem Otomatis (Template {$namaHari})",
+                'is_sesi_buka' => true,
+            ]);
+        } catch (\Throwable $e) {
+            $existing = self::where('tanggal', $dateStr)->first();
+            if ($existing) return $existing;
+            throw $e;
+        }
     }
 
 
