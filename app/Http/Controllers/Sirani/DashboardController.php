@@ -166,8 +166,8 @@ class DashboardController extends Controller
             ->selectRaw("tanggal,
                 SUM(CASE WHEN status = 'hadir' THEN 1 ELSE 0 END) as hadir,
                 SUM(CASE WHEN status = 'terlambat' THEN 1 ELSE 0 END) as terlambat,
-                SUM(CASE WHEN status IN ('sakit', 'izin') THEN 1 ELSE 0 END) as izin,
-                SUM(CASE WHEN status = 'alpha' THEN 1 ELSE 0 END) as alpha,
+                SUM(CASE WHEN status IN ('sakit', 'izin', 'dispen', 'dispensasi', 'cuti') THEN 1 ELSE 0 END) as izin,
+                SUM(CASE WHEN status IN ('alpha', 'alfa') THEN 1 ELSE 0 END) as alpha,
                 SUM(CASE WHEN status = 'bolos' THEN 1 ELSE 0 END) as bolos")
             ->groupBy('tanggal')
             ->get()
@@ -423,8 +423,8 @@ class DashboardController extends Controller
                         ->selectRaw("tanggal,
                             SUM(CASE WHEN status = 'hadir' THEN 1 ELSE 0 END) as hadir,
                             SUM(CASE WHEN status = 'terlambat' THEN 1 ELSE 0 END) as terlambat,
-                            SUM(CASE WHEN status IN ('sakit', 'izin') THEN 1 ELSE 0 END) as izin,
-                            SUM(CASE WHEN status = 'alpha' THEN 1 ELSE 0 END) as alpha,
+                            SUM(CASE WHEN status IN ('sakit', 'izin', 'dispen', 'dispensasi', 'cuti') THEN 1 ELSE 0 END) as izin,
+                            SUM(CASE WHEN status IN ('alpha', 'alfa') THEN 1 ELSE 0 END) as alpha,
                             SUM(CASE WHEN status = 'bolos' THEN 1 ELSE 0 END) as bolos")
                         ->groupBy('tanggal')
                         ->get()

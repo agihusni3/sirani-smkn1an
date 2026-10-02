@@ -185,7 +185,7 @@ class GuruPiketController extends Controller
             ->count();
 
         // Flag: apakah sudah melewati jam tutup gerbang (17:00:00)
-        $jamTutupGerbang   = $jadwal->jam_tutup_gerbang ?? '17:00:00';
+        $jamTutupGerbang   = $jadwal?->jam_tutup_gerbang ?? '17:00:00';
         $sudahLewatJamTutup = $now->format('H:i:s') >= $jamTutupGerbang;
 
 
@@ -645,7 +645,11 @@ class GuruPiketController extends Controller
             $filePath = $request->file('file_pendukung')->store('surat_izin/siswa', 'public');
         }
 
-        $siswaRombel = $siswa->siswaRombels->where('status_keanggotaan', 'aktif')->first();
+        $taAktif = TahunAjaran::where('is_active', true)->first();
+        $siswaRombel = $siswa->siswaRombels()
+            ->where('status_keanggotaan', 'aktif')
+            ->when($taAktif, fn($q) => $q->where('tahun_ajaran_id', $taAktif->id))
+            ->first();
         $siswaRombelId = $siswaRombel?->id;
 
         if (in_array($status, ['alpha', 'sakit', 'izin', 'dispen', 'dispensasi'])) {

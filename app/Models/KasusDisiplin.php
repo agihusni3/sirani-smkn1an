@@ -135,7 +135,7 @@ class KasusDisiplin extends Model
         $stats = Absensi::where('pemilik_type', 'siswa')
             ->where('pemilik_id', $siswaId)
             ->selectRaw("
-                SUM(CASE WHEN status = 'alpha' THEN 1 ELSE 0 END) as total_alpha,
+                SUM(CASE WHEN status IN ('alpha', 'alfa') THEN 1 ELSE 0 END) as total_alpha,
                 SUM(CASE WHEN status = 'bolos' THEN 1 ELSE 0 END) as total_bolos,
                 SUM(CASE WHEN status = 'terlambat' THEN 1 ELSE 0 END) as total_terlambat
             ")->first();

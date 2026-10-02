@@ -95,7 +95,8 @@ class PresensiManualController extends Controller
             }
 
             // Evaluasi status berdasarkan toleransi jam masuk
-            $batasJamMasuk = Carbon::parse($today . ' ' . $jadwal->jam_masuk_toleransi);
+            $toleransiMasuk = $jadwal?->jam_masuk_toleransi ?? $jadwal?->jam_masuk_selesai ?? '07:15:00';
+            $batasJamMasuk = Carbon::parse($today . ' ' . $toleransiMasuk);
             $status = $now->lte($batasJamMasuk) ? 'hadir' : 'terlambat';
 
             // Cari siswa_rombel_id jika siswa

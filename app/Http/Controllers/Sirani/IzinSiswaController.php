@@ -126,6 +126,15 @@ class IzinSiswaController extends Controller
         if ($izin->file_pendukung && Storage::disk('public')->exists($izin->file_pendukung)) {
             Storage::disk('public')->delete($izin->file_pendukung);
         }
+
+        // Hapus juga record absensi otomatis yang dibuat dari izin ini jika belum ada rekaman jam masuk
+        Absensi::where('pemilik_type', 'siswa')
+            ->where('pemilik_id', $izin->siswa_id)
+            ->where('tanggal', $izin->tanggal)
+            ->where('sumber_absen', 'manual_izin_piket')
+            ->whereNull('jam_masuk')
+            ->delete();
+
         $izin->delete();
 
         return redirect()->back()->with('success', 'Catatan perizinan siswa berhasil dihapus.');
@@ -137,6 +146,15 @@ class IzinSiswaController extends Controller
         if ($izin->file_pendukung && Storage::disk('public')->exists($izin->file_pendukung)) {
             Storage::disk('public')->delete($izin->file_pendukung);
         }
+
+        // Hapus juga record absensi otomatis yang dibuat dari izin ini jika belum ada rekaman jam masuk
+        Absensi::where('pemilik_type', 'guru')
+            ->where('pemilik_id', $izin->guru_id)
+            ->where('tanggal', $izin->tanggal)
+            ->where('sumber_absen', 'manual_izin_piket')
+            ->whereNull('jam_masuk')
+            ->delete();
+
         $izin->delete();
 
         return redirect()->back()->with('success', 'Catatan perizinan guru berhasil dihapus.');
