@@ -558,6 +558,7 @@ Route::middleware('auth')->group(function () {
     Route::middleware('role:admin,kepala_sekolah,waka_kesiswaan,waka_kurikulum,waka_sarpras,waka_hubin,kaprog,kepala_bengkel,pustakawan,guru_bk,wali_kelas,staf_tu,guru')->group(function () {
         Route::get('/siswa', [SiswaController::class, 'index'])->name('siswa.index');
         Route::get('/siswa/export', [SiswaController::class, 'export'])->name('siswa.export');
+        Route::get('/siswa/export-barcode', [SiswaController::class, 'exportBarcode'])->name('siswa.export-barcode');
         Route::get('/siswa/template-csv', [SiswaController::class, 'downloadTemplate'])->name('siswa.template-csv');
         Route::get('/siswa/cetak-pdf', [SiswaController::class, 'cetakPdf'])->name('siswa.cetak-pdf');
         Route::get('/siswa/{id}/surat-bebas-masalah', [SuratKesiswaanController::class, 'cetakSuratBebasMasalah'])->name('siswa.surat-bebas-masalah');
@@ -645,6 +646,7 @@ Route::middleware('auth')->group(function () {
     Route::middleware('role:admin,staf_tu')->group(function () {
         Route::get('/kartu-rfid', [\App\Http\Controllers\Sirani\RfidController::class, 'index'])->name('rfid.index');
         Route::get('/kartu-rfid/cetak', [\App\Http\Controllers\Sirani\RfidController::class, 'cetak'])->name('rfid.cetak');
+        Route::get('/kartu-rfid/export-barcode', [\App\Http\Controllers\Sirani\SiswaController::class, 'exportBarcode'])->name('rfid.export-barcode');
         Route::get('/kartu-rfid/broadcast-recipients', [\App\Http\Controllers\Sirani\RfidController::class, 'getBroadcastRecipients'])->name('rfid.broadcast.recipients');
         Route::post('/kartu-rfid/broadcast-wa', [\App\Http\Controllers\Sirani\RfidController::class, 'broadcastWa'])->name('rfid.broadcast.wa');
         Route::get('/manajemen-rfid', [\App\Http\Controllers\Sirani\RfidController::class, 'index']);

@@ -77,6 +77,9 @@
           <a href="/siswa/export" class="btn-situan btn-situan-outline" title="Unduh CSV Kompatibel Excel">
             <i class="bi bi-file-earmark-excel-fill" style="color:#10b981;"></i> Excel
           </a>
+          <a href="/siswa/export-barcode{{ !empty($rombelId) ? '?rombel_id='.$rombelId : '' }}" id="btnTopExportBarcode" onclick="return handleTopExportBarcodeClick(this, event)" target="_blank" class="btn-situan btn-situan-outline" title="Export & Cetak Lembar Barcode (NISN | Nama | Barcode)">
+            <i class="bi bi-upc-scan" style="color:#0284c7;"></i> Barcode
+          </a>
           <a href="/siswa/cetak-pdf{{ !empty($rombelId) ? '?rombel_id='.$rombelId : '' }}" id="btnTopCetakPdf" onclick="return handleTopCetakPdfClick(this, event)" target="_blank" class="btn-situan btn-situan-outline" title="Cetak Format A4 Kop Dinas">
             <i class="bi bi-file-earmark-pdf-fill" style="color:#ef4444;"></i> PDF <span id="topSelectedBadge" style="display:none; background:#000000; color:#FFFFFF; border-radius:10px; padding:1px 6px; font-size:10px; font-family:monospace; margin-left:2px;">0</span>
           </a>
@@ -1370,6 +1373,17 @@
     if (ids.length > 0) {
       event.preventDefault();
       submitCetakPdfSelected();
+      return false;
+    }
+    return true;
+  }
+
+  function handleTopExportBarcodeClick(anchor, event) {
+    const ids = getSelectedSiswaIds();
+    if (ids.length > 0) {
+      event.preventDefault();
+      const url = '/siswa/export-barcode?ids=' + encodeURIComponent(ids.join(','));
+      window.open(url, '_blank');
       return false;
     }
     return true;

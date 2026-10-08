@@ -592,6 +592,104 @@ class SiswaController extends Controller
     }
 
     /**
+     * Export & Cetak Barcode Siswa Resmi (Format: NISN | Nama Siswa | Barcode).
+     */
+    public function exportBarcode(Request $request)
+    {
+        $currentUser = auth()->user();
+        $isWaliOnly = $currentUser && $currentUser->isWaliKelas() && !$currentUser->isAdmin() && !$currentUser->isWakaKesiswaan() && !$currentUser->isGuruBk();
+        $waliRombelIds = $isWaliOnly ? $currentUser->getWaliRombelIds() : [];
+
+        $rombelId = $request->query('rombel_id');
+        $ids = $request->query('ids') ?: $request->input('ids');
+        $layout = $request->query('layout', 'tabel'); // 'tabel' atau 'grid'
+        $selectedIds = [];
+        if (!empty($ids)) {
+            $selectedIds = is_array($ids) ? $ids : array_filter(explode(',', $ids));
+        }
+
+        $query = Siswa::whereIn('status', ['aktif', 'pkl'])->with(['siswaRombels' => function($q) {
+            $q->where('status_keanggotaan', 'aktif')->with('rombel.jurusan');
+        }]);
+
+        $rombel = null;
+        if (!empty($selectedIds)) {
+            $query->whereIn('id', $selectedIds);
+            if ($isWaliOnly) {
+                $rombels = Rombel::whereIn('id', $waliRombelIds)->orderBy('nama_rombel')->get();
+            } else {
+                $rombels = Rombel::orderBy('nama_rombel')->get();
+            }
+        } elseif ($isWaliOnly) {
+            $effectiveRombelId = $rombelId && in_array($rombelId, $waliRombelIds) ? $rombelId : ($waliRombelIds[0] ?? null);
+            if ($effectiveRombelId) {
+                $rombel = Rombel::with('jurusan')->find($effectiveRombelId);
+                $query->whereHas('siswaRombels', fn($q) => $q->where('rombel_id', $effectiveRombelId)->where('status_keanggotaan', 'aktif'));
+            }
+            $rombels = Rombel::whereIn('id', $waliRombelIds)->orderBy('nama_rombel')->get();
+        } else {
+            if ($rombelId) {
+                $rombel = Rombel::with('jurusan')->find($rombelId);
+                $query->whereHas('siswaRombels', fn($q) => $q->where('rombel_id', $rombelId)->where('status_keanggotaan', 'aktif'));
+            }
+            $rombels = Rombel::orderBy('nama_rombel')->get();
+        }
+
+        // Urutkan berjenjang: Kelas kemudian Nama Siswa
+        $siswas = $query->get()->sort(function ($a, $b) {
+            $rombelA = $a->siswaRombels->first()?->rombel?->nama_rombel ?? '';
+            $rombelB = $b->siswaRombels->first()?->rombel?->nama_rombel ?? '';
+            $cmp = strcasecmp($rombelA, $rombelB);
+            if ($cmp !== 0) return $cmp;
+            return strcasecmp($a->nama, $b->nama);
+        })->values();
+
+        // Opsi Ekspor CSV Data Barcode
+        if ($request->query('download') === 'csv') {
+            $fileName = 'export_barcode_siswa_' . ($rombel ? preg_replace('/[^a-zA-Z0-9_-]/', '_', $rombel->nama_rombel) : 'semua') . '_' . date('Ymd_His') . '.csv';
+            $headers = [
+                "Content-type"        => "text/csv; charset=UTF-8",
+                "Content-Disposition" => "attachment; filename=$fileName",
+                "Pragma"              => "no-cache",
+                "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
+                "Expires"             => "0"
+            ];
+            $callback = function () use ($siswas) {
+                $file = fopen('php://output', 'w');
+                fprintf($file, chr(0xEF).chr(0xBB).chr(0xBF));
+                fwrite($file, "sep=;\n");
+                fputcsv($file, ['No', 'NISN', 'Nama Siswa', 'Barcode Scan Value', 'Kelas / Rombel'], ';');
+                foreach ($siswas as $idx => $s) {
+                    $rNama = $s->siswaRombels->first()?->rombel?->nama_rombel ?? '-';
+                    $valBarcode = !empty($s->nisn) ? $s->nisn : ($s->nis ?: (string)$s->id);
+                    fputcsv($file, [
+                        $idx + 1,
+                        $s->nisn ? '="' . $s->nisn . '"' : '-',
+                        $s->nama,
+                        '="' . $valBarcode . '"',
+                        $rNama
+                    ], ';');
+                }
+                fclose($file);
+            };
+            return response()->stream($callback, 200, $headers);
+        }
+
+        $sekolah = \App\Models\PengaturanSekolah::getAktif();
+
+        return view('situan.siswa.export_barcode', compact(
+            'siswas',
+            'rombel',
+            'rombelId',
+            'rombels',
+            'sekolah',
+            'isWaliOnly',
+            'selectedIds',
+            'layout'
+        ));
+    }
+
+    /**
      * Unduh Template CSV Format Siswa Resmi (Standar Dapodik & SIRANI).
      */
     public function downloadTemplate()
