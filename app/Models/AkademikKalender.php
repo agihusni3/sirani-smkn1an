@@ -52,6 +52,14 @@ class AkademikKalender extends Model
             'pekan_efektif' => $efektif,
             'pekan_cadangan' => $cadangan,
         ]);
+
+        // Otomatis sinkronkan ketetapan RPE ke seluruh dokumen Perangkat Ajar pada TA & Semester yang bersangkutan
+        \App\Models\AkademikPerangkatAjar::where('tahun_ajaran_id', $this->tahun_ajaran_id)
+            ->where('semester', $this->semester)
+            ->update([
+                'rpe_pekan_efektif' => $efektif,
+                'rpe_pekan_cadangan' => $cadangan,
+            ]);
     }
 
     /**

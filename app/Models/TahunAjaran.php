@@ -28,6 +28,14 @@ class TahunAjaran extends Model
     }
 
     /**
+     * Alias atribut nama ke tahun_ajaran agar kompatibel di seluruh modul
+     */
+    public function getTahunAjaranAttribute(): string
+    {
+        return (string) ($this->nama ?? '');
+    }
+
+    /**
      * Cek apakah tahun ajaran ini sudah lewat / lampau dibanding tahun ajaran aktif saat ini.
      * Jika lampau, statusnya terkunci sebagai Arsip / Histori.
      */
