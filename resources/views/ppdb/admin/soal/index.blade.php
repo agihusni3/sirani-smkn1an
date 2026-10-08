@@ -62,7 +62,7 @@
         <div class="ppdb-stat-card">
           <div>
             <div style="font-size: 11px; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em;">Pilihan Ganda (PG)</div>
-            <div style="font-size: 24px; font-weight: 800; color: #2563eb; margin-top: 4px;">
+            <div style="font-size: 24px; font-weight: 800; color: #0f172a; margin-top: 4px;">
               {{ $soalPg->count() }} <span style="font-size: 13px; font-weight: 500; color: #64748b;">butir</span>
             </div>
             <div style="font-size: 12px; color: #64748b; margin-top: 2px;">
@@ -74,7 +74,7 @@
         <div class="ppdb-stat-card">
           <div>
             <div style="font-size: 11px; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em;">Soal Esai</div>
-            <div style="font-size: 24px; font-weight: 800; color: #059669; margin-top: 4px;">
+            <div style="font-size: 24px; font-weight: 800; color: #0f172a; margin-top: 4px;">
               {{ $soalEsai->count() }} <span style="font-size: 13px; font-weight: 500; color: #64748b;">butir</span>
             </div>
             <div style="font-size: 12px; color: #64748b; margin-top: 2px;">
@@ -103,7 +103,7 @@
             <h2 class="cbt-card-title">Bagian I: Soal Pilihan Ganda (PG)</h2>
             <div class="cbt-card-desc">Soal dikoreksi secara otomatis oleh sistem berdasarkan kunci jawaban</div>
           </div>
-          <a href="{{ route('admin.ppdb.soal.create', ['settingId' => $setting->id, 'type' => 'pg']) }}" class="cbt-btn cbt-btn-secondary cbt-btn-sm" style="color: #2563eb; font-weight: 700;">
+          <a href="{{ route('admin.ppdb.soal.create', ['settingId' => $setting->id, 'type' => 'pg']) }}" class="cbt-btn cbt-btn-secondary cbt-btn-sm" style="color: #0f172a; font-weight: 700;">
             + Tambah Soal PG
           </a>
         </div>
@@ -178,7 +178,7 @@
             <h2 class="cbt-card-title">Bagian II: Soal Esai / Uraian</h2>
             <div class="cbt-card-desc">Soal dikoreksi manual oleh panitia/guru penguji pada tab Koreksi Esai</div>
           </div>
-          <a href="{{ route('admin.ppdb.soal.create', ['settingId' => $setting->id, 'type' => 'esai']) }}" class="cbt-btn cbt-btn-secondary cbt-btn-sm" style="color: #059669; font-weight: 700;">
+          <a href="{{ route('admin.ppdb.soal.create', ['settingId' => $setting->id, 'type' => 'esai']) }}" class="cbt-btn cbt-btn-secondary cbt-btn-sm" style="color: #0f172a; font-weight: 700;">
             + Tambah Soal Esai
           </a>
         </div>
@@ -187,7 +187,7 @@
           <div class="cbt-empty-state">
             <div class="cbt-empty-state-title">Belum ada soal Esai</div>
             <p class="cbt-empty-state-desc">Klik tombol di bawah untuk menambah soal esai/uraian.</p>
-            <a href="{{ route('admin.ppdb.soal.create', ['settingId' => $setting->id, 'type' => 'esai']) }}" class="cbt-btn cbt-btn-success">
+            <a href="{{ route('admin.ppdb.soal.create', ['settingId' => $setting->id, 'type' => 'esai']) }}" class="cbt-btn cbt-btn-primary">
               + Tambah Soal Esai Sekarang
             </a>
           </div>

@@ -399,28 +399,28 @@
               <tr style="border-bottom:1px solid #f1f5f9; transition:background 0.15s;" class="row-peserta" data-search="{{ strtolower($peserta->nama_lengkap . ' ' . $peserta->no_pendaftaran . ' ' . $peserta->nisn) }}">
                 <td style="padding:10px 14px; color:#64748b; font-weight:700;">{{ $idx + 1 }}</td>
                 <td style="padding:10px 14px;">
-                  <span style="font-family:monospace; font-weight:800; color:#0f172a;">{{ $peserta->no_pendaftaran }}</span>
-                  <div style="font-size:11px; color:#64748b;">NISN: {{ $peserta->nisn }}</div>
+                  <code style="font-size:11.5px; background:#f1f5f9; color:#334155; padding:2px 6px; border-radius:4px; border:1px solid #e2e8f0;">{{ $peserta->no_pendaftaran }}</code>
+                  <div style="font-size:11px; color:#64748b; margin-top:2px;">NISN: {{ $peserta->nisn }}</div>
                 </td>
                 <td style="padding:10px 14px; font-weight:800; color:#0f172a;">
                   {{ strtoupper($peserta->nama_lengkap) }}
                   <div style="font-size:11px; color:#64748b; font-weight:500;">{{ $peserta->asal_sekolah }}</div>
                 </td>
                 <td style="padding:10px 14px;">
-                  <span style="font-weight:700; color:#2563eb;">{{ $peserta->jurusanPilihan1->kode_jurusan ?? '-' }}</span>
+                  <span style="font-weight:700; color:#0f172a;">{{ $peserta->jurusanPilihan1->kode_jurusan ?? '-' }}</span>
                   <div style="font-size:11px; color:#64748b;">{{ $peserta->jurusanPilihan1->nama_jurusan ?? '' }}</div>
                 </td>
                 <td style="padding:10px 14px;">
                   <div style="font-weight:700; color:#334155;">{{ $peserta->jadwal_ruang_resmi }}</div>
-                  <div style="font-size:11px; color:#2563eb; font-weight:700;">{{ $peserta->jadwal_sesi_resmi }}</div>
+                  <div style="font-size:11px; color:#475569; font-weight:700;">{{ $peserta->jadwal_sesi_resmi }}</div>
                 </td>
                 <td style="padding:10px 14px; text-align:center;">
                   @if($isHadir)
-                    <span style="display:inline-flex; align-items:center; gap:4px; background:#ecfdf5; color:#047857; border:1px solid #a7f3d0; padding:3px 10px; border-radius:20px; font-size:11.5px; font-weight:800;">
-                      <i class="bi bi-check-circle-fill"></i> HADIR ({{ $peserta->absensiUjian->waktu_hadir->format('H:i') }})
+                    <span style="display:inline-flex; align-items:center; gap:4px; background:#f1f5f9; color:#0f172a; border:1px solid #cbd5e1; padding:3px 10px; border-radius:6px; font-size:11.5px; font-weight:700;">
+                      <i class="bi bi-check-circle-fill" style="color:#059669;"></i> HADIR ({{ $peserta->absensiUjian->waktu_hadir->format('H:i') }})
                     </span>
                   @else
-                    <span style="display:inline-flex; align-items:center; gap:4px; background:#fffbeb; color:#b45309; border:1px solid #fde68a; padding:3px 10px; border-radius:20px; font-size:11.5px; font-weight:800;">
+                    <span class="badge badge-menunggu" style="padding:4px 10px; font-size:11px;">
                       <i class="bi bi-clock"></i> BELUM HADIR
                     </span>
                   @endif
@@ -429,7 +429,7 @@
                   @if(!$isHadir)
                     <form action="{{ route('admin.ppdb.presensi.manual', $peserta->id) }}" method="POST" style="display:inline;">
                       @csrf
-                      <button type="submit" class="btn" style="background:#0284c7; color:#ffffff; font-size:11px; font-weight:800; border-radius:6px; padding:4px 10px; border:none; cursor:pointer;" title="Sahkan Kehadiran Manual">
+                      <button type="submit" class="btn" style="background:#0f172a; color:#ffffff; font-size:11px; font-weight:700; border-radius:6px; padding:5px 12px; border:none; cursor:pointer;" title="Sahkan Kehadiran Manual">
                         <i class="bi bi-check2 me-1"></i> Hadir Manual
                       </button>
                     </form>
@@ -437,7 +437,7 @@
                     <form action="{{ route('admin.ppdb.presensi.batal', $peserta->absensiUjian->id) }}" method="POST" onsubmit="return confirm('Batalkan status hadir siswa ini?')" style="display:inline;">
                       @csrf
                       @method('DELETE')
-                      <button type="submit" class="btn" style="background:#f1f5f9; color:#ef4444; font-size:11px; font-weight:700; border-radius:6px; padding:4px 8px; border:1px solid #fecaca; cursor:pointer;" title="Batalkan Presensi">
+                      <button type="submit" class="btn" style="background:#f8fafc; color:#b91c1c; font-size:11px; font-weight:700; border-radius:6px; padding:4px 8px; border:1px solid #fecaca; cursor:pointer;" title="Batalkan Presensi">
                         <i class="bi bi-x-circle"></i> Batal
                       </button>
                     </form>

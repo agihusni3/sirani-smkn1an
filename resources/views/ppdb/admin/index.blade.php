@@ -252,84 +252,86 @@
       {{-- TABEL --}}
       <div class="panel" style="background:var(--bg-2); border:1px solid var(--border); border-radius:12px; overflow:hidden;">
         <div style="overflow-x:auto;">
-          <table class="table" style="width:100%; border-collapse:collapse; font-size:12px; margin:0;">
+          <table class="table ppdb-table" style="width:100%; border-collapse:collapse; margin:0;">
             <thead>
-              <tr style="background:var(--surface); border-bottom:2px solid var(--border); text-align:left;">
-                <th style="padding:12px 14px; width:40px;">
+              <tr>
+                <th style="width:40px; text-align:center;">
                   <input type="checkbox" id="checkAll" onchange="toggleAll(this)" title="Pilih semua yang diterima" style="width:15px; height:15px; accent-color:#10b981;">
                 </th>
-                <th style="padding:12px 14px;">No. Pendaftaran</th>
-                <th style="padding:12px 14px;">Calon Siswa</th>
-                <th style="padding:12px 14px;">Asal Sekolah</th>
-                <th style="padding:12px 14px;">Pilihan → Diterima di</th>
-                <th style="padding:12px 14px; text-align:center;">Jalur</th>
-                <th style="padding:12px 14px; text-align:center;">Status</th>
-                <th style="padding:12px 14px; text-align:center;">Aksi</th>
+                <th>No. Pendaftaran</th>
+                <th>Calon Siswa</th>
+                <th>Asal Sekolah</th>
+                <th>Pilihan Jurusan</th>
+                <th style="text-align:center;">Jalur</th>
+                <th style="text-align:center;">Status</th>
+                <th style="text-align:center;">Aksi</th>
               </tr>
             </thead>
             <tbody>
               @forelse($pendaftars as $p)
-                <tr class="cb-row" style="border-bottom:1px solid var(--border); transition:background 0.1s ease;">
-                  <td style="padding:12px 14px;">
+                <tr class="cb-row">
+                  <td style="text-align:center;">
                     @if($p->status === 'diterima' && !$p->siswa_id)
                       <input type="checkbox" name="pendaftar_ids[]" value="{{ $p->id }}"
                              class="bulk-cb" onchange="updateBulkBar()"
                              style="width:15px; height:15px; accent-color:#10b981;">
                     @elseif($p->siswa_id)
-                      <span title="Sudah dimutasi" style="color:#10b981; font-size:14px;"><i class="bi bi-check-circle-fill"></i></span>
+                      <span title="Sudah dimutasi ke rombel" style="color:#059669; font-size:14px;"><i class="bi bi-check-circle-fill"></i></span>
                     @else
                       <span style="color:#cbd5e1; font-size:12px;">—</span>
                     @endif
                   </td>
-                  <td style="padding:12px 14px; font-family:var(--font-mono); font-weight:800; color:#4338ca;">
-                    {{ $p->no_pendaftaran ?? $p->nomor_pendaftaran }}
+                  <td>
+                    <code style="font-weight:800; font-size:12px; color:#1e293b; background:#f1f5f9; padding:3px 7px; border-radius:5px; border:1px solid #e2e8f0;">
+                      {{ $p->no_pendaftaran ?? $p->nomor_pendaftaran }}
+                    </code>
                   </td>
-                  <td style="padding:12px 14px;">
-                    <div style="font-weight:800; font-size:13px; color:var(--text);">{{ $p->nama_lengkap }}</div>
-                    <div style="font-size:11px; color:var(--text-3); font-family:var(--font-mono); margin-top:2px;">
+                  <td>
+                    <div style="font-weight:700; font-size:13px; color:#0f172a;">{{ $p->nama_lengkap }}</div>
+                    <div style="font-size:11px; color:#64748b; margin-top:2px;">
                       NISN: {{ $p->nisn }} · {{ $p->jenis_kelamin == 'L' ? 'Laki-laki' : 'Perempuan' }}
                     </div>
                   </td>
-                  <td style="padding:12px 14px; color:var(--text-2);">
+                  <td style="color:#475569;">
                     {{ $p->asal_sekolah }}
                   </td>
-                  <td style="padding:12px 14px;">
-                    <div style="font-size:11px; color:var(--text-3);">1. {{ $p->jurusanPilihan1 ? $p->jurusanPilihan1->kode_jurusan : '-' }}</div>
+                  <td>
+                    <div style="font-size:11.5px; color:#334155; font-weight:600;">1. {{ $p->jurusanPilihan1 ? $p->jurusanPilihan1->kode_jurusan : '-' }}</div>
                     @if($p->jurusanPilihan2)
-                      <div style="font-size:10.5px; color:var(--text-3);">2. {{ $p->jurusanPilihan2->kode_jurusan }}</div>
+                      <div style="font-size:11px; color:#64748b;">2. {{ $p->jurusanPilihan2->kode_jurusan }}</div>
                     @endif
                     @if($p->jurusanDiterima)
-                      <div style="margin-top:4px; display:inline-flex; align-items:center; gap:4px; background:#dcfce7; color:#15803d; font-size:10.5px; font-weight:800; padding:2px 8px; border-radius:6px;">
+                      <div style="margin-top:4px; display:inline-flex; align-items:center; gap:4px; background:#ecfdf5; color:#065f46; border:1px solid #a7f3d0; font-size:10.5px; font-weight:700; padding:2px 7px; border-radius:4px;">
                         <i class="bi bi-check2"></i> {{ $p->jurusanDiterima->kode_jurusan }}
                       </div>
                     @endif
                   </td>
-                  <td style="padding:12px 14px; text-align:center;">
-                    <span style="font-size:10.5px; font-weight:800; padding:2px 8px; border-radius:6px; background:rgba(0,0,0,0.05); text-transform:uppercase;">
+                  <td style="text-align:center;">
+                    <span style="font-size:10.5px; font-weight:700; padding:3px 8px; border-radius:4px; background:#f1f5f9; color:#475569; border:1px solid #e2e8f0; text-transform:uppercase;">
                       {{ $p->jalur_pendaftaran ?? 'Reguler' }}
                     </span>
                   </td>
-                  <td style="padding:12px 14px; text-align:center;">
+                  <td style="text-align:center;">
                     @php
                       $stBadge = match($p->status) {
-                        'menunggu', 'menunggu_verifikasi', 'draft' => ['bg' => '#fef3c7', 'color' => '#b45309', 'label' => 'Menunggu Cek'],
-                        'berkas_valid', 'terverifikasi'            => ['bg' => '#e0f2fe', 'color' => '#0369a1', 'label' => 'Berkas Valid'],
-                        'diterima'                                 => ['bg' => '#dcfce7', 'color' => '#15803d', 'label' => 'Diterima'],
-                        'cadangan'                                 => ['bg' => '#ffedd5', 'color' => '#c2410c', 'label' => 'Cadangan'],
-                        'ditolak'                                  => ['bg' => '#fee2e2', 'color' => '#b91c1c', 'label' => 'Ditolak'],
-                        default                                    => ['bg' => '#f1f5f9', 'color' => '#64748b', 'label' => $p->status],
+                        'menunggu', 'menunggu_verifikasi', 'draft' => ['class' => 'badge-menunggu', 'label' => 'Menunggu Cek'],
+                        'berkas_valid', 'terverifikasi'            => ['class' => 'badge-berkas_valid', 'label' => 'Berkas Valid'],
+                        'diterima'                                 => ['class' => 'badge-diterima', 'label' => 'Diterima'],
+                        'cadangan'                                 => ['class' => 'badge-cadangan', 'label' => 'Cadangan'],
+                        'ditolak'                                  => ['class' => 'badge-ditolak', 'label' => 'Ditolak'],
+                        default                                    => ['class' => 'badge-cadangan', 'label' => $p->status],
                       };
                     @endphp
-                    <span style="display:inline-block; font-size:11px; font-weight:800; padding:3px 10px; border-radius:12px; background:{{ $stBadge['bg'] }}; color:{{ $stBadge['color'] }};">
+                    <span class="badge-status {{ $stBadge['class'] }}">
                       {{ $stBadge['label'] }}
                     </span>
                     @if($p->siswa_id)
-                      <div style="font-size:10px; color:#10b981; font-weight:700; margin-top:3px;"><i class="bi bi-check-circle"></i> Sudah Dimutasi</div>
+                      <div style="font-size:10.5px; color:#059669; font-weight:600; margin-top:3px;"><i class="bi bi-check-circle"></i> Sudah Dimutasi</div>
                     @endif
                   </td>
-                  <td style="padding:12px 14px; text-align:center;">
-                    <a href="{{ route('admin.ppdb.show', $p->id) }}" class="btn btn-sm" style="background:#4338ca; color:#ffffff; font-weight:800; font-size:11px; padding:6px 12px; border-radius:6px; text-decoration:none; display:inline-flex; align-items:center; gap:5px;">
-                      <i class="bi bi-file-earmark-person"></i> Detail
+                  <td style="text-align:center;">
+                    <a href="{{ route('admin.ppdb.show', $p->id) }}" class="btn btn-sm" style="background:#f8fafc; border:1px solid #cbd5e1; color:#334155; font-weight:700; font-size:11px; padding:5px 12px; border-radius:6px; text-decoration:none; display:inline-flex; align-items:center; gap:5px;">
+                      <i class="bi bi-eye"></i> Detail
                     </a>
                   </td>
                 </tr>

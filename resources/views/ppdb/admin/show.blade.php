@@ -24,8 +24,8 @@
         </div>
 
         <div style="display:flex; align-items:center; gap:8px;">
-          <a href="{{ route('ppdb.cetak', $pendaftar->nomor_pendaftaran) }}" target="_blank" class="btn btn-sm" style="background:#0284c7; color:#fff; font-weight:700; border-radius:6px; font-size:12px; padding:6px 14px;">
-            <i class="bi bi-printer-fill"></i> Cetak Kartu Pendaftaran
+          <a href="{{ route('ppdb.cetak', $pendaftar->nomor_pendaftaran) }}" target="_blank" class="btn btn-sm" style="background:#0f172a; color:#fff; font-weight:700; border-radius:6px; font-size:12px; padding:6px 14px; text-decoration:none;">
+            <i class="bi bi-printer"></i> Cetak Kartu Pendaftaran
           </a>
         </div>
       </div>
@@ -50,13 +50,13 @@
         {{-- BIODATA DETAIL --}}
         <div class="panel" style="background:var(--bg-2); border:1px solid var(--border); border-radius:var(--r-sm); padding:16px;">
           <h3 style="font-size:14px; font-weight:800; margin-bottom:14px; color:var(--text); border-bottom:1px solid var(--border); padding-bottom:8px;">
-            <i class="bi bi-person-lines-fill" style="color:#6366f1;"></i> Data Diri Calon Siswa
+            <i class="bi bi-person-lines-fill" style="color:#0f172a;"></i> Data Diri Calon Siswa
           </h3>
 
           <table style="width:100%; font-size:12.5px; border-collapse:collapse;">
             <tr>
               <td style="width:160px; padding:6px 0; color:var(--text-3);">Nomor Pendaftaran</td>
-              <td style="padding:6px 0; font-family:var(--font-mono); font-weight:800; color:#4338ca;">{{ $pendaftar->nomor_pendaftaran }}</td>
+              <td style="padding:6px 0;"><code style="font-size:12px; background:#f1f5f9; color:#0f172a; padding:2px 6px; border-radius:4px; border:1px solid #cbd5e1; font-weight:700;">{{ $pendaftar->nomor_pendaftaran }}</code></td>
             </tr>
             <tr>
               <td style="padding:6px 0; color:var(--text-3);">NISN</td>
@@ -146,13 +146,13 @@
         {{-- DATA ORANG TUA (AYAH & IBU TERPISAH) --}}
         <div class="panel" style="background:var(--bg-2); border:1px solid var(--border); border-radius:var(--r-sm); padding:16px;">
           <h3 style="font-size:14px; font-weight:800; margin-bottom:14px; color:var(--text); border-bottom:1px solid var(--border); padding-bottom:8px;">
-            <i class="bi bi-people-fill" style="color:#f59e0b;"></i> Data Orang Tua Calon Siswa (Ayah & Ibu)
+            <i class="bi bi-people-fill" style="color:#0f172a;"></i> Data Orang Tua Calon Siswa (Ayah & Ibu)
           </h3>
 
           <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:14px; margin-bottom:14px;">
             {{-- Kartu Ayah --}}
             <div style="border:1px solid var(--border); border-radius:8px; padding:12px; background:var(--surface);">
-              <div style="font-size:12px; font-weight:800; color:#2563eb; margin-bottom:8px; display:flex; align-items:center; gap:6px;">
+              <div style="font-size:12px; font-weight:800; color:#0f172a; margin-bottom:8px; display:flex; align-items:center; gap:6px;">
                 <i class="bi bi-person-badge"></i> Data Ayah Kandung
               </div>
               <table style="width:100%; font-size:11.5px; border-collapse:collapse;">
@@ -173,7 +173,7 @@
 
             {{-- Kartu Ibu --}}
             <div style="border:1px solid var(--border); border-radius:8px; padding:12px; background:var(--surface);">
-              <div style="font-size:12px; font-weight:800; color:#db2777; margin-bottom:8px; display:flex; align-items:center; gap:6px;">
+              <div style="font-size:12px; font-weight:800; color:#0f172a; margin-bottom:8px; display:flex; align-items:center; gap:6px;">
                 <i class="bi bi-person-heart"></i> Data Ibu Kandung
               </div>
               <table style="width:100%; font-size:11.5px; border-collapse:collapse;">
@@ -203,29 +203,29 @@
           {{-- Kontak Komunikasi WhatsApp --}}
           <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:10px;">
             {{-- WhatsApp Ortu --}}
-            <div style="background:rgba(22, 163, 74, 0.06); border:1px solid rgba(22, 163, 74, 0.2); border-radius:6px; padding:10px 14px; display:flex; justify-content:space-between; align-items:center; font-size:12px;">
+            <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:6px; padding:10px 14px; display:flex; justify-content:space-between; align-items:center; font-size:12px;">
               <div>
                 <span style="color:var(--text-3); display:block; font-size:11px;">No. WhatsApp Orang Tua / Wali:</span>
-                <strong style="color:#16a34a; font-size:13px;">{{ $pendaftar->no_hp_ortu ?: ($pendaftar->no_hp_ayah ?: ($pendaftar->no_hp_ibu ?: '-')) }}</strong>
+                <strong style="color:#0f172a; font-size:13px;">{{ $pendaftar->no_hp_ortu ?: ($pendaftar->no_hp_ayah ?: ($pendaftar->no_hp_ibu ?: '-')) }}</strong>
               </div>
               @php
                 $waOrtu = $pendaftar->no_hp_ortu ?: ($pendaftar->no_hp_ayah ?: $pendaftar->no_hp_ibu);
               @endphp
               @if($waOrtu)
-                <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $waOrtu) }}" target="_blank" class="btn btn-sm" style="background:#16a34a; color:#fff; font-size:11px; padding:4px 10px; border-radius:4px; text-decoration:none;">
+                <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $waOrtu) }}" target="_blank" class="btn btn-sm" style="background:#0f172a; color:#fff; font-size:11px; padding:5px 12px; border-radius:6px; text-decoration:none; font-weight:700;">
                   <i class="bi bi-whatsapp"></i> Hubungi Ortu
                 </a>
               @endif
             </div>
 
             {{-- WhatsApp Siswa --}}
-            <div style="background:rgba(37, 99, 235, 0.06); border:1px solid rgba(37, 99, 235, 0.2); border-radius:6px; padding:10px 14px; display:flex; justify-content:space-between; align-items:center; font-size:12px;">
+            <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:6px; padding:10px 14px; display:flex; justify-content:space-between; align-items:center; font-size:12px;">
               <div>
                 <span style="color:var(--text-3); display:block; font-size:11px;">No. WhatsApp Siswa:</span>
-                <strong style="color:#2563eb; font-size:13px;">{{ $pendaftar->no_hp_siswa ?: '-' }}</strong>
+                <strong style="color:#0f172a; font-size:13px;">{{ $pendaftar->no_hp_siswa ?: '-' }}</strong>
               </div>
               @if($pendaftar->no_hp_siswa)
-                <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $pendaftar->no_hp_siswa) }}" target="_blank" class="btn btn-sm" style="background:#2563eb; color:#fff; font-size:11px; padding:4px 10px; border-radius:4px; text-decoration:none;">
+                <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $pendaftar->no_hp_siswa) }}" target="_blank" class="btn btn-sm" style="background:#0f172a; color:#fff; font-size:11px; padding:5px 12px; border-radius:6px; text-decoration:none; font-weight:700;">
                   <i class="bi bi-whatsapp"></i> Hubungi Siswa
                 </a>
               @endif
@@ -236,7 +236,7 @@
         {{-- BERKAS LAMPIRAN --}}
         <div class="panel" style="background:var(--bg-2); border:1px solid var(--border); border-radius:var(--r-sm); padding:16px;">
           <h3 style="font-size:14px; font-weight:800; margin-bottom:14px; color:var(--text); border-bottom:1px solid var(--border); padding-bottom:8px;">
-            <i class="bi bi-paperclip" style="color:#0ea5e9;"></i> Lampiran Berkas Persyaratan
+            <i class="bi bi-paperclip" style="color:#0f172a;"></i> Lampiran Berkas Persyaratan
           </h3>
 
           <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:14px;">
@@ -245,7 +245,7 @@
               <div style="font-size:11px; font-weight:700; color:var(--text-3); margin-bottom:6px;">Pas Foto 3x4</div>
               @if($pendaftar->pas_foto)
                 <img src="{{ asset('storage/' . $pendaftar->pas_foto) }}" alt="Pas Foto" style="width:100px; height:130px; object-fit:cover; border-radius:4px; border:1px solid var(--border); margin-bottom:6px;">
-                <div><a href="{{ asset('storage/' . $pendaftar->pas_foto) }}" target="_blank" style="font-size:11px; color:#0284c7;">Lihat Foto Penuh</a></div>
+                <div><a href="{{ asset('storage/' . $pendaftar->pas_foto) }}" target="_blank" style="font-size:11px; color:#0f172a; font-weight:700;">Lihat Foto Penuh</a></div>
               @else
                 <div style="height:120px; background:var(--surface); display:flex; align-items:center; justify-content:center; color:var(--text-3); font-size:11px;">Belum Diunggah</div>
               @endif
@@ -257,7 +257,7 @@
               @if($pendaftar->scan_kk)
                 <div style="height:120px; background:var(--surface); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px;">
                   <i class="bi bi-file-earmark-pdf-fill" style="font-size:32px; color:#ef4444;"></i>
-                  <a href="{{ asset('storage/' . $pendaftar->scan_kk) }}" target="_blank" class="btn btn-sm" style="background:#0284c7; color:#fff; font-size:11px; padding:4px 8px;">Buka Dokumen KK</a>
+                  <a href="{{ asset('storage/' . $pendaftar->scan_kk) }}" target="_blank" class="btn btn-sm" style="background:#0f172a; color:#fff; font-size:11px; padding:4px 8px; text-decoration:none;">Buka Dokumen KK</a>
                 </div>
               @else
                 <div style="height:120px; background:var(--surface); display:flex; align-items:center; justify-content:center; color:var(--text-3); font-size:11px;">Belum Diunggah</div>
@@ -270,7 +270,7 @@
               @if($pendaftar->scan_ijazah_skl)
                 <div style="height:120px; background:var(--surface); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px;">
                   <i class="bi bi-file-earmark-check-fill" style="font-size:32px; color:#10b981;"></i>
-                  <a href="{{ asset('storage/' . $pendaftar->scan_ijazah_skl) }}" target="_blank" class="btn btn-sm" style="background:#0284c7; color:#fff; font-size:11px; padding:4px 8px;">Buka Dokumen SKL</a>
+                  <a href="{{ asset('storage/' . $pendaftar->scan_ijazah_skl) }}" target="_blank" class="btn btn-sm" style="background:#0f172a; color:#fff; font-size:11px; padding:4px 8px; text-decoration:none;">Buka Dokumen SKL</a>
                 </div>
               @else
                 <div style="height:120px; background:var(--surface); display:flex; align-items:center; justify-content:center; color:var(--text-3); font-size:11px;">Belum Diunggah</div>
@@ -283,7 +283,7 @@
               @if($pendaftar->scan_ktp_ortu)
                 <div style="height:120px; background:var(--surface); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px;">
                   <i class="bi bi-person-vcard-fill" style="font-size:32px; color:#6366f1;"></i>
-                  <a href="{{ asset('storage/' . $pendaftar->scan_ktp_ortu) }}" target="_blank" class="btn btn-sm" style="background:#0284c7; color:#fff; font-size:11px; padding:4px 8px;">Buka Dokumen KTP</a>
+                  <a href="{{ asset('storage/' . $pendaftar->scan_ktp_ortu) }}" target="_blank" class="btn btn-sm" style="background:#0f172a; color:#fff; font-size:11px; padding:4px 8px; text-decoration:none;">Buka Dokumen KTP</a>
                 </div>
               @else
                 <div style="height:120px; background:var(--surface); display:flex; align-items:center; justify-content:center; color:var(--text-3); font-size:11px;">Belum Diunggah</div>
@@ -296,7 +296,7 @@
               @if($pendaftar->scan_akta)
                 <div style="height:120px; background:var(--surface); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px;">
                   <i class="bi bi-file-earmark-text-fill" style="font-size:32px; color:#f59e0b;"></i>
-                  <a href="{{ asset('storage/' . $pendaftar->scan_akta) }}" target="_blank" class="btn btn-sm" style="background:#0284c7; color:#fff; font-size:11px; padding:4px 8px;">Buka Akta Lahir</a>
+                  <a href="{{ asset('storage/' . $pendaftar->scan_akta) }}" target="_blank" class="btn btn-sm" style="background:#0f172a; color:#fff; font-size:11px; padding:4px 8px; text-decoration:none;">Buka Akta Lahir</a>
                 </div>
               @else
                 <div style="height:120px; background:var(--surface); display:flex; align-items:center; justify-content:center; color:var(--text-3); font-size:11px;">Belum Diunggah</div>
@@ -332,7 +332,7 @@
               @if($pendaftar->scan_sktm)
                 <div style="height:120px; background:var(--surface); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px;">
                   <i class="bi bi-file-earmark-medical-fill" style="font-size:32px; color:#ec4899;"></i>
-                  <a href="{{ asset('storage/' . $pendaftar->scan_sktm) }}" target="_blank" class="btn btn-sm" style="background:#0284c7; color:#fff; font-size:11px; padding:4px 8px;">Buka Berkas SKTM</a>
+                  <a href="{{ asset('storage/' . $pendaftar->scan_sktm) }}" target="_blank" class="btn btn-sm" style="background:#0f172a; color:#fff; font-size:11px; padding:4px 8px; text-decoration:none;">Buka Berkas SKTM</a>
                 </div>
               @else
                 <div style="height:120px; background:var(--surface); display:flex; align-items:center; justify-content:center; color:var(--text-3); font-size:11px;">Tidak Ada / Opsional</div>

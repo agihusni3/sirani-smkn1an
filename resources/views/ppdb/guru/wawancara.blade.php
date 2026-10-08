@@ -250,7 +250,7 @@
               <td style="padding:12px 16px;">
                 <strong style="color:var(--text-1); font-size:13.5px; display:block;">{{ $p->nama_lengkap }}</strong>
                 <div style="display:flex; align-items:center; gap:8px; margin-top:2px;">
-                  <span style="font-family:monospace; color:#2563eb; font-weight:700; font-size:11.5px;">{{ $p->no_pendaftaran }}</span>
+                  <code style="font-size:11.5px; background:#f1f5f9; color:#334155; padding:2px 6px; border-radius:4px; border:1px solid #e2e8f0;">{{ $p->no_pendaftaran }}</code>
                   <span style="color:#64748b; font-size:11px;">SMP: {{ $p->asal_sekolah ?? '-' }}</span>
                 </div>
               </td>
@@ -262,16 +262,16 @@
               </td>
               <td style="padding:12px 16px; text-align:center;">
                 @if($p->nilai_wawancara_total !== null)
-                  <span style="background:#ecfdf5; color:#059669; font-weight:800; font-size:11px; padding:3px 8px; border-radius:6px; border:1px solid #a7f3d0; display:inline-flex; align-items:center; gap:4px;">
+                  <span class="badge badge-diterima" style="display:inline-flex; align-items:center; gap:4px;">
                     <i class="bi bi-check-circle-fill"></i> Sudah Diuji
                   </span>
                 @else
-                  <span style="background:#fffbeb; color:#b45309; font-weight:800; font-size:11px; padding:3px 8px; border-radius:6px; border:1px solid #fde68a; display:inline-flex; align-items:center; gap:4px;">
+                  <span class="badge badge-menunggu" style="display:inline-flex; align-items:center; gap:4px;">
                     <i class="bi bi-hourglass-split"></i> Belum Wawancara
                   </span>
                 @endif
               </td>
-              <td style="padding:12px 16px; text-align:center; font-family:monospace; font-weight:900; font-size:15px; color:#059669;">
+              <td style="padding:12px 16px; text-align:center; font-family:monospace; font-weight:800; font-size:14px; color:#0f172a;">
                 {{ $p->nilai_wawancara_total !== null ? number_format($p->nilai_wawancara_total, 1) : '-' }}
               </td>
               <td style="padding:12px 16px;">
@@ -280,17 +280,17 @@
                   @if($p->diwawancara_pada)
                     <div style="font-size:10.5px; color:#64748b;">Diuji: {{ $p->diwawancara_pada->format('d/m/Y H:i') }} WIB</div>
                   @else
-                    <span style="background:#eff6ff; color:#1d4ed8; font-size:10px; font-weight:700; padding:1px 6px; border-radius:4px; border:1px solid #bfdbfe;">Ditunjuk (Pra-Tes)</span>
+                    <span style="background:#f1f5f9; color:#475569; font-size:10px; font-weight:700; padding:1px 6px; border-radius:4px; border:1px solid #e2e8f0;">Ditunjuk (Pra-Tes)</span>
                   @endif
                 @else
                   <span style="color:#94a3b8; font-size:11px;">Belum Ditunjuk</span>
                 @endif
               </td>
               <td style="padding:12px 16px; text-align:center; white-space:nowrap;">
-                <button type="button" class="btn btn-sm" onclick="bukaModalWawancara({{ json_encode($pPayload) }})" style="background:#0284c7; color:#ffffff; font-weight:800; font-size:11.5px; border-radius:6px; border:none; padding:6px 12px; cursor:pointer; display:inline-flex; align-items:center; gap:5px; box-shadow:0 2px 4px rgba(2,132,199,0.25);">
-                  <i class="bi bi-mic-fill"></i> {{ $p->nilai_wawancara_total !== null ? 'Ubah Nilai' : 'Mulai Uji' }}
+                <button type="button" class="btn btn-sm" onclick="bukaModalWawancara({{ json_encode($pPayload) }})" style="background:#0f172a; color:#ffffff; font-weight:700; font-size:11.5px; border-radius:6px; border:none; padding:6px 12px; cursor:pointer; display:inline-flex; align-items:center; gap:5px;">
+                  <i class="bi bi-mic"></i> {{ $p->nilai_wawancara_total !== null ? 'Ubah Nilai' : 'Mulai Uji' }}
                 </button>
-                <a href="{{ route('admin.ppdb.wawancara.cetak', $p->id) }}" target="_blank" class="btn btn-sm" style="background:#f1f5f9; color:#475569; border:1px solid #cbd5e1; font-weight:700; font-size:11.5px; border-radius:6px; padding:5px 9px; text-decoration:none; display:inline-flex; align-items:center; gap:3px; margin-left:4px;" title="Cetak Lembar Format A4">
+                <a href="{{ route('admin.ppdb.wawancara.cetak', $p->id) }}" target="_blank" class="btn btn-sm" style="background:#f8fafc; color:#475569; border:1px solid #cbd5e1; font-weight:700; font-size:11.5px; border-radius:6px; padding:5px 9px; text-decoration:none; display:inline-flex; align-items:center; gap:3px; margin-left:4px;" title="Cetak Lembar Format A4">
                   <i class="bi bi-printer"></i>
                 </a>
               </td>

@@ -238,10 +238,11 @@ class PpdbPendaftar extends Model
     }
 
     /**
-     * Hitung skor akhir seleksi terbobot:
-     * - Nilai Rapor / Administrasi: 30%
-     * - Nilai Tes Tertulis (PG + Esai): 35%
-     * - Nilai Tes Wawancara: 35%
+     * Hitung skor akhir seleksi terbobot (Progressive Weighting Standard PPDB):
+     * - Lengkap (Rapor + Tertulis + Wawancara): 30% Rapor + 35% Tes Tertulis + 35% Wawancara
+     * - Parsial (Rapor + Tertulis): 40% Rapor + 60% Tes Tertulis
+     * - Parsial (Rapor + Wawancara): 40% Rapor + 60% Wawancara
+     * - Seleksi Awal Berkas: 100% Nilai Rapor
      */
     public function hitungNilaiAkhir(): float
     {
@@ -249,12 +250,28 @@ class PpdbPendaftar extends Model
         $tertulis = (float) ($this->nilai_tes_tertulis ?: 0);
         $wawancara = (float) ($this->nilai_wawancara_total ?: $this->hitungNilaiWawancara());
 
-        // Jika nilai rapor dalam skala 10 atau puluhan (misal 7.8 atau 78)
+        // Normalisasi nilai rapor ke skala 0-100 jika menggunakan skala 0-10 (misal 8.2 -> 82)
         if ($rapor > 0 && $rapor <= 10) {
-            $rapor = $rapor * 10; // normalisasi ke skala 0-100
+            $rapor = $rapor * 10;
         }
 
-        $akhir = round((0.30 * $rapor) + (0.35 * $tertulis) + (0.35 * $wawancara), 2);
+        $hasTertulis = ($tertulis > 0);
+        $hasWawancara = ($wawancara > 0);
+
+        if ($hasTertulis && $hasWawancara) {
+            // Semua 3 komponen seleksi terisi lengkap
+            $akhir = round((0.30 * $rapor) + (0.35 * $tertulis) + (0.35 * $wawancara), 2);
+        } elseif ($hasTertulis) {
+            // Baru tahap tes tertulis (wawancara belum terlaksana)
+            $akhir = round((0.40 * $rapor) + (0.60 * $tertulis), 2);
+        } elseif ($hasWawancara) {
+            // Baru tahap wawancara (tes tertulis belum terlaksana)
+            $akhir = round((0.40 * $rapor) + (0.60 * $wawancara), 2);
+        } else {
+            // Tahap seleksi awal administrasi berkas rapor
+            $akhir = round($rapor, 2);
+        }
+
         $this->nilai_akhir = $akhir;
         return $akhir;
     }

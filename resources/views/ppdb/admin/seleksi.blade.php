@@ -354,7 +354,7 @@
                   </td>
                   <td style="padding:12px 16px;">
                     <strong style="color:var(--text-1); font-size:13px; display:block;">{{ $peserta->nama_lengkap }}</strong>
-                    <span style="font-family:monospace; color:#2563eb; font-weight:700;">{{ $peserta->no_pendaftaran }}</span> • NISN: {{ $peserta->nisn }}
+                    <code style="font-weight:700; color:#1e293b; background:#f1f5f9; padding:2px 6px; border-radius:4px; font-size:11.5px;">{{ $peserta->no_pendaftaran }}</code> <span style="color:#64748b; font-size:11.5px;">• NISN: {{ $peserta->nisn }}</span>
                   </td>
                   <td style="padding:12px 16px;">
                     <span style="font-weight:700; color:var(--text-1);">{{ $peserta->jurusan1->nama_jurusan ?? ($peserta->jurusanPilihan1->nama_jurusan ?? '-') }}</span>
@@ -436,24 +436,24 @@
               <tr style="border-bottom:1px solid var(--border);">
                 <td style="padding:12px 16px;">
                   <strong style="color:var(--text-1); font-size:13px; display:block;">{{ $p->nama_lengkap }}</strong>
-                  <span style="font-family:monospace; color:#2563eb; font-weight:700;">{{ $p->no_pendaftaran }}</span> • {{ $p->jurusan1->nama_jurusan ?? ($p->jurusanPilihan1->nama_jurusan ?? '-') }}
+                  <code style="font-weight:700; color:#1e293b; background:#f1f5f9; padding:2px 6px; border-radius:4px; font-size:11.5px;">{{ $p->no_pendaftaran }}</code> <span style="color:#64748b; font-size:11.5px;">• {{ $p->jurusan1->nama_jurusan ?? ($p->jurusanPilihan1->nama_jurusan ?? '-') }}</span>
                 </td>
                 <td style="padding:12px 16px; text-align:center;">
                   @if($u)
                     @if($u->status_pengerjaan === 'selesai_dinilai')
-                      <span style="background:#ecfdf5; color:#059669; font-weight:800; font-size:11px; padding:3px 8px; border-radius:6px; border:1px solid #a7f3d0;">
+                      <span class="badge-status badge-diterima">
                         <i class="bi bi-check2-circle"></i> Selesai Dinilai
                       </span>
                     @elseif($u->status_pengerjaan === 'selesai_menunggu_koreksi' || $u->status_pengerjaan === 'selesai')
-                      <span style="background:#fef3c7; color:#d97706; font-weight:800; font-size:11px; padding:3px 8px; border-radius:6px; border:1px solid #fde68a;">
+                      <span class="badge-status badge-menunggu">
                         <i class="bi bi-clock-history"></i> Butuh Koreksi Esai
                       </span>
                     @elseif($u->status_pengerjaan === 'sedang_mengerjakan')
-                      <span style="background:#eff6ff; color:#2563eb; font-weight:800; font-size:11px; padding:3px 8px; border-radius:6px;">
+                      <span class="badge-status badge-berkas_valid">
                         Sedang Mengerjakan
                       </span>
                     @else
-                      <span style="background:#f1f5f9; color:#64748b; font-weight:700; font-size:11px; padding:3px 8px; border-radius:6px;">
+                      <span class="badge-status badge-cadangan">
                         {{ ucfirst($u->status_pengerjaan) }}
                       </span>
                     @endif
@@ -461,26 +461,25 @@
                     <span style="color:#94a3b8; font-size:11px; font-weight:700;">Belum Mengikuti</span>
                   @endif
                 </td>
-                <td style="padding:12px 16px; text-align:center; font-family:monospace; font-weight:800;">
+                <td style="padding:12px 16px; text-align:center; font-family:monospace; font-weight:800; color:#334155;">
                   @if($u)
-                    <span style="color:#059669;">{{ $u->jumlah_pg_benar ?? 0 }}B</span> / 
-                    <span style="color:#dc2626;">{{ $u->jumlah_pg_salah ?? 0 }}S</span>
+                    <span>{{ $u->jumlah_pg_benar ?? 0 }} Benar</span> / <span>{{ $u->jumlah_pg_salah ?? 0 }} Salah</span>
                   @else
                     -
                   @endif
                 </td>
-                <td style="padding:12px 16px; text-align:center; font-family:monospace; font-weight:800; color:#2563eb;">
+                <td style="padding:12px 16px; text-align:center; font-family:monospace; font-weight:800; color:#1e293b;">
                   {{ $u && $u->nilai_pg !== null ? number_format($u->nilai_pg, 1) : '-' }}
                 </td>
-                <td style="padding:12px 16px; text-align:center; font-family:monospace; font-weight:800; color:#059669;">
+                <td style="padding:12px 16px; text-align:center; font-family:monospace; font-weight:800; color:#1e293b;">
                   {{ $u && $u->nilai_esai !== null ? number_format($u->nilai_esai, 1) : '-' }}
                 </td>
-                <td style="padding:12px 16px; text-align:center; font-family:monospace; font-weight:900; font-size:13.5px; color:#000000;">
+                <td style="padding:12px 16px; text-align:center; font-family:monospace; font-weight:800; font-size:13.5px; color:#0f172a;">
                   {{ $p->nilai_tes_tertulis !== null ? number_format($p->nilai_tes_tertulis, 1) : '-' }}
                 </td>
                 <td style="padding:12px 16px; text-align:center;">
                   @if($u)
-                    <button type="button" class="btn btn-sm" onclick="bukaModalKoreksi({{ json_encode($u) }}, {{ json_encode($p) }})" style="background:#4338ca; color:#ffffff; font-weight:800; font-size:11.5px; border-radius:6px; border:none; padding:5px 12px; cursor:pointer;">
+                    <button type="button" class="btn btn-sm" onclick="bukaModalKoreksi({{ json_encode($u) }}, {{ json_encode($p) }})" style="background:#2563eb; color:#ffffff; font-weight:700; font-size:11.5px; border-radius:6px; border:none; padding:5px 12px; cursor:pointer;">
                       <i class="bi bi-pencil-square me-1"></i> Koreksi Esai
                     </button>
                   @else
@@ -587,7 +586,7 @@
               <tr style="border-bottom:1px solid var(--border);">
                 <td style="padding:12px 16px;">
                   <strong style="color:var(--text-1); font-size:13px; display:block;">{{ $p->nama_lengkap }}</strong>
-                  <span style="font-family:monospace; color:#2563eb; font-weight:700;">{{ $p->no_pendaftaran }}</span>
+                  <code style="font-size:11.5px; background:#f1f5f9; color:#334155; padding:2px 6px; border-radius:4px; border:1px solid #e2e8f0;">{{ $p->no_pendaftaran }}</code>
                 </td>
                 <td style="padding:12px 16px;">
                   <span style="font-weight:700; color:var(--text-1);">{{ $pPayload['jurusan1_nama'] }}</span>
@@ -597,16 +596,16 @@
                 </td>
                 <td style="padding:12px 16px; text-align:center;">
                   @if($p->nilai_wawancara_total !== null)
-                    <span style="background:#ecfdf5; color:#059669; font-weight:800; font-size:11px; padding:3px 8px; border-radius:6px; border:1px solid #a7f3d0;">
-                      <i class="bi bi-check-circle-fill"></i> Sudah Dinilai
+                    <span class="badge badge-diterima">
+                      <i class="bi bi-check-circle-fill"></i> Selesai
                     </span>
                   @else
-                    <span style="background:#f1f5f9; color:#64748b; font-weight:700; font-size:11px; padding:3px 8px; border-radius:6px;">
+                    <span class="badge badge-menunggu">
                       Belum Wawancara
                     </span>
                   @endif
                 </td>
-                <td style="padding:12px 16px; text-align:center; font-family:monospace; font-weight:900; font-size:14px; color:#059669;">
+                <td style="padding:12px 16px; text-align:center; font-family:monospace; font-weight:800; font-size:13.5px; color:#0f172a;">
                   {{ $p->nilai_wawancara_total !== null ? number_format($p->nilai_wawancara_total, 1) : '-' }}
                 </td>
                 <td style="padding:12px 16px;">
@@ -614,10 +613,10 @@
                     @if($p->nilai_wawancara_total !== null)
                       <div style="display:flex; align-items:center; justify-content:space-between; gap:6px;">
                         <div>
-                          <strong style="color:#059669; font-size:12px; display:block;">
-                            <i class="bi bi-check-circle-fill" style="font-size:11px;"></i> {{ $p->pewawancara->name }}
+                          <strong style="color:#0f172a; font-size:12px; display:block;">
+                            <i class="bi bi-check-circle-fill" style="color:#059669; font-size:11px;"></i> {{ $p->pewawancara->name }}
                           </strong>
-                          <span style="font-size:10px; color:#64748b;">Diuji: {{ $p->diwawancara_pada ? $p->diwawancara_pada->format('d/m/Y H:i') : '-' }}</span>
+                          <span style="font-size:10.5px; color:#64748b;">Diuji: {{ $p->diwawancara_pada ? $p->diwawancara_pada->format('d/m/Y H:i') : '-' }}</span>
                         </div>
                         <button type="button" onclick="bukaModalPlotSingle({{ $p->id }}, '{{ addslashes($p->nama_lengkap) }}', {{ $p->pewawancara_id }})" class="btn btn-sm" style="background:#f8fafc; border:1px solid #cbd5e1; padding:3px 7px; border-radius:5px; font-size:10.5px; color:#475569; cursor:pointer;" title="Ganti Guru Penguji">
                           <i class="bi bi-pencil"></i>
@@ -626,34 +625,34 @@
                     @else
                       <div style="display:flex; align-items:center; justify-content:space-between; gap:6px;">
                         <div>
-                          <strong style="color:#1d4ed8; font-size:12px; display:block;">
-                            <i class="bi bi-person-badge-fill" style="font-size:11px;"></i> {{ $p->pewawancara->name }}
+                          <strong style="color:#0f172a; font-size:12px; display:block;">
+                            <i class="bi bi-person-badge" style="color:#475569; font-size:11px;"></i> {{ $p->pewawancara->name }}
                           </strong>
-                          <span style="background:#eff6ff; color:#1d4ed8; font-size:10px; font-weight:700; padding:1px 6px; border-radius:4px; border:1px solid #bfdbfe;">
-                            Ditunjuk (Pra-Tes)
+                          <span style="background:#f1f5f9; color:#475569; font-size:10px; font-weight:700; padding:1px 6px; border-radius:4px; border:1px solid #e2e8f0;">
+                            Ditunjuk
                           </span>
                         </div>
-                        <button type="button" onclick="bukaModalPlotSingle({{ $p->id }}, '{{ addslashes($p->nama_lengkap) }}', {{ $p->pewawancara_id }})" class="btn btn-sm" style="background:#eff6ff; border:1px solid #bfdbfe; padding:3px 7px; border-radius:5px; font-size:10.5px; color:#1d4ed8; cursor:pointer;" title="Ganti Guru Penguji">
+                        <button type="button" onclick="bukaModalPlotSingle({{ $p->id }}, '{{ addslashes($p->nama_lengkap) }}', {{ $p->pewawancara_id }})" class="btn btn-sm" style="background:#f8fafc; border:1px solid #cbd5e1; padding:3px 7px; border-radius:5px; font-size:10.5px; color:#475569; cursor:pointer;" title="Ganti Guru Penguji">
                           <i class="bi bi-arrow-repeat"></i>
                         </button>
                       </div>
                     @endif
                   @else
                     <div style="display:flex; align-items:center; justify-content:space-between; gap:6px;">
-                      <span style="background:#fef2f2; color:#b91c1c; font-size:11px; padding:2px 8px; border-radius:6px; font-weight:700; border:1px solid #fecaca;">
+                      <span class="badge badge-menunggu" style="font-size:10.5px;">
                         Belum Ditunjuk
                       </span>
-                      <button type="button" onclick="bukaModalPlotSingle({{ $p->id }}, '{{ addslashes($p->nama_lengkap) }}', null)" class="btn btn-sm" style="background:#2563eb; color:#ffffff; padding:3px 8px; border-radius:5px; font-size:10.5px; font-weight:800; border:none; cursor:pointer; box-shadow:0 1px 2px rgba(37,99,235,0.2);" title="Tunjuk Guru Penguji Sekarang">
+                      <button type="button" onclick="bukaModalPlotSingle({{ $p->id }}, '{{ addslashes($p->nama_lengkap) }}', null)" class="btn btn-sm" style="background:#0f172a; color:#ffffff; padding:3px 8px; border-radius:5px; font-size:10.5px; font-weight:700; border:none; cursor:pointer;" title="Tunjuk Guru Penguji Sekarang">
                         + Tunjuk
                       </button>
                     </div>
                   @endif
                 </td>
                 <td style="padding:12px 16px; text-align:center; white-space:nowrap;">
-                  <button type="button" class="btn btn-sm" onclick="bukaModalWawancara({{ json_encode($pPayload) }})" style="background:#0284c7; color:#ffffff; font-weight:800; font-size:11.5px; border-radius:6px; border:none; padding:6px 12px; cursor:pointer; display:inline-flex; align-items:center; gap:5px; box-shadow:0 2px 4px rgba(2,132,199,0.2);">
-                    <i class="bi bi-mic-fill"></i> Form Wawancara
+                  <button type="button" class="btn btn-sm" onclick="bukaModalWawancara({{ json_encode($pPayload) }})" style="background:#0f172a; color:#ffffff; font-weight:700; font-size:11.5px; border-radius:6px; border:none; padding:6px 12px; cursor:pointer; display:inline-flex; align-items:center; gap:5px;">
+                    <i class="bi bi-mic"></i> Form Wawancara
                   </button>
-                  <a href="{{ route('admin.ppdb.seleksi.cetak_wawancara', $p->id) }}" target="_blank" class="btn btn-sm" style="background:#f1f5f9; color:#475569; border:1px solid #cbd5e1; font-weight:700; font-size:11.5px; border-radius:6px; padding:5px 9px; text-decoration:none; display:inline-flex; align-items:center; gap:3px; margin-left:4px;" title="Cetak Lembar Hasil Wawancara Siswa Ini (A4)">
+                  <a href="{{ route('admin.ppdb.seleksi.cetak_wawancara', $p->id) }}" target="_blank" class="btn btn-sm" style="background:#f8fafc; color:#475569; border:1px solid #cbd5e1; font-weight:700; font-size:11.5px; border-radius:6px; padding:5px 9px; text-decoration:none; display:inline-flex; align-items:center; gap:3px; margin-left:4px;" title="Cetak Lembar Hasil Wawancara Siswa Ini (A4)">
                     <i class="bi bi-printer"></i>
                   </a>
                 </td>
@@ -686,11 +685,11 @@
 
           <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
             @if(($stats['total_diterima'] ?? 0) > 0)
-              <a href="{{ route('admin.ppdb.index', ['status' => 'diterima']) }}" class="btn btn-sm" style="background:#059669; color:#ffffff; font-weight:800; border-radius:6px; padding:6px 14px; font-size:12px; text-decoration:none;">
+              <a href="{{ route('admin.ppdb.index', ['status' => 'diterima']) }}" class="btn btn-sm" style="background:#0f172a; color:#ffffff; font-weight:700; border-radius:6px; padding:6px 14px; font-size:12px; text-decoration:none;">
                 Lanjut Mutasi Massal ({{ $stats['total_diterima'] }}) &rarr;
               </a>
             @endif
-            <button type="button" class="btn btn-sm" onclick="document.getElementById('modalKalkulasi').style.display = 'flex'" style="background:#2563eb; color:#ffffff; font-weight:800; border-radius:6px; border:none; padding:6px 14px; font-size:12px; cursor:pointer;">
+            <button type="button" class="btn btn-sm" onclick="document.getElementById('modalKalkulasi').style.display = 'flex'" style="background:#334155; color:#ffffff; font-weight:700; border-radius:6px; border:none; padding:6px 14px; font-size:12px; cursor:pointer;">
               Kalkulasi &amp; Ranking Otomatis
             </button>
           </div>
@@ -715,18 +714,18 @@
               <tr style="border-bottom:1px solid var(--border);">
                 <td style="padding:12px 16px; text-align:center;">
                   @if($idx == 0)
-                    <span style="display:inline-block; width:26px; height:26px; border-radius:50%; background:#fef08a; color:#854d0e; font-weight:900; line-height:26px;">1</span>
+                    <span style="display:inline-block; width:24px; height:24px; border-radius:4px; background:#0f172a; color:#ffffff; font-weight:800; font-size:12px; line-height:24px;">1</span>
                   @elseif($idx == 1)
-                    <span style="display:inline-block; width:26px; height:26px; border-radius:50%; background:#e2e8f0; color:#334155; font-weight:900; line-height:26px;">2</span>
+                    <span style="display:inline-block; width:24px; height:24px; border-radius:4px; background:#475569; color:#ffffff; font-weight:800; font-size:12px; line-height:24px;">2</span>
                   @elseif($idx == 2)
-                    <span style="display:inline-block; width:26px; height:26px; border-radius:50%; background:#fed7aa; color:#9a3412; font-weight:900; line-height:26px;">3</span>
+                    <span style="display:inline-block; width:24px; height:24px; border-radius:4px; background:#94a3b8; color:#ffffff; font-weight:800; font-size:12px; line-height:24px;">3</span>
                   @else
-                    <span style="font-weight:700; color:var(--text-3);">{{ $row->peringkat_jurusan ?? ($idx + 1) }}</span>
+                    <span style="font-weight:700; color:#64748b; font-size:12px;">{{ $row->peringkat_jurusan ?? ($idx + 1) }}</span>
                   @endif
                 </td>
                 <td style="padding:12px 16px;">
                   <strong style="color:var(--text-1); font-size:13px; display:block;">{{ $row->nama_lengkap }}</strong>
-                  <span style="font-family:monospace; color:#2563eb; font-weight:700;">{{ $row->no_pendaftaran }}</span>
+                  <code style="font-size:11.5px; background:#f1f5f9; color:#334155; padding:2px 6px; border-radius:4px; border:1px solid #e2e8f0;">{{ $row->no_pendaftaran }}</code>
                 </td>
                 <td style="padding:12px 16px;">
                   <div style="font-weight:700; color:var(--text-1);">1. {{ $row->jurusanPilihan1->kode_jurusan ?? '-' }}</div>
@@ -734,21 +733,21 @@
                     <div style="font-size:11px; color:var(--text-3);">2. {{ $row->jurusanPilihan2->kode_jurusan }}</div>
                   @endif
                 </td>
-                <td style="padding:12px 16px; text-align:center; font-family:monospace; font-weight:800;">
+                <td style="padding:12px 16px; text-align:center; font-family:monospace; font-weight:700; color:#334155;">
                   {{ number_format($row->nilai_rapor ?? 0, 1) }}
                 </td>
-                <td style="padding:12px 16px; text-align:center; font-family:monospace; font-weight:800; color:#2563eb;">
+                <td style="padding:12px 16px; text-align:center; font-family:monospace; font-weight:700; color:#334155;">
                   {{ number_format($row->nilai_tes_tertulis ?? 0, 1) }}
                 </td>
-                <td style="padding:12px 16px; text-align:center; font-family:monospace; font-weight:800; color:#059669;">
+                <td style="padding:12px 16px; text-align:center; font-family:monospace; font-weight:700; color:#334155;">
                   {{ number_format($row->nilai_wawancara_total ?? 0, 1) }}
                 </td>
-                <td style="padding:12px 16px; text-align:center; font-family:monospace; font-weight:900; font-size:15px; color:#1e1b4b; background:#e0e7ff;">
+                <td style="padding:12px 16px; text-align:center; font-family:monospace; font-weight:800; font-size:14px; color:#0f172a; background:#f8fafc;">
                   {{ number_format($row->nilai_akhir ?? 0, 2) }}
                 </td>
                 <td style="padding:12px 16px; text-align:center;">
                   @if($row->jurusanDiterima)
-                    <span style="font-weight:800; color:#15803d; background:#dcfce7; padding:3px 10px; border-radius:6px; font-size:11.5px; border:1px solid #a7f3d0;">
+                    <span style="font-weight:700; color:#0f172a; background:#f1f5f9; padding:3px 10px; border-radius:4px; font-size:11.5px; border:1px solid #cbd5e1;">
                       {{ $row->jurusanDiterima->nama_jurusan }}
                     </span>
                   @else
@@ -757,21 +756,13 @@
                 </td>
                 <td style="padding:12px 16px; text-align:center;">
                   @if($row->status === 'diterima')
-                    <span style="background:#ecfdf5; color:#059669; font-weight:900; font-size:11px; padding:4px 10px; border-radius:6px; border:1px solid #a7f3d0;">
-                      DITERIMA
-                    </span>
+                    <span class="badge badge-diterima">DITERIMA</span>
                   @elseif($row->status === 'cadangan')
-                    <span style="background:#fffbeb; color:#d97706; font-weight:900; font-size:11px; padding:4px 10px; border-radius:6px; border:1px solid #fde68a;">
-                      CADANGAN
-                    </span>
+                    <span class="badge badge-cadangan">CADANGAN</span>
                   @elseif($row->status === 'ditolak')
-                    <span style="background:#fef2f2; color:#dc2626; font-weight:900; font-size:11px; padding:4px 10px; border-radius:6px; border:1px solid #fecaca;">
-                      TIDAK LULUS
-                    </span>
+                    <span class="badge badge-ditolak">TIDAK LULUS</span>
                   @else
-                    <span style="background:#f1f5f9; color:#64748b; font-weight:700; font-size:11px; padding:3px 8px; border-radius:6px;">
-                      {{ ucfirst(str_replace('_', ' ', $row->status)) }}
-                    </span>
+                    <span class="badge badge-menunggu">{{ ucfirst(str_replace('_', ' ', $row->status)) }}</span>
                   @endif
                 </td>
               </tr>
