@@ -17,11 +17,11 @@
       --stat-border: #e2e8f0;
       --stat-hero-bg: #f8fafc;
       --stat-hero-border: #e2e8f0;
-      --stat-badge-bg: #eff6ff;
-      --stat-badge-border: #dbeafe;
-      --stat-badge-text: #2563eb;
-      --palette-primary: #2563eb;
-      --palette-secondary: #0ea5e9;
+      --stat-badge-bg: #f1f5f9;
+      --stat-badge-border: #cbd5e1;
+      --stat-badge-text: #0f172a;
+      --palette-primary: #0f172a;
+      --palette-secondary: #475569;
       --chart-grid: rgba(226, 232, 240, 0.8);
       --chart-text: #64748b;
     }
@@ -35,11 +35,11 @@
       --stat-border: rgba(255, 255, 255, 0.08);
       --stat-hero-bg: #111827;
       --stat-hero-border: rgba(255, 255, 255, 0.08);
-      --stat-badge-bg: rgba(37, 99, 235, 0.18);
-      --stat-badge-border: rgba(59, 130, 246, 0.35);
-      --stat-badge-text: #93c5fd;
-      --palette-primary: #3b82f6;
-      --palette-secondary: #38bdf8;
+      --stat-badge-bg: rgba(255, 255, 255, 0.08);
+      --stat-badge-border: rgba(255, 255, 255, 0.15);
+      --stat-badge-text: #f8fafc;
+      --palette-primary: #f8fafc;
+      --palette-secondary: #cbd5e1;
       --chart-grid: rgba(255, 255, 255, 0.06);
       --chart-text: #94a3b8;
     }
@@ -104,7 +104,7 @@
     .stat-period-btn.active {
       background: var(--palette-primary);
       color: #ffffff !important;
-      box-shadow: 0 2px 8px rgba(37, 99, 235, 0.25);
+      box-shadow: 0 2px 8px rgba(15, 23, 42, 0.2);
     }
 
     .stat-period-btn:not(.active):hover {
@@ -387,7 +387,7 @@
           <h2 style="font-size:15px; font-weight:900; color:var(--stat-text); margin:0 0 2px;">Halaman Paling Sering Dikunjungi</h2>
           <span style="font-size:11.5px; color:var(--stat-text-sub); font-weight:600;">10 Halaman &amp; Konten Terpopuler dalam {{ $days }} Hari Terakhir</span>
         </div>
-        <a href="{{ route('admin.portal') }}" class="btn" style="font-size:11.5px; font-weight:800; background:var(--palette-primary); color:#ffffff; border:none; padding:7px 16px; border-radius:8px; text-decoration:none; box-shadow:0 2px 6px rgba(37,99,235,0.25);">
+        <a href="{{ route('admin.portal') }}" class="btn" style="font-size:11.5px; font-weight:800; background:var(--palette-primary); color:#ffffff; border:none; padding:7px 16px; border-radius:8px; text-decoration:none; box-shadow:0 2px 6px rgba(15,23,42,0.2);">
           Kembali ke DCC
         </a>
       </div>
@@ -462,25 +462,25 @@
               {
                 label: 'Total Tayangan (Views)',
                 data: views,
-                borderColor: '#2563eb',
-                backgroundColor: isDark ? 'rgba(37, 99, 235, 0.25)' : 'rgba(37, 99, 235, 0.12)',
+                borderColor: isDark ? '#f8fafc' : '#0f172a',
+                backgroundColor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(15, 23, 42, 0.05)',
                 fill: true,
                 tension: 0.35,
                 borderWidth: 2.5,
                 pointRadius: 3,
-                pointBackgroundColor: '#2563eb',
+                pointBackgroundColor: isDark ? '#f8fafc' : '#0f172a',
                 pointHoverRadius: 6,
               },
               {
                 label: 'Pengunjung Unik (Visitors)',
                 data: uniques,
-                borderColor: '#06b6d4',
+                borderColor: isDark ? '#94a3b8' : '#64748b',
                 backgroundColor: 'transparent',
                 borderDash: [4, 4],
                 tension: 0.35,
                 borderWidth: 2,
                 pointRadius: 3,
-                pointBackgroundColor: '#06b6d4',
+                pointBackgroundColor: isDark ? '#94a3b8' : '#64748b',
                 pointHoverRadius: 5,
               }
             ]
@@ -547,7 +547,7 @@
             labels: ['Mobile (HP)', 'Desktop', 'Tablet'],
             datasets: [{
               data: [mobCount, dskCount, tabCount],
-              backgroundColor: ['#2563eb', '#06b6d4', '#64748b'],
+              backgroundColor: isDark ? ['#f8fafc', '#94a3b8', '#475569'] : ['#0f172a', '#64748b', '#cbd5e1'],
               borderWidth: 2,
               borderColor: chartDonutBorder
             }]

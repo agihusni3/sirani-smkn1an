@@ -121,12 +121,12 @@
                     </a>
                     @if(auth()->user()?->isAdmin() || auth()->user()?->isWakaKurikulum() || auth()->user()?->guru_id == $j->distribusi?->guru_id)
                       <a href="{{ route('akademik.jurnal.edit', $j->id) }}" class="ak-btn ak-btn-secondary ak-btn-sm" title="Edit Jurnal & Presensi">
-                        <i class="bi bi-pencil-square text-primary"></i>
+                        <i class="bi bi-pencil"></i>
                       </a>
                       <form action="{{ route('akademik.jurnal.destroy', $j->id) }}" method="POST" onsubmit="return confirm('Hapus jurnal KBM pertemuan ke-{{ $j->pertemuan_ke }} ini?')" style="margin:0;">
                         @csrf
                         @method('DELETE')
-                        <button type="submit" class="ak-btn ak-btn-secondary ak-btn-sm text-danger" title="Hapus">
+                        <button type="submit" class="ak-btn ak-btn-secondary ak-btn-sm" style="color:#b91c1c;" title="Hapus">
                           <i class="bi bi-trash"></i>
                         </button>
                       </form>

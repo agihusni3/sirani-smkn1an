@@ -135,8 +135,9 @@ class PortalAsesmenSiswaController extends Controller
                 ->with('info', 'Silakan masukkan NISN dan Tanggal Lahir untuk mengakses ruang ujian.');
         }
 
-        $siswa = Siswa::with(['rombels.jurusan'])->findOrFail($siswaId);
-        $rombelIds = $siswa->rombels->pluck('id')->all();
+        $siswa = Siswa::with(['siswaRombels.rombel.jurusan', 'rombels'])->findOrFail($siswaId);
+        $activeRombelIds = $siswa->siswaRombels->filter(fn($sr) => in_array($sr->status_keanggotaan, ['aktif', null]))->pluck('rombel_id')->all();
+        $rombelIds = !empty($activeRombelIds) ? $activeRombelIds : $siswa->rombels->pluck('id')->all();
 
         $now = now();
 

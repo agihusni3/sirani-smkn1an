@@ -87,7 +87,13 @@ class AkademikJurnalController extends Controller
         if ($request->filled('distribusi_id')) {
             $selectedDistribusi = AkademikDistribusiMengajar::with(['rombel', 'mataPelajaran'])->find($request->distribusi_id);
             if ($selectedDistribusi) {
-                $siswas = Siswa::whereHas('rombels', fn($q) => $q->where('rombels.id', $selectedDistribusi->rombel_id))
+                $siswas = Siswa::whereHas('siswaRombels', function($q) use ($selectedDistribusi) {
+                        $q->where('rombel_id', $selectedDistribusi->rombel_id)
+                          ->where(function($sq) {
+                              $sq->where('status_keanggotaan', 'aktif')
+                                ->orWhereNull('status_keanggotaan');
+                          });
+                    })
                     ->whereIn('status', ['aktif', 'pkl'])
                     ->orderBy('nama')
                     ->get();
@@ -209,7 +215,14 @@ class AkademikJurnalController extends Controller
             abort(403, 'Akses Ditolak: Anda hanya dapat mengedit jurnal KBM mata pelajaran yang Anda ampu.');
         }
 
-        $siswas = Siswa::whereHas('rombels', fn($q) => $q->where('rombels.id', $jurnal->distribusi?->rombel_id))
+        $rombelId = $jurnal->distribusi?->rombel_id;
+        $siswas = Siswa::whereHas('siswaRombels', function($q) use ($rombelId) {
+                $q->where('rombel_id', $rombelId)
+                  ->where(function($sq) {
+                      $sq->where('status_keanggotaan', 'aktif')
+                        ->orWhereNull('status_keanggotaan');
+                  });
+            })
             ->whereIn('status', ['aktif', 'pkl'])
             ->orderBy('nama')
             ->get();

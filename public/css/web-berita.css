@@ -39,11 +39,11 @@
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: var(--brand-blue);
-  background: var(--brand-blue-subtle);
+  color: #0f172a;
+  background: #f1f5f9;
   padding: 4px 12px;
   border-radius: 9999px;
-  border: 1px solid rgba(37, 99, 235, 0.2);
+  border: 1px solid #cbd5e1;
   margin-bottom: 8px;
 }
 
@@ -110,11 +110,11 @@
 }
 
 .warta-pill:hover {
-  color: var(--brand-blue);
-  border-color: rgba(37, 99, 235, 0.3);
-  background: var(--brand-blue-subtle);
+  color: #0f172a;
+  border-color: #cbd5e1;
+  background: #f1f5f9;
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.12);
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
 }
 
 .warta-pill.is-active {
@@ -160,8 +160,8 @@
 
 .warta-search-box:focus-within {
   background: #ffffff;
-  border-color: var(--brand-blue);
-  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12), 0 4px 16px rgba(15, 23, 42, 0.06);
+  border-color: #0f172a;
+  box-shadow: 0 0 0 3px rgba(15, 23, 42, 0.1);
 }
 
 .warta-search-input {
@@ -184,7 +184,7 @@
   height: 32px;
   min-width: 32px;
   border-radius: 50%;
-  background: var(--brand-blue);
+  background: #0f172a;
   border: none;
   color: #ffffff;
   display: inline-flex;
@@ -197,8 +197,8 @@
 }
 
 .warta-search-btn:hover {
-  background: #1d4ed8;
-  transform: scale(1.08) rotate(5deg);
+  background: #334155;
+  transform: scale(1.05);
 }
 
 /* ─── Grid Bento Berita ─── */
@@ -334,27 +334,13 @@
   transform: scale(1.05);
 }
 
-.warta-badge-berita {
-  background: rgba(37, 99, 235, 0.9);
-  color: #ffffff;
-}
-
-.warta-badge-pengumuman {
-  background: rgba(15, 23, 42, 0.9);
-  color: #38bdf8;
-  border: 1px solid rgba(56, 189, 248, 0.35);
-}
-
-.warta-badge-prestasi {
-  background: rgba(180, 83, 9, 0.92);
-  color: #fef08a;
-  border: 1px solid rgba(254, 240, 138, 0.35);
-}
-
+.warta-badge-berita,
+.warta-badge-pengumuman,
+.warta-badge-prestasi,
 .warta-badge-agenda {
-  background: rgba(4, 120, 87, 0.92);
-  color: #a7f3d0;
-  border: 1px solid rgba(167, 243, 208, 0.35);
+  background: rgba(15, 23, 42, 0.92);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 /* ─── Card Text & Kinetic Elements ─── */

@@ -11,7 +11,7 @@
 <div class="akademik-page-head">
   <div>
     <h1 class="akademik-page-title">
-      <i class="bi bi-patch-check-fill text-primary me-2"></i>
+      <i class="bi bi-patch-check-fill me-2" style="color:#0f172a;"></i>
       Supervisi &amp; Pengesahan Perangkat
     </h1>
     <div class="akademik-page-desc">
@@ -105,11 +105,11 @@
 
         <div style="display:grid; grid-template-columns: 1fr 2fr; gap:16px; margin-bottom:16px;">
           <div>
-            <label class="ak-form-label">Keputusan Supervisi <span class="text-danger">*</span></label>
+            <label class="ak-form-label">Keputusan Supervisi <span style="color:#64748b;">*</span></label>
             <select name="status" id="supervisiStatusSelect" class="ak-select" required style="font-weight:700;">
-              <option value="disahkan">✅ Sahkan Resmi (Terbitkan QR)</option>
-              <option value="perlu_revisi">⚠️ Perlu Revisi (Kirim Catatan)</option>
-              <option value="draft">📝 Kembalikan ke Draft</option>
+              <option value="disahkan">Sahkan Resmi (Terbitkan QR)</option>
+              <option value="perlu_revisi">Perlu Revisi (Kirim Catatan)</option>
+              <option value="draft">Kembalikan ke Draft</option>
             </select>
           </div>
           <div>
@@ -119,7 +119,7 @@
         </div>
 
         <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid #f1f5f9; padding-top:14px;">
-          <div style="font-size:12px; color:#059669;">
+          <div style="font-size:12px; color:#475569;">
             <i class="bi bi-info-circle me-1"></i> Pengesahan resmi akan otomatis menerbitkan tanda tangan digital &amp; QR Code.
           </div>
           <div style="display:flex; gap:10px;">

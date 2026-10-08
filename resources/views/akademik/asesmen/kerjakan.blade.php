@@ -17,7 +17,7 @@
 
   <style>
     :root {
-      --cbt-primary: #2563eb;
+      --cbt-primary: #0f172a;
       --cbt-dark: #0f172a;
       --cbt-bg: #f8fafc;
       --cbt-card: #ffffff;
@@ -56,9 +56,9 @@
     }
 
     .cbt-brand-badge {
-      background: #eff6ff;
-      color: #2563eb;
-      border: 1px solid #bfdbfe;
+      background: #f1f5f9;
+      color: #0f172a;
+      border: 1px solid #cbd5e1;
       padding: 4px 10px;
       border-radius: 6px;
       font-size: 11px;
@@ -84,30 +84,30 @@
     }
 
     .cbt-pill-timer {
-      background: #fef2f2;
-      color: #b91c1c;
-      border: 1px solid #fecaca;
+      background: #f8fafc;
+      color: #0f172a;
+      border: 1px solid #cbd5e1;
       font-family: monospace;
       font-size: 17px;
       letter-spacing: 1px;
     }
 
     .cbt-pill-integrity {
-      background: #ecfdf5;
-      color: #047857;
-      border: 1px solid #a7f3d0;
+      background: #f8fafc;
+      color: #334155;
+      border: 1px solid #e2e8f0;
     }
 
     .cbt-pill-integrity.warning {
-      background: #fffbeb;
-      color: #b45309;
-      border-color: #fde68a;
+      background: #f8fafc;
+      color: #334155;
+      border-color: #cbd5e1;
     }
 
     .cbt-pill-integrity.danger {
-      background: #fef2f2;
-      color: #b91c1c;
-      border-color: #fca5a5;
+      background: #f8fafc;
+      color: #0f172a;
+      border-color: #94a3b8;
     }
 
     .cbt-body-layout {
@@ -189,18 +189,18 @@
     .cbt-opt-label input[type="radio"] {
       width: 18px;
       height: 18px;
-      accent-color: #2563eb;
+      accent-color: #0f172a;
       margin: 0;
     }
 
     .cbt-opt-label.active {
-      background: #eff6ff;
-      border-color: #3b82f6;
+      background: #f1f5f9;
+      border-color: #0f172a;
     }
 
     .cbt-opt-label.active .cbt-opt-txt {
       font-weight: 700;
-      color: #1d4ed8;
+      color: #0f172a;
     }
 
     .cbt-nav-box {
@@ -240,8 +240,8 @@
     }
 
     .cbt-nav-btn.answered {
-      background: #10b981;
-      border-color: #059669;
+      background: #0f172a;
+      border-color: #0f172a;
       color: #ffffff;
     }
 
@@ -377,7 +377,7 @@
 @if($isSelesai)
   <div class="cbt-overlay" style="display:flex;">
     <div class="cbt-modal-card" style="max-width:580px;">
-      <div style="width:68px; height:68px; border-radius:50%; background:#ecfdf5; color:#059669; display:inline-flex; align-items:center; justify-content:center; font-size:32px; margin-bottom:16px;">
+      <div style="width:68px; height:68px; border-radius:50%; background:#f1f5f9; color:#0f172a; display:inline-flex; align-items:center; justify-content:center; font-size:32px; margin-bottom:16px; border:1px solid #cbd5e1;">
         <i class="bi bi-check-circle-fill"></i>
       </div>
       <h2 style="font-weight:900; font-size:22px; color:#0f172a; margin-bottom:8px;">Lembar Jawaban Berhasil Terkirim</h2>
@@ -408,7 +408,7 @@
         @if($asesmen->tampilkan_nilai)
           <div style="border-top:1px dashed #cbd5e1; margin-top:12px; padding-top:12px; display:flex; justify-content:space-between; align-items:center;">
             <span style="font-weight:700; color:#0f172a; font-size:14px;">Skor Nilai Akhir:</span>
-            <span style="font-size:26px; font-weight:900; color:{{ $hasil->nilai >= $asesmen->passing_grade ? '#059669' : '#dc2626' }};">
+            <span style="font-size:26px; font-weight:900; color:#0f172a;">
               {{ $hasil->nilai }}
             </span>
           </div>
@@ -430,15 +430,15 @@
 @if(!$isSelesai && $isLocked)
   <div class="cbt-overlay" style="display:flex;">
     <div class="cbt-modal-card">
-      <div style="width:68px; height:68px; border-radius:50%; background:#fef2f2; color:#dc2626; display:inline-flex; align-items:center; justify-content:center; font-size:32px; margin-bottom:16px;">
+      <div style="width:68px; height:68px; border-radius:50%; background:#f1f5f9; color:#0f172a; display:inline-flex; align-items:center; justify-content:center; font-size:32px; margin-bottom:16px; border:1px solid #cbd5e1;">
         <i class="bi bi-shield-x"></i>
       </div>
-      <h2 style="font-weight:900; font-size:20px; color:#991b1b; margin-bottom:8px;">Sesi Ujian Dikunci Otomatis</h2>
+      <h2 style="font-weight:900; font-size:20px; color:#0f172a; margin-bottom:8px;">Sesi Ujian Dikunci Otomatis</h2>
       <p style="color:#64748b; font-size:13px; margin-bottom:20px; line-height:1.5;">
         Sistem anti-kecurangan mendeteksi Anda telah keluar dari layar/jendela CBT sebanyak <strong>{{ $violationsNow }} kali</strong>, yang melebihi batas toleransi maksimal ({{ $maxToleransi }} kali).
       </p>
 
-      <div style="background:#fff1f2; border:1px solid #fecdd3; border-radius:10px; padding:14px; margin-bottom:20px; font-size:12.5px; color:#9f1239; text-align:left;">
+      <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:14px; margin-bottom:20px; font-size:12.5px; color:#334155; text-align:left;">
         <i class="bi bi-info-circle-fill me-1"></i> Silakan lapor ke <strong>Pengawas Ruang atau Guru Pengampu</strong> untuk meminta reset izin sesi ujian Anda.
       </div>
 

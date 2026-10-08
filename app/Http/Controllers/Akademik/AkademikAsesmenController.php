@@ -659,13 +659,14 @@ class AkademikAsesmenController extends Controller
         }
 
         $user = auth()->user();
+        $siswaId = $user?->siswa_id ?: session('cbt_siswa_id');
         $siswa = null;
 
         $targetRombelIds = $asesmen->target_rombel_ids ?? [$asesmen->distribusi?->rombel_id];
         $targetRombelIds = array_map('intval', (array) $targetRombelIds);
 
-        if ($user?->siswa_id) {
-            $siswa = Siswa::with('rombels')->find($user->siswa_id);
+        if ($siswaId) {
+            $siswa = Siswa::with('rombels')->find($siswaId);
 
             // Validasi apakah rombel siswa termasuk dalam rombel sasaran
             if ($siswa) {
@@ -762,7 +763,7 @@ class AkademikAsesmenController extends Controller
     public function submitJawaban(Request $request, $id)
     {
         $asesmen = AkademikAsesmenOnline::with('soals')->findOrFail($id);
-        $siswaId = $request->input('siswa_id');
+        $siswaId = $request->input('siswa_id') ?: (session('cbt_siswa_id') ?: auth()->user()?->siswa_id);
         $jawabanInput = $request->input('jawaban', []); // [soal_id => 'A']
 
         // Pastikan $siswaId benar-benar valid di database
@@ -816,16 +817,18 @@ class AkademikAsesmenController extends Controller
         // Auto-sinkronisasi nilai ujian ke Buku Nilai & Leger
         AkademikNilaiController::syncSingleAsesmenToNilai($asesmen, $siswaId, $nilaiAkhir);
 
+        $redirectUrl = session('cbt_siswa_id') ? route('portal.asesmen.dashboard') : route('akademik.asesmen.hasil', $asesmen->id);
+
         if ($request->wantsJson()) {
             return response()->json([
                 'success' => true,
                 'nilai' => $nilaiAkhir,
                 'status_kejujuran' => $statusKejujuran,
-                'redirect' => route('akademik.asesmen.hasil', $asesmen->id)
+                'redirect' => $redirectUrl
             ]);
         }
 
-        return redirect()->route('akademik.asesmen.hasil', $asesmen->id)
+        return redirect($redirectUrl)
             ->with('success', "Asesmen telah diselesaikan! Nilai perolehan: {$nilaiAkhir} (Integritas: " . strtoupper($statusKejujuran) . ")");
     }
 
@@ -865,7 +868,7 @@ class AkademikAsesmenController extends Controller
     public function logPelanggaran(Request $request, $id)
     {
         $asesmen = AkademikAsesmenOnline::findOrFail($id);
-        $siswaId = $request->input('siswa_id') ?: session('cbt_siswa_id');
+        $siswaId = $request->input('siswa_id') ?: (session('cbt_siswa_id') ?: auth()->user()?->siswa_id);
         if (!$siswaId) {
             return response()->json(['error' => 'Sesi ujian tidak valid atau telah berakhir.'], 403);
         }

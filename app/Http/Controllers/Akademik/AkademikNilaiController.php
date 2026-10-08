@@ -63,7 +63,13 @@ class AkademikNilaiController extends Controller
             ->findOrFail($distribusiId);
         $this->authorizeDistribusi($distribusi);
 
-        $siswas = Siswa::whereHas('rombels', fn($q) => $q->where('rombels.id', $distribusi->rombel_id))
+        $siswas = Siswa::whereHas('siswaRombels', function($q) use ($distribusi) {
+                $q->where('rombel_id', $distribusi->rombel_id)
+                  ->where(function($sq) {
+                      $sq->where('status_keanggotaan', 'aktif')
+                        ->orWhereNull('status_keanggotaan');
+                  });
+            })
             ->whereIn('status', ['aktif', 'pkl'])
             ->orderBy('nama')
             ->get();
@@ -134,7 +140,13 @@ class AkademikNilaiController extends Controller
         $distribusi = AkademikDistribusiMengajar::with(['mataPelajaran', 'rombel'])->findOrFail($distribusiId);
         $this->authorizeDistribusi($distribusi);
 
-        $siswas = Siswa::whereHas('rombels', fn($q) => $q->where('rombels.id', $distribusi->rombel_id))
+        $siswas = Siswa::whereHas('siswaRombels', function($q) use ($distribusi) {
+                $q->where('rombel_id', $distribusi->rombel_id)
+                  ->where(function($sq) {
+                      $sq->where('status_keanggotaan', 'aktif')
+                        ->orWhereNull('status_keanggotaan');
+                  });
+            })
             ->whereIn('status', ['aktif', 'pkl'])
             ->pluck('id');
 
@@ -340,7 +352,13 @@ class AkademikNilaiController extends Controller
             ->when($ta, fn($q) => $q->where('tahun_ajaran_id', $ta->id))
             ->get();
 
-        $siswas = Siswa::whereHas('rombels', fn($q) => $q->where('rombels.id', $selectedRombelId))
+        $siswas = Siswa::whereHas('siswaRombels', function($q) use ($selectedRombelId) {
+                $q->where('rombel_id', $selectedRombelId)
+                  ->where(function($sq) {
+                      $sq->where('status_keanggotaan', 'aktif')
+                        ->orWhereNull('status_keanggotaan');
+                  });
+            })
             ->whereIn('status', ['aktif', 'pkl'])
             ->orderBy('nama')
             ->get();

@@ -7,18 +7,17 @@
   @include('partials.styles')
   <style>
     .humas-hero-bar {
-      background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 50%, #0284c7 100%);
+      background: #0f172a;
       border-radius: 16px;
       padding: 22px 24px;
       color: #ffffff;
       margin-bottom: 20px;
-      box-shadow: 0 10px 25px rgba(37, 99, 235, 0.2);
       display: flex;
       justify-content: space-between;
       align-items: center;
       flex-wrap: wrap;
       gap: 16px;
-      border: 1px solid rgba(255, 255, 255, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.1);
     }
     .humas-stat-grid {
       display: grid;
@@ -37,15 +36,14 @@
       transition: all 0.15s ease;
     }
     .humas-stat-card:hover {
-      border-color: var(--navy);
-      box-shadow: 0 4px 14px rgba(37, 99, 235, 0.15);
+      border-color: #cbd5e1;
     }
     .humas-stat-val {
       font-size: 24px;
       font-weight: 900;
       font-family: var(--font-mono);
       line-height: 1.1;
-      color: var(--text);
+      color: #0f172a;
     }
   </style>
 </head>
@@ -58,34 +56,34 @@
     {{-- HUMAS HERO HEADER --}}
     <div class="humas-hero-bar no-print">
       <div>
-        <div style="display:inline-flex; align-items:center; gap:6px; background:rgba(255,255,255,0.18); color:#f8fafc; font-size:11px; font-weight:800; padding:3px 10px; border-radius:20px; margin-bottom:8px; border:1px solid rgba(255,255,255,0.25);">
-          <i class="bi bi-globe-americas"></i> WORKSPACE RESMI HUMAS &amp; WEBSITE
+        <div style="display:inline-flex; align-items:center; gap:6px; background:rgba(255,255,255,0.12); color:#f8fafc; font-size:11px; font-weight:800; padding:3px 10px; border-radius:20px; margin-bottom:8px; border:1px solid rgba(255,255,255,0.2);">
+          <i class="bi bi-globe"></i> WORKSPACE HUMAS &amp; WEBSITE
         </div>
         <h1 style="margin:0 0 6px; font-size:22px; font-weight:900; letter-spacing:-0.02em; color:#ffffff;">
           Pusat Publikasi Berita &amp; Informasi Sekolah
         </h1>
-        <p style="margin:0; font-size:13px; color:#e2e8f0; max-width:640px; font-weight:500;">
+        <p style="margin:0; font-size:13px; color:#cbd5e1; max-width:640px; font-weight:500;">
           Kelola rilis berita resmi, pengumuman agenda vokasi, artikel prestasi, dan etalase hero banner utama SMKN 1 Air Naningan.
         </p>
       </div>
 
       <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-        <a href="{{ route('admin.portal') }}" class="btn btn-sm" style="background:rgba(255,255,255,0.18); color:#ffffff; font-weight:800; border-radius:8px; font-size:12px; padding:8px 14px; border:1px solid rgba(255,255,255,0.25); text-decoration:none; display:inline-flex; align-items:center; gap:6px;" title="Buka Data Control Center (DCC) SMKN 1 AN">
+        <a href="{{ route('admin.portal') }}" class="btn btn-sm" style="background:rgba(255,255,255,0.12); color:#ffffff; font-weight:800; border-radius:8px; font-size:12px; padding:8px 14px; border:1px solid rgba(255,255,255,0.2); text-decoration:none; display:inline-flex; align-items:center; gap:6px;" title="Buka Data Control Center (DCC) SMKN 1 AN">
           <i class="bi bi-command"></i> DCC SMKN 1 AN
         </a>
-        <a href="{{ route('admin.berita.create') }}" class="btn btn-sm" style="background:#ffffff; color:#1e40af; font-weight:900; border-radius:8px; font-size:12px; padding:8px 16px; border:none; text-decoration:none; display:inline-flex; align-items:center; gap:6px; box-shadow:0 2px 8px rgba(0,0,0,0.15);">
+        <a href="{{ route('admin.berita.create') }}" class="btn btn-sm" style="background:#ffffff; color:#0f172a; font-weight:900; border-radius:8px; font-size:12px; padding:8px 16px; border:none; text-decoration:none; display:inline-flex; align-items:center; gap:6px;">
           <i class="bi bi-plus-lg"></i> Tulis Berita Baru
         </a>
       </div>
     </div>
 
     @if(session('success'))
-      <div class="panel" style="background:rgba(16,185,129,0.12); border:1px solid rgba(16,185,129,0.3); color:#10b981; padding:12px 16px; margin-bottom:16px; border-radius:var(--r-sm); font-size:13px; font-weight:700;">
+      <div class="panel" style="background:#ecfdf5; border:1px solid #a7f3d0; color:#065f46; padding:12px 16px; margin-bottom:16px; border-radius:var(--r-sm); font-size:13px; font-weight:700;">
         <i class="bi bi-check-circle-fill" style="margin-right:6px;"></i> {{ session('success') }}
       </div>
     @endif
     @if(session('error'))
-      <div class="panel" style="background:rgba(239,68,68,0.12); border:1px solid rgba(239,68,68,0.3); color:#ef4444; padding:12px 16px; margin-bottom:16px; border-radius:var(--r-sm); font-size:13px; font-weight:700;">
+      <div class="panel" style="background:#fef2f2; border:1px solid #fecaca; color:#991b1b; padding:12px 16px; margin-bottom:16px; border-radius:var(--r-sm); font-size:13px; font-weight:700;">
         <i class="bi bi-exclamation-triangle-fill" style="margin-right:6px;"></i> {{ session('error') }}
       </div>
     @endif
@@ -93,41 +91,41 @@
     {{-- STATISTIK HUMAS --}}
     <div class="humas-stat-grid">
       <div class="humas-stat-card">
-        <div style="width:42px; height:42px; border-radius:10px; background:rgba(37,99,235,0.15); color:var(--navy); display:flex; align-items:center; justify-content:center; font-size:20px;">
+        <div style="width:40px; height:40px; border-radius:8px; background:#f1f5f9; color:#0f172a; display:flex; align-items:center; justify-content:center; font-size:18px; border:1px solid #e2e8f0;">
           <i class="bi bi-newspaper"></i>
         </div>
         <div>
-          <div class="humas-stat-val" style="color:var(--navy);">{{ $counts['total'] ?? $beritas->total() }}</div>
+          <div class="humas-stat-val">{{ $counts['total'] ?? $beritas->total() }}</div>
           <div style="font-size:11.5px; color:var(--text-3); font-weight:800;">Total Artikel &amp; Rilis</div>
         </div>
       </div>
 
       <div class="humas-stat-card">
-        <div style="width:42px; height:42px; border-radius:10px; background:rgba(16,185,129,0.15); color:#10b981; display:flex; align-items:center; justify-content:center; font-size:20px;">
-          <i class="bi bi-check-circle-fill"></i>
+        <div style="width:40px; height:40px; border-radius:8px; background:#f1f5f9; color:#0f172a; display:flex; align-items:center; justify-content:center; font-size:18px; border:1px solid #e2e8f0;">
+          <i class="bi bi-check-circle"></i>
         </div>
         <div>
-          <div class="humas-stat-val" style="color:#10b981;">{{ $counts['published'] ?? 0 }}</div>
+          <div class="humas-stat-val">{{ $counts['published'] ?? 0 }}</div>
           <div style="font-size:11.5px; color:var(--text-3); font-weight:800;">Artikel Tayang Publik</div>
         </div>
       </div>
 
       <div class="humas-stat-card">
-        <div style="width:42px; height:42px; border-radius:10px; background:rgba(14,165,233,0.15); color:#0ea5e9; display:flex; align-items:center; justify-content:center; font-size:20px;">
+        <div style="width:40px; height:40px; border-radius:8px; background:#f1f5f9; color:#0f172a; display:flex; align-items:center; justify-content:center; font-size:18px; border:1px solid #e2e8f0;">
           <i class="bi bi-images"></i>
         </div>
         <div>
-          <div class="humas-stat-val" style="color:#0ea5e9;">{{ $counts['banners'] ?? 0 }}</div>
+          <div class="humas-stat-val">{{ $counts['banners'] ?? 0 }}</div>
           <div style="font-size:11.5px; color:var(--text-3); font-weight:800;">Hero Banner Aktif</div>
         </div>
       </div>
 
       <div class="humas-stat-card">
-        <div style="width:42px; height:42px; border-radius:10px; background:rgba(245,158,11,0.15); color:#f59e0b; display:flex; align-items:center; justify-content:center; font-size:20px;">
-          <i class="bi bi-eye-fill"></i>
+        <div style="width:40px; height:40px; border-radius:8px; background:#f1f5f9; color:#0f172a; display:flex; align-items:center; justify-content:center; font-size:18px; border:1px solid #e2e8f0;">
+          <i class="bi bi-eye"></i>
         </div>
         <div>
-          <div class="humas-stat-val" style="color:#f59e0b;">{{ number_format($counts['views'] ?? 0) }}</div>
+          <div class="humas-stat-val">{{ number_format($counts['views'] ?? 0) }}</div>
           <div style="font-size:11.5px; color:var(--text-3); font-weight:800;">Total Dibaca Publik</div>
         </div>
       </div>
@@ -147,7 +145,7 @@
             <option value="agenda" {{ request('kategori') == 'agenda' ? 'selected' : '' }}>Agenda</option>
           </select>
 
-          <button type="submit" class="btn btn-sm" style="background:var(--navy); color:#ffffff; height:38px; padding:0 16px; font-size:12.5px; font-weight:800; border-radius:8px; border:none; cursor:pointer;">
+          <button type="submit" class="btn btn-sm" style="background:#0f172a; color:#ffffff; height:38px; padding:0 16px; font-size:12.5px; font-weight:800; border-radius:8px; border:none; cursor:pointer;">
             <i class="bi bi-search"></i> Cari
           </button>
 
@@ -159,7 +157,7 @@
         </div>
 
         <a href="{{ route('web.berita.index') }}" target="_blank" class="btn btn-sm" style="height:38px; padding:0 14px; display:inline-flex; align-items:center; gap:6px; background:var(--bg-3); border:1px solid var(--border-2); color:var(--text); font-size:12px; font-weight:800; border-radius:8px; text-decoration:none;">
-          <i class="bi bi-box-arrow-up-right" style="color:var(--navy);"></i> Lihat Kabar Sekolah di Web
+          <i class="bi bi-box-arrow-up-right" style="color:#64748b;"></i> Lihat Kabar Sekolah di Web
         </a>
       </form>
     </div>
@@ -169,14 +167,14 @@
       <div style="overflow-x:auto;">
         <table class="table" style="width:100%; border-collapse:collapse; font-size:12.5px; margin:0;">
           <thead>
-            <tr style="background:var(--bg-3); border-bottom:2px solid var(--border); text-align:left;">
-              <th style="padding:12px 14px; width:70px; color:var(--text); font-weight:800;">Sampul</th>
-              <th style="padding:12px 14px; color:var(--text); font-weight:800;">Judul Artikel</th>
-              <th style="padding:12px 14px; color:var(--text); font-weight:800;">Kategori</th>
-              <th style="padding:12px 14px; color:var(--text); font-weight:800;">Penulis &amp; Tanggal</th>
-              <th style="padding:12px 14px; text-align:center; color:var(--text); font-weight:800;">Status</th>
-              <th style="padding:12px 14px; text-align:center; color:var(--text); font-weight:800;">Dilihat</th>
-              <th style="padding:12px 14px; text-align:center; color:var(--text); font-weight:800;">Aksi</th>
+            <tr style="background:#f8fafc; border-bottom:1px solid #cbd5e1; text-align:left;">
+              <th style="padding:12px 14px; width:70px; color:#0f172a; font-weight:800;">Sampul</th>
+              <th style="padding:12px 14px; color:#0f172a; font-weight:800;">Judul Artikel</th>
+              <th style="padding:12px 14px; color:#0f172a; font-weight:800;">Kategori</th>
+              <th style="padding:12px 14px; color:#0f172a; font-weight:800;">Penulis &amp; Tanggal</th>
+              <th style="padding:12px 14px; text-align:center; color:#0f172a; font-weight:800;">Status</th>
+              <th style="padding:12px 14px; text-align:center; color:#0f172a; font-weight:800;">Dilihat</th>
+              <th style="padding:12px 14px; text-align:center; color:#0f172a; font-weight:800;">Aksi</th>
             </tr>
           </thead>
           <tbody>
@@ -200,7 +198,7 @@
                   @endif
                 </td>
                 <td style="padding:10px 14px;">
-                  <span style="font-size:10.5px; font-weight:800; padding:3px 8px; border-radius:6px; background:rgba(37,99,235,0.12); color:var(--navy); border:1px solid var(--border); text-transform:uppercase;">
+                  <span style="font-size:10.5px; font-weight:700; padding:3px 8px; border-radius:4px; background:#f1f5f9; color:#334155; border:1px solid #cbd5e1; text-transform:uppercase;">
                     {{ $b->kategori }}
                   </span>
                 </td>
@@ -212,27 +210,27 @@
                 </td>
                 <td style="padding:10px 14px; text-align:center;">
                   @if($b->is_published)
-                    <span style="font-size:10.5px; font-weight:800; padding:3px 8px; border-radius:12px; background:rgba(16,185,129,0.15); color:#10b981; border:1px solid rgba(16,185,129,0.3);">
+                    <span style="font-size:10.5px; font-weight:700; padding:3px 8px; border-radius:4px; background:#f1f5f9; color:#0f172a; border:1px solid #cbd5e1;">
                       Tayang
                     </span>
                   @else
-                    <span style="font-size:10.5px; font-weight:800; padding:3px 8px; border-radius:12px; background:var(--bg-3); color:var(--text-3); border:1px solid var(--border-2);">
+                    <span style="font-size:10.5px; font-weight:600; padding:3px 8px; border-radius:4px; background:#f8fafc; color:#64748b; border:1px solid #e2e8f0;">
                       Draf
                     </span>
                   @endif
                 </td>
-                <td style="padding:10px 14px; text-align:center; font-family:var(--font-mono); font-size:11px; color:var(--text); font-weight:800;">
+                <td style="padding:10px 14px; text-align:center; font-family:var(--font-mono); font-size:11px; color:#0f172a; font-weight:800;">
                   {{ $b->views_count ?? 0 }}
                 </td>
                 <td style="padding:10px 14px; text-align:center;">
                   <div style="display:inline-flex; gap:6px;">
-                    <a href="{{ route('admin.berita.edit', $b->id) }}" class="btn btn-sm btn-outline" style="padding:5px 10px; font-size:11.5px; border-radius:6px; border-color:var(--border-2); color:var(--navy);" title="Edit Artikel">
+                    <a href="{{ route('admin.berita.edit', $b->id) }}" class="btn btn-sm" style="padding:5px 9px; font-size:11.5px; border-radius:5px; border:1px solid #cbd5e1; background:#f8fafc; color:#0f172a;" title="Edit Artikel">
                       <i class="bi bi-pencil"></i>
                     </a>
                     <form action="{{ route('admin.berita.destroy', $b->id) }}" method="POST" onsubmit="return confirm('Hapus artikel ini secara permanen?')" style="margin:0;">
                       @csrf
                       @method('DELETE')
-                      <button type="submit" class="btn btn-sm btn-outline" style="padding:5px 10px; font-size:11.5px; color:#ef4444; border-color:rgba(239,68,68,0.3); border-radius:6px;" title="Hapus Artikel">
+                      <button type="submit" class="btn btn-sm" style="padding:5px 9px; font-size:11.5px; color:#b91c1c; border:1px solid #fecaca; background:#f8fafc; border-radius:5px;" title="Hapus Artikel">
                         <i class="bi bi-trash"></i>
                       </button>
                     </form>
