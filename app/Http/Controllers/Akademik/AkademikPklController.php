@@ -52,7 +52,14 @@ class AkademikPklController extends Controller
             'kontak_dudi' => 'nullable|string|max:20',
         ]);
 
-        AkademikPklTempat::create($request->all());
+        AkademikPklTempat::create($request->only([
+            'nama_dudi',
+            'bidang_usaha',
+            'alamat',
+            'kota',
+            'nama_pembimbing_dudi',
+            'kontak_dudi',
+        ]));
 
         return redirect()->back()->with('success', 'Mitra DU/DI berhasil ditambahkan.');
     }
@@ -71,7 +78,15 @@ class AkademikPklController extends Controller
 
         AkademikPklSiswa::updateOrCreate(
             ['siswa_id' => $request->siswa_id, 'tahun_ajaran_id' => $request->tahun_ajaran_id],
-            $request->all()
+            $request->only([
+                'siswa_id',
+                'pkl_tempat_id',
+                'guru_pembimbing_id',
+                'tahun_ajaran_id',
+                'tanggal_mulai',
+                'tanggal_selesai',
+                'status',
+            ])
         );
 
         return redirect()->back()->with('success', 'Data penempatan PKL siswa berhasil disimpan.');
@@ -80,6 +95,13 @@ class AkademikPklController extends Controller
     public function updateNilai(Request $request, $id)
     {
         $pklSiswa = AkademikPklSiswa::findOrFail($id);
+
+        $user = auth()->user();
+        if ($user && $user->role === 'guru') {
+            if (!$user->guru_id || (int)$user->guru_id !== (int)$pklSiswa->guru_pembimbing_id) {
+                abort(403, 'Akses ditolak: Anda bukan guru pembimbing yang ditugaskan untuk siswa PKL ini.');
+            }
+        }
 
         $request->validate([
             'nilai_pkl' => 'required|numeric|min:0|max:100',

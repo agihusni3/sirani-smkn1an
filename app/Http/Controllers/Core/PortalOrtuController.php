@@ -64,8 +64,11 @@ class PortalOrtuController extends Controller
                 $digitsOnly !== '' ? str_pad($digitsOnly, 10, '0', STR_PAD_LEFT) : null,
             ]));
 
-            // Pencarian siswa berdasarkan NISN resmi (fleksibel awalan 0 atau 10 digit NISN standar)
-            $siswa = Siswa::whereIn('nisn', $candidateNisns)
+            // Pencarian siswa berdasarkan NISN atau NIS resmi (fleksibel awalan 0 atau digit standar)
+            $siswa = Siswa::where(function ($query) use ($candidateNisns) {
+                $query->whereIn('nisn', $candidateNisns)
+                      ->orWhereIn('nis', $candidateNisns);
+            })
                 ->with('kartuRfid')
                 ->first();
 
@@ -530,7 +533,7 @@ class PortalOrtuController extends Controller
                 'tipe'     => $isKoreksi ? 'koreksi' : 'notifikasi',
                 'kategori' => $dn->kategori,
                 'tanggal'  => $dn->tanggal ? $dn->tanggal->format('Y-m-d') : null,
-                'url'      => '/presensi-siswa/' . ($siswa->nisn ?: $siswa->id),
+                'url'      => '/presensi-siswa/' . ($siswa->nisn ?: ($siswa->nis ?: '')),
             ];
         }
 
@@ -555,7 +558,7 @@ class PortalOrtuController extends Controller
                 'tipe'     => 'koreksi',
                 'kategori' => 'koreksi_presensi',
                 'tanggal'  => $ka->tanggal,
-                'url'      => '/presensi-siswa/' . ($siswa->nisn ?: $siswa->id),
+                'url'      => '/presensi-siswa/' . ($siswa->nisn ?: ($siswa->nis ?: '')),
             ];
         }
 

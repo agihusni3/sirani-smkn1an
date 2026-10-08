@@ -54,7 +54,16 @@ class AkademikP5bkController extends Controller
             'tanggal_selesai' => 'nullable|date',
         ]);
 
-        AkademikP5bkProyek::create($request->all());
+        AkademikP5bkProyek::create($request->only([
+            'rombel_id',
+            'tahun_ajaran_id',
+            'semester',
+            'nama_proyek',
+            'tema',
+            'deskripsi',
+            'tanggal_mulai',
+            'tanggal_selesai',
+        ]));
 
         return redirect()->back()->with('success', 'Proyek P5BK berhasil dibuat.');
     }

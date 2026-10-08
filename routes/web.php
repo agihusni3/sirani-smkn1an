@@ -774,4 +774,6 @@ Route::middleware('auth')->group(function () {
 });
 
 // Verifikasi Keabsahan Surat Resmi via QR Code (Akses Publik Tanpa Login)
-Route::get('/verifikasi-surat/{hash}', [SituanPelayananSuratController::class, 'verifikasiSuratPublik'])->name('situan.verifikasi-surat');
+Route::get('/verifikasi-surat/{hash}', [SituanPelayananSuratController::class, 'verifikasiSuratPublik'])
+    ->name('situan.verifikasi-surat')
+    ->middleware('throttle:60,1');
