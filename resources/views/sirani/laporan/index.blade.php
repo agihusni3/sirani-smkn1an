@@ -18,7 +18,7 @@
       $todayDate = \Carbon\Carbon::today()->toDateString();
       $isPiketBertugasHariIni = $userLogin && (
           $userLogin->isAdmin() || 
-          ($userLogin->guru && \App\Models\JadwalPiket::isGuruPiketHariIni($userLogin->guru->id, $todayDate))
+          $userLogin->isPiketHariIni()
       );
     @endphp
 
@@ -703,7 +703,7 @@
                   </td>
                   <td class="no-print" style="text-align:center;">
                     @php
-                      $canKoreksi = $isPiketBertugasHariIni && ($lap->tanggal === $todayDate);
+                      $canKoreksi = $userLogin && ($userLogin->isAdmin() || ($userLogin->isPiketHariIni() && $lap->tanggal === $todayDate));
                     @endphp
                     @if($canKoreksi)
                       <div style="display:flex; gap:4px; justify-content:center;">
@@ -897,7 +897,7 @@
                   </td>
                   <td class="no-print" style="text-align:center;">
                     @php
-                      $canKoreksi = $isPiketBertugasHariIni && ($lap->tanggal === $todayDate);
+                      $canKoreksi = $userLogin && ($userLogin->isAdmin() || ($userLogin->isPiketHariIni() && $lap->tanggal === $todayDate));
                     @endphp
                     <div style="display:flex; gap:4px; justify-content:center;">
                       @if($canKoreksi)
@@ -1014,19 +1014,36 @@
         </div>
       </div>
 
-      <div class="form-group" style="margin-bottom: 16px;">
+      <div class="form-group" style="margin-bottom: 12px;">
         <label style="font-weight: 700; font-size: 12px; text-transform: uppercase; color: var(--text-2); margin-bottom: 6px; display: block;">
           Pilih Status Presensi Baru <span style="color: var(--red);">*</span>
         </label>
-        <select name="status" id="koreksi_status" required class="input-field" style="width: 100%; height: 42px; font-weight: 700; font-size: 13.5px;">
+        <select name="status" id="koreksi_status" required class="input-field" style="width: 100%; height: 42px; font-weight: 700; font-size: 13.5px;" onchange="handleModalStatusChange(this.value)">
           <option value="hadir">HADIR (Tepat Waktu)</option>
           <option value="terlambat">TERLAMBAT (Lewat Jam Toleransi)</option>
           <option value="izin">IZIN (Dengan Keterangan)</option>
           <option value="sakit">SAKIT (Surat Dokter / Istirahat)</option>
           <option value="dispen">DISPEN (Tugas Dinas / Lomba)</option>
           <option value="alpha">ALPHA (Tanpa Keterangan)</option>
-          <option value="bolos">BOLOS (Tidak Tap Pulang)</option>
+          <option value="titip_kartu">BATALKAN PRESENSI — Terindikasi Titip Kartu (Alpha)</option>
+          <option value="bolos">BOLOS (Tidak Tap Pulang / Meninggalkan Kelas)</option>
         </select>
+      </div>
+
+      {{-- Quick Action Preset Chips --}}
+      <div style="margin-bottom: 14px; display: flex; flex-wrap: wrap; gap: 6px;">
+        <button type="button" onclick="setPresetKoreksiLaporan('dispen')" class="btn btn-sm btn-outline" style="border-radius: 6px; font-size: 11px; font-weight: 700; background: rgba(13,148,136,0.1); color: #0d9488; border-color: rgba(13,148,136,0.3);">
+          Dispensasi
+        </button>
+        <button type="button" onclick="setPresetKoreksiLaporan('titip_kartu')" class="btn btn-sm btn-outline" style="border-radius: 6px; font-size: 11px; font-weight: 700; background: rgba(220,38,38,0.1); color: #dc2626; border-color: rgba(220,38,38,0.3);">
+          Titip Kartu
+        </button>
+        <button type="button" onclick="setPresetKoreksiLaporan('alpha')" class="btn btn-sm btn-outline" style="border-radius: 6px; font-size: 11px; font-weight: 700; background: rgba(100,116,139,0.1); color: #475569; border-color: rgba(100,116,139,0.3);">
+          Reset Alpha
+        </button>
+        <button type="button" onclick="setPresetKoreksiLaporan('bolos')" class="btn btn-sm btn-outline" style="border-radius: 6px; font-size: 11px; font-weight: 700; background: rgba(234,88,12,0.1); color: #ea580c; border-color: rgba(234,88,12,0.3);">
+          Bolos
+        </button>
       </div>
 
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 16px;">
@@ -1062,6 +1079,34 @@
 </div>
 
 <script>
+  function handleModalStatusChange(val) {
+    const jamMasuk = document.getElementById('koreksi_jam_masuk');
+    const jamPulang = document.getElementById('koreksi_jam_pulang');
+    const ket = document.getElementById('koreksi_keterangan');
+
+    if (val === 'titip_kartu') {
+      if (jamMasuk) jamMasuk.value = '';
+      if (jamPulang) jamPulang.value = '';
+      if (ket && !ket.value) ket.value = 'Dibatalkan — Terindikasi Titip Kartu Presensi';
+    } else if (val === 'alpha') {
+      if (jamMasuk) jamMasuk.value = '';
+      if (jamPulang) jamPulang.value = '';
+    } else if (val === 'bolos') {
+      if (jamPulang) jamPulang.value = '';
+      if (ket && !ket.value) ket.value = 'Intervensi: Meninggalkan kelas / bolos';
+    } else if (val === 'dispen') {
+      if (ket && !ket.value) ket.value = 'Dispensasi tugas kedinasan / perlombaan';
+    }
+  }
+
+  function setPresetKoreksiLaporan(val) {
+    const sel = document.getElementById('koreksi_status');
+    if (sel) {
+      sel.value = val;
+      handleModalStatusChange(val);
+    }
+  }
+
   function openKoreksiModal(id, nama, tanggal, status, jamMasuk, jamPulang, sumber, keterangan) {
     const modal = document.getElementById('modalKoreksiPresensi');
     const form = document.getElementById('formKoreksiPresensi');

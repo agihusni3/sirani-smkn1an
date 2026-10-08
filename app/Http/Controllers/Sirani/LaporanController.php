@@ -813,10 +813,10 @@ class LaporanController extends Controller
         $user    = auth()->user();
         $today   = \Carbon\Carbon::today()->toDateString();
 
-        // 1. Hak Akses: Hanya Guru Piket yang terjadwal bertugas hari ini atau Admin yang berhak mengoreksi
+        // 1. Hak Akses: Guru Piket yang terjadwal bertugas hari ini atau Admin
         $isAuthorized = $user && (
             $user->isAdmin() || 
-            ($user->guru && \App\Models\JadwalPiket::isGuruPiketHariIni($user->guru->id, $today))
+            $user->isPiketHariIni()
         );
 
         if (!$isAuthorized) {
@@ -829,166 +829,20 @@ class LaporanController extends Controller
         }
 
         $request->validate([
-            'status'     => 'required|in:hadir,terlambat,alpha,sakit,izin,dispen,dispensasi,bolos',
+            'status'     => 'required|in:hadir,terlambat,alpha,sakit,izin,dispen,dispensasi,bolos,titip_kartu,reset',
             'jam_masuk'  => 'nullable',
             'jam_pulang' => 'nullable',
             'keterangan' => 'nullable|string|max:500',
         ]);
 
-        $status = $request->input('status');
-        $keterangan = $request->input('keterangan');
+        $res = \App\Services\KoreksiPresensiService::koreksi(
+            $absensi,
+            $request->only(['status', 'jam_masuk', 'jam_pulang', 'keterangan']),
+            $user,
+            'koreksi_piket_manual'
+        );
 
-        // Normalisasi Jam Masuk & Pulang sesuai status baru
-        $jamMasuk = $request->input('jam_masuk');
-        $jamPulang = $request->input('jam_pulang');
-
-        if (in_array($status, ['alpha', 'sakit', 'izin', 'dispen', 'dispensasi'])) {
-            $status = ($status === 'dispensasi') ? 'dispen' : $status;
-            // Untuk tidak hadir / izin / sakit / dispen / alpha, jika jam tidak diisi spesifik, set null
-            if (empty($jamMasuk)) $jamMasuk = null;
-            if (empty($jamPulang)) $jamPulang = null;
-        } elseif ($status === 'hadir') {
-            if (empty($jamMasuk)) $jamMasuk = $absensi->jam_masuk ?: '07:10:00';
-            if (empty($jamPulang)) $jamPulang = $absensi->jam_pulang ?: '15:30:00';
-        } elseif ($status === 'terlambat') {
-            if (empty($jamMasuk)) $jamMasuk = $absensi->jam_masuk ?: '07:25:00';
-            if (empty($jamPulang)) $jamPulang = $absensi->jam_pulang ?: '15:30:00';
-        } elseif ($status === 'bolos') {
-            if (empty($jamMasuk)) $jamMasuk = $absensi->jam_masuk ?: '07:10:00';
-            $jamPulang = null; // bolos tidak tap pulang
-        }
-
-        $absensi->update([
-            'status'      => $status,
-            'jam_masuk'   => $jamMasuk,
-            'jam_pulang'  => $jamPulang,
-            'sumber_absen'=> 'koreksi_piket_manual',
-            'keterangan'  => $keterangan,
-        ]);
-
-        // SINKRONISASI UNTUK SISWA
-        $isSiswa = ($absensi->pemilik_type === 'siswa' || empty($absensi->pemilik_type) || !empty($absensi->siswa_rombel_id));
-        if ($isSiswa) {
-            $siswaId = $absensi->pemilik_id ?: ($absensi->siswaRombel?->siswa_id);
-            $siswaObj = $absensi->siswa ?: ($absensi->siswaRombel?->siswa ?: Siswa::find($siswaId));
-
-            if ($siswaObj) {
-                $siswaId = $siswaObj->id;
-
-                // 1. Sinkronisasi IzinSiswa
-                if (in_array($status, ['izin', 'sakit', 'dispen', 'dispensasi'])) {
-                    $jenisIzin = ($status === 'dispen') ? 'dispensasi' : $status;
-                    IzinSiswa::updateOrCreate(
-                        [
-                            'siswa_id' => $siswaId,
-                            'tanggal'  => $absensi->tanggal,
-                        ],
-                        [
-                            'jenis'          => $jenisIzin,
-                            'status'         => 'disetujui',
-                            'keterangan'     => $keterangan ?: 'Koreksi perizinan manual oleh guru piket',
-                            'disetujui_oleh' => auth()->user()?->name ?? 'Guru Piket / Admin',
-                        ]
-                    );
-                } else {
-                    // Jika diubah menjadi hadir / terlambat / alpha / bolos, bersihkan data IzinSiswa tanggal tsb
-                    IzinSiswa::where('siswa_id', $siswaId)
-                        ->where('tanggal', $absensi->tanggal)
-                        ->delete();
-                }
-
-                // 2. Sinkronisasi Buku Kasus & Disiplin
-                KasusDisiplin::syncFromPresensi($siswaId);
-
-                // 3. Sinkronisasi Notifikasi WhatsApp
-                if (!in_array($status, ['alpha', 'terlambat', 'bolos'])) {
-                    NotifikasiOrtu::where('siswa_id', $siswaId)
-                        ->where('tanggal', $absensi->tanggal)
-                        ->where('status', 'pending')
-                        ->whereIn('kategori', ['alpha', 'terlambat', 'bolos', 'panggilan_ortu'])
-                        ->delete();
-                }
-
-                // 4. Kirim Push Notification Real-Time ke Portal & HP Orang Tua
-                try {
-                    $nisn = !empty($siswaObj->nisn) ? $siswaObj->nisn : (string)$siswaObj->id;
-                    $labelStatus = match($status) {
-                        'sakit'     => 'Sakit',
-                        'izin'      => 'Izin',
-                        'dispen'    => 'Dispensasi',
-                        'hadir'     => 'Hadir',
-                        'terlambat' => 'Terlambat',
-                        'alpha'     => 'Alpha',
-                        'bolos'     => 'Bolos',
-                        default     => ucfirst($status),
-                    };
-                    $ikon = match($status) {
-                        'sakit'     => '🤒',
-                        'izin'      => '📋',
-                        'dispen'    => '🎖️',
-                        'hadir'     => '✅',
-                        'terlambat' => '⏰',
-                        'alpha'     => '⚠️',
-                        'bolos'     => '🚨',
-                        default     => '📢',
-                    };
-
-                    $ketText = $keterangan ? " Catatan: {$keterangan}" : "";
-
-                    // Catat ke riwayat notifikasi database agar selalu tampil di portal orang tua
-                    try {
-                        NotifikasiOrtu::create([
-                            'siswa_id'    => $siswaObj->id,
-                            'kategori'    => 'koreksi_presensi',
-                            'tanggal'     => $absensi->tanggal,
-                            'no_tujuan'   => $siswaObj->no_hp_ortu ?: ($siswaObj->no_hp ?: '-'),
-                            'nama_ortu'   => $siswaObj->nama_ortu ?: 'Orang Tua / Wali Murid',
-                            'judul'       => "Koreksi Presensi: {$siswaObj->nama} ({$labelStatus})",
-                            'pesan'       => "Data kehadiran ananda tanggal " . \Carbon\Carbon::parse($absensi->tanggal)->translatedFormat('d M Y') . " dikoreksi menjadi {$labelStatus}.{$ketText}",
-                            'status'      => 'terkirim',
-                            'dibuat_oleh' => auth()->user()?->name ?? 'Guru Piket / Admin',
-                            'waktu_kirim' => now(),
-                        ]);
-                    } catch (\Throwable $eDb) {
-                        \Illuminate\Support\Facades\Log::warning("Gagal simpan NotifikasiOrtu koreksi laporan: " . $eDb->getMessage());
-                    }
-
-                    \App\Services\PushNotificationService::sendToSiswa(
-                        $nisn,
-                        "{$ikon} Koreksi Presensi: {$siswaObj->nama} ({$labelStatus})",
-                        "Data kehadiran ananda tanggal {$absensi->tanggal} dikoreksi menjadi {$labelStatus}.{$ketText}",
-                        '/presensi-siswa/' . urlencode($nisn)
-                    );
-                } catch (\Throwable $e) {
-                    \Illuminate\Support\Facades\Log::warning("Gagal kirim push notif koreksi laporan: " . $e->getMessage());
-                }
-            }
-        } elseif ($absensi->pemilik_type === 'guru') {
-            // SINKRONISASI UNTUK GURU
-            $guruId = $absensi->pemilik_id;
-            if ($guruId) {
-                if (in_array($status, ['izin', 'sakit', 'dispen', 'cuti'])) {
-                    IzinGuru::updateOrCreate(
-                        [
-                            'guru_id' => $guruId,
-                            'tanggal' => $absensi->tanggal,
-                        ],
-                        [
-                            'jenis'          => $status,
-                            'status'         => 'disetujui',
-                            'keterangan'     => $keterangan ?: 'Koreksi perizinan manual oleh guru piket / admin',
-                            'disetujui_oleh' => auth()->user()?->name ?? 'Guru Piket / Admin',
-                        ]
-                    );
-                } else {
-                    IzinGuru::where('guru_id', $guruId)
-                        ->where('tanggal', $absensi->tanggal)
-                        ->delete();
-                }
-            }
-        }
-
-        return redirect()->back()->with('success', 'Catatan absensi berhasil dikoreksi dan seluruh modul terkait (Perizinan, Buku Kasus & Peringatan Dasbor) telah tersinkronkan.');
+        return redirect()->back()->with('success', $res['message'] ?? 'Catatan absensi berhasil dikoreksi dan seluruh modul terkait telah tersinkronkan.');
     }
 
     public function destroy($id)
@@ -997,19 +851,19 @@ class LaporanController extends Controller
         $user    = auth()->user();
         $today   = \Carbon\Carbon::today()->toDateString();
 
-        // 1. Batasan Waktu: Hanya data presensi pada hari ini yang dapat dihapus
-        if ($absensi->tanggal !== $today) {
-            return redirect()->back()->with('error', 'Penghapusan presensi hanya diizinkan untuk data absensi pada hari ini (' . \Carbon\Carbon::today()->translatedFormat('d F Y') . ').');
-        }
-
-        // 2. Hak Akses: Hanya Guru Piket yang terjadwal bertugas hari ini (atau Admin) yang berhak
+        // 1. Hak Akses: Hanya Guru Piket yang terjadwal bertugas hari ini atau Admin
         $isAuthorized = $user && (
             $user->isAdmin() || 
-            ($user->guru && \App\Models\JadwalPiket::isGuruPiketHariIni($user->guru->id, $today))
+            $user->isPiketHariIni()
         );
 
         if (!$isAuthorized) {
-            return redirect()->back()->with('error', 'Akses ditolak: Hanya Guru Piket yang terjadwal bertugas pada hari ini yang berwenang menghapus catatan presensi.');
+            return redirect()->back()->with('error', 'Akses ditolak: Hanya Guru Piket yang terjadwal bertugas pada hari ini atau Administrator yang berwenang menghapus catatan presensi.');
+        }
+
+        // 2. Batasan Waktu: Guru piket hanya hari ini, Admin bebas
+        if (!$user->isAdmin() && $absensi->tanggal !== $today) {
+            return redirect()->back()->with('error', 'Penghapusan presensi oleh Guru Piket hanya diizinkan untuk data absensi pada hari ini (' . \Carbon\Carbon::today()->translatedFormat('d F Y') . '). Catatan lampau hanya dapat dihapus oleh Administrator.');
         }
 
         $siswaId = $absensi->pemilik_type === 'siswa' ? ($absensi->pemilik_id ?: ($absensi->siswaRombel?->siswa_id)) : null;
@@ -1024,6 +878,12 @@ class LaporanController extends Controller
         } elseif ($guruId) {
             IzinGuru::where('guru_id', $guruId)->where('tanggal', $tanggal)->delete();
         }
+
+        \App\Models\AuditLog::catat(
+            'hapus_presensi',
+            'absensi',
+            ($user?->name ?? 'User') . " menghapus catatan presensi {$absensi->pemilik_type} (Tgl: {$tanggal})"
+        );
 
         return redirect()->back()->with('success', 'Catatan absensi berhasil dihapus dan seluruh modul terkait telah disinkronkan.');
     }
