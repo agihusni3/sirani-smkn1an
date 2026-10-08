@@ -644,15 +644,120 @@ class SiswaController extends Controller
             return strcasecmp($a->nama, $b->nama);
         })->values();
 
-        // Opsi Ekspor Excel (.xls) dengan Barcode 2D tertanam di tabel
-        if ($request->query('download') === 'excel' || $request->query('download') === 'xls') {
-            $fileName = 'export_barcode_2d_siswa_' . ($rombel ? preg_replace('/[^a-zA-Z0-9_-]/', '_', $rombel->nama_rombel) : 'semua') . '_' . date('Ymd_His') . '.xls';
+        // Opsi Ekspor Asli Excel (.xlsx) dengan Gambar Barcode 2D (QR Code) tertanam di dalam sel tabel
+        if ($request->query('download') === 'excel' || $request->query('download') === 'xlsx' || $request->query('download') === 'xls') {
             $sekolah = \App\Models\PengaturanSekolah::getAktif();
-            return response()->view('situan.siswa.export_barcode_excel', compact('siswas', 'rombel', 'sekolah'))
-                ->header('Content-Type', 'application/vnd.ms-excel; charset=utf-8')
-                ->header('Content-Disposition', 'attachment; filename="' . $fileName . '"')
-                ->header('Pragma', 'no-cache')
-                ->header('Expires', '0');
+            $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+            $sheet = $spreadsheet->getActiveSheet();
+            $sheet->setTitle('Barcode 2D Siswa');
+
+            // Header KOP / Judul
+            $sekolahNama = $sekolah?->nama_sekolah ?? 'SMK NEGERI 1 AIR NANINGAN';
+            $sheet->mergeCells('A1:E1');
+            $sheet->setCellValue('A1', strtoupper($sekolahNama));
+            $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(14);
+            $sheet->getStyle('A1')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+
+            $sheet->mergeCells('A2:E2');
+            $sheet->setCellValue('A2', 'DAFTAR BARCODE 2D (QR CODE) PRESENSI SISWA');
+            $sheet->getStyle('A2')->getFont()->setBold(true)->setSize(11);
+            $sheet->getStyle('A2')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+
+            $subTitle = 'Kelas: ' . ($rombel ? $rombel->nama_rombel : 'Semua Rombel Terpilih') . ' | Total: ' . count($siswas) . ' Siswa | Tanggal: ' . date('d/m/Y');
+            $sheet->mergeCells('A3:E3');
+            $sheet->setCellValue('A3', $subTitle);
+            $sheet->getStyle('A3')->getFont()->setItalic(true)->setSize(9.5);
+            $sheet->getStyle('A3')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+
+            // Header Tabel
+            $headers = ['No', 'NISN', 'Nama Lengkap Siswa', 'Kelas / Rombel', 'Barcode 2D (QR Code)'];
+            $colLetters = ['A', 'B', 'C', 'D', 'E'];
+            foreach ($headers as $i => $h) {
+                $sheet->setCellValue($colLetters[$i] . '5', $h);
+            }
+
+            $sheet->getStyle('A5:E5')->applyFromArray([
+                'font' => ['bold' => true, 'color' => ['rgb' => '0F172A']],
+                'fill' => [
+                    'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
+                    'startColor' => ['rgb' => 'E2E8F0'],
+                ],
+                'alignment' => [
+                    'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
+                    'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER,
+                ],
+                'borders' => [
+                    'allBorders' => [
+                        'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                        'color' => ['rgb' => '000000'],
+                    ],
+                ],
+            ]);
+            $sheet->getRowDimension(5)->setRowHeight(28);
+
+            // Isi Data Baris & Sematkan Gambar Barcode 2D Asli
+            $row = 6;
+            foreach ($siswas as $idx => $s) {
+                $nisnClean = !empty($s->nisn) ? trim($s->nisn) : (!empty($s->nis) ? trim($s->nis) : (string)$s->id);
+                $rombelNama = $s->siswaRombels->first()?->rombel?->nama_rombel ?? '-';
+
+                $sheet->setCellValue('A' . $row, $idx + 1);
+                $sheet->setCellValueExplicit('B' . $row, $s->nisn ?: '-', \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
+                $sheet->setCellValue('C' . $row, $s->nama);
+                $sheet->setCellValue('D' . $row, $rombelNama);
+
+                // Buat & sematkan gambar QR Code ke sel E{$row}
+                $pngBinary = \App\Services\BarcodeService::getBarcode2DPngBinary($nisnClean, 3);
+                if (!empty($pngBinary)) {
+                    $gdImage = @imagecreatefromstring($pngBinary);
+                    if ($gdImage) {
+                        $drawing = new \PhpOffice\PhpSpreadsheet\Worksheet\MemoryDrawing();
+                        $drawing->setName('QR_' . $nisnClean);
+                        $drawing->setDescription('Barcode 2D NISN ' . $nisnClean);
+                        $drawing->setImageResource($gdImage);
+                        $drawing->setRenderingFunction(\PhpOffice\PhpSpreadsheet\Worksheet\MemoryDrawing::RENDERING_PNG);
+                        $drawing->setMimeType(\PhpOffice\PhpSpreadsheet\Worksheet\MemoryDrawing::MIMETYPE_PNG);
+                        $drawing->setWidth(56);
+                        $drawing->setHeight(56);
+                        $drawing->setOffsetX(18);
+                        $drawing->setOffsetY(4);
+                        $drawing->setCoordinates('E' . $row);
+                        $drawing->setWorksheet($sheet);
+                    }
+                }
+
+                $sheet->getRowDimension($row)->setRowHeight(52);
+
+                $sheet->getStyle('A' . $row)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER)->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
+                $sheet->getStyle('B' . $row)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER)->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
+                $sheet->getStyle('C' . $row)->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
+                $sheet->getStyle('D' . $row)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER)->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
+                $sheet->getStyle('E' . $row)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER)->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
+
+                $row++;
+            }
+
+            $lastRow = $row - 1;
+            if ($lastRow >= 6) {
+                $sheet->getStyle("A6:E{$lastRow}")->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN);
+            }
+
+            // Lebar Kolom
+            $sheet->getColumnDimension('A')->setWidth(6);
+            $sheet->getColumnDimension('B')->setWidth(18);
+            $sheet->getColumnDimension('C')->setWidth(34);
+            $sheet->getColumnDimension('D')->setWidth(18);
+            $sheet->getColumnDimension('E')->setWidth(18);
+
+            $fileName = 'export_barcode_2d_siswa_' . ($rombel ? preg_replace('/[^a-zA-Z0-9_-]/', '_', $rombel->nama_rombel) : 'semua') . '_' . date('Ymd_His') . '.xlsx';
+
+            return response()->streamDownload(function () use ($spreadsheet) {
+                $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
+                $writer->save('php://output');
+            }, $fileName, [
+                'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                'Cache-Control' => 'max-age=0',
+            ]);
         }
 
         // Opsi Ekspor CSV Data Barcode

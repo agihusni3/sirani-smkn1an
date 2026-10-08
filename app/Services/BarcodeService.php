@@ -71,6 +71,33 @@ class BarcodeService
     }
 
     /**
+     * Generate Barcode 2D (QR Code) dalam format binary PNG mentah.
+     * Digunakan oleh PhpSpreadsheet MemoryDrawing untuk tertanam asli di file .xlsx.
+     *
+     * @param string $code Data barcode (misal NISN siswa)
+     * @param int $scale Skala pixel per modul
+     * @return string Binary PNG string
+     */
+    public static function getBarcode2DPngBinary(string $code, int $scale = 3): string
+    {
+        $code = trim($code);
+        if ($code === '') {
+            return '';
+        }
+
+        $options = new QROptions([
+            'outputType'    => QRCode::OUTPUT_IMAGE_PNG,
+            'eccLevel'      => QRCode::ECC_M,
+            'scale'         => $scale,
+            'addQuietzone'  => true,
+            'quietzoneSize' => 1,
+            'imageBase64'   => false,
+        ]);
+
+        return (string) @(new QRCode($options))->render($code);
+    }
+
+    /**
      * Alias kompatibilitas: mengembalikan Barcode 2D SVG
      */
     public static function getBarcodeSvg(string $code, int $size = 64, int $moduleWidth = 2, bool $showText = true): string

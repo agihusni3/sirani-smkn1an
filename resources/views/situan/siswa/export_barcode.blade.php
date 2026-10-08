@@ -443,8 +443,8 @@
       <a href="{{ request()->fullUrlWithQuery(['layout' => 'grid']) }}" class="btn-tool {{ ($layout ?? 'tabel') === 'grid' ? 'active' : '' }}" title="Mode Lembar Label Stiker">
         <i class="bi bi-grid-3x3-gap-fill"></i> Label Stiker
       </a>
-      <a href="{{ request()->fullUrlWithQuery(['download' => 'excel']) }}" class="btn-tool" title="Download Excel (.xls) dengan Barcode 2D tertanam di tabel">
-        <i class="bi bi-file-earmark-excel-fill" style="color:#22c55e;"></i> Excel (.xls)
+      <a href="{{ request()->fullUrlWithQuery(['download' => 'excel']) }}" class="btn-tool" title="Download Excel Asli (.xlsx) dengan Barcode 2D tertanam di sel tabel">
+        <i class="bi bi-file-earmark-excel-fill" style="color:#22c55e;"></i> Excel (.xlsx)
       </a>
       <a href="{{ request()->fullUrlWithQuery(['download' => 'csv']) }}" class="btn-tool" title="Unduh CSV Data Siswa & Barcode">
         <i class="bi bi-file-earmark-spreadsheet"></i> CSV
