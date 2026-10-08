@@ -13,14 +13,16 @@ class AkademikMatpelController extends Controller
     public function index(Request $request)
     {
         $ta = TahunAjaran::where('is_active', true)->first();
-        $jurusans = Jurusan::all();
+        $tahunAjarans = TahunAjaran::orderByDesc('id')->get();
+        $jurusans = Jurusan::orderBy('nama_jurusan')->get();
 
-        $query = AkademikMataPelajaran::with(['tahunAjaran', 'jurusan', 'gurus', 'distribusiMengajars.guru', 'distribusiMengajars.rombel']);
+        $selectedTaId = $request->input('tahun_ajaran_id', $ta?->id);
+        $selectedTa = $tahunAjarans->firstWhere('id', $selectedTaId) ?? $ta;
 
-        if ($request->filled('tahun_ajaran_id')) {
-            $query->where('tahun_ajaran_id', $request->tahun_ajaran_id);
-        } elseif ($ta) {
-            $query->where('tahun_ajaran_id', $ta->id);
+        $query = AkademikMataPelajaran::with(['tahunAjaran', 'jurusan']);
+
+        if ($selectedTaId) {
+            $query->where('tahun_ajaran_id', $selectedTaId);
         }
 
         if ($request->filled('jurusan_id')) {
@@ -40,17 +42,31 @@ class AkademikMatpelController extends Controller
         }
 
         if ($request->filled('search')) {
-            $s = $request->search;
+            $s = trim($request->search);
             $query->where(function ($q) use ($s) {
                 $q->where('nama_mapel', 'like', "%{$s}%")
                   ->orWhere('kode_mapel', 'like', "%{$s}%");
             });
         }
 
-        $mapels = $query->orderBy('jenis')->orderBy('nama_mapel')->paginate(20)->withQueryString();
-        $tahunAjarans = TahunAjaran::orderByDesc('id')->get();
+        // Statistik Cepat (KPI) Kurikulum untuk Tahun Ajaran terpilih
+        $statQuery = AkademikMataPelajaran::query();
+        if ($selectedTaId) {
+            $statQuery->where('tahun_ajaran_id', $selectedTaId);
+        }
 
-        return view('akademik.matpel.index', compact('mapels', 'ta', 'jurusans', 'tahunAjarans'));
+        $stats = [
+            'total_mapel'    => (clone $statQuery)->count(),
+            'total_jp'       => (clone $statQuery)->sum('jumlah_jam_per_minggu'),
+            'total_kejuruan' => (clone $statQuery)->whereIn('jenis', ['kejuruan', 'pilihan'])->count(),
+            'total_lab'      => (clone $statQuery)->whereNotNull('resource_key')->count(),
+        ];
+
+        $mapels = $query->orderBy('jenis')->orderBy('kode_mapel')->paginate(25)->withQueryString();
+
+        return view('akademik.matpel.index', compact(
+            'mapels', 'ta', 'selectedTa', 'selectedTaId', 'jurusans', 'tahunAjarans', 'stats'
+        ));
     }
 
     public function store(Request $request)
@@ -63,7 +79,7 @@ class AkademikMatpelController extends Controller
             $tingkatStr = $request->tingkat;
         }
 
-        // Determine fase based on tingkat if not explicitly set
+        // Tentukan fase otomatis sesuai tingkat
         $fase = $request->fase ?? 'E';
         if (str_contains($tingkatStr, 'XI') || str_contains($tingkatStr, 'XII')) {
             $fase = 'F';
@@ -71,76 +87,84 @@ class AkademikMatpelController extends Controller
         if (str_contains($tingkatStr, 'X') && !str_contains($tingkatStr, 'XI') && !str_contains($tingkatStr, 'XII')) {
             $fase = 'E';
         }
+        if (str_contains($tingkatStr, 'X') && (str_contains($tingkatStr, 'XI') || str_contains($tingkatStr, 'XII'))) {
+            $fase = 'E,F';
+        }
 
         $request->validate([
-            'kode_mapel' => 'required|string|max:20',
-            'nama_mapel' => 'required|string|max:255',
-            'jenis' => 'required|in:umum,kejuruan,pilihan,p5bk,pkl',
+            'kode_mapel'            => 'required|string|max:20',
+            'nama_mapel'            => 'required|string|max:255',
+            'jenis'                 => 'required|in:umum,kejuruan,pilihan,p5bk,pkl',
             'jumlah_jam_per_minggu' => 'required|integer|min:1|max:20',
-            'tahun_ajaran_id' => 'required|exists:tahun_ajarans,id',
-            'jurusan_id' => 'nullable|exists:jurusans,id',
-            'deskripsi_cp' => 'nullable|string',
-            'resource_key' => 'nullable|string|max:50',
+            'tahun_ajaran_id'       => 'required|exists:tahun_ajarans,id',
+            'jurusan_id'            => 'nullable|exists:jurusans,id',
+            'deskripsi_cp'          => 'nullable|string',
+            'resource_key'          => 'nullable|string|max:50',
         ]);
 
         AkademikMataPelajaran::create([
-            'tahun_ajaran_id' => $request->tahun_ajaran_id,
-            'jurusan_id' => in_array($request->jenis, ['kejuruan', 'pilihan']) ? $request->jurusan_id : null,
-            'kode_mapel' => strtoupper(trim($request->kode_mapel)),
-            'nama_mapel' => trim($request->nama_mapel),
-            'jenis' => $request->jenis,
-            'fase' => $fase,
-            'tingkat' => $tingkatStr,
+            'tahun_ajaran_id'       => $request->tahun_ajaran_id,
+            'jurusan_id'            => in_array($request->jenis, ['kejuruan', 'pilihan']) ? $request->jurusan_id : null,
+            'kode_mapel'            => strtoupper(trim($request->kode_mapel)),
+            'nama_mapel'            => trim($request->nama_mapel),
+            'jenis'                 => $request->jenis,
+            'fase'                  => $fase,
+            'tingkat'               => $tingkatStr,
             'jumlah_jam_per_minggu' => $request->jumlah_jam_per_minggu,
-            'deskripsi_cp' => $request->deskripsi_cp,
-            'resource_key' => $request->resource_key ?: null,
-            'is_active' => true,
+            'deskripsi_cp'          => $request->deskripsi_cp,
+            'resource_key'          => $request->resource_key ?: null,
+            'is_active'             => true,
         ]);
 
-        return redirect()->route('akademik.matpel.index')
-            ->with('success', 'Mata Pelajaran berhasil ditambahkan ke kurikulum.');
+        return redirect()->route('akademik.matpel.index', ['tahun_ajaran_id' => $request->tahun_ajaran_id])
+            ->with('success', 'Mata Pelajaran berhasil ditambahkan.');
     }
 
     public function update(Request $request, $id)
     {
         $mapel = AkademikMataPelajaran::findOrFail($id);
 
-        $tingkatStr = $mapel->tingkat ?? 'X,XI,XII';
+        $tingkatStr = 'X,XI,XII';
         if ($request->has('tingkats') && is_array($request->tingkats) && count($request->tingkats) > 0) {
             $tingkatStr = implode(',', $request->tingkats);
         } elseif ($request->filled('tingkat')) {
             $tingkatStr = $request->tingkat;
+        } elseif (!empty($mapel->tingkat)) {
+            $tingkatStr = $mapel->tingkat;
         }
 
-        $fase = $request->fase ?? $mapel->fase;
+        $fase = $request->fase ?? 'E';
         if (str_contains($tingkatStr, 'XI') || str_contains($tingkatStr, 'XII')) {
             $fase = 'F';
         }
         if (str_contains($tingkatStr, 'X') && !str_contains($tingkatStr, 'XI') && !str_contains($tingkatStr, 'XII')) {
             $fase = 'E';
         }
+        if (str_contains($tingkatStr, 'X') && (str_contains($tingkatStr, 'XI') || str_contains($tingkatStr, 'XII'))) {
+            $fase = 'E,F';
+        }
 
         $request->validate([
-            'kode_mapel' => 'required|string|max:20',
-            'nama_mapel' => 'required|string|max:255',
-            'jenis' => 'required|in:umum,kejuruan,pilihan,p5bk,pkl',
+            'kode_mapel'            => 'required|string|max:20',
+            'nama_mapel'            => 'required|string|max:255',
+            'jenis'                 => 'required|in:umum,kejuruan,pilihan,p5bk,pkl',
             'jumlah_jam_per_minggu' => 'required|integer|min:1|max:20',
-            'jurusan_id' => 'nullable|exists:jurusans,id',
-            'deskripsi_cp' => 'nullable|string',
-            'resource_key' => 'nullable|string|max:50',
+            'jurusan_id'            => 'nullable|exists:jurusans,id',
+            'deskripsi_cp'          => 'nullable|string',
+            'resource_key'          => 'nullable|string|max:50',
         ]);
 
         $mapel->update([
-            'jurusan_id' => in_array($request->jenis, ['kejuruan', 'pilihan']) ? $request->jurusan_id : null,
-            'kode_mapel' => strtoupper(trim($request->kode_mapel)),
-            'nama_mapel' => trim($request->nama_mapel),
-            'jenis' => $request->jenis,
-            'fase' => $fase,
-            'tingkat' => $tingkatStr,
+            'jurusan_id'            => in_array($request->jenis, ['kejuruan', 'pilihan']) ? $request->jurusan_id : null,
+            'kode_mapel'            => strtoupper(trim($request->kode_mapel)),
+            'nama_mapel'            => trim($request->nama_mapel),
+            'jenis'                 => $request->jenis,
+            'fase'                  => $fase,
+            'tingkat'               => $tingkatStr,
             'jumlah_jam_per_minggu' => $request->jumlah_jam_per_minggu,
-            'deskripsi_cp' => $request->deskripsi_cp,
-            'resource_key' => $request->resource_key ?: null,
-            'is_active' => $request->has('is_active') ? $request->boolean('is_active') : ($mapel->is_active ?? true),
+            'deskripsi_cp'          => $request->deskripsi_cp,
+            'resource_key'          => $request->resource_key ?: null,
+            'is_active'             => $request->has('is_active') ? $request->boolean('is_active') : ($mapel->is_active ?? true),
         ]);
 
         // Sinkronkan juga resource_key ke jadwal yang sudah di-generate untuk mapel ini
@@ -158,3 +182,4 @@ class AkademikMatpelController extends Controller
         return redirect()->back()->with('success', 'Mata Pelajaran berhasil dihapus.');
     }
 }
+
