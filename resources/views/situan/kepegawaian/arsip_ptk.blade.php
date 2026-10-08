@@ -118,7 +118,7 @@
               </td>
               <td class="text-center px-3">
                 <div class="btn-group btn-group-sm">
-                  <a href="{{ asset('storage/' . $arsip->file_path) }}" target="_blank" class="btn btn-primary" title="Buka Dokumen">
+                  <a href="{{ $arsip->file_url }}" target="_blank" class="btn btn-primary" title="Buka Dokumen">
                     <i class="bi bi-eye-fill me-1"></i> Buka
                   </a>
                   <button type="button" class="btn btn-outline-danger" title="Hapus Dokumen" onclick="if(confirm('Hapus berkas digital ini?')) { document.getElementById('formHapusArsip{{ $arsip->id }}').submit(); }">

@@ -13,6 +13,9 @@
     RewriteCond %{HTTP:x-xsrf-token} .
     RewriteRule .* - [E=HTTP_X_XSRF_TOKEN:%{HTTP:X-XSRF-Token}]
 
+    # Keamanan UU PDP No. 27/2022: Cegah akses publik anonim ke berkas identitas sipil & kependudukan
+    RewriteRule ^storage/(arsip_siswa|arsip_ptk|ppdb/berkas)/.*$ - [F,L]
+
     # Redirect Trailing Slashes If Not A Folder...
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteCond %{REQUEST_URI} (.+)/$

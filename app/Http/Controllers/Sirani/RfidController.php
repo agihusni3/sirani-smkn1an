@@ -595,6 +595,16 @@ class RfidController extends Controller
 
         $type = $request->input('type');
         $id = $request->input('id');
+
+        // Proteksi Flooding / Anti-Spam: Cooldown 5 menit per identitas target
+        $cacheKey = "wa_gateway_cooldown_{$type}_{$id}";
+        if (\Illuminate\Support\Facades\Cache::has($cacheKey)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Permintaan kirim WhatsApp untuk penerima ini baru saja diproses. Harap tunggu beberapa menit sebelum mencoba kembali.',
+            ], 429);
+        }
+
         $sekolah = PengaturanSekolah::getAktif();
         $namaSekolah = $sekolah->nama_sekolah ?? 'SMKN 1 AIR NANINGAN';
         $baseUrl = self::getPublicBaseUrl();
@@ -639,6 +649,9 @@ class RfidController extends Controller
             }
 
             $res = $waService->kirimDirect($noHp, $pesan, 'KARTU PRESENSI DIGITAL');
+            if ($res['success'] ?? false) {
+                \Illuminate\Support\Facades\Cache::put($cacheKey, true, now()->addMinutes(5));
+            }
 
             $labelTarget = ($type === 'ortu') ? 'Orang Tua' : 'Siswa';
             return response()->json([
@@ -673,6 +686,9 @@ class RfidController extends Controller
                    . "_Simpan QR di HP untuk melakukan presensi mandiri pada scanner gerbang sekolah._";
 
             $res = $waService->kirimDirect($noHp, $pesan, 'KARTU PRESENSI GURU');
+            if ($res['success'] ?? false) {
+                \Illuminate\Support\Facades\Cache::put($cacheKey, true, now()->addMinutes(5));
+            }
 
             return response()->json([
                 'success' => $res['success'] ?? false,

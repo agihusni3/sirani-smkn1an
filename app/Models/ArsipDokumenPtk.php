@@ -32,4 +32,13 @@ class ArsipDokumenPtk extends Model
     {
         return $this->belongsTo(BukuSkKepsek::class, 'buku_sk_id');
     }
+
+    public function getFileUrlAttribute(): string
+    {
+        if (!$this->file_path) return '#';
+        if (str_starts_with($this->file_path, 'http')) {
+            return $this->file_path;
+        }
+        return route('situan.ekabinet.file', ['type' => 'ptk', 'id' => $this->id]);
+    }
 }

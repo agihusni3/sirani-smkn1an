@@ -214,7 +214,6 @@ class RfidScanService
                 if ($siswaByNisn) {
                     $type = 'siswa';
                     $id   = $siswaByNisn->id;
-                } else {
                     // Fallback B: Cek apakah kode barcode adalah NIS Siswa (jika kolom tersedia)
                     $siswaByNis = null;
                     if (\Illuminate\Support\Facades\Schema::hasColumn('siswas', 'nis')) {
@@ -223,28 +222,12 @@ class RfidScanService
                     if ($siswaByNis) {
                         $type = 'siswa';
                         $id   = $siswaByNis->id;
-                    } elseif (str_starts_with($cleanUid, 'SISWA-')) {
-                        // Fallback C: Cek kode barcode SISWA-{id}
-                        $sId = (int) substr($cleanUid, 6);
-                        $siswaById = Siswa::find($sId);
-                        if ($siswaById) {
-                            $type = 'siswa';
-                            $id   = $siswaById->id;
-                        }
                     } else {
-                        // Fallback D: Cek apakah kode barcode adalah NIP Guru
+                        // Fallback C: Cek apakah kode barcode adalah NIP Guru
                         $guruByNip = Guru::whereIn('nip', $cleanUidVariants)->first();
                         if ($guruByNip) {
                             $type = 'guru';
                             $id   = $guruByNip->id;
-                        } elseif (str_starts_with($cleanUid, 'GURU-')) {
-                            // Fallback E: Cek kode barcode GURU-{id}
-                            $gId = (int) substr($cleanUid, 5);
-                            $guruById = Guru::find($gId);
-                            if ($guruById) {
-                                $type = 'guru';
-                                $id   = $guruById->id;
-                            }
                         }
                     }
                 }

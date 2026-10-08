@@ -64,9 +64,8 @@ class PortalOrtuController extends Controller
                 $digitsOnly !== '' ? str_pad($digitsOnly, 10, '0', STR_PAD_LEFT) : null,
             ]));
 
-            // Pencarian siswa berdasarkan NISN (fleksibel awalan 0 atau 10 digit NISN standar)
+            // Pencarian siswa berdasarkan NISN resmi (fleksibel awalan 0 atau 10 digit NISN standar)
             $siswa = Siswa::whereIn('nisn', $candidateNisns)
-                ->orWhere('id', $cleanKeyword)
                 ->with('kartuRfid')
                 ->first();
 
@@ -485,7 +484,6 @@ class PortalOrtuController extends Controller
 
         $siswa = Siswa::whereIn('nisn', $candidateNisns)
             ->orWhere('nis', $cleanKeyword)
-            ->orWhere('id', $cleanKeyword)
             ->first();
 
         if (!$siswa) {

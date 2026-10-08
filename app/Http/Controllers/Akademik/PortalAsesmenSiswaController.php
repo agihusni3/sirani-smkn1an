@@ -107,8 +107,8 @@ class PortalAsesmenSiswaController extends Controller
                 return back()->withInput()->with('error', 'Kombinasi NISN dan Tanggal Lahir tidak cocok. Pastikan tanggal lahir yang Anda masukkan sesuai format ddmmyyyy (Contoh: 22101991).');
             }
         } else {
-            // Jika tanggal lahir di DB masih kosong/belum valid, perbarui otomatis dengan tanggal yang dimasukkan siswa
-            $siswa->update(['tanggal_lahir' => $inputDate]);
+            // Pengamanan: Jika tanggal lahir di database sekolah belum valid, tolak auto-bind sepihak
+            return back()->withInput()->with('error', 'Data tanggal lahir Anda belum terverifikasi di pangkalan data sekolah. Harap hubungi Proktor Ujian atau Wali Kelas untuk validasi data.');
         }
 
         // Simpan sesi autentikasi siswa CBT

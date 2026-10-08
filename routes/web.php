@@ -260,6 +260,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/situan/ekabinet/ptk', [SituanEKabinetController::class, 'ptk'])->name('situan.ekabinet.ptk');
         Route::get('/situan/ekabinet/lembaga', [SituanEKabinetController::class, 'lembaga'])->name('situan.ekabinet.lembaga');
         Route::get('/situan/ekabinet/mou', [SituanEKabinetController::class, 'mou'])->name('situan.ekabinet.mou');
+        Route::get('/situan/ekabinet/dokumen/{type}/{id}', [SituanEKabinetController::class, 'unduhDokumen'])->name('situan.ekabinet.file');
 
         Route::post('/situan/ekabinet/ptk', [SituanEKabinetController::class, 'storePtk'])->name('situan.ekabinet.ptk.store');
         Route::delete('/situan/ekabinet/ptk/{id}', [SituanEKabinetController::class, 'destroyPtk'])->name('situan.ekabinet.ptk.destroy');
@@ -695,6 +696,7 @@ Route::middleware('auth')->group(function () {
             Route::post('/ppdb/wawancara/nilai/{id}', [\App\Http\Controllers\Ppdb\PpdbGuruWawancaraController::class, 'simpanNilai'])->name('ppdb.wawancara.simpan');
             Route::get('/ppdb/wawancara/cetak/{id?}', [\App\Http\Controllers\Ppdb\PpdbGuruWawancaraController::class, 'cetak'])->name('ppdb.wawancara.cetak');
             Route::get('/ppdb/wawancara/tes-buta-warna', [\App\Http\Controllers\Ppdb\PpdbGuruWawancaraController::class, 'tesButaWarna'])->name('ppdb.wawancara.tes_buta_warna');
+            Route::get('/ppdb/berkas/{id}/{jenis}', [PpdbAdminController::class, 'lihatBerkas'])->name('ppdb.berkas');
         });
 
         // Panitia PPDB Online (Admin, Kepsek, Panitia PPDB, Waka Kesiswaan)

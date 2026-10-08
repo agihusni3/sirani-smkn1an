@@ -88,6 +88,6 @@ class ArsipDokumenSiswa extends Model
         if (str_starts_with($this->file_path, 'http')) {
             return $this->file_path;
         }
-        return asset('storage/' . $this->file_path);
+        return route('situan.ekabinet.file', ['type' => 'siswa', 'id' => $this->id]);
     }
 }

@@ -112,6 +112,17 @@ class BackupDatabaseController extends Controller
         try {
             $sqlitePath = database_path('database.sqlite');
 
+            $ext = strtolower(pathinfo($filePath, PATHINFO_EXTENSION));
+            if (in_array($ext, ['sqlite', 'db', 'sqlite3'])) {
+                $handle = @fopen($filePath, 'rb');
+                $header = $handle ? fread($handle, 16) : '';
+                if ($handle) fclose($handle);
+
+                if (!str_starts_with($header, "SQLite format 3\0")) {
+                    return back()->with('error', 'File cadangan bukan database SQLite 3 yang valid (header berkas rusak).');
+                }
+            }
+
             // Snapshot keselamatan sebelum restore
             if (File::exists($sqlitePath)) {
                 $safetySnapshot = storage_path('app/backup_pre_restore_' . time() . '.sqlite');
@@ -223,6 +234,15 @@ class BackupDatabaseController extends Controller
                 }
 
                 if (in_array($extension, ['sqlite', 'db', 'sqlite3'])) {
+                    // Validasi integritas berkas database: Magic Byte SQLite 3
+                    $handle = @fopen($file->getRealPath(), 'rb');
+                    $header = $handle ? fread($handle, 16) : '';
+                    if ($handle) fclose($handle);
+
+                    if (!str_starts_with($header, "SQLite format 3\0")) {
+                        return back()->with('error', 'File yang diunggah bukan database SQLite 3 yang valid (header berkas tidak sesuai).');
+                    }
+
                     // Putuskan koneksi DB sebelum file database.sqlite ditimpa
                     DB::disconnect();
                     File::copy($file->getRealPath(), $sqlitePath);

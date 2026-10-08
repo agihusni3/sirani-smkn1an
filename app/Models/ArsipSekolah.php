@@ -65,4 +65,14 @@ class ArsipSekolah extends Model
             default            => 'bg-secondary-subtle text-secondary',
         };
     }
+
+    public function getFileUrlAttribute(): string
+    {
+        if (!$this->file_path) return '#';
+        if (str_starts_with($this->file_path, 'http')) {
+            return $this->file_path;
+        }
+        $type = $this->kategori_arsip === 'mou_industri' ? 'mou' : 'lembaga';
+        return route('situan.ekabinet.file', ['type' => $type, 'id' => $this->id]);
+    }
 }

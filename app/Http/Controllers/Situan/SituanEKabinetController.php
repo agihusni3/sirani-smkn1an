@@ -584,4 +584,72 @@ class SituanEKabinetController extends Controller
         return redirect()->route('situan.ekabinet.index', ['tab' => 'mou'])
             ->with('success', "Dokumen MoU {$namaArsip} berhasil dihapus dari E-Kabinet MoU.");
     }
+
+    /**
+     * Jalur Unduh / Tinjau Aman Dokumen E-Kabinet (Tervalidasi Hak Akses & Sesuai UU PDP)
+     */
+    public function unduhDokumen(Request $request, string $type, int $id)
+    {
+        $user = auth()->user();
+        if (!$user) {
+            abort(401, 'Silakan login terlebih dahulu untuk mengakses berkas digital.');
+        }
+
+        $filePath = null;
+        $fileName = 'dokumen';
+
+        if ($type === 'ptk') {
+            $arsip = ArsipDokumenPtk::with('guru')->findOrFail($id);
+            // Otorisasi: Admin, Kepsek, Staf TU, atau Guru pemilik berkas
+            $isOwner = ($user->guru_id && (int)$user->guru_id === (int)$arsip->guru_id);
+            if (!$isOwner && !$user->isAdmin() && !$user->isKepalaSekolah() && !$user->isStafTu()) {
+                abort(403, 'Akses ditolak. Anda tidak memiliki wewenang untuk melihat berkas kepegawaian ini.');
+            }
+            $filePath = $arsip->file_path;
+            $fileName = $arsip->nama_dokumen ?: basename($filePath);
+        } elseif ($type === 'siswa') {
+            $arsip = ArsipDokumenSiswa::with('siswa')->findOrFail($id);
+            // Otorisasi: Admin, Kepsek, Staf TU, Waka, Guru BK, atau Guru Sekolah
+            $allowed = $user->isAdmin() || $user->isKepalaSekolah() || $user->isStafTu() || $user->isGuru();
+            if (!$allowed) {
+                abort(403, 'Akses ditolak. Anda tidak memiliki wewenang untuk melihat berkas kependudukan siswa ini.');
+            }
+            $filePath = $arsip->file_path;
+            $fileName = $arsip->nama_dokumen ?: basename($filePath);
+        } elseif (in_array($type, ['lembaga', 'mou'])) {
+            $arsip = ArsipSekolah::findOrFail($id);
+            $filePath = $arsip->file_path;
+            $fileName = $arsip->nama_arsip ?: basename($filePath);
+        } else {
+            abort(404, 'Kategori arsip tidak ditemukan.');
+        }
+
+        if (!$filePath) {
+            abort(404, 'File path tidak tercatat pada arsip.');
+        }
+
+        // Cari file di disk public maupun local
+        $fullPath = null;
+        if (Storage::disk('public')->exists($filePath)) {
+            $fullPath = Storage::disk('public')->path($filePath);
+        } elseif (Storage::disk('local')->exists($filePath)) {
+            $fullPath = Storage::disk('local')->path($filePath);
+        } elseif (file_exists(public_path('storage/' . $filePath))) {
+            $fullPath = public_path('storage/' . $filePath);
+        }
+
+        if (!$fullPath || !file_exists($fullPath)) {
+            abort(404, 'Berkas fisik tidak ditemukan di server.');
+        }
+
+        $mime = mime_content_type($fullPath) ?: 'application/octet-stream';
+        $safeName = preg_replace('/[^a-zA-Z0-9._-]/', '_', $fileName) . '.' . pathinfo($fullPath, PATHINFO_EXTENSION);
+
+        return response()->file($fullPath, [
+            'Content-Type' => $mime,
+            'Content-Disposition' => 'inline; filename="' . $safeName . '"',
+            'X-Content-Type-Options' => 'nosniff',
+        ]);
+    }
 }
+

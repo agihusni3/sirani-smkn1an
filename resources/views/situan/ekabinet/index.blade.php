@@ -393,7 +393,7 @@
                 <td class="px-3 text-center">
                   <div class="d-flex align-items-center justify-content-center gap-1">
                     @if($arsip->file_path)
-                      <a href="{{ asset('storage/' . $arsip->file_path) }}" target="_blank" class="ek-btn-icon" title="Lihat / Unduh Dokumen">
+                      <a href="{{ $arsip->file_url }}" target="_blank" class="ek-btn-icon" title="Lihat / Unduh Dokumen">
                         <i class="bi bi-eye"></i>
                       </a>
                     @endif
@@ -703,7 +703,7 @@
                 <td class="text-center">
                   <div class="d-flex align-items-center justify-content-center gap-1">
                     @if($arsip->file_path)
-                      <a href="{{ asset('storage/' . $arsip->file_path) }}" target="_blank" class="ek-btn-icon" title="Lihat / Unduh Dokumen">
+                      <a href="{{ $arsip->file_url }}" target="_blank" class="ek-btn-icon" title="Lihat / Unduh Dokumen">
                         <i class="bi bi-eye"></i>
                       </a>
                     @endif
@@ -843,7 +843,7 @@
                 <td class="text-center">
                   <div class="d-flex align-items-center justify-content-center gap-1">
                     @if($mou->file_path)
-                      <a href="{{ asset('storage/' . $mou->file_path) }}" target="_blank" class="ek-btn-icon" title="Lihat / Unduh MoU">
+                      <a href="{{ $mou->file_url }}" target="_blank" class="ek-btn-icon" title="Lihat / Unduh MoU">
                         <i class="bi bi-eye"></i>
                       </a>
                     @endif

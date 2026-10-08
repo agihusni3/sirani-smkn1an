@@ -244,8 +244,8 @@
             <div style="border:1px solid var(--border); border-radius:8px; padding:10px; text-align:center;">
               <div style="font-size:11px; font-weight:700; color:var(--text-3); margin-bottom:6px;">Pas Foto 3x4</div>
               @if($pendaftar->pas_foto)
-                <img src="{{ asset('storage/' . $pendaftar->pas_foto) }}" alt="Pas Foto" style="width:100px; height:130px; object-fit:cover; border-radius:4px; border:1px solid var(--border); margin-bottom:6px;">
-                <div><a href="{{ asset('storage/' . $pendaftar->pas_foto) }}" target="_blank" style="font-size:11px; color:#0f172a; font-weight:700;">Lihat Foto Penuh</a></div>
+                <img src="{{ route('admin.ppdb.berkas', ['id' => $pendaftar->id, 'jenis' => 'foto']) }}" alt="Pas Foto" style="width:100px; height:130px; object-fit:cover; border-radius:4px; border:1px solid var(--border); margin-bottom:6px;">
+                <div><a href="{{ route('admin.ppdb.berkas', ['id' => $pendaftar->id, 'jenis' => 'foto']) }}" target="_blank" style="font-size:11px; color:#0f172a; font-weight:700;">Lihat Foto Penuh</a></div>
               @else
                 <div style="height:120px; background:var(--surface); display:flex; align-items:center; justify-content:center; color:var(--text-3); font-size:11px;">Belum Diunggah</div>
               @endif
@@ -257,7 +257,7 @@
               @if($pendaftar->scan_kk)
                 <div style="height:120px; background:var(--surface); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px;">
                   <i class="bi bi-file-earmark-pdf-fill" style="font-size:32px; color:#ef4444;"></i>
-                  <a href="{{ asset('storage/' . $pendaftar->scan_kk) }}" target="_blank" class="btn btn-sm" style="background:#0f172a; color:#fff; font-size:11px; padding:4px 8px; text-decoration:none;">Buka Dokumen KK</a>
+                  <a href="{{ route('admin.ppdb.berkas', ['id' => $pendaftar->id, 'jenis' => 'kk']) }}" target="_blank" class="btn btn-sm" style="background:#0f172a; color:#fff; font-size:11px; padding:4px 8px; text-decoration:none;">Buka Dokumen KK</a>
                 </div>
               @else
                 <div style="height:120px; background:var(--surface); display:flex; align-items:center; justify-content:center; color:var(--text-3); font-size:11px;">Belum Diunggah</div>
@@ -270,7 +270,7 @@
               @if($pendaftar->scan_ijazah_skl)
                 <div style="height:120px; background:var(--surface); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px;">
                   <i class="bi bi-file-earmark-check-fill" style="font-size:32px; color:#10b981;"></i>
-                  <a href="{{ asset('storage/' . $pendaftar->scan_ijazah_skl) }}" target="_blank" class="btn btn-sm" style="background:#0f172a; color:#fff; font-size:11px; padding:4px 8px; text-decoration:none;">Buka Dokumen SKL</a>
+                  <a href="{{ route('admin.ppdb.berkas', ['id' => $pendaftar->id, 'jenis' => 'ijazah_skl']) }}" target="_blank" class="btn btn-sm" style="background:#0f172a; color:#fff; font-size:11px; padding:4px 8px; text-decoration:none;">Buka Dokumen SKL</a>
                 </div>
               @else
                 <div style="height:120px; background:var(--surface); display:flex; align-items:center; justify-content:center; color:var(--text-3); font-size:11px;">Belum Diunggah</div>
@@ -283,7 +283,7 @@
               @if($pendaftar->scan_ktp_ortu)
                 <div style="height:120px; background:var(--surface); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px;">
                   <i class="bi bi-person-vcard-fill" style="font-size:32px; color:#6366f1;"></i>
-                  <a href="{{ asset('storage/' . $pendaftar->scan_ktp_ortu) }}" target="_blank" class="btn btn-sm" style="background:#0f172a; color:#fff; font-size:11px; padding:4px 8px; text-decoration:none;">Buka Dokumen KTP</a>
+                  <a href="{{ route('admin.ppdb.berkas', ['id' => $pendaftar->id, 'jenis' => 'ktp_ortu']) }}" target="_blank" class="btn btn-sm" style="background:#0f172a; color:#fff; font-size:11px; padding:4px 8px; text-decoration:none;">Buka Dokumen KTP</a>
                 </div>
               @else
                 <div style="height:120px; background:var(--surface); display:flex; align-items:center; justify-content:center; color:var(--text-3); font-size:11px;">Belum Diunggah</div>
@@ -296,7 +296,7 @@
               @if($pendaftar->scan_akta)
                 <div style="height:120px; background:var(--surface); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px;">
                   <i class="bi bi-file-earmark-text-fill" style="font-size:32px; color:#f59e0b;"></i>
-                  <a href="{{ asset('storage/' . $pendaftar->scan_akta) }}" target="_blank" class="btn btn-sm" style="background:#0f172a; color:#fff; font-size:11px; padding:4px 8px; text-decoration:none;">Buka Akta Lahir</a>
+                  <a href="{{ route('admin.ppdb.berkas', ['id' => $pendaftar->id, 'jenis' => 'akta']) }}" target="_blank" class="btn btn-sm" style="background:#0f172a; color:#fff; font-size:11px; padding:4px 8px; text-decoration:none;">Buka Akta Lahir</a>
                 </div>
               @else
                 <div style="height:120px; background:var(--surface); display:flex; align-items:center; justify-content:center; color:var(--text-3); font-size:11px;">Belum Diunggah</div>
@@ -317,7 +317,7 @@
               @if($berkasPip)
                 <div style="height:120px; background:var(--surface); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px;">
                   <i class="bi bi-credit-card-2-front-fill" style="font-size:32px; color:#16a34a;"></i>
-                  <a href="{{ asset('storage/' . $berkasPip) }}" target="_blank" class="btn btn-sm" style="background:#16a34a; color:#fff; font-size:11px; padding:4px 8px; font-weight:700;">Buka Berkas PIP</a>
+                  <a href="{{ route('admin.ppdb.berkas', ['id' => $pendaftar->id, 'jenis' => 'pip']) }}" target="_blank" class="btn btn-sm" style="background:#16a34a; color:#fff; font-size:11px; padding:4px 8px; font-weight:700;">Buka Berkas PIP</a>
                 </div>
               @else
                 <div style="height:120px; background:var(--surface); display:flex; align-items:center; justify-content:center; color:var(--text-3); font-size:11px;">
@@ -332,7 +332,7 @@
               @if($pendaftar->scan_sktm)
                 <div style="height:120px; background:var(--surface); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px;">
                   <i class="bi bi-file-earmark-medical-fill" style="font-size:32px; color:#ec4899;"></i>
-                  <a href="{{ asset('storage/' . $pendaftar->scan_sktm) }}" target="_blank" class="btn btn-sm" style="background:#0f172a; color:#fff; font-size:11px; padding:4px 8px; text-decoration:none;">Buka Berkas SKTM</a>
+                  <a href="{{ route('admin.ppdb.berkas', ['id' => $pendaftar->id, 'jenis' => 'sktm']) }}" target="_blank" class="btn btn-sm" style="background:#0f172a; color:#fff; font-size:11px; padding:4px 8px; text-decoration:none;">Buka Berkas SKTM</a>
                 </div>
               @else
                 <div style="height:120px; background:var(--surface); display:flex; align-items:center; justify-content:center; color:var(--text-3); font-size:11px;">Tidak Ada / Opsional</div>

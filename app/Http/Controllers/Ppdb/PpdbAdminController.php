@@ -954,4 +954,60 @@ class PpdbAdminController extends Controller
         $jurusan = Jurusan::find($validated['jurusan_diterima_id']);
         return back()->with('success', "Jurusan yang diterima untuk {$pendaftar->nama_lengkap} berhasil diperbarui menjadi {$jurusan->nama_jurusan}.");
     }
+
+    /**
+     * Akses Stream Dokumen Pendaftaran PPDB Aman (KTP, KK, Ijazah, Akta, dll.) Sesuai UU PDP
+     */
+    public function lihatBerkas(Request $request, int $id, string $jenis)
+    {
+        $user = auth()->user();
+        if (!$user) {
+            abort(401, 'Silakan login terlebih dahulu untuk mengakses dokumen pendaftar.');
+        }
+
+        // Otorisasi: Admin, Kepsek, Panitia PPDB, Waka Kesiswaan, atau Guru Penguji
+        $allowed = $user->isAdmin() || $user->isKepalaSekolah() || $user->isPanitiaPpdb() || $user->isWaka() || $user->canAccessWawancaraPpdb();
+        if (!$allowed) {
+            abort(403, 'Akses ditolak. Anda tidak berwenang melihat berkas kependudukan calon siswa.');
+        }
+
+        $pendaftar = PpdbPendaftar::findOrFail($id);
+
+        $path = match ($jenis) {
+            'foto'       => $pendaftar->berkas_foto,
+            'kk'         => $pendaftar->scan_kk ?: $pendaftar->berkas_kk,
+            'ijazah_skl' => $pendaftar->scan_ijazah_skl ?: $pendaftar->berkas_ijazah_skl,
+            'ktp_ortu'   => $pendaftar->scan_ktp_ortu ?: $pendaftar->berkas_ktp_ortu,
+            'akta'       => $pendaftar->scan_akta ?: $pendaftar->berkas_akta,
+            'pip', 'kip' => $pendaftar->berkas_pip ?: ($pendaftar->scan_kip ?: $pendaftar->berkas_kip),
+            'sktm'       => $pendaftar->scan_sktm ?: $pendaftar->berkas_sktm,
+            default      => null,
+        };
+
+        if (!$path) {
+            abort(404, 'Dokumen jenis ini belum diunggah atau tidak ditemukan.');
+        }
+
+        $fullPath = null;
+        if (\Illuminate\Support\Facades\Storage::disk('public')->exists($path)) {
+            $fullPath = \Illuminate\Support\Facades\Storage::disk('public')->path($path);
+        } elseif (\Illuminate\Support\Facades\Storage::disk('local')->exists($path)) {
+            $fullPath = \Illuminate\Support\Facades\Storage::disk('local')->path($path);
+        } elseif (file_exists(public_path('storage/' . $path))) {
+            $fullPath = public_path('storage/' . $path);
+        }
+
+        if (!$fullPath || !file_exists($fullPath)) {
+            abort(404, 'Berkas fisik tidak ditemukan di server.');
+        }
+
+        $mime = mime_content_type($fullPath) ?: 'application/octet-stream';
+        $fileName = 'ppdb_' . preg_replace('/[^a-zA-Z0-9_-]/', '_', $pendaftar->no_pendaftaran) . '_' . $jenis . '.' . pathinfo($fullPath, PATHINFO_EXTENSION);
+
+        return response()->file($fullPath, [
+            'Content-Type' => $mime,
+            'Content-Disposition' => 'inline; filename="' . $fileName . '"',
+            'X-Content-Type-Options' => 'nosniff',
+        ]);
+    }
 }
