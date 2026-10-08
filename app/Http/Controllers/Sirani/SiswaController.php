@@ -644,9 +644,20 @@ class SiswaController extends Controller
             return strcasecmp($a->nama, $b->nama);
         })->values();
 
+        // Opsi Ekspor Excel (.xls) dengan Barcode 2D tertanam di tabel
+        if ($request->query('download') === 'excel' || $request->query('download') === 'xls') {
+            $fileName = 'export_barcode_2d_siswa_' . ($rombel ? preg_replace('/[^a-zA-Z0-9_-]/', '_', $rombel->nama_rombel) : 'semua') . '_' . date('Ymd_His') . '.xls';
+            $sekolah = \App\Models\PengaturanSekolah::getAktif();
+            return response()->view('situan.siswa.export_barcode_excel', compact('siswas', 'rombel', 'sekolah'))
+                ->header('Content-Type', 'application/vnd.ms-excel; charset=utf-8')
+                ->header('Content-Disposition', 'attachment; filename="' . $fileName . '"')
+                ->header('Pragma', 'no-cache')
+                ->header('Expires', '0');
+        }
+
         // Opsi Ekspor CSV Data Barcode
         if ($request->query('download') === 'csv') {
-            $fileName = 'export_barcode_siswa_' . ($rombel ? preg_replace('/[^a-zA-Z0-9_-]/', '_', $rombel->nama_rombel) : 'semua') . '_' . date('Ymd_His') . '.csv';
+            $fileName = 'export_barcode_2d_siswa_' . ($rombel ? preg_replace('/[^a-zA-Z0-9_-]/', '_', $rombel->nama_rombel) : 'semua') . '_' . date('Ymd_His') . '.csv';
             $headers = [
                 "Content-type"        => "text/csv; charset=UTF-8",
                 "Content-Disposition" => "attachment; filename=$fileName",
@@ -658,7 +669,7 @@ class SiswaController extends Controller
                 $file = fopen('php://output', 'w');
                 fprintf($file, chr(0xEF).chr(0xBB).chr(0xBF));
                 fwrite($file, "sep=;\n");
-                fputcsv($file, ['No', 'NISN', 'Nama Siswa', 'Barcode Scan Value', 'Kelas / Rombel'], ';');
+                fputcsv($file, ['No', 'NISN', 'Nama Siswa', 'Barcode 2D Scan Value', 'Kelas / Rombel'], ';');
                 foreach ($siswas as $idx => $s) {
                     $rNama = $s->siswaRombels->first()?->rombel?->nama_rombel ?? '-';
                     $valBarcode = !empty($s->nisn) ? $s->nisn : ($s->nis ?: (string)$s->id);

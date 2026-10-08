@@ -45,8 +45,8 @@
           <a href="{{ route('rfid.cetak', ['tab' => $tab, 'rombel_id' => $rombelId]) }}" id="btnTopCetakKartu" onclick="return handleTopCetakClick(this, event)" target="_blank" class="btn btn-sm btn-outline" style="height:32px; padding:0 12px; font-size:11.5px; font-weight:800; display:inline-flex; align-items:center; gap:5px; border-radius:6px; text-decoration:none;" title="Cetak Kartu Siswa/Guru Siap Pakai">
             <i class="bi bi-printer-fill"></i> Cetak Kartu Barcode <span id="topSelectedBadge" style="display:none; background:#000000; color:#FFFFFF; border-radius:10px; padding:1px 6px; font-size:10px; font-family:var(--font-mono); margin-left:2px;">0</span>
           </a>
-          <a href="{{ route('rfid.export-barcode', ['rombel_id' => $rombelId]) }}" target="_blank" class="btn btn-sm btn-outline" style="height:32px; padding:0 12px; font-size:11.5px; font-weight:800; display:inline-flex; align-items:center; gap:5px; border-radius:6px; text-decoration:none;" title="Export & Cetak Lembar Barcode (NISN | Nama | Barcode)">
-            <i class="bi bi-upc-scan" style="color:#0284c7;"></i> Export Barcode NISN
+          <a href="{{ route('rfid.export-barcode', ['rombel_id' => $rombelId]) }}" target="_blank" class="btn btn-sm btn-outline" style="height:32px; padding:0 12px; font-size:11.5px; font-weight:800; display:inline-flex; align-items:center; gap:5px; border-radius:6px; text-decoration:none;" title="Export & Cetak Lembar Barcode 2D (NISN | Nama | Barcode 2D)">
+            <i class="bi bi-qr-code" style="color:#0284c7;"></i> Export Barcode 2D (NISN)
           </a>
           <button type="button" onclick="openModalTambahKartu('{{ $tab }}')" class="btn btn-sm btn-gold" style="height:32px; padding:0 12px; font-size:11.5px; font-weight:800; display:inline-flex; align-items:center; gap:5px; border-radius:6px; cursor:pointer;">
             <i class="bi bi-plus-circle-fill"></i> Tambah / Pasang Kartu

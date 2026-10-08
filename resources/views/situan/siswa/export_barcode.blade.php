@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Export Barcode Siswa - SMKN 1 Air Naningan</title>
+  <title>Export Barcode 2D Siswa - SMKN 1 Air Naningan</title>
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -222,7 +222,7 @@
       flex-wrap: wrap;
     }
 
-    /* ─── TABEL FORMAT: NISN | NAMA | BARCODE ─── */
+    /* ─── TABEL FORMAT: NISN | NAMA | BARCODE 2D ─── */
     .barcode-table {
       width: 100%;
       border-collapse: collapse;
@@ -280,53 +280,53 @@
     }
 
     .col-rombel {
-      width: 85px;
+      width: 90px;
       text-align: center;
       font-size: 8.5pt;
       white-space: nowrap;
     }
 
     .col-barcode {
-      width: 190px;
+      width: 120px;
       text-align: center;
-      padding: 4px 6px;
+      padding: 5px 4px;
     }
 
-    .barcode-box {
+    .barcode-2d-box {
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       background: #ffffff;
-      padding: 2px 4px;
+      padding: 2px;
     }
 
-    .barcode-box svg {
-      max-width: 100%;
-      height: 38px;
+    .barcode-2d-box svg {
+      width: 60px;
+      height: 60px;
     }
 
     .barcode-text-num {
       font-family: 'JetBrains Mono', monospace;
-      font-size: 8pt;
+      font-size: 7.5pt;
       font-weight: 800;
-      letter-spacing: 1px;
+      letter-spacing: 0.5px;
       color: #000000;
-      margin-top: 1px;
+      margin-top: 2px;
     }
 
-    /* ─── MODE GRID STIKER / LABEL (ALTERNATIF LAYOUT) ─── */
+    /* ─── MODE GRID STIKER / LABEL 2D (ALTERNATIF LAYOUT) ─── */
     .barcode-grid-wrap {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 8px;
+      gap: 10px;
       margin-top: 10px;
     }
 
     .stiker-card {
       border: 1.5px dashed #000000;
       border-radius: 6px;
-      padding: 8px;
+      padding: 10px;
       text-align: center;
       background: #ffffff;
       page-break-inside: avoid;
@@ -359,13 +359,13 @@
     .stiker-meta {
       font-size: 7.5pt;
       color: #475569;
-      margin-bottom: 4px;
+      margin-bottom: 6px;
       font-weight: 600;
     }
 
-    .stiker-barcode-svg svg {
-      max-width: 100%;
-      height: 36px;
+    .stiker-barcode-2d svg {
+      width: 72px;
+      height: 72px;
     }
 
     /* ─── TANDA TANGAN / PENGESAHAN ─── */
@@ -417,8 +417,8 @@
   <div class="print-actions-bar no-print">
     <div class="toolbar-left">
       <div class="toolbar-title">
-        <i class="bi bi-upc-scan" style="color: #38bdf8; font-size: 16px;"></i>
-        Export Barcode Siswa (NISN - Nama - Barcode)
+        <i class="bi bi-qr-code" style="color: #38bdf8; font-size: 16px;"></i>
+        Export Barcode 2D (QR Code) Siswa
       </div>
 
       {{-- Filter Rombel Cepat --}}
@@ -443,8 +443,11 @@
       <a href="{{ request()->fullUrlWithQuery(['layout' => 'grid']) }}" class="btn-tool {{ ($layout ?? 'tabel') === 'grid' ? 'active' : '' }}" title="Mode Lembar Label Stiker">
         <i class="bi bi-grid-3x3-gap-fill"></i> Label Stiker
       </a>
-      <a href="{{ request()->fullUrlWithQuery(['download' => 'csv']) }}" class="btn-tool" title="Unduh CSV Data Barcode">
-        <i class="bi bi-file-earmark-spreadsheet-fill" style="color:#22c55e;"></i> CSV
+      <a href="{{ request()->fullUrlWithQuery(['download' => 'excel']) }}" class="btn-tool" title="Download Excel (.xls) dengan Barcode 2D tertanam di tabel">
+        <i class="bi bi-file-earmark-excel-fill" style="color:#22c55e;"></i> Excel (.xls)
+      </a>
+      <a href="{{ request()->fullUrlWithQuery(['download' => 'csv']) }}" class="btn-tool" title="Unduh CSV Data Siswa & Barcode">
+        <i class="bi bi-file-earmark-spreadsheet"></i> CSV
       </a>
       <button type="button" onclick="window.print()" class="btn-tool btn-print" title="Cetak atau Simpan sebagai PDF">
         <i class="bi bi-printer-fill"></i> Cetak / Print PDF
@@ -475,7 +478,7 @@
 
     {{-- JUDUL DOKUMEN --}}
     <div class="doc-header">
-      <h2 class="doc-title">DAFTAR BARCODE PRESENSI SISWA</h2>
+      <h2 class="doc-title">DAFTAR BARCODE 2D (QR CODE) PRESENSI SISWA</h2>
       <div class="doc-meta">
         <span>Rombel / Kelas: <strong>{{ $rombel ? $rombel->nama_rombel : 'Semua Rombel Terpilih' }}</strong></span>
         <span>Total: <strong>{{ number_format(count($siswas)) }} Siswa</strong></span>
@@ -485,23 +488,23 @@
 
     @if(($layout ?? 'tabel') === 'grid')
       {{-- ═══════════════════════════════════════════════════════════════════ --}}
-      {{-- MODE 2: LEMBAR LABEL / STIKER BARCODE KARTU                     --}}
+      {{-- MODE 2: LEMBAR LABEL / STIKER BARCODE 2D                        --}}
       {{-- ═══════════════════════════════════════════════════════════════════ --}}
       <div class="barcode-grid-wrap">
         @forelse($siswas as $idx => $s)
           @php
             $nisnClean = !empty($s->nisn) ? trim($s->nisn) : (!empty($s->nis) ? trim($s->nis) : (string)$s->id);
             $rombelNama = $s->siswaRombels->first()?->rombel?->nama_rombel ?? '-';
-            $barcodeSvg = \App\Services\BarcodeService::getBarcodeSvg($nisnClean, 36, 2, false);
+            $barcode2dSvg = \App\Services\BarcodeService::getBarcode2DSvg($nisnClean, 72);
           @endphp
           <div class="stiker-card">
             <div class="stiker-school">{{ !empty($sekolah->nama_sekolah) ? $sekolah->nama_sekolah : 'SMKN 1 AIR NANINGAN' }}</div>
             <div class="stiker-nama" title="{{ $s->nama }}">{{ $s->nama }}</div>
             <div class="stiker-meta">NISN: {{ $s->nisn ?: '-' }} · {{ $rombelNama }}</div>
-            <div class="stiker-barcode-svg">
-              {!! $barcodeSvg !!}
+            <div class="stiker-barcode-2d">
+              {!! $barcode2dSvg !!}
             </div>
-            <div class="barcode-text-num">*{{ $nisnClean }}*</div>
+            <div class="barcode-text-num">{{ $nisnClean }}</div>
           </div>
         @empty
           <div style="grid-column: 1 / -1; text-align:center; padding: 40px; color:#64748b;">
@@ -511,7 +514,7 @@
       </div>
     @else
       {{-- ═══════════════════════════════════════════════════════════════════ --}}
-      {{-- MODE 1: TABEL RESMI FORMAT: NISN | NAMA | BARCODE (DEFAULT)     --}}
+      {{-- MODE 1: TABEL RESMI FORMAT: NISN | NAMA | BARCODE 2D (DEFAULT)   --}}
       {{-- ═══════════════════════════════════════════════════════════════════ --}}
       <table class="barcode-table">
         <thead>
@@ -522,7 +525,7 @@
             @if(empty($rombelId))
               <th class="col-rombel">Rombel</th>
             @endif
-            <th class="col-barcode">Barcode Scanner</th>
+            <th class="col-barcode">Barcode 2D</th>
           </tr>
         </thead>
         <tbody>
@@ -530,7 +533,7 @@
             @php
               $nisnClean = !empty($s->nisn) ? trim($s->nisn) : (!empty($s->nis) ? trim($s->nis) : (string)$s->id);
               $rombelNama = $s->siswaRombels->first()?->rombel?->nama_rombel ?? '-';
-              $barcodeSvg = \App\Services\BarcodeService::getBarcodeSvg($nisnClean, 38, 2, false);
+              $barcode2dSvg = \App\Services\BarcodeService::getBarcode2DSvg($nisnClean, 60);
             @endphp
             <tr>
               <td class="col-no">{{ $idx + 1 }}</td>
@@ -545,9 +548,9 @@
                 <td class="col-rombel">{{ $rombelNama }}</td>
               @endif
               <td class="col-barcode">
-                <div class="barcode-box">
-                  {!! $barcodeSvg !!}
-                  <div class="barcode-text-num">*{{ $nisnClean }}*</div>
+                <div class="barcode-2d-box">
+                  {!! $barcode2dSvg !!}
+                  <div class="barcode-text-num">{{ $nisnClean }}</div>
                 </div>
               </td>
             </tr>
