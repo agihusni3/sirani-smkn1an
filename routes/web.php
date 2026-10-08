@@ -92,7 +92,7 @@ Route::middleware('throttle:120,1')->group(function () {
     // Redirect Alias dari rute lama ke monitoring absen mandiri
     Route::get('/portal-siswa/{nisn?}', [\App\Http\Controllers\Sirani\RfidController::class, 'portalSiswa'])->name('portal.siswa');
     Route::get('/kartu-digital/{nisn}', [\App\Http\Controllers\Sirani\RfidController::class, 'kartuDigital'])->name('kartu.digital');
-    Route::get('/kartu-digital-guru/{id}', [\App\Http\Controllers\Sirani\RfidController::class, 'kartuDigitalGuru'])->name('kartu.digital.guru');
+    Route::get('/kartu-digital-guru/{identifier}', [\App\Http\Controllers\Sirani\RfidController::class, 'kartuDigitalGuru'])->name('kartu.digital.guru');
 
     // Unduh Aplikasi Android SIRANI (APK Langsung)
     Route::get('/download-apk', function () {
@@ -765,11 +765,13 @@ Route::middleware('auth')->group(function () {
         return redirect()->route('admin.ppdb.index');
     })->name('ppdb.admin.index');
 
-});
+    // Format Cetak Surat Resmi Kesiswaan (Khusus Staf Terautentikasi & Berwenang)
+    Route::middleware('role:admin,kepala_sekolah,guru_bk,waka_kesiswaan,wali_kelas,guru_piket')->group(function () {
+        Route::get('/surat', [SuratKesiswaanController::class, 'cetak'])->name('surat.index');
+        Route::get('/surat/cetak/{id?}', [SuratKesiswaanController::class, 'cetak'])->name('surat.cetak');
+    });
 
-// Format Cetak Surat Resmi Kesiswaan
-Route::get('/surat', [SuratKesiswaanController::class, 'cetak'])->name('surat.index');
-Route::get('/surat/cetak/{id?}', [SuratKesiswaanController::class, 'cetak'])->name('surat.cetak');
+});
 
 // Verifikasi Keabsahan Surat Resmi via QR Code (Akses Publik Tanpa Login)
 Route::get('/verifikasi-surat/{hash}', [SituanPelayananSuratController::class, 'verifikasiSuratPublik'])->name('situan.verifikasi-surat');

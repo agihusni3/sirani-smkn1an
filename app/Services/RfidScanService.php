@@ -214,22 +214,14 @@ class RfidScanService
                 if ($siswaByNisn) {
                     $type = 'siswa';
                     $id   = $siswaByNisn->id;
+                } elseif (\Illuminate\Support\Facades\Schema::hasColumn('siswas', 'nis') && ($siswaByNis = Siswa::whereIn('nis', $cleanUidVariants)->first())) {
                     // Fallback B: Cek apakah kode barcode adalah NIS Siswa (jika kolom tersedia)
-                    $siswaByNis = null;
-                    if (\Illuminate\Support\Facades\Schema::hasColumn('siswas', 'nis')) {
-                        $siswaByNis = Siswa::whereIn('nis', $cleanUidVariants)->first();
-                    }
-                    if ($siswaByNis) {
-                        $type = 'siswa';
-                        $id   = $siswaByNis->id;
-                    } else {
-                        // Fallback C: Cek apakah kode barcode adalah NIP Guru
-                        $guruByNip = Guru::whereIn('nip', $cleanUidVariants)->first();
-                        if ($guruByNip) {
-                            $type = 'guru';
-                            $id   = $guruByNip->id;
-                        }
-                    }
+                    $type = 'siswa';
+                    $id   = $siswaByNis->id;
+                } elseif ($guruByNip = Guru::whereIn('nip', $cleanUidVariants)->first()) {
+                    // Fallback C: Cek apakah kode barcode adalah NIP Guru
+                    $type = 'guru';
+                    $id   = $guruByNip->id;
                 }
             }
 

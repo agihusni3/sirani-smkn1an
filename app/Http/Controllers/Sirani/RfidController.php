@@ -290,11 +290,21 @@ class RfidController extends Controller
     /**
      * Tampilan Kartu Digital Mobile-Friendly untuk Guru & Pegawai
      */
-    public function kartuDigitalGuru(int $id)
+    public function kartuDigitalGuru($identifier)
     {
-        $guru = Guru::with('kartuRfid')->findOrFail($id);
+        $cleanId = trim((string) $identifier);
+        $guru = Guru::with('kartuRfid')
+            ->where(function ($q) use ($cleanId) {
+                $q->where('nip', $cleanId);
+                if (is_numeric($cleanId)) {
+                    $q->orWhere('id', (int) $cleanId);
+                }
+                $q->orWhereHas('kartuRfid', fn($kq) => $kq->where('uid', $cleanId));
+            })
+            ->firstOrFail();
+
         $sekolah = PengaturanSekolah::getAktif();
-        $codeValue = $guru->kartuRfid?->uid ?? ($guru->nip ?: 'GURU-'.$guru->id);
+        $codeValue = $guru->kartuRfid?->uid ?? ($guru->nip ?: $guru->nama);
 
         return view('sirani.rfid.kartu_digital_guru', compact('guru', 'sekolah', 'codeValue'));
     }

@@ -710,12 +710,22 @@ class PeringkatController extends Controller
                 'Predikat Teladan'
             ], ';');
 
+            // Netralkan formula injection Excel (CWE-1236)
+            $cleanCell = function ($val) {
+                if ($val === null || $val === '') return '-';
+                $str = (string) $val;
+                if (in_array(substr($str, 0, 1), ['=', '+', '-', '@', "\t", "\r"])) {
+                    return "'" . $str;
+                }
+                return $str;
+            };
+
             foreach ($data as $d) {
                 fputcsv($file, [
                     $d['rank'],
                     '="' . $d['ident'] . '"',
-                    $d['nama'],
-                    $d['sub'],
+                    $cleanCell($d['nama']),
+                    $cleanCell($d['sub']),
                     $d['hadir_tepat'],
                     $d['terlambat'],
                     $d['izin'] + $d['sakit'] + $d['dispensasi'],
@@ -729,7 +739,7 @@ class PeringkatController extends Controller
                     $d['total_durasi_str'],
                     $d['avg_durasi_harian_str'],
                     $d['skor_disiplin'],
-                    $d['predikat']
+                    $cleanCell($d['predikat'])
                 ], ';');
             }
 

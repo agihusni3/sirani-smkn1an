@@ -497,6 +497,16 @@ class LaporanController extends Controller
             fprintf($file, chr(0xEF).chr(0xBB).chr(0xBF)); // BOM UTF-8
             fwrite($file, "sep=;\n");
 
+            // Netralkan formula injection Excel (CWE-1236)
+            $cleanCell = function ($val) {
+                if ($val === null || $val === '') return '-';
+                $str = (string) $val;
+                if (in_array(substr($str, 0, 1), ['=', '+', '-', '@', "\t", "\r"])) {
+                    return "'" . $str;
+                }
+                return $str;
+            };
+
             // ── FORMAT REKAP AGREGAT: MINGGUAN / BULANAN / TAHUNAN ──
             if (in_array($periode, ['mingguan', 'bulanan', 'tahunan'])) {
                 if ($kategori === 'siswa') {
@@ -517,8 +527,8 @@ class LaporanController extends Controller
                         fputcsv($file, [
                             $i + 1,
                             $s->nisn ? '="' . $s->nisn . '"' : '-',
-                            $s->nama,
-                            $rombelNama,
+                            $cleanCell($s->nama),
+                            $cleanCell($rombelNama),
                             $absenSiswa->where('status', 'hadir')->count(),
                             $absenSiswa->where('status', 'terlambat')->count(),
                             $absenSiswa->where('status', 'sakit')->count(),
@@ -538,8 +548,8 @@ class LaporanController extends Controller
                         fputcsv($file, [
                             $i + 1,
                             $g->nip ? '="' . $g->nip . '"' : '-',
-                            $g->nama,
-                            $g->jabatan ?? '-',
+                            $cleanCell($g->nama),
+                            $cleanCell($g->jabatan ?? '-'),
                             $absenGuru->where('status', 'hadir')->count(),
                             $absenGuru->where('status', 'terlambat')->count(),
                             $absenGuru->where('status', 'sakit')->count(),
@@ -562,12 +572,12 @@ class LaporanController extends Controller
                             $i + 1,
                             $lap->tanggal,
                             $nisn !== '-' ? '="' . $nisn . '"' : '-',
-                            $nama,
-                            $rombel,
+                            $cleanCell($nama),
+                            $cleanCell($rombel),
                             strtoupper($lap->status),
                             $lap->jam_masuk ?? '-',
                             $lap->jam_pulang ?? '-',
-                            $lap->sumber_absen_label,
+                            $cleanCell($lap->sumber_absen_label),
                         ], ';');
                     }
                 } else {
@@ -580,12 +590,12 @@ class LaporanController extends Controller
                             $i + 1,
                             $lap->tanggal,
                             $guru && $guru->nip ? '="' . $guru->nip . '"' : '-',
-                            $guru->nama ?? '-',
-                            $guru->jabatan ?? '-',
+                            $cleanCell($guru->nama ?? '-'),
+                            $cleanCell($guru->jabatan ?? '-'),
                             strtoupper($lap->status),
                             $lap->jam_masuk ?? '-',
                             $lap->jam_pulang ?? '-',
-                            $lap->sumber_absen_label,
+                            $cleanCell($lap->sumber_absen_label),
                         ], ';');
                     }
                 }
