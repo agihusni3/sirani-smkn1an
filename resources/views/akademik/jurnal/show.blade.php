@@ -12,10 +12,18 @@
     </div>
   </div>
 
-  <a href="{{ route('akademik.jurnal.index') }}" class="ak-btn ak-btn-secondary">
-    <i class="bi bi-arrow-left"></i>
-    <span>Kembali ke Daftar</span>
-  </a>
+  <div style="display:flex; gap:8px;">
+    @if(auth()->user()->isAdmin() || auth()->user()->isWakaKurikulum() || auth()->user()->guru_id == $jurnal->distribusi?->guru_id)
+      <a href="{{ route('akademik.jurnal.edit', $jurnal->id) }}" class="ak-btn ak-btn-primary">
+        <i class="bi bi-pencil-square"></i>
+        <span>Edit Jurnal</span>
+      </a>
+    @endif
+    <a href="{{ route('akademik.jurnal.index') }}" class="ak-btn ak-btn-secondary">
+      <i class="bi bi-arrow-left"></i>
+      <span>Kembali ke Daftar</span>
+    </a>
+  </div>
 </div>
 
 {{-- Detail Materi Card --}}

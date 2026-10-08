@@ -18,7 +18,7 @@ class AkademikPklController extends Controller
 
         $tempats = AkademikPklTempat::withCount('siswaPkls')->latest()->get();
         
-        $querySiswa = AkademikPklSiswa::with(['siswa.rombel', 'pklTempat', 'guruPembimbing', 'tahunAjaran'])
+        $querySiswa = AkademikPklSiswa::with(['siswa.rombels', 'siswa.siswaRombels.rombel', 'pklTempat', 'guruPembimbing', 'tahunAjaran'])
             ->when($ta, fn($q) => $q->where('tahun_ajaran_id', $ta->id));
 
         if ($request->filled('status')) {

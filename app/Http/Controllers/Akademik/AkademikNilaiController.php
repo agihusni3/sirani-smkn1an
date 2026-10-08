@@ -95,9 +95,6 @@ class AkademikNilaiController extends Controller
         DB::beginTransaction();
         try {
             foreach ($nilaiData as $siswaId => $penilaians) {
-                $formatifScores = [];
-                $sumatifScores = [];
-
                 foreach ($penilaians as $nama => $skor) {
                     if ($skor === null || $skor === '') continue;
 
@@ -117,45 +114,10 @@ class AkademikNilaiController extends Controller
                             'deskripsi_capaian' => $deskripsiData[$siswaId] ?? null,
                         ]
                     );
-
-                    if ($jenis === 'formatif') {
-                        $formatifScores[] = $skorNum;
-                    } else {
-                        $sumatifScores[] = $skorNum;
-                    }
                 }
 
-                // Kalkulasi Leger Otomatis
-                $formatifAvg = count($formatifScores) > 0 ? array_sum($formatifScores) / count($formatifScores) : 0;
-                $sumatifAvg = count($sumatifScores) > 0 ? array_sum($sumatifScores) / count($sumatifScores) : 0;
-                
-                // Bobot Kurikulum Merdeka SMK: 50% Formatif + 50% Sumatif (atau rata-rata)
-                $nilaiAkhir = ($formatifAvg > 0 && $sumatifAvg > 0)
-                    ? round(($formatifAvg * 0.5) + ($sumatifAvg * 0.5), 2)
-                    : round(max($formatifAvg, $sumatifAvg), 2);
-
-                $predikat = 'D';
-                if ($nilaiAkhir >= 85) $predikat = 'A';
-                elseif ($nilaiAkhir >= 75) $predikat = 'B';
-                elseif ($nilaiAkhir >= 65) $predikat = 'C';
-
-                $statusLulus = $nilaiAkhir >= 70;
-
-                AkademikLeger::updateOrCreate(
-                    [
-                        'distribusi_id' => $distribusi->id,
-                        'siswa_id' => $siswaId,
-                        'semester' => $distribusi->semester,
-                    ],
-                    [
-                        'nilai_formatif_avg' => round($formatifAvg, 2),
-                        'nilai_sumatif_avg' => round($sumatifAvg, 2),
-                        'nilai_akhir' => $nilaiAkhir,
-                        'predikat' => $predikat,
-                        'deskripsi_rapor' => $deskripsiData[$siswaId] ?? 'Menunjukkan penguasaan kompetensi yang memadai.',
-                        'status_lulus' => $statusLulus,
-                    ]
-                );
+                // Kalkulasi Leger Otomatis Terpusat (Standar Kurikulum Merdeka)
+                self::kalkulasiLegerSiswa($distribusi, $siswaId, $deskripsiData[$siswaId] ?? null);
             }
 
             DB::commit();
@@ -297,7 +259,7 @@ class AkademikNilaiController extends Controller
         }
     }
 
-    public static function kalkulasiLegerSiswa(AkademikDistribusiMengajar $distribusi, $siswaId): void
+    public static function kalkulasiLegerSiswa(AkademikDistribusiMengajar $distribusi, $siswaId, ?string $customDeskripsi = null): void
     {
         $allNilais = AkademikNilai::where('distribusi_id', $distribusi->id)
             ->where('siswa_id', $siswaId)
@@ -307,12 +269,24 @@ class AkademikNilaiController extends Controller
         $formatifScores = $allNilais->where('jenis_penilaian', 'formatif')->pluck('nilai')->map(fn($v) => floatval($v))->all();
         $sumatifScores = $allNilais->where('jenis_penilaian', 'sumatif')->pluck('nilai')->map(fn($v) => floatval($v))->all();
 
-        $formatifAvg = count($formatifScores) > 0 ? array_sum($formatifScores) / count($formatifScores) : 0;
-        $sumatifAvg = count($sumatifScores) > 0 ? array_sum($sumatifScores) / count($sumatifScores) : 0;
+        $hasFormatif = count($formatifScores) > 0;
+        $hasSumatif = count($sumatifScores) > 0;
 
-        $nilaiAkhir = ($formatifAvg > 0 && $sumatifAvg > 0)
-            ? round(($formatifAvg * 0.5) + ($sumatifAvg * 0.5), 2)
-            : round(max($formatifAvg, $sumatifAvg), 2);
+        $formatifAvg = $hasFormatif ? round(array_sum($formatifScores) / count($formatifScores), 2) : 0;
+        $sumatifAvg = $hasSumatif ? round(array_sum($sumatifScores) / count($sumatifScores), 2) : 0;
+
+        // Formula Nilai Akhir Kurikulum Merdeka:
+        // Jika Formatif dan Sumatif terisi: 50% Formatif + 50% Sumatif.
+        // Jika hanya salah satu: gunakan komponen yang ada.
+        if ($hasFormatif && $hasSumatif) {
+            $nilaiAkhir = round(($formatifAvg * 0.5) + ($sumatifAvg * 0.5), 2);
+        } elseif ($hasSumatif) {
+            $nilaiAkhir = $sumatifAvg;
+        } elseif ($hasFormatif) {
+            $nilaiAkhir = $formatifAvg;
+        } else {
+            $nilaiAkhir = 0;
+        }
 
         $predikat = 'D';
         if ($nilaiAkhir >= 85) $predikat = 'A';
@@ -322,6 +296,19 @@ class AkademikNilaiController extends Controller
         $passingGrade = $distribusi->mataPelajaran?->passing_grade ?? 75;
         $statusLulus = $nilaiAkhir >= $passingGrade;
 
+        // Narasi Deskripsi Rapor Kurikulum Merdeka Terintegrasi
+        $mapelNama = $distribusi->mataPelajaran?->nama_mapel ?? 'Mata Pelajaran';
+        if (!empty($customDeskripsi)) {
+            $deskripsiRapor = $customDeskripsi;
+        } else {
+            $deskripsiRapor = match($predikat) {
+                'A' => "Menunjukkan penguasaan materi yang sangat istimewa dan terampil dalam menyelesaikan capaian pembelajaran {$mapelNama}.",
+                'B' => "Menunjukkan penguasaan materi yang baik dan tuntas dalam mencapai tujuan pembelajaran {$mapelNama}.",
+                'C' => "Cukup menguasai capaian pembelajaran {$mapelNama}, namun perlu penguatan pada kompetensi lanjutan.",
+                default => "Perlu bimbingan dan pendampingan lebih lanjut untuk mencapai kompetensi pokok {$mapelNama}.",
+            };
+        }
+
         AkademikLeger::updateOrCreate(
             [
                 'distribusi_id' => $distribusi->id,
@@ -329,11 +316,11 @@ class AkademikNilaiController extends Controller
                 'semester' => $distribusi->semester,
             ],
             [
-                'nilai_formatif_avg' => round($formatifAvg, 2),
-                'nilai_sumatif_avg' => round($sumatifAvg, 2),
+                'nilai_formatif_avg' => $formatifAvg,
+                'nilai_sumatif_avg' => $sumatifAvg,
                 'nilai_akhir' => $nilaiAkhir,
                 'predikat' => $predikat,
-                'deskripsi_rapor' => 'Capaian kompetensi berdasarkan asesmen formatif & sumatif.',
+                'deskripsi_rapor' => $deskripsiRapor,
                 'status_lulus' => $statusLulus,
             ]
         );

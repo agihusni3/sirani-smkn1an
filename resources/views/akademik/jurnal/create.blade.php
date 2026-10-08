@@ -173,32 +173,51 @@
               </thead>
               <tbody>
                 @foreach($siswas as $idx => $s)
+                  @php
+                    $absenAuto = isset($absensisHariIni) ? $absensisHariIni->get($s->id) : null;
+                    $defaultStatus = 'hadir';
+                    $defaultKet = '';
+                    if ($absenAuto) {
+                        $st = strtolower($absenAuto->status);
+                        if (in_array($st, ['izin', 'sakit', 'alfa', 'alpha'])) {
+                            $defaultStatus = ($st === 'alpha') ? 'alfa' : $st;
+                            $defaultKet = $absenAuto->keterangan ?: ucfirst($defaultStatus) . ' (Presensi Sekolah)';
+                        }
+                    }
+                  @endphp
                   <tr>
                     <td>{{ $idx + 1 }}</td>
                     <td><code>{{ $s->nisn ?? '-' }}</code></td>
-                    <td style="font-weight:700; color:var(--ak-dark);">{{ $s->nama_lengkap }}</td>
+                    <td>
+                      <div style="font-weight:700; color:var(--ak-dark);">{{ $s->nama_lengkap }}</div>
+                      @if($absenAuto && in_array(strtolower($absenAuto->status), ['izin', 'sakit', 'alfa', 'alpha']))
+                        <div style="font-size:11px; color:#64748b; margin-top:2px;">
+                          <i class="bi bi-info-circle text-primary"></i> Tercatat {{ ucfirst($defaultStatus) }} di Presensi Sekolah
+                        </div>
+                      @endif
+                    </td>
                     <td style="text-align:center;">
                       <div style="display:inline-flex; gap:14px; align-items:center;">
                         <label style="cursor:pointer; display:flex; align-items:center; gap:4px; font-weight:600; font-size:12px; color:#059669;">
-                          <input type="radio" name="kehadiran[{{ $s->id }}]" value="hadir" checked class="radio-status-hadir">
+                          <input type="radio" name="kehadiran[{{ $s->id }}]" value="hadir" {{ $defaultStatus === 'hadir' ? 'checked' : '' }} class="radio-status-hadir">
                           Hadir
                         </label>
                         <label style="cursor:pointer; display:flex; align-items:center; gap:4px; font-weight:600; font-size:12px; color:#2563eb;">
-                          <input type="radio" name="kehadiran[{{ $s->id }}]" value="izin">
+                          <input type="radio" name="kehadiran[{{ $s->id }}]" value="izin" {{ $defaultStatus === 'izin' ? 'checked' : '' }}>
                           Izin
                         </label>
                         <label style="cursor:pointer; display:flex; align-items:center; gap:4px; font-weight:600; font-size:12px; color:#d97706;">
-                          <input type="radio" name="kehadiran[{{ $s->id }}]" value="sakit">
+                          <input type="radio" name="kehadiran[{{ $s->id }}]" value="sakit" {{ $defaultStatus === 'sakit' ? 'checked' : '' }}>
                           Sakit
                         </label>
                         <label style="cursor:pointer; display:flex; align-items:center; gap:4px; font-weight:600; font-size:12px; color:#dc2626;">
-                          <input type="radio" name="kehadiran[{{ $s->id }}]" value="alfa">
+                          <input type="radio" name="kehadiran[{{ $s->id }}]" value="alfa" {{ $defaultStatus === 'alfa' ? 'checked' : '' }}>
                           Alfa
                         </label>
                       </div>
                     </td>
                     <td>
-                      <input type="text" name="keterangan[{{ $s->id }}]" class="ak-input" style="padding:4px 8px; font-size:12px;" placeholder="Ket. khusus (opsional)">
+                      <input type="text" name="keterangan[{{ $s->id }}]" class="ak-input" value="{{ $defaultKet }}" style="padding:4px 8px; font-size:12px;" placeholder="Ket. khusus (opsional)">
                     </td>
                   </tr>
                 @endforeach

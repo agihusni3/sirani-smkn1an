@@ -376,12 +376,11 @@ Route::middleware('auth')->group(function () {
         Route::middleware('role:admin,waka_kurikulum,guru,waka_sarpras,waka_hubin,waka_kesiswaan,kepala_sekolah,wali_kelas,guru_bk')->group(function () {
             Route::get('/jurnal/create', [\App\Http\Controllers\Akademik\AkademikJurnalController::class, 'create'])->name('akademik.jurnal.create');
             Route::post('/jurnal', [\App\Http\Controllers\Akademik\AkademikJurnalController::class, 'store'])->name('akademik.jurnal.store');
+            Route::get('/jurnal/{id}/edit', [\App\Http\Controllers\Akademik\AkademikJurnalController::class, 'edit'])->name('akademik.jurnal.edit')->whereNumber('id');
+            Route::put('/jurnal/{id}', [\App\Http\Controllers\Akademik\AkademikJurnalController::class, 'update'])->name('akademik.jurnal.update')->whereNumber('id');
+            Route::delete('/jurnal/{id}', [\App\Http\Controllers\Akademik\AkademikJurnalController::class, 'destroy'])->name('akademik.jurnal.destroy')->whereNumber('id');
         });
         Route::get('/jurnal/{id}', [\App\Http\Controllers\Akademik\AkademikJurnalController::class, 'show'])->name('akademik.jurnal.show')->whereNumber('id');
-        Route::delete('/jurnal/{id}', [\App\Http\Controllers\Akademik\AkademikJurnalController::class, 'destroy'])
-            ->name('akademik.jurnal.destroy')
-            ->middleware('role:admin,waka_kurikulum')
-            ->whereNumber('id');
 
         // Sub-Modul 4: Penilaian Formatif, Sumatif & Leger
         Route::middleware('role:admin,waka_kurikulum,guru')->group(function () {

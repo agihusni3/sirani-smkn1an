@@ -866,6 +866,10 @@ class AkademikAsesmenController extends Controller
     {
         $asesmen = AkademikAsesmenOnline::findOrFail($id);
         $siswaId = $request->input('siswa_id') ?: session('cbt_siswa_id');
+        if (!$siswaId) {
+            return response()->json(['error' => 'Sesi ujian tidak valid atau telah berakhir.'], 403);
+        }
+
         $tipe = $request->input('tipe', 'pindah_tab');
         $keterangan = $request->input('keterangan', 'Terdeteksi keluar dari layar CBT');
 
@@ -873,6 +877,10 @@ class AkademikAsesmenController extends Controller
             ['asesmen_id' => $asesmen->id, 'siswa_id' => $siswaId],
             ['mulai_pada' => now(), 'is_selesai' => false, 'jumlah_pelanggaran' => 0, 'status_kejujuran' => 'jujur']
         );
+
+        if ($hasil->is_selesai) {
+            return response()->json(['error' => 'Ujian telah selesai.', 'is_locked' => true], 200);
+        }
 
         $violations = ($hasil->jumlah_pelanggaran ?? 0) + 1;
         $logs = is_array($hasil->log_pelanggaran) ? $hasil->log_pelanggaran : [];
@@ -909,12 +917,20 @@ class AkademikAsesmenController extends Controller
     {
         $asesmen = AkademikAsesmenOnline::findOrFail($id);
         $siswaId = $request->input('siswa_id') ?: session('cbt_siswa_id');
+        if (!$siswaId) {
+            return response()->json(['error' => 'Sesi ujian tidak valid atau telah berakhir.'], 403);
+        }
+
         $jawabanInput = $request->input('jawaban', []);
 
         $hasil = AkademikAsesmenHasil::firstOrCreate(
             ['asesmen_id' => $asesmen->id, 'siswa_id' => $siswaId],
             ['mulai_pada' => now(), 'is_selesai' => false, 'jumlah_pelanggaran' => 0, 'status_kejujuran' => 'jujur']
         );
+
+        if ($hasil->is_selesai) {
+            return response()->json(['error' => 'Ujian telah dikirim dan dikunci.', 'saved_at' => null], 200);
+        }
 
         $current = is_array($hasil->jawaban) ? $hasil->jawaban : [];
         $merged = array_merge($current, $jawabanInput);

@@ -81,6 +81,8 @@ class AkademikJurnalController extends Controller
         $perangkatAjar = null;
         $atpList = collect();
         $modulList = collect();
+        $absensisHariIni = collect();
+        $tanggalPilihan = $request->get('tanggal', Carbon::today()->toDateString());
 
         if ($request->filled('distribusi_id')) {
             $selectedDistribusi = AkademikDistribusiMengajar::with(['rombel', 'mataPelajaran'])->find($request->distribusi_id);
@@ -89,6 +91,13 @@ class AkademikJurnalController extends Controller
                     ->whereIn('status', ['aktif', 'pkl'])
                     ->orderBy('nama')
                     ->get();
+
+                // Ambil data absensi harian siswa sekolah untuk tanggal tersebut (Smart Attendance Integration)
+                $absensisHariIni = \App\Models\Absensi::where('pemilik_type', 'siswa')
+                    ->whereIn('pemilik_id', $siswas->pluck('id'))
+                    ->whereDate('tanggal', $tanggalPilihan)
+                    ->get()
+                    ->keyBy('pemilik_id');
 
                 $lastPertemuan = AkademikJurnalKbm::where('distribusi_id', $selectedDistribusi->id)->max('pertemuan_ke');
                 $pertemuanKe = ($lastPertemuan ?? 0) + 1;
@@ -108,7 +117,7 @@ class AkademikJurnalController extends Controller
             }
         }
 
-        return view('akademik.jurnal.create', compact('distribusis', 'selectedDistribusi', 'siswas', 'pertemuanKe', 'perangkatAjar', 'atpList', 'modulList'));
+        return view('akademik.jurnal.create', compact('distribusis', 'selectedDistribusi', 'siswas', 'pertemuanKe', 'perangkatAjar', 'atpList', 'modulList', 'absensisHariIni', 'tanggalPilihan'));
     }
 
     public function store(Request $request)
@@ -123,6 +132,17 @@ class AkademikJurnalController extends Controller
             'refleksi' => 'nullable|string',
             'kehadiran' => 'required|array', // [siswa_id => status]
         ]);
+
+        // Cek proteksi duplikasi nomor pertemuan untuk distribusi mengajar yang sama
+        $isDuplicate = AkademikJurnalKbm::where('distribusi_id', $request->distribusi_id)
+            ->where('pertemuan_ke', $request->pertemuan_ke)
+            ->exists();
+
+        if ($isDuplicate) {
+            return redirect()->back()
+                ->withInput()
+                ->with('error', "Pertemuan ke-{$request->pertemuan_ke} untuk kelas dan mata pelajaran ini sudah pernah tercatat. Silakan gunakan nomor pertemuan berikutnya atau edit jurnal yang sudah ada.");
+        }
 
         DB::beginTransaction();
         try {
@@ -175,12 +195,110 @@ class AkademikJurnalController extends Controller
         return view('akademik.jurnal.show', compact('jurnal', 'rekap'));
     }
 
+    public function edit($id)
+    {
+        $jurnal = AkademikJurnalKbm::with([
+            'distribusi.guru',
+            'distribusi.mataPelajaran',
+            'distribusi.rombel',
+            'kehadirans.siswa'
+        ])->findOrFail($id);
+
+        $user = auth()->user();
+        if (!$user->isAdmin() && !$user->isWakaKurikulum() && $user->guru_id != $jurnal->distribusi?->guru_id) {
+            abort(403, 'Akses Ditolak: Anda hanya dapat mengedit jurnal KBM mata pelajaran yang Anda ampu.');
+        }
+
+        $siswas = Siswa::whereHas('rombels', fn($q) => $q->where('rombels.id', $jurnal->distribusi?->rombel_id))
+            ->whereIn('status', ['aktif', 'pkl'])
+            ->orderBy('nama')
+            ->get();
+
+        $kehadiranMap = $jurnal->kehadirans->keyBy('siswa_id');
+
+        return view('akademik.jurnal.edit', compact('jurnal', 'siswas', 'kehadiranMap'));
+    }
+
+    public function update(Request $request, $id)
+    {
+        $jurnal = AkademikJurnalKbm::with('distribusi')->findOrFail($id);
+
+        $user = auth()->user();
+        if (!$user->isAdmin() && !$user->isWakaKurikulum() && $user->guru_id != $jurnal->distribusi?->guru_id) {
+            abort(403, 'Akses Ditolak: Anda hanya dapat memperbarui jurnal KBM mata pelajaran yang Anda ampu.');
+        }
+
+        $request->validate([
+            'tanggal' => 'required|date',
+            'pertemuan_ke' => 'required|integer|min:1',
+            'materi_ajar' => 'required|string',
+            'metode_pembelajaran' => 'nullable|string|max:100',
+            'catatan_guru' => 'nullable|string',
+            'refleksi' => 'nullable|string',
+            'kehadiran' => 'required|array',
+        ]);
+
+        // Cek jika nomor pertemuan diubah dan berbenturan dengan record lain
+        if ((int)$request->pertemuan_ke !== (int)$jurnal->pertemuan_ke) {
+            $isDuplicate = AkademikJurnalKbm::where('distribusi_id', $jurnal->distribusi_id)
+                ->where('pertemuan_ke', $request->pertemuan_ke)
+                ->where('id', '!=', $jurnal->id)
+                ->exists();
+
+            if ($isDuplicate) {
+                return redirect()->back()
+                    ->withInput()
+                    ->with('error', "Pertemuan ke-{$request->pertemuan_ke} sudah digunakan oleh jurnal lain.");
+            }
+        }
+
+        DB::beginTransaction();
+        try {
+            $jurnal->update([
+                'tanggal' => $request->tanggal,
+                'pertemuan_ke' => $request->pertemuan_ke,
+                'materi_ajar' => $request->materi_ajar,
+                'metode_pembelajaran' => $request->metode_pembelajaran,
+                'catatan_guru' => $request->catatan_guru,
+                'refleksi' => $request->refleksi,
+            ]);
+
+            foreach ($request->kehadiran as $siswaId => $status) {
+                AkademikKehadiranKbm::updateOrCreate(
+                    [
+                        'jurnal_id' => $jurnal->id,
+                        'siswa_id' => $siswaId,
+                    ],
+                    [
+                        'status' => in_array($status, ['hadir', 'izin', 'sakit', 'alfa']) ? $status : 'hadir',
+                        'keterangan' => $request->keterangan[$siswaId] ?? null,
+                    ]
+                );
+            }
+
+            DB::commit();
+            return redirect()->route('akademik.jurnal.show', $jurnal->id)
+                ->with('success', "Jurnal KBM Pertemuan ke-{$jurnal->pertemuan_ke} berhasil diperbarui.");
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->withInput()->with('error', 'Gagal memperbarui jurnal: ' . $e->getMessage());
+        }
+    }
+
     public function destroy($id)
     {
-        $jurnal = AkademikJurnalKbm::findOrFail($id);
+        $jurnal = AkademikJurnalKbm::with('distribusi')->findOrFail($id);
+        $user = auth()->user();
+
+        // Izinkan guru pemilik jurnal, waka kurikulum, atau admin untuk menghapus
+        if (!$user->isAdmin() && !$user->isWakaKurikulum() && $user->guru_id != $jurnal->distribusi?->guru_id) {
+            abort(403, 'Akses Ditolak: Anda tidak memiliki wewenang untuk menghapus jurnal ini.');
+        }
+
+        $pertemuan = $jurnal->pertemuan_ke;
         $jurnal->delete();
 
         return redirect()->route('akademik.jurnal.index')
-            ->with('success', 'Jurnal KBM berhasil dihapus.');
+            ->with('success', "Jurnal KBM pertemuan ke-{$pertemuan} berhasil dihapus.");
     }
 }
