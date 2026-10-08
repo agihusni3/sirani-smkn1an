@@ -493,6 +493,12 @@ class GuruController extends Controller
 
             $role = $request->input('role_akun') ?: ($request->input('role') ?: $defaultRole);
 
+            // Pencegahan Eskalasi Wewenang (Privilege Escalation Defense):
+            // Staf non-admin DILARANG keras memberikan peran Administrator
+            if ($role === 'admin' && (!auth()->check() || !auth()->user()->isAdmin())) {
+                $role = $defaultRole;
+            }
+
             $user = User::create([
                 'name' => $guru->nama,
                 'email' => $request->input('email_akun'),

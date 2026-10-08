@@ -18,10 +18,8 @@ return Application::configure(basePath: dirname(__DIR__))
             'role.admin'    => \App\Http\Middleware\RoleAdminMiddleware::class,
             'track.visitor' => \App\Http\Middleware\TrackWebsiteVisitor::class,
         ]);
-        // Toleransi CSRF khusus endpoint login publik (mencegah error 419 jika tab terbuka lama) & rute API stateless
+        // Toleransi CSRF hanya khusus untuk rute API stateless
         $middleware->validateCsrfTokens(except: [
-            '/login',
-            'login',
             '/api/*',
             'api/*',
         ]);

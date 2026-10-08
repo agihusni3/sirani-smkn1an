@@ -35,20 +35,12 @@ class AuthController extends Controller
 
         $inputClean = strtolower(trim(preg_replace('/\s+/', '', $input)));
 
-        // 1. Cari user berdasarkan Username, Email, atau Nama (Exact & Case-Insensitive)
+        // 1. Cari user berdasarkan Username atau Email (Exact & Case-Insensitive)
         $user = User::whereRaw('LOWER(username) = ?', [$inputClean])
             ->orWhereRaw('LOWER(email) = ?', [strtolower($input)])
-            ->orWhereRaw('LOWER(name) = ?', [strtolower($input)])
             ->first();
 
-        // 2. Cari melalui awalan/nickname parsial (misal: "sepriyanto" -> "sepriyanto123")
-        if (!$user && strlen($inputClean) >= 3) {
-            $user = User::where('username', 'like', $inputClean . '%')
-                ->orWhere('username', 'like', '%' . $inputClean . '%')
-                ->first();
-        }
-
-        // 3. Cari melalui NIP Guru
+        // 2. Cari melalui NIP Guru yang terhubung jika belum ditemukan
         if (!$user) {
             $guruByNip = Guru::where('nip', $input)->orWhere('nip', $inputClean)->first();
             if ($guruByNip) {
@@ -56,31 +48,11 @@ class AuthController extends Controller
             }
         }
 
-        // 4. Cari melalui nama parsial / fuzzy name (misal: "Sugeng" -> "Drs. Sugeng Wardoyo")
-        if (!$user) {
-            $user = User::where('name', 'like', '%' . $input . '%')->first();
-            if (!$user) {
-                $guruByName = Guru::where('nama', 'like', '%' . $input . '%')->first();
-                if ($guruByName) {
-                    $user = User::where('guru_id', $guruByName->id)->first();
-                }
-            }
-        }
-
-        // 5. Alias kemudahan jika mengetik 'admin' atau alias admin lainnya
-        if (!$user && in_array($inputClean, ['admin', 'admin@admin.com', 'admin@smkn1.sch.id', 'administrator'])) {
-            $user = User::where('role', 'admin')->first();
-        }
-
         if ($user) {
             $guru = $user->guru;
-            $isLocalEnv = app()->isLocal() || config('app.debug', false);
 
-            // Validasi kata sandi utama via Hash::check.
-            // Fallback sandi darurat HANYA diizinkan di lingkungan lokal/pengujian, DITUTUP di server produksi.
-            $isPasswordValid = Hash::check($password, $user->password)
-                || ($isLocalEnv && in_array($password, ['sandiwali', 'password', '123456'], true))
-                || ($isLocalEnv && $guru && !empty($guru->nip) && $password === $guru->nip);
+            // Validasi kata sandi mutlak menggunakan Hash::check tanpa bypass
+            $isPasswordValid = Hash::check($password, $user->password);
 
             if ($isPasswordValid) {
                 Auth::login($user, $request->boolean('remember'));
@@ -146,17 +118,25 @@ class AuthController extends Controller
             return redirect('/login');
         }
 
-        $request->validate([
+        $rules = [
             'name'     => 'required|string|max:255',
             'username' => 'required|string|max:100|unique:users,username,' . $user->id,
             'email'    => 'nullable|email|max:255|unique:users,email,' . $user->id,
-            'password' => 'nullable|string|min:4|confirmed',
-        ], [
-            'username.required'  => 'Username wajib diisi (bisa nama panggilan atau nama pengguna Anda).',
-            'username.unique'    => 'Username ini sudah digunakan oleh akun lain. Silakan pilih username lain.',
-            'email.unique'       => 'Email ini sudah digunakan oleh akun lain.',
-            'password.min'       => 'Kata sandi minimal 4 karakter.',
-            'password.confirmed' => 'Konfirmasi kata sandi baru tidak cocok.',
+        ];
+
+        if ($request->filled('password')) {
+            $rules['current_password'] = ['required', 'current_password:web'];
+            $rules['password']         = ['required', 'string', 'min:8', 'confirmed'];
+        }
+
+        $request->validate($rules, [
+            'username.required'                 => 'Username wajib diisi (bisa nama panggilan atau nama pengguna Anda).',
+            'username.unique'                   => 'Username ini sudah digunakan oleh akun lain. Silakan pilih username lain.',
+            'email.unique'                      => 'Email ini sudah digunakan oleh akun lain.',
+            'current_password.required'         => 'Kata sandi saat ini wajib diisi untuk mengubah kata sandi.',
+            'current_password.current_password' => 'Kata sandi saat ini yang Anda masukkan salah.',
+            'password.min'                      => 'Kata sandi baru minimal 8 karakter.',
+            'password.confirmed'                => 'Konfirmasi kata sandi baru tidak cocok.',
         ]);
 
         $updateData = [

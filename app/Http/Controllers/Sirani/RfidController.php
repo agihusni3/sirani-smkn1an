@@ -758,7 +758,7 @@ class RfidController extends Controller
                 'message' => str_contains($e->getMessage(), 'database is locked')
                     ? 'Sistem sedang memproses antrean absensi bersamaan. Presensi Anda telah terekam, silakan periksa papan riwayat.'
                     : 'Terjadi kendala pada sistem presensi. Silakan ulangi sesaat lagi.',
-                'error'   => $e->getMessage(),
+                'error'   => config('app.debug') ? $e->getMessage() : null,
             ], 500);
         }
     }

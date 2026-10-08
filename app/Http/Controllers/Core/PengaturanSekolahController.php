@@ -40,8 +40,8 @@ class PengaturanSekolahController extends Controller
             'website'            => 'nullable|string|max:100',
             'nama_kepala_sekolah'=> 'nullable|string|max:255',
             'nip_kepala_sekolah' => 'nullable|string|max:100',
-            'logo_provinsi'      => 'nullable|image|mimes:jpg,jpeg,png,webp,svg|max:4096',
-            'logo_sekolah'       => 'nullable|image|mimes:jpg,jpeg,png,webp,svg|max:4096',
+            'logo_provinsi'      => 'nullable|image|mimes:jpg,jpeg,png,webp|max:4096',
+            'logo_sekolah'       => 'nullable|image|mimes:jpg,jpeg,png,webp|max:4096',
         ]);
 
         $sekolah = PengaturanSekolah::getAktif();

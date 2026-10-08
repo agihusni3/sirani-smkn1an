@@ -156,6 +156,12 @@ class PpdbUjianController extends Controller
             $peserta->save();
         }
 
+        // Terbitkan token sesi otorisasi pengerjaan ujian khusus peserta ini di browser lokal
+        session([
+            "ppdb_ujian_peserta_{$pendaftar->id}" => true,
+            "ppdb_ujian_nomor_{$pendaftar->no_pendaftaran}" => true,
+        ]);
+
         // Hitung sisa waktu ujian (detik)
         $durasiMenit = (int) ($setting->durasi_menit ?: 60);
         $batasWaktu = Carbon::parse($peserta->waktu_mulai)->addMinutes($durasiMenit);
@@ -217,6 +223,14 @@ class PpdbUjianController extends Controller
         $pendaftar = PpdbPendaftar::where('no_pendaftaran', $nomor)->firstOrFail();
         $peserta = PpdbUjianPeserta::where('ppdb_pendaftar_id', $pendaftar->id)->firstOrFail();
 
+        // Validasi Otorisasi Sesi Ujian (Anti-IDOR & Session Tampering)
+        if (!session("ppdb_ujian_peserta_{$pendaftar->id}") && !session("ppdb_ujian_nomor_{$pendaftar->no_pendaftaran}")) {
+            return response()->json([
+                'status'  => 'unauthorized',
+                'message' => 'Sesi ujian Anda tidak valid atau telah berakhir. Harap muat ulang halaman dari ruang ujian resmi.',
+            ], 403);
+        }
+
         if (in_array($peserta->status_pengerjaan, ['selesai', 'selesai_menunggu_koreksi', 'selesai_dinilai'])) {
             return response()->json(['status' => 'already_finished', 'message' => 'Ujian telah selesai dikirim.'], 400);
         }
@@ -244,6 +258,12 @@ class PpdbUjianController extends Controller
         $peserta = PpdbUjianPeserta::where('ppdb_pendaftar_id', $pendaftar->id)->firstOrFail();
         $setting = PpdbUjianSetting::getAktif();
 
+        // Validasi Otorisasi Sesi Ujian (Anti-IDOR & Session Tampering)
+        if (!session("ppdb_ujian_peserta_{$pendaftar->id}") && !session("ppdb_ujian_nomor_{$pendaftar->no_pendaftaran}")) {
+            return redirect()->route('ppdb.ujian.portal')
+                ->with('error', 'Sesi ujian Anda tidak valid atau telah berakhir.');
+        }
+
         if (in_array($peserta->status_pengerjaan, ['selesai', 'selesai_menunggu_koreksi', 'selesai_dinilai'])) {
             return redirect()->route('ppdb.ujian.selesai', ['nomor' => $pendaftar->no_pendaftaran]);
         }
@@ -265,6 +285,12 @@ class PpdbUjianController extends Controller
         $peserta->waktu_selesai = now();
         $peserta->status_pengerjaan = 'selesai_menunggu_koreksi';
         $peserta->sinkronNilaiKePendaftar();
+
+        // Hapus kunci sesi ujian setelah selesai
+        session()->forget([
+            "ppdb_ujian_peserta_{$pendaftar->id}",
+            "ppdb_ujian_nomor_{$pendaftar->no_pendaftaran}",
+        ]);
 
         return redirect()->route('ppdb.ujian.selesai', ['nomor' => $pendaftar->no_pendaftaran])
             ->with('success', 'Ujian Anda telah berhasil dikirim dan tersimpan di sistem!');

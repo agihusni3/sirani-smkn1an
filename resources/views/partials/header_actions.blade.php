@@ -121,11 +121,15 @@
         <div style="font-weight:800; font-size:12px; color:var(--text); margin-bottom:8px;">Ganti Kata Sandi (Kosongkan jika tidak diubah)</div>
         
         <div style="margin-bottom:10px;">
-          <input type="password" name="password" placeholder="Kata sandi baru (min. 4 karakter)" autocomplete="new-password" class="input-field" style="width:100%; height:36px; padding:0 10px; font-size:12px; background:var(--surface); border:1px solid var(--border-2); border-radius:6px; color:var(--text);" />
+          <input type="password" name="current_password" placeholder="Kata sandi saat ini (diperlukan jika mengganti sandi)" autocomplete="current-password" class="input-field" style="width:100%; height:36px; padding:0 10px; font-size:12px; background:var(--surface); border:1px solid var(--border-2); border-radius:6px; color:var(--text);" />
+        </div>
+
+        <div style="margin-bottom:10px;">
+          <input type="password" name="password" placeholder="Kata sandi baru (min. 8 karakter)" autocomplete="new-password" class="input-field" style="width:100%; height:36px; padding:0 10px; font-size:12px; background:var(--surface); border:1px solid var(--border-2); border-radius:6px; color:var(--text);" />
         </div>
 
         <div>
-          <input type="password" name="password_confirmation" placeholder="Ulangi kata sandi baru" autocomplete="new-password" class="input-field" style="width:100%; height:36px; padding:0 10px; font-size:12px; background:var(--surface); border:1px solid var(--border-2); border-radius:6px; color:var(--text);" />
+          <input type="password" name="password_confirmation" placeholder="Ulangi konfirmasi kata sandi baru" autocomplete="new-password" class="input-field" style="width:100%; height:36px; padding:0 10px; font-size:12px; background:var(--surface); border:1px solid var(--border-2); border-radius:6px; color:var(--text);" />
         </div>
       </div>
 
