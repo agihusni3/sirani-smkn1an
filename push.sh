@@ -93,7 +93,11 @@ fi
 # Jika server URL ditemukan, panggil endpoint webhook secara instan
 if [ -n "$SERVER_URL" ]; then
     echo -e "Menghubungi endpoint Webhook Server di: ${CYAN}${SERVER_URL}${NC}..."
-    WEBHOOK_URL="${SERVER_URL%/}/api/deploy-webhook?token=${DEPLOY_TOKEN}"
+    RUN_COMPOSER_FLAG=""
+    if git diff --name-only HEAD~2 HEAD 2>/dev/null | grep -qE "composer\.(json|lock)"; then
+        RUN_COMPOSER_FLAG="&run_composer=1"
+    fi
+    WEBHOOK_URL="${SERVER_URL%/}/api/deploy-webhook?token=${DEPLOY_TOKEN}${RUN_COMPOSER_FLAG}"
     
     RESPONSE=$(curl -s -m 180 -X POST "$WEBHOOK_URL" 2>/dev/null || curl -s -m 180 "$WEBHOOK_URL" 2>/dev/null || true)
     

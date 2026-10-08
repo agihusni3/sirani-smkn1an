@@ -646,6 +646,10 @@ class SiswaController extends Controller
 
         // Opsi Ekspor Asli Excel (.xlsx) dengan Gambar Barcode 2D (QR Code) tertanam di dalam sel tabel
         if ($request->query('download') === 'excel' || $request->query('download') === 'xlsx' || $request->query('download') === 'xls') {
+            if (!class_exists(\PhpOffice\PhpSpreadsheet\Spreadsheet::class)) {
+                // Fallback aman ke CSV jika pustaka spreadsheet belum selesai di-load di server
+                return redirect()->to(request()->fullUrlWithQuery(['download' => 'csv']));
+            }
             $sekolah = \App\Models\PengaturanSekolah::getAktif();
             $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
             $sheet = $spreadsheet->getActiveSheet();
