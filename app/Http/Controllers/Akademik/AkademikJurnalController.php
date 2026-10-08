@@ -139,6 +139,12 @@ class AkademikJurnalController extends Controller
             'kehadiran' => 'required|array', // [siswa_id => status]
         ]);
 
+        $distribusi = AkademikDistribusiMengajar::findOrFail($request->distribusi_id);
+        $user = auth()->user();
+        if (!$user->isAdmin() && !$user->isWakaKurikulum() && (int) $user->guru_id !== (int) $distribusi->guru_id) {
+            abort(403, 'Akses Ditolak: Anda hanya dapat mengisi jurnal KBM untuk mata pelajaran dan rombel yang Anda ampu.');
+        }
+
         // Cek proteksi duplikasi nomor pertemuan untuk distribusi mengajar yang sama
         $isDuplicate = AkademikJurnalKbm::where('distribusi_id', $request->distribusi_id)
             ->where('pertemuan_ke', $request->pertemuan_ke)

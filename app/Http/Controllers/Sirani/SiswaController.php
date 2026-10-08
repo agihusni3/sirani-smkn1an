@@ -224,6 +224,7 @@ class SiswaController extends Controller
             'no_hp_ortu'    => 'nullable|string',
             'no_hp_siswa'   => 'nullable|string',
             'foto'          => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
+            'berkas_pip'    => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120',
         ]);
 
         $taAktif = TahunAjaran::where('is_active', true)->first();
@@ -344,6 +345,7 @@ class SiswaController extends Controller
             'no_hp_siswa'   => 'nullable|string',
             'status'        => 'required|in:aktif,pkl,lulus,pindah,keluar',
             'foto'          => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
+            'berkas_pip'    => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120',
         ]);
 
         $fotoPath = $siswa->foto;

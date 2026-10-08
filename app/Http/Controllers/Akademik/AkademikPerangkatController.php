@@ -209,11 +209,29 @@ class AkademikPerangkatController extends Controller
     }
 
     /**
+     * Otorisasi kepemilikan perangkat ajar untuk mencegah IDOR / modifikasi ilegal
+     */
+    protected function authorizePerangkat(AkademikPerangkatAjar $perangkat): void
+    {
+        $user = auth()->user();
+        if ($user->isAdmin() || $user->isWakaKurikulum() || $user->isKepalaSekolah()) {
+            return;
+        }
+
+        if ($user->guru_id && (int) $user->guru_id === (int) $perangkat->guru_id) {
+            return;
+        }
+
+        abort(403, 'Akses Ditolak: Anda tidak memiliki wewenang untuk memodifikasi dokumen perangkat ajar ini.');
+    }
+
+    /**
      * Update Informasi Umum / RPE
      */
     public function updateInfo(Request $request, $id)
     {
         $perangkat = AkademikPerangkatAjar::findOrFail($id);
+        $this->authorizePerangkat($perangkat);
 
         $validated = $request->validate([
             'rpe_pekan_efektif' => 'required|integer|min:1|max:30',
@@ -246,12 +264,7 @@ class AkademikPerangkatController extends Controller
     public function storeCp(Request $request, $id)
     {
         $perangkat = AkademikPerangkatAjar::findOrFail($id);
-        $user = auth()->user();
-
-        // Validasi hak akses: guru pemilik atau admin / wakakurikulum
-        if ($user->isGuru() && !$user->isAdmin() && !$user->isWakaKurikulum() && $user->guru_id != $perangkat->guru_id) {
-            return back()->with('error', 'Anda hanya dapat mengedit Capaian Pembelajaran pada perangkat milik akun guru Anda.');
-        }
+        $this->authorizePerangkat($perangkat);
 
         $validated = $request->validate([
             'capaian_pembelajaran' => 'required|string',
@@ -291,11 +304,7 @@ class AkademikPerangkatController extends Controller
     public function copyTemplateCp(Request $request, $id)
     {
         $perangkat = AkademikPerangkatAjar::with('mataPelajaran')->findOrFail($id);
-        $user = auth()->user();
-
-        if ($user->isGuru() && !$user->isAdmin() && !$user->isWakaKurikulum() && $user->guru_id != $perangkat->guru_id) {
-            return back()->with('error', 'Anda tidak memiliki hak akses pada dokumen perangkat ajar ini.');
-        }
+        $this->authorizePerangkat($perangkat);
 
         $mapel = $perangkat->mataPelajaran;
         if (!$mapel) {
@@ -331,6 +340,7 @@ class AkademikPerangkatController extends Controller
     public function storeAtp(Request $request, $id)
     {
         $perangkat = AkademikPerangkatAjar::findOrFail($id);
+        $this->authorizePerangkat($perangkat);
 
         $validated = $request->validate([
             'atp_id' => 'nullable|exists:akademik_atp_items,id',
@@ -364,6 +374,7 @@ class AkademikPerangkatController extends Controller
     public function destroyAtp($id, $atpId)
     {
         $perangkat = AkademikPerangkatAjar::findOrFail($id);
+        $this->authorizePerangkat($perangkat);
         $atp = AkademikAtpItem::where('perangkat_id', $perangkat->id)->findOrFail($atpId);
         $atp->delete();
 
@@ -376,6 +387,7 @@ class AkademikPerangkatController extends Controller
     public function storeModul(Request $request, $id)
     {
         $perangkat = AkademikPerangkatAjar::findOrFail($id);
+        $this->authorizePerangkat($perangkat);
 
         $validated = $request->validate([
             'modul_id' => 'nullable|exists:akademik_modul_ajars,id',
@@ -430,6 +442,7 @@ class AkademikPerangkatController extends Controller
     public function destroyModul($id, $modulId)
     {
         $perangkat = AkademikPerangkatAjar::findOrFail($id);
+        $this->authorizePerangkat($perangkat);
         $modul = AkademikModulAjar::where('perangkat_id', $perangkat->id)->findOrFail($modulId);
 
         if ($modul->file_modul_pdf && Storage::disk('public')->exists($modul->file_modul_pdf)) {
@@ -452,12 +465,7 @@ class AkademikPerangkatController extends Controller
     public function storeKktp(Request $request, $id)
     {
         $perangkat = AkademikPerangkatAjar::findOrFail($id);
-        $user = auth()->user();
-
-        // Validasi hak akses
-        if ($user->isGuru() && !$user->isAdmin() && !$user->isWakaKurikulum() && $user->guru_id != $perangkat->guru_id) {
-            return back()->with('error', 'Anda tidak memiliki hak akses untuk mengubah kriteria KKTP ini.');
-        }
+        $this->authorizePerangkat($perangkat);
 
         $validated = $request->validate([
             'atp_item_id' => 'nullable|exists:akademik_atp_items,id',
@@ -491,12 +499,7 @@ class AkademikPerangkatController extends Controller
     public function destroyKktp($id, $kktpId)
     {
         $perangkat = AkademikPerangkatAjar::findOrFail($id);
-        $user = auth()->user();
-
-        // Validasi hak akses
-        if ($user->isGuru() && !$user->isAdmin() && !$user->isWakaKurikulum() && $user->guru_id != $perangkat->guru_id) {
-            return back()->with('error', 'Anda tidak memiliki hak akses untuk menghapus kriteria KKTP ini.');
-        }
+        $this->authorizePerangkat($perangkat);
 
         $kktp = AkademikKktpItem::where('perangkat_id', $perangkat->id)->findOrFail($kktpId);
         $kktp->delete();
@@ -510,12 +513,7 @@ class AkademikPerangkatController extends Controller
     public function ajukan($id)
     {
         $perangkat = AkademikPerangkatAjar::findOrFail($id);
-        $user = auth()->user();
-
-        // Validasi kepemilikan
-        if ($user->isGuru() && !$user->isAdmin() && $user->guru_id != $perangkat->guru_id) {
-            return back()->with('error', 'Anda tidak memiliki hak akses untuk mengajukan perangkat ajar ini.');
-        }
+        $this->authorizePerangkat($perangkat);
 
         if ($perangkat->atpItems()->count() == 0) {
             return back()->with('error', 'Gagal mengajukan: Alur Tujuan Pembelajaran (ATP) belum diisi.');
@@ -601,12 +599,8 @@ class AkademikPerangkatController extends Controller
      */
     public function destroy($id)
     {
-        $user = auth()->user();
         $perangkat = AkademikPerangkatAjar::findOrFail($id);
-
-        if (!$user->isAdmin() && !$user->isWakaKurikulum() && $user->guru_id != $perangkat->guru_id) {
-            abort(403);
-        }
+        $this->authorizePerangkat($perangkat);
 
         $perangkat->delete();
         return redirect()->route('akademik.perangkat.index')->with('success', 'Folder Perangkat Pembelajaran berhasil dihapus.');
