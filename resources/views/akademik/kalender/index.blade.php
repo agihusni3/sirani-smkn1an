@@ -7,10 +7,10 @@
 
 @push('styles')
 <style>
-  /* ─── KONTROL TOP PANEL ─── */
+  /* ─── KONTROL TOP PANEL (BORDERLESS & BERSIH) ─── */
   .kaldik-header-card {
     background: #ffffff;
-    border: 1px solid #e2e8f0;
+    border: none;
     border-radius: 12px;
     padding: 16px 20px;
     margin-bottom: 20px;
@@ -22,7 +22,7 @@
     align-items: center;
     gap: 6px;
     background: #f8fafc;
-    border: 1px solid #e2e8f0;
+    border: none;
     border-radius: 8px;
     padding: 6px 14px;
     font-size: 12px;
@@ -43,7 +43,7 @@
 
   .kaldik-card-month {
     background: #ffffff;
-    border: 1px solid #e2e8f0;
+    border: none;
     border-radius: 12px;
     overflow: hidden;
     box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
@@ -58,7 +58,7 @@
   .kaldik-month-top {
     background: #f8fafc;
     padding: 10px 14px;
-    border-bottom: 1px solid #e2e8f0;
+    border: none;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -73,19 +73,20 @@
     gap: 6px;
   }
 
-  /* ─── TABEL KALENDER BULANAN ─── */
+  /* ─── TABEL KALENDER BULANAN (BORDERLESS) ─── */
   .kaldik-table {
     width: 100%;
     border-collapse: collapse;
     font-size: 11px;
     text-align: center;
+    border: none;
   }
   .kaldik-table th {
-    padding: 6px 2px;
+    padding: 7px 2px;
     font-weight: 800;
     color: #475569;
     background: #f1f5f9;
-    border-bottom: 1px solid #e2e8f0;
+    border: none;
     font-size: 10.5px;
   }
   .kaldik-table th.sun, .kaldik-table td.sun {
@@ -93,8 +94,7 @@
   }
   .kaldik-table td {
     padding: 3px 1px;
-    border-bottom: 1px solid #f8fafc;
-    border-right: 1px solid #f8fafc;
+    border: none;
     height: 28px;
     vertical-align: middle;
   }
@@ -112,7 +112,7 @@
     font-weight: 800;
     font-size: 10px;
     background: #f8fafc;
-    border-right: 1px solid #e2e8f0 !important;
+    border: none !important;
     cursor: pointer;
   }
   .kaldik-col-pekan:hover {
@@ -143,11 +143,11 @@
     font-weight: 800;
   }
 
-  /* ─── LIST AGENDA KHUSUS DI CARD BULAN ─── */
+  /* ─── LIST AGENDA KHUSUS DI CARD BULAN (BORDERLESS) ─── */
   .kaldik-agenda-list {
     padding: 8px 12px;
     background: #ffffff;
-    border-top: 1px solid #f1f5f9;
+    border: none;
     display: flex;
     flex-direction: column;
     gap: 6px;
@@ -158,32 +158,33 @@
     align-items: center;
     justify-content: space-between;
     gap: 8px;
-    padding: 4px 8px;
+    padding: 5px 8px;
     border-radius: 6px;
     font-size: 11px;
     background: #fffbeb;
-    border: 1px solid #fde68a;
+    border: none;
   }
 
-  /* ─── TABEL REKAPITULASI RPE ─── */
+  /* ─── TABEL REKAPITULASI RPE (BORDERLESS) ─── */
   .rpe-summary-table {
     width: 100%;
     border-collapse: collapse;
     font-size: 12px;
+    border: none;
   }
   .rpe-summary-table th {
     background: #f8fafc;
     color: #334155;
     font-weight: 800;
-    padding: 10px 12px;
-    border-bottom: 2px solid #e2e8f0;
+    padding: 10px 14px;
+    border: none;
     font-size: 11.5px;
     text-transform: uppercase;
     letter-spacing: 0.3px;
   }
   .rpe-summary-table td {
-    padding: 9px 12px;
-    border-bottom: 1px solid #f1f5f9;
+    padding: 10px 14px;
+    border: none;
     vertical-align: middle;
   }
   .rpe-summary-table tr:hover td {
@@ -192,7 +193,7 @@
   .rpe-summary-table tfoot td {
     background: #f1f5f9;
     font-weight: 800;
-    border-top: 2px solid #cbd5e1;
+    border: none;
     color: var(--ak-dark);
   }
 
@@ -207,7 +208,7 @@
 
 @section('content')
 
-{{-- 1. HEADER HALAMAN & AKSI TERPUSAT (SATU TEMPAT, TANPA DUPLIKAT) --}}
+{{-- 1. HEADER HALAMAN & AKSI TERPUSAT --}}
 <div class="akademik-page-head" style="margin-bottom:16px;">
   <div>
     <h1 class="akademik-page-title">
@@ -219,53 +220,54 @@
     </div>
   </div>
 
+  {{-- Tata Ulang Tombol Aksi (Rapi & Terstruktur) --}}
   <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
     @if($canManage && (!$kalender || !$kalender->is_locked))
-      <button type="button" class="ak-btn ak-btn-primary" style="font-size:12px;" onclick="openTambahAgendaModal()">
-        <i class="bi bi-plus-circle-fill me-1"></i> Tambah Agenda
+      <button type="button" class="ak-btn ak-btn-primary" style="font-size:12.5px; border:none; padding:7px 16px; border-radius:8px;" onclick="openTambahAgendaModal()">
+        <i class="bi bi-plus-lg me-1"></i> Tambah Agenda
       </button>
     @endif
+
+    <button type="button" class="ak-btn ak-btn-secondary" style="font-size:12.5px; border:none; padding:7px 14px; border-radius:8px;" onclick="window.print()" title="Cetak Format Lembar A4">
+      <i class="bi bi-printer me-1"></i> Cetak Kaldik &amp; RPE
+    </button>
 
     @if($kalender && $canManage)
       <form action="{{ route('akademik.kalender.toggle-lock', $kalender->id) }}" method="POST" style="margin:0;">
         @csrf
         @if($kalender->is_locked)
-          <button type="submit" class="ak-btn ak-btn-secondary" style="font-size:12px;" title="Buka kunci agar dapat disesuaikan kembali">
+          <button type="submit" class="ak-btn ak-btn-secondary" style="font-size:12.5px; border:none; padding:7px 14px; border-radius:8px;" title="Buka kunci agar dapat disesuaikan kembali">
             <i class="bi bi-unlock me-1"></i> Buka Kunci
           </button>
         @else
-          <button type="submit" class="ak-btn ak-btn-success" style="font-size:12px;" title="Kunci kalender sebagai acuan resmi sekolah">
-            <i class="bi bi-lock-fill me-1"></i> Kunci Acuan Resmi
+          <button type="submit" class="ak-btn ak-btn-secondary" style="font-size:12.5px; border:none; padding:7px 14px; border-radius:8px; color:#059669;" title="Kunci kalender sebagai acuan resmi sekolah">
+            <i class="bi bi-lock-fill me-1"></i> Kunci Acuan
           </button>
         @endif
       </form>
     @endif
-
-    <button type="button" class="ak-btn ak-btn-secondary" style="font-size:12px;" onclick="window.print()" title="Cetak Format Lembar A4">
-      <i class="bi bi-printer me-1"></i> Cetak Kaldik &amp; RPE
-    </button>
 
     @if($canManage && (!$kalender || !$kalender->is_locked))
       <form action="{{ route('akademik.kalender.generate') }}" method="POST" style="margin:0;" onsubmit="return confirm('Reset ulang kalender ke template standar SMK?')">
         @csrf
         <input type="hidden" name="tahun_ajaran_id" value="{{ $selectedTa?->id }}">
         <input type="hidden" name="semester" value="{{ $semester }}">
-        <button type="submit" class="ak-btn ak-btn-secondary" style="font-size:12px;" title="Reset ke Template Standar SMK">
-          <i class="bi bi-arrow-counterclockwise me-1"></i> {{ $kalender ? 'Reset Template' : 'Buat Template' }}
+        <button type="submit" class="ak-btn ak-btn-secondary" style="font-size:12.5px; border:none; padding:7px 14px; border-radius:8px; color:#64748b;" title="Reset ke Template Standar SMK">
+          <i class="bi bi-arrow-counterclockwise me-1"></i> Reset Template
         </button>
       </form>
     @endif
   </div>
 </div>
 
-{{-- 2. PANEL FILTER & RANGKUMAN METRIK TERPADU --}}
+{{-- 2. PANEL FILTER & RANGKUMAN METRIK TERPADU (BORDERLESS) --}}
 <div class="kaldik-header-card">
-  <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:14px; padding-bottom:12px; border-bottom:1px solid #f1f5f9;">
+  <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:14px;">
     {{-- Form Filter Periode --}}
     <form method="GET" action="{{ route('akademik.kalender.index') }}" style="display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin:0;">
       <div style="display:flex; align-items:center; gap:6px;">
         <label style="font-size:12px; font-weight:700; color:#475569; margin:0;">Tahun Ajaran:</label>
-        <select name="tahun_ajaran_id" class="ak-input" style="font-size:12px; height:32px; padding:2px 8px; width:170px;" onchange="this.form.submit()">
+        <select name="tahun_ajaran_id" class="ak-input" style="font-size:12px; height:34px; padding:2px 10px; width:180px; border:none; background:#f1f5f9; border-radius:8px;" onchange="this.form.submit()">
           @foreach($tahunAjarans as $ta)
             <option value="{{ $ta->id }}" {{ $selectedTa?->id == $ta->id ? 'selected' : '' }}>
               {{ $ta->nama }} {{ $ta->is_active ? '(Aktif)' : '' }}
@@ -274,42 +276,31 @@
         </select>
       </div>
 
-      <div style="display:flex; align-items:center; gap:4px;">
+      {{-- Segmented Pill Button untuk Semester (Rapi & Borderless) --}}
+      <div style="display:inline-flex; background:#f1f5f9; border-radius:8px; padding:3px; gap:3px;">
         <a href="{{ route('akademik.kalender.index', ['tahun_ajaran_id' => $selectedTa?->id, 'semester' => 1]) }}" 
-           class="ak-btn {{ $semester == 1 ? 'ak-btn-primary' : 'ak-btn-secondary' }}" 
-           style="font-size:11.5px; height:30px; padding:3px 12px;">
+           style="font-size:12px; font-weight:700; padding:6px 14px; border-radius:6px; text-decoration:none; transition:all 0.15s; border:none; {{ $semester == 1 ? 'background:#ffffff; color:#4f46e5; box-shadow:0 1px 3px rgba(0,0,0,0.06);' : 'color:#64748b; background:transparent;' }}">
            Semester 1 (Ganjil)
         </a>
         <a href="{{ route('akademik.kalender.index', ['tahun_ajaran_id' => $selectedTa?->id, 'semester' => 2]) }}" 
-           class="ak-btn {{ $semester == 2 ? 'ak-btn-primary' : 'ak-btn-secondary' }}" 
-           style="font-size:11.5px; height:30px; padding:3px 12px;">
+           style="font-size:12px; font-weight:700; padding:6px 14px; border-radius:6px; text-decoration:none; transition:all 0.15s; border:none; {{ $semester == 2 ? 'background:#ffffff; color:#4f46e5; box-shadow:0 1px 3px rgba(0,0,0,0.06);' : 'color:#64748b; background:transparent;' }}">
            Semester 2 (Genap)
         </a>
       </div>
     </form>
 
-    {{-- Status Kunci / Penetapan --}}
+    {{-- Status Penetapan Resmi (Hanya tampil jika terkunci) --}}
     <div>
-      @if($kalender)
-        @if($kalender->is_locked)
-          <span class="ak-badge ak-badge-success" style="font-size:11.5px; padding:5px 12px;">
-            <i class="bi bi-shield-check me-1"></i> DITETAPKAN RESMI SEKOLAH
-          </span>
-        @else
-          <span class="ak-badge ak-badge-warning" style="font-size:11.5px; padding:5px 12px;">
-            <i class="bi bi-pencil-square me-1"></i> Draf Penyesuaian Waka Kurikulum
-          </span>
-        @endif
-      @else
-        <span class="ak-badge ak-badge-secondary" style="font-size:11.5px; padding:5px 12px;">
-          Belum Dibuat
+      @if($kalender && $kalender->is_locked)
+        <span class="ak-badge ak-badge-success" style="font-size:11.5px; padding:5px 12px; border:none;">
+          <i class="bi bi-shield-check me-1"></i> Ditetapkan Resmi
         </span>
       @endif
     </div>
   </div>
 
   @if($kalender)
-    {{-- Baris Metrik Pekan Efektif & Legenda Ringkas --}}
+    {{-- Baris Metrik Pekan Efektif & Legenda Ringkas (Borderless Chips) --}}
     <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
       <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
         <div class="kaldik-meta-chip">
@@ -317,13 +308,13 @@
           <strong>{{ $kalender->total_pekan }} Pekan</strong>
         </div>
 
-        <div class="kaldik-meta-chip" style="background:#eff6ff; border-color:#bfdbfe;">
+        <div class="kaldik-meta-chip" style="background:#eff6ff;">
           <span style="font-size:11px; font-weight:700; color:#1e40af; text-transform:uppercase;">Efektif KBM:</span>
           <strong style="color:#1d4ed8;">{{ $kalender->pekan_efektif }} Pekan</strong>
         </div>
 
-        <div class="kaldik-meta-chip" style="background:#fffbeb; border-color:#fde68a;">
-          <span style="font-size:11px; font-weight:700; color:#92400e; text-transform:uppercase;">Non-Efektif / Cadangan:</span>
+        <div class="kaldik-meta-chip" style="background:#fffbeb;">
+          <span style="font-size:11px; font-weight:700; color:#92400e; text-transform:uppercase;">Non-Efektif:</span>
           <strong style="color:#b45309;">{{ $kalender->pekan_cadangan }} Pekan</strong>
         </div>
       </div>
@@ -348,7 +339,7 @@
 </div>
 
 @if($kalender)
-  {{-- 3. KALENDER VISUAL 6 BULAN (KOMPAK & PROPORSIONAL) --}}
+  {{-- 3. KALENDER VISUAL 6 BULAN (BORDERLESS & KOMPAK) --}}
   <div class="kaldik-grid">
     @foreach($calendarMonths as $m)
       @php
@@ -366,7 +357,7 @@
               {{ $m['days_in_month'] }} Hari · <strong>{{ $m['efektif_count'] }} Pekan Efektif KBM</strong>
             </div>
           </div>
-          <span class="badge" style="background:#e0e7ff; color:#3730a3; font-weight:800; font-size:10px;">
+          <span class="badge" style="background:#e0e7ff; color:#3730a3; font-weight:800; font-size:10px; border:none;">
             {{ $m['kaldik_items']->first()?->minggu_ke_semester ? ('Pekan ' . $m['kaldik_items']->first()->minggu_ke_semester . '-' . $m['kaldik_items']->last()->minggu_ke_semester) : '' }}
           </span>
         </div>
@@ -470,17 +461,16 @@
                 </div>
 
                 @if($canManage && !$kalender->is_locked)
-                  <div style="display:flex; align-items:center; gap:2px; flex-shrink:0;">
+                  <div style="display:flex; align-items:center; gap:3px; flex-shrink:0;">
                     <button type="button" 
-                            class="ak-btn ak-btn-secondary" 
-                            style="padding:1px 5px; font-size:9.5px; height:18px;" 
+                            style="border:none; background:rgba(0,0,0,0.05); border-radius:4px; padding:2px 6px; font-size:10px; color:#475569; cursor:pointer;" 
                             title="Edit Agenda"
                             onclick="openEditPekanModal({{ $item->id }}, '{{ $item->bulan }}', {{ $item->minggu_ke }}, '{{ $item->jenis }}', '{{ $item->kategori }}', '{{ addslashes($item->keterangan ?? '') }}', '{{ $item->tanggal_mulai?->format('Y-m-d') ?? '' }}', '{{ $item->tanggal_selesai?->format('Y-m-d') ?? '' }}')">
                       <i class="bi bi-pencil"></i>
                     </button>
                     <form action="{{ route('akademik.kalender.reset-item', $item->id) }}" method="POST" style="margin:0;" onsubmit="return confirm('Kembalikan pekan ini ke KBM Efektif?')">
                       @csrf
-                      <button type="submit" class="ak-btn ak-btn-secondary" style="padding:1px 5px; font-size:9.5px; height:18px; color:#ef4444;" title="Reset ke KBM Normal">
+                      <button type="submit" style="border:none; background:rgba(239,68,68,0.1); border-radius:4px; padding:2px 6px; font-size:10px; color:#ef4444; cursor:pointer;" title="Reset ke KBM Normal">
                         <i class="bi bi-arrow-counterclockwise"></i>
                       </button>
                     </form>
@@ -490,7 +480,7 @@
             @endforeach
           </div>
         @else
-          <div style="padding:6px 10px; text-align:center; font-size:10.5px; color:#16a34a; background:#f0fdf4; border-top:1px solid #dcfce7;">
+          <div style="padding:6px 10px; text-align:center; font-size:10.5px; color:#16a34a; background:#f0fdf4; border:none;">
             <i class="bi bi-check2-circle me-1"></i> Full KBM Efektif Tatap Muka
           </div>
         @endif
@@ -498,16 +488,13 @@
     @endforeach
   </div>
 
-  {{-- 4. MATRIKS PENETAPAN RPE RESMI (RINCIAN PEKAN EFEKTIF PER BULAN) --}}
-  <div class="akademik-card" style="margin-bottom:20px;">
-    <div class="akademik-card-header" style="background:#f8fafc; display:flex; justify-content:space-between; align-items:center; padding:12px 18px;">
+  {{-- 4. MATRIKS PENETAPAN RPE RESMI (BORDERLESS) --}}
+  <div class="akademik-card" style="margin-bottom:20px; border:none; box-shadow:0 1px 3px rgba(15,23,42,0.04);">
+    <div class="akademik-card-header" style="background:#f8fafc; border:none; display:flex; justify-content:space-between; align-items:center; padding:12px 18px;">
       <h3 class="akademik-card-title" style="font-size:14px; margin:0;">
         <i class="bi bi-table text-primary me-2"></i>
         Matriks Penetapan Rincian Pekan Efektif (RPE) Semester {{ $semester == 1 ? '1 (Ganjil)' : '2 (Genap)' }}
       </h3>
-      <span class="badge" style="background:#dbeafe; color:#1e40af; font-weight:800; font-size:11px;">
-        Standar RPE Waka Kurikulum
-      </span>
     </div>
 
     <div class="akademik-card-body" style="padding:0;">
@@ -544,37 +531,31 @@
                   {{ $rpe['total_pekan'] }} Pekan
                 </td>
                 <td style="text-align:center;">
-                  <span class="badge" style="background:#eff6ff; color:#1d4ed8; font-weight:800; font-size:11px; padding:3px 8px;">
+                  <span class="badge" style="background:#eff6ff; color:#1d4ed8; font-weight:800; font-size:11px; padding:4px 9px; border:none;">
                     {{ $rpe['efektif'] }} Pekan
                   </span>
                 </td>
                 <td style="text-align:center;">
                   @if($rpe['non_efektif'] > 0)
-                    <span class="badge" style="background:#fffbeb; color:#92400e; font-weight:800; font-size:11px; padding:3px 8px;">
+                    <span class="badge" style="background:#fffbeb; color:#b45309; font-weight:800; font-size:11px; padding:4px 9px; border:none;">
                       {{ $rpe['non_efektif'] }} Pekan
                     </span>
                   @else
-                    <span style="color:#94a3b8;">-</span>
+                    <span style="color:#94a3b8; font-weight:600;">-</span>
                   @endif
                 </td>
                 <td>
-                  @if($rpe['agendas']->isNotEmpty())
-                    <div style="display:flex; flex-direction:column; gap:3px;">
+                  @if(!empty($rpe['agendas']))
+                    <div style="display:flex; flex-wrap:wrap; gap:6px;">
                       @foreach($rpe['agendas'] as $ag)
-                        <div style="font-size:11.5px; color:#334155;">
-                          <span class="badge" style="background:{{ $ag->warna ?: '#f59e0b' }}; color:#fff; font-size:9px; padding:1px 4px; margin-right:4px;">
-                            M{{ $ag->minggu_ke }}
-                          </span>
-                          <strong>{{ $ag->keterangan }}</strong>
-                          @if($ag->tanggal_mulai)
-                            <span style="color:#64748b; font-size:10.5px;">({{ $ag->formatRentangTanggal() }})</span>
-                          @endif
-                        </div>
+                        <span style="background:#f1f5f9; color:#334155; font-size:11px; font-weight:700; padding:2px 8px; border-radius:5px; border:none;">
+                          M{{ $ag->minggu_ke }}: {{ $ag->keterangan }}
+                        </span>
                       @endforeach
                     </div>
                   @else
-                    <span style="color:#16a34a; font-weight:600; font-size:11px;">
-                      <i class="bi bi-check me-1"></i>KBM Efektif Penuh
+                    <span style="color:#16a34a; font-size:11px; font-weight:600;">
+                      <i class="bi bi-check2"></i> Pembelajaran Tatap Muka Penuh
                     </span>
                   @endif
                 </td>
@@ -583,10 +564,18 @@
           </tbody>
           <tfoot>
             <tr>
-              <td colspan="2" style="text-align:center; font-weight:800;">TOTAL SEMESTER {{ $semester }}</td>
-              <td style="text-align:center;">{{ $totPekan }} Pekan</td>
-              <td style="text-align:center; color:#1d4ed8;">{{ $totEfektif }} Pekan</td>
-              <td style="text-align:center; color:#92400e;">{{ $totNonEfektif }} Pekan</td>
+              <td colspan="2" style="text-align:right; font-weight:900; letter-spacing:0.5px;">
+                TOTAL SEMESTER:
+              </td>
+              <td style="text-align:center; font-weight:900;">
+                {{ $totPekan }} Pekan
+              </td>
+              <td style="text-align:center; font-weight:900; color:#1d4ed8;">
+                {{ $totEfektif }} Pekan Efektif
+              </td>
+              <td style="text-align:center; font-weight:900; color:#b45309;">
+                {{ $totNonEfektif }} Pekan Cadangan
+              </td>
               <td style="font-size:11px; font-weight:normal; color:#475569;">
                 Rincian Pekan Efektif (RPE) resmi menjadi dasar perhitungan alokasi jam tatap muka PROTA &amp; PROMES guru.
               </td>
@@ -597,23 +586,23 @@
     </div>
   </div>
 
-  {{-- 5. CATATAN KEBIJAKAN KURIKULUM (KOMPAK) --}}
-  <div class="akademik-card" style="padding:14px 18px; margin-bottom:20px;">
+  {{-- 5. CATATAN KEBIJAKAN KURIKULUM (KOMPAK & BORDERLESS) --}}
+  <div class="akademik-card" style="padding:14px 18px; margin-bottom:20px; border:none; box-shadow:0 1px 3px rgba(15,23,42,0.04);">
     <h3 style="font-size:13px; font-weight:800; color:var(--ak-dark); margin:0 0 8px;">
-      <i class="bi bi-card-text text-primary me-2"></i> Catatan Kebijakan Kaldik Waka Kurikulum
+      <i class="bi bi-card-text text-primary me-2"></i> Catatan Kebijakan Kaldik
     </h3>
     @if($canManage && !$kalender->is_locked)
       <form action="{{ route('akademik.kalender.catatan', $kalender->id) }}" method="POST" style="margin:0;">
         @csrf
         <div style="display:flex; gap:10px; align-items:flex-start;">
-          <textarea name="catatan" class="ak-input" rows="2" style="font-size:12px; flex:1;" placeholder="Tuliskan catatan arahan khusus pelaksanaan KBM, asesmen, atau libur...">{{ $kalender->catatan }}</textarea>
-          <button type="submit" class="ak-btn ak-btn-secondary" style="font-size:12px; height:36px;">
+          <textarea name="catatan" class="ak-input" rows="2" style="font-size:12px; flex:1; border:none; background:#f8fafc; border-radius:8px;" placeholder="Tuliskan catatan arahan khusus pelaksanaan KBM, asesmen, atau libur...">{{ $kalender->catatan }}</textarea>
+          <button type="submit" class="ak-btn ak-btn-secondary" style="font-size:12px; height:36px; border:none;">
             <i class="bi bi-floppy me-1"></i> Simpan Catatan
           </button>
         </div>
       </form>
     @else
-      <div style="font-size:12px; color:#475569; background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:8px 12px;">
+      <div style="font-size:12px; color:#475569; background:#f8fafc; border:none; border-radius:8px; padding:8px 12px;">
         {{ $kalender->catatan ?: 'Belum ada catatan kebijakan khusus.' }}
       </div>
     @endif
@@ -621,7 +610,7 @@
 
 @else
   {{-- Empty State (Saat Kalender Belum Dibuat) --}}
-  <div class="akademik-card" style="padding:40px 20px; text-align:center;">
+  <div class="akademik-card" style="padding:40px 20px; text-align:center; border:none; box-shadow:0 1px 3px rgba(15,23,42,0.04);">
     <i class="bi bi-calendar2-range" style="font-size:42px; color:#94a3b8; display:block; margin-bottom:12px;"></i>
     <h3 style="font-size:16px; font-weight:800; color:var(--ak-dark); margin:0 0 6px;">
       Kalender Pendidikan Semester {{ $semester == 1 ? '1 (Ganjil)' : '2 (Genap)' }} Belum Ditetapkan
@@ -635,7 +624,7 @@
         @csrf
         <input type="hidden" name="tahun_ajaran_id" value="{{ $selectedTa?->id }}">
         <input type="hidden" name="semester" value="{{ $semester }}">
-        <button type="submit" class="ak-btn ak-btn-primary" style="font-size:13px; padding:7px 20px;">
+        <button type="submit" class="ak-btn ak-btn-primary" style="font-size:13px; padding:7px 20px; border:none;">
           <i class="bi bi-magic me-1"></i> Buat Template Standar SMK
         </button>
       </form>
@@ -653,21 +642,21 @@
         <input type="hidden" name="semester" value="{{ $semester }}">
         <input type="hidden" id="agendaItemId" name="item_id" value="">
 
-        <div class="modal-header" style="border-bottom:1px solid #e2e8f0; padding:12px 16px;">
+        <div class="modal-header" style="border:none; padding:16px 20px;">
           <h5 class="modal-title" style="font-size:14px; font-weight:800; color:var(--ak-dark);" id="modalAgendaTitle">
             <i class="bi bi-calendar-event text-primary me-2"></i> Kelola Agenda Kaldik
           </h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
 
-        <div class="modal-body" style="padding:14px 16px; display:flex; flex-direction:column; gap:12px;">
+        <div class="modal-body" style="padding:14px 20px; display:flex; flex-direction:column; gap:12px;">
           {{-- Pilihan Tanggal --}}
-          <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:12px;">
+          <div style="background:#f8fafc; border:none; border-radius:10px; padding:12px;">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
               <label style="font-size:11.5px; font-weight:800; color:#334155; margin:0;">
                 <i class="bi bi-calendar2-range text-primary me-1"></i> Rentang Tanggal Pelaksanaan:
               </label>
-              <label style="display:inline-flex; align-items:center; gap:6px; font-size:11px; font-weight:700; color:#4338ca; cursor:pointer; margin:0; background:#e0e7ff; padding:2px 8px; border-radius:6px;">
+              <label style="display:inline-flex; align-items:center; gap:6px; font-size:11px; font-weight:700; color:#4338ca; cursor:pointer; margin:0; background:#e0e7ff; padding:2px 8px; border-radius:6px; border:none;">
                 <input type="checkbox" id="modalIsSingleDay" name="is_single_day" value="1" onchange="toggleSingleDayModal()">
                 <span>1 Hari Saja</span>
               </label>
@@ -676,11 +665,11 @@
             <div id="modalGridTanggal" style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
               <div>
                 <label id="modalLabelMulai" style="font-size:11px; font-weight:700; color:#64748b; margin-bottom:3px; display:block;">Tanggal Mulai:</label>
-                <input type="date" name="tanggal_mulai" id="modalTanggalMulai" class="ak-input" style="font-size:12px; height:36px;" onchange="handleModalTanggalChange()">
+                <input type="date" name="tanggal_mulai" id="modalTanggalMulai" class="ak-input" style="font-size:12px; height:36px; border:none; background:#ffffff;" onchange="handleModalTanggalChange()">
               </div>
               <div id="modalColSelesai">
                 <label style="font-size:11px; font-weight:700; color:#64748b; margin-bottom:3px; display:block;">Tanggal Selesai:</label>
-                <input type="date" name="tanggal_selesai" id="modalTanggalSelesai" class="ak-input" style="font-size:12px; height:36px;" onchange="handleModalTanggalChange()">
+                <input type="date" name="tanggal_selesai" id="modalTanggalSelesai" class="ak-input" style="font-size:12px; height:36px; border:none; background:#ffffff;" onchange="handleModalTanggalChange()">
               </div>
             </div>
 
@@ -693,7 +682,7 @@
           <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
             <div>
               <label style="font-size:11.5px; font-weight:700; color:#475569; margin-bottom:3px; display:block;">Alokasi Bulan:</label>
-              <select name="bulan" id="modalBulan" class="ak-input" style="font-size:12px;" required>
+              <select name="bulan" id="modalBulan" class="ak-input" style="font-size:12px; border:none; background:#f8fafc;" required>
                 @if($semester == 1)
                   <option value="Juli">Juli</option>
                   <option value="Agustus">Agustus</option>
@@ -714,7 +703,7 @@
 
             <div>
               <label style="font-size:11.5px; font-weight:700; color:#475569; margin-bottom:3px; display:block;">Pekan ke-:</label>
-              <select name="minggu_ke" id="modalMingguKe" class="ak-input" style="font-size:12px;" required>
+              <select name="minggu_ke" id="modalMingguKe" class="ak-input" style="font-size:12px; border:none; background:#f8fafc;" required>
                 <option value="1">Pekan 1 (M1)</option>
                 <option value="2">Pekan 2 (M2)</option>
                 <option value="3">Pekan 3 (M3)</option>
@@ -727,7 +716,7 @@
           {{-- Kategori Kegiatan --}}
           <div>
             <label style="font-size:11.5px; font-weight:700; color:#475569; margin-bottom:3px; display:block;">Kategori Agenda:</label>
-            <select name="kategori" id="modalKategori" class="ak-input" style="font-size:12px;" required onchange="handleModalKategoriChange()">
+            <select name="kategori" id="modalKategori" class="ak-input" style="font-size:12px; border:none; background:#f8fafc;" required onchange="handleModalKategoriChange()">
               <option value="kbm">KBM Efektif Tatap Muka</option>
               <option value="mpls">MPLS &amp; Masa Orientasi Jurusan</option>
               <option value="sts">Sumatif Tengah Semester (STS)</option>
@@ -744,26 +733,26 @@
           {{-- Nama Kegiatan --}}
           <div>
             <label style="font-size:11.5px; font-weight:700; color:#475569; margin-bottom:3px; display:block;">Nama Agenda / Keterangan:</label>
-            <input type="text" name="keterangan" id="modalKeterangan" class="ak-input" style="font-size:12px;" placeholder="Contoh: Sumatif Tengah Semester (STS)" required>
+            <input type="text" name="keterangan" id="modalKeterangan" class="ak-input" style="font-size:12px; border:none; background:#f8fafc;" placeholder="Contoh: Sumatif Tengah Semester (STS)" required>
           </div>
 
           {{-- Dampak Terhadap KBM --}}
           <div>
             <label style="font-size:11.5px; font-weight:700; color:#475569; margin-bottom:3px; display:block;">Dampak KBM:</label>
-            <select name="jenis" id="modalJenis" class="ak-input" style="font-size:12px;" required>
+            <select name="jenis" id="modalJenis" class="ak-input" style="font-size:12px; border:none; background:#f8fafc;" required>
               <option value="efektif">Efektif (KBM Tatap Muka Tetap Berjalan)</option>
               <option value="non_efektif">Non-Efektif (Memotong Jam Tatap Muka / Libur)</option>
             </select>
           </div>
         </div>
 
-        <div class="modal-footer" style="border-top:1px solid #e2e8f0; padding:10px 16px; display:flex; justify-content:space-between; align-items:center;">
+        <div class="modal-footer" style="border:none; padding:12px 20px; display:flex; justify-content:space-between; align-items:center;">
           <div id="modalLeftActions">
             {{-- Tombol Reset ke KBM akan muncul jika mode edit --}}
           </div>
           <div style="display:flex; align-items:center; gap:8px;">
-            <button type="button" class="ak-btn ak-btn-secondary" data-bs-dismiss="modal" style="font-size:11.5px;">Batal</button>
-            <button type="submit" class="ak-btn ak-btn-primary" style="font-size:11.5px;">
+            <button type="button" class="ak-btn ak-btn-secondary" data-bs-dismiss="modal" style="font-size:11.5px; border:none;">Batal</button>
+            <button type="submit" class="ak-btn ak-btn-primary" style="font-size:11.5px; border:none;">
               <i class="bi bi-check-lg me-1"></i> Simpan Agenda
             </button>
           </div>
@@ -917,7 +906,7 @@
     document.getElementById('modalLeftActions').innerHTML = `
       <form action="{{ url('dcc/akademik/kalender/item') }}/${id}/reset" method="POST" style="margin:0;" onsubmit="return confirm('Reset pekan ini kembali ke KBM Efektif normal?')">
         @csrf
-        <button type="submit" class="ak-btn ak-btn-secondary" style="font-size:11px; color:#ef4444;" title="Kembalikan ke KBM Efektif">
+        <button type="submit" class="ak-btn ak-btn-secondary" style="font-size:11px; color:#ef4444; border:none;" title="Kembalikan ke KBM Efektif">
           <i class="bi bi-arrow-counterclockwise me-1"></i> Reset ke KBM Normal
         </button>
       </form>
