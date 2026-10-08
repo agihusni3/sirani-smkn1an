@@ -44,35 +44,33 @@
     $activeElemen    = $activePerangkat->resolved_elemen_cp;
     $hasCustomElemen = !empty($activePerangkat->elemen_cp) && count($activePerangkat->elemen_cp) > 0;
     $elemenForForm   = !empty($activePerangkat->elemen_cp) ? $activePerangkat->elemen_cp : $activeElemen;
-  @endphp
-
-  {{-- ===== HEADER CARD: Identitas + Tombol Aksi ===== --}}
-  <div class="akademik-card" style="margin-bottom:20px; padding:18px 22px; border-left:4px solid var(--ak-primary); overflow:visible !important; position:relative; z-index:20;">
+  @endphp  {{-- ===== HEADER CARD: Identitas + Tombol Aksi ===== --}}
+  <div class="akademik-card" style="margin-bottom:20px; padding:18px 22px; overflow:visible !important; position:relative; z-index:20;">
     <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:14px;">
       
       {{-- Info Kiri --}}
       <div>
         <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:8px;">
-          <span class="ak-badge ak-badge-primary" style="font-size:12px; font-weight:800;">{{ $mapel?->kode_mapel }}</span>
-          <span class="badge" style="background:#e0e7ff; color:#3730a3; font-size:12px; font-weight:700;">
+          <span class="ak-badge ak-badge-secondary" style="font-size:12px; font-weight:800;">{{ $mapel?->kode_mapel }}</span>
+          <span class="badge" style="background:#f1f5f9; color:#1e293b; font-size:12px; font-weight:700; border:1px solid #e2e8f0;">
             Kelas {{ $activePerangkat->tingkat }} &middot; Fase {{ $activePerangkat->fase }}
           </span>
-          <span class="badge" style="background:#f1f5f9; color:#475569; font-size:12px;">
+          <span class="badge" style="background:#f8fafc; color:#475569; font-size:12px; border:1px solid #e2e8f0;">
             Semester {{ $activePerangkat->semester == 1 ? 'Ganjil' : 'Genap' }}
           </span>
           @if($hasCustomCp)
-            <span class="badge" style="background:#ecfdf5; color:#065f46; border:1px solid #a7f3d0; font-size:11.5px; font-weight:700;">
-              <i class="bi bi-check-circle-fill me-1"></i> CP Telah Diinput Guru
+            <span class="badge" style="background:#f8fafc; color:#0f172a; border:1px solid #cbd5e1; font-size:11.5px; font-weight:700;">
+              <i class="bi bi-check-circle me-1"></i> CP Telah Diinput Guru
             </span>
           @else
-            <span class="badge" style="background:#fffbeb; color:#92400e; border:1px solid #fde68a; font-size:11.5px; font-weight:700;">
+            <span class="badge" style="background:#f8fafc; color:#64748b; border:1px solid #e2e8f0; font-size:11.5px; font-weight:700;">
               <i class="bi bi-info-circle me-1"></i> Belum Diinput
             </span>
           @endif
         </div>
-        <h2 style="font-weight:900; font-size:20px; color:var(--ak-dark); margin:0 0 3px 0;">{{ $mapel?->nama_mapel }}</h2>
+        <h2 style="font-weight:900; font-size:20px; color:#0f172a; margin:0 0 3px 0;">{{ $mapel?->nama_mapel }}</h2>
         <div style="font-size:12px; color:#64748b;">
-          Guru Pengampu: <strong style="color:#1e293b;">{{ $activePerangkat->guru?->nama }}</strong>
+          Guru Pengampu: <strong style="color:#0f172a;">{{ $activePerangkat->guru?->nama }}</strong>
           &ensp;&middot;&ensp; NIP: {{ $activePerangkat->guru?->nip ?? '-' }}
         </div>
       </div>
@@ -82,19 +80,19 @@
         {{-- Tombol Langsung: Ekspor CP ke PDF A4 --}}
         <a href="{{ route('akademik.perangkat.cp.export-pdf', $activePerangkat->id) }}"
            target="_blank"
-           class="ak-btn"
-           style="font-size:12.5px; padding:7px 14px; font-weight:700; background:#fef2f2; color:#b91c1c; border:1px solid #fca5a5; border-radius:8px; display:inline-flex; align-items:center; gap:6px; text-decoration:none; cursor:pointer;"
+           class="ak-btn ak-btn-secondary"
+           style="font-size:12.5px; padding:7px 14px; font-weight:700;"
            title="Unduh Dokumen CP format PDF A4 Resmi Kop SITUAN">
-          <i class="bi bi-file-earmark-pdf-fill" style="font-size:15px; color:#dc2626;"></i>
+          <i class="bi bi-file-earmark-pdf me-1"></i>
           <span>Ekspor PDF</span>
         </a>
 
         {{-- Tombol Langsung: Ekspor CP ke Word A4 --}}
         <a href="{{ route('akademik.perangkat.cp.export-docx', $activePerangkat->id) }}"
-           class="ak-btn"
-           style="font-size:12.5px; padding:7px 14px; font-weight:700; background:#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe; border-radius:8px; display:inline-flex; align-items:center; gap:6px; text-decoration:none; cursor:pointer;"
+           class="ak-btn ak-btn-secondary"
+           style="font-size:12.5px; padding:7px 14px; font-weight:700;"
            title="Unduh Dokumen CP format Word (.docx) A4 Resmi Kop SITUAN">
-          <i class="bi bi-file-earmark-word-fill" style="font-size:15px; color:#2563eb;"></i>
+          <i class="bi bi-file-earmark-word me-1"></i>
           <span>Ekspor Word</span>
         </a>
 
@@ -111,18 +109,18 @@
             </li>
             <li>
               <a class="dropdown-item py-2 d-flex align-items-center gap-2" href="{{ route('akademik.perangkat.export-pdf', $activePerangkat->id) }}" target="_blank">
-                <i class="bi bi-file-earmark-pdf text-danger fs-5"></i>
+                <i class="bi bi-file-earmark-pdf fs-5" style="color:#0f172a;"></i>
                 <div>
-                  <div style="font-weight:700; color:#1e293b;">Perangkat Lengkap (PDF A4)</div>
+                  <div style="font-weight:700; color:#0f172a;">Perangkat Lengkap (PDF A4)</div>
                   <div style="font-size:11px; color:#64748b;">Sampul, Pengesahan &amp; 5 Bab</div>
                 </div>
               </a>
             </li>
             <li>
               <a class="dropdown-item py-2 d-flex align-items-center gap-2" href="{{ route('akademik.perangkat.export-docx', $activePerangkat->id) }}">
-                <i class="bi bi-file-earmark-word text-primary fs-5"></i>
+                <i class="bi bi-file-earmark-word fs-5" style="color:#0f172a;"></i>
                 <div>
-                  <div style="font-weight:700; color:#1e293b;">Perangkat Lengkap (Word A4)</div>
+                  <div style="font-weight:700; color:#0f172a;">Perangkat Lengkap (Word A4)</div>
                   <div style="font-size:11px; color:#64748b;">Dokumen Lengkap (.docx)</div>
                 </div>
               </a>
@@ -138,6 +136,7 @@
               <i class="bi bi-lightning-charge me-1"></i> Salin Template BSKAP
             </button>
           </form>
+
           <button type="button" id="btnOpenEdit" onclick="togglePanel(true)"
                   class="ak-btn ak-btn-primary" style="font-size:12.5px; padding:7px 16px; font-weight:700;">
             <i class="bi bi-pencil-square me-1"></i>
@@ -149,28 +148,28 @@
   </div>
 
   {{-- ===== SECTION 1: TEKS CP ===== --}}
-  <div class="akademik-card" style="margin-bottom:20px; border-top:4px solid #0284c7;">
-    <div class="akademik-card-header" style="background:#f0f9ff; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
-      <h3 class="akademik-card-title" style="font-size:14.5px; display:flex; align-items:center; gap:8px; margin:0;">
-        <i class="bi bi-file-text text-primary"></i>
+  <div class="akademik-card" style="margin-bottom:20px;">
+    <div class="akademik-card-header" style="background:#f8fafc; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+      <h3 class="akademik-card-title" style="font-size:14.5px; display:flex; align-items:center; gap:8px; margin:0; color:#0f172a;">
+        <i class="bi bi-file-text me-1" style="color:#475569;"></i>
         Teks Capaian Pembelajaran
-        <span class="badge bg-primary" style="font-size:11px; font-weight:600;">Fase {{ $activePerangkat->fase }}</span>
+        <span class="ak-badge ak-badge-secondary" style="font-size:11px; font-weight:600;">Fase {{ $activePerangkat->fase }}</span>
       </h3>
       <div style="display:flex; align-items:center; gap:10px;">
         <div class="btn-group btn-group-sm" role="group">
-          <a href="{{ route('akademik.perangkat.cp.export-pdf', $activePerangkat->id) }}" class="btn btn-outline-danger" title="Ekspor Dokumen CP ke PDF A4" style="font-size:11.5px; font-weight:700; padding:3px 9px;">
+          <a href="{{ route('akademik.perangkat.cp.export-pdf', $activePerangkat->id) }}" class="ak-btn ak-btn-secondary ak-btn-sm" title="Ekspor Dokumen CP ke PDF A4" style="font-size:11.5px; font-weight:700; padding:3px 9px;">
             <i class="bi bi-file-earmark-pdf me-1"></i> PDF
           </a>
-          <a href="{{ route('akademik.perangkat.cp.export-docx', $activePerangkat->id) }}" class="btn btn-outline-primary" title="Ekspor Dokumen CP ke Word A4" style="font-size:11.5px; font-weight:700; padding:3px 9px;">
+          <a href="{{ route('akademik.perangkat.cp.export-docx', $activePerangkat->id) }}" class="ak-btn ak-btn-secondary ak-btn-sm" title="Ekspor Dokumen CP ke Word A4" style="font-size:11.5px; font-weight:700; padding:3px 9px;">
             <i class="bi bi-file-earmark-word me-1"></i> Word
           </a>
         </div>
         @if($hasCustomCp)
-          <span style="font-size:11.5px; color:#059669; font-weight:700; display:flex; align-items:center; gap:4px;">
-            <i class="bi bi-person-check-fill"></i> Rumusan Guru
+          <span style="font-size:11.5px; color:#0f172a; font-weight:700; display:flex; align-items:center; gap:4px;">
+            <i class="bi bi-person-check-fill" style="color:#475569;"></i> Rumusan Guru
           </span>
         @else
-          <span style="font-size:11.5px; color:#92400e; font-weight:600; display:flex; align-items:center; gap:4px;">
+          <span style="font-size:11.5px; color:#64748b; font-weight:600; display:flex; align-items:center; gap:4px;">
             <i class="bi bi-info-circle"></i> Acuan Standar Nasional
           </span>
         @endif

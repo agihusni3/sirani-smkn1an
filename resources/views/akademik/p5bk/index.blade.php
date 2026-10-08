@@ -49,7 +49,7 @@
                   <div style="font-size:12px; color:#64748b;">{{ Str::limit($p->deskripsi, 60) }}</div>
                 </td>
                 <td>
-                  <span class="ak-badge ak-badge-primary">{{ $p->tema }}</span>
+                  <span class="ak-badge ak-badge-secondary">{{ $p->tema }}</span>
                 </td>
                 <td>
                   <span class="ak-badge ak-badge-secondary">{{ $p->rombel?->nama_rombel }}</span>
@@ -58,7 +58,7 @@
                   <span class="ak-badge ak-badge-secondary">Sem {{ $p->semester }}</span>
                 </td>
                 <td>
-                  <span class="ak-badge ak-badge-success">{{ $p->nilais_count }} Siswa</span>
+                  <span class="ak-badge ak-badge-secondary">{{ $p->nilais_count }} Siswa</span>
                 </td>
                 <td style="text-align:center;">
                   <div style="display:flex; justify-content:center; gap:6px;">

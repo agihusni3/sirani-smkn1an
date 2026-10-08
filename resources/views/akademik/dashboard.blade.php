@@ -21,18 +21,18 @@
 {{-- 2. AGENDA KALDIK TERDEKAT / SEDANG BERJALAN (INFORMASI PENTING WAKAKUR)    --}}
 {{-- ========================================================================== --}}
 @if($agendaKaldikTerdekat)
-  <div style="background:#ffffff; border:1px solid #e2e8f0; border-left:4px solid #6366f1; border-radius:12px; padding:14px 18px; margin-bottom:20px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; box-shadow:0 2px 4px rgba(0,0,0,0.03);">
+  <div style="background:#ffffff; border:1px solid #e2e8f0; border-radius:12px; padding:14px 18px; margin-bottom:20px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; box-shadow:0 2px 4px rgba(0,0,0,0.03);">
     <div style="display:flex; align-items:center; gap:12px; min-width:0;">
-      <div style="width:40px; height:40px; border-radius:10px; background:#eff2fe; color:#4f46e5; display:flex; align-items:center; justify-content:center; font-size:18px; flex-shrink:0;">
-        <i class="bi bi-calendar-event-fill"></i>
+      <div style="width:40px; height:40px; border-radius:10px; background:#f1f5f9; color:#0f172a; border:1px solid #e2e8f0; display:flex; align-items:center; justify-content:center; font-size:18px; flex-shrink:0;">
+        <i class="bi bi-calendar-event"></i>
       </div>
       <div style="min-width:0;">
-        <div style="font-size:11px; font-weight:800; text-transform:uppercase; color:#6366f1; letter-spacing:0.04em;">
+        <div style="font-size:11px; font-weight:800; text-transform:uppercase; color:#64748b; letter-spacing:0.04em;">
           Agenda Kurikulum Berjalan / Terdekat
         </div>
-        <div style="font-size:14px; font-weight:800; color:var(--ak-dark); margin-top:2px;">
+        <div style="font-size:14px; font-weight:800; color:#0f172a; margin-top:2px;">
           {{ $agendaKaldikTerdekat->keterangan }}
-          <span class="badge" style="background:{{ $agendaKaldikTerdekat->warna ?: '#f59e0b' }}; color:#ffffff; font-size:10px; font-weight:800; padding:2px 6px; margin-left:6px;">
+          <span class="badge" style="background:#f1f5f9; color:#0f172a; border:1px solid #cbd5e1; font-size:10px; font-weight:800; padding:2px 6px; margin-left:6px;">
             {{ strtoupper($agendaKaldikTerdekat->kategori) }}
           </span>
         </div>
@@ -59,13 +59,13 @@
   {{-- 1. Rincian Pekan Efektif (Kaldik) --}}
   <a href="{{ route('akademik.kalender.index') }}" class="akademik-kpi-card" title="Kelola Kalender Pendidikan & Rincian Pekan Efektif">
     <div>
-      <div class="akademik-kpi-val" style="color:#4f46e5;">
+      <div class="akademik-kpi-val" style="color:#0f172a;">
         {{ $kalender?->pekan_efektif ?? 18 }} 
         <span style="font-size:13px; font-weight:700; color:#64748b;">/ {{ $kalender?->total_pekan ?? 25 }} Pekan</span>
       </div>
       <div class="akademik-kpi-label">Pekan Efektif KBM (RPE)</div>
     </div>
-    <div class="akademik-kpi-icon icon-indigo">
+    <div class="akademik-kpi-icon" style="background:#f1f5f9; color:#334155;">
       <i class="bi bi-calendar-range"></i>
     </div>
   </a>
@@ -73,13 +73,13 @@
   {{-- 2. Mata Pelajaran Kurikulum --}}
   <a href="{{ route('akademik.matpel.index') }}" class="akademik-kpi-card" title="Kelola Mata Pelajaran Kurikulum">
     <div>
-      <div class="akademik-kpi-val">
+      <div class="akademik-kpi-val" style="color:#0f172a;">
         {{ $totalMapel }} 
         <span style="font-size:13px; font-weight:700; color:#64748b;">Mapel</span>
       </div>
       <div class="akademik-kpi-label">Mata Pelajaran Aktif ({{ $totalDistribusi }} Sesi)</div>
     </div>
-    <div class="akademik-kpi-icon icon-violet">
+    <div class="akademik-kpi-icon" style="background:#f1f5f9; color:#334155;">
       <i class="bi bi-book"></i>
     </div>
   </a>
@@ -87,13 +87,13 @@
   {{-- 3. Guru Pengajar Ber-SK --}}
   <a href="{{ route('akademik.jadwal.index', ['tab' => 'distribusi']) }}" class="akademik-kpi-card" title="Distribusi Beban Mengajar Guru">
     <div>
-      <div class="akademik-kpi-val" style="color:#059669;">
+      <div class="akademik-kpi-val" style="color:#0f172a;">
         {{ $totalGuruMengajar }} 
         <span style="font-size:13px; font-weight:700; color:#64748b;">/ {{ $totalGuru }} Guru</span>
       </div>
       <div class="akademik-kpi-label">Guru Terplot Beban Ajar</div>
     </div>
-    <div class="akademik-kpi-icon icon-emerald">
+    <div class="akademik-kpi-icon" style="background:#f1f5f9; color:#334155;">
       <i class="bi bi-file-earmark-person"></i>
     </div>
   </a>
@@ -101,13 +101,13 @@
   {{-- 4. Keterisian Jurnal KBM Hari Ini --}}
   <a href="{{ route('akademik.jurnal.index') }}" class="akademik-kpi-card" title="Monitoring Keterisian Jurnal Guru Hari Ini">
     <div>
-      <div class="akademik-kpi-val" style="color:#0284c7;">
+      <div class="akademik-kpi-val" style="color:#0f172a;">
         {{ $jurnalHariIni }} 
         <span style="font-size:13px; font-weight:700; color:#64748b;">/ {{ $totalJadwalHariIni }} Sesi</span>
       </div>
       <div class="akademik-kpi-label">Jurnal KBM Terisi Hari Ini</div>
     </div>
-    <div class="akademik-kpi-icon icon-cyan">
+    <div class="akademik-kpi-icon" style="background:#f1f5f9; color:#334155;">
       <i class="bi bi-journal-check"></i>
     </div>
   </a>
@@ -147,7 +147,7 @@
     @if($piketHariIni)
       <div style="background:#f8fafc; border-bottom:1px solid #e2e8f0; padding:12px 18px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; font-size:12px;">
         <div style="display:flex; align-items:center; gap:8px;">
-          <span class="ak-badge ak-badge-primary" style="font-size:11px;">
+          <span class="ak-badge ak-badge-secondary" style="font-size:11px;">
             <i class="bi bi-shield-check me-1"></i> Waka Piket:
           </span>
           <b style="color:var(--ak-dark);">{{ $piketHariIni->wakaPiket?->nama ?? 'Belum Ditentukan' }}</b>
@@ -181,7 +181,7 @@
               @foreach($jadwalHariIni as $jdw)
                 <tr>
                   <td>
-                    <span class="ak-badge ak-badge-primary" style="font-weight:800; font-size:11px;">
+                    <span class="ak-badge ak-badge-secondary" style="font-weight:700; font-size:11px;">
                       Jam Ke-{{ $jdw->jam_ke }}
                     </span>
                   </td>
@@ -191,7 +191,7 @@
                     </span>
                   </td>
                   <td>
-                    <div style="font-weight:700; color:var(--ak-primary); font-size:12.5px;">
+                    <div style="font-weight:700; color:#0f172a; font-size:13px;">
                       {{ $jdw->mataPelajaran?->nama_mapel ?? '-' }}
                     </div>
                     <div style="font-size:11px; color:#64748b;">
@@ -232,7 +232,7 @@
     <div class="akademik-card" style="margin-bottom:0;">
       <div class="akademik-card-header">
         <h3 class="akademik-card-title">
-          <i class="bi bi-activity text-success"></i>
+          <i class="bi bi-activity me-1" style="color:#475569;"></i>
           <span>Jurnal KBM Terisi</span>
         </h3>
         <a href="{{ route('akademik.jurnal.index') }}" class="ak-btn ak-btn-secondary ak-btn-sm" style="font-size:11.5px;">Lihat Semua</a>
@@ -253,10 +253,10 @@
             @foreach($jurnalTerbaru as $jrn)
               <div style="padding:12px 16px; border-bottom:1px solid #f1f5f9; display:flex; justify-content:space-between; align-items:center; gap:10px;">
                 <div>
-                  <div style="font-size:12.5px; font-weight:700; color:var(--ak-dark);">
+                  <div style="font-size:12.5px; font-weight:700; color:#0f172a;">
                     {{ $jrn->distribusi?->guru?->nama ?? '-' }}
                   </div>
-                  <div style="font-size:11.5px; color:var(--ak-primary); font-weight:600;">
+                  <div style="font-size:11.5px; color:#0f172a; font-weight:600;">
                     {{ $jrn->distribusi?->mataPelajaran?->nama_mapel ?? '-' }} · <span style="color:#64748b;">{{ $jrn->distribusi?->rombel?->nama_rombel }}</span>
                   </div>
                   <div style="font-size:11px; color:#94a3b8; margin-top:2px;">
@@ -277,7 +277,7 @@
     <div class="akademik-card" style="margin-bottom:0;">
       <div class="akademik-card-header">
         <h3 class="akademik-card-title">
-          <i class="bi bi-laptop text-primary"></i>
+          <i class="bi bi-laptop me-1" style="color:#475569;"></i>
           <span>Asesmen Ujian Daring</span>
         </h3>
         <a href="{{ route('akademik.asesmen.index') }}" class="ak-btn ak-btn-secondary ak-btn-sm" style="font-size:11.5px;">Kelola</a>
@@ -298,14 +298,14 @@
             @foreach($asesmenMendatang as $asm)
               <div style="padding:12px 16px; border-bottom:1px solid #f1f5f9; display:flex; justify-content:space-between; align-items:center; gap:10px;">
                 <div>
-                  <div style="font-size:12.5px; font-weight:700; color:var(--ak-dark);">
+                  <div style="font-size:12.5px; font-weight:700; color:#0f172a;">
                     {{ $asm->judul }}
                   </div>
                   <div style="font-size:11.5px; color:#64748b;">
                     {{ $asm->distribusi?->rombel?->nama_rombel }} · {{ $asm->distribusi?->mataPelajaran?->nama_mapel }}
                   </div>
                   <div style="margin-top:3px; display:flex; gap:6px;">
-                    <span class="ak-badge ak-badge-warning" style="font-size:10.5px;">
+                    <span class="ak-badge ak-badge-secondary" style="font-size:10.5px;">
                       <i class="bi bi-clock me-1"></i>{{ $asm->durasi_menit }} Menit
                     </span>
                   </div>

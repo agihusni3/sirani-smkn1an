@@ -246,14 +246,14 @@
       <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
         {{-- Info legend --}}
         <div style="display:flex; gap:6px; align-items:center; font-size:11.5px;">
-          <span style="background:#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe; padding:4px 10px; border-radius:6px; font-weight:700; display:inline-flex; align-items:center; gap:4px;">
-            <i class="bi bi-mortarboard-fill"></i> Jam KBM
+          <span style="background:#f1f5f9; color:#0f172a; border:1px solid #e2e8f0; padding:4px 10px; border-radius:6px; font-weight:700; display:inline-flex; align-items:center; gap:4px;">
+            <i class="bi bi-mortarboard-fill text-muted"></i> Jam KBM
           </span>
-          <span style="background:#fef2f2; color:#b91c1c; border:1px solid #fecaca; padding:4px 10px; border-radius:6px; font-weight:700; display:inline-flex; align-items:center; gap:4px;">
-            <i class="bi bi-cup-hot-fill"></i> Istirahat
+          <span style="background:#f8fafc; color:#475569; border:1px solid #e2e8f0; padding:4px 10px; border-radius:6px; font-weight:700; display:inline-flex; align-items:center; gap:4px;">
+            <i class="bi bi-cup-hot-fill text-muted"></i> Istirahat
           </span>
-          <span style="background:#f0fdf4; color:#15803d; border:1px solid #bbf7d0; padding:4px 10px; border-radius:6px; font-weight:700; display:inline-flex; align-items:center; gap:4px;">
-            <i class="bi bi-flag-fill"></i> Khusus
+          <span style="background:#f8fafc; color:#475569; border:1px solid #e2e8f0; padding:4px 10px; border-radius:6px; font-weight:700; display:inline-flex; align-items:center; gap:4px;">
+            <i class="bi bi-flag-fill text-muted"></i> Khusus
           </span>
         </div>
         <form action="{{ route('akademik.jadwal.update-pukul') }}" method="POST" style="margin:0;" onsubmit="return confirm('⚠️ Reset SEMUA pukul dan istirahat ke standar resmi SMKN 1 Air Naningan?\n\nSemua perubahan manual akan hilang!')">
@@ -278,12 +278,12 @@
       @php $globalRowIdx = 0; @endphp
 
       @foreach($jadwalWaktuFull as $hKbm => $rows)
-      <div style="margin-bottom:0; border-bottom:2px solid #e2e8f0;">
+      <div style="margin-bottom:0; border-bottom:1px solid #e2e8f0;">
         {{-- Header Hari --}}
-        <div style="padding:10px 20px; background:linear-gradient(135deg,#1e3a8a,#2563eb); color:#fff; display:flex; align-items:center; gap:12px; position:sticky; top:0; z-index:5;">
-          <span style="font-weight:900; font-size:14px; letter-spacing:0.8px;">{{ $hKbm }}</span>
-          <span style="background:rgba(255,255,255,0.18); padding:2px 10px; border-radius:20px; font-size:11.5px; font-weight:700; color:#e0e7ff;">{{ count($rows) }} Sesi</span>
-          <button type="button" onclick="tambahIstirahat('{{ $hKbm }}')" style="margin-left:auto; background:rgba(255,255,255,0.15); border:1px solid rgba(255,255,255,0.35); color:#fff; padding:5px 14px; border-radius:6px; font-size:12px; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; gap:6px; transition:all 0.2s;">
+        <div style="padding:10px 20px; background:#1e293b; color:#fff; display:flex; align-items:center; gap:12px; position:sticky; top:0; z-index:5;">
+          <span style="font-weight:900; font-size:13.5px; letter-spacing:0.8px;">{{ $hKbm }}</span>
+          <span style="background:rgba(255,255,255,0.15); padding:2px 10px; border-radius:20px; font-size:11.5px; font-weight:700; color:#f1f5f9;">{{ count($rows) }} Sesi</span>
+          <button type="button" onclick="tambahIstirahat('{{ $hKbm }}')" style="margin-left:auto; background:rgba(255,255,255,0.12); border:1px solid rgba(255,255,255,0.25); color:#fff; padding:5px 14px; border-radius:6px; font-size:12px; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; gap:6px; transition:all 0.2s;">
             <i class="bi bi-plus-circle-fill"></i> Tambah Istirahat
           </button>
         </div>
@@ -291,10 +291,10 @@
         <table style="width:100%; border-collapse:collapse; font-size:13px;">
           <thead>
             <tr style="background:#f8fafc; border-bottom:1px solid #e2e8f0;">
-              <th style="padding:10px 16px; text-align:center; width:70px; color:#64748b; font-weight:800; font-size:11px; letter-spacing:0.5px;">SESI</th>
-              <th style="padding:10px 16px; text-align:left; width:340px; color:#64748b; font-weight:800; font-size:11px; letter-spacing:0.5px;">LABEL / NAMA SESI</th>
-              <th style="padding:10px 16px; text-align:left; color:#64748b; font-weight:800; font-size:11px; letter-spacing:0.5px;">PUKUL <span style="font-weight:500; color:#94a3b8; text-transform:none;">(format: HH.MM - HH.MM)</span></th>
-              <th style="padding:10px 16px; text-align:center; width:60px; color:#64748b;"></th>
+              <th style="padding:10px 16px; text-align:center; width:70px; color:#475569; font-weight:700; font-size:11.5px; letter-spacing:0.5px;">SESI</th>
+              <th style="padding:10px 16px; text-align:left; width:340px; color:#475569; font-weight:700; font-size:11.5px; letter-spacing:0.5px;">LABEL / NAMA SESI</th>
+              <th style="padding:10px 16px; text-align:left; color:#475569; font-weight:700; font-size:11.5px; letter-spacing:0.5px;">PUKUL <span style="font-weight:500; color:#94a3b8; text-transform:none;">(format: HH.MM - HH.MM)</span></th>
+              <th style="padding:10px 16px; text-align:center; width:60px; color:#475569;"></th>
             </tr>
           </thead>
           <tbody id="tbody-{{ $hKbm }}">
@@ -306,16 +306,11 @@
                 $label   = $row['label'] ?? ($tipe === 'istirahat' ? 'Istirahat' : 'Jam ' . $jamKe);
                 $pukul   = $row['pukul'] ?? '';
 
-                // Warna baris per tipe
-                $bgRow = match($tipe) {
-                  'istirahat' => '#fff5f5',
-                  'khusus'    => '#f0fdf4',
-                  default     => ($loop->odd ? '#ffffff' : '#f8fafc'),
-                };
+                $bgRow = '#ffffff';
                 $badgeStyle = match($tipe) {
-                  'istirahat' => 'background:#fee2e2; color:#991b1b; border:1px solid #fca5a5;',
-                  'khusus'    => 'background:#dcfce7; color:#15803d; border:1px solid #86efac;',
-                  default     => 'background:#dbeafe; color:#1e40af; border:1px solid #93c5fd;',
+                  'istirahat' => 'background:#f8fafc; color:#475569; border:1px solid #e2e8f0;',
+                  'khusus'    => 'background:#f8fafc; color:#475569; border:1px solid #e2e8f0;',
+                  default     => 'background:#f1f5f9; color:#0f172a; border:1px solid #e2e8f0;',
                 };
                 $rowId = $globalRowIdx;
               @endphp
@@ -772,22 +767,13 @@ function tambahIstirahat(hari) {
                 </thead>
                 <tbody>
                   @foreach($gurus as $g)
-                    @php
-                      $roleBadgeStyle = match(true) {
-                        $g->kode_nomor === 1 => 'background:#fef3c7; color:#92400e;',
-                        $g->kode_nomor >= 2 && $g->kode_nomor <= 5 => 'background:#e0e7ff; color:#3730a3;',
-                        $g->kode_nomor >= 6 && $g->kode_nomor <= 8 => 'background:#dcfce7; color:#166534;',
-                        $g->kode_nomor >= 9 && $g->kode_nomor <= 13 => 'background:#ede9fe; color:#5b21b6;',
-                        default => 'background:#f1f5f9; color:#475569;',
-                      };
-                    @endphp
                     <tr>
                       <td style="text-align:center;">
                         <span class="roster-guru-badge">{{ $g->kode_nomor ?? '-' }}</span>
                       </td>
-                      <td style="font-weight:700; color:#1e293b;">{{ $g->nama }}</td>
+                      <td style="font-weight:700; color:#0f172a;">{{ $g->nama }}</td>
                       <td>
-                        <span style="display:inline-block; font-size:10.5px; font-weight:700; padding:2px 8px; border-radius:12px; white-space:nowrap; {{ $roleBadgeStyle }}">
+                        <span style="display:inline-block; font-size:11px; font-weight:600; padding:2px 8px; border-radius:6px; white-space:nowrap; background:#f8fafc; color:#475569; border:1px solid #e2e8f0;">
                           {{ $g->peran_struktural }}
                         </span>
                       </td>
@@ -1337,13 +1323,13 @@ function tambahIstirahat(hari) {
                 @if($bg->mapels->isEmpty())
                   <span style="font-size:11.5px; color:#94a3b8; font-style:italic;">Belum ada mapel diampu</span>
                 @else
-                  <div style="font-size:12px; font-weight:600; color:var(--ak-primary);">
+                  <div style="font-size:12.5px; font-weight:700; color:#0f172a;">
                     {{ $bg->mapels->implode(', ') }}
                   </div>
-                  <div style="font-size:10.5px; color:#64748b;">{{ $bg->total_rombel }} Rombel Diajar</div>
+                  <div style="font-size:11px; color:#64748b;">{{ $bg->total_rombel }} Rombel Diajar</div>
                 @endif
               </td>
-              <td style="text-align:center; font-weight:800; font-size:13px;">
+              <td style="text-align:center; font-weight:700; font-size:13px; color:#0f172a;">
                 {{ $bg->jtm_murni }} JP
               </td>
               <td>
@@ -1352,8 +1338,8 @@ function tambahIstirahat(hari) {
                 @else
                   <div style="display:flex; flex-direction:column; gap:2px;">
                     @foreach($bg->tugas_tambahan as $tt)
-                      <span style="font-size:11.5px; font-weight:600; color:var(--ak-dark);">
-                        • {{ $tt['nama'] }} <b class="text-primary">(+{{ $tt['jp'] }} JP)</b>
+                      <span style="font-size:11.5px; font-weight:600; color:#1e293b;">
+                        • {{ $tt['nama'] }} <span style="color:#64748b; font-weight:700;">(+{{ $tt['jp'] }} JP)</span>
                       </span>
                     @endforeach
                   </div>
@@ -1430,7 +1416,7 @@ function tambahIstirahat(hari) {
                 <div style="font-size:11px; color:#64748b;">NIP: {{ $d->guru?->nip ?? 'Non-NIP' }}</div>
               </td>
               <td>
-                <div style="font-weight:700; color:var(--ak-primary);">{{ $d->mataPelajaran?->nama_mapel ?? '-' }}</div>
+                <div style="font-weight:700; color:#0f172a;">{{ $d->mataPelajaran?->nama_mapel ?? '-' }}</div>
                 <div style="font-size:11px; color:#64748b;">Kode: {{ $d->mataPelajaran?->kode_mapel }} · {{ $d->mataPelajaran?->jenis_label }}</div>
               </td>
               <td>
@@ -1444,12 +1430,12 @@ function tambahIstirahat(hari) {
                 </div>
               </td>
               <td>
-                <span class="ak-badge ak-badge-primary">Sem {{ $d->semester }}</span>
+                <span class="ak-badge ak-badge-secondary">Sem {{ $d->semester }}</span>
               </td>
               <td>
-                <div style="font-weight:800; color:var(--ak-dark);">{{ $d->total_jam_per_minggu }} JP / Rombel</div>
+                <div style="font-weight:700; color:#0f172a;">{{ $d->total_jam_per_minggu }} JP / Rombel</div>
                 @if($d->rombels->count() > 1)
-                  <div style="font-size:11.5px; font-weight:800; color:var(--ak-primary); margin-top:2px;">
+                  <div style="font-size:11.5px; font-weight:700; color:#475569; margin-top:2px;">
                     Total: {{ $d->total_jam_akumulasi }} JP/Mgg
                   </div>
                 @endif

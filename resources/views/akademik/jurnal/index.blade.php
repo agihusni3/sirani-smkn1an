@@ -89,13 +89,13 @@
                   <div style="font-size:11px; color:#64748b;">{{ \Carbon\Carbon::parse($j->tanggal)->isoFormat('dddd') }}</div>
                 </td>
                 <td>
-                  <span class="ak-badge ak-badge-primary">Ke-{{ $j->pertemuan_ke }}</span>
+                  <span class="ak-badge ak-badge-secondary">Ke-{{ $j->pertemuan_ke }}</span>
                 </td>
                 <td>
-                  <div style="font-weight:700; color:var(--ak-dark);">{{ $j->distribusi?->guru?->nama ?? '-' }}</div>
+                  <div style="font-weight:700; color:#0f172a;">{{ $j->distribusi?->guru?->nama ?? '-' }}</div>
                 </td>
                 <td>
-                  <div style="font-weight:700; color:var(--ak-primary);">{{ $j->distribusi?->mataPelajaran?->nama_mapel ?? '-' }}</div>
+                  <div style="font-weight:700; color:#0f172a;">{{ $j->distribusi?->mataPelajaran?->nama_mapel ?? '-' }}</div>
                   <span class="ak-badge ak-badge-secondary" style="margin-top:2px;">{{ $j->distribusi?->rombel?->nama_rombel ?? '-' }}</span>
                 </td>
                 <td style="max-width:280px;">
@@ -109,9 +109,9 @@
                     $hadir = $j->hadir_count ?? ($j->relationLoaded('kehadirans') ? $j->kehadirans->where('status', 'hadir')->count() : 0);
                     $tidakHadir = $j->tidak_hadir_count ?? ($j->relationLoaded('kehadirans') ? $j->kehadirans->whereIn('status', ['izin', 'sakit', 'alfa'])->count() : 0);
                   @endphp
-                  <span class="ak-badge ak-badge-success">{{ $hadir }} Hadir</span>
+                  <span class="ak-badge ak-badge-secondary" style="font-weight:700;">{{ $hadir }} Hadir</span>
                   @if($tidakHadir > 0)
-                    <span class="ak-badge ak-badge-danger">{{ $tidakHadir }} Absen</span>
+                    <span class="ak-badge ak-badge-secondary" style="color:#64748b; font-weight:700;">{{ $tidakHadir }} Absen</span>
                   @endif
                 </td>
                 <td style="text-align:center;">

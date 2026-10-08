@@ -531,13 +531,13 @@
                   {{ $rpe['total_pekan'] }} Pekan
                 </td>
                 <td style="text-align:center;">
-                  <span class="badge" style="background:#eff6ff; color:#1d4ed8; font-weight:800; font-size:11px; padding:4px 9px; border:none;">
+                  <span style="background:#f1f5f9; color:#0f172a; font-weight:700; font-size:11.5px; padding:3px 9px; border-radius:6px; border:1px solid #e2e8f0;">
                     {{ $rpe['efektif'] }} Pekan
                   </span>
                 </td>
                 <td style="text-align:center;">
                   @if($rpe['non_efektif'] > 0)
-                    <span class="badge" style="background:#fffbeb; color:#b45309; font-weight:800; font-size:11px; padding:4px 9px; border:none;">
+                    <span style="background:#f8fafc; color:#475569; font-weight:700; font-size:11.5px; padding:3px 9px; border-radius:6px; border:1px solid #e2e8f0;">
                       {{ $rpe['non_efektif'] }} Pekan
                     </span>
                   @else
@@ -548,14 +548,14 @@
                   @if(!empty($rpe['agendas']))
                     <div style="display:flex; flex-wrap:wrap; gap:6px;">
                       @foreach($rpe['agendas'] as $ag)
-                        <span style="background:#f1f5f9; color:#334155; font-size:11px; font-weight:700; padding:2px 8px; border-radius:5px; border:none;">
+                        <span style="background:#f1f5f9; color:#334155; font-size:11px; font-weight:600; padding:2px 8px; border-radius:5px; border:1px solid #e2e8f0;">
                           M{{ $ag->minggu_ke }}: {{ $ag->keterangan }}
                         </span>
                       @endforeach
                     </div>
                   @else
-                    <span style="color:#16a34a; font-size:11px; font-weight:600;">
-                      <i class="bi bi-check2"></i> Pembelajaran Tatap Muka Penuh
+                    <span style="color:#64748b; font-size:11.5px; font-weight:600;">
+                      <i class="bi bi-check2 me-1"></i> Pembelajaran Tatap Muka Penuh
                     </span>
                   @endif
                 </td>

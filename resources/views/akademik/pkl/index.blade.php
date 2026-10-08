@@ -38,36 +38,36 @@
 
   <div class="akademik-kpi-card">
     <div>
-      <div class="akademik-kpi-val" style="color:#059669;">
+      <div class="akademik-kpi-val" style="color:#0f172a;">
         {{ $siswaPkls->where('status', 'aktif')->count() }}
       </div>
       <div class="akademik-kpi-label">Siswa Sedang PKL Aktif</div>
     </div>
-    <div class="akademik-kpi-icon icon-emerald">
+    <div class="akademik-kpi-icon">
       <i class="bi bi-person-workspace"></i>
     </div>
   </div>
 
   <div class="akademik-kpi-card">
     <div>
-      <div class="akademik-kpi-val" style="color:#d97706;">
+      <div class="akademik-kpi-val" style="color:#0f172a;">
         {{ $siswaPkls->where('status', 'belum_berangkat')->count() }}
       </div>
       <div class="akademik-kpi-label">Menunggu Keberangkatan</div>
     </div>
-    <div class="akademik-kpi-icon icon-amber">
+    <div class="akademik-kpi-icon">
       <i class="bi bi-hourglass-split"></i>
     </div>
   </div>
 
   <div class="akademik-kpi-card">
     <div>
-      <div class="akademik-kpi-val" style="color:#4f46e5;">
+      <div class="akademik-kpi-val" style="color:#0f172a;">
         {{ $siswaPkls->where('status', 'selesai')->count() }}
       </div>
       <div class="akademik-kpi-label">Selesai Magang</div>
     </div>
-    <div class="akademik-kpi-icon icon-indigo">
+    <div class="akademik-kpi-icon">
       <i class="bi bi-check2-circle"></i>
     </div>
   </div>
@@ -111,13 +111,13 @@
                   <div style="font-size:11px; color:#64748b;">{{ $sp->siswa?->rombel?->nama_rombel ?? '-' }}</div>
                 </td>
                 <td>
-                  <div style="font-weight:700; color:var(--ak-primary);">{{ $sp->pklTempat?->nama_dudi ?? '-' }}</div>
+                  <div style="font-weight:700; color:#0f172a;">{{ $sp->pklTempat?->nama_dudi ?? '-' }}</div>
                   <div style="font-size:11px; color:#64748b;">{{ $sp->pklTempat?->kota ?? 'Lampung' }} · Pembimbing DU/DI: {{ $sp->pklTempat?->nama_pembimbing_dudi ?? '-' }}</div>
                 </td>
                 <td>
-                  <div style="font-weight:600;">{{ $sp->guruPembimbing?->nama ?? '-' }}</div>
+                  <div style="font-weight:600; color:#1e293b;">{{ $sp->guruPembimbing?->nama ?? '-' }}</div>
                 </td>
-                <td style="font-size:12px;">
+                <td style="font-size:12px; color:#334155;">
                   {{ $sp->tanggal_mulai ? \Carbon\Carbon::parse($sp->tanggal_mulai)->isoFormat('D MMM') : '-' }} s/d 
                   {{ $sp->tanggal_selesai ? \Carbon\Carbon::parse($sp->tanggal_selesai)->isoFormat('D MMM Y') : '-' }}
                 </td>
@@ -125,15 +125,15 @@
                   @if($sp->status == 'aktif')
                     <span class="ak-badge ak-badge-success">Aktif Magang</span>
                   @elseif($sp->status == 'selesai')
-                    <span class="ak-badge ak-badge-primary">Selesai</span>
+                    <span class="ak-badge ak-badge-secondary">Selesai</span>
                   @else
                     <span class="ak-badge ak-badge-warning">Persiapan</span>
                   @endif
                 </td>
                 <td>
                   @if($sp->nilai_pkl)
-                    <span style="font-weight:800; color:var(--ak-primary);">{{ $sp->nilai_pkl }}</span>
-                    <span class="ak-badge ak-badge-success">{{ $sp->predikat_pkl }}</span>
+                    <span style="font-weight:700; color:#0f172a;">{{ $sp->nilai_pkl }}</span>
+                    <span class="ak-badge ak-badge-secondary">{{ $sp->predikat_pkl }}</span>
                   @else
                     <span style="color:#94a3b8; font-size:12px;">Belum dinilai</span>
                   @endif

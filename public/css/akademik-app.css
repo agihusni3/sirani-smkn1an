@@ -1,12 +1,12 @@
 :root {
-  --ak-primary: #7c3aed;
-  --ak-primary-hover: #6d28d9;
-  --ak-primary-light: #f5f3ff;
-  --ak-primary-ring: rgba(124, 58, 237, 0.25);
-  --ak-indigo: #4f46e5;
-  --ak-emerald: #059669;
-  --ak-amber: #d97706;
-  --ak-rose: #e11d48;
+  --ak-primary: #0f172a;
+  --ak-primary-hover: #1e293b;
+  --ak-primary-light: #f1f5f9;
+  --ak-primary-ring: rgba(15, 23, 42, 0.18);
+  --ak-indigo: #1e293b;
+  --ak-emerald: #334155;
+  --ak-amber: #475569;
+  --ak-rose: #475569;
   --ak-dark: #0f172a;
   --ak-slate-50: #f8fafc;
   --ak-slate-100: #f1f5f9;
@@ -15,10 +15,10 @@
   --ak-slate-600: #475569;
   --ak-slate-800: #1e293b;
   --ak-card-bg: #ffffff;
-  --ak-radius: 14px;
-  --ak-shadow-sm: 0 1px 3px rgba(0,0,0,0.05), 0 1px 2px rgba(0,0,0,0.03);
-  --ak-shadow: 0 4px 6px -1px rgba(0,0,0,0.06), 0 2px 4px -1px rgba(0,0,0,0.03);
-  --ak-shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.08), 0 4px 6px -2px rgba(0,0,0,0.04);
+  --ak-radius: 12px;
+  --ak-shadow-sm: 0 1px 3px rgba(0,0,0,0.04);
+  --ak-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+  --ak-shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.06);
 }
 
 body.akademik-body {
@@ -92,13 +92,13 @@ body.akademik-body {
   width: 40px;
   height: 40px;
   border-radius: 10px;
-  background: linear-gradient(135deg, #7c3aed, #4f46e5);
+  background: #0f172a;
   display: flex;
   align-items: center;
   justify-content: center;
   color: #ffffff;
   font-size: 20px;
-  box-shadow: 0 4px 10px rgba(124, 58, 237, 0.3);
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.15);
 }
 
 .akademik-brand-name {
@@ -130,8 +130,8 @@ body.akademik-body {
 }
 
 .akademik-dcc-pill:hover {
-  background: #ede9fe;
-  color: var(--ak-primary);
+  background: #e2e8f0;
+  color: #0f172a;
 }
 
 .akademik-nav-body {
@@ -174,19 +174,19 @@ body.akademik-body {
 }
 
 .akademik-nav-link:hover .akademik-nav-link-left i {
-  color: #4f46e5;
+  color: #0f172a;
   transform: translateX(1px);
 }
 
 .akademik-nav-link.active {
-  background: #eff2fe;
-  color: #3730a3;
+  background: #f1f5f9;
+  color: #0f172a;
   font-weight: 700;
-  box-shadow: inset 3px 0 0 #4f46e5;
+  box-shadow: inset 3px 0 0 #0f172a;
 }
 
 .akademik-nav-link.active .akademik-nav-link-left i {
-  color: #4f46e5;
+  color: #0f172a;
 }
 
 .akademik-nav-link-left {
@@ -323,14 +323,15 @@ body.akademik-body {
 /* Hero Welcome Banner                                                        */
 /* ========================================================================== */
 .akademik-hero {
-  background: linear-gradient(135deg, #2e1065 0%, #581c87 35%, #7c3aed 75%, #4f46e5 100%);
-  border-radius: 18px;
-  padding: 28px 32px;
+  background: #0f172a;
+  border: 1px solid #1e293b;
+  border-radius: 16px;
+  padding: 26px 30px;
   color: #ffffff;
   margin-bottom: 24px;
   position: relative;
   overflow: hidden;
-  box-shadow: 0 12px 30px -6px rgba(107, 33, 168, 0.35);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
 }
 
 .akademik-hero::before {
@@ -341,7 +342,7 @@ body.akademik-body {
   width: 280px;
   height: 280px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0) 70%);
+  background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0) 70%);
   pointer-events: none;
 }
 
@@ -353,7 +354,7 @@ body.akademik-body {
   width: 200px;
   height: 200px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(168,85,247,0.25) 0%, rgba(168,85,247,0) 70%);
+  background: radial-gradient(circle, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0) 70%);
   pointer-events: none;
 }
 
@@ -520,13 +521,17 @@ body.akademik-body {
   flex-shrink: 0;
 }
 
-.icon-violet  { background: #f5f3ff; color: #7c3aed; }
-.icon-indigo  { background: #e0e7ff; color: #4f46e5; }
-.icon-emerald { background: #ecfdf5; color: #059669; }
-.icon-amber   { background: #fef3c7; color: #d97706; }
-.icon-rose    { background: #ffe4e6; color: #e11d48; }
-.icon-cyan    { background: #cffafe; color: #0891b2; }
-.icon-blue    { background: #dbeafe; color: #2563eb; }
+.icon-violet,
+.icon-indigo,
+.icon-emerald,
+.icon-amber,
+.icon-rose,
+.icon-cyan,
+.icon-blue {
+  background: #f1f5f9;
+  color: #334155;
+  border: 1px solid #e2e8f0;
+}
 
 /* ========================================================================== */
 /* Module Quick Hub (Pusat Akses Cepat Modul)                                 */
@@ -653,21 +658,22 @@ body.akademik-body {
 
 .akademik-table th {
   background: #f8fafc;
-  padding: 11px 16px;
+  padding: 12px 16px;
   font-weight: 700;
-  color: #475569;
-  border-bottom: 1px solid var(--ak-slate-200);
+  color: #334155;
+  border-bottom: 1px solid #e2e8f0;
   white-space: nowrap;
 }
 
 .akademik-table td {
   padding: 12px 16px;
-  border-bottom: 1px solid var(--ak-slate-100);
+  border-bottom: 1px solid #f1f5f9;
   vertical-align: middle;
+  color: #0f172a;
 }
 
 .akademik-table tbody tr:hover {
-  background: #f8faff;
+  background: #f8fafc;
 }
 
 /* Badges */
@@ -681,11 +687,12 @@ body.akademik-body {
   font-weight: 700;
 }
 
-.ak-badge-primary { background: #f5f3ff; color: #7c3aed; border: 1px solid #e9d5ff; }
-.ak-badge-success { background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0; }
-.ak-badge-warning { background: #fef3c7; color: #b45309; border: 1px solid #fde68a; }
-.ak-badge-danger { background: #ffe4e6; color: #e11d48; border: 1px solid #fecdd3; }
+.ak-badge-primary { background: #f1f5f9; color: #0f172a; border: 1px solid #cbd5e1; }
+.ak-badge-success { background: #f8fafc; color: #0f172a; border: 1px solid #e2e8f0; }
+.ak-badge-warning { background: #f8fafc; color: #334155; border: 1px solid #e2e8f0; }
+.ak-badge-danger { background: #f8fafc; color: #0f172a; border: 1px solid #e2e8f0; }
 .ak-badge-secondary { background: #f1f5f9; color: #475569; border: 1px solid #e2e8f0; }
+.ak-badge-info { background: #f1f5f9; color: #334155; border: 1px solid #e2e8f0; }
 
 /* Buttons */
 .ak-btn {
@@ -977,56 +984,30 @@ body.akademik-body {
 /* Headers */
 .roster-th-identitas,
 .roster-th-dark {
-  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%) !important;
+  background: #0f172a !important;
   color: #ffffff !important;
   font-weight: 800;
   font-size: 11.5px;
   letter-spacing: 0.8px;
   padding: 9px 4px;
   vertical-align: middle;
-  border-bottom: 2px solid #4338ca !important;
-  text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+  border-bottom: 2px solid #0f172a !important;
+  text-shadow: none;
 }
 
-.roster-th-kelas-x {
-  background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
-  color: #ffffff;
-  font-weight: 800;
-  font-size: 12px;
-  padding: 9px 6px;
-  letter-spacing: 0.6px;
-  text-shadow: 0 1px 2px rgba(0,0,0,0.2);
-}
-
-.roster-th-kelas-xi {
-  background: linear-gradient(135deg, #0369a1 0%, #0284c7 100%);
-  color: #ffffff;
-  font-weight: 800;
-  font-size: 12px;
-  padding: 9px 6px;
-  letter-spacing: 0.6px;
-  text-shadow: 0 1px 2px rgba(0,0,0,0.2);
-}
-
-.roster-th-kelas-xii {
-  background: linear-gradient(135deg, #b45309 0%, #f59e0b 100%);
-  color: #ffffff;
-  font-weight: 800;
-  font-size: 12px;
-  padding: 9px 6px;
-  letter-spacing: 0.6px;
-  text-shadow: 0 1px 2px rgba(0,0,0,0.2);
-}
-
+.roster-th-kelas-x,
+.roster-th-kelas-xi,
+.roster-th-kelas-xii,
 .roster-th-piket {
-  background: linear-gradient(135deg, #065f46 0%, #10b981 100%);
-  color: #ffffff;
+  background: #1e293b !important;
+  color: #ffffff !important;
   font-weight: 800;
   font-size: 12px;
   padding: 9px 6px;
   letter-spacing: 0.6px;
   vertical-align: middle;
-  text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+  border-bottom: 2px solid #0f172a !important;
+  text-shadow: none;
 }
 
 /* Sub-headers */
@@ -1035,24 +1016,12 @@ body.akademik-body {
   vertical-align: middle;
 }
 
-.th-sub-aphp {
-  background: #f0fdf4 !important;
-  border-bottom: 2px solid #86efac !important;
-}
-
-.th-sub-rpl {
-  background: #eff6ff !important;
-  border-bottom: 2px solid #93c5fd !important;
-}
-
-.th-sub-tsm {
-  background: #fff7ed !important;
-  border-bottom: 2px solid #fdba74 !important;
-}
-
+.th-sub-aphp,
+.th-sub-rpl,
+.th-sub-tsm,
 .th-sub-pkl {
-  background: #fefce8 !important;
-  border-bottom: 2px solid #fde047 !important;
+  background: #f8fafc !important;
+  border-bottom: 2px solid #cbd5e1 !important;
 }
 
 .sub-pill {
@@ -1063,24 +1032,18 @@ body.akademik-body {
   padding: 3px 10px;
   border-radius: 5px;
   text-transform: uppercase;
+  background: #f1f5f9 !important;
+  color: #1e293b !important;
+  border: 1px solid #cbd5e1 !important;
 }
 
-.pill-aphp {
-  background: #dcfce7;
-  color: #166534;
-  border: 1px solid #86efac;
-}
-
-.pill-rpl {
-  background: #dbeafe;
-  color: #1e40af;
-  border: 1px solid #93c5fd;
-}
-
-.pill-tsm {
-  background: #ffedd5;
-  color: #9a3412;
-  border: 1px solid #fdba74;
+.pill-aphp,
+.pill-rpl,
+.pill-tsm,
+.pill-pkl {
+  background: #f1f5f9 !important;
+  color: #1e293b !important;
+  border: 1px solid #cbd5e1 !important;
 }
 
 .pill-pkl {
@@ -1111,56 +1074,34 @@ body.akademik-body {
   margin: 0 auto;
   display: inline-block;
   color: #ffffff;
+  background: #1e293b;
+  border: 1px solid #0f172a;
 }
 
-.day-badge-senin {
-  background: linear-gradient(180deg, #1d4ed8 0%, #2563eb 100%);
-  border: 1px solid #1e40af;
-  box-shadow: 0 2px 4px rgba(29, 78, 216, 0.25);
-}
-
-.day-badge-selasa {
-  background: linear-gradient(180deg, #0f766e 0%, #0d9488 100%);
-  border: 1px solid #115e59;
-  box-shadow: 0 2px 4px rgba(15, 118, 110, 0.25);
-}
-
-.day-badge-rabu {
-  background: linear-gradient(180deg, #6d28d9 0%, #7c3aed 100%);
-  border: 1px solid #5b21b6;
-  box-shadow: 0 2px 4px rgba(109, 40, 217, 0.25);
-}
-
-.day-badge-kamis {
-  background: linear-gradient(180deg, #b45309 0%, #d97706 100%);
-  border: 1px solid #92400e;
-  box-shadow: 0 2px 4px rgba(180, 83, 9, 0.25);
-}
-
-.day-badge-jumat {
-  background: linear-gradient(180deg, #047857 0%, #059669 100%);
-  border: 1px solid #064e3b;
-  box-shadow: 0 2px 4px rgba(4, 120, 87, 0.25);
-}
-
+.day-badge-senin,
+.day-badge-selasa,
+.day-badge-rabu,
+.day-badge-kamis,
+.day-badge-jumat,
 .day-badge-sabtu {
-  background: linear-gradient(180deg, #3730a3 0%, #4338ca 100%);
-  border: 1px solid #312e81;
-  box-shadow: 0 2px 4px rgba(55, 48, 163, 0.25);
+  background: #1e293b;
+  border: 1px solid #0f172a;
+  color: #ffffff;
+  box-shadow: none;
 }
 
 /* Jam Ke & Pukul (Anchor Time Columns) */
 .roster-cell-jam {
   background: #f8fafc;
   font-weight: 800;
-  color: #4338ca;
+  color: #0f172a;
   font-size: 11.5px;
   padding: 6px 4px;
 }
 
 .roster-cell-pukul {
   background: #f8fafc;
-  font-size: 9.5px;
+  font-size: 10px;
   color: #475569;
   font-weight: 700;
   font-family: var(--font-mono, monospace);
@@ -1171,20 +1112,20 @@ body.akademik-body {
 
 .roster-table tbody tr:hover td.roster-cell-jam,
 .roster-table tbody tr:hover td.roster-cell-pukul {
-  background: #e0e7ff !important;
-  color: #312e81 !important;
+  background: #f1f5f9 !important;
+  color: #0f172a !important;
 }
 
 .roster-row-break .roster-cell-jam,
 .roster-row-break .roster-cell-pukul {
-  background: #fff7ed !important;
-  color: #c2410c !important;
+  background: #f8fafc !important;
+  color: #475569 !important;
   font-weight: 800;
 }
 
 /* Column Division Border between Classes */
 .roster-col-divider {
-  border-right: 2.5px solid #94a3b8 !important;
+  border-right: 2px solid #cbd5e1 !important;
 }
 
 /* Interactive Schedule Cell */
@@ -1200,26 +1141,17 @@ body.akademik-body {
   overflow: hidden;
 }
 
-/* Jurusan Subtle Column Tints */
-.slot-aphp {
-  background: #fcfefc;
-}
-.slot-rpl {
-  background: #f8fbff;
-}
+/* Consistent Neutral Column Backgrounds */
+.slot-aphp,
+.slot-rpl,
 .slot-tsm {
-  background: #fffdf9;
+  background: #ffffff;
 }
 
-/* Hover States per Jurusan */
-.slot-aphp:hover {
-  background: #ecfdf5 !important;
-}
-.slot-rpl:hover {
-  background: #eff6ff !important;
-}
+.slot-aphp:hover,
+.slot-rpl:hover,
 .slot-tsm:hover {
-  background: #fff7ed !important;
+  background: #f8fafc !important;
 }
 
 .roster-cell-readonly {
@@ -1231,9 +1163,9 @@ body.akademik-body {
 }
 
 .roster-cell-locked {
-  outline: 2px solid #f59e0b;
+  outline: 2px solid #94a3b8;
   outline-offset: -2px;
-  background: #fffbeb !important;
+  background: #f8fafc !important;
 }
 
 .roster-slot-card {
@@ -1251,22 +1183,21 @@ body.akademik-body {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%) !important;
+  background: #0f172a !important;
   color: #ffffff !important;
   font-weight: 800;
-  font-size: 10px;
+  font-size: 10.5px;
   min-width: 22px;
   height: 20px;
   padding: 0 4px;
   border-radius: 4px;
   flex-shrink: 0;
-  box-shadow: 0 1px 3px rgba(30, 64, 175, 0.25);
 }
 
 .roster-mapel-name {
-  font-weight: 800;
-  font-size: 11px;
-  color: #1e293b;
+  font-weight: 700;
+  font-size: 11.5px;
+  color: #0f172a;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -1279,18 +1210,24 @@ body.akademik-body {
   font-weight: 800;
   padding: 1px 4px;
   border-radius: 3px;
-  color: #ffffff;
+  background: #f1f5f9 !important;
+  color: #334155 !important;
+  border: 1px solid #cbd5e1;
   white-space: nowrap;
 }
 
-.badge-lab-komp { background: #0284c7; }
-.badge-lab-aphp { background: #059669; }
-.badge-bengkel  { background: #ea580c; }
-.badge-custom   { background: #6366f1; }
+.badge-lab-komp,
+.badge-lab-aphp,
+.badge-bengkel,
+.badge-custom {
+  background: #f1f5f9 !important;
+  color: #334155 !important;
+  border: 1px solid #cbd5e1;
+}
 
 .roster-lock-badge {
   font-size: 10px;
-  color: #d97706;
+  color: #64748b;
   flex-shrink: 0;
 }
 
@@ -1308,77 +1245,74 @@ body.akademik-body {
   user-select: none;
 }
 
-.slot-aphp .roster-empty-slot { color: #86efac; }
-.slot-aphp:hover .roster-empty-slot {
-  background: #dcfce7;
-  color: #15803d;
+.slot-aphp .roster-empty-slot,
+.slot-rpl .roster-empty-slot,
+.slot-tsm .roster-empty-slot {
+  color: #94a3b8;
 }
 
-.slot-rpl .roster-empty-slot { color: #93c5fd; }
-.slot-rpl:hover .roster-empty-slot {
-  background: #dbeafe;
-  color: #1d4ed8;
-}
-
-.slot-tsm .roster-empty-slot { color: #fdba74; }
+.slot-aphp:hover .roster-empty-slot,
+.slot-rpl:hover .roster-empty-slot,
 .slot-tsm:hover .roster-empty-slot {
-  background: #ffedd5;
-  color: #c2410c;
+  background: #f1f5f9;
+  color: #0f172a;
 }
 
 /* Ceremony & Break Banners */
 .roster-banner-upacara {
-  background: linear-gradient(90deg, #dc2626 0%, #ef4444 50%, #dc2626 100%);
-  color: #ffffff;
+  background: #f1f5f9;
+  color: #0f172a;
   font-weight: 800;
   font-size: 11.5px;
   letter-spacing: 1.5px;
   padding: 8px 12px;
   text-transform: uppercase;
-  text-shadow: 0 1px 2px rgba(0,0,0,0.25);
+  border-top: 1px solid #e2e8f0;
+  border-bottom: 1px solid #e2e8f0;
 }
 
 .roster-banner-apel {
-  background: linear-gradient(90deg, #d97706 0%, #f59e0b 50%, #d97706 100%);
-  color: #ffffff;
+  background: #f1f5f9;
+  color: #0f172a;
   font-weight: 800;
   font-size: 11px;
   letter-spacing: 1.2px;
   padding: 8px 12px;
   text-transform: uppercase;
-  text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+  border-top: 1px solid #e2e8f0;
+  border-bottom: 1px solid #e2e8f0;
 }
 
 .roster-banner-jumat {
-  background: linear-gradient(90deg, #059669 0%, #10b981 50%, #059669 100%);
-  color: #ffffff;
+  background: #f1f5f9;
+  color: #0f172a;
   font-weight: 800;
   font-size: 11px;
   letter-spacing: 1.2px;
   padding: 8px 12px;
   text-transform: uppercase;
-  text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+  border-top: 1px solid #e2e8f0;
+  border-bottom: 1px solid #e2e8f0;
 }
 
 .roster-banner-istirahat {
-  background: linear-gradient(90deg, #fff7ed 0%, #ffedd5 50%, #fff7ed 100%);
-  color: #c2410c;
+  background: #f8fafc;
+  color: #475569;
   font-weight: 800;
   font-size: 11px;
   letter-spacing: 1.2px;
   padding: 7px 12px;
-  border-top: 1.5px dashed #fdba74;
-  border-bottom: 1.5px dashed #fdba74;
+  border-top: 1px solid #e2e8f0;
+  border-bottom: 1px solid #e2e8f0;
 }
 
 /* PKL (Kelas XII) Unified Column */
 .roster-cell-pkl-unified {
-  background: linear-gradient(180deg, #fefce8 0%, #fef9c3 50%, #fef08a 100%);
-  border-right: 2.5px solid #94a3b8 !important;
+  background: #f8fafc;
+  border-right: 2px solid #cbd5e1 !important;
   padding: 10px 4px;
   vertical-align: middle;
   text-align: center;
-  box-shadow: inset 0 0 10px rgba(234, 179, 8, 0.08);
 }
 
 .roster-pkl-unified-box {
@@ -1396,7 +1330,7 @@ body.akademik-body {
   font-weight: 900;
   font-size: 11.5px;
   letter-spacing: 2.5px;
-  color: #854d0e;
+  color: #334155;
   text-transform: uppercase;
 }
 

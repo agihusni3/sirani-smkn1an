@@ -89,19 +89,19 @@
     <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap:12px; margin-top:16px;">
       <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:12px 16px;">
         <div style="font-size:11px; font-weight:700; color:#64748b; text-transform:uppercase;">Jumlah Pekan</div>
-        <div style="font-size:22px; font-weight:900; color:var(--ak-dark); margin-top:2px;">{{ $totalPekan }} <span style="font-size:12px; font-weight:600; color:#64748b;">Pekan</span></div>
+        <div style="font-size:22px; font-weight:900; color:#0f172a; margin-top:2px;">{{ $totalPekan }} <span style="font-size:12px; font-weight:600; color:#64748b;">Pekan</span></div>
       </div>
-      <div style="background:#eff6ff; border:1px solid #bfdbfe; border-radius:10px; padding:12px 16px;">
-        <div style="font-size:11px; font-weight:700; color:#1e40af; text-transform:uppercase;">Pekan Efektif KBM</div>
-        <div style="font-size:22px; font-weight:900; color:#1e40af; margin-top:2px;">{{ $rpePekanEfektif }} <span style="font-size:12px; font-weight:600; color:#3b82f6;">Pekan</span></div>
+      <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:12px 16px;">
+        <div style="font-size:11px; font-weight:700; color:#64748b; text-transform:uppercase;">Pekan Efektif KBM</div>
+        <div style="font-size:22px; font-weight:900; color:#0f172a; margin-top:2px;">{{ $rpePekanEfektif }} <span style="font-size:12px; font-weight:600; color:#64748b;">Pekan</span></div>
       </div>
-      <div style="background:#fffbeb; border:1px solid #fde68a; border-radius:10px; padding:12px 16px;">
-        <div style="font-size:11px; font-weight:700; color:#92400e; text-transform:uppercase;">Non-Efektif / Cadangan</div>
-        <div style="font-size:22px; font-weight:900; color:#92400e; margin-top:2px;">{{ $rpeCadangan }} <span style="font-size:12px; font-weight:600; color:#d97706;">Pekan</span></div>
+      <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:12px 16px;">
+        <div style="font-size:11px; font-weight:700; color:#64748b; text-transform:uppercase;">Non-Efektif / Cadangan</div>
+        <div style="font-size:22px; font-weight:900; color:#0f172a; margin-top:2px;">{{ $rpeCadangan }} <span style="font-size:12px; font-weight:600; color:#64748b;">Pekan</span></div>
       </div>
-      <div style="background:#f0fdf4; border:1px solid #bbf7d0; border-radius:10px; padding:12px 16px;">
-        <div style="font-size:11px; font-weight:700; color:#166534; text-transform:uppercase;">Total Beban JP</div>
-        <div style="font-size:22px; font-weight:900; color:#166534; margin-top:2px;">{{ $totalJpSemester }} <span style="font-size:12px; font-weight:700; color:#15803d;">JP ({{ $jamPerMinggu }} JP/Mgg)</span></div>
+      <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:12px 16px;">
+        <div style="font-size:11px; font-weight:700; color:#64748b; text-transform:uppercase;">Total Beban JP</div>
+        <div style="font-size:22px; font-weight:900; color:#0f172a; margin-top:2px;">{{ $totalJpSemester }} <span style="font-size:12px; font-weight:700; color:#64748b;">JP ({{ $jamPerMinggu }} JP/Mgg)</span></div>
       </div>
     </div>
   </div>
@@ -109,12 +109,12 @@
   {{-- Tabel Program Semester (Promes) --}}
   <div class="akademik-card" style="margin-bottom:24px;">
     <div class="akademik-card-header" style="background:#f8fafc; display:flex; justify-content:space-between; align-items:center; padding:14px 20px;">
-      <h3 class="akademik-card-title" style="font-size:15px; margin:0;">
-        <i class="bi bi-calendar-range text-primary me-2"></i>
+      <h3 class="akademik-card-title" style="font-size:15px; margin:0; color:#0f172a;">
+        <i class="bi bi-calendar-range me-2" style="color:#475569;"></i>
         Distribusi Program Semester (Promes) — Semester {{ $activePerangkat->semester == 1 ? '1 (Juli - Des)' : '2 (Jan - Jun)' }}
       </h3>
       <div style="display:flex; align-items:center; gap:8px;">
-        <span class="ak-badge ak-badge-primary" style="font-weight:700; font-size:11.5px;">
+        <span class="ak-badge ak-badge-secondary" style="font-weight:700; font-size:11.5px;">
           {{ $atpItems->count() }} Tujuan Pembelajaran ({{ $atpItems->sum('alokasi_jp') }} JP)
         </span>
       </div>
@@ -136,7 +136,7 @@
               <th rowspan="2">Materi Pokok &amp; Tujuan Pembelajaran</th>
               <th rowspan="2" style="width:65px; text-align:center;">JP</th>
               @foreach($months as $mName => $weeks)
-                <th colspan="{{ $weeks }}" style="text-align:center; background:#f1f5f9; border-left:1px solid #cbd5e1; font-weight:800;">
+                <th colspan="{{ $weeks }}" style="text-align:center; background:#f1f5f9; border-left:1px solid #cbd5e1; font-weight:800; color:#1e293b;">
                   {{ $mName }}
                 </th>
               @endforeach
@@ -150,10 +150,10 @@
                     $isEfektifHead = $kaldikItem ? $kaldikItem->isEfektif() : true;
                     $agendaTag = ($kaldikItem && !$isEfektifHead) ? $kaldikItem->getLabelSingkat() : null;
                   @endphp
-                  <th style="width:26px; text-align:center; padding:4px 2px; font-size:10px; border-left:{{ $w==1 ? '1px solid #cbd5e1' : 'none' }}; background:{{ $isEfektifHead ? '#ffffff' : '#fff7ed' }}; color:{{ $isEfektifHead ? '#0f172a' : '#c2410c' }};" title="{{ $kaldikItem?->keterangan ?? 'KBM Efektif' }}">
+                  <th style="width:26px; text-align:center; padding:4px 2px; font-size:10px; border-left:{{ $w==1 ? '1px solid #cbd5e1' : 'none' }}; background:{{ $isEfektifHead ? '#ffffff' : '#f1f5f9' }}; color:#334155;" title="{{ $kaldikItem?->keterangan ?? 'KBM Efektif' }}">
                     <div>{{ $w }}</div>
                     @if($agendaTag)
-                      <span style="display:block; font-size:7.5px; font-weight:900; line-height:1; color:#ea580c; text-transform:uppercase;">{{ $agendaTag }}</span>
+                      <span style="display:block; font-size:7.5px; font-weight:900; line-height:1; color:#64748b; text-transform:uppercase;">{{ $agendaTag }}</span>
                     @endif
                   </th>
                   @php $headWeekCounter++; @endphp
@@ -177,15 +177,15 @@
                 }
               @endphp
               <tr>
-                <td style="text-align:center; font-weight:800;">{{ $loop->iteration }}</td>
+                <td style="text-align:center; font-weight:800; color:#64748b;">{{ $loop->iteration }}</td>
                 <td>
-                  <span class="ak-badge ak-badge-primary" style="font-size:11px; font-weight:800;">{{ $atp->kode_tp }}</span>
+                  <span class="ak-badge ak-badge-secondary" style="font-size:11px; font-weight:800;">{{ $atp->kode_tp }}</span>
                 </td>
                 <td>
-                  <div style="font-weight:700; color:var(--ak-dark);">{{ $atp->materi_pokok }}</div>
+                  <div style="font-weight:700; color:#0f172a;">{{ $atp->materi_pokok }}</div>
                   <div style="font-size:11.5px; color:#64748b;">{{ $atp->tujuan_pembelajaran }}</div>
                 </td>
-                <td style="text-align:center; font-weight:900; color:var(--ak-primary);">
+                <td style="text-align:center; font-weight:900; color:#0f172a;">
                   {{ $atp->alokasi_jp }}
                 </td>
 
@@ -198,13 +198,13 @@
                       $isNonEfektifWeek = $kaldikItem && !$kaldikItem->isEfektif();
                       $isAllocatedHere = in_array($weekCounter, $allocatedGlobalWeeks);
                     @endphp
-                    <td style="text-align:center; padding:2px; border-left:{{ $w==1 ? '1px solid #cbd5e1' : 'none' }}; background:{{ $isNonEfektifWeek ? '#fef3c7' : ($isAllocatedHere ? '#eff6ff' : 'transparent') }};" title="{{ $isNonEfektifWeek ? ($kaldikItem?->keterangan ?: 'Non-Efektif') : ($isAllocatedHere ? ($atp->materi_pokok . ' (' . $jamPerMinggu . ' JP)') : '') }}">
+                    <td style="text-align:center; padding:2px; border-left:{{ $w==1 ? '1px solid #cbd5e1' : 'none' }}; background:{{ $isNonEfektifWeek ? '#f1f5f9' : ($isAllocatedHere ? '#f8fafc' : 'transparent') }};" title="{{ $isNonEfektifWeek ? ($kaldikItem?->keterangan ?: 'Non-Efektif') : ($isAllocatedHere ? ($atp->materi_pokok . ' (' . $jamPerMinggu . ' JP)') : '') }}">
                       @if($isNonEfektifWeek)
-                        <span style="font-weight:800; color:#b45309; font-size:8px; opacity:0.85;">
+                        <span style="font-weight:800; color:#64748b; font-size:8px;">
                           {{ $kaldikItem->getLabelSingkat() }}
                         </span>
                       @elseif($isAllocatedHere)
-                        <span style="font-weight:900; color:#2563eb; font-size:11px;">{{ $jamPerMinggu }}</span>
+                        <span style="font-weight:900; color:#0f172a; font-size:11px;">{{ $jamPerMinggu }}</span>
                       @endif
                     </td>
                     @php $weekCounter++; @endphp

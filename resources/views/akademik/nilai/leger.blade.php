@@ -99,7 +99,7 @@
                   @endphp
                   <td style="text-align:center;">
                     @if($score !== null && $score > 0)
-                      <span style="font-weight:700; color: {{ $score < 70 ? '#dc2626' : '#059669' }};">
+                      <span style="font-weight:700; color:#0f172a;">
                         {{ $score }}
                       </span>
                       <div style="font-size:10px; color:#64748b;">{{ $entry->predikat }}</div>
@@ -108,16 +108,16 @@
                     @endif
                   </td>
                 @endforeach
-                <td style="text-align:center; background:#f8fafc; font-weight:800; color:var(--ak-primary);">
+                <td style="text-align:center; background:#f8fafc; font-weight:800; color:#0f172a;">
                   {{ $avg > 0 ? $avg : '-' }}
                 </td>
                 <td style="text-align:center; background:#f8fafc;">
                   @if($avg >= 70)
-                    <span class="ak-badge ak-badge-success">Lulus</span>
+                    <span class="ak-badge ak-badge-secondary" style="font-weight:700;">Lulus</span>
                   @elseif($avg > 0)
-                    <span class="ak-badge ak-badge-danger">Remedial</span>
+                    <span class="ak-badge ak-badge-secondary" style="font-weight:700;">Remedial</span>
                   @else
-                    <span class="ak-badge ak-badge-secondary">Pending</span>
+                    <span class="ak-badge ak-badge-secondary" style="color:#94a3b8;">Pending</span>
                   @endif
                 </td>
               </tr>

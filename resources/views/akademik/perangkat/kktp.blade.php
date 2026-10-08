@@ -33,20 +33,20 @@
   {{-- Ringkasan Interval Nilai Resmi (Compact Strip) --}}
   <div class="akademik-card" style="margin-bottom: 16px; padding: 10px 18px; background: #f8fafc; border: 1px solid #e2e8f0;">
     <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
-      <div style="font-size: 12.5px; font-weight: 800; color: var(--ak-dark); display: flex; align-items: center; gap: 6px;">
-        <i class="bi bi-sliders text-primary"></i> Standar Interval Nilai:
+      <div style="font-size: 12.5px; font-weight: 800; color: #0f172a; display: flex; align-items: center; gap: 6px;">
+        <i class="bi bi-sliders me-1" style="color: #475569;"></i> Standar Interval Nilai:
       </div>
       <div style="display: flex; gap: 8px; flex-wrap: wrap; font-size: 11.5px;">
-        <span style="background: #fee2e2; color: #991b1b; padding: 3px 10px; border-radius: 6px; font-weight: 700; border: 1px solid #fca5a5;">
+        <span style="background: #ffffff; color: #334155; padding: 3px 10px; border-radius: 6px; font-weight: 700; border: 1px solid #e2e8f0;">
           0 – 60: Perlu Bimbingan
         </span>
-        <span style="background: #fef3c7; color: #92400e; padding: 3px 10px; border-radius: 6px; font-weight: 700; border: 1px solid #fde68a;">
+        <span style="background: #ffffff; color: #334155; padding: 3px 10px; border-radius: 6px; font-weight: 700; border: 1px solid #e2e8f0;">
           61 – 74: Cukup (Remedial)
         </span>
-        <span style="background: #ecfdf5; color: #065f46; padding: 3px 10px; border-radius: 6px; font-weight: 700; border: 1px solid #a7f3d0;">
+        <span style="background: #ffffff; color: #0f172a; padding: 3px 10px; border-radius: 6px; font-weight: 700; border: 1px solid #cbd5e1;">
           75 – 85: Tuntas Mandiri
         </span>
-        <span style="background: #eff6ff; color: #1e40af; padding: 3px 10px; border-radius: 6px; font-weight: 700; border: 1px solid #bfdbfe;">
+        <span style="background: #ffffff; color: #0f172a; padding: 3px 10px; border-radius: 6px; font-weight: 700; border: 1px solid #cbd5e1;">
           86 – 100: Mahir (Pengayaan)
         </span>
       </div>
@@ -55,13 +55,13 @@
 
   {{-- FORM INLINE ATUR KKTP (NON-POPUP) --}}
   @if($activePerangkat->guru_id == auth()->user()->guru_id || $isAdminOrWaka)
-    <div class="akademik-card" id="formCardTambahKktp" style="border: 2px solid #3b82f6; border-radius: 14px; margin-bottom: 22px; box-shadow: 0 4px 14px rgba(37, 99, 235, 0.08); {{ $kktpItems->isEmpty() ? '' : 'display: none;' }}">
-      <div class="akademik-card-header" style="background: linear-gradient(135deg, #eff6ff 0%, #ffffff 100%); border-bottom: 1px solid #dbeafe; display: flex; justify-content: space-between; align-items: center; padding: 14px 20px;">
-        <h3 class="akademik-card-title" style="font-weight: 800; font-size: 15px; color: #1e3a8a; margin: 0;">
-          <i class="bi bi-speedometer text-primary me-2"></i>
+    <div class="akademik-card" id="formCardTambahKktp" style="border: 1px solid #cbd5e1; border-radius: 12px; margin-bottom: 22px; {{ $kktpItems->isEmpty() ? '' : 'display: none;' }}">
+      <div class="akademik-card-header" style="background: #f8fafc; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; padding: 14px 20px;">
+        <h3 class="akademik-card-title" style="font-weight: 800; font-size: 15px; color: #0f172a; margin: 0;">
+          <i class="bi bi-speedometer me-2" style="color: #475569;"></i>
           <span>Formulir Kriteria Ketercapaian (KKTP) Baru</span>
         </h3>
-        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="toggleFormKktp(false)" title="Tutup Formulir" style="border-radius: 8px; padding: 4px 12px; font-size: 12px; font-weight: 700;">
+        <button type="button" class="ak-btn ak-btn-secondary ak-btn-sm" onclick="toggleFormKktp(false)" title="Tutup Formulir" style="font-size: 12px;">
           <i class="bi bi-x-lg me-1"></i> Tutup
         </button>
       </div>
@@ -115,10 +115,10 @@
   {{-- Tabel Rincian KKTP per TP --}}
   <div class="akademik-card">
     <div class="akademik-card-header" style="background: #f8fafc; padding: 14px 20px;">
-      <h3 class="akademik-card-title" style="font-size: 15px; margin: 0;">
-        <i class="bi bi-check2-square text-primary me-2"></i>
+      <h3 class="akademik-card-title" style="font-size: 15px; margin: 0; color: #0f172a;">
+        <i class="bi bi-check2-square me-2" style="color: #475569;"></i>
         <span>Daftar Kriteria Ketuntasan Tujuan Pembelajaran</span>
-        <span class="ak-badge ak-badge-primary" style="font-size: 11px; margin-left: 6px;">{{ $kktpItems->count() }} Kriteria</span>
+        <span class="ak-badge ak-badge-secondary" style="font-size: 11px; margin-left: 6px;">{{ $kktpItems->count() }} Kriteria</span>
       </h3>
     </div>
 
@@ -145,7 +145,7 @@
                 </td>
                 <td>
                   @if($kktp->atpItem)
-                    <span class="ak-badge ak-badge-primary" style="font-weight: 800; font-size: 11px;">
+                    <span class="ak-badge ak-badge-secondary" style="font-weight: 800; font-size: 11px;">
                       {{ $kktp->atpItem->kode_tp }}
                     </span>
                   @else
@@ -153,11 +153,11 @@
                   @endif
                 </td>
                 <td>
-                  <span class="badge" style="background: #eff6ff; color: #1d4ed8; font-size: 11px; text-transform: uppercase;">
+                  <span class="badge" style="background: #f1f5f9; color: #1e293b; font-size: 11px; text-transform: uppercase; border: 1px solid #e2e8f0;">
                     {{ str_replace('_', ' ', $kktp->pendekatan) }}
                   </span>
                 </td>
-                <td style="font-size: 12.5px; line-height: 1.55; color: var(--ak-dark); font-weight: 600;">
+                <td style="font-size: 12.5px; line-height: 1.55; color: #0f172a; font-weight: 600;">
                   {{ $kktp->keterangan_tuntas }}
                 </td>
                 <td style="font-size: 12px; color: #64748b; line-height: 1.45;">

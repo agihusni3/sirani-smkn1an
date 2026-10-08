@@ -40,37 +40,37 @@
       <div class="akademik-kpi-val">{{ $stats['total'] }}</div>
       <div class="akademik-kpi-label">Total Dokumen</div>
     </div>
-    <div class="akademik-kpi-icon icon-indigo">
+    <div class="akademik-kpi-icon">
       <i class="bi bi-folder2-open"></i>
     </div>
   </div>
 
   <div class="akademik-kpi-card">
     <div>
-      <div class="akademik-kpi-val" style="color:#059669;">{{ $stats['disahkan'] }}</div>
+      <div class="akademik-kpi-val">{{ $stats['disahkan'] }}</div>
       <div class="akademik-kpi-label">Sudah Disahkan (Ber-QR)</div>
     </div>
-    <div class="akademik-kpi-icon icon-emerald">
+    <div class="akademik-kpi-icon">
       <i class="bi bi-patch-check-fill"></i>
     </div>
   </div>
 
   <div class="akademik-kpi-card">
     <div>
-      <div class="akademik-kpi-val" style="color:#ea580c;">{{ $stats['diajukan'] }}</div>
+      <div class="akademik-kpi-val">{{ $stats['diajukan'] }}</div>
       <div class="akademik-kpi-label">Menunggu Telaah</div>
     </div>
-    <div class="akademik-kpi-icon icon-amber">
+    <div class="akademik-kpi-icon">
       <i class="bi bi-hourglass-split"></i>
     </div>
   </div>
 
   <div class="akademik-kpi-card">
     <div>
-      <div class="akademik-kpi-val" style="color:#dc2626;">{{ $stats['revisi'] + $stats['draft'] }}</div>
+      <div class="akademik-kpi-val">{{ $stats['revisi'] + $stats['draft'] }}</div>
       <div class="akademik-kpi-label">{{ $stats['revisi'] }} Perlu Revisi · {{ $stats['draft'] }} Draft</div>
     </div>
-    <div class="akademik-kpi-icon" style="background:#fee2e2; color:#dc2626;">
+    <div class="akademik-kpi-icon">
       <i class="bi bi-pencil-square"></i>
     </div>
   </div>
@@ -78,13 +78,13 @@
 
 {{-- INLINE FORM TELAAH SUPERVISI (NON-POPUP) --}}
 @if($isAdminOrWaka)
-  <div class="akademik-card" id="panelTelaahSupervisi" style="display:none; border:2px solid #3b82f6; border-radius:14px; margin-bottom:20px; box-shadow:0 4px 14px rgba(37, 99, 235, 0.08);">
-    <div class="akademik-card-header" style="background:linear-gradient(135deg, #eff6ff 0%, #ffffff 100%); border-bottom:1px solid #dbeafe; display:flex; justify-content:space-between; align-items:center; padding:14px 20px;">
-      <h3 class="akademik-card-title" style="font-weight:800; font-size:15px; color:#1e3a8a; margin:0;">
-        <i class="bi bi-shield-check text-primary me-2"></i>
+  <div class="akademik-card" id="panelTelaahSupervisi" style="display:none; border:1px solid #cbd5e1; border-radius:12px; margin-bottom:20px;">
+    <div class="akademik-card-header" style="background:#f8fafc; border-bottom:1px solid #e2e8f0; display:flex; justify-content:space-between; align-items:center; padding:14px 20px;">
+      <h3 class="akademik-card-title" style="font-weight:800; font-size:15px; color:#0f172a; margin:0;">
+        <i class="bi bi-shield-check me-2" style="color:#475569;"></i>
         <span>Formulir Telaah &amp; Pengesahan Perangkat</span>
       </h3>
-      <button type="button" class="btn btn-sm btn-outline-secondary" onclick="tutupTelaahPanel()" style="border-radius:8px; padding:4px 12px; font-size:12px; font-weight:700;">
+      <button type="button" class="ak-btn ak-btn-secondary ak-btn-sm" onclick="tutupTelaahPanel()" style="font-size:12px;">
         <i class="bi bi-x-lg me-1"></i> Tutup
       </button>
     </div>
@@ -221,19 +221,19 @@
               <td>
                 <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:3px;">
                   <span style="font-size:11px; font-weight:700; color:#475569;">Progress:</span>
-                  <span style="font-size:11.5px; font-weight:800; color:{{ $kel['persen'] == 100 ? '#059669' : ($kel['persen'] >= 60 ? '#d97706' : '#64748b') }};">
+                  <span style="font-size:11.5px; font-weight:800; color:#0f172a;">
                     {{ $kel['persen'] }}%
                   </span>
                 </div>
                 <div class="progress" style="height:5px; background:#e2e8f0; border-radius:3px; margin-bottom:6px;">
-                  <div class="progress-bar" style="width:{{ $kel['persen'] }}%; background-color:{{ $kel['persen'] == 100 ? '#10b981' : ($kel['persen'] >= 60 ? '#f59e0b' : '#3b82f6') }};"></div>
+                  <div class="progress-bar" style="width:{{ $kel['persen'] }}%; background-color:#1e293b;"></div>
                 </div>
                 <div style="display:flex; gap:3px; font-size:9.5px;">
-                  <span style="padding:1px 4px; border-radius:3px; font-weight:700; {{ $kel['has_cp'] ? 'background:#ecfdf5; color:#065f46;' : 'background:#f1f5f9; color:#94a3b8;' }}">CP</span>
-                  <span style="padding:1px 4px; border-radius:3px; font-weight:700; {{ $kel['has_atp'] ? 'background:#ecfdf5; color:#065f46;' : 'background:#f1f5f9; color:#94a3b8;' }}">ATP ({{ $p->atpItems->count() }})</span>
-                  <span style="padding:1px 4px; border-radius:3px; font-weight:700; {{ $kel['has_rpe'] ? 'background:#ecfdf5; color:#065f46;' : 'background:#f1f5f9; color:#94a3b8;' }}">Prota</span>
-                  <span style="padding:1px 4px; border-radius:3px; font-weight:700; {{ $kel['has_modul'] ? 'background:#ecfdf5; color:#065f46;' : 'background:#f1f5f9; color:#94a3b8;' }}">Modul ({{ $p->modulAjars->count() }})</span>
-                  <span style="padding:1px 4px; border-radius:3px; font-weight:700; {{ $kel['has_kktp'] ? 'background:#ecfdf5; color:#065f46;' : 'background:#f1f5f9; color:#94a3b8;' }}">KKTP</span>
+                  <span style="padding:1px 4px; border-radius:3px; font-weight:700; {{ $kel['has_cp'] ? 'background:#f1f5f9; color:#0f172a; border:1px solid #cbd5e1;' : 'background:#f8fafc; color:#94a3b8; border:1px solid #e2e8f0;' }}">CP</span>
+                  <span style="padding:1px 4px; border-radius:3px; font-weight:700; {{ $kel['has_atp'] ? 'background:#f1f5f9; color:#0f172a; border:1px solid #cbd5e1;' : 'background:#f8fafc; color:#94a3b8; border:1px solid #e2e8f0;' }}">ATP ({{ $p->atpItems->count() }})</span>
+                  <span style="padding:1px 4px; border-radius:3px; font-weight:700; {{ $kel['has_rpe'] ? 'background:#f1f5f9; color:#0f172a; border:1px solid #cbd5e1;' : 'background:#f8fafc; color:#94a3b8; border:1px solid #e2e8f0;' }}">Prota</span>
+                  <span style="padding:1px 4px; border-radius:3px; font-weight:700; {{ $kel['has_modul'] ? 'background:#f1f5f9; color:#0f172a; border:1px solid #cbd5e1;' : 'background:#f8fafc; color:#94a3b8; border:1px solid #e2e8f0;' }}">Modul ({{ $p->modulAjars->count() }})</span>
+                  <span style="padding:1px 4px; border-radius:3px; font-weight:700; {{ $kel['has_kktp'] ? 'background:#f1f5f9; color:#0f172a; border:1px solid #cbd5e1;' : 'background:#f8fafc; color:#94a3b8; border:1px solid #e2e8f0;' }}">KKTP</span>
                 </div>
               </td>
 
@@ -243,7 +243,7 @@
                   <span class="ak-badge ak-badge-success">
                     <i class="bi bi-patch-check-fill me-1"></i> Disahkan Resmi
                   </span>
-                  <div style="font-size:10.5px; color:#059669; font-weight:700; margin-top:3px;">
+                  <div style="font-size:10.5px; color:#475569; font-weight:700; margin-top:3px;">
                     QR: <code>{{ $p->qr_token_pengesahan }}</code>
                   </div>
                 @elseif($p->status === 'diajukan')
@@ -255,7 +255,7 @@
                     <i class="bi bi-exclamation-octagon me-1"></i> Perlu Revisi
                   </span>
                   @if($p->catatan_supervisi)
-                    <div style="font-size:10.5px; color:#b91c1c; margin-top:2px;" title="{{ $p->catatan_supervisi }}">
+                    <div style="font-size:10.5px; color:#475569; margin-top:2px;" title="{{ $p->catatan_supervisi }}">
                       {{ Str::limit($p->catatan_supervisi, 25) }}
                     </div>
                   @endif

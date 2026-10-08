@@ -35,33 +35,33 @@
 {{-- Kartu Ringkasan Kepatuhan & Supervisi --}}
 <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:14px; margin-bottom:24px;">
   <div class="akademik-card" style="padding:16px;">
-    <div style="font-size:12px; font-weight:700; color:var(--ak-slate-500); text-transform:uppercase; margin-bottom:6px;">Total Perangkat Ajar</div>
-    <div style="font-size:24px; font-weight:900; color:var(--ak-dark);">{{ $stats['total'] }}</div>
-    <div style="font-size:11.5px; color:var(--ak-slate-400); margin-top:2px;">Semester {{ $semester == 1 ? 'Ganjil' : 'Genap' }}</div>
+    <div style="font-size:11.5px; font-weight:700; color:#64748b; text-transform:uppercase; margin-bottom:6px;">Total Perangkat Ajar</div>
+    <div style="font-size:24px; font-weight:800; color:#0f172a;">{{ $stats['total'] }}</div>
+    <div style="font-size:11.5px; color:#94a3b8; margin-top:2px;">Semester {{ $semester == 1 ? 'Ganjil' : 'Genap' }}</div>
   </div>
 
   <div class="akademik-card" style="padding:16px;">
-    <div style="font-size:12px; font-weight:700; color:#059669; text-transform:uppercase; margin-bottom:6px;">Disahkan Kepala Sekolah</div>
-    <div style="font-size:24px; font-weight:900; color:#059669;">{{ $stats['disahkan'] }}</div>
-    <div style="font-size:11.5px; color:var(--ak-slate-400); margin-top:2px;">Sudah Ber-QR Code Sah</div>
+    <div style="font-size:11.5px; font-weight:700; color:#475569; text-transform:uppercase; margin-bottom:6px;">Disahkan Kepala Sekolah</div>
+    <div style="font-size:24px; font-weight:800; color:#0f172a;">{{ $stats['disahkan'] }}</div>
+    <div style="font-size:11.5px; color:#94a3b8; margin-top:2px;">Sudah Ber-QR Code Sah</div>
   </div>
 
   <div class="akademik-card" style="padding:16px;">
-    <div style="font-size:12px; font-weight:700; color:#d97706; text-transform:uppercase; margin-bottom:6px;">Menunggu Supervisi</div>
-    <div style="font-size:24px; font-weight:900; color:#d97706;">{{ $stats['diajukan'] }}</div>
-    <div style="font-size:11.5px; color:var(--ak-slate-400); margin-top:2px;">Perlu Telaah Wakakur/Kepsek</div>
+    <div style="font-size:11.5px; font-weight:700; color:#475569; text-transform:uppercase; margin-bottom:6px;">Menunggu Supervisi</div>
+    <div style="font-size:24px; font-weight:800; color:#0f172a;">{{ $stats['diajukan'] }}</div>
+    <div style="font-size:11.5px; color:#94a3b8; margin-top:2px;">Perlu Telaah Wakakur/Kepsek</div>
   </div>
 
   <div class="akademik-card" style="padding:16px;">
-    <div style="font-size:12px; font-weight:700; color:#dc2626; text-transform:uppercase; margin-bottom:6px;">Perlu Revisi</div>
-    <div style="font-size:24px; font-weight:900; color:#dc2626;">{{ $stats['revisi'] }}</div>
-    <div style="font-size:11.5px; color:var(--ak-slate-400); margin-top:2px;">Ada catatan perbaikan</div>
+    <div style="font-size:11.5px; font-weight:700; color:#475569; text-transform:uppercase; margin-bottom:6px;">Perlu Revisi</div>
+    <div style="font-size:24px; font-weight:800; color:#0f172a;">{{ $stats['revisi'] }}</div>
+    <div style="font-size:11.5px; color:#94a3b8; margin-top:2px;">Ada catatan perbaikan</div>
   </div>
 
   <div class="akademik-card" style="padding:16px;">
-    <div style="font-size:12px; font-weight:700; color:var(--ak-slate-500); text-transform:uppercase; margin-bottom:6px;">Draft / Dalam Proses</div>
-    <div style="font-size:24px; font-weight:900; color:var(--ak-slate-600);">{{ $stats['draft'] }}</div>
-    <div style="font-size:11.5px; color:var(--ak-slate-400); margin-top:2px;">Sedang disusun guru</div>
+    <div style="font-size:11.5px; font-weight:700; color:#64748b; text-transform:uppercase; margin-bottom:6px;">Draft / Dalam Proses</div>
+    <div style="font-size:24px; font-weight:800; color:#0f172a;">{{ $stats['draft'] }}</div>
+    <div style="font-size:11.5px; color:#94a3b8; margin-top:2px;">Sedang disusun guru</div>
   </div>
 </div>
 
@@ -192,7 +192,7 @@
                 </a>
               </div>
               <div style="display:flex; gap:6px; align-items:center; margin-top:3px; flex-wrap:wrap;">
-                <span class="badge" style="background:#e0e7ff; color:#3730a3; font-size:11px; font-weight:700;">
+                <span class="badge" style="background:#f1f5f9; color:#475569; border:1px solid #e2e8f0; font-size:11px; font-weight:600;">
                   Kelas {{ $p->tingkat }} · Fase {{ $p->fase }}
                 </span>
                 <span style="font-size:11.5px; color:#64748b;">
@@ -208,19 +208,19 @@
               {{-- Indikator Kelengkapan 5 Komponen --}}
               <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:4px;">
                 <span style="font-size:11px; font-weight:700; color:#475569;">Progress:</span>
-                <span style="font-size:11px; font-weight:800; color:{{ $kel['persen'] == 100 ? '#059669' : ($kel['persen'] >= 60 ? '#d97706' : '#64748b') }};">
+                <span style="font-size:11px; font-weight:800; color:#0f172a;">
                   {{ $kel['persen'] }}%
                 </span>
               </div>
               <div class="progress" style="height:6px; background:#e2e8f0; border-radius:3px; margin-bottom:6px;">
-                <div class="progress-bar" style="width: {{ $kel['persen'] }}%; background-color: {{ $kel['persen'] == 100 ? '#10b981' : ($kel['persen'] >= 60 ? '#f59e0b' : '#3b82f6') }};"></div>
+                <div class="progress-bar" style="width: {{ $kel['persen'] }}%; background-color: #1e293b;"></div>
               </div>
               <div style="display:flex; gap:4px; font-size:10px;">
-                <span title="Capaian Pembelajaran (CP)" style="padding:1px 5px; border-radius:3px; font-weight:700; {{ $kel['has_cp'] ? 'background:#ecfdf5; color:#065f46;' : 'background:#f1f5f9; color:#94a3b8;' }}">CP</span>
-                <span title="Alur Tujuan Pembelajaran (ATP)" style="padding:1px 5px; border-radius:3px; font-weight:700; {{ $kel['has_atp'] ? 'background:#ecfdf5; color:#065f46;' : 'background:#f1f5f9; color:#94a3b8;' }}">ATP ({{ $p->atp_items_count ?? $p->atpItems->count() }})</span>
-                <span title="Rincian Pekan Efektif / Prota Promes" style="padding:1px 5px; border-radius:3px; font-weight:700; {{ $kel['has_rpe'] ? 'background:#ecfdf5; color:#065f46;' : 'background:#f1f5f9; color:#94a3b8;' }}">RPE</span>
-                <span title="Modul Ajar / RPP Merdeka" style="padding:1px 5px; border-radius:3px; font-weight:700; {{ $kel['has_modul'] ? 'background:#ecfdf5; color:#065f46;' : 'background:#f1f5f9; color:#94a3b8;' }}">Modul ({{ $p->modul_ajars_count ?? $p->modulAjars->count() }})</span>
-                <span title="Kriteria Ketercapaian (KKTP)" style="padding:1px 5px; border-radius:3px; font-weight:700; {{ $kel['has_kktp'] ? 'background:#ecfdf5; color:#065f46;' : 'background:#f1f5f9; color:#94a3b8;' }}">KKTP</span>
+                <span title="Capaian Pembelajaran (CP)" style="padding:1px 5px; border-radius:3px; font-weight:700; {{ $kel['has_cp'] ? 'background:#f1f5f9; color:#0f172a; border:1px solid #cbd5e1;' : 'background:#ffffff; color:#94a3b8; border:1px solid #e2e8f0;' }}">CP</span>
+                <span title="Alur Tujuan Pembelajaran (ATP)" style="padding:1px 5px; border-radius:3px; font-weight:700; {{ $kel['has_atp'] ? 'background:#f1f5f9; color:#0f172a; border:1px solid #cbd5e1;' : 'background:#ffffff; color:#94a3b8; border:1px solid #e2e8f0;' }}">ATP ({{ $p->atp_items_count ?? $p->atpItems->count() }})</span>
+                <span title="Rincian Pekan Efektif / Prota Promes" style="padding:1px 5px; border-radius:3px; font-weight:700; {{ $kel['has_rpe'] ? 'background:#f1f5f9; color:#0f172a; border:1px solid #cbd5e1;' : 'background:#ffffff; color:#94a3b8; border:1px solid #e2e8f0;' }}">RPE</span>
+                <span title="Modul Ajar / RPP Merdeka" style="padding:1px 5px; border-radius:3px; font-weight:700; {{ $kel['has_modul'] ? 'background:#f1f5f9; color:#0f172a; border:1px solid #cbd5e1;' : 'background:#ffffff; color:#94a3b8; border:1px solid #e2e8f0;' }}">Modul ({{ $p->modul_ajars_count ?? $p->modulAjars->count() }})</span>
+                <span title="Kriteria Ketercapaian (KKTP)" style="padding:1px 5px; border-radius:3px; font-weight:700; {{ $kel['has_kktp'] ? 'background:#f1f5f9; color:#0f172a; border:1px solid #cbd5e1;' : 'background:#ffffff; color:#94a3b8; border:1px solid #e2e8f0;' }}">KKTP</span>
               </div>
             </td>
             <td style="text-align:center;">

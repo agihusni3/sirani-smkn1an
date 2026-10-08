@@ -48,39 +48,39 @@
 
   <div class="akademik-kpi-card">
     <div>
-      <div class="akademik-kpi-val" style="color:#059669;">
+      <div class="akademik-kpi-val" style="color:#0f172a;">
         {{ $stats['total_jp'] }}
         <span style="font-size:13px; font-weight:700; color:#64748b;">JP / Pekan</span>
       </div>
       <div class="akademik-kpi-label">Total Beban Tatap Muka</div>
     </div>
-    <div class="akademik-kpi-icon" style="background:#ecfdf5; color:#059669;">
+    <div class="akademik-kpi-icon" style="background:#f1f5f9; color:#334155;">
       <i class="bi bi-clock-history"></i>
     </div>
   </div>
 
   <div class="akademik-kpi-card">
     <div>
-      <div class="akademik-kpi-val" style="color:#7c3aed;">
+      <div class="akademik-kpi-val" style="color:#0f172a;">
         {{ $stats['total_kejuruan'] }}
         <span style="font-size:13px; font-weight:700; color:#64748b;">Mapel</span>
       </div>
       <div class="akademik-kpi-label">Kejuruan &amp; Mapel Pilihan</div>
     </div>
-    <div class="akademik-kpi-icon" style="background:#f5f3ff; color:#7c3aed;">
+    <div class="akademik-kpi-icon" style="background:#f1f5f9; color:#334155;">
       <i class="bi bi-tools"></i>
     </div>
   </div>
 
   <div class="akademik-kpi-card">
     <div>
-      <div class="akademik-kpi-val" style="color:#0284c7;">
+      <div class="akademik-kpi-val" style="color:#0f172a;">
         {{ $stats['total_lab'] }}
         <span style="font-size:13px; font-weight:700; color:#64748b;">Mapel</span>
       </div>
       <div class="akademik-kpi-label">Kebutuhan Lab / Bengkel Khusus</div>
     </div>
-    <div class="akademik-kpi-icon" style="background:#f0f9ff; color:#0284c7;">
+    <div class="akademik-kpi-icon" style="background:#f1f5f9; color:#334155;">
       <i class="bi bi-display"></i>
     </div>
   </div>
@@ -184,22 +184,6 @@
           </thead>
           <tbody>
             @foreach($mapels as $idx => $m)
-              @php
-                $jenisColor = match($m->jenis) {
-                  'kejuruan' => '#6d28d9',
-                  'pilihan'  => '#0284c7',
-                  'p5bk'     => '#b45309',
-                  'pkl'      => '#15803d',
-                  default    => '#475569',
-                };
-                $jenisBg = match($m->jenis) {
-                  'kejuruan' => '#f5f3ff',
-                  'pilihan'  => '#f0f9ff',
-                  'p5bk'     => '#fef3c7',
-                  'pkl'      => '#ecfdf5',
-                  default    => '#f1f5f9',
-                };
-              @endphp
               <tr style="border-bottom:1px solid #f1f5f9;">
                 {{-- No --}}
                 <td style="text-align:center; color:#64748b; font-weight:600; font-size:12.5px;">
@@ -208,7 +192,7 @@
 
                 {{-- Kode Mapel --}}
                 <td style="text-align:center;">
-                  <span style="font-weight:800; font-size:12px; color:#4338ca; font-family:var(--font-mono, monospace); background:#eef2ff; border:1px solid #c7d2fe; padding:3px 8px; border-radius:6px; letter-spacing:0.5px;">
+                  <span style="font-weight:700; font-size:12px; color:#1e293b; font-family:var(--font-mono, monospace); background:#f1f5f9; border:1px solid #e2e8f0; padding:3px 8px; border-radius:6px; letter-spacing:0.5px;">
                     {{ $m->kode_mapel }}
                   </span>
                 </td>
@@ -219,7 +203,7 @@
                     {{ $m->nama_mapel }}
                   </div>
                   @if($m->deskripsi_cp)
-                    <div style="font-size:11px; color:#64748b; margin-top:2px; max-width:420px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+                    <div style="font-size:11.5px; color:#64748b; margin-top:2px; max-width:420px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
                       {{ $m->deskripsi_cp }}
                     </div>
                   @endif
@@ -227,7 +211,7 @@
 
                 {{-- Kelompok --}}
                 <td>
-                  <span style="font-weight:700; font-size:11.5px; color:{{ $jenisColor }}; background:{{ $jenisBg }}; padding:3px 9px; border-radius:6px; display:inline-block;">
+                  <span style="font-weight:600; font-size:11.5px; color:#475569; background:#f8fafc; border:1px solid #e2e8f0; padding:3px 9px; border-radius:6px; display:inline-block;">
                     {{ $m->jenis_label }}
                   </span>
                 </td>
@@ -236,18 +220,18 @@
                 <td style="text-align:center;">
                   <div style="display:flex; justify-content:center; gap:4px; align-items:center; flex-wrap:wrap;">
                     @foreach($m->tingkat_array as $tk)
-                      <span style="font-weight:700; font-size:11px; color:#334155; background:#e2e8f0; padding:2px 7px; border-radius:4px;">
+                      <span style="font-weight:600; font-size:11px; color:#475569; background:#f1f5f9; border:1px solid #e2e8f0; padding:2px 7px; border-radius:4px;">
                         Kelas {{ $tk }}
                       </span>
                     @endforeach
                   </div>
-                  <div style="font-size:10.5px; color:#64748b; font-weight:600; margin-top:3px;">
+                  <div style="font-size:11px; color:#64748b; font-weight:600; margin-top:3px;">
                     {{ $m->fase_label }}
                   </div>
                 </td>
 
                 {{-- Beban Jam (JP) --}}
-                <td style="text-align:center; font-weight:800; font-size:13px; color:#0f172a; white-space:nowrap;">
+                <td style="text-align:center; font-weight:700; font-size:13px; color:#0f172a; white-space:nowrap;">
                   <span style="background:#f8fafc; border:1px solid #e2e8f0; padding:3px 10px; border-radius:6px;">
                     {{ $m->jumlah_jam_per_minggu }} JP
                   </span>
@@ -269,8 +253,8 @@
                 {{-- Ruang / Lab --}}
                 <td>
                   @if($m->resource_key)
-                    <span style="font-weight:700; font-size:11.5px; color:#2563eb; background:#eff6ff; border:1px solid #bfdbfe; padding:3px 8px; border-radius:6px; display:inline-flex; align-items:center; gap:5px;">
-                      <i class="bi bi-display"></i> {{ $m->resource_label }}
+                    <span style="font-weight:600; font-size:11.5px; color:#334155; background:#f8fafc; border:1px solid #e2e8f0; padding:3px 8px; border-radius:6px; display:inline-flex; align-items:center; gap:5px;">
+                      <i class="bi bi-display text-muted"></i> {{ $m->resource_label }}
                     </span>
                   @else
                     <span style="color:#94a3b8; font-size:12px;">Kelas Reguler</span>

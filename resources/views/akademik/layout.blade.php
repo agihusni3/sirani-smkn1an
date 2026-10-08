@@ -38,7 +38,7 @@
       </div>
 
       <div style="display:flex; align-items:center; gap:12px;">
-        <span class="ak-badge ak-badge-primary">
+        <span class="ak-badge ak-badge-secondary">
           <i class="bi bi-mortarboard me-1"></i> Kurikulum Merdeka
         </span>
         @include('partials.header_actions')

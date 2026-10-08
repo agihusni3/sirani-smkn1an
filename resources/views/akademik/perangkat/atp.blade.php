@@ -33,13 +33,13 @@
 
   {{-- FORM INLINE TAMBAH BUTIR ATP (NON-POPUP) --}}
   @if($activePerangkat->guru_id == auth()->user()->guru_id || $isAdminOrWaka)
-    <div class="akademik-card" id="formCardTambahAtp" style="border: 2px solid #3b82f6; border-radius: 14px; margin-bottom: 22px; box-shadow: 0 4px 14px rgba(37, 99, 235, 0.08); {{ $atpItems->isEmpty() ? '' : 'display: none;' }}">
-      <div class="akademik-card-header" style="background: linear-gradient(135deg, #eff6ff 0%, #ffffff 100%); border-bottom: 1px solid #dbeafe; display: flex; justify-content: space-between; align-items: center; padding: 14px 20px;">
-        <h3 class="akademik-card-title" style="font-weight: 800; font-size: 15px; color: #1e3a8a; margin: 0;">
-          <i class="bi bi-plus-circle-fill text-primary me-2"></i>
+    <div class="akademik-card" id="formCardTambahAtp" style="border: 1px solid #cbd5e1; border-radius: 12px; margin-bottom: 22px; {{ $atpItems->isEmpty() ? '' : 'display: none;' }}">
+      <div class="akademik-card-header" style="background: #f8fafc; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; padding: 14px 20px;">
+        <h3 class="akademik-card-title" style="font-weight: 800; font-size: 15px; color: #0f172a; margin: 0;">
+          <i class="bi bi-plus-circle-fill me-2" style="color: #475569;"></i>
           <span>Formulir Tambah Butir Alur Tujuan Pembelajaran (ATP)</span>
         </h3>
-        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="toggleFormAtp(false)" title="Tutup Formulir" style="border-radius: 8px; padding: 4px 12px; font-size: 12px; font-weight: 700;">
+        <button type="button" class="ak-btn ak-btn-secondary ak-btn-sm" onclick="toggleFormAtp(false)" title="Tutup Formulir" style="font-size: 12px;">
           <i class="bi bi-x-lg me-1"></i> Tutup
         </button>
       </div>
@@ -106,14 +106,14 @@
   @endif
 
   {{-- Tabel Alur Tujuan Pembelajaran (ATP) --}}
-  <div class="akademik-card" style="border-top:4px solid var(--ak-primary);">
+  <div class="akademik-card">
     <div class="akademik-card-header" style="background:#f8fafc; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; padding:12px 20px;">
       <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
-        <h3 class="akademik-card-title" style="font-size:15px; margin:0;">
-          <i class="bi bi-table text-primary me-2"></i>
+        <h3 class="akademik-card-title" style="font-size:15px; margin:0; color:#0f172a;">
+          <i class="bi bi-table me-2" style="color:#475569;"></i>
           Matriks Alur Tujuan Pembelajaran (ATP)
         </h3>
-        <span class="ak-badge ak-badge-primary" style="font-size:11.5px; font-weight:800;">
+        <span class="ak-badge ak-badge-secondary" style="font-size:11.5px; font-weight:800;">
           Fase {{ $activePerangkat->fase }}
         </span>
       </div>
@@ -121,11 +121,11 @@
       <div style="display:flex; align-items:center; gap:14px; flex-wrap:wrap;">
         <div style="display:flex; align-items:center; gap:10px; font-size:12.5px;">
           <span style="color:#64748b;">
-            Beban ATP: <strong style="color:var(--ak-primary); font-size:14px; font-weight:800;">{{ $totalJp }} JP</strong>
+            Beban ATP: <strong style="color:#0f172a; font-size:14px; font-weight:800;">{{ $totalJp }} JP</strong>
           </span>
           <span style="color:#cbd5e1;">&bull;</span>
           <span style="color:#64748b;">
-            Jumlah: <strong style="color:#059669; font-size:14px; font-weight:800;">{{ $atpItems->count() }} Tujuan</strong>
+            Jumlah: <strong style="color:#0f172a; font-size:14px; font-weight:800;">{{ $atpItems->count() }} Tujuan</strong>
           </span>
         </div>
       </div>
@@ -155,17 +155,17 @@
                   {{ $atp->urutan }}
                 </td>
                 <td>
-                  <span class="ak-badge ak-badge-primary" style="font-weight:800; font-size:11.5px;">
+                  <span class="ak-badge ak-badge-secondary" style="font-weight:800; font-size:11.5px;">
                     {{ $atp->kode_tp }}
                   </span>
                 </td>
                 <td style="font-size:12.5px; font-weight:600; color:#334155;">
                   {{ $atp->elemen_cp ?: '—' }}
                 </td>
-                <td style="font-size:12.5px; line-height:1.55; color:var(--ak-dark); font-weight:600;">
+                <td style="font-size:12.5px; line-height:1.55; color:#0f172a; font-weight:600;">
                   {{ $atp->tujuan_pembelajaran }}
                   @if($atp->asesmen_rencana)
-                    <div style="font-size:11px; color:#0284c7; margin-top:3px; font-weight:500;">
+                    <div style="font-size:11px; color:#64748b; margin-top:3px; font-weight:500;">
                       <i class="bi bi-check-circle me-1"></i> Asesmen: {{ $atp->asesmen_rencana }}
                     </div>
                   @endif
@@ -173,7 +173,7 @@
                 <td style="font-size:12px; color:#475569;">
                   {{ $atp->materi_pokok }}
                 </td>
-                <td style="text-align:center; font-weight:900; color:var(--ak-primary); font-size:13px;">
+                <td style="text-align:center; font-weight:900; color:#0f172a; font-size:13px;">
                   {{ $atp->alokasi_jp }} JP
                 </td>
                 <td style="font-size:11.5px; color:#475569;">

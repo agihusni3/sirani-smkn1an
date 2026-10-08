@@ -33,13 +33,13 @@
 
   {{-- FORM INLINE TAMBAH MODUL AJAR (NON-POPUP) --}}
   @if($activePerangkat->guru_id == auth()->user()->guru_id || $isAdminOrWaka)
-    <div class="akademik-card" id="formCardTambahModul" style="border: 2px solid #3b82f6; border-radius: 14px; margin-bottom: 22px; box-shadow: 0 4px 14px rgba(37, 99, 235, 0.08); {{ $modulAjars->isEmpty() ? '' : 'display: none;' }}">
-      <div class="akademik-card-header" style="background: linear-gradient(135deg, #eff6ff 0%, #ffffff 100%); border-bottom: 1px solid #dbeafe; display: flex; justify-content: space-between; align-items: center; padding: 14px 20px;">
-        <h3 class="akademik-card-title" style="font-weight: 800; font-size: 15px; color: #1e3a8a; margin: 0;">
-          <i class="bi bi-journal-plus text-primary me-2"></i>
+    <div class="akademik-card" id="formCardTambahModul" style="border: 1px solid #cbd5e1; border-radius: 12px; margin-bottom: 22px; {{ $modulAjars->isEmpty() ? '' : 'display: none;' }}">
+      <div class="akademik-card-header" style="background: #f8fafc; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; padding: 14px 20px;">
+        <h3 class="akademik-card-title" style="font-weight: 800; font-size: 15px; color: #0f172a; margin: 0;">
+          <i class="bi bi-journal-plus me-2" style="color: #475569;"></i>
           <span>Formulir Modul Ajar &amp; LKPD Baru</span>
         </h3>
-        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="toggleFormModul(false)" title="Tutup Formulir" style="border-radius: 8px; padding: 4px 12px; font-size: 12px; font-weight: 700;">
+        <button type="button" class="ak-btn ak-btn-secondary ak-btn-sm" onclick="toggleFormModul(false)" title="Tutup Formulir" style="font-size: 12px;">
           <i class="bi bi-x-lg me-1"></i> Tutup
         </button>
       </div>
@@ -103,8 +103,8 @@
           </div>
 
           <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 14px 16px; margin-bottom: 16px;">
-            <div style="font-weight: 800; font-size: 12.5px; color: var(--ak-dark); margin-bottom: 10px;">
-              <i class="bi bi-paperclip me-1 text-primary"></i> Lampiran Berkas &amp; Tautan Media
+            <div style="font-weight: 800; font-size: 12.5px; color: #0f172a; margin-bottom: 10px;">
+              <i class="bi bi-paperclip me-1" style="color: #475569;"></i> Lampiran Berkas &amp; Tautan Media
             </div>
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 12px;">
               <div>
@@ -139,23 +139,23 @@
   {{-- Daftar Modul Ajar Grid --}}
   @if($modulAjars->isNotEmpty())
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
-      <div style="font-size: 14px; font-weight: 800; color: var(--ak-dark); display: flex; align-items: center; gap: 8px;">
-        <i class="bi bi-collection text-primary"></i>
+      <div style="font-size: 14px; font-weight: 800; color: #0f172a; display: flex; align-items: center; gap: 8px;">
+        <i class="bi bi-collection me-1" style="color: #475569;"></i>
         <span>Daftar Modul Ajar &amp; LKPD</span>
-        <span class="ak-badge ak-badge-primary" style="font-size: 11px;">{{ $modulAjars->count() }} Modul</span>
+        <span class="ak-badge ak-badge-secondary" style="font-size: 11px;">{{ $modulAjars->count() }} Modul</span>
       </div>
     </div>
 
     <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 18px; margin-bottom: 24px;">
       @foreach($modulAjars as $ma)
-        <div class="akademik-card" style="display: flex; flex-direction: column; justify-content: space-between; border-top: 4px solid var(--ak-primary);">
+        <div class="akademik-card" style="display: flex; flex-direction: column; justify-content: space-between;">
           <div class="akademik-card-header" style="background: #f8fafc; padding: 12px 18px;">
             <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 8px;">
               <div>
-                <span class="badge" style="background: #e0e7ff; color: #3730a3; font-weight: 800; font-size: 11px;">
+                <span class="badge" style="background: #f1f5f9; color: #1e293b; font-weight: 800; font-size: 11px; border: 1px solid #e2e8f0;">
                   Pertemuan {{ $ma->pertemuan_ke_mulai }} s/d {{ $ma->pertemuan_ke_selesai }} ({{ $ma->alokasi_jp }} JP)
                 </span>
-                <h3 style="font-size: 15px; font-weight: 800; color: var(--ak-dark); margin: 6px 0 0; line-height: 1.35;">
+                <h3 style="font-size: 15px; font-weight: 800; color: #0f172a; margin: 6px 0 0; line-height: 1.35;">
                   {{ $ma->judul_modul }}
                 </h3>
               </div>
@@ -173,9 +173,9 @@
 
           <div class="akademik-card-body" style="padding: 16px 18px; font-size: 12.5px; flex: 1;">
             @if($ma->atpItem)
-              <div style="margin-bottom: 10px; padding: 6px 10px; background: #eff6ff; border-radius: 6px; border-left: 3px solid #3b82f6;">
-                <span style="font-weight: 800; color: #1d4ed8;">{{ $ma->atpItem->kode_tp }}:</span>
-                <span style="color: #1e3a8a;">{{ Str::limit($ma->atpItem->tujuan_pembelajaran, 85) }}</span>
+              <div style="margin-bottom: 10px; padding: 6px 10px; background: #f8fafc; border-radius: 6px; border-left: 3px solid #0f172a;">
+                <span style="font-weight: 800; color: #0f172a;">{{ $ma->atpItem->kode_tp }}:</span>
+                <span style="color: #475569;">{{ Str::limit($ma->atpItem->tujuan_pembelajaran, 85) }}</span>
               </div>
             @endif
 
@@ -186,7 +186,7 @@
                 </span>
               @endif
               @if($ma->metode_pembelajaran)
-                <span class="ak-badge ak-badge-info" style="font-size: 11px;">
+                <span class="ak-badge ak-badge-secondary" style="font-size: 11px;">
                   <i class="bi bi-tools me-1"></i> {{ $ma->metode_pembelajaran }}
                 </span>
               @endif

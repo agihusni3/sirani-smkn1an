@@ -11,13 +11,13 @@
 <div class="akademik-page-head">
   <div>
     <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
-      <span class="badge" style="background:#e0e7ff; color:#3730a3; font-size:12px; font-weight:800;">
+      <span class="badge" style="background:#f1f5f9; color:#1e293b; font-size:12px; font-weight:800; border:1px solid #e2e8f0;">
         Kelas {{ $perangkat->tingkat }} · Fase {{ $perangkat->fase }}
       </span>
-      <span class="badge" style="background:#f1f5f9; color:#475569; font-size:12px; font-weight:700;">
+      <span class="badge" style="background:#f8fafc; color:#475569; font-size:12px; font-weight:700; border:1px solid #e2e8f0;">
         Semester {{ $perangkat->semester == 1 ? 'Ganjil' : 'Genap' }} · TA {{ $perangkat->tahunAjaran?->nama ?? '2026/2027' }}
       </span>
-      <span class="badge" style="background:{{ $statusBadge['bg'] }}; color:{{ $statusBadge['color'] }}; border:1px solid {{ $statusBadge['border'] }}; font-size:12px; font-weight:700;">
+      <span class="badge" style="background:#f1f5f9; color:#0f172a; border:1px solid #cbd5e1; font-size:12px; font-weight:700;">
         <i class="bi {{ $statusBadge['icon'] }} me-1"></i> {{ $statusBadge['label'] }}
       </span>
     </div>
@@ -46,7 +46,7 @@
 
     {{-- Tombol Cetak Pengesahan jika Disahkan --}}
     @if($perangkat->status === 'disahkan')
-      <a href="{{ route('akademik.perangkat.cetak-pengesahan', $perangkat->id) }}" target="_blank" class="ak-btn ak-btn-secondary" style="border-color:#059669; color:#059669; font-weight:700;">
+      <a href="{{ route('akademik.perangkat.cetak-pengesahan', $perangkat->id) }}" target="_blank" class="ak-btn ak-btn-secondary" style="font-weight:700;">
         <i class="bi bi-printer"></i>
         <span>Cetak Lembar Pengesahan Resmi</span>
       </a>
@@ -54,28 +54,28 @@
 
     {{-- Tombol Export PDF & DOCX (selalu tersedia) --}}
     <div class="dropdown d-inline-block">
-      <button type="button" class="ak-btn" style="background:linear-gradient(135deg,#1d4ed8,#6d28d9); color:#fff; font-weight:700; border:none; display:flex; align-items:center; gap:6px;" data-bs-toggle="dropdown" aria-expanded="false">
+      <button type="button" class="ak-btn ak-btn-secondary" style="font-weight:700; display:flex; align-items:center; gap:6px;" data-bs-toggle="dropdown" aria-expanded="false">
         <i class="bi bi-cloud-download"></i>
         <span>Unduh Dokumen</span>
         <i class="bi bi-chevron-down" style="font-size:11px;"></i>
       </button>
-      <ul class="dropdown-menu dropdown-menu-end shadow-lg" style="border:none; border-radius:12px; min-width:220px; padding:8px;">
+      <ul class="dropdown-menu dropdown-menu-end shadow-lg" style="border:1px solid #e2e8f0; border-radius:12px; min-width:220px; padding:8px;">
         <li>
-          <a class="dropdown-item d-flex align-items-center gap-2 py-2 px-3 rounded-2" href="{{ route('akademik.perangkat.export-pdf', $perangkat->id) }}" target="_blank" style="font-weight:600; color:#dc2626;">
-            <i class="bi bi-file-earmark-pdf-fill" style="font-size:18px; color:#dc2626;"></i>
+          <a class="dropdown-item d-flex align-items-center gap-2 py-2 px-3 rounded-2" href="{{ route('akademik.perangkat.export-pdf', $perangkat->id) }}" target="_blank" style="font-weight:600; color:#0f172a;">
+            <i class="bi bi-file-earmark-pdf" style="font-size:18px;"></i>
             <div>
               <div style="font-size:13px;">Unduh PDF</div>
-              <div style="font-size:10px; color:#888; font-weight:400;">Perangkat Lengkap (5 Bab)</div>
+              <div style="font-size:10px; color:#64748b; font-weight:400;">Perangkat Lengkap (5 Bab)</div>
             </div>
           </a>
         </li>
         <li><hr class="dropdown-divider my-1"></li>
         <li>
-          <a class="dropdown-item d-flex align-items-center gap-2 py-2 px-3 rounded-2" href="{{ route('akademik.perangkat.export-docx', $perangkat->id) }}" style="font-weight:600; color:#2563eb;">
-            <i class="bi bi-file-earmark-word-fill" style="font-size:18px; color:#2563eb;"></i>
+          <a class="dropdown-item d-flex align-items-center gap-2 py-2 px-3 rounded-2" href="{{ route('akademik.perangkat.export-docx', $perangkat->id) }}" style="font-weight:600; color:#0f172a;">
+            <i class="bi bi-file-earmark-word" style="font-size:18px;"></i>
             <div>
               <div style="font-size:13px;">Unduh DOCX (Word)</div>
-              <div style="font-size:10px; color:#888; font-weight:400;">Dapat diedit di Microsoft Word</div>
+              <div style="font-size:10px; color:#64748b; font-weight:400;">Dapat diedit di Microsoft Word</div>
             </div>
           </a>
         </li>
@@ -96,44 +96,44 @@
 {{-- Bar Progress Kelengkapan --}}
 <div class="akademik-card" style="margin-bottom:20px; padding:16px 20px;">
   <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; flex-wrap:wrap; gap:8px;">
-    <div style="font-size:13px; font-weight:800; color:var(--ak-dark);">
-      <i class="bi bi-clipboard2-check text-primary me-1"></i> Keterpenuhan 5 Pilar Standar Perangkat Kurikulum Merdeka:
+    <div style="font-size:13px; font-weight:800; color:#0f172a;">
+      <i class="bi bi-clipboard2-check me-1" style="color:#475569;"></i> Keterpenuhan 5 Pilar Standar Perangkat Kurikulum Merdeka:
     </div>
-    <div style="font-size:13px; font-weight:900; color:{{ $kelengkapan['persen'] == 100 ? '#059669' : '#0284c7' }};">
+    <div style="font-size:13px; font-weight:900; color:#0f172a;">
       {{ $kelengkapan['persen'] }}% Lengkap
     </div>
   </div>
-  <div class="progress" style="height:8px; background:#e2e8f0; border-radius:4px; margin-bottom:12px;">
-    <div class="progress-bar" style="width: {{ $kelengkapan['persen'] }}%; background-color: {{ $kelengkapan['persen'] == 100 ? '#10b981' : '#0284c7' }};"></div>
+  <div class="progress" style="height:6px; background:#e2e8f0; border-radius:3px; margin-bottom:12px;">
+    <div class="progress-bar" style="width: {{ $kelengkapan['persen'] }}%; background-color: #1e293b;"></div>
   </div>
 
   <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap:10px; font-size:12px;">
-    <div style="display:flex; align-items:center; gap:6px; color:{{ $kelengkapan['has_cp'] ? '#059669' : '#64748b' }};">
-      <i class="bi {{ $kelengkapan['has_cp'] ? 'bi-check-circle-fill text-success' : 'bi-circle text-muted' }}"></i>
+    <div style="display:flex; align-items:center; gap:6px; color:{{ $kelengkapan['has_cp'] ? '#0f172a' : '#64748b' }};">
+      <i class="bi {{ $kelengkapan['has_cp'] ? 'bi-check-circle-fill' : 'bi-circle' }}" style="color:{{ $kelengkapan['has_cp'] ? '#0f172a' : '#cbd5e1' }};"></i>
       <span>1. Capaian Pembelajaran (CP)</span>
     </div>
-    <div style="display:flex; align-items:center; gap:6px; color:{{ $kelengkapan['has_atp'] ? '#059669' : '#64748b' }};">
-      <i class="bi {{ $kelengkapan['has_atp'] ? 'bi-check-circle-fill text-success' : 'bi-circle text-muted' }}"></i>
+    <div style="display:flex; align-items:center; gap:6px; color:{{ $kelengkapan['has_atp'] ? '#0f172a' : '#64748b' }};">
+      <i class="bi {{ $kelengkapan['has_atp'] ? 'bi-check-circle-fill' : 'bi-circle' }}" style="color:{{ $kelengkapan['has_atp'] ? '#0f172a' : '#cbd5e1' }};"></i>
       <span>2. Alur Tujuan Pembelajaran (ATP)</span>
     </div>
-    <div style="display:flex; align-items:center; gap:6px; color:{{ $kelengkapan['has_rpe'] ? '#059669' : '#64748b' }};">
-      <i class="bi {{ $kelengkapan['has_rpe'] ? 'bi-check-circle-fill text-success' : 'bi-circle text-muted' }}"></i>
+    <div style="display:flex; align-items:center; gap:6px; color:{{ $kelengkapan['has_rpe'] ? '#0f172a' : '#64748b' }};">
+      <i class="bi {{ $kelengkapan['has_rpe'] ? 'bi-check-circle-fill' : 'bi-circle' }}" style="color:{{ $kelengkapan['has_rpe'] ? '#0f172a' : '#cbd5e1' }};"></i>
       <span>3. Pekan Efektif &amp; Prota/Promes</span>
     </div>
-    <div style="display:flex; align-items:center; gap:6px; color:{{ $kelengkapan['has_modul'] ? '#059669' : '#64748b' }};">
-      <i class="bi {{ $kelengkapan['has_modul'] ? 'bi-check-circle-fill text-success' : 'bi-circle text-muted' }}"></i>
+    <div style="display:flex; align-items:center; gap:6px; color:{{ $kelengkapan['has_modul'] ? '#0f172a' : '#64748b' }};">
+      <i class="bi {{ $kelengkapan['has_modul'] ? 'bi-check-circle-fill' : 'bi-circle' }}" style="color:{{ $kelengkapan['has_modul'] ? '#0f172a' : '#cbd5e1' }};"></i>
       <span>4. Modul Ajar &amp; LKPD Praktik</span>
     </div>
-    <div style="display:flex; align-items:center; gap:6px; color:{{ $kelengkapan['has_kktp'] ? '#059669' : '#64748b' }};">
-      <i class="bi {{ $kelengkapan['has_kktp'] ? 'bi-check-circle-fill text-success' : 'bi-circle text-muted' }}"></i>
+    <div style="display:flex; align-items:center; gap:6px; color:{{ $kelengkapan['has_kktp'] ? '#0f172a' : '#64748b' }};">
+      <i class="bi {{ $kelengkapan['has_kktp'] ? 'bi-check-circle-fill' : 'bi-circle' }}" style="color:{{ $kelengkapan['has_kktp'] ? '#0f172a' : '#cbd5e1' }};"></i>
       <span>5. Kriteria Ketuntasan (KKTP)</span>
     </div>
   </div>
 
   @if($perangkat->status === 'perlu_revisi' && $perangkat->catatan_supervisi)
-    <div style="margin-top:14px; background:#fef2f2; border:1px solid #fecaca; border-radius:8px; padding:12px 14px; font-size:12.5px; color:#991b1b;">
-      <strong><i class="bi bi-exclamation-triangle-fill me-1"></i> Catatan Revisi dari Waka Kurikulum / Kepala Sekolah:</strong>
-      <div style="margin-top:4px; line-height:1.4;">{{ $perangkat->catatan_supervisi }}</div>
+    <div style="margin-top:14px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:12px 14px; font-size:12.5px; color:#0f172a;">
+      <strong><i class="bi bi-info-circle me-1" style="color:#475569;"></i> Catatan Revisi dari Waka Kurikulum / Kepala Sekolah:</strong>
+      <div style="margin-top:4px; line-height:1.4; color:#475569;">{{ $perangkat->catatan_supervisi }}</div>
     </div>
   @endif
 </div>
