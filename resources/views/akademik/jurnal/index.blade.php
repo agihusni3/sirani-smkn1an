@@ -106,8 +106,8 @@
                 </td>
                 <td>
                   @php
-                    $hadir = $j->kehadirans->where('status', 'hadir')->count();
-                    $tidakHadir = $j->kehadirans->whereIn('status', ['izin', 'sakit', 'alfa'])->count();
+                    $hadir = $j->hadir_count ?? ($j->relationLoaded('kehadirans') ? $j->kehadirans->where('status', 'hadir')->count() : 0);
+                    $tidakHadir = $j->tidak_hadir_count ?? ($j->relationLoaded('kehadirans') ? $j->kehadirans->whereIn('status', ['izin', 'sakit', 'alfa'])->count() : 0);
                   @endphp
                   <span class="ak-badge ak-badge-success">{{ $hadir }} Hadir</span>
                   @if($tidakHadir > 0)

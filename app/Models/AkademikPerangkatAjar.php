@@ -91,9 +91,15 @@ class AkademikPerangkatAjar extends Model
     public function getKelengkapanAttribute(): array
     {
         $hasCp = !empty($this->capaian_pembelajaran) || !empty($this->elemen_cp) || !empty($this->mataPelajaran?->deskripsi_cp);
-        $hasAtp = $this->atpItems()->count() > 0;
-        $hasModul = $this->modulAjars()->count() > 0;
-        $hasKktp = $this->kktpItems()->count() > 0;
+        $hasAtp = $this->relationLoaded('atpItems') 
+            ? $this->atpItems->isNotEmpty() 
+            : (isset($this->atp_items_count) ? $this->atp_items_count > 0 : $this->atpItems()->count() > 0);
+        $hasModul = $this->relationLoaded('modulAjars') 
+            ? $this->modulAjars->isNotEmpty() 
+            : (isset($this->modul_ajars_count) ? $this->modul_ajars_count > 0 : $this->modulAjars()->count() > 0);
+        $hasKktp = $this->relationLoaded('kktpItems') 
+            ? $this->kktpItems->isNotEmpty() 
+            : (isset($this->kktp_items_count) ? $this->kktp_items_count > 0 : $this->kktpItems()->count() > 0);
         $hasRpe = ($this->rpe_pekan_efektif > 0);
 
         $totalPoin = 0;

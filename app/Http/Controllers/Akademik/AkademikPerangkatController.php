@@ -46,8 +46,9 @@ class AkademikPerangkatController extends Controller
             $guruId = $request->guru_id;
         }
 
-        // Query Perangkat
-        $query = AkademikPerangkatAjar::with(['guru', 'mataPelajaran', 'distribusiMengajar.rombel', 'tahunAjaran', 'atpItems', 'modulAjars', 'kktpItems', 'validator'])
+        // Query Perangkat (Gunakan withCount untuk item relasi agar tidak membebani RAM PHP)
+        $query = AkademikPerangkatAjar::with(['guru', 'mataPelajaran', 'distribusiMengajar.rombel', 'tahunAjaran', 'validator'])
+            ->withCount(['atpItems', 'modulAjars', 'kktpItems'])
             ->where('semester', $semester);
 
         if ($guruId && !$isAdminOrWaka) {
@@ -83,13 +84,22 @@ class AkademikPerangkatController extends Controller
                 ->get();
         }
 
-        // Statistik monitoring untuk Wakakur / Kepsek
+        // Statistik monitoring kurikulum (Satu query agregat SQL cepat)
+        $rawStats = AkademikPerangkatAjar::where('semester', $semester)
+            ->selectRaw("
+                COUNT(*) as total,
+                SUM(CASE WHEN status = 'disahkan' THEN 1 ELSE 0 END) as disahkan,
+                SUM(CASE WHEN status = 'diajukan' THEN 1 ELSE 0 END) as diajukan,
+                SUM(CASE WHEN status = 'perlu_revisi' THEN 1 ELSE 0 END) as revisi,
+                SUM(CASE WHEN status = 'draft' THEN 1 ELSE 0 END) as draft
+            ")->first();
+
         $stats = [
-            'total' => AkademikPerangkatAjar::where('semester', $semester)->count(),
-            'disahkan' => AkademikPerangkatAjar::where('semester', $semester)->where('status', 'disahkan')->count(),
-            'diajukan' => AkademikPerangkatAjar::where('semester', $semester)->where('status', 'diajukan')->count(),
-            'revisi' => AkademikPerangkatAjar::where('semester', $semester)->where('status', 'perlu_revisi')->count(),
-            'draft' => AkademikPerangkatAjar::where('semester', $semester)->where('status', 'draft')->count(),
+            'total' => (int) ($rawStats->total ?? 0),
+            'disahkan' => (int) ($rawStats->disahkan ?? 0),
+            'diajukan' => (int) ($rawStats->diajukan ?? 0),
+            'revisi' => (int) ($rawStats->revisi ?? 0),
+            'draft' => (int) ($rawStats->draft ?? 0),
         ];
 
         $gurus = Guru::where('status', 'aktif')->orderBy('nama')->get();

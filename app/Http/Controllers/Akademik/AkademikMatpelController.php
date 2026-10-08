@@ -49,17 +49,24 @@ class AkademikMatpelController extends Controller
             });
         }
 
-        // Statistik Cepat (KPI) Kurikulum untuk Tahun Ajaran terpilih
+        // Statistik Cepat (KPI) Kurikulum untuk Tahun Ajaran terpilih (1 Query Agregat Cepat)
         $statQuery = AkademikMataPelajaran::query();
         if ($selectedTaId) {
             $statQuery->where('tahun_ajaran_id', $selectedTaId);
         }
 
+        $statAgg = $statQuery->selectRaw("
+            COUNT(*) as total_mapel,
+            COALESCE(SUM(jumlah_jam_per_minggu), 0) as total_jp,
+            SUM(CASE WHEN jenis IN ('kejuruan', 'pilihan') THEN 1 ELSE 0 END) as total_kejuruan,
+            SUM(CASE WHEN resource_key IS NOT NULL AND resource_key != '' THEN 1 ELSE 0 END) as total_lab
+        ")->first();
+
         $stats = [
-            'total_mapel'    => (clone $statQuery)->count(),
-            'total_jp'       => (clone $statQuery)->sum('jumlah_jam_per_minggu'),
-            'total_kejuruan' => (clone $statQuery)->whereIn('jenis', ['kejuruan', 'pilihan'])->count(),
-            'total_lab'      => (clone $statQuery)->whereNotNull('resource_key')->count(),
+            'total_mapel'    => (int) ($statAgg->total_mapel ?? 0),
+            'total_jp'       => (int) ($statAgg->total_jp ?? 0),
+            'total_kejuruan' => (int) ($statAgg->total_kejuruan ?? 0),
+            'total_lab'      => (int) ($statAgg->total_lab ?? 0),
         ];
 
         $mapels = $query->orderBy('jenis')->orderBy('kode_mapel')->paginate(25)->withQueryString();

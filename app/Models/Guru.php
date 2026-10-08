@@ -379,11 +379,17 @@ class Guru extends Model
         return $this->hasMany(AkademikPerangkatAjar::class, 'guru_id');
     }
 
+    protected ?array $memoizedTugasTambahanList = null;
+
     /**
      * Rincian tugas tambahan yang diemban guru beserta ekuivalensi jam (Permendikbud 15/2018)
      */
     public function getTugasTambahanListAttribute(): array
     {
+        if ($this->memoizedTugasTambahanList !== null) {
+            return $this->memoizedTugasTambahanList;
+        }
+
         $list = [];
         $addedKeys = [];
 
@@ -498,7 +504,10 @@ class Guru extends Model
         }
 
         // 2. Dari Tabel Rombels (Wali Kelas Resmi)
-        $rombelWali = \App\Models\Rombel::where('wali_kelas_id', $this->id)->get();
+        $rombelWali = $this->relationLoaded('rombels') 
+            ? $this->rombels 
+            : \App\Models\Rombel::where('wali_kelas_id', $this->id)->get();
+
         foreach ($rombelWali as $rw) {
             $namaWali = 'Wali Kelas ' . $rw->nama_rombel;
             $uniqueKey = strtolower($namaWali);
@@ -513,7 +522,7 @@ class Guru extends Model
             }
         }
 
-        return $list;
+        return $this->memoizedTugasTambahanList = $list;
     }
 
     /**

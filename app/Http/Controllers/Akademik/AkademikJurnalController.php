@@ -26,7 +26,9 @@ class AkademikJurnalController extends Controller
             'distribusi.guru',
             'distribusi.mataPelajaran',
             'distribusi.rombel',
-            'kehadirans'
+        ])->withCount([
+            'kehadirans as hadir_count' => fn($q) => $q->where('status', 'hadir'),
+            'kehadirans as tidak_hadir_count' => fn($q) => $q->whereIn('status', ['izin', 'sakit', 'alfa']),
         ]);
 
         if ($request->filled('tanggal')) {

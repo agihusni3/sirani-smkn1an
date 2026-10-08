@@ -217,9 +217,9 @@
               </div>
               <div style="display:flex; gap:4px; font-size:10px;">
                 <span title="Capaian Pembelajaran (CP)" style="padding:1px 5px; border-radius:3px; font-weight:700; {{ $kel['has_cp'] ? 'background:#ecfdf5; color:#065f46;' : 'background:#f1f5f9; color:#94a3b8;' }}">CP</span>
-                <span title="Alur Tujuan Pembelajaran (ATP)" style="padding:1px 5px; border-radius:3px; font-weight:700; {{ $kel['has_atp'] ? 'background:#ecfdf5; color:#065f46;' : 'background:#f1f5f9; color:#94a3b8;' }}">ATP ({{ $p->atpItems->count() }})</span>
+                <span title="Alur Tujuan Pembelajaran (ATP)" style="padding:1px 5px; border-radius:3px; font-weight:700; {{ $kel['has_atp'] ? 'background:#ecfdf5; color:#065f46;' : 'background:#f1f5f9; color:#94a3b8;' }}">ATP ({{ $p->atp_items_count ?? $p->atpItems->count() }})</span>
                 <span title="Rincian Pekan Efektif / Prota Promes" style="padding:1px 5px; border-radius:3px; font-weight:700; {{ $kel['has_rpe'] ? 'background:#ecfdf5; color:#065f46;' : 'background:#f1f5f9; color:#94a3b8;' }}">RPE</span>
-                <span title="Modul Ajar / RPP Merdeka" style="padding:1px 5px; border-radius:3px; font-weight:700; {{ $kel['has_modul'] ? 'background:#ecfdf5; color:#065f46;' : 'background:#f1f5f9; color:#94a3b8;' }}">Modul ({{ $p->modulAjars->count() }})</span>
+                <span title="Modul Ajar / RPP Merdeka" style="padding:1px 5px; border-radius:3px; font-weight:700; {{ $kel['has_modul'] ? 'background:#ecfdf5; color:#065f46;' : 'background:#f1f5f9; color:#94a3b8;' }}">Modul ({{ $p->modul_ajars_count ?? $p->modulAjars->count() }})</span>
                 <span title="Kriteria Ketercapaian (KKTP)" style="padding:1px 5px; border-radius:3px; font-weight:700; {{ $kel['has_kktp'] ? 'background:#ecfdf5; color:#065f46;' : 'background:#f1f5f9; color:#94a3b8;' }}">KKTP</span>
               </div>
             </td>

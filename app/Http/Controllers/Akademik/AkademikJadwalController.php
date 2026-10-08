@@ -64,174 +64,200 @@ class AkademikJadwalController extends Controller
             $mapels = AkademikMataPelajaran::orderBy('kode_mapel')->orderBy('nama_mapel')->get();
         }
 
-        // 1. Matriks Roster Jadwal Mingguan
-        $jadwalQuery = AkademikJadwalPelajaran::with(['guru', 'mataPelajaran', 'rombel'])
-            ->where('semester', $semester)
-            ->when($ta, fn($q) => $q->where('tahun_ajaran_id', $ta->id));
-
-        if ($hariFilter) {
-            $jadwalQuery->where('hari', strtoupper($hariFilter));
-        }
-
-        $allSlots = $jadwalQuery->get();
-
-        // Group slots by [hari][jam_ke][rombel_id] for lightning-fast matrix lookup
-        $slotsMatrix = [];
-        foreach ($allSlots as $s) {
-            $slotsMatrix[$s->hari][$s->jam_ke][$s->rombel_id] = $s;
-        }
-
-        // 2. Data Guru Piket
-        $guruPikets = AkademikGuruPiket::with('wakaPiket')
-            ->where('semester', $semester)
-            ->when($ta, fn($q) => $q->where('tahun_ajaran_id', $ta->id))
-            ->get()
-            ->keyBy('hari');
-
-        // 3. Data Distribusi Mengajar (Beban JJM) - Dikelompokkan 1 Mapel 1 Guru Jadi 1 Baris
-        $distribusiQuery = AkademikDistribusiMengajar::with(['guru', 'mataPelajaran', 'rombel', 'tahunAjaran'])
-            ->where('semester', $semester)
-            ->when($ta, fn($q) => $q->where('tahun_ajaran_id', $ta->id));
-
-        if ($request->filled('guru_id')) {
-            $distribusiQuery->where('guru_id', $request->guru_id);
-        }
-        if ($request->filled('rombel_id')) {
-            $distribusiQuery->where('rombel_id', $request->rombel_id);
-        }
-        if ($request->filled('mata_pelajaran_id')) {
-            $distribusiQuery->where('mata_pelajaran_id', $request->mata_pelajaran_id);
-        }
-
-        $allRawDistribusi = $distribusiQuery->orderBy('mata_pelajaran_id')->orderBy('guru_id')->get();
-
-        // Gabungkan rombel jika 1 mapel diampu oleh guru yang sama
-        $groupedDistribusi = $allRawDistribusi->groupBy(function ($item) {
-            return $item->guru_id . '_' . $item->mata_pelajaran_id . '_' . $item->semester;
-        })->map(function ($items) {
-            $first = $items->first();
-            return (object) [
-                'id' => $first->id,
-                'ids' => $items->pluck('id')->toArray(),
-                'ids_string' => $items->pluck('id')->implode(','),
-                'guru_id' => $first->guru_id,
-                'guru' => $first->guru,
-                'mata_pelajaran_id' => $first->mata_pelajaran_id,
-                'mataPelajaran' => $first->mataPelajaran,
-                'semester' => $first->semester,
-                'total_jam_per_minggu' => $first->total_jam_per_minggu,
-                'total_jam_akumulasi' => $items->sum('total_jam_per_minggu'),
-                'rombels' => $items->pluck('rombel')->filter()->unique('id')->values(),
-                'rombel_ids' => $items->pluck('rombel_id')->toArray(),
-                'catatan' => $first->catatan,
-            ];
-        })->values();
-
-        // Paginate manual collection agar pagination tetap rapi
-        $currentPage = \Illuminate\Pagination\Paginator::resolveCurrentPage() ?: 1;
-        $perPage = 25;
-        $currentPageItems = $groupedDistribusi->slice(($currentPage - 1) * $perPage, $perPage)->values();
-        $distribusis = new \Illuminate\Pagination\LengthAwarePaginator(
-            $currentPageItems,
-            $groupedDistribusi->count(),
-            $perPage,
-            $currentPage,
-            ['path' => \Illuminate\Pagination\Paginator::resolveCurrentPath(), 'query' => $request->query()]
-        );
-
-        // Rekap JJM (Jam Jabatan Mengajar) per Guru
-        $rekapJjm = AkademikDistribusiMengajar::where('semester', $semester)
-            ->when($ta, fn($q) => $q->where('tahun_ajaran_id', $ta->id))
-            ->selectRaw('guru_id, SUM(total_jam_per_minggu) as total_jam, COUNT(id) as total_rombel')
-            ->groupBy('guru_id')
-            ->with('guru')
-            ->get();
-
         $tahunAjarans = TahunAjaran::orderByDesc('id')->get();
-
-        // Definisi Jam & Pukul Resmi SMKN 1 Air Naningan (Dinamis per TA & Semester)
         $defaultSchedule = AkademikJadwalWaktu::defaultSchedule();
-        $customWaktus = AkademikJadwalWaktu::where('tahun_ajaran_id', $ta?->id)
-            ->where('semester', $semester)
-            ->orderBy('hari')->orderBy('urutan')->orderBy('jam_ke')
-            ->get();
 
-        // jadwalWaktu: hanya jam KBM [hari][jam_ke] => pukul (untuk roster matriks)
+        // Variabel Inisialisasi Default (Mencegah Undefined Variable di Blade antar Tab)
+        $slotsMatrix = [];
+        $guruPikets = collect();
+        $distribusis = new \Illuminate\Pagination\LengthAwarePaginator([], 0, 25);
+        $rekapJjm = collect();
         $jadwalWaktu = $defaultSchedule;
-        foreach ($customWaktus->where('tipe', 'jam') as $w) {
-            $jadwalWaktu[$w->hari][$w->jam_ke] = $w->pukul;
+        $jadwalWaktuFull = AkademikJadwalWaktu::defaultScheduleFull();
+        $matrixDistribusi = [];
+        $rekapBebanGuru = collect();
+        $masterTugasTambahan = collect();
+
+        // =========================================================================
+        // 1. TAB: ROSTER (Matriks Jadwal Mingguan KBM) - DEFAULT
+        // =========================================================================
+        if ($tab === 'roster' || $tab === 'formulasi') {
+            $jadwalQuery = AkademikJadwalPelajaran::with(['guru', 'mataPelajaran', 'rombel'])
+                ->where('semester', $semester)
+                ->when($ta, fn($q) => $q->where('tahun_ajaran_id', $ta->id));
+
+            if ($hariFilter) {
+                $jadwalQuery->where('hari', strtoupper($hariFilter));
+            }
+
+            $allSlots = $jadwalQuery->get();
+            foreach ($allSlots as $s) {
+                $slotsMatrix[$s->hari][$s->jam_ke][$s->rombel_id] = $s;
+            }
+
+            // Guru Piket untuk info operasional roster
+            $guruPikets = AkademikGuruPiket::with('wakaPiket')
+                ->where('semester', $semester)
+                ->when($ta, fn($q) => $q->where('tahun_ajaran_id', $ta->id))
+                ->get()
+                ->keyBy('hari');
+
+            // Jadwal Pukul Jam KBM
+            $customWaktus = AkademikJadwalWaktu::where('tahun_ajaran_id', $ta?->id)
+                ->where('semester', $semester)
+                ->where('tipe', 'jam')
+                ->get();
+            foreach ($customWaktus as $w) {
+                $jadwalWaktu[$w->hari][$w->jam_ke] = $w->pukul;
+            }
         }
+        // =========================================================================
+        // 2. TAB: DISTRIBUSI (SK Pembagian Tugas & Beban Mengajar Guru)
+        // =========================================================================
+        elseif ($tab === 'distribusi') {
+            // Eager load rombels untuk mencegah query N+1 pada accessor tugas_tambahan_list
+            $gurus->loadMissing('rombels');
 
-        // jadwalWaktuFull: semua baris per hari termasuk istirahat (untuk tab Atur Pukul)
-        $defaultFull = AkademikJadwalWaktu::defaultScheduleFull();
-        $jadwalWaktuFull = $defaultFull;
+            // Cukup 1 query ke AkademikDistribusiMengajar untuk seluruh kebutuhan tab distribusi
+            $allDistribusiList = AkademikDistribusiMengajar::with(['guru', 'mataPelajaran', 'rombel', 'tahunAjaran'])
+                ->where('semester', $semester)
+                ->when($ta, fn($q) => $q->where('tahun_ajaran_id', $ta->id))
+                ->orderBy('mata_pelajaran_id')
+                ->orderBy('guru_id')
+                ->get();
 
-        // Override dengan data custom yang tersimpan di DB
-        if ($customWaktus->isNotEmpty()) {
-            foreach (array_keys($defaultFull) as $hari) {
-                $dbRows = $customWaktus->where('hari', $hari)->sortBy('urutan');
-                if ($dbRows->count() >= count($defaultFull[$hari])) {
-                    // Ada data custom lengkap — gunakan dari DB
-                    $jadwalWaktuFull[$hari] = $dbRows->map(fn($r) => [
-                        'tipe'   => $r->tipe ?? 'jam',
-                        'jam_ke' => $r->jam_ke,
-                        'urutan' => $r->urutan,
-                        'label'  => $r->label ?? ($r->tipe === 'istirahat' ? 'Istirahat' : 'Jam ' . $r->jam_ke),
-                        'pukul'  => $r->pukul,
-                    ])->values()->toArray();
-                } else {
-                    // Data parsial — merge default dengan override dari DB
-                    foreach ($jadwalWaktuFull[$hari] as &$row) {
-                        $dbRow = $customWaktus->where('hari', $hari)->where('jam_ke', $row['jam_ke'])->first();
-                        if ($dbRow) {
-                            $row['pukul'] = $dbRow->pukul;
-                            if ($dbRow->label) $row['label'] = $dbRow->label;
+            // Filter data untuk tabel paginasi jika ada filter aktif
+            $filteredDistribusi = $allDistribusiList;
+            if ($request->filled('guru_id')) {
+                $filteredDistribusi = $filteredDistribusi->where('guru_id', $request->guru_id);
+            }
+            if ($request->filled('rombel_id')) {
+                $filteredDistribusi = $filteredDistribusi->where('rombel_id', $request->rombel_id);
+            }
+            if ($request->filled('mata_pelajaran_id')) {
+                $filteredDistribusi = $filteredDistribusi->where('mata_pelajaran_id', $request->mata_pelajaran_id);
+            }
+
+            // Gabungkan rombel jika 1 mapel diampu oleh guru yang sama
+            $groupedDistribusi = $filteredDistribusi->groupBy(function ($item) {
+                return $item->guru_id . '_' . $item->mata_pelajaran_id . '_' . $item->semester;
+            })->map(function ($items) {
+                $first = $items->first();
+                return (object) [
+                    'id' => $first->id,
+                    'ids' => $items->pluck('id')->toArray(),
+                    'ids_string' => $items->pluck('id')->implode(','),
+                    'guru_id' => $first->guru_id,
+                    'guru' => $first->guru,
+                    'mata_pelajaran_id' => $first->mata_pelajaran_id,
+                    'mataPelajaran' => $first->mataPelajaran,
+                    'semester' => $first->semester,
+                    'total_jam_per_minggu' => $first->total_jam_per_minggu,
+                    'total_jam_akumulasi' => $items->sum('total_jam_per_minggu'),
+                    'rombels' => $items->pluck('rombel')->filter()->unique('id')->values(),
+                    'rombel_ids' => $items->pluck('rombel_id')->toArray(),
+                    'catatan' => $first->catatan,
+                ];
+            })->values();
+
+            $currentPage = \Illuminate\Pagination\Paginator::resolveCurrentPage() ?: 1;
+            $perPage = 25;
+            $currentPageItems = $groupedDistribusi->slice(($currentPage - 1) * $perPage, $perPage)->values();
+            $distribusis = new \Illuminate\Pagination\LengthAwarePaginator(
+                $currentPageItems,
+                $groupedDistribusi->count(),
+                $perPage,
+                $currentPage,
+                ['path' => \Illuminate\Pagination\Paginator::resolveCurrentPath(), 'query' => $request->query()]
+            );
+
+            // Matriks Distribusi: [mata_pelajaran_id][rombel_id] => AkademikDistribusiMengajar
+            foreach ($allDistribusiList as $dist) {
+                $matrixDistribusi[$dist->mata_pelajaran_id][$dist->rombel_id] = $dist;
+            }
+
+            // Rekap JJM dihitung langsung dari in-memory collection (Zero Query)
+            $rekapJjm = $allDistribusiList->groupBy('guru_id')->map(function ($items, $gId) {
+                return (object) [
+                    'guru_id' => $gId,
+                    'guru' => $items->first()->guru,
+                    'total_jam' => $items->sum('total_jam_per_minggu'),
+                    'total_rombel' => $items->count(),
+                ];
+            })->values();
+
+            // Rekap Beban Mengajar & Tugas Tambahan Seluruh Guru (Standar Permendikbud 15/2018 & Dapodik)
+            $rekapBebanGuru = $gurus->map(function ($guru) use ($allDistribusiList) {
+                $guruDists = $allDistribusiList->where('guru_id', $guru->id);
+                $jtmMurni = $guruDists->sum('total_jam_per_minggu');
+                $tugasTambahan = $guru->tugas_tambahan_list;
+                $eqTugasTambahan = $guru->total_ekuivalen_tugas_tambahan;
+                $totalEkuivalen = $jtmMurni + $eqTugasTambahan;
+
+                $status = 'kurang';
+                if ($totalEkuivalen >= 24 && $totalEkuivalen <= 40) {
+                    $status = 'memenuhi';
+                } elseif ($totalEkuivalen > 40) {
+                    $status = 'lebih';
+                }
+
+                return (object) [
+                    'guru' => $guru,
+                    'jtm_murni' => $jtmMurni,
+                    'total_rombel' => $guruDists->pluck('rombel_id')->unique()->count(),
+                    'tugas_tambahan' => $tugasTambahan,
+                    'ekuivalen_tugas' => $eqTugasTambahan,
+                    'total_ekuivalen' => $totalEkuivalen,
+                    'status' => $status,
+                    'mapels' => $guruDists->pluck('mataPelajaran.nama_mapel')->filter()->unique()->values(),
+                ];
+            })->sortByDesc('total_ekuivalen')->values();
+
+            $masterTugasTambahan = AkademikMasterTugasTambahan::where('is_active', true)->orderBy('urutan')->orderBy('nama_tugas')->get();
+        }
+        // =========================================================================
+        // 3. TAB: PIKET (Penjadwalan Guru Piket Harian)
+        // =========================================================================
+        elseif ($tab === 'piket') {
+            $guruPikets = AkademikGuruPiket::with('wakaPiket')
+                ->where('semester', $semester)
+                ->when($ta, fn($q) => $q->where('tahun_ajaran_id', $ta->id))
+                ->get()
+                ->keyBy('hari');
+        }
+        // =========================================================================
+        // 4. TAB: PUKUL (Konfigurasi Jam Pelajaran & Waktu Istirahat)
+        // =========================================================================
+        elseif ($tab === 'pukul') {
+            $customWaktus = AkademikJadwalWaktu::where('tahun_ajaran_id', $ta?->id)
+                ->where('semester', $semester)
+                ->orderBy('hari')->orderBy('urutan')->orderBy('jam_ke')
+                ->get();
+
+            if ($customWaktus->isNotEmpty()) {
+                foreach (array_keys($jadwalWaktuFull) as $hari) {
+                    $dbRows = $customWaktus->where('hari', $hari)->sortBy('urutan');
+                    if ($dbRows->count() >= count($jadwalWaktuFull[$hari])) {
+                        $jadwalWaktuFull[$hari] = $dbRows->map(fn($r) => [
+                            'tipe'   => $r->tipe ?? 'jam',
+                            'jam_ke' => $r->jam_ke,
+                            'urutan' => $r->urutan,
+                            'label'  => $r->label ?? ($r->tipe === 'istirahat' ? 'Istirahat' : 'Jam ' . $r->jam_ke),
+                            'pukul'  => $r->pukul,
+                        ])->values()->toArray();
+                    } else {
+                        foreach ($jadwalWaktuFull[$hari] as &$row) {
+                            $dbRow = $customWaktus->where('hari', $hari)->where('jam_ke', $row['jam_ke'])->first();
+                            if ($dbRow) {
+                                $row['pukul'] = $dbRow->pukul;
+                                if ($dbRow->label) $row['label'] = $dbRow->label;
+                            }
                         }
+                        unset($row);
                     }
-                    unset($row);
                 }
             }
         }
-
-        // 4. Matriks Distribusi: [mata_pelajaran_id][rombel_id] => AkademikDistribusiMengajar
-        $allDistribusiList = AkademikDistribusiMengajar::with(['guru', 'mataPelajaran', 'rombel'])
-            ->where('semester', $semester)
-            ->when($ta, fn($q) => $q->where('tahun_ajaran_id', $ta->id))
-            ->get();
-
-        $matrixDistribusi = [];
-        foreach ($allDistribusiList as $dist) {
-            $matrixDistribusi[$dist->mata_pelajaran_id][$dist->rombel_id] = $dist;
-        }
-
-        // 5. Rekap Beban Mengajar & Tugas Tambahan Seluruh Guru (Standar Permendikbud 15/2018 & Dapodik)
-        $rekapBebanGuru = $gurus->map(function ($guru) use ($allDistribusiList) {
-            $guruDists = $allDistribusiList->where('guru_id', $guru->id);
-            $jtmMurni = $guruDists->sum('total_jam_per_minggu');
-            $tugasTambahan = $guru->tugas_tambahan_list;
-            $eqTugasTambahan = $guru->total_ekuivalen_tugas_tambahan;
-            $totalEkuivalen = $jtmMurni + $eqTugasTambahan;
-
-            $status = 'kurang';
-            if ($totalEkuivalen >= 24 && $totalEkuivalen <= 40) {
-                $status = 'memenuhi';
-            } elseif ($totalEkuivalen > 40) {
-                $status = 'lebih';
-            }
-
-            return (object) [
-                'guru' => $guru,
-                'jtm_murni' => $jtmMurni,
-                'total_rombel' => $guruDists->pluck('rombel_id')->unique()->count(),
-                'tugas_tambahan' => $tugasTambahan,
-                'ekuivalen_tugas' => $eqTugasTambahan,
-                'total_ekuivalen' => $totalEkuivalen,
-                'status' => $status,
-                'mapels' => $guruDists->pluck('mataPelajaran.nama_mapel')->filter()->unique()->values(),
-            ];
-        })->sortByDesc('total_ekuivalen')->values();
-
-        $masterTugasTambahan = AkademikMasterTugasTambahan::where('is_active', true)->orderBy('urutan')->orderBy('nama_tugas')->get();
 
         return view('akademik.jadwal.index', compact(
             'distribusis', 'ta', 'gurus', 'rombels', 'mapels', 'semester', 'rekapJjm',
