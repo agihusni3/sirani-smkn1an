@@ -106,9 +106,13 @@ class LaporanController extends Controller
         if ($kategori === 'siswa') {
             if ($periode === 'harian') {
                 \App\Services\EvaluasiPresensiService::evaluasiOtomatisJikaWaktunya($tanggal);
-                // Sinkronkan status Alpha otomatis setelah pukul 09:00 jika hari aktif sekolah
+                // Sinkronkan status Alpha otomatis setelah pukul 09:00 jika hari aktif sekolah (hanya 1x per hari via cache)
                 if ($tanggal === Carbon::today()->toDateString() && now()->format('H:i') >= '09:00' && !\App\Models\HariLibur::isLibur($tanggal)) {
-                    \Illuminate\Support\Facades\Artisan::call('piket:kunci-alpha', ['tanggal' => $tanggal]);
+                    $cacheKey = 'piket_kunci_alpha_ran_' . $tanggal;
+                    if (!\Illuminate\Support\Facades\Cache::has($cacheKey)) {
+                        \Illuminate\Support\Facades\Artisan::call('piket:kunci-alpha', ['tanggal' => $tanggal]);
+                        \Illuminate\Support\Facades\Cache::put($cacheKey, true, now()->endOfDay());
+                    }
                 }
             } else {
                 \App\Services\EvaluasiPresensiService::evaluasiOtomatisJikaWaktunya(Carbon::today()->toDateString());

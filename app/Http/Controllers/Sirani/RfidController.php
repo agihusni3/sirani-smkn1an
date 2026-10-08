@@ -158,10 +158,19 @@ class RfidController extends Controller
         $statTotalAktif = $statSiswaAktif + $statGuruAktif;
         $statRfidPaired = KartuRfid::where('status', 'aktif')->count();
 
-        // Data Siswa & Guru untuk opsi pendaftaran/pairing
+        // Data Siswa & Guru untuk opsi pendaftaran/pairing (hanya kolom esensial untuk modal pairing)
         $rombels = \App\Models\Rombel::orderBy('nama_rombel')->get();
-        $allSiswas = Siswa::where('status', 'aktif')->with('siswaRombels.rombel')->orderBy('nama')->get();
-        $allGurus = Guru::where('status', 'aktif')->orderBy('nama')->get();
+        $allSiswas = Siswa::where('status', 'aktif')
+            ->select('id', 'nama', 'nisn', 'foto')
+            ->with(['siswaRombels' => function ($q) {
+                $q->where('status_keanggotaan', 'aktif')->with('rombel:id,nama_rombel');
+            }])
+            ->orderBy('nama')
+            ->get();
+        $allGurus = Guru::where('status', 'aktif')
+            ->select('id', 'nama', 'nip', 'jabatan', 'foto')
+            ->orderBy('nama')
+            ->get();
 
         return view('sirani.rfid.index', compact(
             'kartus',
@@ -259,7 +268,7 @@ class RfidController extends Controller
     /**
      * Redirect langsung ke Portal Presensi Mandiri Terpadu Siswa & Orang Tua
      */
-    public function portalSiswa(?string $nisn = null, Request $request = null)
+    public function portalSiswa(?string $nisn = null, ?Request $request = null)
     {
         $nisn = $nisn ?: ($request ? ($request->input('nisn') ?: $request->input('nis') ?: $request->input('keyword')) : null);
 
@@ -273,7 +282,7 @@ class RfidController extends Controller
     /**
      * Redirect langsung ke Portal Presensi Mandiri Terpadu Siswa & Orang Tua
      */
-    public function kartuDigital(string $identifier, Request $request = null)
+    public function kartuDigital(string $identifier, ?Request $request = null)
     {
         return redirect()->route('portal.ortu.detail', ['nisn' => $identifier]);
     }
@@ -295,13 +304,25 @@ class RfidController extends Controller
      */
     public static function getPublicBaseUrl(): string
     {
-        // 1. Cek apakah ada active ngrok tunnel di local
+        // 1. Cek Request Host jika bukan localhost (misal domain live produksi)
+        $host = request()->getHost();
+        if ($host && !in_array($host, ['localhost', '127.0.0.1'])) {
+            return rtrim(request()->getSchemeAndHttpHost(), '/');
+        }
+
+        // 2. Cek APP_URL dari konfigurasi
+        $appUrl = config('app.url');
+        if ($appUrl && !str_contains($appUrl, 'localhost') && !str_contains($appUrl, '127.0.0.1')) {
+            return rtrim($appUrl, '/');
+        }
+
+        // 3. Hanya di environment lokal: cek apakah ada active ngrok tunnel
         try {
             $ch = curl_init('http://127.0.0.1:4040/api/tunnels');
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-            curl_setopt($ch, CURLOPT_TIMEOUT, 1);
+            curl_setopt($ch, CURLOPT_TIMEOUT_MS, 300);
+            curl_setopt($ch, CURLOPT_CONNECTTIMEOUT_MS, 200);
             $res = curl_exec($ch);
-            curl_close($ch);
             if ($res) {
                 $data = json_decode($res, true);
                 if (!empty($data['tunnels'][0]['public_url'])) {
@@ -309,18 +330,6 @@ class RfidController extends Controller
                 }
             }
         } catch (\Throwable $e) {}
-
-        // 2. Cek Request Host jika bukan localhost
-        $host = request()->getHost();
-        if ($host && !in_array($host, ['localhost', '127.0.0.1'])) {
-            return rtrim(request()->getSchemeAndHttpHost(), '/');
-        }
-
-        // 3. Cek APP_URL dari konfigurasi
-        $appUrl = config('app.url');
-        if ($appUrl && !str_contains($appUrl, 'localhost') && !str_contains($appUrl, '127.0.0.1')) {
-            return rtrim($appUrl, '/');
-        }
 
         return rtrim(request()->getSchemeAndHttpHost(), '/');
     }
@@ -761,24 +770,48 @@ class RfidController extends Controller
     {
         $today = Carbon::today()->toDateString();
 
-        // 1. Aktivitas scan terkini (mencatat baik saat scan masuk maupun saat scan pulang)
-        $absensiHariIni = Absensi::where('tanggal', $today)
+        // 1. Aktivitas scan terkini (hanya ambil 20 entri terakhir langsung via SQL teroptimasi)
+        $recentAbsensis = Absensi::where('tanggal', $today)
             ->where(function ($q) {
                 $q->whereNotNull('jam_masuk')->orWhereNotNull('jam_pulang');
             })
-            ->with(['siswa.siswaRombels.rombel', 'guru'])
+            ->orderByDesc('updated_at')
+            ->limit(20)
+            ->with([
+                'siswa' => fn($q) => $q->select('id', 'nama', 'nisn', 'foto'),
+                'siswa.siswaRombels' => fn($q) => $q->where('status_keanggotaan', 'aktif')->with('rombel:id,nama_rombel'),
+                'guru' => fn($q) => $q->select('id', 'nama', 'nip', 'jabatan', 'foto'),
+            ])
             ->get();
 
         $scanEvents = collect();
 
-        foreach ($absensiHariIni as $a) {
+        foreach ($recentAbsensis as $a) {
             $isSiswa = $a->pemilik_type === 'siswa';
             $person = $isSiswa ? $a->siswa : $a->guru;
             if (!$person) continue;
 
-            $rombel = $isSiswa ? ($person?->siswaRombels?->first()?->rombel?->nama_rombel ?? '-') : ($person?->jabatan ?? 'Guru');
-            $identitas = $isSiswa ? ('NISN: ' . ($person?->nisn ?: '-')) : ($person?->nip ? 'NIP: ' . $person->nip : 'Non-NIP');
-            $foto = $person?->foto_url ?? '/img/user-default.png';
+            $rombel = $isSiswa ? ($person->siswaRombels->first()?->rombel?->nama_rombel ?? '-') : ($person->jabatan ?? 'Guru');
+            $identitas = $isSiswa ? ('NISN: ' . ($person->nisn ?: '-')) : ($person->nip ? 'NIP: ' . $person->nip : 'Non-NIP');
+            $foto = $person->foto_url ?? '/img/user-default.png';
+
+            // Peristiwa Scan Pulang (jika sudah tap pulang)
+            if (!empty($a->jam_pulang)) {
+                $scanEvents->push([
+                    'id'                  => $a->id . '_pulang',
+                    'nama'                => $person->nama,
+                    'type'                => $a->pemilik_type,
+                    'identitas'           => $identitas,
+                    'rombel'              => $rombel,
+                    'rombel_atau_jabatan' => $rombel,
+                    'foto'                => $foto,
+                    'status'              => 'pulang',
+                    'status_label'        => 'Pulang',
+                    'jam'                 => substr($a->jam_pulang, 0, 5),
+                    'time'                => substr($a->jam_pulang, 0, 8),
+                    'sort_time'           => $a->jam_pulang,
+                ]);
+            }
 
             // Peristiwa Scan Masuk (jika sudah tap masuk)
             if (!empty($a->jam_masuk)) {
@@ -799,24 +832,6 @@ class RfidController extends Controller
                     'sort_time'           => $a->jam_masuk,
                 ]);
             }
-
-            // Peristiwa Scan Pulang (jika sudah tap pulang)
-            if (!empty($a->jam_pulang)) {
-                $scanEvents->push([
-                    'id'                  => $a->id . '_pulang',
-                    'nama'                => $person->nama,
-                    'type'                => $a->pemilik_type,
-                    'identitas'           => $identitas,
-                    'rombel'              => $rombel,
-                    'rombel_atau_jabatan' => $rombel,
-                    'foto'                => $foto,
-                    'status'              => 'pulang',
-                    'status_label'        => 'Pulang',
-                    'jam'                 => substr($a->jam_pulang, 0, 5),
-                    'time'                => substr($a->jam_pulang, 0, 8),
-                    'sort_time'           => $a->jam_pulang,
-                ]);
-            }
         }
 
         $recentScans = $scanEvents->sortByDesc('sort_time')->take(20)->values();
@@ -824,30 +839,34 @@ class RfidController extends Controller
         // 2. Log Percobaan Gagal Absen / Ditolak hari ini
         $failedScans = \App\Services\RfidScanService::getFailedScansToday();
 
-        // 3. Siswa yang Belum Hadir (Ditiadakan dari Kios agar pemuatan feed lebih cepat dan ringan)
         $isLibur = \App\Models\HariLibur::isLibur($today);
-        $belumHadir = collect();
 
-        // 4. Statistik Ringkas
-        $totalHadir = Absensi::where('tanggal', $today)->where('status', 'hadir')->count();
-        $totalTerlambat = Absensi::where('tanggal', $today)->where('status', 'terlambat')->count();
-        $totalPulang = Absensi::where('tanggal', $today)->whereNotNull('jam_pulang')->count();
+        // 3. Statistik Ringkas dalam 1 query agregasi
+        $statsRaw = Absensi::where('tanggal', $today)
+            ->selectRaw("
+                SUM(CASE WHEN status = 'hadir' THEN 1 ELSE 0 END) as total_hadir,
+                SUM(CASE WHEN status = 'terlambat' THEN 1 ELSE 0 END) as total_terlambat,
+                SUM(CASE WHEN jam_pulang IS NOT NULL THEN 1 ELSE 0 END) as total_pulang
+            ")
+            ->first();
+
+        $totalHadir     = (int) ($statsRaw->total_hadir ?? 0);
+        $totalTerlambat = (int) ($statsRaw->total_terlambat ?? 0);
+        $totalPulang    = (int) ($statsRaw->total_pulang ?? 0);
 
         return response()->json([
-            'success'            => true,
-            'is_libur'           => $isLibur,
-            'recent_scans'       => $recentScans,
-            'failed_scans'       => $failedScans,
-            'belum_hadir'        => $belumHadir,
-            'stats'              => [
+            'success'      => true,
+            'is_libur'     => $isLibur,
+            'recent_scans' => $recentScans,
+            'failed_scans' => $failedScans,
+            'stats'        => [
                 'total_hadir'       => $totalHadir,
                 'total_terlambat'   => $totalTerlambat,
                 'total_pulang'      => $totalPulang,
                 'total_gagal'       => count($failedScans),
-                'total_belum_absen' => $isLibur ? 0 : count($belumHadir),
-                'is_libur'          => $isLibur,
+                'total_belum_absen' => 0,
             ],
-            'server_time'        => now()->format('H:i:s'),
+            'server_time'  => now()->format('H:i:s'),
         ]);
     }
 

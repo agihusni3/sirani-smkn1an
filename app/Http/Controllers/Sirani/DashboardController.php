@@ -27,11 +27,6 @@ class DashboardController extends Controller
         // ── 1. DATA SISWA ──
         $totalSiswaActive = Siswa::where('status', 'aktif')->count();
         $totalSiswaPkl    = Siswa::where('status', 'aktif')->where('status_pkl', 'aktif_pkl')->count();
-        $siswaHadir       = Absensi::where('pemilik_type', 'siswa')->where('tanggal', $today)->where('status', 'hadir')->count();
-        $siswaTerlambat   = Absensi::where('pemilik_type', 'siswa')->where('tanggal', $today)->where('status', 'terlambat')->count();
-        $siswaIzin        = Absensi::where('pemilik_type', 'siswa')->where('tanggal', $today)->whereIn('status', ['sakit', 'izin', 'dispen'])->count();
-        $siswaAlpha       = Absensi::where('pemilik_type', 'siswa')->where('tanggal', $today)->where('status', 'alpha')->count();
-        $persenSekolah    = $totalSiswaActive > 0 ? min(100.0, round((($siswaHadir + $siswaTerlambat) / $totalSiswaActive) * 100, 1)) : 0;
 
         // Semua siswa aktif beserta rombelnya (Query tunggal teroptimasi untuk JS & kalkulasi rombel)
         $allActiveSiswas = Siswa::where('status', 'aktif')
@@ -46,44 +41,55 @@ class DashboardController extends Controller
             }])
             ->get();
 
-        $semuaSiswaList = $allActiveSiswas;
-
-        // Daftar absensi siswa hari ini
+        // Daftar absensi siswa hari ini (single source of truth untuk absensi siswa hari ini)
         $absensiSiswaHariIni = Absensi::with(['siswa', 'siswaRombel.rombel'])
             ->where('pemilik_type', 'siswa')
             ->where('tanggal', $today)
             ->orderBy('jam_masuk', 'asc')
             ->get();
 
+        $todayAbsensis = $absensiSiswaHariIni->keyBy('pemilik_id');
+
+        $siswaHadir     = $absensiSiswaHariIni->where('status', 'hadir')->count();
+        $siswaTerlambat = $absensiSiswaHariIni->where('status', 'terlambat')->count();
+        $siswaIzin      = $absensiSiswaHariIni->filter(fn($a) => in_array($a->status, ['sakit', 'izin', 'dispen']))->count();
+        $siswaAlpha     = $absensiSiswaHariIni->where('status', 'alpha')->count();
+        $siswaBolos     = $absensiSiswaHariIni->where('status', 'bolos')->count();
+        $persenSekolah  = $totalSiswaActive > 0 ? min(100.0, round((($siswaHadir + $siswaTerlambat) / $totalSiswaActive) * 100, 1)) : 0;
+
+        // Payload teroptimasi untuk modal drilldown JS (hanya field esensial, pangkas overhead JSON)
+        $semuaSiswaList = $allActiveSiswas->map(function ($s) {
+            return [
+                'id'          => $s->id,
+                'nis'         => $s->nis,
+                'nama'        => $s->nama,
+                'status_pkl'  => $s->status_pkl,
+                'rombel_nama' => $s->siswaRombels->first()?->rombel?->nama_rombel ?? '-',
+            ];
+        });
+
         // ── 2. DATA GURU & PEGAWAI ──
-        $totalGuruActive  = Guru::where('status', 'aktif')->count();
-        $guruHadir        = Absensi::where('pemilik_type', 'guru')->where('tanggal', $today)->where('status', 'hadir')->count();
-        $guruTerlambat    = Absensi::where('pemilik_type', 'guru')->where('tanggal', $today)->where('status', 'terlambat')->count();
-        $guruIzin         = Absensi::where('pemilik_type', 'guru')->where('tanggal', $today)->whereIn('status', ['sakit', 'izin', 'dispen'])->count();
-        $guruTotalScan    = Absensi::where('pemilik_type', 'guru')->where('tanggal', $today)->count();
-        $guruBelumHadir   = max(0, $totalGuruActive - $guruTotalScan);
-        $persenGuru       = $totalGuruActive > 0 ? min(100.0, round(($guruTotalScan / $totalGuruActive) * 100, 1)) : 0;
-
-        // Semua guru aktif (hanya kolom yg dibutuhkan JS)
-        $semuaGuruList = Guru::where('status', 'aktif')->select('id', 'nip', 'nama', 'jabatan')->get();
-
-        // Daftar absensi guru hari ini
+        $totalGuruActive    = Guru::where('status', 'aktif')->count();
         $absensiGuruHariIni = Absensi::with('guru')
             ->where('pemilik_type', 'guru')
             ->where('tanggal', $today)
             ->orderBy('jam_masuk', 'asc')
             ->get();
 
-        // ── 3. SUMMARY PER ROMBEL (MENGGUNAKAN KOLEKSI AKTIF TUNGGAL) ──
+        $guruHadir        = $absensiGuruHariIni->where('status', 'hadir')->count();
+        $guruTerlambat    = $absensiGuruHariIni->where('status', 'terlambat')->count();
+        $guruIzin         = $absensiGuruHariIni->filter(fn($a) => in_array($a->status, ['sakit', 'izin', 'dispen']))->count();
+        $guruTotalScan    = $absensiGuruHariIni->count();
+        $guruBelumHadir   = max(0, $totalGuruActive - $guruTotalScan);
+        $persenGuru       = $totalGuruActive > 0 ? min(100.0, round(($guruTotalScan / $totalGuruActive) * 100, 1)) : 0;
 
+        // Semua guru aktif (hanya kolom yg dibutuhkan JS)
+        $semuaGuruList = Guru::where('status', 'aktif')->select('id', 'nip', 'nama', 'jabatan')->get();
+
+        // ── 3. SUMMARY PER ROMBEL (MENGGUNAKAN KOLEKSI AKTIF TUNGGAL) ──
         $siswaByRombel = $allActiveSiswas->groupBy(function ($s) {
             return $s->siswaRombels->first()?->rombel_id;
         });
-
-        $todayAbsensis = Absensi::where('pemilik_type', 'siswa')
-            ->where('tanggal', $today)
-            ->get()
-            ->keyBy('pemilik_id');
 
         $rombelSummary = Rombel::all()->map(function ($rombel) use ($siswaByRombel, $todayAbsensis) {
             $siswas = $siswaByRombel->get($rombel->id, collect());
@@ -102,6 +108,7 @@ class DashboardController extends Controller
             $persen = $totalSiswa > 0 ? round((($hadir + $terlambat) / $totalSiswa) * 100, 1) : 0;
 
             return (object) [
+                'id'          => $rombel->id,
                 'nama_rombel' => $rombel->nama_rombel,
                 'total_siswa' => $totalSiswa,
                 'hadir'       => $hadir,
@@ -251,7 +258,8 @@ class DashboardController extends Controller
         }
 
         // ── 7. DISTRIBUSI KEDISIPLINAN PER JURUSAN ──
-        $jurusanList = \App\Models\Jurusan::with('rombels')->get();
+        $jurusanList = \App\Models\Jurusan::with('rombels:id,jurusan_id')->get();
+        $rombelSummaryById = $rombelSummary->keyBy('id');
 
         $jurusanLabels = [];
         $jurusanPersen = [];
@@ -264,15 +272,11 @@ class DashboardController extends Controller
             $alphaJur = 0;
 
             foreach ($jur->rombels as $r) {
-                $siswasInRombel = $siswaByRombel->get($r->id, collect());
-                $totalSisInJur += $siswasInRombel->count();
-
-                foreach ($siswasInRombel as $s) {
-                    $ab = $todayAbsensis->get($s->id);
-                    if ($ab) {
-                        if (in_array($ab->status, ['hadir', 'terlambat'])) $hadirJur++;
-                        elseif (in_array($ab->status, ['alpha', 'bolos'])) $alphaJur++;
-                    }
+                $rSum = $rombelSummaryById->get($r->id);
+                if ($rSum) {
+                    $totalSisInJur += $rSum->total_siswa;
+                    $hadirJur      += ($rSum->hadir + $rSum->terlambat);
+                    $alphaJur      += $rSum->alpha;
                 }
             }
 
@@ -285,8 +289,6 @@ class DashboardController extends Controller
             $jurusanHadir[]  = $hadirJur;
             $jurusanAlpha[]  = $alphaJur;
         }
-
-        $siswaBolos = $todayAbsensis->where('status', 'bolos')->count();
 
         // Data Donut Chart Komposisi Kehadiran Hari Ini
         $donutSiswaLabels = ['Hadir Tepat Waktu', 'Terlambat', 'Sakit / Izin', 'Alpha', 'Bolos'];
@@ -582,11 +584,19 @@ class DashboardController extends Controller
 
         // D. Kepala Sekolah Specific Data
         $kepsekKasusTahap4List = collect();
+        $kepsekCountsRaw = \App\Models\KasusDisiplin::where('is_active', true)
+            ->selectRaw("
+                SUM(CASE WHEN status_tahap = 'tahap_1_wali_kelas' THEN 1 ELSE 0 END) as t1,
+                SUM(CASE WHEN status_tahap = 'tahap_2_bk' THEN 1 ELSE 0 END) as t2,
+                SUM(CASE WHEN status_tahap = 'tahap_3_wakasis' THEN 1 ELSE 0 END) as t3,
+                SUM(CASE WHEN status_tahap = 'tahap_4_kepsek' THEN 1 ELSE 0 END) as t4
+            ")->first();
+
         $kepsekStageCounts = (object)[
-            'tahap_1' => \App\Models\KasusDisiplin::where('is_active', true)->where('status_tahap', 'tahap_1_wali_kelas')->count(),
-            'tahap_2' => \App\Models\KasusDisiplin::where('is_active', true)->where('status_tahap', 'tahap_2_bk')->count(),
-            'tahap_3' => \App\Models\KasusDisiplin::where('is_active', true)->where('status_tahap', 'tahap_3_wakasis')->count(),
-            'tahap_4' => \App\Models\KasusDisiplin::where('is_active', true)->where('status_tahap', 'tahap_4_kepsek')->count(),
+            'tahap_1' => (int) ($kepsekCountsRaw->t1 ?? 0),
+            'tahap_2' => (int) ($kepsekCountsRaw->t2 ?? 0),
+            'tahap_3' => (int) ($kepsekCountsRaw->t3 ?? 0),
+            'tahap_4' => (int) ($kepsekCountsRaw->t4 ?? 0),
         ];
 
         if ($currentUser && ($currentUser->isKepalaSekolah() || $currentUser->isAdmin())) {
@@ -628,12 +638,11 @@ class DashboardController extends Controller
             ->get();
         $piketBelumHadirCount = $isLiburHariIni ? 0 : max(0, $totalSiswaActive - ($siswaHadir + $siswaTerlambat + $siswaIzin + $totalSiswaPkl));
 
-        // Siswa yang sudah absen masuk tapi belum scan pulang (hadir, terlambat, atau bolos)
-        $siswaBelumPulangCount = Absensi::where('pemilik_type', 'siswa')
-            ->where('tanggal', $today)
+        // Siswa yang sudah absen masuk tapi belum scan pulang (dihitung langsung dari koleksi absensi hari ini)
+        $siswaBelumPulangCount = $absensiSiswaHariIni
             ->whereNotNull('jam_masuk')
             ->whereNull('jam_pulang')
-            ->whereIn('status', ['hadir', 'terlambat', 'bolos'])
+            ->filter(fn($a) => in_array($a->status, ['hadir', 'terlambat', 'bolos']))
             ->count();
 
         // Cek apakah sudah melewati jam tutup gerbang (17:00:00)
@@ -650,11 +659,10 @@ class DashboardController extends Controller
         $petugasPiketHariIniList = \App\Models\JadwalPiket::where('hari', $hariHariIni)
             ->with(['guru.user'])
             ->get();
-        $guruPiketIds = $petugasPiketHariIniList->pluck('guru_id');
-        $absensiPiketMap = Absensi::where('pemilik_type', 'guru')
+        $guruPiketIds = $petugasPiketHariIniList->pluck('guru_id')->toArray();
+        // Gunakan kembali absensiGuruHariIni yang sudah di-load di memori (tanpa query ulang)
+        $absensiPiketMap = $absensiGuruHariIni
             ->whereIn('pemilik_id', $guruPiketIds)
-            ->where('tanggal', $today)
-            ->get()
             ->keyBy('pemilik_id');
 
         $piketTotalTugas = $petugasPiketHariIniList->count();

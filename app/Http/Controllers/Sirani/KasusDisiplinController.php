@@ -39,10 +39,14 @@ class KasusDisiplinController extends Controller
         $katalogPelanggarans = KatalogPelanggaran::orderBy('kategori')->orderBy('nama_pelanggaran')->get();
 
         // 1. Auto-sync siswa baru yang memiliki pelanggaran dan belum tercatat di tabel kasus disiplin
-        $existingKasusIds = KasusDisiplin::where('is_active', true)->pluck('siswa_id')->toArray();
         $siswaPerluSync = Absensi::where('pemilik_type', 'siswa')
             ->whereIn('status', ['alpha', 'bolos'])
-            ->whereNotIn('pemilik_id', $existingKasusIds)
+            ->whereNotExists(function ($q) {
+                $q->select(\Illuminate\Support\Facades\DB::raw(1))
+                    ->from('kasus_disiplins')
+                    ->whereColumn('kasus_disiplins.siswa_id', 'absensis.pemilik_id')
+                    ->where('kasus_disiplins.is_active', true);
+            })
             ->selectRaw('pemilik_id, count(*) as total')
             ->groupBy('pemilik_id')
             ->having('total', '>=', 1)
@@ -111,24 +115,36 @@ class KasusDisiplinController extends Controller
             ->paginate(10)
             ->withQueryString();
 
-        // 3. Statistik Hitungan Angka per Tahap (Ringkasan statistik di kartu KPI sesuai wewenang/kelas user)
+        // 3. Statistik Hitungan Angka per Tahap dalam 1 query teragregasi
         $baseStatQuery = KasusDisiplin::where('is_active', true)->forUser($user);
         if ($rombelId) {
             $baseStatQuery->whereHas('siswa.siswaRombels', function ($q) use ($rombelId) {
                 $q->where('rombel_id', $rombelId)->where('status_keanggotaan', 'aktif');
             });
         }
-        $statTahap1    = (clone $baseStatQuery)->where('status_tahap', 'tahap_1_wali_kelas')->count();
-        $statTahap2    = (clone $baseStatQuery)->where('status_tahap', 'tahap_2_bk')->count();
-        $statTahap3    = (clone $baseStatQuery)->where('status_tahap', 'tahap_3_wakasis')->count();
-        $statTahap4    = (clone $baseStatQuery)->where('status_tahap', 'tahap_4_kepsek')->count();
-        $statSelesai   = (clone $baseStatQuery)->where('status_tahap', 'selesai_pembinaan')->count();
-        $totalKasus    = (clone $baseStatQuery)->count();
+
+        $statsStageRaw = (clone $baseStatQuery)
+            ->selectRaw("
+                SUM(CASE WHEN status_tahap = 'tahap_1_wali_kelas' THEN 1 ELSE 0 END) as t1,
+                SUM(CASE WHEN status_tahap = 'tahap_2_bk' THEN 1 ELSE 0 END) as t2,
+                SUM(CASE WHEN status_tahap = 'tahap_3_wakasis' THEN 1 ELSE 0 END) as t3,
+                SUM(CASE WHEN status_tahap = 'tahap_4_kepsek' THEN 1 ELSE 0 END) as t4,
+                SUM(CASE WHEN status_tahap = 'selesai_pembinaan' THEN 1 ELSE 0 END) as selesai,
+                COUNT(*) as total
+            ")->first();
+
+        $statTahap1    = (int) ($statsStageRaw->t1 ?? 0);
+        $statTahap2    = (int) ($statsStageRaw->t2 ?? 0);
+        $statTahap3    = (int) ($statsStageRaw->t3 ?? 0);
+        $statTahap4    = (int) ($statsStageRaw->t4 ?? 0);
+        $statSelesai   = (int) ($statsStageRaw->selesai ?? 0);
+        $totalKasus    = (int) ($statsStageRaw->total ?? 0);
 
         if ($user->isWaliKelas() && !$user->isAdmin() && !$user->isKepalaSekolah() && !$user->isWakaKesiswaan() && !$user->isGuruBk()) {
             $rombelIds = $user->guru ? $user->guru->rombels()->pluck('id') : collect();
             $rombels = Rombel::whereIn('id', $rombelIds)->orderBy('tingkat')->orderBy('nama_rombel')->get();
             $allSiswa = Siswa::where('status', 'aktif')
+                ->select('id', 'nama', 'nisn')
                 ->whereHas('siswaRombels', function ($q) use ($rombelIds) {
                     $q->whereIn('rombel_id', $rombelIds)->where('status_keanggotaan', 'aktif');
                 })
@@ -136,7 +152,7 @@ class KasusDisiplinController extends Controller
                 ->get();
         } else {
             $rombels = Rombel::orderBy('tingkat')->orderBy('nama_rombel')->get();
-            $allSiswa = Siswa::where('status', 'aktif')->orderBy('nama')->get();
+            $allSiswa = Siswa::where('status', 'aktif')->select('id', 'nama', 'nisn')->orderBy('nama')->get();
         }
 
         return view('sirani.disiplin.index', compact(

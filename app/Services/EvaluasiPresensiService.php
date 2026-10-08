@@ -71,43 +71,56 @@ class EvaluasiPresensiService
             ->whereHas('siswa', function ($query) {
                 $query->where('status', 'aktif');
             })
+            ->with([
+                'siswa:id,nama,nisn,no_hp_ortu,status',
+                'rombel:id,nama_rombel'
+            ])
             ->get();
+
+        // Preload seluruh absensi siswa & izin resmi hari ini dalam 2 query cepat (mencegah N+1 query per siswa)
+        $existingAbsensis = Absensi::where('pemilik_type', 'siswa')
+            ->where('tanggal', $tanggal)
+            ->get()
+            ->keyBy('pemilik_id');
+
+        $existingIzins = IzinSiswa::where('tanggal', $tanggal)
+            ->where('status', 'disetujui')
+            ->get()
+            ->keyBy('siswa_id');
 
         $countAlpha = 0;
         $countBolos = 0;
 
         foreach ($activeMemberships as $membership) {
-            try {
-                DB::transaction(function () use ($membership, $tanggal, &$countAlpha, &$countBolos) {
-                    $absensi = Absensi::where('pemilik_type', 'siswa')
-                        ->where('pemilik_id', $membership->siswa_id)
-                        ->where('tanggal', $tanggal)
-                        ->first();
+            $absensi = $existingAbsensis->get($membership->siswa_id);
+            $adaIzin = $existingIzins->get($membership->siswa_id);
 
+            // Jika absensi sudah lengkap atau sudah ada status final (hadir pulang, sakit, izin, dll), lewati langsung tanpa sentuh DB
+            if ($absensi && (!empty($absensi->jam_pulang) || !in_array($absensi->status, ['hadir', 'terlambat']))) {
+                continue;
+            }
+
+            try {
+                DB::transaction(function () use ($membership, $tanggal, $absensi, $adaIzin, &$countAlpha, &$countBolos) {
                     if (!$absensi) {
                         // 1. Siswa sama sekali tidak tap hadir & tanpa izin -> ALPHA
-                        $adaIzin = IzinSiswa::where('siswa_id', $membership->siswa_id)
-                            ->where('tanggal', $tanggal)
-                            ->where('status', 'disetujui')
-                            ->first();
-
                         if ($adaIzin) {
                             Absensi::create([
-                                'pemilik_type' => 'siswa',
-                                'pemilik_id' => $membership->siswa_id,
+                                'pemilik_type'    => 'siswa',
+                                'pemilik_id'      => $membership->siswa_id,
                                 'siswa_rombel_id' => $membership->id,
-                                'tanggal' => $tanggal,
-                                'status' => in_array($adaIzin->jenis, ['sakit', 'izin', 'dispen']) ? $adaIzin->jenis : 'izin',
-                                'sumber_absen' => 'auto_evaluasi_izin',
+                                'tanggal'         => $tanggal,
+                                'status'          => in_array($adaIzin->jenis, ['sakit', 'izin', 'dispen']) ? $adaIzin->jenis : 'izin',
+                                'sumber_absen'    => 'auto_evaluasi_izin',
                             ]);
                         } else {
                             Absensi::create([
-                                'pemilik_type' => 'siswa',
-                                'pemilik_id' => $membership->siswa_id,
+                                'pemilik_type'    => 'siswa',
+                                'pemilik_id'      => $membership->siswa_id,
                                 'siswa_rombel_id' => $membership->id,
-                                'tanggal' => $tanggal,
-                                'status' => 'alpha',
-                                'sumber_absen' => 'auto_evaluasi_alpha',
+                                'tanggal'         => $tanggal,
+                                'status'          => 'alpha',
+                                'sumber_absen'    => 'auto_evaluasi_alpha',
                             ]);
                             $countAlpha++;
 
@@ -141,14 +154,9 @@ class EvaluasiPresensiService
                         }
                     } elseif (in_array($absensi->status, ['hadir', 'terlambat']) && is_null($absensi->jam_pulang)) {
                         // 2. Siswa tap masuk pagi, tapi tidak tap pulang -> BOLOS (Pulang Tanpa Izin)
-                        $adaIzinPulang = IzinSiswa::where('siswa_id', $membership->siswa_id)
-                            ->where('tanggal', $tanggal)
-                            ->where('status', 'disetujui')
-                            ->exists();
-
-                        if (!$adaIzinPulang) {
+                        if (!$adaIzin) {
                             $absensi->update([
-                                'status'      => 'bolos',
+                                'status'       => 'bolos',
                                 'sumber_absen' => 'auto_evaluasi_bolos',
                             ]);
                             $countBolos++;

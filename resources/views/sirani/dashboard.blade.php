@@ -432,7 +432,7 @@
         list = rawSemuaSiswa.map(s => {
           const a = absenMap[s.id];
           const rombels = s.siswa_rombels || s.siswaRombels || [];
-          const rombelNama = (rombels.length > 0 && rombels[0].rombel) ? rombels[0].rombel.nama_rombel : '-';
+          const rombelNama = s.rombel_nama || ((rombels.length > 0 && rombels[0].rombel) ? rombels[0].rombel.nama_rombel : '-');
           const isPkl = (s.status_pkl === 'aktif_pkl' || s.status_pkl === 'pkl');
           
           let st = 'alpha';
@@ -457,7 +457,7 @@
       } else if (filterStatus === 'pkl') {
         list = rawSemuaSiswa.filter(s => s.status_pkl === 'aktif_pkl' || s.status_pkl === 'pkl').map(s => {
           const rombels = s.siswa_rombels || s.siswaRombels || [];
-          const rombelNama = (rombels.length > 0 && rombels[0].rombel) ? rombels[0].rombel.nama_rombel : '-';
+          const rombelNama = s.rombel_nama || ((rombels.length > 0 && rombels[0].rombel) ? rombels[0].rombel.nama_rombel : '-');
           return {
             type: 'siswa',
             siswaId: s.id,
@@ -495,7 +495,7 @@
         }).map(s => {
           const a = absenMap[s.id];
           const rombels = s.siswa_rombels || s.siswaRombels || [];
-          const rombelNama = (rombels.length > 0 && rombels[0].rombel) ? rombels[0].rombel.nama_rombel : '-';
+          const rombelNama = s.rombel_nama || ((rombels.length > 0 && rombels[0].rombel) ? rombels[0].rombel.nama_rombel : '-');
           return {
             type: 'siswa',
             siswaId: s.id,

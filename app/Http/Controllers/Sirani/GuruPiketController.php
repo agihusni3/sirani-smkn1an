@@ -104,14 +104,16 @@ class GuruPiketController extends Controller
         $izinCount = count($izinSiswaIds);
         $belumAbsen = $isLibur ? 0 : max(0, $totalSiswaAktif - $absensiHariIni->count());
 
-        // Data untuk form presensi manual
+        // Data untuk form presensi manual (hanya kolom esensial untuk formulir & pencarian)
         $semuaSiswa = Siswa::where('status', 'aktif')
+            ->select('id', 'nama', 'nis', 'nisn')
             ->with([
                 'siswaRombels' => function ($q) use ($taAktif) {
                     if ($taAktif) {
                         $q->where('tahun_ajaran_id', $taAktif->id)
                           ->where('status_keanggotaan', 'aktif')
-                          ->with('rombel');
+                          ->select('id', 'siswa_id', 'rombel_id')
+                          ->with('rombel:id,nama_rombel');
                     }
                 }
             ])
@@ -119,19 +121,21 @@ class GuruPiketController extends Controller
             ->get();
 
         // Siswa belum hadir dan belum izin (potensi alpha / bolos)
-        // Pada hari libur atau akhir pekan, siswa bebas presensi sehingga list belum hadir dikosongkan
+        // Gunakan hash map O(1) untuk performa filter instan
         if ($isLibur) {
             $siswaBelumHadirList = collect();
         } else {
-            $siswaBelumHadirList = $semuaSiswa->filter(function ($s) use ($hadirSiswaIds, $izinSiswaIds) {
-                return !in_array($s->id, $hadirSiswaIds) && !in_array($s->id, $izinSiswaIds);
+            $hadirSiswaMap = array_flip($hadirSiswaIds);
+            $izinSiswaMap  = array_flip($izinSiswaIds);
+            $siswaBelumHadirList = $semuaSiswa->filter(function ($s) use ($hadirSiswaMap, $izinSiswaMap) {
+                return !isset($hadirSiswaMap[$s->id]) && !isset($izinSiswaMap[$s->id]);
             });
         }
 
         // Siswa terlambat hari ini
         $siswaTerlambatList = $absensiHariIni->where('status', 'terlambat');
 
-        $semuaGuru = Guru::where('status', 'aktif')->orderBy('nama')->get();
+        $semuaGuru = Guru::where('status', 'aktif')->select('id', 'nama', 'nip', 'jabatan')->orderBy('nama')->get();
 
         // ── REKAP STATISTIK KEHADIRAN DEWAN GURU & PEGAWAI HARI INI ──
         $guruHadirTepat      = $absensiGuruHariIni->where('status', 'hadir')->count();
@@ -146,8 +150,9 @@ class GuruPiketController extends Controller
         if ($isLibur) {
             $guruBelumHadirList = collect();
         } else {
-            $guruBelumHadirList = $semuaGuru->filter(function ($g) use ($hadirGuruIds) {
-                return !in_array($g->id, $hadirGuruIds);
+            $hadirGuruMap = array_flip($hadirGuruIds);
+            $guruBelumHadirList = $semuaGuru->filter(function ($g) use ($hadirGuruMap) {
+                return !isset($hadirGuruMap[$g->id]);
             });
         }
 

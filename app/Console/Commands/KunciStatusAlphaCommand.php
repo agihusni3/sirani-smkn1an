@@ -15,15 +15,22 @@ use Illuminate\Support\Facades\DB;
 
 class KunciStatusAlphaCommand extends Command
 {
-    protected $signature = 'piket:kunci-alpha {tanggal?}';
+    protected $signature = 'piket:kunci-alpha {tanggal?} {--force}';
     protected $description = 'Pukul 09:00 — kunci status siswa & guru yang belum hadir menjadi Alpha';
 
     public function handle()
     {
         $tanggal = $this->argument('tanggal') ?? Carbon::today()->toDateString();
+        $force = (bool) $this->option('force');
 
         if (HariLibur::isLibur($tanggal)) {
             $this->info("Tanggal {$tanggal} adalah hari libur. Kunci Alpha dilewati.");
+            return 0;
+        }
+
+        $cacheKey = 'piket_kunci_alpha_ran_' . $tanggal;
+        if (!$force && \Illuminate\Support\Facades\Cache::has($cacheKey)) {
+            $this->info("Kunci status Alpha untuk {$tanggal} sudah pernah dijalankan hari ini.");
             return 0;
         }
 
@@ -42,64 +49,68 @@ class KunciStatusAlphaCommand extends Command
         $activeMemberships = SiswaRombel::where('tahun_ajaran_id', $taAktif->id)
             ->where('status_keanggotaan', 'aktif')
             ->whereHas('siswa', fn($q) => $q->where('status', 'aktif'))
+            ->with(['siswa:id,nama,nisn,status', 'rombel:id,nama_rombel'])
             ->get();
 
+        // Bulk lookup ID yang sudah memiliki catatan absensi atau izin resmi
+        $existingSiswaAbsensiMap = Absensi::where('pemilik_type', 'siswa')
+            ->where('tanggal', $tanggal)
+            ->pluck('pemilik_id')
+            ->flip()
+            ->all();
+
+        $existingIzinSiswaMap = IzinSiswa::where('tanggal', $tanggal)
+            ->where('status', 'disetujui')
+            ->pluck('siswa_id')
+            ->flip()
+            ->all();
+
         foreach ($activeMemberships as $membership) {
-            DB::transaction(function () use ($membership, $tanggal, &$countSiswaAlpha) {
-                // Cek apakah sudah ada record absensi
-                $absensi = Absensi::where('pemilik_type', 'siswa')
-                    ->where('pemilik_id', $membership->siswa_id)
-                    ->where('tanggal', $tanggal)
-                    ->first();
+            // Sudah ada catatan absensi atau izin resmi — lewati langsung tanpa query
+            if (isset($existingSiswaAbsensiMap[$membership->siswa_id]) || isset($existingIzinSiswaMap[$membership->siswa_id])) {
+                continue;
+            }
 
-                if ($absensi) return; // Sudah ada catatan (hadir/izin/dll) — lewati
+            try {
+                DB::transaction(function () use ($membership, $tanggal, &$countSiswaAlpha) {
+                    Absensi::create([
+                        'pemilik_type'    => 'siswa',
+                        'pemilik_id'      => $membership->siswa_id,
+                        'siswa_rombel_id' => $membership->id,
+                        'tanggal'         => $tanggal,
+                        'status'          => 'alpha',
+                        'sumber_absen'    => 'auto_kunci_piket',
+                        'keterangan'      => 'Dikunci otomatis sistem pukul 09:00 — tanpa keterangan dari Guru Piket',
+                    ]);
+                    $countSiswaAlpha++;
 
-                // Cek izin yang sudah disetujui
-                $adaIzin = IzinSiswa::where('siswa_id', $membership->siswa_id)
-                    ->where('tanggal', $tanggal)
-                    ->where('status', 'disetujui')
-                    ->exists();
-
-                if ($adaIzin) return; // Ada izin resmi — lewati
-
-                // Kunci sebagai Alpha
-                Absensi::create([
-                    'pemilik_type'    => 'siswa',
-                    'pemilik_id'      => $membership->siswa_id,
-                    'siswa_rombel_id' => $membership->id,
-                    'tanggal'         => $tanggal,
-                    'status'          => 'alpha',
-                    'sumber_absen'    => 'auto_kunci_piket',
-                    'keterangan'      => 'Dikunci otomatis sistem pukul 09:00 — tanpa keterangan dari Guru Piket',
-                ]);
-                $countSiswaAlpha++;
-
-                // Buat draf notifikasi Alpha
-                try {
                     if ($membership->siswa) {
-                        \App\Services\NotifikasiDraftService::buatDraft($membership->siswa, 'alpha', [
-                            'tanggal' => $tanggal,
-                            'jam'     => '09:00',
-                        ], 'sistem_cron');
+                        try {
+                            \App\Services\NotifikasiDraftService::buatDraft($membership->siswa, 'alpha', [
+                                'tanggal' => $tanggal,
+                                'jam'     => '09:00',
+                            ], 'sistem_cron');
 
-                        \App\Services\NotifikasiDraftService::cekAkumulasiAlphaDanBuatPanggilan($membership->siswa, 'sistem_cron');
-                        \App\Models\KasusDisiplin::syncFromPresensi($membership->siswa_id);
+                            \App\Services\NotifikasiDraftService::cekAkumulasiAlphaDanBuatPanggilan($membership->siswa, 'sistem_cron');
+                            \App\Models\KasusDisiplin::syncFromPresensi($membership->siswa_id);
 
-                        // Push Notifikasi Real-Time ke HP Orang Tua → Alpha (Pukul 09:00)
-                        if (!empty($membership->siswa->nisn)) {
-                            $kelas = $membership->rombel->nama_rombel ?? 'Siswa';
-                            \App\Services\PushNotificationService::sendToSiswa(
-                                $membership->siswa->nisn,
-                                '🚨 Tidak Hadir (Alpha): ' . $membership->siswa->nama,
-                                "Hingga pukul 09:00 WIB, ananda ({$kelas}) belum hadir di sekolah tanpa keterangan (Alpha). Ketuk untuk cek riwayat absensi.",
-                                '/presensi-siswa/' . urlencode($membership->siswa->nisn)
-                            );
+                            if (!empty($membership->siswa->nisn)) {
+                                $kelas = $membership->rombel->nama_rombel ?? 'Siswa';
+                                \App\Services\PushNotificationService::sendToSiswa(
+                                    $membership->siswa->nisn,
+                                    '🚨 Tidak Hadir (Alpha): ' . $membership->siswa->nama,
+                                    "Hingga pukul 09:00 WIB, ananda ({$kelas}) belum hadir di sekolah tanpa keterangan (Alpha). Ketuk untuk cek riwayat absensi.",
+                                    '/presensi-siswa/' . urlencode($membership->siswa->nisn)
+                                );
+                            }
+                        } catch (\Throwable $e) {
+                            // ignore
                         }
                     }
-                } catch (\Throwable $e) {
-                    // ignore
-                }
-            });
+                });
+            } catch (\Throwable $e) {
+                // ignore
+            }
         }
 
         // ── Kunci Guru ────────────────────────────────────────────────────────
@@ -113,25 +124,31 @@ class KunciStatusAlphaCommand extends Command
             ->get()
             ->filter(fn($g) => $g->isWajibHadirHari($hariIniIndo));
 
+        $existingIzinGuruMap = IzinGuru::where('tanggal', $tanggal)
+            ->where('status', 'disetujui')
+            ->pluck('guru_id')
+            ->flip()
+            ->all();
+
         foreach ($guruBelumHadir as $guru) {
-            // Cek izin guru yang sudah disetujui
-            $adaIzin = IzinGuru::where('guru_id', $guru->id)
-                ->where('tanggal', $tanggal)
-                ->where('status', 'disetujui')
-                ->exists();
+            if (isset($existingIzinGuruMap[$guru->id])) continue;
 
-            if ($adaIzin) continue;
-
-            Absensi::create([
-                'pemilik_type' => 'guru',
-                'pemilik_id'   => $guru->id,
-                'tanggal'      => $tanggal,
-                'status'       => 'alpha',
-                'sumber_absen' => 'auto_kunci_piket',
-                'keterangan'   => 'Dikunci otomatis sistem pukul 09:00 — tanpa keterangan dari Guru Piket',
-            ]);
-            $countGuruAlpha++;
+            try {
+                Absensi::create([
+                    'pemilik_type' => 'guru',
+                    'pemilik_id'   => $guru->id,
+                    'tanggal'      => $tanggal,
+                    'status'       => 'alpha',
+                    'sumber_absen' => 'auto_kunci_piket',
+                    'keterangan'   => 'Dikunci otomatis sistem pukul 09:00 — tanpa keterangan dari Guru Piket',
+                ]);
+                $countGuruAlpha++;
+            } catch (\Throwable $e) {
+                // ignore
+            }
         }
+
+        \Illuminate\Support\Facades\Cache::put($cacheKey, true, now()->endOfDay());
 
         $this->info("Kunci selesai: {$countSiswaAlpha} siswa & {$countGuruAlpha} guru dikunci sebagai Alpha.");
         return 0;

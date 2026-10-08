@@ -136,13 +136,17 @@ class SiswaController extends Controller
             });
         }
 
-        $statTotal = (clone $baseActiveQuery)->count();
-        $statPria = (clone $baseActiveQuery)->where(function ($q) {
-            $q->where('jenis_kelamin', 'L')->orWhere('jenis_kelamin', 'like', 'L%');
-        })->count();
-        $statWanita = (clone $baseActiveQuery)->where(function ($q) {
-            $q->where('jenis_kelamin', 'P')->orWhere('jenis_kelamin', 'like', 'P%');
-        })->count();
+        $statsGender = (clone $baseActiveQuery)
+            ->selectRaw("
+                COUNT(*) as total,
+                SUM(CASE WHEN jenis_kelamin = 'L' OR jenis_kelamin LIKE 'L%' THEN 1 ELSE 0 END) as pria,
+                SUM(CASE WHEN jenis_kelamin = 'P' OR jenis_kelamin LIKE 'P%' THEN 1 ELSE 0 END) as wanita
+            ")
+            ->first();
+
+        $statTotal  = (int) ($statsGender->total ?? 0);
+        $statPria   = (int) ($statsGender->pria ?? 0);
+        $statWanita = (int) ($statsGender->wanita ?? 0);
         $statAlumni = $baseAlumniQuery->count();
         $statPkl    = $basePklQuery->count();
         $statRombel = $isWaliOnly ? count($waliRombelIds) : Rombel::count();
