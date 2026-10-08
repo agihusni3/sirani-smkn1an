@@ -30,6 +30,7 @@ class AkademikKalenderController extends Controller
         $itemsByMonth = collect([]);
 
         $calendarMonths = [];
+        $rpeSummary = [];
         if ($selectedTa) {
             $kalender = AkademikKalender::with('items')
                 ->where('tahun_ajaran_id', $selectedTa->id)
@@ -38,6 +39,21 @@ class AkademikKalenderController extends Controller
 
             if ($kalender) {
                 $itemsByMonth = $kalender->items->groupBy('bulan');
+            }
+
+            // Pra-indeks tanggal yang memiliki agenda spesifik untuk pencarian O(1) cepat
+            $dateToItemMap = [];
+            if ($kalender) {
+                foreach ($kalender->items as $it) {
+                    if ($it->tanggal_mulai) {
+                        $cur = $it->tanggal_mulai->copy();
+                        $end = ($it->tanggal_selesai && $it->tanggal_selesai >= $cur) ? $it->tanggal_selesai->copy() : $cur->copy();
+                        while ($cur <= $end) {
+                            $dateToItemMap[$cur->format('Y-m-d')] = $it;
+                            $cur->addDay();
+                        }
+                    }
+                }
             }
 
             $tahunAwal = $selectedTa->tahun_awal;
@@ -111,11 +127,7 @@ class AkademikKalenderController extends Controller
                         }
 
                         $dateStr = sprintf('%04d-%02d-%02d', $mc['year'], $mc['m'], $dayNum);
-
-                        // Cek apakah ada agenda spesifik tanggal yang meng-cover tanggal ini
-                        $specificItem = $kalender ? $kalender->items->first(function ($it) use ($dateStr) {
-                            return $it->isDateCovered($dateStr);
-                        }) : null;
+                        $specificItem = $dateToItemMap[$dateStr] ?? null;
 
                         $resolvedItem = $specificItem;
                         if (!$resolvedItem && $kItem && !$kItem->tanggal_mulai) {
@@ -150,6 +162,16 @@ class AkademikKalenderController extends Controller
                     'efektif_count' => $monthKaldikItems->where('jenis', 'efektif')->count(),
                     'non_efektif_count' => $monthKaldikItems->where('jenis', 'non_efektif')->count(),
                 ];
+
+                // RPE Ringkasan Per Bulan
+                $rpeSummary[] = [
+                    'bulan' => $mc['name'],
+                    'year' => $mc['year'],
+                    'total_pekan' => $totalPekanBulan,
+                    'efektif' => $monthKaldikItems->where('jenis', 'efektif')->count(),
+                    'non_efektif' => $monthKaldikItems->where('jenis', '!=', 'efektif')->count(),
+                    'agendas' => $monthKaldikItems->where('jenis', '!=', 'efektif')->values(),
+                ];
             }
         }
 
@@ -160,6 +182,7 @@ class AkademikKalenderController extends Controller
             'kalender' => $kalender,
             'itemsByMonth' => $itemsByMonth,
             'calendarMonths' => $calendarMonths,
+            'rpeSummary' => $rpeSummary,
             'canManage' => $canManage,
         ]);
     }
@@ -230,14 +253,22 @@ class AkademikKalenderController extends Controller
             default => ($validated['jenis'] === 'efektif' ? '#2563eb' : '#64748b'),
         };
 
-        $item->update([
+        $updates = [
             'tanggal_mulai' => $tglMulai,
             'tanggal_selesai' => $tglSelesai,
             'jenis' => $validated['jenis'],
             'kategori' => $validated['kategori'],
-            'keterangan' => $validated['keterangan'],
+            'keterangan' => $validated['keterangan'] ?: ($validated['jenis'] === 'efektif' ? 'KBM Efektif' : strtoupper($validated['kategori'])),
             'warna' => $warna,
-        ]);
+        ];
+        if ($request->filled('bulan')) {
+            $updates['bulan'] = $request->input('bulan');
+        }
+        if ($request->filled('minggu_ke')) {
+            $updates['minggu_ke'] = (int) $request->input('minggu_ke');
+        }
+
+        $item->update($updates);
 
         $item->kalender->hitungUlangPekan();
 
