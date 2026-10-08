@@ -512,28 +512,38 @@ class SiswaController extends Controller
                 'Status Keaktifan'
             ], ';');
 
+            $cleanCell = function ($val) {
+                if ($val === null || $val === '') return '-';
+                $str = (string) $val;
+                // Netralkan formula injection Excel (CWE-1236)
+                if (in_array(substr($str, 0, 1), ['=', '+', '-', '@', "\t", "\r"])) {
+                    return "'" . $str;
+                }
+                return $str;
+            };
+
             foreach ($siswas as $idx => $s) {
                 $sr = $s->siswaRombels->firstWhere('status_keanggotaan', 'aktif');
                 fputcsv($file, [
                     $idx + 1,
                     $s->nisn ? '="' . $s->nisn . '"' : '-',
                     $s->nik ? '="' . $s->nik . '"' : '-',
-                    $s->nama,
+                    $cleanCell($s->nama),
                     $s->jenis_kelamin ?? '-',
-                    $s->tempat_lahir ?? '-',
+                    $cleanCell($s->tempat_lahir),
                     $s->tanggal_lahir ? (is_string($s->tanggal_lahir) ? substr($s->tanggal_lahir, 0, 10) : $s->tanggal_lahir->format('Y-m-d')) : '-',
-                    $s->agama ?? '-',
-                    $s->alamat ?? '-',
-                    $s->desa_kelurahan ?? '-',
-                    $s->kecamatan ?? '-',
-                    $s->kabupaten ?? '-',
-                    $s->provinsi ?? '-',
-                    $s->nama_ortu ?? '-',
+                    $cleanCell($s->agama),
+                    $cleanCell($s->alamat),
+                    $cleanCell($s->desa_kelurahan),
+                    $cleanCell($s->kecamatan),
+                    $cleanCell($s->kabupaten),
+                    $cleanCell($s->provinsi),
+                    $cleanCell($s->nama_ortu),
                     $s->no_hp_ortu ? '="' . $s->no_hp_ortu . '"' : '-',
                     $s->no_hp_siswa ? '="' . $s->no_hp_siswa . '"' : '-',
                     ($s->penerima_pip && strtolower($s->penerima_pip) === 'ya') ? 'Ya' : 'Tidak',
                     $s->nomor_pip ? '="' . $s->nomor_pip . '"' : '-',
-                    $s->asal_sekolah ?? '-',
+                    $cleanCell($s->asal_sekolah),
                     $sr->rombel->nama_rombel ?? '-',
                     strtoupper($s->status),
                 ], ';');

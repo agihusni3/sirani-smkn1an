@@ -875,27 +875,37 @@ class GuruController extends Controller
                     'Status Keaktifan'
                 ], ';');
 
+                $cleanCell = function ($val) {
+                    if ($val === null || $val === '') return '-';
+                    $str = (string) $val;
+                    // Netralkan formula injection Excel (CWE-1236)
+                    if (in_array(substr($str, 0, 1), ['=', '+', '-', '@', "\t", "\r"])) {
+                        return "'" . $str;
+                    }
+                    return $str;
+                };
+
                 foreach ($gurus as $idx => $g) {
                     fputcsv($file, [
                         $idx + 1,
-                        $g->nama_lengkap_gelar,
-                        $g->nama_lengkap ?: $g->nama,
-                        $g->gelar_depan ?: '-',
-                        $g->gelar_belakang ?: '-',
+                        $cleanCell($g->nama_lengkap_gelar),
+                        $cleanCell($g->nama_lengkap ?: $g->nama),
+                        $cleanCell($g->gelar_depan ?: '-'),
+                        $cleanCell($g->gelar_belakang ?: '-'),
                         $g->nik ? '="' . $g->nik . '"' : '-',
                         $g->nuptk ? '="' . $g->nuptk . '"' : '-',
                         $g->nip ? '="' . $g->nip . '"' : '-',
-                        $g->jenis_ptk ?: $g->jabatan,
+                        $cleanCell($g->jenis_ptk ?: $g->jabatan),
                         strtoupper($g->jenis_kepegawaian),
-                        $g->golongan_pangkat ?: '-',
-                        $g->pendidikan_terakhir ?: '-',
-                        $g->jurusan_kuliah ?: '-',
-                        $g->kampus ?: '-',
+                        $cleanCell($g->golongan_pangkat ?: '-'),
+                        $cleanCell($g->pendidikan_terakhir ?: '-'),
+                        $cleanCell($g->jurusan_kuliah ?: '-'),
+                        $cleanCell($g->kampus ?: '-'),
                         $g->status_sertifikasi === 'sudah' ? 'Sudah Sertifikasi' : 'Belum Sertifikasi',
                         $g->nomor_serdik ?: '-',
-                        $g->mapel_diampu ?: '-',
+                        $cleanCell($g->mapel_diampu ?: '-'),
                         $g->jjm ? ($g->jjm . ' Jam') : '-',
-                        $g->tugas_tambahan ?: '-',
+                        $cleanCell($g->tugas_tambahan ?: '-'),
                         $g->no_hp ? '="' . $g->no_hp . '"' : '-',
                         $g->sertifikats_count ?? 0,
                         strtoupper($g->status),

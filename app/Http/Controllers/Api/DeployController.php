@@ -49,8 +49,11 @@ class DeployController extends Controller
             return $this->auditTandaBaca();
         }
 
-        // ── ACTION: Fix Data Siswa (jalankan perbaikan langsung di produksi) ──
+        // ── ACTION: Fix Data Siswa (jalankan perbaikan langsung di produksi - WAJIB POST) ──
         if ($request->input('action') === 'fix_siswa') {
+            if (!$request->isMethod('POST')) {
+                return response()->json(['status' => 'error', 'message' => 'Aksi mutasi fix_siswa wajib menggunakan HTTP POST.'], 405);
+            }
             return $this->fixSiswa();
         }
 

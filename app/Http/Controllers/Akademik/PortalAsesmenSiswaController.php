@@ -291,9 +291,9 @@ class PortalAsesmenSiswaController extends Controller
      */
     public function submitJawaban(Request $request, $id)
     {
-        $siswaId = session('cbt_siswa_id') ?: $request->input('siswa_id');
+        $siswaId = session('cbt_siswa_id');
         if (!$siswaId) {
-            return response()->json(['error' => 'Sesi login tidak valid'], 403);
+            return response()->json(['error' => 'Sesi login ujian tidak valid atau telah berakhir.'], 403);
         }
 
         $siswa = Siswa::findOrFail($siswaId);

@@ -763,15 +763,21 @@ class AkademikAsesmenController extends Controller
     public function submitJawaban(Request $request, $id)
     {
         $asesmen = AkademikAsesmenOnline::with('soals')->findOrFail($id);
-        $siswaId = $request->input('siswa_id') ?: (session('cbt_siswa_id') ?: auth()->user()?->siswa_id);
-        $jawabanInput = $request->input('jawaban', []); // [soal_id => 'A']
-
-        // Pastikan $siswaId benar-benar valid di database
-        $siswa = $siswaId ? Siswa::find($siswaId) : null;
-        if (!$siswa) {
-            $siswa = Siswa::first();
-            $siswaId = $siswa?->id;
+        
+        // Otorisasi Sesi Siswa Ketat (Anti-IDOR): Utamakan session terenkripsi di server
+        if (session()->has('cbt_siswa_id')) {
+            $siswaId = (int) session('cbt_siswa_id');
+        } elseif (auth()->check() && (auth()->user()->isGuru() || auth()->user()->isAdmin())) {
+            $siswaId = (int) ($request->input('siswa_id') ?: auth()->user()->siswa_id);
+        } else {
+            $siswaId = auth()->user()?->siswa_id;
         }
+
+        if (!$siswaId) {
+            return response()->json(['error' => 'Sesi ujian tidak valid atau telah berakhir.'], 403);
+        }
+
+        $siswa = Siswa::findOrFail($siswaId);
 
         $totalBobot = $asesmen->soals->sum('bobot');
         $skorDidapat = 0;
@@ -868,7 +874,16 @@ class AkademikAsesmenController extends Controller
     public function logPelanggaran(Request $request, $id)
     {
         $asesmen = AkademikAsesmenOnline::findOrFail($id);
-        $siswaId = $request->input('siswa_id') ?: (session('cbt_siswa_id') ?: auth()->user()?->siswa_id);
+
+        // Otorisasi Sesi Siswa Ketat (Anti-IDOR): Mencegah siswa mengirim log pelanggaran palsu ke siswa lain
+        if (session()->has('cbt_siswa_id')) {
+            $siswaId = (int) session('cbt_siswa_id');
+        } elseif (auth()->check() && (auth()->user()->isGuru() || auth()->user()->isAdmin())) {
+            $siswaId = (int) ($request->input('siswa_id') ?: auth()->user()->siswa_id);
+        } else {
+            $siswaId = auth()->user()?->siswa_id;
+        }
+
         if (!$siswaId) {
             return response()->json(['error' => 'Sesi ujian tidak valid atau telah berakhir.'], 403);
         }
@@ -919,7 +934,16 @@ class AkademikAsesmenController extends Controller
     public function autosaveJawaban(Request $request, $id)
     {
         $asesmen = AkademikAsesmenOnline::findOrFail($id);
-        $siswaId = $request->input('siswa_id') ?: session('cbt_siswa_id');
+
+        // Otorisasi Sesi Siswa Ketat (Anti-IDOR): Mencegah penimpaan autosave jawaban siswa lain
+        if (session()->has('cbt_siswa_id')) {
+            $siswaId = (int) session('cbt_siswa_id');
+        } elseif (auth()->check() && (auth()->user()->isGuru() || auth()->user()->isAdmin())) {
+            $siswaId = (int) ($request->input('siswa_id') ?: auth()->user()->siswa_id);
+        } else {
+            $siswaId = auth()->user()?->siswa_id;
+        }
+
         if (!$siswaId) {
             return response()->json(['error' => 'Sesi ujian tidak valid atau telah berakhir.'], 403);
         }

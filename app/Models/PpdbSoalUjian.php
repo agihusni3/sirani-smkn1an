@@ -30,6 +30,10 @@ class PpdbSoalUjian extends Model
         'bobot_nilai' => 'decimal:2',
     ];
 
+    protected $hidden = [
+        'kunci_jawaban',
+    ];
+
     public function setting()
     {
         return $this->belongsTo(PpdbUjianSetting::class, 'ppdb_ujian_setting_id');

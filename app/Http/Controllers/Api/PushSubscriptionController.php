@@ -101,10 +101,7 @@ class PushSubscriptionController extends Controller
             ], 404);
         }
 
-        if ($delay > 0) {
-            sleep($delay);
-        }
-
+        // Kirim langsung payload push notification tanpa menahan worker thread PHP-FPM
         $payload = [
             'title'     => '🔔 SIRANI — Tes Notifikasi Background',
             'body'      => 'Hebat! Notifikasi latar belakang berhasil diterima di HP Anda saat aplikasi tertutup (seperti WhatsApp).',
