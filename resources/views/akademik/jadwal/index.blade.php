@@ -115,34 +115,36 @@
   {{-- ========================================================================= --}}
   {{-- PENYUSUNAN JADWAL PELAJARAN (ROSTER MINGGUAN)                             --}}
   {{-- ========================================================================= --}}
-  <div class="akademik-card" style="margin-bottom:20px;">
-    <div class="akademik-card-header" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; padding:16px 20px; background:#ffffff;">
+  <div class="akademik-card" style="margin-bottom:20px; border:none; box-shadow:0 1px 3px rgba(15,23,42,0.04);">
+    <div class="akademik-card-header" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; padding:16px 20px; background:#ffffff; border:none;">
       <div>
-        <h2 style="font-weight:800; font-size:18px; color:#000; margin:0; display:flex; align-items:center; gap:8px;">
-          <i class="bi bi-calendar3-week"></i>
+        <h2 style="font-weight:800; font-size:18px; color:#0f172a; margin:0; display:flex; align-items:center; gap:8px;">
+          <i class="bi bi-calendar3-week text-primary"></i>
           Penyusunan Jadwal Pelajaran (Roster Mingguan)
         </h2>
-        <div style="font-size:12px; color:#6b7280; margin-top:3px;">
-          Tahun Ajaran <b>{{ $ta?->tahun_ajaran ?? '2025/2026' }}</b> · Semester <b>{{ $semester == 1 ? '1 (Ganjil)' : '2 (Genap)' }}</b> — Disusun berdasarkan SK Pembagian Tugas dengan proteksi anti-bentrok guru &amp; lab.
+        <div style="font-size:12px; color:#64748b; margin-top:3px;">
+          Tahun Ajaran <b>{{ $ta?->tahun_ajaran ?? '2025/2026' }}</b> · Semester <b>{{ $semester == 1 ? '1 (Ganjil)' : '2 (Genap)' }}</b> — Matriks KBM mingguan terpadu dengan proteksi anti-bentrok guru &amp; laboratorium.
         </div>
       </div>
       <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-        {{-- Switch Semester --}}
-        <div class="btn-group" role="group">
-          <a href="{{ route('akademik.jadwal.index', ['tab' => $tab, 'semester' => 1]) }}" class="ak-btn {{ $semester == 1 ? 'ak-btn-primary' : 'ak-btn-secondary' }}" style="font-size:12px; padding:6px 12px;">
+        {{-- Switch Semester: Segmented Pill (Borderless & Modern) --}}
+        <div style="display:inline-flex; background:#f1f5f9; border-radius:8px; padding:3px; gap:3px;">
+          <a href="{{ route('akademik.jadwal.index', ['tab' => $tab, 'semester' => 1]) }}" 
+             style="font-size:12px; font-weight:700; padding:6px 14px; border-radius:6px; text-decoration:none; transition:all 0.15s; border:none; {{ $semester == 1 ? 'background:#ffffff; color:#4f46e5; box-shadow:0 1px 3px rgba(0,0,0,0.06);' : 'color:#64748b; background:transparent;' }}">
             Sem 1 (Ganjil)
           </a>
-          <a href="{{ route('akademik.jadwal.index', ['tab' => $tab, 'semester' => 2]) }}" class="ak-btn {{ $semester == 2 ? 'ak-btn-primary' : 'ak-btn-secondary' }}" style="font-size:12px; padding:6px 12px;">
+          <a href="{{ route('akademik.jadwal.index', ['tab' => $tab, 'semester' => 2]) }}" 
+             style="font-size:12px; font-weight:700; padding:6px 14px; border-radius:6px; text-decoration:none; transition:all 0.15s; border:none; {{ $semester == 2 ? 'background:#ffffff; color:#4f46e5; box-shadow:0 1px 3px rgba(0,0,0,0.06);' : 'color:#64748b; background:transparent;' }}">
             Sem 2 (Genap)
           </a>
         </div>
 
         {{-- Dropdown Cetak Dokumen Resmi Roster --}}
         <div class="dropdown">
-          <button class="ak-btn ak-btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" style="font-size:12.5px; font-weight:700;">
+          <button class="ak-btn ak-btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" style="font-size:12.5px; font-weight:700; border:none;">
             <i class="bi bi-printer me-1"></i> Cetak Dokumen Roster
           </button>
-          <ul class="dropdown-menu dropdown-menu-end" style="border-radius:12px; box-shadow:0 10px 25px rgba(0,0,0,0.12); border:1px solid #e2e8f0; font-size:13px; min-width:260px; padding:6px 0;">
+          <ul class="dropdown-menu dropdown-menu-end" style="border-radius:12px; box-shadow:0 10px 25px rgba(0,0,0,0.12); border:none; font-size:13px; min-width:260px; padding:6px 0;">
             <li>
               <a class="dropdown-item py-2" href="{{ route('akademik.jadwal.cetak', ['semester' => $semester]) }}" target="_blank">
                 <i class="bi bi-grid-3x3-gap-fill text-indigo me-2"></i> <b>Roster Jadwal Sekolah</b>
@@ -152,57 +154,68 @@
             <li>
               <a class="dropdown-item py-2" href="{{ route('akademik.jadwal.cetak-kelas', ['semester' => $semester]) }}" target="_blank">
                 <i class="bi bi-mortarboard-fill text-success me-2"></i> <b>Jadwal per Rombel / Kelas</b>
-                <div style="font-size:11px; color:#64748b; margin-left:24px;">Siap Ditempel di Papan Pengumuman Kelas</div>
+                <div style="font-size:11px; color:#64748b; margin-left:24px;">Format Tempel Papan Pengumuman</div>
               </a>
             </li>
             <li>
               <a class="dropdown-item py-2" href="{{ route('akademik.jadwal.cetak-lab', ['semester' => $semester]) }}" target="_blank">
                 <i class="bi bi-display-fill text-info me-2"></i> <b>Jadwal Ruang Lab Komputer</b>
-                <div style="font-size:11px; color:#64748b; margin-left:24px;">Siap Ditempel di Pintu Masuk Lab</div>
+                <div style="font-size:11px; color:#64748b; margin-left:24px;">Format Tempel Pintu Lab</div>
               </a>
             </li>
           </ul>
         </div>
 
         @if($canEditJadwal)
-        {{-- Sinkron Kode Guru Hirarki --}}
-        <form action="{{ route('akademik.jadwal.sync-kode-hierarki') }}" method="POST" style="margin:0;">
-          @csrf
-          <button type="submit" class="ak-btn" style="font-size:12.5px; font-weight:700; background:#f0fdf4; color:#15803d; border:1px solid #bbf7d0;" title="Sinkronkan nomor urut kode guru otomatis sesuai hirarki struktural sekolah (Kepsek #1, Wakakur #2, Wakasis #3, Waka Sarpras #4, Waka Hubin #5, Kaprog #6+, dst)">
-            <i class="bi bi-diagram-3-fill me-1"></i> Sinkron Hirarki Guru
+          {{-- Tombol Otomatisasi Jadwal 1-Klik --}}
+          <button type="button" class="ak-btn" data-bs-toggle="modal" data-bs-target="#modalAutoScheduler" style="font-size:12.5px; background:linear-gradient(135deg, #059669, #10b981); color:#ffffff; border:none; box-shadow:0 2px 6px rgba(16,185,129,0.25); font-weight:700; border-radius:8px; padding:7px 14px;">
+            <i class="bi bi-magic me-1"></i> ✨ Otomatisasi Jadwal (1-Klik)
           </button>
-        </form>
 
-        {{-- Tombol Otomatisasi Jadwal 1-Klik --}}
-        <button type="button" class="ak-btn" data-bs-toggle="modal" data-bs-target="#modalAutoScheduler" style="font-size:12.5px; background:linear-gradient(135deg, #059669, #10b981); color:#ffffff; border:none; box-shadow:0 4px 12px rgba(16,185,129,0.3); font-weight:700;">
-          <i class="bi bi-magic me-1"></i> ✨ Otomatisasi Jadwal (1-Klik)
-        </button>
+          {{-- Tombol Isi Blok Jadwal --}}
+          <button type="button" class="ak-btn ak-btn-primary" data-bs-toggle="modal" data-bs-target="#modalFormulasiBlok" style="font-size:12.5px; font-weight:700; border:none; border-radius:8px; padding:7px 14px;">
+            <i class="bi bi-lightning-charge-fill me-1"></i> + Formulasi Blok Jam
+          </button>
 
-        {{-- Tombol Isi Blok Jadwal --}}
-        <button type="button" class="ak-btn ak-btn-primary" data-bs-toggle="modal" data-bs-target="#modalFormulasiBlok" style="font-size:12.5px; font-weight:700;">
-          <i class="bi bi-lightning-charge-fill me-1"></i> + Formulasi Blok Jam
-        </button>
+          {{-- Menu Aksi Tambahan (Sinkron Hirarki & Reset) --}}
+          <div class="dropdown">
+            <button class="ak-btn ak-btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" style="font-size:12.5px; border:none; padding:7px 12px; border-radius:8px;" title="Opsi Lainnya">
+              <i class="bi bi-three-dots-vertical"></i>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end" style="border-radius:10px; border:none; box-shadow:0 10px 25px rgba(0,0,0,0.1); font-size:12.5px; min-width:200px; padding:6px 0;">
+              <li>
+                <form action="{{ route('akademik.jadwal.sync-kode-hierarki') }}" method="POST" style="margin:0;">
+                  @csrf
+                  <button type="submit" class="dropdown-item py-2" style="font-weight:600;">
+                    <i class="bi bi-diagram-3 text-success me-2"></i> Sinkron Hirarki Guru
+                  </button>
+                </form>
+              </li>
+              <li><hr class="dropdown-divider" style="margin:4px 0;"></li>
+              <li>
+                <button type="button" class="dropdown-item py-2 text-danger" data-bs-toggle="modal" data-bs-target="#modalResetJadwal" style="font-weight:600;">
+                  <i class="bi bi-trash3 text-danger me-2"></i> Hapus / Reset Jadwal
+                </button>
+              </li>
+            </ul>
+          </div>
         @else
-        <span class="ak-badge ak-badge-secondary" style="font-size:12px; font-weight:700; padding:6px 12px; background:#f1f5f9; color:#475569; border:1px solid #cbd5e1;">
-          <i class="bi bi-eye me-1"></i> Mode Baca
-        </span>
+          <span class="ak-badge ak-badge-secondary" style="font-size:12px; font-weight:700; padding:6px 12px; border:none;">
+            <i class="bi bi-eye me-1"></i> Mode Baca
+          </span>
         @endif
       </div>
     </div>
 
-    {{-- Navigation Tabs Roster --}}
-    <div style="display:flex; border-bottom:1px solid #e2e8f0; background:#f8fafc; padding:0 16px; overflow-x:auto;">
+    {{-- Navigation Tabs Roster: Bersih & Terarah (Tanpa Tab Formulasi Ganda) --}}
+    <div style="display:flex; background:#f8fafc; padding:0 16px; overflow-x:auto; border-radius:0 0 12px 12px;">
       <a href="{{ route('akademik.jadwal.index', ['tab' => 'roster', 'semester' => $semester]) }}"
-         style="padding:12px 18px; font-size:13px; font-weight:700; text-decoration:none; display:inline-flex; align-items:center; gap:6px; white-space:nowrap; border-bottom: 2.5px solid {{ $tab == 'roster' ? 'var(--ak-primary)' : 'transparent' }}; color: {{ $tab == 'roster' ? 'var(--ak-primary)' : '#64748b' }};">
+         style="padding:10px 18px; font-size:13px; font-weight:700; text-decoration:none; display:inline-flex; align-items:center; gap:6px; white-space:nowrap; border-bottom: 2.5px solid {{ $tab == 'roster' ? 'var(--ak-primary)' : 'transparent' }}; color: {{ $tab == 'roster' ? 'var(--ak-primary)' : '#64748b' }};">
         <i class="bi bi-grid-3x3-gap-fill"></i> Matriks Roster Jadwal
       </a>
       @if($canEditJadwal)
-      <a href="{{ route('akademik.jadwal.index', ['tab' => 'formulasi', 'semester' => $semester]) }}"
-         style="padding:12px 18px; font-size:13px; font-weight:700; text-decoration:none; display:inline-flex; align-items:center; gap:6px; white-space:nowrap; border-bottom: 2.5px solid {{ $tab == 'formulasi' ? 'var(--ak-primary)' : 'transparent' }}; color: {{ $tab == 'formulasi' ? 'var(--ak-primary)' : '#64748b' }};">
-        <i class="bi bi-lightning-charge-fill"></i> Formulasi Blok Cepat
-      </a>
       <a href="{{ route('akademik.jadwal.index', ['tab' => 'pukul', 'semester' => $semester]) }}"
-         style="padding:12px 18px; font-size:13px; font-weight:700; text-decoration:none; display:inline-flex; align-items:center; gap:6px; white-space:nowrap; border-bottom: 2.5px solid {{ $tab == 'pukul' ? '#f59e0b' : 'transparent' }}; color: {{ $tab == 'pukul' ? '#b45309' : '#64748b' }};">
+         style="padding:10px 18px; font-size:13px; font-weight:700; text-decoration:none; display:inline-flex; align-items:center; gap:6px; white-space:nowrap; border-bottom: 2.5px solid {{ $tab == 'pukul' ? '#f59e0b' : 'transparent' }}; color: {{ $tab == 'pukul' ? '#b45309' : '#64748b' }};">
         <i class="bi bi-clock-history"></i> Atur Pukul KBM &amp; Istirahat
       </a>
       @endif
@@ -434,41 +447,41 @@ function tambahIstirahat(hari) {
 {{-- TAB 1: MATRIKS ROSTER JADWAL SEKOLAH (FORMAT WAKAKUR)                     --}}
 {{-- ========================================================================= --}}
 @if($tab === 'roster')
-<div class="akademik-card" style="margin-bottom:24px;">
-  <div class="akademik-card-header" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+<div class="akademik-card" style="margin-bottom:24px; border:none; box-shadow:0 1px 3px rgba(15,23,42,0.04);">
+  <div class="akademik-card-header" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; border:none; padding:14px 20px; background:#ffffff;">
     <div>
       <h3 style="font-weight:800; font-size:15px; margin:0; color:var(--ak-dark);">
         Matriks Jadwal Pelajaran Mingguan
       </h3>
-      <div style="font-size:12px; color:#64748b;">
+      <div style="font-size:12px; color:#64748b; margin-top:2px;">
         @if($canEditJadwal)
-          Klik pada sel jadwal mana pun untuk mengubah atau mengosongkan slot secara instan.
+          Klik pada sel jadwal untuk mengisi atau mengedit slot KBM secara instan.
         @else
-          Mode Baca: Matriks jadwal KBM mingguan resmi seluruh rombel dan pendidik SMKN 1 Air Naningan.
+          Matriks jadwal KBM mingguan resmi seluruh rombel dan pendidik.
         @endif
       </div>
     </div>
-    {{-- Filter Hari & Sorot Guru --}}
+
+    {{-- Filter Hari & Sorot Guru & Tombol Legenda --}}
     <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
-      <div style="display:flex; gap:6px; align-items:center;">
-        <span style="font-size:12px; font-weight:700; color:#64748b;">Filter Hari:</span>
+      {{-- Filter Hari (Segmented Buttons Borderless) --}}
+      <div style="display:inline-flex; background:#f1f5f9; border-radius:8px; padding:2px; gap:2px;">
         @php $hariArr = ['' => 'Semua Hari', 'SENIN' => 'Senin', 'SELASA' => 'Selasa', 'RABU' => 'Rabu', 'KAMIS' => 'Kamis', 'JUMAT' => 'Jumat']; @endphp
         @foreach($hariArr as $key => $lbl)
           <a href="{{ route('akademik.jadwal.index', ['tab' => 'roster', 'semester' => $semester, 'hari' => $key]) }}"
-             class="ak-btn {{ $hariFilter === $key ? 'ak-btn-primary' : 'ak-btn-secondary' }}"
-             style="font-size:11.5px; padding:4px 10px;">
+             style="font-size:11.5px; font-weight:700; padding:5px 11px; border-radius:6px; text-decoration:none; transition:all 0.15s; border:none; {{ $hariFilter === $key ? 'background:#ffffff; color:#4f46e5; box-shadow:0 1px 2px rgba(0,0,0,0.06);' : 'color:#64748b; background:transparent;' }}">
             {{ $lbl }}
           </a>
         @endforeach
       </div>
 
       {{-- Sorot Guru Dropdown --}}
-      <div style="display:flex; align-items:center; gap:6px; background:#f8fafc; padding:3px 8px; border-radius:8px; border:1px solid #e2e8f0;">
+      <div style="display:flex; align-items:center; gap:6px; background:#f1f5f9; padding:2px 10px; border-radius:8px;">
         <label for="filterHighlightGuru" style="font-size:11.5px; font-weight:700; color:#475569; white-space:nowrap; margin:0;">
-          <i class="bi bi-funnel-fill text-primary me-1"></i> Sorot Guru:
+          <i class="bi bi-funnel-fill text-primary me-1"></i> Sorot:
         </label>
-        <select id="filterHighlightGuru" class="ak-select" onchange="highlightGuruSchedule(this.value)" style="font-size:11.5px; padding:3px 8px; width:auto; min-width:170px; height:28px;">
-          <option value="">-- Tampilkan Semua --</option>
+        <select id="filterHighlightGuru" class="ak-select" onchange="highlightGuruSchedule(this.value)" style="font-size:11.5px; padding:2px 6px; width:auto; min-width:160px; height:28px; border:none; background:transparent;">
+          <option value="">-- Semua Guru --</option>
           @if($currentGuruId)
             @php $me = $gurus->firstWhere('id', $currentGuruId); @endphp
             @if($me)
@@ -482,6 +495,11 @@ function tambahIstirahat(hari) {
           @endforeach
         </select>
       </div>
+
+      {{-- Tombol Buka Legenda Popup (Menghilangkan info ganda raksasa di bawah matriks) --}}
+      <button type="button" class="ak-btn ak-btn-secondary" data-bs-toggle="modal" data-bs-target="#modalLegendaRoster" style="font-size:11.5px; padding:5px 12px; border:none; border-radius:8px;" title="Lihat daftar kode guru & singkatan mapel">
+        <i class="bi bi-info-circle me-1"></i> Legenda
+      </button>
     </div>
   </div>
 
@@ -726,31 +744,110 @@ function tambahIstirahat(hari) {
   </div>
 </div>
 
-@if($canEditJadwal)
-{{-- Tombol Ringkas Opsi Reset Jadwal --}}
-<div style="display:flex; justify-content:flex-end; margin-top:8px; margin-bottom:16px;">
-  <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="collapse" data-bs-target="#panelResetJadwal" style="font-size:11.5px; font-weight:700; border-radius:6px; display:inline-flex; align-items:center; gap:6px;">
-    <i class="bi bi-trash3"></i> Opsi Hapus / Reset Jadwal
-  </button>
+{{-- MODAL: LEGENDA GURU & MAPEL (POPUP RAPI, MENGHILANGKAN INFO GANDA DI BAWAH MATRIKS) --}}
+<div class="modal fade" id="modalLegendaRoster" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content" style="border-radius:14px; border:none; box-shadow:0 20px 25px -5px rgba(0,0,0,0.1);">
+      <div class="modal-header" style="border:none; padding:16px 20px;">
+        <h5 class="modal-title" style="font-weight:800; font-size:16px; margin:0; color:#0f172a;">
+          <i class="bi bi-info-circle text-primary me-2"></i> Legenda Guru &amp; Mata Pelajaran
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body" style="padding:16px 20px;">
+        <div style="display:grid; grid-template-columns: 1.2fr 1fr; gap:16px;">
+          {{-- Daftar Kode Guru Sesuai Hirarki --}}
+          <div>
+            <h6 style="font-weight:800; font-size:13px; color:#1e293b; margin-bottom:8px;">
+              <i class="bi bi-diagram-3-fill text-primary me-1"></i> Kode Guru Sesuai Hirarki Struktural
+            </h6>
+            <div style="max-height:380px; overflow-y:auto; border-radius:8px; background:#f8fafc;">
+              <table class="table table-sm table-hover mb-0" style="font-size:11.5px; vertical-align:middle;">
+                <thead style="background:#f1f5f9; position:sticky; top:0; z-index:2;">
+                  <tr>
+                    <th style="width:48px; text-align:center;">Kode</th>
+                    <th>Nama Pendidik</th>
+                    <th>Jabatan</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @foreach($gurus as $g)
+                    @php
+                      $roleBadgeStyle = match(true) {
+                        $g->kode_nomor === 1 => 'background:#fef3c7; color:#92400e;',
+                        $g->kode_nomor >= 2 && $g->kode_nomor <= 5 => 'background:#e0e7ff; color:#3730a3;',
+                        $g->kode_nomor >= 6 && $g->kode_nomor <= 8 => 'background:#dcfce7; color:#166534;',
+                        $g->kode_nomor >= 9 && $g->kode_nomor <= 13 => 'background:#ede9fe; color:#5b21b6;',
+                        default => 'background:#f1f5f9; color:#475569;',
+                      };
+                    @endphp
+                    <tr>
+                      <td style="text-align:center;">
+                        <span class="roster-guru-badge">{{ $g->kode_nomor ?? '-' }}</span>
+                      </td>
+                      <td style="font-weight:700; color:#1e293b;">{{ $g->nama }}</td>
+                      <td>
+                        <span style="display:inline-block; font-size:10.5px; font-weight:700; padding:2px 8px; border-radius:12px; white-space:nowrap; {{ $roleBadgeStyle }}">
+                          {{ $g->peran_struktural }}
+                        </span>
+                      </td>
+                    </tr>
+                  @endforeach
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {{-- Daftar Singkatan Mapel --}}
+          <div>
+            <h6 style="font-weight:800; font-size:13px; color:#1e293b; margin-bottom:8px;">
+              <i class="bi bi-book-half text-success me-1"></i> Singkatan Mata Pelajaran
+            </h6>
+            <div style="max-height:380px; overflow-y:auto; border-radius:8px; background:#f8fafc; padding:8px;">
+              <div style="display:flex; flex-direction:column; gap:6px;">
+                @foreach($mapels as $m)
+                  <div style="display:flex; align-items:center; gap:8px; padding:5px 8px; background:#ffffff; border-radius:6px;">
+                    <code style="font-weight:900; color:#0369a1; font-size:11.5px; min-width:65px;">{{ $m->singkatan_mapel ?? $m->kode_mapel }}</code>
+                    <span style="font-weight:600; color:#334155; font-size:11.5px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="{{ $m->nama_mapel }}">{{ $m->nama_mapel }}</span>
+                  </div>
+                @endforeach
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer" style="border:none; padding:12px 20px;">
+        <button type="button" class="ak-btn ak-btn-secondary" data-bs-dismiss="modal">Tutup</button>
+      </div>
+    </div>
+  </div>
 </div>
 
-<div class="collapse" id="panelResetJadwal" style="margin-bottom:20px;">
-  <div class="akademik-card" style="border:1.5px solid #fee2e2;">
-    <div class="akademik-card-header" style="background:linear-gradient(135deg,#fef2f2,#fff5f5); border-bottom:1px solid #fecaca; padding:10px 16px;">
-      <h4 style="font-weight:800; font-size:13px; margin:0; color:#b91c1c; display:flex; align-items:center; gap:8px;">
-        <i class="bi bi-trash3-fill"></i> Hapus / Reset Jadwal
-      </h4>
-      <div style="font-size:11px; color:#dc2626; margin-top:2px;">Hapus slot jadwal berdasarkan hari atau kelas. Slot yang dikunci (🔒 KEEP) tidak akan terhapus.</div>
-    </div>
-    <div class="akademik-card-body" style="padding:12px 16px;">
+{{-- MODAL: HAPUS / RESET JADWAL (TERPADU & AMAN) --}}
+@if($canEditJadwal)
+<div class="modal fade" id="modalResetJadwal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content" style="border-radius:14px; border:none; box-shadow:0 20px 25px -5px rgba(0,0,0,0.1);">
       <form action="{{ route('akademik.jadwal.clear') }}" method="POST" onsubmit="return confirmHapus(this)">
         @csrf
         <input type="hidden" name="tahun_ajaran_id" value="{{ $ta?->id ?? 1 }}">
         <input type="hidden" name="semester" value="{{ $semester }}">
-        <div style="display:flex; gap:12px; align-items:flex-end; flex-wrap:wrap;">
-          <div>
-            <label style="font-size:11px; font-weight:700; color:#64748b; display:block; margin-bottom:3px;">Filter Hari (Opsional)</label>
-            <select name="hari" class="ak-select" style="min-width:130px; font-size:12px;">
+
+        <div class="modal-header" style="border:none; padding:16px 20px;">
+          <h5 class="modal-title text-danger" style="font-weight:800; font-size:16px; margin:0;">
+            <i class="bi bi-trash3-fill me-2"></i> Hapus / Reset Jadwal
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+
+        <div class="modal-body" style="padding:14px 20px;">
+          <div style="font-size:12.5px; color:#475569; margin-bottom:14px;">
+            Pilih cakupan jadwal yang ingin direset. Slot jadwal yang dikunci (🔒 KEEP) tidak akan terhapus jika opsi dicentang.
+          </div>
+
+          <div style="margin-bottom:12px;">
+            <label class="ak-form-label" style="font-weight:700;">Filter Hari (Opsional)</label>
+            <select name="hari" class="ak-select">
               <option value="">Semua Hari</option>
               <option value="SENIN">SENIN</option>
               <option value="SELASA">SELASA</option>
@@ -759,23 +856,29 @@ function tambahIstirahat(hari) {
               <option value="JUMAT">JUMAT</option>
             </select>
           </div>
-          <div>
-            <label style="font-size:11px; font-weight:700; color:#64748b; display:block; margin-bottom:3px;">Filter Kelas (Opsional)</label>
-            <select name="rombel_id" class="ak-select" style="min-width:150px; font-size:12px;">
+
+          <div style="margin-bottom:12px;">
+            <label class="ak-form-label" style="font-weight:700;">Filter Kelas (Opsional)</label>
+            <select name="rombel_id" class="ak-select">
               <option value="">Semua Kelas</option>
               @foreach($rombels as $r)
                 <option value="{{ $r->id }}">{{ $r->nama_rombel }}</option>
               @endforeach
             </select>
           </div>
-          <div style="display:flex; align-items:center; gap:8px;">
-            <label style="font-size:11.5px; font-weight:700; cursor:pointer; display:flex; align-items:center; gap:6px; color:#92400e; background:#fffbeb; border:1px solid #fde68a; padding:5px 10px; border-radius:6px;">
-              <input type="checkbox" name="keep_locked" value="1" checked style="width:14px; height:14px;">
-              Pertahankan Slot Terkunci 🔒
+
+          <div style="margin-bottom:6px;">
+            <label style="font-size:12px; font-weight:700; cursor:pointer; display:flex; align-items:center; gap:8px; color:#92400e; background:#fffbeb; padding:8px 12px; border-radius:8px;">
+              <input type="checkbox" name="keep_locked" value="1" checked style="width:16px; height:16px;">
+              <span>Pertahankan Slot Terkunci (🔒 KEEP)</span>
             </label>
           </div>
-          <button type="submit" class="ak-btn" style="background:linear-gradient(135deg,#dc2626,#ef4444); color:#fff; font-weight:700; font-size:12px; border:none; padding:7px 16px;">
-            <i class="bi bi-trash3 me-1"></i> Hapus Jadwal
+        </div>
+
+        <div class="modal-footer" style="border:none; padding:12px 20px;">
+          <button type="button" class="ak-btn ak-btn-secondary" data-bs-dismiss="modal">Batal</button>
+          <button type="submit" class="ak-btn" style="background:#dc2626; color:#ffffff; font-weight:700; border:none; border-radius:8px; padding:7px 16px;">
+            <i class="bi bi-trash3 me-1"></i> Konfirmasi Hapus
           </button>
         </div>
       </form>
@@ -783,76 +886,6 @@ function tambahIstirahat(hari) {
   </div>
 </div>
 @endif
-
-{{-- Panel Legenda Guru (Hirarki Struktural) & Legenda Mapel --}}
-<div style="display:grid; grid-template-columns: 1.3fr 1fr; gap:16px; margin-bottom:24px;">
-  {{-- Legenda Guru (Hirarki Struktural) --}}
-  <div class="akademik-card">
-    <div class="akademik-card-header" style="background:#f8fafc; display:flex; justify-content:space-between; align-items:center; padding:10px 14px;">
-      <h4 style="font-weight:800; font-size:13px; margin:0; color:var(--ak-dark); display:flex; align-items:center; gap:6px;">
-        <i class="bi bi-diagram-3-fill text-primary"></i> Daftar Kode Guru Sesuai Hirarki Struktural (1 - {{ $gurus->count() }})
-      </h4>
-      <span style="font-size:11px; color:#64748b; font-weight:600;">Otomatis Mengikuti Jabatan</span>
-    </div>
-    <div class="akademik-card-body" style="padding:0; max-height:360px; overflow-y:auto;">
-      <table class="table table-sm table-hover mb-0" style="font-size:11.5px; vertical-align:middle;">
-        <thead style="background:#f1f5f9; position:sticky; top:0; z-index:2;">
-          <tr>
-            <th style="width:48px; text-align:center;">Kode</th>
-            <th>Nama Pendidik & Tenaga Kependidikan</th>
-            <th style="width:200px;">Jabatan / Peran Struktural</th>
-          </tr>
-        </thead>
-        <tbody>
-          @foreach($gurus as $g)
-            @php
-              $roleBadgeStyle = match(true) {
-                $g->kode_nomor === 1 => 'background:#fef3c7; color:#92400e; border:1px solid #fde68a;',
-                $g->kode_nomor >= 2 && $g->kode_nomor <= 5 => 'background:#e0e7ff; color:#3730a3; border:1px solid #c7d2fe;',
-                $g->kode_nomor >= 6 && $g->kode_nomor <= 8 => 'background:#dcfce7; color:#166534; border:1px solid #bbf7d0;',
-                $g->kode_nomor >= 9 && $g->kode_nomor <= 13 => 'background:#ede9fe; color:#5b21b6; border:1px solid #ddd6fe;',
-                $g->kode_nomor >= 14 && $g->kode_nomor <= 18 => 'background:#ffedd5; color:#9a3412; border:1px solid #fed7aa;',
-                default => 'background:#f1f5f9; color:#475569; border:1px solid #e2e8f0;',
-              };
-            @endphp
-            <tr>
-              <td style="text-align:center;">
-                <span class="roster-guru-badge">{{ $g->kode_nomor ?? '-' }}</span>
-              </td>
-              <td style="font-weight:700; color:#1e293b;">
-                {{ $g->nama }}
-              </td>
-              <td>
-                <span style="display:inline-block; font-size:10.5px; font-weight:700; padding:2px 8px; border-radius:12px; white-space:nowrap; {{ $roleBadgeStyle }}">
-                  {{ $g->peran_struktural }}
-                </span>
-              </td>
-            </tr>
-          @endforeach
-        </tbody>
-      </table>
-    </div>
-  </div>
-
-  {{-- Legenda Mata Pelajaran --}}
-  <div class="akademik-card">
-    <div class="akademik-card-header" style="background:#f8fafc; padding:10px 14px;">
-      <h4 style="font-weight:800; font-size:13px; margin:0; color:var(--ak-dark); display:flex; align-items:center; gap:6px;">
-        <i class="bi bi-book-half text-success"></i> Daftar Singkatan Mata Pelajaran
-      </h4>
-    </div>
-    <div class="akademik-card-body" style="padding:12px; max-height:360px; overflow-y:auto;">
-      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; font-size:11px;">
-        @foreach($mapels as $m)
-          <div style="display:flex; align-items:center; gap:6px; padding:5px 8px; background:#f8fafc; border-radius:6px; border:1px solid #e2e8f0;">
-            <code style="font-weight:900; color:#0369a1; font-size:11px; flex-shrink:0;">{{ $m->singkatan_mapel ?? $m->kode_mapel }}</code>
-            <span style="font-weight:600; color:#334155; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="{{ $m->nama_mapel }}">{{ $m->nama_mapel }}</span>
-          </div>
-        @endforeach
-      </div>
-    </div>
-  </div>
-</div>
 @endif
 
 {{-- ========================================================================= --}}
