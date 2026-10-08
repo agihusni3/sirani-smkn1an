@@ -9,7 +9,7 @@ class BarcodeService
 {
     /**
      * Generate Barcode 2D (QR Code) dalam format SVG murni.
-     * Sangat tajam untuk cetak resolusi tinggi (A4/PDF) dan browser.
+     * Sangat tajam untuk cetak resolusi tinggi (A4/PDF) dan browser tanpa ketergantungan GD.
      *
      * @param string $code Data barcode (misal NISN siswa)
      * @param int $size Ukuran pixel (lebar & tinggi)
@@ -43,8 +43,72 @@ class BarcodeService
     }
 
     /**
+     * Generate Barcode 2D (QR Code) dalam format binary PNG murni tanpa ekstensi GD.
+     * Sangat handal dan kompatibel di semua server Ubuntu / Linux walaupun tanpa php-gd.
+     *
+     * @param string $code Data barcode (misal NISN siswa)
+     * @param int $scale Skala pixel per modul QR (default 3)
+     * @param int $quietZone Margin padding modul (default 1)
+     * @return string Binary PNG string
+     */
+    public static function getBarcode2DPngBinary(string $code, int $scale = 3, int $quietZone = 1): string
+    {
+        $code = trim($code);
+        if ($code === '') {
+            return '';
+        }
+
+        try {
+            $options = new QROptions([
+                'version'  => -1,
+                'eccLevel' => QRCode::ECC_M,
+            ]);
+            $matrix = (new QRCode($options))->getMatrix($code);
+            $matrixSize = $matrix->size();
+
+            $totalModules = $matrixSize + ($quietZone * 2);
+            $w = $totalModules * $scale;
+            $h = $w;
+
+            // Susun scanline mentah format 8-bit Grayscale (0 = hitam, 255 = putih)
+            $scanlines = '';
+            for ($y = 0; $y < $totalModules; $y++) {
+                $moduleY = $y - $quietZone;
+                $rowBytes = '';
+                for ($x = 0; $x < $totalModules; $x++) {
+                    $moduleX = $x - $quietZone;
+                    $isDark = ($moduleY >= 0 && $moduleY < $matrixSize && $moduleX >= 0 && $moduleX < $matrixSize)
+                        ? $matrix->check($moduleX, $moduleY)
+                        : false;
+                    $pixel = $isDark ? "\x00" : "\xFF";
+                    $rowBytes .= str_repeat($pixel, $scale);
+                }
+                $line = "\x00" . $rowBytes; // Filter type 0: None
+                for ($s = 0; $s < $scale; $s++) {
+                    $scanlines .= $line;
+                }
+            }
+
+            // Chunk IHDR: width, height, 8 bit depth, color type 0 (Grayscale)
+            $ihdrData = pack('NNCCCCC', $w, $h, 8, 0, 0, 0, 0);
+            $ihdrChunk = pack('N', 13) . 'IHDR' . $ihdrData . pack('N', crc32('IHDR' . $ihdrData));
+
+            // Chunk IDAT: kompresi zlib
+            $idatCompressed = gzcompress($scanlines, 9);
+            $idatChunk = pack('N', strlen($idatCompressed)) . 'IDAT' . $idatCompressed . pack('N', crc32('IDAT' . $idatCompressed));
+
+            // Chunk IEND
+            $iendChunk = pack('N', 0) . 'IEND' . pack('N', crc32('IEND'));
+
+            return "\x89PNG\r\n\x1a\n" . $ihdrChunk . $idatChunk . $iendChunk;
+        } catch (\Throwable $e) {
+            \Log::warning('BarcodeService PNG generation error: ' . $e->getMessage());
+            return '';
+        }
+    }
+
+    /**
      * Generate Barcode 2D (QR Code) dalam format Data URI PNG (Base64).
-     * Sangat kompatibel saat dimasukkan ke dalam sel tabel Microsoft Excel (.xls).
      *
      * @param string $code Data barcode (misal NISN siswa)
      * @param int $scale Skala pixel per modul
@@ -52,49 +116,12 @@ class BarcodeService
      */
     public static function getBarcode2DDataUri(string $code, int $scale = 3): string
     {
-        $code = trim($code);
-        if ($code === '') {
+        $png = self::getBarcode2DPngBinary($code, $scale);
+        if ($png === '') {
             return '';
         }
 
-        $options = new QROptions([
-            'outputType'    => QRCode::OUTPUT_IMAGE_PNG,
-            'eccLevel'      => QRCode::ECC_M,
-            'scale'         => $scale,
-            'addQuietzone'  => true,
-            'quietzoneSize' => 1,
-            'imageBase64'   => true,
-        ]);
-
-        // Suppress PHP 8.5 imagedestroy notice from internal GD library
-        return (string) @(new QRCode($options))->render($code);
-    }
-
-    /**
-     * Generate Barcode 2D (QR Code) dalam format binary PNG mentah.
-     * Digunakan oleh PhpSpreadsheet MemoryDrawing untuk tertanam asli di file .xlsx.
-     *
-     * @param string $code Data barcode (misal NISN siswa)
-     * @param int $scale Skala pixel per modul
-     * @return string Binary PNG string
-     */
-    public static function getBarcode2DPngBinary(string $code, int $scale = 3): string
-    {
-        $code = trim($code);
-        if ($code === '') {
-            return '';
-        }
-
-        $options = new QROptions([
-            'outputType'    => QRCode::OUTPUT_IMAGE_PNG,
-            'eccLevel'      => QRCode::ECC_M,
-            'scale'         => $scale,
-            'addQuietzone'  => true,
-            'quietzoneSize' => 1,
-            'imageBase64'   => false,
-        ]);
-
-        return (string) @(new QRCode($options))->render($code);
+        return 'data:image/png;base64,' . base64_encode($png);
     }
 
     /**
