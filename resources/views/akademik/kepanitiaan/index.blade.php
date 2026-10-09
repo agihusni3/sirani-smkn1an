@@ -1,6 +1,7 @@
-@extends('layouts.app')
+@extends('akademik.layout')
 
 @section('title', 'Kepanitiaan Asesmen - Kurikulum DCC')
+@section('breadcrumb', 'Kepanitiaan Asesmen')
 
 @section('content')
 <div class="container-fluid py-3">

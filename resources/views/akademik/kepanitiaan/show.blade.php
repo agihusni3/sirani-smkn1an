@@ -1,6 +1,7 @@
-@extends('layouts.app')
+@extends('akademik.layout')
 
 @section('title', 'Susunan Panitia - ' . $periode->nama_event)
+@section('breadcrumb', 'Susunan Panitia Asesmen')
 
 @section('content')
 <div class="container-fluid py-3">
