@@ -298,6 +298,32 @@ class PortalAsesmenSiswaController extends Controller
 
         $siswa = Siswa::findOrFail($siswaId);
         $asesmen = AkademikAsesmenOnline::with('soals')->findOrFail($id);
+
+        if (!$asesmen->is_active) {
+            if ($request->wantsJson()) {
+                return response()->json(['error' => 'Asesmen ini sedang tidak aktif.'], 422);
+            }
+            return redirect()->route('portal.asesmen.dashboard')->with('error', 'Asesmen ini sedang tidak aktif.');
+        }
+
+        if ($asesmen->ditutup_pada && now()->gt($asesmen->ditutup_pada)) {
+            if ($request->wantsJson()) {
+                return response()->json(['error' => 'Waktu pengerjaan asesmen ini telah ditutup.'], 422);
+            }
+            return redirect()->route('portal.asesmen.dashboard')->with('error', 'Waktu pengerjaan asesmen ini telah ditutup.');
+        }
+
+        $hasil = AkademikAsesmenHasil::where('asesmen_id', $asesmen->id)
+            ->where('siswa_id', $siswaId)
+            ->first();
+
+        if ($hasil && $hasil->is_selesai) {
+            if ($request->wantsJson()) {
+                return response()->json(['error' => 'Anda sudah menyelesaikan asesmen ini sebelumnya.', 'nilai' => $hasil->nilai], 422);
+            }
+            return redirect()->route('portal.asesmen.dashboard')->with('info', 'Anda sudah menyelesaikan asesmen ini sebelumnya.');
+        }
+
         $jawabanInput = $request->input('jawaban', []);
 
         $totalBobot = $asesmen->soals->sum('bobot');
@@ -311,10 +337,6 @@ class PortalAsesmenSiswaController extends Controller
         }
 
         $nilaiAkhir = $totalBobot > 0 ? round(($skorDidapat / $totalBobot) * 100, 2) : 0;
-
-        $hasil = AkademikAsesmenHasil::where('asesmen_id', $asesmen->id)
-            ->where('siswa_id', $siswaId)
-            ->first();
 
         $durasi = null;
         if ($hasil && $hasil->mulai_pada) {
