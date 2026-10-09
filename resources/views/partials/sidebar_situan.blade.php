@@ -98,6 +98,13 @@
           <span>Surat Tugas &amp; SPPD</span>
         </div>
       </a>
+
+      <a href="{{ route('situan.rapat.index') }}" class="situan-nav-link {{ request()->is('situan/rapat*') ? 'active' : '' }}" title="Administrasi Rapat Dinas, Presensi &amp; Notula Terpadu">
+        <div class="situan-nav-link-left">
+          <i class="bi bi-people-fill"></i>
+          <span>Administrasi Rapat</span>
+        </div>
+      </a>
     </div>
 
     {{-- 3. Kepegawaian & Kearsipan Sentral --}}

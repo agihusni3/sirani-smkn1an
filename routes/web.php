@@ -238,6 +238,25 @@ Route::middleware('auth')->group(function () {
         Route::get('/situan/surat-tugas/{id}/cetak-sppd/{sppdId?}', [SituanSuratTugasController::class, 'cetakSppd'])->name('situan.surat-tugas.cetak-sppd');
         Route::get('/situan/surat-tugas/{id}/cetak-paket', [SituanSuratTugasController::class, 'cetakPaket'])->name('situan.surat-tugas.cetak-paket');
 
+        // Administrasi Rapat Dinas & Notula Terpadu
+        Route::get('/situan/rapat', [\App\Http\Controllers\Situan\SituanRapatController::class, 'index'])->name('situan.rapat.index');
+        Route::post('/situan/rapat', [\App\Http\Controllers\Situan\SituanRapatController::class, 'store'])->name('situan.rapat.store');
+        Route::get('/situan/rapat/{id}', [\App\Http\Controllers\Situan\SituanRapatController::class, 'show'])->name('situan.rapat.show');
+        Route::put('/situan/rapat/{id}', [\App\Http\Controllers\Situan\SituanRapatController::class, 'update'])->name('situan.rapat.update');
+        Route::match(['put', 'post'], '/situan/rapat/{id}/notula', [\App\Http\Controllers\Situan\SituanRapatController::class, 'updateNotula'])->name('situan.rapat.notula');
+        Route::delete('/situan/rapat/{id}', [\App\Http\Controllers\Situan\SituanRapatController::class, 'destroy'])->name('situan.rapat.destroy');
+        Route::get('/situan/rapat/{id}/cetak-undangan', [\App\Http\Controllers\Situan\SituanRapatController::class, 'cetakUndangan'])->name('situan.rapat.cetak.undangan');
+        Route::get('/situan/rapat/{id}/cetak-daftar-hadir', [\App\Http\Controllers\Situan\SituanRapatController::class, 'cetakDaftarHadir'])->name('situan.rapat.cetak.daftar-hadir');
+        Route::get('/situan/rapat/{id}/cetak-notula', [\App\Http\Controllers\Situan\SituanRapatController::class, 'cetakNotula'])->name('situan.rapat.cetak.notula');
+        Route::get('/situan/rapat/{id}/cetak-berita-acara', [\App\Http\Controllers\Situan\SituanRapatController::class, 'cetakBeritaAcara'])->name('situan.rapat.cetak.berita-acara');
+        Route::get('/situan/rapat/{id}/cetak-paket', [\App\Http\Controllers\Situan\SituanRapatController::class, 'cetakPaket'])->name('situan.rapat.cetak.paket');
+        // Alias dengan format strip
+        Route::get('/situan/rapat/{id}/cetak-undangan-alt', [\App\Http\Controllers\Situan\SituanRapatController::class, 'cetakUndangan'])->name('situan.rapat.cetak-undangan');
+        Route::get('/situan/rapat/{id}/cetak-daftar-hadir-alt', [\App\Http\Controllers\Situan\SituanRapatController::class, 'cetakDaftarHadir'])->name('situan.rapat.cetak-daftar-hadir');
+        Route::get('/situan/rapat/{id}/cetak-notula-alt', [\App\Http\Controllers\Situan\SituanRapatController::class, 'cetakNotula'])->name('situan.rapat.cetak-notula');
+        Route::get('/situan/rapat/{id}/cetak-berita-acara-alt', [\App\Http\Controllers\Situan\SituanRapatController::class, 'cetakBeritaAcara'])->name('situan.rapat.cetak-berita-acara');
+        Route::get('/situan/rapat/{id}/cetak-paket-alt', [\App\Http\Controllers\Situan\SituanRapatController::class, 'cetakPaket'])->name('situan.rapat.cetak-paket');
+
         // Loket Pelayanan Mandiri Siswa
         Route::get('/situan/pelayanan', [SituanPelayananSuratController::class, 'index'])->name('situan.pelayanan.index');
         Route::post('/situan/pelayanan/buat', [SituanPelayananSuratController::class, 'buatSurat'])->name('situan.pelayanan.buat');
@@ -448,11 +467,35 @@ Route::middleware('auth')->group(function () {
             Route::delete('/bank-soal/{id}', [\App\Http\Controllers\Akademik\AkademikAsesmenController::class, 'destroyBankSoal'])->name('akademik.bank_soal.destroy');
         });
 
+        // Manajemen Kepanitiaan Asesmen (Waka Kurikulum & Admin)
+        Route::middleware('role:admin,waka_kurikulum,kepala_sekolah')->group(function () {
+            Route::get('/kepanitiaan-asesmen', [\App\Http\Controllers\Akademik\KepanitiaanAsesmenController::class, 'index'])->name('akademik.kepanitiaan.index');
+            Route::post('/kepanitiaan-asesmen', [\App\Http\Controllers\Akademik\KepanitiaanAsesmenController::class, 'store'])->name('akademik.kepanitiaan.store');
+            Route::get('/kepanitiaan-asesmen/{id}', [\App\Http\Controllers\Akademik\KepanitiaanAsesmenController::class, 'show'])->name('akademik.kepanitiaan.show');
+            Route::post('/kepanitiaan-asesmen/{id}/panitia', [\App\Http\Controllers\Akademik\KepanitiaanAsesmenController::class, 'addPanitia'])->name('akademik.kepanitiaan.add-panitia');
+            Route::delete('/kepanitiaan-asesmen/{id}/panitia/{panitiaId}', [\App\Http\Controllers\Akademik\KepanitiaanAsesmenController::class, 'removePanitia'])->name('akademik.kepanitiaan.remove-panitia');
+            Route::put('/kepanitiaan-asesmen/{id}/status', [\App\Http\Controllers\Akademik\KepanitiaanAsesmenController::class, 'toggleStatus'])->name('akademik.kepanitiaan.toggle-status');
+            Route::get('/kepanitiaan-asesmen/{id}/cetak-sk', [\App\Http\Controllers\Akademik\KepanitiaanAsesmenController::class, 'cetakSk'])->name('akademik.kepanitiaan.cetak-sk');
+        });
+
         // Pengerjaan Ujian Siswa & Anti-Cheat Session
         Route::get('/asesmen/{id}/kerjakan', [\App\Http\Controllers\Akademik\AkademikAsesmenController::class, 'kerjakan'])->name('akademik.asesmen.kerjakan');
         Route::post('/asesmen/{id}/submit', [\App\Http\Controllers\Akademik\AkademikAsesmenController::class, 'submitJawaban'])->name('akademik.asesmen.submit');
         Route::post('/asesmen/{id}/log-pelanggaran', [\App\Http\Controllers\Akademik\AkademikAsesmenController::class, 'logPelanggaran'])->name('akademik.asesmen.log_pelanggaran');
         Route::post('/asesmen/{id}/autosave', [\App\Http\Controllers\Akademik\AkademikAsesmenController::class, 'autosaveJawaban'])->name('akademik.asesmen.autosave');
+    });
+
+    // Workspace Panitia Asesmen & CBT
+    Route::middleware(['auth', 'role:admin,waka_kurikulum,panitia_asesmen'])->prefix('panitia-asesmen')->name('panitia-asesmen.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\PanitiaAsesmen\PanitiaAsesmenController::class, 'dashboard'])->name('dashboard');
+        Route::get('/control-room', [\App\Http\Controllers\PanitiaAsesmen\PanitiaAsesmenController::class, 'controlRoom'])->name('control-room');
+        Route::post('/generate-token', [\App\Http\Controllers\PanitiaAsesmen\PanitiaAsesmenController::class, 'generateToken'])->name('generate-token');
+        Route::post('/ujian/{id}/toggle', [\App\Http\Controllers\PanitiaAsesmen\PanitiaAsesmenController::class, 'toggleUjianStatus'])->name('toggle-ujian');
+        Route::post('/hasil/{hasilId}/reset', [\App\Http\Controllers\PanitiaAsesmen\PanitiaAsesmenController::class, 'resetSiswaSession'])->name('reset-session');
+        Route::get('/administrasi', [\App\Http\Controllers\PanitiaAsesmen\PanitiaAsesmenController::class, 'administrasi'])->name('administrasi');
+        Route::get('/administrasi/cetak-kartu', [\App\Http\Controllers\PanitiaAsesmen\PanitiaAsesmenController::class, 'cetakKartu'])->name('cetak-kartu');
+        Route::get('/administrasi/cetak-daftar-hadir', [\App\Http\Controllers\PanitiaAsesmen\PanitiaAsesmenController::class, 'cetakDaftarHadir'])->name('cetak-daftar-hadir');
+        Route::get('/administrasi/cetak-berita-acara', [\App\Http\Controllers\PanitiaAsesmen\PanitiaAsesmenController::class, 'cetakBeritaAcara'])->name('cetak-berita-acara');
     });
 
     Route::get('/akademik', fn() => redirect()->route('akademik.dashboard'));

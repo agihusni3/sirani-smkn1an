@@ -204,9 +204,31 @@
       <a href="{{ route('akademik.asesmen.index') }}" class="akademik-nav-link {{ request()->routeIs('akademik.asesmen.*') ? 'active' : '' }}">
         <div class="akademik-nav-link-left">
           <i class="bi bi-laptop"></i>
-          <span>Asesmen Penilaian Online</span>
+          <span>Asesmen Kelas (Guru)</span>
         </div>
-        <span class="akademik-nav-badge">CBT</span>
+        <span class="akademik-nav-badge">Formatif</span>
+      </a>
+      @endif
+
+      {{-- Penetapan Kepanitiaan Asesmen (Waka Kurikulum) --}}
+      @if($isAdmin || $isWakaKurikulum || $isKepsek)
+      <a href="{{ route('akademik.kepanitiaan.index') }}" class="akademik-nav-link {{ request()->routeIs('akademik.kepanitiaan.*') ? 'active' : '' }}">
+        <div class="akademik-nav-link-left">
+          <i class="bi bi-people-fill text-primary"></i>
+          <span>Kepanitiaan Asesmen</span>
+        </div>
+        <span class="akademik-nav-badge" style="background:#e0e7ff; color:#3730a3;">SK</span>
+      </a>
+      @endif
+
+      {{-- Workspace Khusus Panitia Pelaksana Asesmen & CBT --}}
+      @if($user && ($user->isPanitiaAsesmen() || $isAdmin || $isWakaKurikulum))
+      <a href="{{ route('panitia-asesmen.dashboard') }}" class="akademik-nav-link {{ request()->routeIs('panitia-asesmen.*') ? 'active' : '' }}">
+        <div class="akademik-nav-link-left">
+          <i class="bi bi-shield-lock-fill text-success"></i>
+          <span>Workspace Panitia CBT</span>
+        </div>
+        <span class="akademik-nav-badge" style="background:#dcfce7; color:#15803d;">Panitia</span>
       </a>
       @endif
     </div>

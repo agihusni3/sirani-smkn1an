@@ -80,6 +80,7 @@ class User extends Authenticatable
             'staf_tu'        => ['name' => 'Staf Tata Usaha (TU)', 'icon' => 'bi-folder-symlink-fill', 'badge' => 'Staf TU'],
             'humas'          => ['name' => 'Tim Humas & Web', 'icon' => 'bi-broadcast', 'badge' => 'Humas'],
             'panitia_ppdb'   => ['name' => 'Panitia PPDB 2026', 'icon' => 'bi-person-plus-fill', 'badge' => 'PPDB'],
+            'panitia_asesmen'=> ['name' => 'Panitia Asesmen & CBT', 'icon' => 'bi-laptop-fill', 'badge' => 'Panitia Asesmen'],
             default          => ['name' => 'Guru / Tenaga Pendidik', 'icon' => 'bi-person-badge-fill', 'badge' => 'Guru'],
         };
     }
@@ -149,6 +150,22 @@ class User extends Authenticatable
             if (str_contains($jabatanText, 'tata usaha') || str_contains($jabatanText, 'tu') || str_contains($jabatanText, 'administrasi')) {
                 $roles[] = 'staf_tu';
             }
+
+            // Deteksi keanggotaan aktif dalam Kepanitiaan Asesmen / CBT
+            if ($this->guru_id && \Illuminate\Support\Facades\Schema::hasTable('akademik_asesmen_panitias')) {
+                $isPanitia = \App\Models\AkademikAsesmenPanitia::where('guru_id', $this->guru_id)
+                    ->where('is_active', true)
+                    ->whereHas('periode', fn($q) => $q->whereIn('status', ['draft', 'aktif']))
+                    ->exists();
+                if ($isPanitia) {
+                    $roles[] = 'panitia_asesmen';
+                }
+            }
+        }
+
+        // Admin dan Waka Kurikulum selalu dapat mengakses peran Panitia Asesmen
+        if ($this->role === 'admin' || in_array('waka_kurikulum', $roles, true)) {
+            $roles[] = 'panitia_asesmen';
         }
 
         if (empty($roles)) {
@@ -249,6 +266,11 @@ class User extends Authenticatable
     public function isPanitiaPpdb(): bool
     {
         return in_array($this->getActiveRole(), ['panitia_ppdb', 'ppdb'], true);
+    }
+
+    public function isPanitiaAsesmen(): bool
+    {
+        return in_array($this->getActiveRole(), ['panitia_asesmen', 'panitia_cbt'], true);
     }
 
     public function isKepalaSekolah(): bool
