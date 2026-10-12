@@ -397,8 +397,16 @@
       return;
     }
 
-    // Masukkan ke antrean serial FIFO
-    scanQueue.push({ code: cleanCode, time: now });
+    // Rekam waktu fisik tepat saat kartu disentuh scanner (HH:mm:ss)
+    const nowDate = new Date();
+    const tapTime = [
+      String(nowDate.getHours()).padStart(2, '0'),
+      String(nowDate.getMinutes()).padStart(2, '0'),
+      String(nowDate.getSeconds()).padStart(2, '0')
+    ].join(':');
+
+    // Masukkan ke antrean serial FIFO beserta tap_time asli
+    scanQueue.push({ code: cleanCode, time: now, tap_time: tapTime });
     runScanQueue();
   }
 
@@ -409,6 +417,7 @@
     isQueueRunning = true;
     const item = scanQueue.shift();
     const cleanCode = item.code;
+    const itemTapTime = item.tap_time || '';
     lastScannedCode = cleanCode;
     lastScannedTime = item.time;
 
@@ -425,19 +434,33 @@
           'Accept': 'application/json',
           'X-CSRF-TOKEN': csrf,
         },
-        body: JSON.stringify({ uid: cleanCode })
+        body: JSON.stringify({ uid: cleanCode, tap_time: itemTapTime })
       });
 
       const data = await res.json();
       showIdentityResult(data);
-      // Auto-refresh monitor feed instantly upon any scan
-      fetchMonitorFeed();
+
+      // REAL-TIME: Sisipkan hasil scan langsung ke tampilan monitor lokal tanpa request HTTP kedua!
+      if (data && data.success && data.data) {
+        prependScanToMonitorFeed(data.data);
+      } else if (data && !data.success) {
+        prependFailedScanToMonitorFeed({
+          nama: data.data?.nama || 'Kartu Tidak Dikenal',
+          uid: cleanCode,
+          jam: (data.data?.jam || itemTapTime || '').substring(0, 5),
+          time: (data.data?.jam || itemTapTime || '').substring(0, 5),
+          rombel: data.data?.rombel_atau_jabatan || data.data?.sub || 'Pengguna Tidak Terdaftar',
+          alasan: data.message || 'Pemindaian ditolak',
+          pesan: data.message || 'Pemindaian ditolak',
+          type: data.type || 'gagal',
+          is_unregistered: data.type === 'kartu_tidak_dikenal' || !data.data?.nama,
+        });
+      }
     } catch (err) {
       showIdentityResult({
         success: false,
         message: 'Gagal menghubungi server presensi. Pastikan koneksi stabil.'
       });
-      fetchMonitorFeed();
     } finally {
       isQueueRunning = false;
       if (ind && scanQueue.length === 0) {
@@ -771,6 +794,65 @@
         setTimeout(() => refreshIcon.classList.remove('spin-anim'), 400);
       }
     }
+  }
+
+  // ── SINKRONISASI REAL-TIME LOKAL (0 ms tanpa request SQL sekunder) ──
+  function prependScanToMonitorFeed(scanData) {
+    if (!scanData || !scanData.nama) return;
+
+    if (!monitorData.recent_scans) monitorData.recent_scans = [];
+    if (!monitorData.stats) {
+      monitorData.stats = { total_hadir: 0, total_terlambat: 0, total_pulang: 0, total_gagal: 0, total_belum_absen: 0 };
+    }
+
+    const st = (scanData.status || 'hadir').toLowerCase();
+    const isPulang = st === 'pulang';
+    const isTerlambat = st === 'terlambat';
+
+    // Tambah statistik lokal secara akurat
+    if (isPulang) {
+      monitorData.stats.total_pulang = (monitorData.stats.total_pulang || 0) + 1;
+    } else if (isTerlambat) {
+      monitorData.stats.total_terlambat = (monitorData.stats.total_terlambat || 0) + 1;
+    } else {
+      monitorData.stats.total_hadir = (monitorData.stats.total_hadir || 0) + 1;
+    }
+
+    const jamFormatted = (scanData.jam || scanData.jam_masuk || scanData.jam_pulang || '').substring(0, 5)
+      || new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+
+    const newScanEntry = {
+      nama: scanData.nama,
+      rombel_atau_jabatan: scanData.rombel_atau_jabatan || scanData.sub || scanData.kelas || '-',
+      status: st,
+      status_label: scanData.status_label || (isTerlambat ? 'Terlambat' : (isPulang ? 'Pulang' : 'Hadir')),
+      jam: jamFormatted,
+      foto: scanData.foto || scanData.foto_url || '/img/user-default.png',
+    };
+
+    // Sisipkan di posisi pertama
+    monitorData.recent_scans.unshift(newScanEntry);
+    if (monitorData.recent_scans.length > 30) {
+      monitorData.recent_scans.pop();
+    }
+
+    updateMonitorUI();
+  }
+
+  function prependFailedScanToMonitorFeed(failedData) {
+    if (!failedData) return;
+    if (!monitorData.failed_scans) monitorData.failed_scans = [];
+    if (!monitorData.stats) {
+      monitorData.stats = { total_hadir: 0, total_terlambat: 0, total_pulang: 0, total_gagal: 0, total_belum_absen: 0 };
+    }
+
+    monitorData.stats.total_gagal = (monitorData.stats.total_gagal || 0) + 1;
+    monitorData.failed_scans.unshift(failedData);
+    if (monitorData.failed_scans.length > 50) {
+      monitorData.failed_scans.pop();
+    }
+
+    updateMonitorUI();
   }
 
   function updateMonitorUI() {

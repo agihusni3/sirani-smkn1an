@@ -24,9 +24,9 @@ class RfidScanService
      * @return array Data respons hasil absensi
      * @throws Exception
      */
-    public function scanRfid(string $uid, string $device = 'kios_rfid'): array
+    public function scanRfid(string $uid, string $device = 'kios_rfid', ?string $tapTime = null): array
     {
-        $res = $this->executeScanRfid($uid, $device);
+        $res = $this->executeScanRfid($uid, $device, $tapTime);
 
         // Jika pemindaian gagal, ditolak, atau di luar ketentuan operasional, catat ke log pantau gagal hari ini
         // Catatan: 'belum_waktunya_pulang' BUKAN kegagalan scan (siswa sudah hadir pagi), sehingga tidak dimasukkan ke log gagal
@@ -156,7 +156,7 @@ class RfidScanService
     /**
      * Eksekusi inti verifikasi pemindaian RFID / Barcode.
      */
-    protected function executeScanRfid(string $uid, string $device = 'kios_rfid'): array
+    protected function executeScanRfid(string $uid, string $device = 'kios_rfid', ?string $tapTime = null): array
     {
         // ── PARAMETER 1: Sanitasi & Normalisasi Input Barcode / RFID ──
         // Bersihkan whitespace, kontrol karakter ASCII, dan prefix/suffix bawaan scanner USB
@@ -185,7 +185,25 @@ class RfidScanService
 
         $now = Carbon::now();
         $today = $now->toDateString();
-        $timeNow = $now->format('H:i:s');
+        $serverTime = $now->format('H:i:s');
+
+        // Validasi dan gunakan tap_time jika dikirim dari browser kios (agar presisi sesuai detik kartu ditempel)
+        $timeNow = $serverTime;
+        if (!empty($tapTime) && preg_match('/^\d{1,2}:\d{2}(?::\d{2})?$/', trim($tapTime))) {
+            $parts = explode(':', trim($tapTime));
+            $h = (int) $parts[0];
+            $m = (int) $parts[1];
+            $s = isset($parts[2]) ? (int) $parts[2] : 0;
+            if ($h >= 0 && $h < 24 && $m >= 0 && $m < 60 && $s >= 0 && $s < 60) {
+                $parsedTap = sprintf('%02d:%02d:%02d', $h, $m, $s);
+                $tapCarbon = Carbon::createFromTime($h, $m, $s);
+                $diffSeconds = $now->diffInSeconds($tapCarbon, false);
+                // Terima jam tap jika tidak lebih dari 5 menit di masa depan dan tidak lebih dari 6 jam lalu di hari yang sama
+                if ($diffSeconds <= 300 && $diffSeconds >= -21600) {
+                    $timeNow = $parsedTap;
+                }
+            }
+        }
 
         // ── PARAMETER 2: Identifikasi Pemilik (RFID UID -> NISN Siswa -> NIS Siswa -> NIP Guru) ──
         $cleanUidVariants = array_values(array_unique(array_filter([
@@ -530,44 +548,52 @@ class RfidScanService
                     }
                 }
 
-                // Notifikasi WhatsApp Orang Tua untuk Siswa (Hanya jika kategori aktif & lewat NotifikasiDraftService)
+                // Notifikasi Orang Tua diproses secara non-blocking di latar belakang agar respon tap kartu instan (< 100ms)
                 if ($type === 'siswa') {
-                    try {
-                        $kategori = $isTerlambat ? 'terlambat' : 'masuk';
-                        $settingNotif = \App\Models\PengaturanNotifikasi::getPengaturan();
-                        if ($settingNotif->isKategoriAktif($kategori)) {
-                            \App\Services\NotifikasiDraftService::buatDraft($person, $kategori, [
-                                'tanggal'    => $today,
-                                'jam'        => $timeNow,
-                                'batas_jam'  => $jamMasukMaks,
-                                'keterangan' => $absensi->keterangan,
-                            ], 'sistem_rfid');
-                        }
-                    } catch (\Throwable $e) {
-                        \Illuminate\Support\Facades\Log::warning("Gagal memproses draf notifikasi ortu masuk RFID: " . $e->getMessage());
-                    }
-
-                    // Push Notification Real-Time ke Aplikasi HP Orang Tua (Hadir Tepat Waktu & Terlambat)
-                    try {
-                        if (!empty($person->nisn)) {
-                            $kelasLabel = $rombelOrJabatan;
-                            $nisnEncoded = urlencode($person->nisn);
-                            if ($isTerlambat) {
-                                $pushTitle = "⚠️ Terlambat: {$person->nama}";
-                                $pushBody  = "Ananda ({$kelasLabel}) hadir pukul {$timeNow} WIB, melewati batas toleransi {$jamMasukMaks} WIB. Ketuk untuk cek riwayat absensi.";
-                            } else {
-                                $pushTitle = "✅ Hadir Tepat Waktu: {$person->nama}";
-                                $pushBody  = "Ananda ({$kelasLabel}) telah tiba di sekolah tepat waktu pada pukul {$timeNow} WIB. Ketuk untuk cek riwayat absensi.";
+                    $deferNotificationMasuk = function () use ($person, $isTerlambat, $today, $timeNow, $jamMasukMaks, $absensi, $rombelOrJabatan) {
+                        try {
+                            $kategori = $isTerlambat ? 'terlambat' : 'masuk';
+                            $settingNotif = \App\Models\PengaturanNotifikasi::getPengaturan();
+                            if ($settingNotif->isKategoriAktif($kategori)) {
+                                \App\Services\NotifikasiDraftService::buatDraft($person, $kategori, [
+                                    'tanggal'    => $today,
+                                    'jam'        => $timeNow,
+                                    'batas_jam'  => $jamMasukMaks,
+                                    'keterangan' => $absensi->keterangan,
+                                ], 'sistem_rfid');
                             }
-                            \App\Services\PushNotificationService::sendToSiswa(
-                                $person->nisn,
-                                $pushTitle,
-                                $pushBody,
-                                '/presensi-siswa/' . $nisnEncoded
-                            );
+                        } catch (\Throwable $e) {
+                            \Illuminate\Support\Facades\Log::warning("Gagal memproses draf notifikasi ortu masuk RFID: " . $e->getMessage());
                         }
-                    } catch (\Throwable $e) {
-                        \Illuminate\Support\Facades\Log::warning("Gagal kirim push notif presensi masuk: " . $e->getMessage());
+
+                        // Push Notification Real-Time ke Aplikasi HP Orang Tua (Hadir Tepat Waktu & Terlambat)
+                        try {
+                            if (!empty($person->nisn)) {
+                                $kelasLabel = $rombelOrJabatan;
+                                $nisnEncoded = urlencode($person->nisn);
+                                if ($isTerlambat) {
+                                    $pushTitle = "⚠️ Terlambat: {$person->nama}";
+                                    $pushBody  = "Ananda ({$kelasLabel}) hadir pukul {$timeNow} WIB, melewati batas toleransi {$jamMasukMaks} WIB. Ketuk untuk cek riwayat absensi.";
+                                } else {
+                                    $pushTitle = "✅ Hadir Tepat Waktu: {$person->nama}";
+                                    $pushBody  = "Ananda ({$kelasLabel}) telah tiba di sekolah tepat waktu pada pukul {$timeNow} WIB. Ketuk untuk cek riwayat absensi.";
+                                }
+                                \App\Services\PushNotificationService::sendToSiswa(
+                                    $person->nisn,
+                                    $pushTitle,
+                                    $pushBody,
+                                    '/presensi-siswa/' . $nisnEncoded
+                                );
+                            }
+                        } catch (\Throwable $e) {
+                            \Illuminate\Support\Facades\Log::warning("Gagal kirim push notif presensi masuk: " . $e->getMessage());
+                        }
+                    };
+
+                    if (function_exists('defer')) {
+                        defer($deferNotificationMasuk);
+                    } else {
+                        $deferNotificationMasuk();
                     }
                 }
 
@@ -629,37 +655,45 @@ class RfidScanService
                     }
                 }
 
-                // Notifikasi WhatsApp Pulang (Hanya jika kategori pulang diaktifkan)
+                // Notifikasi WhatsApp & Push Pulang diproses secara non-blocking di latar belakang
                 if ($type === 'siswa') {
-                    try {
-                        $settingNotif = \App\Models\PengaturanNotifikasi::getPengaturan();
-                        if ($settingNotif->isKategoriAktif('pulang')) {
-                            \App\Services\NotifikasiDraftService::buatDraft($person, 'pulang', [
-                                'tanggal'    => $today,
-                                'jam'        => $timeNow,
-                                'keterangan' => 'Presensi Pulang Resmi via RFID/Barcode',
-                            ], 'sistem_rfid');
+                    $deferNotificationPulang = function () use ($person, $today, $timeNow, $rombelOrJabatan) {
+                        try {
+                            $settingNotif = \App\Models\PengaturanNotifikasi::getPengaturan();
+                            if ($settingNotif->isKategoriAktif('pulang')) {
+                                \App\Services\NotifikasiDraftService::buatDraft($person, 'pulang', [
+                                    'tanggal'    => $today,
+                                    'jam'        => $timeNow,
+                                    'keterangan' => 'Presensi Pulang Resmi via RFID/Barcode',
+                                ], 'sistem_rfid');
+                            }
+                        } catch (\Throwable $e) {
+                            \Illuminate\Support\Facades\Log::warning("Gagal memproses draf notifikasi ortu pulang RFID: " . $e->getMessage());
                         }
-                    } catch (\Throwable $e) {
-                        \Illuminate\Support\Facades\Log::warning("Gagal memproses draf notifikasi ortu pulang RFID: " . $e->getMessage());
-                    }
 
-                    // Push Notification Real-Time ke Aplikasi HP Orang Tua
-                    try {
-                        if (!empty($person->nisn)) {
-                            $kelasLabel = $rombelOrJabatan;
-                            $nisnEncoded = urlencode($person->nisn);
-                            $pushTitle = "🏠 Pulang: {$person->nama}";
-                            $pushBody = "Ananda ({$kelasLabel}) telah tap pulang dari sekolah pada pukul {$timeNow} WIB. Ketuk untuk cek riwayat absensi.";
-                            \App\Services\PushNotificationService::sendToSiswa(
-                                $person->nisn,
-                                $pushTitle,
-                                $pushBody,
-                                '/presensi-siswa/' . $nisnEncoded
-                            );
+                        // Push Notification Real-Time ke Aplikasi HP Orang Tua
+                        try {
+                            if (!empty($person->nisn)) {
+                                $kelasLabel = $rombelOrJabatan;
+                                $nisnEncoded = urlencode($person->nisn);
+                                $pushTitle = "🏠 Pulang: {$person->nama}";
+                                $pushBody = "Ananda ({$kelasLabel}) telah tap pulang dari sekolah pada pukul {$timeNow} WIB. Ketuk untuk cek riwayat absensi.";
+                                \App\Services\PushNotificationService::sendToSiswa(
+                                    $person->nisn,
+                                    $pushTitle,
+                                    $pushBody,
+                                    '/presensi-siswa/' . $nisnEncoded
+                                );
+                            }
+                        } catch (\Throwable $e) {
+                            \Illuminate\Support\Facades\Log::warning("Gagal kirim push notif pulang: " . $e->getMessage());
                         }
-                    } catch (\Throwable $e) {
-                        \Illuminate\Support\Facades\Log::warning("Gagal kirim push notif pulang: " . $e->getMessage());
+                    };
+
+                    if (function_exists('defer')) {
+                        defer($deferNotificationPulang);
+                    } else {
+                        $deferNotificationPulang();
                     }
                 }
 

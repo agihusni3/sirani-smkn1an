@@ -5,8 +5,9 @@ use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function () {
     // Endpoint Scan Smart Gate RFID & Barcode (Dilindungi rate limiter)
-    Route::post('/rfid-scan', [RfidController::class, 'scan'])->middleware('throttle:120,1');
-    Route::get('/kiosk-monitor-feed', [RfidController::class, 'monitorFeed'])->middleware('throttle:60,1');
+    // Rate limit tinggi 1200 req/menit (20 scan/detik) agar tidak bottleneck di jam sibuk gerbang
+    Route::post('/rfid-scan', [RfidController::class, 'scan'])->middleware('throttle:1200,1');
+    Route::get('/kiosk-monitor-feed', [RfidController::class, 'monitorFeed'])->middleware('throttle:300,1');
 });
 
 // Endpoint Webhook Auto-Deploy Server SIRANI (Rate limit 15 req/menit untuk mencegah brute-force token)

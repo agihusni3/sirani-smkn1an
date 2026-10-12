@@ -758,11 +758,14 @@ class RfidController extends Controller
     public function scan(Request $request): JsonResponse
     {
         $request->validate([
-            'uid' => 'required|string|min:3',
+            'uid'      => 'required|string|min:3',
+            'tap_time' => 'nullable|string|max:10',
         ]);
 
+        $tapTime = $request->input('tap_time');
+
         try {
-            $result = $this->rfidService->scanRfid($request->input('uid'), 'kios_rfid');
+            $result = $this->rfidService->scanRfid($request->input('uid'), 'kios_rfid', $tapTime);
             return response()->json($result, $result['success'] ? 200 : 422);
         } catch (\Throwable $e) {
             \Illuminate\Support\Facades\Log::warning("Error scan RFID: " . $e->getMessage());
@@ -771,7 +774,7 @@ class RfidController extends Controller
             if (str_contains($e->getMessage(), 'database is locked')) {
                 usleep(80000); // 80ms
                 try {
-                    $result = $this->rfidService->scanRfid($request->input('uid'), 'kios_rfid');
+                    $result = $this->rfidService->scanRfid($request->input('uid'), 'kios_rfid', $tapTime);
                     return response()->json($result, $result['success'] ? 200 : 422);
                 } catch (\Throwable $e2) {
                     \Illuminate\Support\Facades\Log::warning("Retry scan RFID database locked gagal: " . $e2->getMessage());
