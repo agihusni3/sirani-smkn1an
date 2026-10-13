@@ -293,7 +293,7 @@ class KoreksiPresensiService
                 'status'  => $statusFinal,
                 'absensi' => $absensi->fresh(),
             ];
-        });
+        }, 5);
     }
 
     /**
