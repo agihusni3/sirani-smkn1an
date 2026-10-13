@@ -651,6 +651,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/piket/presensi-manual', [GuruPiketController::class, 'storePresensiManual'])->name('piket.presensi-manual.store');
         Route::put('/piket/absensi/{id}', [GuruPiketController::class, 'updateAbsensi'])->name('piket.absensi.update');
         Route::post('/piket/koreksi-massal', [GuruPiketController::class, 'koreksiMassal'])->name('piket.koreksi-massal');
+        Route::get('/piket/koreksi-massal', fn() => redirect()->route('piket.index'));
         Route::post('/piket/toggle-gerbang', [GuruPiketController::class, 'toggleSesiGerbang'])->name('piket.toggle-gerbang');
         Route::post('/piket/validasi-siswa', [GuruPiketController::class, 'validasiPresensiSiswa'])->name('piket.validasi-siswa');
         Route::post('/piket/kirim-wa', [GuruPiketController::class, 'kirimWaGateway'])->name('piket.kirim-wa');

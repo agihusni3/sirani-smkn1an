@@ -221,12 +221,25 @@ class KoreksiPresensiService
                             'waktu_kirim' => now(),
                         ]);
 
-                        PushNotificationService::sendToSiswa(
-                            $nisn,
-                            "{$ikon} Koreksi Presensi: {$siswaObj->nama} ({$labelStatus})",
-                            "Data kehadiran ananda tanggal {$absensi->tanggal} diperbarui menjadi {$labelStatus}. Catatan: {$ketFinal}",
-                            '/presensi-siswa/' . urlencode($nisn)
-                        );
+                        if (function_exists('defer')) {
+                            defer(function () use ($nisn, $ikon, $siswaObj, $labelStatus, $absensi, $ketFinal) {
+                                try {
+                                    PushNotificationService::sendToSiswa(
+                                        $nisn,
+                                        "{$ikon} Koreksi Presensi: {$siswaObj->nama} ({$labelStatus})",
+                                        "Data kehadiran ananda tanggal {$absensi->tanggal} diperbarui menjadi {$labelStatus}. Catatan: {$ketFinal}",
+                                        '/presensi-siswa/' . urlencode($nisn)
+                                    );
+                                } catch (\Throwable) {}
+                            });
+                        } else {
+                            PushNotificationService::sendToSiswa(
+                                $nisn,
+                                "{$ikon} Koreksi Presensi: {$siswaObj->nama} ({$labelStatus})",
+                                "Data kehadiran ananda tanggal {$absensi->tanggal} diperbarui menjadi {$labelStatus}. Catatan: {$ketFinal}",
+                                '/presensi-siswa/' . urlencode($nisn)
+                            );
+                        }
                     } catch (\Throwable $eNotif) {
                         Log::warning("Gagal kirim notifikasi/push koreksi presensi: " . $eNotif->getMessage());
                     }
@@ -308,26 +321,43 @@ class KoreksiPresensiService
                 ->first();
             $siswaRombelId = $siswaRombel?->id;
 
-            // Cari atau buat record presensi
-            $absensi = Absensi::firstOrCreate(
-                [
-                    'pemilik_type' => 'siswa',
-                    'pemilik_id'   => $siswa->id,
-                    'tanggal'      => $tanggal,
-                ],
-                [
-                    'siswa_rombel_id' => $siswaRombelId,
-                    'status'          => 'alpha',
-                    'sumber_absen'    => 'koreksi_piket_massal',
-                ]
-            );
+            // Retry loop dengan toleransi SQLite database is locked
+            $suksesSiswa = false;
+            for ($attempt = 1; $attempt <= 5; $attempt++) {
+                try {
+                    // Cari atau buat record presensi
+                    $absensi = Absensi::firstOrCreate(
+                        [
+                            'pemilik_type' => 'siswa',
+                            'pemilik_id'   => $siswa->id,
+                            'tanggal'      => $tanggal,
+                        ],
+                        [
+                            'siswa_rombel_id' => $siswaRombelId,
+                            'status'          => 'alpha',
+                            'sumber_absen'    => 'koreksi_piket_massal',
+                        ]
+                    );
 
-            if ($absensi && !$absensi->siswa_rombel_id && $siswaRombelId) {
-                $absensi->update(['siswa_rombel_id' => $siswaRombelId]);
+                    if ($absensi && !$absensi->siswa_rombel_id && $siswaRombelId) {
+                        $absensi->update(['siswa_rombel_id' => $siswaRombelId]);
+                    }
+
+                    self::koreksi($absensi, $data, $user, 'koreksi_piket_massal');
+                    $suksesSiswa = true;
+                    break;
+                } catch (\Throwable $e) {
+                    if (str_contains($e->getMessage(), 'database is locked') && $attempt < 5) {
+                        usleep(random_int(40000, 120000));
+                        continue;
+                    }
+                    throw $e;
+                }
             }
 
-            self::koreksi($absensi, $data, $user, 'koreksi_piket_massal');
-            $successCount++;
+            if ($suksesSiswa) {
+                $successCount++;
+            }
         }
 
         return [

@@ -614,9 +614,14 @@ class RfidScanService
             if (!empty($absensi->jam_masuk) && empty($absensi->jam_pulang)) {
                 $jamPulangJadwal = Carbon::parse($jamPulangMulai);
 
-                // Validasi: Belum Waktunya Pulang (< jamPulangMulai)
-                if ($now->lessThan($jamPulangJadwal)) {
-                    $selisihDetik = $now->diffInRealSeconds($jamPulangJadwal);
+                // Toleransi kepulangan: izinkan tap pulang hingga 20 menit sebelum jam kepulangan resmi
+                // (misal kepulangan 15:30, siswa yang selesai pembelajaran 15:10 sudah dapat tap pulang tanpa ditolak)
+                $toleransiPulangMulai = $jamPulangJadwal->copy()->subMinutes(20);
+                $waktuCek = Carbon::parse($timeNow);
+
+                // Validasi: Belum Waktunya Pulang (< toleransiPulangMulai)
+                if ($waktuCek->lessThan($toleransiPulangMulai)) {
+                    $selisihDetik = $waktuCek->diffInRealSeconds($jamPulangJadwal);
                     $selisihMenit = max(1, (int) ceil($selisihDetik / 60));
                     $menitLabel = $selisihMenit === 1 ? 'kurang 1 menit lagi' : "kurang {$selisihMenit} menit lagi";
                     $pesanWaktu = "Anda sudah presensi masuk pukul " . substr($absensi->jam_masuk, 0, 5) . " WIB. Kepulangan dimulai pukul " . substr($jamPulangMulai, 0, 5) . " WIB ({$menitLabel}).";

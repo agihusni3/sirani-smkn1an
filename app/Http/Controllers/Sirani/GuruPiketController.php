@@ -306,25 +306,54 @@ class GuruPiketController extends Controller
         );
 
         if (!$canKoreksi) {
-            return redirect()->back()->with('error', 'Akses ditolak: Hanya Guru Piket bertugas hari ini yang berwenang melakukan koreksi presensi.');
+            if ($request->expectsJson() || $request->ajax()) {
+                return response()->json(['success' => false, 'message' => 'Akses ditolak: Hanya Guru Piket bertugas hari ini yang berwenang melakukan koreksi presensi.'], 403);
+            }
+            return redirect()->route('piket.index')->with('error', 'Akses ditolak: Hanya Guru Piket bertugas hari ini yang berwenang melakukan koreksi presensi.');
         }
 
-        $request->validate([
-            'siswa_ids'   => 'required|array|min:1',
-            'siswa_ids.*' => 'required|exists:siswas,id',
-            'status'      => 'required|string|in:hadir,terlambat,alpha,sakit,izin,dispen,dispensasi,bolos,titip_kartu,reset',
-            'jam_masuk'   => 'nullable|string',
-            'jam_pulang'  => 'nullable|string',
-            'keterangan'  => 'nullable|string|max:500',
-        ]);
+        try {
+            $request->validate([
+                'siswa_ids'   => 'required|array|min:1',
+                'siswa_ids.*' => 'required|exists:siswas,id',
+                'status'      => 'required|string|in:hadir,terlambat,alpha,sakit,izin,dispen,dispensasi,bolos,titip_kartu,reset',
+                'jam_masuk'   => 'nullable|string',
+                'jam_pulang'  => 'nullable|string',
+                'keterangan'  => 'nullable|string|max:500',
+            ], [
+                'siswa_ids.required' => 'Pilih minimal satu siswa untuk melakukan koreksi masal.',
+                'siswa_ids.min'      => 'Pilih minimal satu siswa untuk melakukan koreksi masal.',
+                'status.required'    => 'Pilih status kehadiran baru.',
+            ]);
 
-        $siswaIds = array_values(array_unique($request->input('siswa_ids')));
-        $data = $request->only(['status', 'jam_masuk', 'jam_pulang', 'keterangan']);
-        $data['tanggal'] = $today;
+            $siswaIds = array_values(array_unique($request->input('siswa_ids')));
+            $data = $request->only(['status', 'jam_masuk', 'jam_pulang', 'keterangan']);
+            $data['tanggal'] = $today;
 
-        $res = \App\Services\KoreksiPresensiService::koreksiMassal($siswaIds, $data, $user);
+            $res = \App\Services\KoreksiPresensiService::koreksiMassal($siswaIds, $data, $user);
 
-        return redirect()->back()->with('success', $res['message']);
+            if ($request->expectsJson() || $request->ajax()) {
+                return response()->json($res);
+            }
+
+            return redirect()->route('piket.index')->with('success', $res['message']);
+        } catch (\Illuminate\Validation\ValidationException $ve) {
+            $firstError = collect($ve->errors())->flatten()->first() ?: 'Validasi input tidak sesuai.';
+            if ($request->expectsJson() || $request->ajax()) {
+                return response()->json(['success' => false, 'message' => $firstError], 422);
+            }
+            return redirect()->route('piket.index')->with('error', $firstError);
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error("Gagal koreksi masal piket: " . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            if ($request->expectsJson() || $request->ajax()) {
+                return response()->json(['success' => false, 'message' => 'Gagal memproses koreksi masal: ' . $e->getMessage()], 500);
+            }
+
+            return redirect()->route('piket.index')->with('error', 'Terjadi kendala saat memproses koreksi masal (' . $e->getMessage() . '). Silakan ulangi sesaat lagi.');
+        }
     }
 
     /**
