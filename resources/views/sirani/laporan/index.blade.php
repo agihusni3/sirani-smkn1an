@@ -388,6 +388,15 @@
             @endif
           @endif
 
+          <!-- Filter Pencarian Nama / NISN -->
+          <div class="form-group" style="flex:1.2; min-width:200px; margin-bottom:0;">
+            <label style="font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:0.5px; color:var(--text-2); margin-bottom:6px; display:block;">Pencarian {{ $kategori === 'siswa' ? '(Nama / NISN / Kelas)' : '(Nama / NIP / Jabatan)' }}</label>
+            <div style="position:relative;">
+              <i class="bi bi-search" style="position:absolute; left:12px; top:50%; transform:translateY(-50%); color:var(--text-3); font-size:13px; pointer-events:none;"></i>
+              <input type="text" name="search" value="{{ request('search') }}" placeholder="Ketik kata kunci pencarian..." style="width:100%; height:42px; background:var(--bg-3); border:1px solid var(--border-2); border-radius:var(--r-sm); padding:0 12px 0 34px; color:var(--text); font-size:13px; font-weight:700;" />
+            </div>
+          </div>
+
           <!-- Filter Status Presensi -->
           <div class="form-group" style="flex:1; min-width:180px; margin-bottom:0;">
             <label style="font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:0.5px; color:var(--text-2); margin-bottom:6px; display:block;">Status Presensi</label>
@@ -418,8 +427,8 @@
       <!-- TABEL REKAP AGREGAT PERIODE (MINGGUAN / BULANAN / TAHUNAN) -->
       <!-- ═══════════════════════════════════════════════════════════════════ -->
       <div class="panel" style="padding:0; overflow:hidden; border:1px solid var(--border); border-radius:var(--r-md); box-shadow:var(--shadow-sm); background:var(--bg-2); margin-bottom:24px;">
-        <div class="panel-title no-print" style="padding:14px 18px; margin:0; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
-          <div style="font-weight:800; font-size:15px; color:var(--text); display:flex; align-items:center; gap:8px;">
+        <div class="panel-title no-print" style="padding:12px 18px; margin:0; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+          <div style="font-weight:800; font-size:15px; color:var(--text); display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
             <i class="bi bi-file-earmark-spreadsheet-fill" style="color:#000000;"></i>
             <span>Rekapitulasi {{ ucfirst($kategori) }} ({{ ucfirst($periode) }})</span>
             @if(request('status'))
@@ -428,8 +437,46 @@
                 <a href="{{ request()->fullUrlWithQuery(['status' => null, 'page' => 1]) }}" style="color:#FFFFFF; text-decoration:none; margin-left:2px;" title="Hapus Filter Status"><i class="bi bi-x-circle-fill"></i></a>
               </span>
             @endif
+            @if(request('search'))
+              <span class="badge" style="background:#2563EB; color:#FFFFFF; font-size:11px; padding:3px 8px; border-radius:4px; font-weight:700; display:inline-flex; align-items:center; gap:5px;">
+                Cari: "{{ request('search') }}"
+                <a href="{{ request()->fullUrlWithQuery(['search' => null, 'page' => 1]) }}" style="color:#FFFFFF; text-decoration:none; margin-left:2px;" title="Hapus Pencarian"><i class="bi bi-x-circle-fill"></i></a>
+              </span>
+            @endif
           </div>
-          <div>
+          <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+            <!-- Form Pencarian Server & Live Client Search -->
+            <form action="{{ url('/laporan') }}" method="GET" style="margin:0; display:flex; align-items:center; gap:6px;">
+              <input type="hidden" name="kategori" value="{{ $kategori }}" />
+              <input type="hidden" name="periode" value="{{ $periode }}" />
+              @if(request('tanggal')) <input type="hidden" name="tanggal" value="{{ request('tanggal') }}" /> @endif
+              @if(request('tanggal_mulai')) <input type="hidden" name="tanggal_mulai" value="{{ request('tanggal_mulai') }}" /> @endif
+              @if(request('tanggal_selesai')) <input type="hidden" name="tanggal_selesai" value="{{ request('tanggal_selesai') }}" /> @endif
+              @if(request('bulan')) <input type="hidden" name="bulan" value="{{ request('bulan') }}" /> @endif
+              @if(request('tahun')) <input type="hidden" name="tahun" value="{{ request('tahun') }}" /> @endif
+              @if(request('rombel_id')) <input type="hidden" name="rombel_id" value="{{ request('rombel_id') }}" /> @endif
+              @if(request('status')) <input type="hidden" name="status" value="{{ request('status') }}" /> @endif
+
+              <div style="position:relative; width:250px; max-width:100%;">
+                <i class="bi bi-search" style="position:absolute; left:11px; top:50%; transform:translateY(-50%); color:var(--text-3); font-size:12px; pointer-events:none;"></i>
+                <input type="text" 
+                       name="search" 
+                       id="liveSearchRekap"
+                       value="{{ request('search') }}" 
+                       placeholder="Cari {{ $kategori === 'siswa' ? 'nama, NISN, kelas...' : 'nama, NIP, jabatan...' }}" 
+                       style="width:100%; height:36px; padding:0 30px 0 32px; font-size:12px; font-weight:600; border-radius:var(--r-sm); border:1px solid var(--border-2); background:var(--bg-3); color:var(--text); outline:none;" 
+                       autocomplete="off" />
+                @if(request('search'))
+                  <a href="{{ request()->fullUrlWithQuery(['search' => null, 'page' => 1]) }}" style="position:absolute; right:10px; top:50%; transform:translateY(-50%); color:var(--text-3); text-decoration:none; display:flex; align-items:center;" title="Bersihkan Pencarian">
+                    <i class="bi bi-x-circle-fill" style="font-size:13px;"></i>
+                  </a>
+                @endif
+              </div>
+              <button type="submit" class="btn btn-primary" style="height:36px; padding:0 14px; font-size:12px; font-weight:800; display:inline-flex; align-items:center; gap:5px;" title="Cari di Seluruh Halaman Data">
+                <i class="bi bi-search"></i> Cari
+              </button>
+            </form>
+
             <a href="{{ route('laporan.cetak-pdf', request()->query()) }}" target="_blank" class="btn btn-outline" style="height:36px; font-size:12px; font-weight:800; color:#000000; border:1.5px solid #000000; background:var(--bg-2); display:inline-flex; align-items:center; gap:6px;" title="Buka Dokumen PDF Resmi">
               <i class="bi bi-file-earmark-pdf-fill" style="color:#000000;"></i> Cetak PDF
             </a>
@@ -747,8 +794,8 @@
       <!-- TABEL HARIAN -->
       <!-- ═══════════════════════════════════════════════════════════════════ -->
       <div class="panel" style="padding:0; overflow:hidden; border:1px solid var(--border); border-radius:var(--r-md); box-shadow:var(--shadow-sm); background:var(--bg-2); margin-bottom:24px;">
-        <div class="panel-title no-print" style="padding:14px 18px; margin:0; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
-          <div style="font-weight:800; font-size:15px; color:var(--text); display:flex; align-items:center; gap:8px;">
+        <div class="panel-title no-print" style="padding:12px 18px; margin:0; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+          <div style="font-weight:800; font-size:15px; color:var(--text); display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
             <i class="bi bi-table" style="color:#000000;"></i>
             <span>Rincian Presensi Harian</span>
             @if(request('status'))
@@ -757,8 +804,48 @@
                 <a href="{{ request()->fullUrlWithQuery(['status' => null, 'page' => 1]) }}" style="color:#FFFFFF; text-decoration:none; margin-left:2px;" title="Hapus Filter Status"><i class="bi bi-x-circle-fill"></i></a>
               </span>
             @endif
+            @if(request('search'))
+              <span class="badge" style="background:#2563EB; color:#FFFFFF; font-size:11px; padding:3px 8px; border-radius:4px; font-weight:700; display:inline-flex; align-items:center; gap:5px;">
+                Cari: "{{ request('search') }}"
+                <a href="{{ request()->fullUrlWithQuery(['search' => null, 'page' => 1]) }}" style="color:#FFFFFF; text-decoration:none; margin-left:2px;" title="Hapus Pencarian"><i class="bi bi-x-circle-fill"></i></a>
+              </span>
+            @endif
           </div>
-          <div>
+          <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+            <!-- Form Pencarian Server & Live Client Search -->
+            <form action="{{ url('/laporan') }}" method="GET" style="margin:0; display:flex; align-items:center; gap:6px;">
+              <input type="hidden" name="kategori" value="{{ $kategori }}" />
+              <input type="hidden" name="periode" value="{{ $periode }}" />
+              @if(request('tanggal')) <input type="hidden" name="tanggal" value="{{ request('tanggal') }}" /> @endif
+              @if(request('tanggal_mulai')) <input type="hidden" name="tanggal_mulai" value="{{ request('tanggal_mulai') }}" /> @endif
+              @if(request('tanggal_selesai')) <input type="hidden" name="tanggal_selesai" value="{{ request('tanggal_selesai') }}" /> @endif
+              @if(request('bulan')) <input type="hidden" name="bulan" value="{{ request('bulan') }}" /> @endif
+              @if(request('tahun')) <input type="hidden" name="tahun" value="{{ request('tahun') }}" /> @endif
+              @if(request('rombel_id')) <input type="hidden" name="rombel_id" value="{{ request('rombel_id') }}" /> @endif
+              @if(request('status')) <input type="hidden" name="status" value="{{ request('status') }}" /> @endif
+              @if(request('siswa_id')) <input type="hidden" name="siswa_id" value="{{ request('siswa_id') }}" /> @endif
+              @if(request('guru_id')) <input type="hidden" name="guru_id" value="{{ request('guru_id') }}" /> @endif
+
+              <div style="position:relative; width:250px; max-width:100%;">
+                <i class="bi bi-search" style="position:absolute; left:11px; top:50%; transform:translateY(-50%); color:var(--text-3); font-size:12px; pointer-events:none;"></i>
+                <input type="text" 
+                       name="search" 
+                       id="liveSearchHarian"
+                       value="{{ request('search') }}" 
+                       placeholder="Cari {{ $kategori === 'siswa' ? 'nama, NISN, kelas...' : 'nama, NIP, jabatan...' }}" 
+                       style="width:100%; height:36px; padding:0 30px 0 32px; font-size:12px; font-weight:600; border-radius:var(--r-sm); border:1px solid var(--border-2); background:var(--bg-3); color:var(--text); outline:none;" 
+                       autocomplete="off" />
+                @if(request('search'))
+                  <a href="{{ request()->fullUrlWithQuery(['search' => null, 'page' => 1]) }}" style="position:absolute; right:10px; top:50%; transform:translateY(-50%); color:var(--text-3); text-decoration:none; display:flex; align-items:center;" title="Bersihkan Pencarian">
+                    <i class="bi bi-x-circle-fill" style="font-size:13px;"></i>
+                  </a>
+                @endif
+              </div>
+              <button type="submit" class="btn btn-primary" style="height:36px; padding:0 14px; font-size:12px; font-weight:800; display:inline-flex; align-items:center; gap:5px;" title="Cari di Seluruh Halaman Data">
+                <i class="bi bi-search"></i> Cari
+              </button>
+            </form>
+
             <a href="{{ route('laporan.cetak-pdf', request()->query()) }}" target="_blank" class="btn btn-outline" style="height:36px; font-size:12px; font-weight:800; color:#000000; border:1.5px solid #000000; background:var(--bg-2); display:inline-flex; align-items:center; gap:6px;" title="Buka Dokumen PDF Resmi">
               <i class="bi bi-file-earmark-pdf-fill" style="color:#000000;"></i> Cetak PDF
             </a>
@@ -1306,3 +1393,58 @@
 
 </body>
 </html>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  function setupLiveTableSearch(inputId, tableContainerSelector) {
+    const input = document.getElementById(inputId);
+    if (!input) return;
+    const container = input.closest('.panel');
+    if (!container) return;
+    const table = container.querySelector('table.data-table');
+    if (!table) return;
+    const tbody = table.querySelector('tbody');
+    if (!tbody) return;
+
+    input.addEventListener('input', function () {
+      const q = this.value.toLowerCase().trim();
+      const rows = tbody.querySelectorAll('tr:not(.live-search-empty-row)');
+      let visibleCount = 0;
+
+      rows.forEach(row => {
+        if (row.querySelector('td[colspan]')) return;
+        const text = row.innerText.toLowerCase();
+        if (text.includes(q)) {
+          row.style.display = '';
+          visibleCount++;
+        } else {
+          row.style.display = 'none';
+        }
+      });
+
+      let emptyMsg = tbody.querySelector('.live-search-empty-row');
+      if (visibleCount === 0 && q !== '') {
+        if (!emptyMsg) {
+          emptyMsg = document.createElement('tr');
+          emptyMsg.className = 'live-search-empty-row';
+          const colSpan = table.querySelectorAll('thead th').length || 10;
+          emptyMsg.innerHTML = `<td colspan="${colSpan}" style="text-align:center; padding:28px 16px; color:var(--text-3); font-size:13px;">
+            <i class="bi bi-search" style="font-size:22px; display:block; margin-bottom:6px; color:var(--text-3);"></i>
+            Tidak ada baris di halaman ini yang cocok dengan <strong>"${input.value}"</strong>.<br>
+            <span style="font-size:11.5px; color:var(--text-3); display:inline-block; margin-top:4px;">Klik tombol <strong>Cari</strong> atau tekan Enter untuk mencari ke seluruh data.</span>
+          </td>`;
+          tbody.appendChild(emptyMsg);
+        } else {
+          emptyMsg.style.display = '';
+          emptyMsg.querySelector('strong').textContent = `"${input.value}"`;
+        }
+      } else if (emptyMsg) {
+        emptyMsg.style.display = 'none';
+      }
+    });
+  }
+
+  setupLiveTableSearch('liveSearchHarian', '.panel');
+  setupLiveTableSearch('liveSearchRekap', '.panel');
+});
+</script>

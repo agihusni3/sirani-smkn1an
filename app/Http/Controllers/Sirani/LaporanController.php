@@ -120,6 +120,7 @@ class LaporanController extends Controller
         }
 
         $status = $request->input('status');
+        $search = trim($request->input('search', ''));
 
         // ── QUERY UTAMA ────────────────────────────────────────────────────────
         $baseQuery = Absensi::where('pemilik_type', $kategori)
@@ -162,10 +163,31 @@ class LaporanController extends Controller
             }
         }
 
+        // Filter Pencarian Teks (Search) untuk Rincian Harian & Individu
+        if ($search !== '') {
+            if ($kategori === 'siswa') {
+                $tableQuery->where(function ($q) use ($search) {
+                    $q->whereHas('siswa', function ($sq) use ($search) {
+                        $sq->where('nama', 'like', "%{$search}%")
+                           ->orWhere('nis', 'like', "%{$search}%")
+                           ->orWhere('nisn', 'like', "%{$search}%");
+                    })->orWhereHas('siswaRombel.rombel', function ($rq) use ($search) {
+                        $rq->where('nama_rombel', 'like', "%{$search}%");
+                    });
+                });
+            } else {
+                $tableQuery->whereHas('guru', function ($gq) use ($search) {
+                    $gq->where('nama', 'like', "%{$search}%")
+                       ->orWhere('nip', 'like', "%{$search}%")
+                       ->orWhere('jabatan', 'like', "%{$search}%");
+                });
+            }
+        }
+
         // Paginasi 20 per halaman untuk tabel rincian harian & individu
         $laporans = $tableQuery
             ->with($kategori === 'siswa'
-                ? ['siswa:id,nis,nama', 'siswaRombel.rombel:id,nama_rombel']
+                ? ['siswa:id,nis,nisn,nama', 'siswaRombel.rombel:id,nama_rombel']
                 : ['guru:id,nip,nama,jabatan'])
             ->orderBy('tanggal', 'desc')->orderBy('jam_masuk', 'asc')
             ->paginate(20)->withQueryString();
@@ -217,6 +239,13 @@ class LaporanController extends Controller
                 if ($rombelId) {
                     $siswaQuery->whereHas('siswaRombels', fn($q) => $q->where('rombel_id', $rombelId)->where('status_keanggotaan', 'aktif'));
                 }
+                if ($search !== '') {
+                    $siswaQuery->where(function ($sq) use ($search) {
+                        $sq->where('nama', 'like', "%{$search}%")
+                           ->orWhere('nis', 'like', "%{$search}%")
+                           ->orWhere('nisn', 'like', "%{$search}%");
+                    });
+                }
                 $daftarSiswa = $this->sortSiswaByTingkatAndRombel($siswaQuery->get());
 
                 $rekapCollection = $daftarSiswa->values()->map(function ($s) use ($aggrMap) {
@@ -237,7 +266,15 @@ class LaporanController extends Controller
                     ];
                 });
             } else {
-                $daftarGuru = Guru::where('status', 'aktif')->orderBy('nama')->get();
+                $guruQuery = Guru::where('status', 'aktif')->orderBy('nama');
+                if ($search !== '') {
+                    $guruQuery->where(function ($gq) use ($search) {
+                        $gq->where('nama', 'like', "%{$search}%")
+                           ->orWhere('nip', 'like', "%{$search}%")
+                           ->orWhere('jabatan', 'like', "%{$search}%");
+                    });
+                }
+                $daftarGuru = $guruQuery->get();
 
                 $rekapCollection = $daftarGuru->values()->map(function ($g) use ($aggrMap) {
                     $a = $aggrMap->get($g->id);
@@ -388,6 +425,7 @@ class LaporanController extends Controller
             'waliRombelId',
             'waliRombelNama',
             'status',
+            'search',
             'sekolah'
         ));
     }
@@ -449,8 +487,30 @@ class LaporanController extends Controller
         else                              { $startDate = $tanggalMulai; $endDate = $tanggalSelesai; }
 
         $status = $request->input('status');
+        $search = trim($request->input('search', ''));
 
+        $search = trim($request->input('search', ''));
         $query = Absensi::where('pemilik_type', $kategori)->whereBetween('tanggal', [$startDate, $endDate]);
+
+        if ($search !== '') {
+            if ($kategori === 'siswa') {
+                $query->where(function ($q) use ($search) {
+                    $q->whereHas('siswa', function ($sq) use ($search) {
+                        $sq->where('nama', 'like', "%{$search}%")
+                           ->orWhere('nis', 'like', "%{$search}%")
+                           ->orWhere('nisn', 'like', "%{$search}%");
+                    })->orWhereHas('siswaRombel.rombel', function ($rq) use ($search) {
+                        $rq->where('nama_rombel', 'like', "%{$search}%");
+                    });
+                });
+            } else {
+                $query->whereHas('guru', function ($gq) use ($search) {
+                    $gq->where('nama', 'like', "%{$search}%")
+                       ->orWhere('nip', 'like', "%{$search}%")
+                       ->orWhere('jabatan', 'like', "%{$search}%");
+                });
+            }
+        }
 
         if (!empty($status)) {
             if ($status === 'izin') {
@@ -540,7 +600,15 @@ class LaporanController extends Controller
                     }
                 } else {
                     fputcsv($file, ['No', 'NIP', 'Nama Guru/Pegawai', 'Jabatan', 'Hadir', 'Telat', 'Sakit', 'Izin', 'Alpha', 'Bolos', 'Total Hari'], ';');
-                    $daftarGuru = Guru::where('status', 'aktif')->orderBy('nama')->get();
+                    $guruQuery = Guru::where('status', 'aktif')->orderBy('nama');
+                if ($search !== '') {
+                    $guruQuery->where(function ($gq) use ($search) {
+                        $gq->where('nama', 'like', "%{$search}%")
+                           ->orWhere('nip', 'like', "%{$search}%")
+                           ->orWhere('jabatan', 'like', "%{$search}%");
+                    });
+                }
+                $daftarGuru = $guruQuery->get();
                     $absensiByGuru = $laporans->groupBy('pemilik_id');
 
                     foreach ($daftarGuru as $i => $g) {
@@ -682,8 +750,30 @@ class LaporanController extends Controller
         }
 
         $status = $request->input('status');
+        $search = trim($request->input('search', ''));
 
+        $search = trim($request->input('search', ''));
         $query = Absensi::where('pemilik_type', $kategori)->whereBetween('tanggal', [$startDate, $endDate]);
+
+        if ($search !== '') {
+            if ($kategori === 'siswa') {
+                $query->where(function ($q) use ($search) {
+                    $q->whereHas('siswa', function ($sq) use ($search) {
+                        $sq->where('nama', 'like', "%{$search}%")
+                           ->orWhere('nis', 'like', "%{$search}%")
+                           ->orWhere('nisn', 'like', "%{$search}%");
+                    })->orWhereHas('siswaRombel.rombel', function ($rq) use ($search) {
+                        $rq->where('nama_rombel', 'like', "%{$search}%");
+                    });
+                });
+            } else {
+                $query->whereHas('guru', function ($gq) use ($search) {
+                    $gq->where('nama', 'like', "%{$search}%")
+                       ->orWhere('nip', 'like', "%{$search}%")
+                       ->orWhere('jabatan', 'like', "%{$search}%");
+                });
+            }
+        }
 
         if (!empty($status)) {
             if ($status === 'izin') {
@@ -731,6 +821,13 @@ class LaporanController extends Controller
                 if ($rombelId) {
                     $siswaQuery->whereHas('siswaRombels', fn($q) => $q->where('rombel_id', $rombelId)->where('status_keanggotaan', 'aktif'));
                 }
+                if ($search !== '') {
+                    $siswaQuery->where(function ($sq) use ($search) {
+                        $sq->where('nama', 'like', "%{$search}%")
+                           ->orWhere('nis', 'like', "%{$search}%")
+                           ->orWhere('nisn', 'like', "%{$search}%");
+                    });
+                }
                 $daftarSiswa = $this->sortSiswaByTingkatAndRombel($siswaQuery->get());
                 $absensiBySiswa = $laporans->groupBy('pemilik_id');
 
@@ -766,7 +863,15 @@ class LaporanController extends Controller
                     ];
                 });
             } else {
-                $daftarGuru = Guru::where('status', 'aktif')->orderBy('nama')->get();
+                $guruQuery = Guru::where('status', 'aktif')->orderBy('nama');
+                if ($search !== '') {
+                    $guruQuery->where(function ($gq) use ($search) {
+                        $gq->where('nama', 'like', "%{$search}%")
+                           ->orWhere('nip', 'like', "%{$search}%")
+                           ->orWhere('jabatan', 'like', "%{$search}%");
+                    });
+                }
+                $daftarGuru = $guruQuery->get();
                 $absensiByGuru = $laporans->groupBy('pemilik_id');
 
                 $rekapData = $daftarGuru->map(function ($g, $idx) use ($absensiByGuru) {
