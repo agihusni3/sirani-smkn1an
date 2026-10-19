@@ -755,7 +755,7 @@
                        title="Cetak Lembar Biodata GTK">
                        <i class="bi bi-file-earmark-person-fill" style="font-size:12px;"></i>
                     </a>
-                    <a href="{{ route('kartu.digital.guru', ['id' => $g->id]) }}" target="_blank"
+                    <a href="{{ route('kartu.digital.guru', $g->id) }}" target="_blank"
                        class="btn-icon btn-icon-view"
                        style="width:28px; height:28px; text-decoration:none; display:inline-flex; align-items:center; justify-content:center;"
                        title="Lihat Barcode &amp; Kartu Digital Guru">

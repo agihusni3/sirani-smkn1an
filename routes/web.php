@@ -92,7 +92,7 @@ Route::middleware('throttle:120,1')->group(function () {
     // Redirect Alias dari rute lama ke monitoring absen mandiri
     Route::get('/portal-siswa/{nisn?}', [\App\Http\Controllers\Sirani\RfidController::class, 'portalSiswa'])->name('portal.siswa');
     Route::get('/kartu-digital/{nisn}', [\App\Http\Controllers\Sirani\RfidController::class, 'kartuDigital'])->name('kartu.digital');
-    Route::get('/kartu-digital-guru/{identifier}', [\App\Http\Controllers\Sirani\RfidController::class, 'kartuDigitalGuru'])->name('kartu.digital.guru');
+    Route::get('/kartu-digital-guru/{id}', [\App\Http\Controllers\Sirani\RfidController::class, 'kartuDigitalGuru'])->name('kartu.digital.guru');
 
     // Unduh Aplikasi Android SIRANI (APK Langsung)
     Route::get('/download-apk', function () {
