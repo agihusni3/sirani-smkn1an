@@ -12,30 +12,30 @@ use Illuminate\Validation\Rule;
 class PpdbSoalController extends Controller
 {
     /**
-     * Daftar bank soal untuk setting ujian tertentu
+     * Daftar bank soal untuk setting ujian tertentu.
      */
     public function index($settingId)
     {
-        $setting = PpdbUjianSetting::with(['soals'])->findOrFail($settingId);
-        $soalPg   = $setting->soalPg()->get();
-        $soalEsai = $setting->soalEsai()->get();
+        $setting  = PpdbUjianSetting::with(['soals'])->findOrFail($settingId);
+        $soalPg   = $setting->soalPg()->orderBy('nomor_urut')->get();
+        $soalEsai = $setting->soalEsai()->orderBy('nomor_urut')->get();
 
         return view('ppdb.admin.soal.index', compact('setting', 'soalPg', 'soalEsai'));
     }
 
     /**
-     * Form tambah soal baru
+     * Form tambah soal baru.
      */
     public function create(Request $request, $settingId)
     {
         $setting = PpdbUjianSetting::findOrFail($settingId);
 
-        // Hitung nomor urut berikutnya secara presisi
         $lastPg   = PpdbSoalUjian::where('ppdb_ujian_setting_id', $settingId)->where('tipe_soal', 'pg')->max('nomor_urut') ?? 0;
         $lastEsai = PpdbSoalUjian::where('ppdb_ujian_setting_id', $settingId)->where('tipe_soal', 'esai')->max('nomor_urut') ?? 0;
-        
-        $nextPg   = min($lastPg + 1, max(1, (int) $setting->jumlah_soal_pg));
-        $nextEsai = $lastEsai > 0 ? $lastEsai + 1 : ((int) $setting->jumlah_soal_pg + 1);
+
+        $totalPg   = max(1, (int) $setting->jumlah_soal_pg);
+        $nextPg    = $lastPg + 1;
+        $nextEsai  = $lastEsai > 0 ? $lastEsai + 1 : $totalPg + 1;
 
         $type      = $request->query('type', 'pg');
         $nextNomor = ($type === 'esai') ? $nextEsai : $nextPg;
@@ -44,106 +44,45 @@ class PpdbSoalController extends Controller
     }
 
     /**
-     * Simpan soal baru
+     * Simpan soal baru.
      */
     public function store(Request $request, $settingId)
     {
-        $setting = PpdbUjianSetting::findOrFail($settingId);
+        PpdbUjianSetting::findOrFail($settingId);
 
-        $validated = $request->validate([
-            'tipe_soal'     => ['required', 'in:pg,esai'],
-            'nomor_urut'    => [
-                'required',
-                'integer',
-                'min:1',
-                'max:500',
-                Rule::unique('ppdb_soal_ujians', 'nomor_urut')
-                    ->where('ppdb_ujian_setting_id', $settingId),
-            ],
-            'pertanyaan'    => ['required', 'string', 'max:10000'],
-            'opsi_a'        => ['required_if:tipe_soal,pg', 'nullable', 'string', 'max:2000'],
-            'opsi_b'        => ['required_if:tipe_soal,pg', 'nullable', 'string', 'max:2000'],
-            'opsi_c'        => ['required_if:tipe_soal,pg', 'nullable', 'string', 'max:2000'],
-            'opsi_d'        => ['required_if:tipe_soal,pg', 'nullable', 'string', 'max:2000'],
-            'opsi_e'        => ['nullable', 'string', 'max:2000'],
-            'kunci_jawaban' => ['required_if:tipe_soal,pg', 'nullable', 'in:A,B,C,D,E'],
-            'bobot_nilai'   => ['nullable', 'numeric', 'min:0', 'max:100'],
-        ], [
-            'nomor_urut.unique'         => "Nomor urut {$request->nomor_urut} sudah ada di bank soal ujian ini. Gunakan nomor urut lain.",
-            'kunci_jawaban.required_if' => 'Kunci jawaban wajib dipilih untuk soal bertipe Pilihan Ganda (PG).',
-            'opsi_a.required_if'        => 'Pilihan opsi A wajib diisi untuk soal PG.',
-            'opsi_b.required_if'        => 'Pilihan opsi B wajib diisi untuk soal PG.',
-            'opsi_c.required_if'        => 'Pilihan opsi C wajib diisi untuk soal PG.',
-            'opsi_d.required_if'        => 'Pilihan opsi D wajib diisi untuk soal PG.',
-        ]);
+        $validated = $request->validate(
+            $this->validationRules($settingId),
+            $this->validationMessages($request->nomor_urut)
+        );
 
-        $isPg = ($validated['tipe_soal'] === 'pg');
-
-        DB::transaction(function () use ($settingId, $validated, $isPg) {
-            PpdbSoalUjian::create([
-                'ppdb_ujian_setting_id' => $settingId,
-                'nomor_urut'            => $validated['nomor_urut'],
-                'tipe_soal'             => $validated['tipe_soal'],
-                'pertanyaan'            => trim($validated['pertanyaan']),
-                'opsi_a'                => $isPg ? (trim($validated['opsi_a'] ?? '') ?: null) : null,
-                'opsi_b'                => $isPg ? (trim($validated['opsi_b'] ?? '') ?: null) : null,
-                'opsi_c'                => $isPg ? (trim($validated['opsi_c'] ?? '') ?: null) : null,
-                'opsi_d'                => $isPg ? (trim($validated['opsi_d'] ?? '') ?: null) : null,
-                'opsi_e'                => $isPg ? (trim($validated['opsi_e'] ?? '') ?: null) : null,
-                'kunci_jawaban'         => $isPg && !empty($validated['kunci_jawaban']) ? strtoupper($validated['kunci_jawaban']) : null,
-                'bobot_nilai'           => $validated['bobot_nilai'] ?? 0,
-            ]);
-        });
+        $this->saveSoal($validated, $settingId);
 
         return redirect()->route('admin.ppdb.soal.index', $settingId)
-            ->with('success', "Soal no. {$validated['nomor_urut']} berhasil ditambahkan ke bank soal.");
+            ->with('success', "Soal no. {$validated['nomor_urut']} berhasil ditambahkan.");
     }
 
     /**
-     * Form edit soal
+     * Form edit soal.
      */
     public function edit($id)
     {
         $soal    = PpdbSoalUjian::findOrFail($id);
         $setting = $soal->setting;
-        
+
         return view('ppdb.admin.soal.form', compact('soal', 'setting'));
     }
 
     /**
-     * Simpan perubahan soal
+     * Simpan perubahan soal.
      */
     public function update(Request $request, $id)
     {
         $soal = PpdbSoalUjian::findOrFail($id);
 
-        $validated = $request->validate([
-            'tipe_soal'     => ['required', 'in:pg,esai'],
-            'nomor_urut'    => [
-                'required',
-                'integer',
-                'min:1',
-                'max:500',
-                Rule::unique('ppdb_soal_ujians', 'nomor_urut')
-                    ->where('ppdb_ujian_setting_id', $soal->ppdb_ujian_setting_id)
-                    ->ignore($id),
-            ],
-            'pertanyaan'    => ['required', 'string', 'max:10000'],
-            'opsi_a'        => ['required_if:tipe_soal,pg', 'nullable', 'string', 'max:2000'],
-            'opsi_b'        => ['required_if:tipe_soal,pg', 'nullable', 'string', 'max:2000'],
-            'opsi_c'        => ['required_if:tipe_soal,pg', 'nullable', 'string', 'max:2000'],
-            'opsi_d'        => ['required_if:tipe_soal,pg', 'nullable', 'string', 'max:2000'],
-            'opsi_e'        => ['nullable', 'string', 'max:2000'],
-            'kunci_jawaban' => ['required_if:tipe_soal,pg', 'nullable', 'in:A,B,C,D,E'],
-            'bobot_nilai'   => ['nullable', 'numeric', 'min:0', 'max:100'],
-        ], [
-            'nomor_urut.unique'         => "Nomor urut {$request->nomor_urut} sudah digunakan soal lain.",
-            'kunci_jawaban.required_if' => 'Kunci jawaban wajib dipilih untuk soal bertipe Pilihan Ganda (PG).',
-            'opsi_a.required_if'        => 'Pilihan opsi A wajib diisi untuk soal PG.',
-            'opsi_b.required_if'        => 'Pilihan opsi B wajib diisi untuk soal PG.',
-            'opsi_c.required_if'        => 'Pilihan opsi C wajib diisi untuk soal PG.',
-            'opsi_d.required_if'        => 'Pilihan opsi D wajib diisi untuk soal PG.',
-        ]);
+        $validated = $request->validate(
+            $this->validationRules($soal->ppdb_ujian_setting_id, $id),
+            $this->validationMessages($request->nomor_urut)
+        );
 
         $isPg = ($validated['tipe_soal'] === 'pg');
 
@@ -163,21 +102,87 @@ class PpdbSoalController extends Controller
         });
 
         return redirect()->route('admin.ppdb.soal.index', $soal->ppdb_ujian_setting_id)
-            ->with('success', "Soal no. {$soal->nomor_urut} berhasil diperbarui.");
+            ->with('success', "Soal no. {$validated['nomor_urut']} berhasil diperbarui.");
     }
 
     /**
-     * Hapus soal
+     * Hapus soal.
      */
     public function destroy($id)
     {
         $soal      = PpdbSoalUjian::findOrFail($id);
         $settingId = $soal->ppdb_ujian_setting_id;
         $nomor     = $soal->nomor_urut;
-        
+
         $soal->delete();
 
         return redirect()->route('admin.ppdb.soal.index', $settingId)
             ->with('success', "Soal no. {$nomor} berhasil dihapus.");
+    }
+
+    // ─── Private Helpers ─────────────────────────────────────────────────────
+
+    /**
+     * Aturan validasi soal (dipakai bersama oleh store & update).
+     *
+     * @param int      $settingId
+     * @param int|null $ignoreId  Abaikan ID ini saat pengecekan unique (untuk update).
+     */
+    private function validationRules(int $settingId, ?int $ignoreId = null): array
+    {
+        $uniqueRule = Rule::unique('ppdb_soal_ujians', 'nomor_urut')
+            ->where('ppdb_ujian_setting_id', $settingId);
+
+        if ($ignoreId) {
+            $uniqueRule->ignore($ignoreId);
+        }
+
+        return [
+            'tipe_soal'     => ['required', 'in:pg,esai'],
+            'nomor_urut'    => ['required', 'integer', 'min:1', 'max:500', $uniqueRule],
+            'pertanyaan'    => ['required', 'string', 'max:10000'],
+            'opsi_a'        => ['required_if:tipe_soal,pg', 'nullable', 'string', 'max:2000'],
+            'opsi_b'        => ['required_if:tipe_soal,pg', 'nullable', 'string', 'max:2000'],
+            'opsi_c'        => ['required_if:tipe_soal,pg', 'nullable', 'string', 'max:2000'],
+            'opsi_d'        => ['required_if:tipe_soal,pg', 'nullable', 'string', 'max:2000'],
+            'opsi_e'        => ['nullable', 'string', 'max:2000'],
+            'kunci_jawaban' => ['required_if:tipe_soal,pg', 'nullable', 'in:A,B,C,D,E'],
+            'bobot_nilai'   => ['nullable', 'numeric', 'min:0', 'max:100'],
+        ];
+    }
+
+    /** Pesan validasi kustom. */
+    private function validationMessages(?string $nomorUrut): array
+    {
+        return [
+            'nomor_urut.unique'         => "Nomor urut {$nomorUrut} sudah digunakan soal lain.",
+            'kunci_jawaban.required_if' => 'Kunci jawaban wajib dipilih untuk soal Pilihan Ganda.',
+            'opsi_a.required_if'        => 'Opsi A wajib diisi untuk soal PG.',
+            'opsi_b.required_if'        => 'Opsi B wajib diisi untuk soal PG.',
+            'opsi_c.required_if'        => 'Opsi C wajib diisi untuk soal PG.',
+            'opsi_d.required_if'        => 'Opsi D wajib diisi untuk soal PG.',
+        ];
+    }
+
+    /** Buat soal baru ke database. */
+    private function saveSoal(array $validated, int $settingId): void
+    {
+        $isPg = ($validated['tipe_soal'] === 'pg');
+
+        DB::transaction(function () use ($settingId, $validated, $isPg) {
+            PpdbSoalUjian::create([
+                'ppdb_ujian_setting_id' => $settingId,
+                'nomor_urut'            => $validated['nomor_urut'],
+                'tipe_soal'             => $validated['tipe_soal'],
+                'pertanyaan'            => trim($validated['pertanyaan']),
+                'opsi_a'                => $isPg ? (trim($validated['opsi_a'] ?? '') ?: null) : null,
+                'opsi_b'                => $isPg ? (trim($validated['opsi_b'] ?? '') ?: null) : null,
+                'opsi_c'                => $isPg ? (trim($validated['opsi_c'] ?? '') ?: null) : null,
+                'opsi_d'                => $isPg ? (trim($validated['opsi_d'] ?? '') ?: null) : null,
+                'opsi_e'                => $isPg ? (trim($validated['opsi_e'] ?? '') ?: null) : null,
+                'kunci_jawaban'         => $isPg && !empty($validated['kunci_jawaban']) ? strtoupper($validated['kunci_jawaban']) : null,
+                'bobot_nilai'           => $validated['bobot_nilai'] ?? 0,
+            ]);
+        });
     }
 }

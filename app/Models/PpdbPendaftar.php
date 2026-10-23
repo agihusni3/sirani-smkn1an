@@ -96,16 +96,6 @@ class PpdbPendaftar extends Model
         'dimutasi_pada'            => 'datetime',
     ];
 
-    public function jurusan1()
-    {
-        return $this->belongsTo(Jurusan::class, 'jurusan_id_1');
-    }
-
-    public function jurusan2()
-    {
-        return $this->belongsTo(Jurusan::class, 'jurusan_id_2');
-    }
-
     public function jurusanPilihan1()
     {
         return $this->belongsTo(Jurusan::class, 'jurusan_id_1');
@@ -114,6 +104,18 @@ class PpdbPendaftar extends Model
     public function jurusanPilihan2()
     {
         return $this->belongsTo(Jurusan::class, 'jurusan_id_2');
+    }
+
+    /** @deprecated Gunakan jurusanPilihan1() */
+    public function jurusan1()
+    {
+        return $this->jurusanPilihan1();
+    }
+
+    /** @deprecated Gunakan jurusanPilihan2() */
+    public function jurusan2()
+    {
+        return $this->jurusanPilihan2();
     }
 
     public function jurusanDiterima()

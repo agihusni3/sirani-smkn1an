@@ -6,7 +6,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PPDB</title>
+  <title>Bank Soal CBT - PPDB SMKN 1 Air Naningan</title>
   @include('partials.styles')
   <link rel="stylesheet" href="{{ asset('css/admin-ppdb.css') }}?v={{ $cssVersion }}">
 </head>
@@ -86,11 +86,11 @@
         <div class="ppdb-stat-card">
           <div>
             <div style="font-size: 11px; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em;">Pengacakan Soal</div>
-            <div style="font-size: 16px; font-weight: 800; color: #0f172a; margin-top: 6px;">
-              Aktif Otomatis
+            <div style="font-size: 16px; font-weight: 800; color: {{ $setting->acak_soal ? '#059669' : '#64748b' }}; margin-top: 6px;">
+              {{ $setting->acak_soal ? 'Aktif Otomatis' : 'Sesuai Nomor Urut' }}
             </div>
             <div style="font-size: 12px; color: #64748b; margin-top: 2px;">
-              Urutan soal diacak per siswa saat ujian
+              {{ $setting->acak_soal ? 'Urutan soal diacak per siswa saat ujian' : 'Urutan soal tetap sesuai nomor urut' }}
             </div>
           </div>
         </div>

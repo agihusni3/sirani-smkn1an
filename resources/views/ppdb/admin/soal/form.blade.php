@@ -8,7 +8,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PPDB</title>
+  <title>{{ $isEdit ? "Edit Soal" : "Tambah Soal" }} CBT - PPDB SMKN 1 Air Naningan</title>
   @include('partials.styles')
   <link rel="stylesheet" href="{{ asset('css/admin-ppdb.css') }}?v={{ $cssVersion }}">
 </head>
@@ -96,7 +96,7 @@
                      max="500" 
                      required 
                      class="cbt-control @error('nomor_urut') is-invalid @enderror">
-              <span class="cbt-hint">Standar rekomendasi: 1-{{ $setting->jumlah_soal_pg ?: 30 }} untuk PG, dilanjutkan untuk Esai</span>
+              <span class="cbt-hint">PG: 1-{{ $setting->jumlah_soal_pg ?: 30 }} · Esai: mulai {{ ($setting->jumlah_soal_pg ?: 30) + 1 }}</span>
               @error('nomor_urut')
                 <span class="cbt-error-feedback">{{ $message }}</span>
               @enderror

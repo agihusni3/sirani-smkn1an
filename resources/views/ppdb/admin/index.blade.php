@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PPDB</title>
+  <title>Dasbor PPDB - SMKN 1 Air Naningan</title>
   @include('partials.styles')
   <link rel="stylesheet" href="{{ asset('css/admin-ppdb.css') }}?v={{ file_exists(public_path('css/admin-ppdb.css')) ? filemtime(public_path('css/admin-ppdb.css')) : time() }}">
 </head>
@@ -20,7 +20,7 @@
           Dasbor Seleksi Penerimaan Siswa Baru
         </h1>
         <p style="margin:0; font-size:13px; color:#c7d2fe; max-width:640px;">
-          Pusat pemantauan berkas, seleksi kuota jurusan, verifikasi persyaratan pendaftar, dan kelulusan calon peserta didik SMKN 1 Air Naningan.
+          Pantau dan kelola berkas, verifikasi, seleksi kuota, serta penetapan kelulusan calon peserta didik.
         </p>
       </div>
 

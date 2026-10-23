@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PPDB</title>
+  <title>Seleksi Terpadu & CBT - PPDB SMKN 1 Air Naningan</title>
   @include('partials.styles')
   <link rel="stylesheet" href="{{ asset('css/admin-ppdb.css') }}?v={{ file_exists(public_path('css/admin-ppdb.css')) ? filemtime(public_path('css/admin-ppdb.css')) : time() }}">
 </head>
@@ -23,7 +23,7 @@
           Seleksi Terpadu Masuk Calon Siswa Baru
         </h1>
         <p style="margin:0; font-size:13px; color:#c7d2fe; max-width:680px;">
-          Kelola naskah soal PDF, kunci jawaban pilihan ganda, penjadwalan sesi ruang lab, koreksi esai, penilaian wawancara kejuruan, dan kalkulasi ranking kelulusan.
+          Kelola bank soal CBT, penjadwalan ujian, koreksi esai, penilaian wawancara, dan kalkulasi ranking kelulusan.
         </p>
       </div>
 
@@ -143,7 +143,7 @@
               Bank Soal Ujian CBT PPDB
             </h3>
             <div style="font-size: 13px; color: #64748b;">
-              Soal diinput satu persatu ke dalam sistem. Saat siswa mengerjakan ujian, urutan soal akan teracak otomatis per peserta untuk meminimalisir pencontekan.
+              Soal diacak otomatis per peserta saat ujian.
             </div>
           </div>
 
@@ -162,17 +162,17 @@
           <div>
             <div style="font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase;">Soal Pilihan Ganda (PG)</div>
             <div style="font-size: 20px; font-weight: 800; color: #2563eb; margin-top: 2px;">{{ $setting->soalPg()->count() }} butir</div>
-            <div style="font-size: 11.5px; color: #64748b;">Koreksi otomatis berdasarkan kunci tiap soal</div>
+            <div style="font-size: 11.5px; color: #64748b;">Koreksi otomatis</div>
           </div>
           <div>
             <div style="font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase;">Soal Esai / Uraian</div>
             <div style="font-size: 20px; font-weight: 800; color: #059669; margin-top: 2px;">{{ $setting->soalEsai()->count() }} butir</div>
-            <div style="font-size: 11.5px; color: #64748b;">Koreksi manual di tab Koreksi Esai</div>
+            <div style="font-size: 11.5px; color: #64748b;">Koreksi manual</div>
           </div>
           <div>
             <div style="font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase;">Anti-Contek (Random Soal)</div>
-            <div style="font-size: 14px; font-weight: 700; color: #059669; margin-top: 6px;">Aktif (Diacak per Siswa)</div>
-            <div style="font-size: 11.5px; color: #64748b;">Urutan soal berbeda untuk setiap siswa</div>
+            <div style="font-size: 14px; font-weight: 700; color: #059669; margin-top: 6px;">Aktif — Diacak per Peserta</div>
+            <div style="font-size: 11.5px; color: #64748b;"></div>
           </div>
         </div>
       </div>
@@ -357,7 +357,7 @@
                     <code style="font-weight:700; color:#1e293b; background:#f1f5f9; padding:2px 6px; border-radius:4px; font-size:11.5px;">{{ $peserta->no_pendaftaran }}</code> <span style="color:#64748b; font-size:11.5px;">• NISN: {{ $peserta->nisn }}</span>
                   </td>
                   <td style="padding:12px 16px;">
-                    <span style="font-weight:700; color:var(--text-1);">{{ $peserta->jurusan1->nama_jurusan ?? ($peserta->jurusanPilihan1->nama_jurusan ?? '-') }}</span>
+                    <span style="font-weight:700; color:var(--text-1);">{{ $peserta->jurusanPilihan1->nama_jurusan ?? '-' }}</span>
                   </td>
                   <td style="padding:12px 16px;">
                     @if($peserta->jadwal_tes_tanggal)
@@ -436,7 +436,7 @@
               <tr style="border-bottom:1px solid var(--border);">
                 <td style="padding:12px 16px;">
                   <strong style="color:var(--text-1); font-size:13px; display:block;">{{ $p->nama_lengkap }}</strong>
-                  <code style="font-weight:700; color:#1e293b; background:#f1f5f9; padding:2px 6px; border-radius:4px; font-size:11.5px;">{{ $p->no_pendaftaran }}</code> <span style="color:#64748b; font-size:11.5px;">• {{ $p->jurusan1->nama_jurusan ?? ($p->jurusanPilihan1->nama_jurusan ?? '-') }}</span>
+                  <code style="font-weight:700; color:#1e293b; background:#f1f5f9; padding:2px 6px; border-radius:4px; font-size:11.5px;">{{ $p->no_pendaftaran }}</code> <span style="color:#64748b; font-size:11.5px;">• {{ $p->jurusanPilihan1->nama_jurusan ?? '-' }}</span>
                 </td>
                 <td style="padding:12px 16px; text-align:center;">
                   @if($u)
@@ -568,10 +568,10 @@
                   'nama_lengkap' => $p->nama_lengkap,
                   'no_pendaftaran' => $p->no_pendaftaran,
                   'asal_sekolah' => $p->asal_sekolah ?? '-',
-                  'jurusan1_nama' => $p->jurusan1->nama_jurusan ?? ($p->jurusanPilihan1->nama_jurusan ?? '-'),
-                  'jurusan1_kode' => $p->jurusan1->kode_jurusan ?? ($p->jurusanPilihan1->kode_jurusan ?? ''),
-                  'jurusan2_nama' => $p->jurusan2->nama_jurusan ?? ($p->jurusanPilihan2->nama_jurusan ?? '-'),
-                  'jurusan2_kode' => $p->jurusan2->kode_jurusan ?? ($p->jurusanPilihan2->kode_jurusan ?? ''),
+                  'jurusan1_nama' => $p->jurusanPilihan1->nama_jurusan ?? '-',
+                  'jurusan1_kode' => $p->jurusanPilihan1->kode_jurusan ?? '',
+                  'jurusan2_nama' => $p->jurusanPilihan2->nama_jurusan ?? '-',
+                  'jurusan2_kode' => $p->jurusanPilihan2->kode_jurusan ?? '',
                   'nilai_wawancara_motivasi' => $p->nilai_wawancara_motivasi,
                   'nilai_wawancara_karakter' => $p->nilai_wawancara_karakter,
                   'nilai_wawancara_kejuruan' => $p->nilai_wawancara_kejuruan,
@@ -1374,7 +1374,7 @@
           <i class="bi bi-eye-fill text-emerald-400"></i> Uji Persepsi Buta Warna Ishihara (8 Piringan Standar)
         </h3>
         <div style="font-size:12px; color:#94a3b8;">
-          Calon siswa melihat piringan pada layar dalam jarak ~75 cm. Pilih respon bacaan siswa pada setiap piringan.
+          Pilih respon bacaan siswa untuk setiap piringan.
         </div>
       </div>
       <button type="button" onclick="tutupModalTesIshihara()" style="border:none; background:transparent; font-size:24px; cursor:pointer; color:#94a3b8; line-height:1;">&times;</button>
@@ -1607,7 +1607,7 @@
     cbs.forEach(cb => cb.checked = source.checked);
   }
 
-  const bankSoalEsai = @json($setting->soalEsai);
+  const bankSoalEsai = @json($setting->soalEsai()->orderBy('nomor_urut')->get());
 
   // Koreksi Esai Popup Fill
   function bukaModalKoreksi(ujian, pendaftar) {
@@ -1646,26 +1646,7 @@
         container.insertAdjacentHTML('beforeend', itemHtml);
       });
     } else {
-      for (let num = 31; num <= 35; num++) {
-        const teksJawaban = esaiData[num] || '<span style="color:#ef4444; font-style:italic;">(Peserta tidak mengisi jawaban)</span>';
-        const skorDefault = nilaiTersimpan[num] !== undefined ? nilaiTersimpan[num] : 8;
-        
-        const itemHtml = `
-          <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:14px; margin-bottom:12px;">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-              <strong style="font-size:13px; color:#0f172a;">Soal Esai No. ${num}</strong>
-              <div style="display:flex; align-items:center; gap:6px;">
-                <span style="font-size:12px; font-weight:700;">Skor (0 - 10):</span>
-                <input type="number" name="nilai_esai_${num}" min="0" max="10" step="0.5" value="${skorDefault}" required class="form-control form-control-sm" style="width:70px; font-weight:800; text-align:center;">
-              </div>
-            </div>
-            <div style="background:#ffffff; border:1px solid #cbd5e1; border-radius:8px; padding:10px; font-size:12.5px; color:#1e293b; white-space:pre-wrap; max-height:140px; overflow-y:auto;">
-              ${teksJawaban}
-            </div>
-          </div>
-        `;
-        container.insertAdjacentHTML('beforeend', itemHtml);
-      }
+      container.innerHTML = '<div style="padding:20px; text-align:center; color:#64748b; font-size:13px;">Bank soal esai belum diinput. Tambahkan soal esai di tab Pengaturan terlebih dahulu.</div>';
     }
 
     document.getElementById('modalKoreksi').style.display = 'flex';
@@ -1794,7 +1775,7 @@
   }
 
   function konfirmasiResetMateri() {
-    if (confirm('Apakah Anda yakin ingin mengembalikan materi pertanyaan & rubrik wawancara ke template standar juknis sekolah? Perubahan khusus yang telah dibuat akan dihapus.')) {
+    if (confirm('Reset materi wawancara ke template standar? Perubahan yang ada akan hilang.')) {
       document.getElementById('formResetMateri').submit();
     }
   }
@@ -1996,7 +1977,7 @@
       <div style="background:#eff6ff; border:1px solid #bfdbfe; border-radius:10px; padding:12px 14px; font-size:12px; color:#1e40af; margin-bottom:18px; display:flex; align-items:flex-start; gap:10px;">
         <i class="bi bi-info-circle-fill" style="font-size:16px; margin-top:1px;"></i>
         <div>
-          Panitia dapat mem-plotting guru penguji jauh-jauh hari sebelum tanggal ujian. Saat guru penguji login ke sistem, siswa yang ditugaskan akan langsung muncul di antrean wawancara mereka.
+          Guru penguji yang di-plot akan langsung melihat antrean wawancara saat login.
         </div>
       </div>
 
@@ -2008,7 +1989,7 @@
             <option value="{{ $j->id }}">{{ $j->kode_jurusan }} - {{ $j->nama_jurusan }}</option>
           @endforeach
         </select>
-        <div style="font-size:11px; color:#64748b; margin-top:4px;">Contoh: Pilih RPL jika ingin menugaskan guru penguji khusus untuk jurusan RPL.</div>
+        <div style="font-size:11px; color:#64748b; margin-top:4px;"></div>
       </div>
 
       <div style="margin-bottom:16px;">
@@ -2030,7 +2011,7 @@
           <input type="checkbox" name="timpa_yang_sudah" value="1" style="width:16px; height:16px; accent-color:#2563eb;">
           <span>Timpa siswa yang sebelumnya sudah ditugaskan ke guru lain</span>
         </label>
-        <div style="font-size:11px; color:#94a3b8; margin-left:24px; margin-top:2px;">Secara default, plotting hanya diterapkan pada siswa yang <em>Belum Ditunjuk</em>.</div>
+        <div style="font-size:11px; color:#94a3b8; margin-left:24px; margin-top:2px;">Default: hanya siswa yang belum ditunjuk yang akan di-plot.</div>
       </div>
 
       <div style="display:flex; justify-content:flex-end; gap:10px;">
@@ -2069,7 +2050,7 @@
             <option value="{{ $g->id }}">{{ $g->name }} ({{ $jabatanGuru }}{{ $nipGuru ? ' - NIP: '.$nipGuru : '' }})</option>
           @endforeach
         </select>
-        <div style="font-size:11px; color:#64748b; margin-top:4px;">Pilih guru yang akan ditugaskan mewawancarai siswa ini.</div>
+        <div style="font-size:11px; color:#64748b; margin-top:4px;"></div>
       </div>
 
       <div style="display:flex; justify-content:flex-end; gap:10px;">

@@ -46,7 +46,7 @@
   color: var(--text-1, #0f172a);
 }
 
-/* ─── Standarisasi Desain Tabel PPDB 2026 (Konsisten & Bebas Teks Warna-Warni) ─── */
+/* ─── Tabel PPDB ─── */
 .table,
 .ppdb-table {
   width: 100%;
