@@ -65,6 +65,21 @@
       </div>
     @endif
 
+    @if(($isLibur ?? false) && $periode === 'harian')
+      <div class="no-print" style="margin-bottom: 14px; background: #fffbeb; border: 1.5px solid #fde68a; border-radius: var(--r-sm); padding: 12px 16px; color: #92400e; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; font-size: 13px;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <i class="bi bi-calendar-x-fill text-warning" style="font-size: 20px;"></i>
+          <div>
+            <strong>Hari Libur / Akhir Pekan ({{ \Carbon\Carbon::parse($tanggal)->translatedFormat('l, d F Y') }}):</strong>
+            <span>{{ $liburDetail?->keterangan ?? (\App\Models\HariLibur::isWeekend($tanggal) ? 'Hari libur akhir pekan sekolah. Tidak ada jadwal kegiatan belajar mengajar / presensi reguler.' : 'Hari libur sekolah.') }}</span>
+          </div>
+        </div>
+        <span class="badge" style="background: #fef3c7; color: #b45309; border: 1px solid #fde68a; font-weight: 800; font-size: 11px; padding: 4px 10px; border-radius: 20px;">
+          <i class="bi bi-moon-stars-fill"></i> Bebas Presensi
+        </span>
+      </div>
+    @endif
+
     <!-- ═══════════════════════════════════════════════════════════════════ -->
     <!-- KOP SURAT DINAS RESMI (PRINT / PDF ONLY) -->
     <!-- ═══════════════════════════════════════════════════════════════════ -->
@@ -994,9 +1009,15 @@
                 </tr>
               @empty
                 <tr>
-                  <td colspan="9" style="text-align:center; padding:30px; color:var(--text-3);">
-                    <i class="bi bi-inbox" style="font-size:24px; display:block; margin-bottom:6px;"></i>
-                    Tidak ada data presensi ditemukan untuk filter dan periode ini.
+                  <td colspan="9" style="text-align:center; padding:36px 20px; color:var(--text-3);">
+                    @if(($isLibur ?? false) && $periode === 'harian')
+                      <i class="bi bi-calendar-x" style="font-size:28px; display:block; margin-bottom:8px; color:#d97706;"></i>
+                      <strong style="color:var(--text); font-size:13.5px; display:block; margin-bottom:4px;">Hari Libur Sekolah / Akhir Pekan</strong>
+                      <span style="font-size:12px; color:var(--text-2);">Tanggal {{ \Carbon\Carbon::parse($tanggal)->translatedFormat('l, d F Y') }} adalah hari libur sekolah, sehingga tidak ada catatan presensi yang dicatat.</span>
+                    @else
+                      <i class="bi bi-inbox" style="font-size:24px; display:block; margin-bottom:6px;"></i>
+                      Tidak ada data presensi ditemukan untuk filter dan periode ini.
+                    @endif
                   </td>
                 </tr>
               @endforelse

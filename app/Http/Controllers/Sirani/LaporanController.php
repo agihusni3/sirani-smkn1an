@@ -332,8 +332,11 @@ class LaporanController extends Controller
         $totalAlpha     = (int)($statsRaw->total_alpha ?? 0);
         $totalBolos     = (int)($statsRaw->total_bolos ?? 0);
 
-        // Harmonisasikan perhitungan Harian Hari Ini dengan Meja Piket
-        if ($periode === 'harian' && $tanggal === Carbon::today()->toDateString()) {
+        $isLibur = ($periode === 'harian') ? \App\Models\HariLibur::isLibur($tanggal) : false;
+        $liburDetail = ($periode === 'harian') ? \App\Models\HariLibur::getLiburHariIni($tanggal) : null;
+
+        // Harmonisasikan perhitungan Harian Hari Ini dengan Meja Piket (hanya pada hari aktif sekolah, bukan hari libur)
+        if ($periode === 'harian' && $tanggal === Carbon::today()->toDateString() && !$isLibur) {
             if ($kategori === 'siswa') {
                 if ($rombelId) {
                     $totalTarget = Siswa::where('status', 'aktif')
@@ -426,7 +429,9 @@ class LaporanController extends Controller
             'waliRombelNama',
             'status',
             'search',
-            'sekolah'
+            'sekolah',
+            'isLibur',
+            'liburDetail'
         ));
     }
 
