@@ -319,6 +319,23 @@
     .table-data td.text-center {
       text-align: center;
     }
+    .table-data th.col-stat,
+    .table-data td.col-stat {
+      padding: 3px 1px !important;
+      font-size: 7.5pt;
+      text-align: center;
+      line-height: 1.15;
+      color: #000000;
+    }
+    .table-data th.col-name,
+    .table-data td.col-name {
+      padding: 4px 6px !important;
+      font-size: 8.5pt !important;
+      text-align: left;
+      line-height: 1.25;
+      color: #000000;
+      font-weight: 700;
+    }
 
     /* LEMBAR TANDA TANGAN */
     .ttd-container {
@@ -455,38 +472,38 @@
       <table class="table-data">
         <thead>
           <tr>
-            <th rowspan="2" style="width:4%;">No</th>
-            <th rowspan="2" style="width:12%;">{{ $kategori === 'siswa' ? 'NISN' : 'NIP' }}</th>
-            <th rowspan="2">Nama Lengkap</th>
-            <th rowspan="2" style="width:13%; text-align:center;">{{ $kategori === 'siswa' ? 'Kelas' : 'Jabatan' }}</th>
-            <th colspan="6">Kehadiran &amp; Ketidakhadiran</th>
-            <th rowspan="2" style="width:7%; text-align:center;">Total</th>
-            <th rowspan="2" style="width:7%; text-align:center;">% Hadir</th>
+            <th rowspan="2" style="width:3.5%; padding:3px 1px; font-size:7.5pt;">No</th>
+            <th rowspan="2" style="width:10%; padding:3px 2px; font-size:7.5pt;">{{ $kategori === 'siswa' ? 'NISN' : 'NIP' }}</th>
+            <th rowspan="2" class="col-name" style="width:47%;">Nama Lengkap</th>
+            <th rowspan="2" style="width:8.5%; text-align:center; padding:3px 2px; font-size:7.5pt;">{{ $kategori === 'siswa' ? 'Kelas' : 'Jabatan' }}</th>
+            <th colspan="6" style="width:21%; padding:3px 2px; font-size:7.5pt;">Kehadiran &amp; Ketidakhadiran</th>
+            <th rowspan="2" style="width:5%; text-align:center; padding:3px 1px; font-size:7.5pt;">Total</th>
+            <th rowspan="2" style="width:5%; text-align:center; padding:3px 1px; font-size:7.5pt;">% Hadir</th>
           </tr>
           <tr>
-            <th style="width:5%;">H</th>
-            <th style="width:5%;">T</th>
-            <th style="width:5%;">S</th>
-            <th style="width:5%;">I</th>
-            <th style="width:5%;">A</th>
-            <th style="width:5%;">B</th>
+            <th class="col-stat" style="width:3.5%;" title="Hadir Tepat">H</th>
+            <th class="col-stat" style="width:3.5%;" title="Terlambat">T</th>
+            <th class="col-stat" style="width:3.5%;" title="Sakit">S</th>
+            <th class="col-stat" style="width:3.5%;" title="Izin Resmi">I</th>
+            <th class="col-stat" style="width:3.5%;" title="Tanpa Keterangan (Alpha)">A</th>
+            <th class="col-stat" style="width:3.5%;" title="Bolos / Tidak Tap Pulang">B</th>
           </tr>
         </thead>
         <tbody>
           @forelse($rekapData as $r)
             <tr>
-              <td class="text-center">{{ $r->no }}</td>
-              <td class="text-center" style="font-family:'JetBrains Mono', monospace; font-weight:700; color:#000000;">{{ $kategori === 'siswa' ? ($r->nisn ?? '-') : $r->nip }}</td>
-              <td><strong>{{ $r->nama }}</strong></td>
-              <td class="text-center" style="font-weight:700; color:#000000;">{{ $kategori === 'siswa' ? $r->rombel : $r->jabatan }}</td>
-              <td class="text-center" style="font-weight:{{ $r->hadir > 0 ? '700' : '400' }}; color:#000000;">{{ $r->hadir }}</td>
-              <td class="text-center" style="font-weight:{{ $r->terlambat > 0 ? '800' : '400' }}; color:#000000;">{{ $r->terlambat }}</td>
-              <td class="text-center" style="font-weight:{{ $r->sakit > 0 ? '700' : '400' }}; color:#000000;">{{ $r->sakit }}</td>
-              <td class="text-center" style="font-weight:{{ $r->izin > 0 ? '700' : '400' }}; color:#000000;">{{ $r->izin }}</td>
-              <td class="text-center" style="font-weight:{{ $r->alpha > 0 ? '800' : '400' }}; color:#000000;">{{ $r->alpha }}</td>
-              <td class="text-center" style="font-weight:{{ $r->bolos > 0 ? '800' : '400' }}; color:#000000;">{{ $r->bolos }}</td>
-              <td class="text-center" style="font-weight:700; color:#000000;">{{ $r->total_hari }}</td>
-              <td class="text-center" style="font-weight:800; color:#000000;">{{ $r->persen }}%</td>
+              <td class="text-center" style="padding:3px 1px; font-size:7.5pt;">{{ $r->no }}</td>
+              <td class="text-center" style="font-family:'JetBrains Mono', monospace; font-size:7pt; font-weight:700; color:#000000; padding:3px 2px; letter-spacing:-0.2px;">{{ $kategori === 'siswa' ? ($r->nisn ?? '-') : $r->nip }}</td>
+              <td class="col-name">{{ $r->nama }}</td>
+              <td class="text-center" style="font-weight:700; color:#000000; padding:3px 2px; font-size:7.5pt;">{{ $kategori === 'siswa' ? $r->rombel : $r->jabatan }}</td>
+              <td class="col-stat" style="font-weight:{{ $r->hadir > 0 ? '700' : '400' }};">{{ $r->hadir }}</td>
+              <td class="col-stat" style="font-weight:{{ $r->terlambat > 0 ? '800' : '400' }};">{{ $r->terlambat }}</td>
+              <td class="col-stat" style="font-weight:{{ $r->sakit > 0 ? '700' : '400' }};">{{ $r->sakit }}</td>
+              <td class="col-stat" style="font-weight:{{ $r->izin > 0 ? '700' : '400' }};">{{ $r->izin }}</td>
+              <td class="col-stat" style="font-weight:{{ $r->alpha > 0 ? '800' : '400' }};">{{ $r->alpha }}</td>
+              <td class="col-stat" style="font-weight:{{ $r->bolos > 0 ? '800' : '400' }};">{{ $r->bolos }}</td>
+              <td class="col-stat" style="font-weight:700;">{{ $r->total_hari }}</td>
+              <td class="col-stat" style="font-weight:800;">{{ $r->persen }}%</td>
             </tr>
           @empty
             <tr>
@@ -500,15 +517,15 @@
       <table class="table-data">
         <thead>
           <tr>
-            <th style="width:4%;">No</th>
-            <th style="width:9%;">Tanggal</th>
-            <th style="width:13%;">{{ $kategori === 'siswa' ? 'NISN' : 'NIP' }}</th>
-            <th style="width:22%;">Nama Lengkap</th>
-            <th style="width:10%; text-align:center;">{{ $kategori === 'siswa' ? 'Kelas' : 'Jabatan' }}</th>
-            <th style="width:9%;">Status</th>
-            <th style="width:7%;">Masuk</th>
-            <th style="width:7%;">Pulang</th>
-            <th style="width:19%;">Alasan / Keterangan</th>
+            <th style="width:3.5%; padding:3px 1px; font-size:7.5pt;">No</th>
+            <th style="width:8.5%; padding:3px 2px; font-size:7.5pt;">Tanggal</th>
+            <th style="width:10%; padding:3px 2px; font-size:7.5pt;">{{ $kategori === 'siswa' ? 'NISN' : 'NIP' }}</th>
+            <th class="col-name" style="width:36%;">Nama Lengkap</th>
+            <th style="width:8.5%; text-align:center; padding:3px 2px; font-size:7.5pt;">{{ $kategori === 'siswa' ? 'Kelas' : 'Jabatan' }}</th>
+            <th style="width:8%; padding:3px 2px; font-size:7.5pt;">Status</th>
+            <th style="width:6.5%; padding:3px 1px; font-size:7.5pt;">Masuk</th>
+            <th style="width:6.5%; padding:3px 1px; font-size:7.5pt;">Pulang</th>
+            <th style="width:12.5%; padding:3px 4px; font-size:7.5pt;">Alasan / Keterangan</th>
           </tr>
         </thead>
         <tbody>
@@ -522,7 +539,7 @@
               <td class="text-center" style="font-family:'JetBrains Mono', monospace; font-weight:700; color:#000000; font-size:7.5pt;">
                 {{ $kategori === 'siswa' ? ($lap->siswaRombel->siswa->nisn ?? ($lap->siswa->nisn ?? '-')) : ($lap->guru->nip ?? '-') }}
               </td>
-              <td style="word-break:break-word;"><strong>{{ $kategori === 'siswa' ? ($lap->siswaRombel->siswa->nama ?? ($lap->siswa->nama ?? '-')) : ($lap->guru->nama ?? '-') }}</strong></td>
+              <td class="col-name">{{ $kategori === 'siswa' ? ($lap->siswaRombel->siswa->nama ?? ($lap->siswa->nama ?? '-')) : ($lap->guru->nama ?? '-') }}</td>
               <td class="text-center" style="font-weight:700; color:#000000;">{{ $kategori === 'siswa' ? ($lap->siswaRombel->rombel->nama_rombel ?? ($lap->siswa->siswaRombels->first()?->rombel?->nama_rombel ?? '-')) : ($lap->guru->jabatan ?? '-') }}</td>
               <td class="text-center" style="font-weight:800; color:#000000;">
                 {{ strtoupper($lap->status) }}
