@@ -527,7 +527,7 @@
     <!-- Header Instansi Kop 2 Logo Resmi -->
     <div class="cert-kop-block" id="certKopBlock" style="{{ $showKop ? 'display:flex;' : 'display:none;' }}; justify-content:space-between; align-items:center; width:100%; padding:0 24px 8px 24px; box-sizing:border-box;">
       <div style="width:52px; height:56px; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
-        <img src="{{ $sekolah->logo_provinsi_url ?? '/img/logo_prov_lampung.png' }}" alt="Logo Provinsi Lampung" class="cert-logo cert-logo-prov" onerror="if(!this.dataset.fallback){this.dataset.fallback=1;this.src='/img/logo_prov_lampung.png';}else if(this.dataset.fallback==1){this.dataset.fallback=2;this.src='/lampung.png';}" />
+        <img src="{{ $sekolah->logo_provinsi_url ?? '/img/logo_prov_lampung.png' }}" alt="Logo Provinsi Lampung" class="cert-logo cert-logo-prov" onerror="if(!this.dataset.fallback){this.dataset.fallback=1;this.src='/img/logo_prov_lampung.png';}else if(this.dataset.fallback==1){this.dataset.fallback=2;this.src='/img/lampung.png';}" />
       </div>
       <div class="cert-kop-text" style="flex:1;">
         <h3>{{ $sekolah->nama_instansi_atas ?: 'PEMERINTAH PROVINSI LAMPUNG' }} &bull; {{ $sekolah->nama_dinas ?: 'DINAS PENDIDIKAN DAN KEBUDAYAAN' }}</h3>

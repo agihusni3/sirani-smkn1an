@@ -366,6 +366,10 @@
       text-decoration: underline;
       color: #000000;
     }
+    body.mode-ttd-digital .ttd-digital-only { display: flex !important; }
+    body.mode-ttd-digital .ttd-basah-only { display: none !important; }
+    body.mode-ttd-basah .ttd-digital-only { display: none !important; }
+    body.mode-ttd-basah .ttd-basah-only { display: block !important; }
 
     @media print {
       @page {
@@ -440,6 +444,15 @@
     @endif
 
     <div class="btn-action-group">
+      <div style="display:flex; align-items:center; gap:4px; background:rgba(255,255,255,0.06); padding:3px 6px; border-radius:8px; border:1px solid rgba(255,255,255,0.15);">
+        <span style="font-size:11px; color:#cbd5e1; font-weight:700; margin-right:4px;">Pengesahan:</span>
+        <button type="button" id="btnTtdDigital" onclick="switchTtdMode('digital')" style="background:#0284c7; color:#fff; border:none; padding:6px 10px; border-radius:6px; font-weight:700; font-size:11.5px; cursor:pointer; display:inline-flex; align-items:center; gap:5px; transition:all 0.2s;">
+          <i class="bi bi-qr-code"></i> TTD Digital (QR)
+        </button>
+        <button type="button" id="btnTtdBasah" onclick="switchTtdMode('basah')" style="background:transparent; color:#94a3b8; border:none; padding:6px 10px; border-radius:6px; font-weight:700; font-size:11.5px; cursor:pointer; display:inline-flex; align-items:center; gap:5px; transition:all 0.2s;">
+          <i class="bi bi-pen"></i> TTD Basah
+        </button>
+      </div>
       <a href="{{ url('/laporan') }}" class="btn-back">
         <i class="bi bi-arrow-left"></i> Kembali ke Filter
       </a>
@@ -584,23 +597,99 @@
       <em>* Dokumen ini dicetak otomatis dari SIRANI (Sistem Informasi Responsif Absensi &amp; Penegakan Disiplin) SMKN 1 Air Naningan pada {{ \Carbon\Carbon::now()->translatedFormat('d F Y, H:i') }} WIB.</em>
     </div>
 
-    {{-- TANDA TANGAN PENGESAHAN --}}
+        {{-- TANDA TANGAN PENGESAHAN (KEDUA PIHAK MENDUKUNG TTD DIGITAL & TTD BASAH) --}}
+    @php
+      $namaKepsek = $sekolah->nama_kepala_sekolah ?: 'Aprida, S.Si.';
+      $nipKepsek = $sekolah->nip_kepala_sekolah ?: '197904172008012019';
+      $jabatanKepsek = 'Kepala Sekolah';
+
+      if ($kategori === 'siswa' && $rombel) {
+          $jabatanPihak2 = 'Wali Kelas ' . $rombel->nama_rombel;
+          $namaPihak2 = $rombel->waliKelas ? $rombel->waliKelas->nama : (auth()->user()->name ?? 'Wali Kelas ' . $rombel->nama_rombel);
+          $nipPihak2 = $rombel->waliKelas && $rombel->waliKelas->nip ? 'NIP. ' . $rombel->waliKelas->nip : 'NIP/NUPTK. -';
+      } elseif ($kategori === 'guru') {
+          $jabatanPihak2 = 'Koordinator Kepegawaian & GTK';
+          $namaPihak2 = auth()->user()->name ?? 'Petugas Kepegawaian';
+          $nipPihak2 = 'NIP/NUPTK. -';
+      } else {
+          $jabatanPihak2 = 'Koordinator Piket & Kesiswaan';
+          $namaPihak2 = auth()->user()->name ?? 'Petugas Piket SMKN 1 AN';
+          $nipPihak2 = 'NIP/NUPTK. -';
+      }
+
+      $nowStr = \Carbon\Carbon::now()->translatedFormat('d/m/Y H:i') . ' WIB';
+
+      $qrPayloadKepsek = "DOKUMEN RESMI TTE SMKN 1 AIR NANINGAN\n"
+          . "========================================\n"
+          . "Dokumen  : Rekapitulasi Presensi " . strtoupper($kategori) . "\n"
+          . "Periode  : " . $periodeText . "\n"
+          . "Penandatangan:\n"
+          . "  Nama   : " . $namaKepsek . "\n"
+          . "  Jabatan: " . $jabatanKepsek . "\n"
+          . "  NIP    : " . $nipKepsek . "\n"
+          . "Status   : SAH / TERVERIFIKASI TTE SISTEM\n"
+          . "Waktu    : " . $nowStr . "\n"
+          . "Sistem   : SIRANI SMKN 1 Air Naningan";
+
+      $cleanNip2 = str_replace(['NIP. ', 'NIP/NUPTK. '], '', $nipPihak2);
+      $qrPayloadPihak2 = "DOKUMEN RESMI TTE SMKN 1 AIR NANINGAN\n"
+          . "========================================\n"
+          . "Dokumen  : Rekapitulasi Presensi " . strtoupper($kategori) . "\n"
+          . "Periode  : " . $periodeText . "\n"
+          . "Penandatangan:\n"
+          . "  Nama   : " . $namaPihak2 . "\n"
+          . "  Jabatan: " . $jabatanPihak2 . "\n"
+          . "  NIP    : " . $cleanNip2 . "\n"
+          . "Status   : SAH / TERVERIFIKASI TTE SISTEM\n"
+          . "Waktu    : " . $nowStr . "\n"
+          . "Sistem   : SIRANI SMKN 1 Air Naningan";
+    @endphp
+
     <div class="ttd-container">
       <table class="ttd-table">
         <tr>
+          {{-- PIHAK 1: KEPALA SEKOLAH --}}
           <td>
             Mengetahui,<br />
             Kepala SMK Negeri 1 Air Naningan
-            <div class="ttd-space"></div>
-            <div class="ttd-name">{{ $sekolah->nama_kepala_sekolah ?? 'Drs. H. Ahmad Sudrajat, M.Pd.' }}</div>
-            <div>NIP. {{ $sekolah->nip_kepala_sekolah ?? '19750510 200003 1 005' }}</div>
+
+            {{-- TTD DIGITAL (QR CODE RESMI) --}}
+            <div class="ttd-digital-only" style="display:flex; flex-direction:column; align-items:center; justify-content:center; margin:6px auto 4px auto;">
+              <div style="background:#ffffff; border:1px solid #000000; padding:2px; border-radius:4px; display:inline-block; box-shadow:0 1px 3px rgba(0,0,0,0.06);">
+                {!! \App\Services\BarcodeService::getBarcode2DSvg($qrPayloadKepsek, 56) !!}
+              </div>
+              <div style="font-size:6.5pt; font-family:'JetBrains Mono', monospace; font-weight:700; color:#000000; margin-top:2px; letter-spacing:0.2px;">
+                TTE TERVERIFIKASI
+              </div>
+            </div>
+
+            {{-- TTD BASAH (MANUAL) --}}
+            <div class="ttd-basah-only ttd-space" style="display:none;"></div>
+
+            <div class="ttd-name">{{ $namaKepsek }}</div>
+            <div>NIP. {{ $nipKepsek }}</div>
           </td>
+
+          {{-- PIHAK 2: WALI KELAS / KOORDINATOR --}}
           <td>
-            Air Naningan, {{ \Carbon\Carbon::now()->translatedFormat('d F Y') }}<br />
-            Koordinator Piket &amp; Kesiswaan
-            <div class="ttd-space"></div>
-            <div class="ttd-name">{{ auth()->user()->name ?? 'Petugas Piket SMKN 1 AN' }}</div>
-            <div>NIP/NUPTK. -</div>
+            {{ $sekolah->kecamatan ?? 'Air Naningan' }}, {{ \Carbon\Carbon::now()->translatedFormat('d F Y') }}<br />
+            {{ $jabatanPihak2 }}
+
+            {{-- TTD DIGITAL (QR CODE RESMI) --}}
+            <div class="ttd-digital-only" style="display:flex; flex-direction:column; align-items:center; justify-content:center; margin:6px auto 4px auto;">
+              <div style="background:#ffffff; border:1px solid #000000; padding:2px; border-radius:4px; display:inline-block; box-shadow:0 1px 3px rgba(0,0,0,0.06);">
+                {!! \App\Services\BarcodeService::getBarcode2DSvg($qrPayloadPihak2, 56) !!}
+              </div>
+              <div style="font-size:6.5pt; font-family:'JetBrains Mono', monospace; font-weight:700; color:#000000; margin-top:2px; letter-spacing:0.2px;">
+                TTE TERVERIFIKASI
+              </div>
+            </div>
+
+            {{-- TTD BASAH (MANUAL) --}}
+            <div class="ttd-basah-only ttd-space" style="display:none;"></div>
+
+            <div class="ttd-name">{{ $namaPihak2 }}</div>
+            <div>{{ $nipPihak2 }}</div>
           </td>
         </tr>
       </table>
@@ -610,6 +699,41 @@
   </div>
 
   <script>
+    function switchTtdMode(mode) {
+      const btnDig = document.getElementById('btnTtdDigital');
+      const btnBas = document.getElementById('btnTtdBasah');
+      if (mode === 'basah') {
+        document.body.classList.remove('mode-ttd-digital');
+        document.body.classList.add('mode-ttd-basah');
+        if (btnBas) {
+          btnBas.style.background = '#0284c7';
+          btnBas.style.color = '#ffffff';
+        }
+        if (btnDig) {
+          btnDig.style.background = 'transparent';
+          btnDig.style.color = '#94a3b8';
+        }
+        localStorage.setItem('sirani_doc_ttd_mode', 'basah');
+      } else {
+        document.body.classList.remove('mode-ttd-basah');
+        document.body.classList.add('mode-ttd-digital');
+        if (btnDig) {
+          btnDig.style.background = '#0284c7';
+          btnDig.style.color = '#ffffff';
+        }
+        if (btnBas) {
+          btnBas.style.background = 'transparent';
+          btnBas.style.color = '#94a3b8';
+        }
+        localStorage.setItem('sirani_doc_ttd_mode', 'digital');
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      const savedMode = localStorage.getItem('sirani_doc_ttd_mode') || 'digital';
+      switchTtdMode(savedMode);
+    });
+
     function gantiRombelCetak(rombelId) {
       const url = new URL(window.location.href);
       if (rombelId) {

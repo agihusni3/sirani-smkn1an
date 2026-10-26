@@ -12,7 +12,7 @@
       <td style="width:{{ $colLogoWidth }}; text-align:center; vertical-align:middle; border:none !important; padding:0;">
         <img src="{{ $sekolahKop->logo_provinsi_url }}" alt="Logo Provinsi Lampung" 
              style="height:{{ $logoProvHeight }}; width:auto; max-width:{{ $colLogoWidth }}; object-fit:contain; display:block; margin:0 auto;" 
-             onerror="if(!this.dataset.fallback){this.dataset.fallback=1;this.src='/img/logo_prov_lampung.png';}else if(this.dataset.fallback==1){this.dataset.fallback=2;this.src='/lampung.png';}" />
+             onerror="if(!this.dataset.fallback){this.dataset.fallback=1;this.src='/img/logo_prov_lampung.png';}else if(this.dataset.fallback==1){this.dataset.fallback=2;this.src='/img/lampung.png';}" />
       </td>
 
       {{-- TEKS KOP DINAS PUSAT --}}
