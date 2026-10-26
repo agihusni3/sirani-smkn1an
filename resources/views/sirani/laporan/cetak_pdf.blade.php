@@ -416,6 +416,29 @@
       <span>Laporan Rekapitulasi Presensi {{ strtoupper($kategori) }}</span>
       <span class="badge-a4">Format A4 Portrait</span>
     </div>
+
+    @if($kategori === 'siswa' && isset($rombels) && $rombels->isNotEmpty())
+      <div class="print-rombel-filter" style="display:flex; align-items:center; gap:8px;">
+        <label for="pilihRombelCetak" style="color:#CBD5E1; font-size:12px; font-weight:700; white-space:nowrap; display:inline-flex; align-items:center; gap:5px;">
+          <i class="bi bi-funnel-fill" style="color:#FACC15;"></i> Pilih Kelas:
+        </label>
+        @if($isWaliKelas ?? false)
+          <select id="pilihRombelCetak" disabled style="background:#0F172A; color:#94A3B8; border:1px solid #334155; padding:6px 12px; border-radius:6px; font-size:12px; font-weight:700; outline:none; cursor:not-allowed;">
+            <option value="{{ $rombelId }}">{{ $rombel->nama_rombel ?? 'Kelas Anda' }} (Wali Kelas)</option>
+          </select>
+        @else
+          <select id="pilihRombelCetak" onchange="gantiRombelCetak(this.value)" style="background:#0F172A; color:#FFFFFF; border:1.5px solid #FACC15; padding:6px 14px; border-radius:6px; font-size:12.5px; font-weight:700; outline:none; cursor:pointer; box-shadow:0 0 10px rgba(250, 204, 21, 0.2);">
+            <option value="">-- Semua Kelas / Rombel --</option>
+            @foreach($rombels as $r)
+              <option value="{{ $r->id }}" {{ (string)$rombelId === (string)$r->id ? 'selected' : '' }}>
+                {{ $r->nama_rombel }}
+              </option>
+            @endforeach
+          </select>
+        @endif
+      </div>
+    @endif
+
     <div class="btn-action-group">
       <a href="{{ url('/laporan') }}" class="btn-back">
         <i class="bi bi-arrow-left"></i> Kembali ke Filter
@@ -445,24 +468,24 @@
         <td style="width:14%;"><strong>Kategori</strong></td>
         <td style="width:1%;">:</td>
         <td style="width:43%;">{{ $kategori === 'siswa' ? 'Peserta Didik (Siswa)' : 'Tenaga Pendidik & Kependidikan (Guru/Staf)' }}</td>
-        @if($kategori === 'siswa' && $rombel)
+        @if($kategori === 'siswa')
           <td style="width:15%;"><strong>Rombel / Kelas</strong></td>
           <td style="width:1%;">:</td>
-          <td style="width:26%;">{{ $rombel->nama_rombel }}</td>
+          <td style="width:26%;"><strong>{{ $rombel ? $rombel->nama_rombel : 'Semua Kelas / Rombel' }}</strong></td>
         @else
           <td style="width:15%;"><strong>Tahun Pelajaran</strong></td>
           <td style="width:1%;">:</td>
           <td style="width:26%;">2026/2027</td>
         @endif
       </tr>
-      @if($kategori === 'siswa' && $rombel)
+      @if($kategori === 'siswa')
         <tr>
           <td style="width:14%;"><strong>Tahun Pelajaran</strong></td>
           <td style="width:1%;">:</td>
           <td style="width:43%;">2026/2027</td>
           <td style="width:15%;"><strong>Wali Kelas</strong></td>
           <td style="width:1%;">:</td>
-          <td style="width:26%;">{{ $rombel->waliKelas->nama ?? '-' }}</td>
+          <td style="width:26%;">{{ $rombel ? ($rombel->waliKelas->nama ?? '-') : '-' }}</td>
         </tr>
       @endif
     </table>
@@ -586,5 +609,16 @@
   </div>
   </div>
 
+  <script>
+    function gantiRombelCetak(rombelId) {
+      const url = new URL(window.location.href);
+      if (rombelId) {
+        url.searchParams.set('rombel_id', rombelId);
+      } else {
+        url.searchParams.delete('rombel_id');
+      }
+      window.location.href = url.toString();
+    }
+  </script>
 </body>
 </html>

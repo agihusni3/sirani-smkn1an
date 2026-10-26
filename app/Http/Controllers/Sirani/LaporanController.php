@@ -795,6 +795,12 @@ class LaporanController extends Controller
             $rombel = Rombel::with(['jurusan', 'waliKelas'])->find($rombelId);
         }
 
+        if ($isWaliKelas && $waliRombelId) {
+            $rombels = Rombel::where('id', $waliRombelId)->get();
+        } else {
+            $rombels = $this->sortRombelByTingkat(Rombel::all());
+        }
+
         if ($kategori === 'siswa') {
             $query->whereHas('siswa', fn($q) => $q->where('status', 'aktif'));
             $query->with(['siswa.siswaRombels.rombel', 'siswaRombel.siswa', 'siswaRombel.rombel']);
@@ -920,6 +926,10 @@ class LaporanController extends Controller
             'startDate',
             'endDate',
             'rombel',
+            'rombelId',
+            'rombels',
+            'isWaliKelas',
+            'waliRombelId',
             'laporans',
             'rekapData',
             'sekolah',
