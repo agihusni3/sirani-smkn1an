@@ -181,10 +181,10 @@ class PengaturanSekolah extends Model
      */
     public function getLogoProvinsiUrlAttribute(): string
     {
-        if (!empty($this->logo_provinsi) && Storage::disk('public')->exists($this->logo_provinsi)) {
-            return asset('storage/' . $this->logo_provinsi);
+        if (!empty($this->logo_provinsi) && !str_contains($this->logo_provinsi, 'Kegi6Kv3') && Storage::disk('public')->exists($this->logo_provinsi)) {
+            return asset('storage/' . $this->logo_provinsi) . '?v=20261026c';
         }
-        return asset('img/logo_prov_lampung.png');
+        return asset('img/logo_prov_lampung.png') . '?v=20261026c';
     }
 
     /**

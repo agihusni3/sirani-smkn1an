@@ -161,7 +161,7 @@
 
               <div style="display:flex; align-items:center; gap:16px;">
                 <div id="logo_prov_preview_wrap" style="width:72px; height:72px; border-radius:12px; border:1.5px solid rgba(0,0,0,0.12); background:#ffffff; display:flex; align-items:center; justify-content:center; overflow:hidden; flex-shrink:0; padding:6px; box-shadow:0 2px 6px rgba(0,0,0,0.05);">
-                  <img id="logo_prov_preview_img" src="{{ $sekolah->logo_provinsi_url }}" alt="Logo Provinsi" style="max-width:100%; max-height:100%; object-fit:contain;" onerror="if(!this.dataset.fallback){this.dataset.fallback=1;this.src='/img/logo_prov_lampung.png';}else{this.src='/img/lampung.png';}" />
+                  <img id="logo_prov_preview_img" src="{{ $sekolah->logo_provinsi_url }}" alt="Logo Provinsi" style="max-width:100%; max-height:100%; object-fit:contain;" onerror="if(!this.dataset.fallback){this.dataset.fallback=1;this.src='/img/logo_prov_lampung.png?v=20261026c';}else{this.src='/img/lampung.png?v=20261026c';}" />
                 </div>
                 <div style="flex:1; min-width:0;">
                   <input type="file" name="logo_provinsi" id="inputLogoProvinsi" accept="image/png,image/jpeg,image/webp,image/svg+xml" style="display:none;" onchange="handleLogoPreview(this, 'logo_prov_preview_img', 'nama_file_prov')" />

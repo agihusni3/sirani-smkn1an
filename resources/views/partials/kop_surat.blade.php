@@ -8,11 +8,11 @@
 <div class="kop-surat-master" style="width:100%; margin-bottom:{{ $isCompact ? '8px' : '12px' }}; font-family:'Times New Roman', Times, 'Tinos', serif; color:#000;">
   <table style="width:100%; border-collapse:collapse; border:none; margin:0; padding:0; background:transparent;">
     <tr>
-      {{-- LOGO KIRI: PROVINSI LAMPUNG --}}
+      {{-- LOGO KIRI: PROVINSI LAMPUNG (RESMI & UTUH DENGAN CACHE-BUSTER) --}}
       <td style="width:{{ $colLogoWidth }}; text-align:center; vertical-align:middle; border:none !important; padding:0;">
-        <img src="{{ $sekolahKop->logo_provinsi_url }}" alt="Logo Provinsi Lampung" 
+        <img src="{{ asset('img/logo_prov_lampung.png') }}?v=20261026c" alt="Logo Provinsi Lampung" 
              style="height:{{ $logoProvHeight }}; width:auto; max-width:{{ $colLogoWidth }}; object-fit:contain; display:block; margin:0 auto;" 
-             onerror="if(!this.dataset.fallback){this.dataset.fallback=1;this.src='/img/logo_prov_lampung.png';}else if(this.dataset.fallback==1){this.dataset.fallback=2;this.src='/img/lampung.png';}" />
+             onerror="if(!this.dataset.fallback){this.dataset.fallback=1;this.src='/img/lampung.png?v=20261026c';}" />
       </td>
 
       {{-- TEKS KOP DINAS PUSAT --}}
